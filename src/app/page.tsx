@@ -259,16 +259,23 @@ export default function HomePortal() {
                           </div>
 
                           {/* Title with Options (Upselling applied) */}
-                          <h4 className={`
-                            text-sm flex items-center gap-1 transition-colors
-                            ${shop.options?.bold ? 'font-black' : 'font-bold'}
-                            ${shop.options?.blink ? 'animate-blink' : ''}
-                            ${shop.options?.color || 'group-hover:text-pink-500'}
-                          `}>
-                            {shop.name}
-                            {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50" />}
-                            {shop.is_placeholder && <span className="ml-1 text-[10px] font-normal text-gray-400">(상호비공개)</span>}
-                          </h4>
+                          <div className="flex flex-wrap items-center gap-1">
+                            {shop.options?.icons?.map((icon, idx) => (
+                              <span key={idx} className="text-[9px] px-1 rounded-sm font-bold bg-red-100 text-red-600 border border-red-200">
+                                {icon}
+                              </span>
+                            ))}
+                            <h4 className={`
+                                text-sm flex items-center gap-1 transition-colors
+                                ${shop.options?.bold ? 'font-black' : 'font-bold'}
+                                ${shop.options?.blink ? 'animate-blink' : ''}
+                                ${shop.options?.color || 'group-hover:text-pink-500'}
+                              `}>
+                              {shop.name}
+                              {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50" />}
+                              {shop.is_placeholder && <span className="ml-1 text-[10px] font-normal text-gray-400">(상호비공개)</span>}
+                            </h4>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
