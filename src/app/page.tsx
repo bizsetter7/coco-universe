@@ -21,6 +21,8 @@ interface Shop {
   is_placeholder: boolean;
   is_premium?: boolean;
   is_verified?: boolean;
+  tier?: 'grand' | 'premium' | 'special' | 'basic';
+  updatedAt?: string;
 }
 
 export default function HomePortal() {
@@ -36,13 +38,30 @@ export default function HomePortal() {
       ? shops
       : shops.filter(shop => shop.region.includes(selectedRegion));
 
-    // Sort logic: Premium first, then Verified, then normal
+    // Weight map for Tiers
+    const tierWeight = {
+      grand: 100,
+      premium: 50,
+      special: 20,
+      basic: 0
+    };
+
     return [...result].sort((a, b) => {
-      if (a.is_premium && !b.is_premium) return -1;
-      if (!a.is_premium && b.is_premium) return 1;
+      // 1. Tier Check (Migrate old data on the fly)
+      const tierA = tierWeight[a.tier || (a.is_premium ? 'grand' : 'basic')];
+      const tierB = tierWeight[b.tier || (b.is_premium ? 'grand' : 'basic')];
+
+      if (tierA !== tierB) return tierB - tierA; // Higher tier first
+
+      // 2. Verified Check (Second priority)
       if (a.is_verified && !b.is_verified) return -1;
       if (!a.is_verified && b.is_verified) return 1;
-      return 0;
+
+      // 3. Jump (UpdatedAt) Check (Desc)
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+
+      return dateB - dateA; // Recent jump first
     });
   }, [selectedRegion, shops]);
 
