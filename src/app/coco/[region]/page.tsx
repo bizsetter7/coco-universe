@@ -1,0 +1,211 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home } from 'lucide-react';
+import shopsData from '@/lib/data/shops.json';
+import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
+
+interface Shop {
+    name: string;
+    region: string;
+    phone: string;
+    kakao: string;
+    telegram: string;
+    pay: string;
+    workType: string;
+    url: string;
+    site: string;
+    id: string;
+    is_placeholder: boolean;
+    is_premium?: boolean;
+    is_verified?: boolean;
+}
+
+// Next.js 15 requires params to be handled as a Promise
+type Params = Promise<{ region: string }>;
+
+export async function generateStaticParams() {
+    return seoRegionsMaster.slice(0, 100).map((region) => ({
+        region: region.id,
+    }));
+}
+
+export async function generateMetadata(props: { params: Params }): Promise<Metadata> {
+    const { region: regionId } = await props.params;
+    const region = seoRegionsMaster.find((r) => r.id === regionId) || { mainRegion: regionId.replace(/-/g, ' ') };
+    const regionName = region.mainRegion;
+
+    return {
+        title: `${regionName} 구인구직 - 1위 여성알바 코코 유니버스`,
+        description: `${regionName} 지역 고소득 알바, 룸알바, 노래방알바 실시간 공고 보유. ${regionName} 업소 상세 정보와 연락처를 확인하세요.`,
+        keywords: `${regionName}알바, ${regionName}룸알바, ${regionName}밤알바, 고소득알바`,
+    };
+}
+
+export default async function RegionPage(props: { params: Params }) {
+    const { region: rawRegionId } = await props.params;
+    const regionId = decodeURIComponent(rawRegionId);
+    const regionData = seoRegionsMaster.find((r) => r.id === regionId);
+    const regionName = regionData ? regionData.mainRegion : regionId.replace(/-/g, ' ');
+
+    const shops = (shopsData as Shop[]).filter(shop => {
+        const cleanRegionName = regionName.trim();
+        const regionParts = cleanRegionName.split(' ');
+
+        // Match if shop region includes the full region name OR major parts (Sido + Gungu)
+        return shop.region.includes(cleanRegionName) ||
+            (regionParts.length >= 2 && shop.region.includes(`${regionParts[0]} ${regionParts[1]}`));
+    });
+
+    const sortedShops = [...shops].sort((a, b) => {
+        if (a.is_premium && !b.is_premium) return -1;
+        if (!a.is_premium && b.is_premium) return 1;
+        if (a.is_verified && !b.is_verified) return -1;
+        if (!a.is_verified && b.is_verified) return 1;
+        return 0;
+    });
+
+    return (
+        <div className="min-h-screen bg-gray-50 pb-20">
+            {/* Header */}
+            <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-1 text-pink-500 font-black">
+                        <Home size={20} />
+                        <span>COCO UNIVERSE</span>
+                    </Link>
+                    <div className="text-sm font-bold text-gray-900">{regionName} 실시간 현황</div>
+                </div>
+            </header>
+
+            <main className="max-w-4xl mx-auto px-4 py-8">
+                {/* Hero Section */}
+                <section className="mb-10 text-center py-10 bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl text-white shadow-xl shadow-rose-200">
+                    <div className="inline-block bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold mb-4">
+                        AI 기반 최적 매칭 시스템 가동 중
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">
+                        {regionName} 지역<br />
+                        실시간 구인 공고 TOP
+                    </h1>
+                    <p className="text-pink-100 text-sm opacity-90">
+                        {regionName}에서 검증된 우수 업소 {shops.length}곳이<br />
+                        당신의 가능성을 기다리고 있습니다.
+                    </p>
+                </section>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-4 mb-10">
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center">
+                            <TrendingUp size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-gray-400">일일 조회수</p>
+                            <p className="text-lg font-bold text-gray-900">1,240+</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-50 text-amber-500 rounded-lg flex items-center justify-center">
+                            <Sparkles size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-gray-400">진행 중인 공고</p>
+                            <p className="text-lg font-bold text-gray-900">{shops.length}개</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-6 flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-gray-900">추천 업소 리스트</h2>
+                    <span className="text-xs text-blue-500 font-bold">인기순</span>
+                </div>
+
+                <div className="space-y-4">
+                    {sortedShops.length > 0 ? (
+                        sortedShops.map((shop, i) => (
+                            <div
+                                key={shop.id || i}
+                                className={`bg-white rounded-2xl p-5 shadow-sm border ${shop.is_premium ? 'border-amber-200 bg-amber-50/20' : 'border-gray-100'} hover:shadow-md transition-all group relative overflow-hidden`}
+                            >
+                                {shop.is_premium && (
+                                    <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-3 py-1 rounded-bl-xl">
+                                        PREMIUM
+                                    </div>
+                                )}
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
+                                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                            <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
+                                                {shop.name}
+                                            </a>
+                                            {shop.is_verified && <CheckCircle2 size={14} className="text-blue-500 fill-blue-50" />}
+                                        </h3>
+                                        <div className="flex items-center gap-1 mt-1 text-gray-400">
+                                            <MapPin size={12} />
+                                            <span className="text-xs">{shop.region}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 mb-4">
+                                    <div className="bg-gray-50 p-2 rounded-lg">
+                                        <p className="text-[10px] text-gray-400 mb-0.5">급여 조건</p>
+                                        <p className="text-xs font-bold text-rose-500">{shop.pay}</p>
+                                    </div>
+                                    <div className="bg-gray-50 p-2 rounded-lg">
+                                        <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
+                                        <p className="text-xs font-bold text-gray-700">{shop.workType}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <a
+                                        href={shop.phone ? `tel:${shop.phone}` : '#'}
+                                        className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                    >
+                                        <Phone size={16} /> 전화상담
+                                    </a>
+                                    <a
+                                        href={shop.kakao ? `https://pf.kakao.com/_` : '#'}
+                                        className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                    >
+                                        <MessageSquare size={16} /> 카톡문의
+                                    </a>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                            <p className="text-gray-400 text-sm">해당 지역의 상세 공고가 업데이트 중입니다.</p>
+                            <Link href="/" className="text-pink-500 font-bold text-sm mt-4 inline-block">전체 공고 보러가기</Link>
+                        </div>
+                    )}
+                </div>
+
+                {/* Bottom CTA */}
+                <div className="mt-12 p-6 bg-gray-900 rounded-3xl text-white text-center">
+                    <h4 className="font-bold mb-2">사장님이신가요?</h4>
+                    <p className="text-xs text-gray-400 mb-6">{regionName} 지역 1위 노출을 지금 시작하세요.</p>
+                    <Link href="/" className="bg-pink-500 text-white px-8 py-3 rounded-full text-sm font-bold inline-block">
+                        3개월 무료 등록하기
+                    </Link>
+                </div>
+            </main>
+
+            {/* Footer Keywords */}
+            <footer className="max-w-4xl mx-auto px-4 py-10 opacity-30">
+                <div className="text-[10px] flex flex-wrap gap-2 justify-center">
+                    <span>{regionName}알바</span>
+                    <span>{regionName}여성알바</span>
+                    <span>{regionName}룸알바</span>
+                    <span>{regionName}노래방알바</span>
+                    <span>{regionName}밤알바</span>
+                </div>
+            </footer>
+        </div>
+    );
+}

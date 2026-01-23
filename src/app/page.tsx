@@ -1,12 +1,50 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
-import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect, useMemo } from 'react';
+import shopsData from '@/lib/data/shops.json';
+import regionsData from '@/lib/data/regions.json';
+
+interface Shop {
+  name: string;
+  region: string;
+  phone: string;
+  kakao: string;
+  telegram: string;
+  pay: string;
+  workType: string;
+  url: string;
+  site: string;
+  id: string;
+  is_placeholder: boolean;
+  is_premium?: boolean;
+  is_verified?: boolean;
+}
 
 export default function HomePortal() {
   const brand = useBrand();
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedRegion, setSelectedRegion] = useState('전체');
+  const [visibleCount, setVisibleCount] = useState(10);
+  const [shops] = useState<Shop[]>(shopsData as Shop[]);
+  const [regions] = useState<string[]>(regionsData as string[]);
+
+  const filteredShops = useMemo(() => {
+    let result = selectedRegion === '전체'
+      ? shops
+      : shops.filter(shop => shop.region.includes(selectedRegion));
+
+    // Sort logic: Premium first, then Verified, then normal
+    return [...result].sort((a, b) => {
+      if (a.is_premium && !b.is_premium) return -1;
+      if (!a.is_premium && b.is_premium) return 1;
+      if (a.is_verified && !b.is_verified) return -1;
+      if (!a.is_verified && b.is_verified) return 1;
+      return 0;
+    });
+  }, [selectedRegion, shops]);
 
   const primaryStyle = { color: brand.primaryColor };
   const primaryBgStyle = { backgroundColor: brand.primaryColor };
@@ -94,13 +132,16 @@ export default function HomePortal() {
 
               {/* 프리미엄 라운지 (여성 타겟 리텐션 도구) */}
               <div className="mt-12">
-                <h3 className="flex items-center gap-2 text-xl font-bold mb-6">
-                  <Sparkles size={20} className="text-amber-500" />
-                  <span>프리미엄 라운지</span>
-                </h3>
+                <div className="flex justify-between items-end mb-6">
+                  <h3 className="flex items-center gap-2 text-xl font-bold">
+                    <Sparkles size={20} className="text-amber-500" />
+                    <span>프리미엄 라운지</span>
+                  </h3>
+                  <Link href="/lounge" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">전체보기 &gt;</Link>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div
-                    onClick={() => setCurrentPage('diet')}
+                  <Link
+                    href="/lounge"
                     className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-green-900/20 to-gray-800 border-green-900/30' : 'bg-gradient-to-br from-green-50 to-white border-green-100'}`}
                   >
                     <div className="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-green-500/20">
@@ -111,10 +152,10 @@ export default function HomePortal() {
                     <div className="flex items-center text-xs font-bold text-green-500">
                       바로가기 <ArrowRight size={14} className="ml-1" />
                     </div>
-                  </div>
+                  </Link>
 
-                  <div
-                    onClick={() => setCurrentPage('mbti')}
+                  <Link
+                    href="/lounge"
                     className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-purple-900/20 to-gray-800 border-purple-900/30' : 'bg-gradient-to-br from-purple-50 to-white border-purple-100'}`}
                   >
                     <div className="bg-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-purple-500/20">
@@ -125,10 +166,10 @@ export default function HomePortal() {
                     <div className="flex items-center text-xs font-bold text-purple-500">
                       테스트 시작 <ArrowRight size={14} className="ml-1" />
                     </div>
-                  </div>
+                  </Link>
 
-                  <div
-                    onClick={() => setCurrentPage('fortune')}
+                  <Link
+                    href="/lounge"
                     className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-amber-900/20 to-gray-800 border-amber-900/30' : 'bg-gradient-to-br from-amber-50 to-white border-amber-100'}`}
                   >
                     <div className="bg-amber-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-amber-500/20">
@@ -139,8 +180,82 @@ export default function HomePortal() {
                     <div className="flex items-center text-xs font-bold text-amber-500">
                       운세 보기 <ArrowRight size={14} className="ml-1" />
                     </div>
-                  </div>
+                  </Link>
                 </div>
+              </div>
+
+              {/* 지역별 구인 공고 (Real Data) */}
+              <div className="mt-12">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="flex items-center gap-2 text-xl font-bold">
+                    <ShoppingBag size={20} className="text-blue-500" />
+                    <span>실시간 채용 공고</span>
+                  </h3>
+                  <select
+                    className={`text-xs p-2 rounded-lg border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                    value={selectedRegion}
+                    onChange={(e) => {
+                      setSelectedRegion(e.target.value);
+                      setVisibleCount(10);
+                    }}
+                  >
+                    <option value="전체">전체 지역</option>
+                    {regions.map(reg => (
+                      <option key={reg} value={reg}>{reg}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-3">
+                  {filteredShops.slice(0, visibleCount).map((shop, i) => (
+                    <div
+                      key={i}
+                      onClick={() => shop.url && window.open(shop.url, '_blank')}
+                      className={`p-4 rounded-xl border flex items-center justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden ${shop.is_premium ? 'bg-amber-50/30 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}
+                    >
+                      {shop.is_premium && (
+                        <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
+                          PREMIUM
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
+                          {shop.site === 'catalba' ? 'C' : shop.site === 'badalba' ? 'B' : shop.site === 'ladyalba' ? 'L' : 'Q'}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <p className="text-[10px] text-gray-400">{shop.region}</p>
+                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                          </div>
+                          <h4 className="font-bold text-sm group-hover:text-pink-500 transition-colors flex items-center gap-1">
+                            {shop.name}
+                            {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50" />}
+                            {shop.is_placeholder && <span className="ml-1 text-[10px] font-normal text-gray-400">(상호비공개)</span>}
+                          </h4>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-red-500 font-bold text-xs mb-1">{shop.pay}</p>
+                        <p className="text-[10px] text-gray-400">{shop.workType}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {visibleCount < filteredShops.length && (
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 20)}
+                    className="w-full mt-6 py-4 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 font-bold text-sm hover:bg-gray-50 transition-colors"
+                  >
+                    공고 더보기 ({filteredShops.length - visibleCount}개 남음)
+                  </button>
+                )}
+
+                {filteredShops.length === 0 && (
+                  <div className="text-center py-20 text-gray-400 text-sm">
+                    해당 지역의 공고가 없습니다.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -228,94 +343,6 @@ export default function HomePortal() {
           </div>
         )}
 
-        {/* 식단 관리 페이지 */}
-        {currentPage === 'diet' && (
-          <div className="max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-right duration-500">
-            <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-              <div className="text-center mb-8">
-                <div className="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Apple size={32} />
-                </div>
-                <h2 className="text-2xl font-black mb-2">프리미엄 식단 관리</h2>
-                <p className="text-gray-500">키와 몸무게를 입력하시면 BMI와 맞춤 식단을 제안합니다.</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold mb-2">신장 (cm)</label>
-                    <input type="number" placeholder="165" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold mb-2">체중 (kg)</label>
-                    <input type="number" placeholder="50" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`} />
-                  </div>
-                </div>
-                <button
-                  style={primaryBgStyle}
-                  className="w-full text-white font-bold py-4 rounded-2xl shadow-lg hover:opacity-90 transition"
-                  onClick={() => alert('BMI 계산 중... 전문 식단 가이드가 곧 공개됩니다!')}
-                >
-                  맞춤형 식단 리포트 받기
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* MBTI 성향 테스트 */}
-        {currentPage === 'mbti' && (
-          <div className="max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-right duration-500">
-            <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-              <div className="text-center mb-8">
-                <div className="bg-purple-100 text-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles size={32} />
-                </div>
-                <h2 className="text-2xl font-black mb-2">컬러 & 직업 성향 테스트</h2>
-                <p className="text-gray-500">나에게 꼭 맞는 직업 환경과 퍼스널 컬러를 찾아보세요.</p>
-              </div>
-              <div className="bg-gray-50 border border-dashed border-gray-300 p-10 rounded-2xl text-center mb-6">
-                <p className="text-gray-400 font-medium">총 12가지 문항이 준비되어 있습니다.</p>
-              </div>
-              <button
-                style={primaryBgStyle}
-                className="w-full text-white font-bold py-4 rounded-2xl shadow-lg hover:opacity-90 transition"
-                onClick={() => alert('테스트가 준비 중입니다!')}
-              >
-                테스트 시작하기 (무료)
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 사주/운세 */}
-        {currentPage === 'fortune' && (
-          <div className="max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-right duration-500">
-            <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-              <div className="text-center mb-8">
-                <div className="bg-amber-100 text-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Moon size={32} />
-                </div>
-                <h2 className="text-2xl font-black mb-2">오늘의 프리미엄 사주</h2>
-                <p className="text-gray-500">재물운, 연애운, 그리고 오늘의 조언을 확인하세요.</p>
-              </div>
-              <div className="space-y-4">
-                <input type="date" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`} />
-                <div className="flex gap-4">
-                  <button className="flex-1 p-4 rounded-xl border border-gray-200 text-gray-500 font-bold">오전 생</button>
-                  <button className="flex-1 p-4 rounded-xl border border-amber-500 bg-amber-50 text-amber-600 font-bold">오후 생</button>
-                </div>
-                <button
-                  style={primaryBgStyle}
-                  className="w-full text-white font-bold py-4 rounded-2xl shadow-lg hover:opacity-90 transition"
-                  onClick={() => alert('오늘의 운세 데이터를 불러오는 중입니다!')}
-                >
-                  지금 운세 확인하기
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* 로그인 페이지 */}
         {currentPage === 'login' && (
@@ -408,9 +435,9 @@ export default function HomePortal() {
           <PlusCircle size={32} className="-mt-4 bg-white rounded-full shadow-lg" />
           광고등록
         </button>
-        <button className="flex flex-col items-center gap-1 hover:text-brand-primary">
-          <ShoppingBag size={20} /> 장터
-        </button>
+        <Link href="/lounge" className="flex flex-col items-center gap-1 hover:text-brand-primary">
+          <Sparkles size={20} /> 라운지
+        </Link>
         <button className="flex flex-col items-center gap-1 hover:text-brand-primary">
           <User size={20} /> MY
         </button>
