@@ -472,6 +472,25 @@ export default function HomePortal() {
                 <span className="w-px h-3 bg-gray-200 my-auto"></span>
                 <button className="text-gray-600 font-bold" onClick={() => setCurrentPage('signup')}>회원가입</button>
               </div>
+
+              {/* Social Login */}
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <p className="text-center text-xs text-gray-400 mb-4">또는 SNS로 간편하게 시작하기</p>
+                <div className="space-y-3">
+                  <button
+                    className="w-full py-4 rounded-xl bg-[#03C75A] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm"
+                    onClick={() => alert('네이버 로그인 연동 준비 중입니다.')}
+                  >
+                    <span className="font-black text-lg">N</span> 네이버로 시작하기
+                  </button>
+                  <button
+                    className="w-full py-4 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition shadow-sm"
+                    onClick={() => alert('구글 로그인 연동 준비 중입니다.')}
+                  >
+                    <span className="font-black text-lg text-blue-500">G</span> 구글로 시작하기
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
