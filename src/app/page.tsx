@@ -628,15 +628,15 @@ export default function HomePortal() {
                   <div className="grid grid-cols-4 gap-4 items-center">
                     <label className="text-right text-sm font-bold text-gray-600">이름 <span className="text-red-500">*</span></label>
                     <div className="col-span-3 flex gap-2">
-                      <input type="text" placeholder="실명 입력" className="flex-1 p-3 border rounded-lg text-sm bg-gray-50" readOnly value="엄재숙" />
-                      <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap">본인인증 완료</button>
+                      <input type="text" placeholder="실명 입력 (본인인증)" className="flex-1 p-3 border rounded-lg text-sm bg-gray-50" readOnly />
+                      <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap">본인인증 하기</button>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-4 gap-4 items-center">
                     <label className="text-right text-sm font-bold text-gray-600">휴대폰 <span className="text-red-500">*</span></label>
                     <div className="col-span-3">
-                      <input type="tel" value="010-6651-0509" readOnly className="w-full p-3 border rounded-lg text-sm bg-gray-50 text-gray-500" />
+                      <input type="tel" placeholder="휴대폰 번호 (- 제외)" className="w-full p-3 border rounded-lg text-sm bg-gray-50 text-gray-500" readOnly />
                     </div>
                   </div>
 
