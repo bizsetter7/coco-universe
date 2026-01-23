@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "코코 유니버스 - 최고의 알바 매칭",
   description: "대한민국 No.1 고소득 알바 플랫폼",
+  verification: {
+    google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
+  },
 };
 
 export default function RootLayout({
