@@ -23,6 +23,12 @@ interface Shop {
   is_verified?: boolean;
   tier?: 'grand' | 'premium' | 'special' | 'basic';
   updatedAt?: string;
+  options?: {
+    blink?: boolean;
+    bold?: boolean;
+    color?: string;
+    icons?: string[];
+  }
 }
 
 export default function HomePortal() {
@@ -230,13 +236,18 @@ export default function HomePortal() {
                     <div
                       key={i}
                       onClick={() => shop.url && window.open(shop.url, '_blank')}
-                      className={`p-4 rounded-xl border flex items-center justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden ${shop.is_premium ? 'bg-amber-50/30 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}
+                      className={`p-4 rounded-xl border flex items-center justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden 
+                        ${shop.is_premium ? 'bg-amber-50/30 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}
+                        ${shop.tier === 'grand' ? 'border-amber-400 border-2 shadow-amber-100' : ''}
+                      `}
                     >
-                      {shop.is_premium && (
+                      {/* Premium/Grand Badge */}
+                      {(shop.is_premium || shop.tier === 'grand') && (
                         <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
                           PREMIUM
                         </div>
                       )}
+
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
                           {shop.site === 'catalba' ? 'C' : shop.site === 'badalba' ? 'B' : shop.site === 'ladyalba' ? 'L' : 'Q'}
@@ -246,7 +257,14 @@ export default function HomePortal() {
                             <p className="text-[10px] text-gray-400">{shop.region}</p>
                             {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
                           </div>
-                          <h4 className="font-bold text-sm group-hover:text-pink-500 transition-colors flex items-center gap-1">
+
+                          {/* Title with Options (Upselling applied) */}
+                          <h4 className={`
+                            text-sm flex items-center gap-1 transition-colors
+                            ${shop.options?.bold ? 'font-black' : 'font-bold'}
+                            ${shop.options?.blink ? 'animate-blink' : ''}
+                            ${shop.options?.color || 'group-hover:text-pink-500'}
+                          `}>
                             {shop.name}
                             {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50" />}
                             {shop.is_placeholder && <span className="ml-1 text-[10px] font-normal text-gray-400">(상호비공개)</span>}
