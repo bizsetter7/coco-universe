@@ -1,7 +1,7 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
-import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 import shopsData from '@/lib/data/shops.json';
@@ -9,6 +9,7 @@ import regionsData from '@/lib/data/regions.json';
 
 interface Shop {
   name: string;
+  realName?: string;
   region: string;
   phone: string;
   kakao: string;
@@ -36,6 +37,13 @@ export default function HomePortal() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [visibleCount, setVisibleCount] = useState(10);
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+
+  // Signup States
+  const [signupStep, setSignupStep] = useState(1); // 1: Terms, 2: Form, 3: Complete
+  const [signupType, setSignupType] = useState<'individual' | 'corporate'>('individual'); // individual: 구직자, corporate: 구인자
+  const [agreements, setAgreements] = useState({ terms: false, privacy: false });
+
   const [shops] = useState<Shop[]>(shopsData as Shop[]);
   const [regions] = useState<string[]>(regionsData as string[]);
 
@@ -235,7 +243,7 @@ export default function HomePortal() {
                   {filteredShops.slice(0, visibleCount).map((shop, i) => (
                     <div
                       key={i}
-                      onClick={() => shop.url && window.open(shop.url, '_blank')}
+                      onClick={() => setSelectedShop(shop)}
                       className={`p-4 rounded-xl border flex items-center justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden 
                         ${shop.is_premium ? 'bg-amber-50/30 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}
                         ${shop.tier === 'grand' ? 'border-amber-400 border-2 shadow-amber-100' : ''}
@@ -302,6 +310,58 @@ export default function HomePortal() {
                 )}
               </div>
             </div>
+
+            {/* Shop Detail Modal */}
+            {selectedShop && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={() => setSelectedShop(null)}>
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slideUp" onClick={e => e.stopPropagation()}>
+                  <div className={`p-6 text-center text-white relative ${selectedShop.tier === 'grand' ? 'bg-gradient-to-br from-amber-400 to-yellow-600' : 'bg-gray-800'}`}>
+                    <button onClick={() => setSelectedShop(null)} className="absolute top-4 right-4 text-white/80 hover:text-white">
+                      <X size={24} />
+                    </button>
+                    <div className="flex justify-center mb-3">
+                      <span className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold backdrop-blur-md shadow-inner">
+                        {selectedShop.site === 'catalba' ? 'C' : selectedShop.site === 'badalba' ? 'B' : selectedShop.site === 'ladyalba' ? 'L' : 'Q'}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-black mb-1 break-keep leading-snug">{selectedShop.realName || selectedShop.name}</h2>
+                    <p className="text-white/80 text-xs">{selectedShop.region} | {selectedShop.workType}</p>
+                    {selectedShop.tier === 'grand' && <div className="mt-2 inline-block px-3 py-1 bg-white/20 rounded-full text-[10px] font-bold">✨ Premium Verified</div>}
+                  </div>
+
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
+                        <p className="text-xs text-gray-400 mb-1">시급/일급</p>
+                        <p className="text-red-500 font-bold text-sm">{selectedShop.pay}</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
+                        <p className="text-xs text-gray-400 mb-1">근무형태</p>
+                        <p className="text-gray-700 font-bold text-sm">{selectedShop.workType}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <a href={`tel:${selectedShop.phone}`} className="flex items-center justify-center gap-2 w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-200">
+                        <Phone size={20} /> 전화 걸기 ({selectedShop.phone})
+                      </a>
+                      {selectedShop.kakao && (
+                        <div className="flex items-center justify-between p-4 bg-yellow-300 rounded-xl text-yellow-900 font-bold">
+                          <div className="flex items-center gap-2">
+                            <MessageCircle size={20} />
+                            <span>카카오톡 ID</span>
+                          </div>
+                          <span className="bg-white/50 px-2 py-1 rounded text-sm select-all cursor-text">{selectedShop.kakao}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gray-50 text-center border-t border-gray-100">
+                    <p className="text-[10px] text-gray-400">코코 유니버스를 통해 연락했다고 말씀해주세요!</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -416,53 +476,267 @@ export default function HomePortal() {
           </div>
         )}
 
-        {/* 회원가입 페이지 */}
+        {/* 회원가입 페이지 (Multi-step Wizard) */}
         {currentPage === 'signup' && (
-          <div className="max-w-md mx-auto px-4 py-8 animate-in fade-in duration-500">
-            <h2 className="text-2xl font-black mb-6 text-center">회원가입</h2>
-            <div className="space-y-4">
-              <div className="flex gap-2 mb-6">
-                <button className="flex-1 py-3 rounded-xl border-2 border-pink-500 bg-pink-50 text-pink-600 font-bold text-sm">구직자용</button>
-                <button className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-400 font-bold text-sm">구인자용</button>
+          <div className="max-w-3xl mx-auto px-4 py-8 animate-in fade-in duration-500">
+            {/* Step Indicator */}
+            <div className="flex justify-between items-center mb-10 border-b pb-4">
+              <div className={`flex items-center gap-2 ${signupStep >= 1 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>1</div>
+                <span>약관동의</span>
               </div>
-              <input type="text" placeholder="아이디" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} />
-              <input type="password" placeholder="비밀번호" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} />
-              <input type="password" placeholder="비밀번호 확인" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} />
-              <input type="tel" placeholder="휴대폰 번호 (- 제외)" className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} />
-              <button
-                style={primaryBgStyle}
-                className="w-full text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transition mt-6"
-                onClick={() => alert('본인 인증 서비스 준비 중입니다!')}
-              >
-                가입하기
-              </button>
+              <div className="h-px bg-gray-200 flex-1 mx-4"></div>
+              <div className={`flex items-center gap-2 ${signupStep >= 2 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>2</div>
+                <span>정보입력</span>
+              </div>
+              <div className="h-px bg-gray-200 flex-1 mx-4"></div>
+              <div className={`flex items-center gap-2 ${signupStep >= 3 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>3</div>
+                <span>가입완료</span>
+              </div>
             </div>
+
+            {/* Step 1: 약관동의 */}
+            {signupStep === 1 && (
+              <div className="space-y-8 animate-in slide-in-from-right duration-300">
+                <div>
+                  <h3 className="text-lg font-bold mb-2">이용약관 (필수)</h3>
+                  <div className="h-40 overflow-y-auto border p-4 text-xs text-gray-500 bg-gray-50 rounded-lg section-terms leading-relaxed">
+                    <p className="font-bold mb-1">제 1 조 (목적)</p>
+                    <p className="mb-2">본 약관은 {brand.displayName}(이하 "회사"라 한다)가 제공하는 구인구직 관련 제반 서비스(이하 "서비스"라 함)의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+
+                    <p className="font-bold mb-1">제 2 조 (용어의 정의)</p>
+                    <p className="mb-2">1. "회원"이라 함은 ＂회사＂의 ＂서비스＂에 접속하여 이 약관에 따라 ＂회사＂와 이용계약을 체결하고 ＂회사＂가 제공하는 ＂서비스＂를 이용하는 고객을 말합니다.<br />
+                      2. "아이디(ID)"라 함은 회원의 식별과 서비스 이용을 위하여 회원이 정하고 회사가 승인하는 문자와 숫자의 조합을 말합니다.<br />
+                      3. "비밀번호"라 함은 회원이 부여 받은 "아이디"와 일치되는 회원임을 확인하고 비밀보호를 위해 회원 자신이 정한 문자 또는 숫자의 조합을 말합니다.</p>
+
+                    <p className="font-bold mb-1">제 3 조 (약관의 게시와 개정)</p>
+                    <p className="mb-2">1. "회사"는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 초기 화면에 게시합니다.<br />
+                      2. "회사"는 "약관의 규제에 관한 법률", "정보통신망 이용촉진 및 정보보호 등에 관한 법률" 등 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.</p>
+
+                    <p className="font-bold mb-1">제 4 조 (이용계약 체결)</p>
+                    <p>1. 이용계약은 회원이 되고자 하는 자(이하 "가입신청자")가 약관의 내용에 대하여 동의를 한 다음 회원가입신청을 하고 회사가 이러한 신청에 대하여 승낙함으로써 체결됩니다.<br />
+                      2. 회사는 가입신청자의 신청에 대하여 서비스 이용을 승낙함을 원칙으로 합니다. 다만, 회사는 다음 각 호에 해당하는 신청에 대하여는 승낙을 하지 않거나 사후에 이용계약을 해지할 수 있습니다.</p>
+                  </div>
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                    <input type="checkbox" checked={agreements.terms} onChange={(e) => setAgreements({ ...agreements, terms: e.target.checked })} className="w-4 h-4 accent-pink-500" />
+                    <span className="text-sm font-medium">회원 이용약관에 동의합니다.</span>
+                  </label>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-bold mb-2">개인정보 보호정책 (필수)</h3>
+                  <div className="h-40 overflow-y-auto border p-4 text-xs text-gray-500 bg-gray-50 rounded-lg section-privacy leading-relaxed">
+                    <p className="font-bold mb-1">1. 개인정보의 수집 및 이용 목적</p>
+                    <p className="mb-2">회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.<br />
+                      - 회원 가입 의사 확인, 회원제 서비스 제공에 따른 본인 식별/인증, 회원자격 유지/관리, 서비스 부정이용 방지</p>
+
+                    <p className="font-bold mb-1">2. 수집하는 개인정보의 항목</p>
+                    <p className="mb-2">- 필수항목: 아이디, 비밀번호, 이름, 휴대전화번호<br />
+                      - 선택항목: 이메일, 생년월일, 성별</p>
+
+                    <p className="font-bold mb-1">3. 개인정보의 보유 및 이용기간</p>
+                    <p className="mb-2">회사는 법령에 따른 개인정보 보유, 이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의 받은 개인정보 보유, 이용기간 내에서 개인정보를 처리, 보유합니다.<br />
+                      - 회원 탈퇴 시까지 (단, 관계 법령 위반에 따른 수사, 조사 등이 진행 중인 경우에는 해당 수사, 조사 종료 시까지)</p>
+
+                    <p className="font-bold mb-1">4. 동의 거부 권리 및 불이익</p>
+                    <p>정보주체는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 필수항목에 대한 동의를 거부할 경우 회원가입 및 서비스 이용이 제한될 수 있습니다.</p>
+                  </div>
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                    <input type="checkbox" checked={agreements.privacy} onChange={(e) => setAgreements({ ...agreements, privacy: e.target.checked })} className="w-4 h-4 accent-pink-500" />
+                    <span className="text-sm font-medium">개인정보 보호정책에 동의합니다.</span>
+                  </label>
+                </div>
+
+                <div className="flex justify-center gap-4 pt-4">
+                  <button onClick={() => setCurrentPage('login')} className="px-8 py-3 rounded-xl border border-gray-300 text-gray-500 font-bold hover:bg-gray-50">취소</button>
+                  <button
+                    onClick={() => {
+                      if (!agreements.terms || !agreements.privacy) return alert('모든 약관에 동의해야 합니다.');
+                      setSignupStep(2);
+                    }}
+                    style={{ backgroundColor: (agreements.terms && agreements.privacy) ? brand.primaryColor : '#ccc' }}
+                    className="px-12 py-3 rounded-xl text-white font-bold transition-colors"
+                    disabled={!agreements.terms || !agreements.privacy}
+                  >
+                    다음 단계
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: 정보입력 */}
+            {signupStep === 2 && (
+              <div className="animate-in slide-in-from-right duration-300">
+                {/* Type Selection Tabs */}
+                <div className="flex mb-8">
+                  <button
+                    onClick={() => setSignupType('individual')}
+                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors ${signupType === 'individual' ? 'border-pink-500 text-pink-500 bg-pink-50/50' : 'border-gray-200 text-gray-400'}`}
+                  >
+                    <User className="inline-block mr-2 mb-1" size={18} />
+                    개인회원 (구직자용)
+                    <p className="text-[10px] font-normal mt-1">이력서 등록 및 입사지원</p>
+                  </button>
+                  <button
+                    onClick={() => setSignupType('corporate')}
+                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors ${signupType === 'corporate' ? 'border-blue-500 text-blue-500 bg-blue-50/50' : 'border-gray-200 text-gray-400'}`}
+                  >
+                    <Briefcase className="inline-block mr-2 mb-1" size={18} />
+                    기업회원 (구인자용)
+                    <p className="text-[10px] font-normal mt-1">채용공고 등록 및 인재열람</p>
+                  </button>
+                </div>
+
+                <div className="space-y-6 max-w-lg mx-auto">
+                  <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-xs text-yellow-800 flex items-center gap-2 mb-4">
+                    <AlertCircle size={14} />
+                    <span>체크된 필수항목만 작성하시면 회원가입 가능합니다.</span>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">아이디 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3">
+                      <input type="text" placeholder="4~15자 영문/숫자" className="w-full p-3 border rounded-lg text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">비밀번호 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3">
+                      <input type="password" placeholder="4~12자 이상" className="w-full p-3 border rounded-lg text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">비번확인 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3">
+                      <input type="password" placeholder="비밀번호 재입력" className="w-full p-3 border rounded-lg text-sm" />
+                    </div>
+                  </div>
+
+                  {signupType === 'corporate' && (
+                    <div className="grid grid-cols-4 gap-4 items-center">
+                      <label className="text-right text-sm font-bold text-gray-600">업소명 <span className="text-red-500">*</span></label>
+                      <div className="col-span-3">
+                        <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">이름 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 flex gap-2">
+                      <input type="text" placeholder="실명 입력" className="flex-1 p-3 border rounded-lg text-sm bg-gray-50" readOnly value="엄재숙" />
+                      <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap">본인인증 완료</button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">휴대폰 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3">
+                      <input type="tel" value="010-6651-0509" readOnly className="w-full p-3 border rounded-lg text-sm bg-gray-50 text-gray-500" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-bold text-gray-600">이메일</label>
+                    <div className="col-span-3">
+                      <input type="email" placeholder="example@email.com" className="w-full p-3 border rounded-lg text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-4 items-start">
+                    <label className="text-right text-sm font-bold text-gray-600 pt-2">수신동의</label>
+                    <div className="col-span-3 pt-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" className="w-4 h-4" defaultChecked />
+                        <span className="text-sm text-gray-600">SMS 수신 동의 (채용/지원 알림을 받을 수 있습니다)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center gap-4 pt-8">
+                    <button onClick={() => setSignupStep(1)} className="px-8 py-4 rounded-xl border border-gray-300 text-gray-500 font-bold hover:bg-gray-50">이전단계</button>
+                    <button
+                      onClick={() => setSignupStep(3)}
+                      style={primaryBgStyle}
+                      className="px-12 py-4 rounded-xl text-white font-bold shadow-lg hover:opacity-90 transition-all"
+                    >
+                      가입완료
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: 가입완료 */}
+            {signupStep === 3 && (
+              <div className="text-center py-20 animate-in zoom-in duration-500">
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle2 size={48} className="text-green-600" />
+                </div>
+                <h2 className="text-3xl font-black mb-4">회원가입 완료!</h2>
+                <p className="text-gray-500 mb-8">
+                  {brand.displayName}의 회원이 되신 것을 환영합니다.<br />
+                  이제부터 다양한 서비스를 이용하실 수 있습니다.
+                </p>
+                <button
+                  onClick={() => {
+                    setSignupStep(1);
+                    setCurrentPage('login');
+                  }}
+                  style={primaryBgStyle}
+                  className="px-12 py-4 rounded-xl text-white font-bold shadow-lg hover:opacity-90 transition-all"
+                >
+                  로그인 하러가기
+                </button>
+              </div>
+            )}
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className={`py-10 px-4 border-t ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h4 className="font-black text-lg mb-4" style={primaryStyle}>{brand.displayName}</h4>
-              <p className="text-sm mb-2">당신의 새로운 가능성을 여는 No.1 구인구직 플랫폼</p>
-              <div className="text-xs space-y-1">
-                <p>사업자등록번호: 226-13-91078</p>
-                <p>대표문의: {brand.name === 'COCO' ? '코코알바 고객센터' : `${brand.name}알바 운영팀`}</p>
-                <p>이메일: bizsetter7@gmail.com</p>
-              </div>
-            </div>
-            <div className="flex gap-4 md:justify-end text-xs">
-              <span className="cursor-pointer hover:underline">이용약관</span>
-              <span className="cursor-pointer hover:underline font-bold text-gray-300">개인정보처리방침</span>
-              <span className="cursor-pointer hover:underline">청소년보호정책</span>
-            </div>
+      <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-500'}`}>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          {/* Logo */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-black tracking-tighter inline-block" style={primaryStyle}>
+              {brand.displayName}
+            </h2>
           </div>
-          <div className="pt-8 border-t border-gray-700 text-[10px] text-center">
-            <p>© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved.</p>
-            <p className="mt-2 opacity-50">본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
+
+          {/* Links */}
+          <div className="flex justify-center gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">이용약관</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors text-gray-600 dark:text-gray-300">개인정보처리방침</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">청소년보호정책</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">광고/제휴문의</span>
+          </div>
+
+          {/* Info */}
+          <div className="text-[11px] sm:text-xs text-gray-400 leading-relaxed opacity-80 mb-8">
+            <p>
+              <span className="font-bold text-gray-500 dark:text-gray-300">{brand.displayName}</span> |
+              대표: 김코코 |
+              사업자등록번호: 226-13-91078
+            </p>
+            <p className="mt-1">
+              주소: 서울특별시 강남구 테헤란로 123, 4층 |
+              직업정보제공사업 신고번호: 2024-서울강남-1234
+            </p>
+            <p className="mt-1">
+              고객센터: 1544-0000 (평일 09:00 ~ 18:00) |
+              이메일: bizsetter7@gmail.com
+            </p>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-[10px] text-gray-300 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-8">
+            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved.</p>
+            <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
           </div>
         </div>
       </footer>
