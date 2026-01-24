@@ -1,7 +1,7 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
-import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users } from 'lucide-react';
+import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 import EventPopup from '@/components/EventPopup';
@@ -90,6 +90,9 @@ export default function HomePortal() {
       <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
+            {currentPage !== 'home' ? (
+              <ChevronLeft className="md:hidden mr-1" size={24} />
+            ) : null}
             <span className="text-2xl font-black tracking-tighter">
               {brand.displayName.split(' ')[0]}
               <span style={primaryStyle} className="ml-1">
@@ -521,12 +524,12 @@ export default function HomePortal() {
               >
                 로그인
               </button>
-              <div className="flex justify-center gap-8 text-sm text-gray-400 px-2 mt-4">
-                <span>아이디 찾기</span>
-                <span className="w-px h-3 bg-gray-200 my-auto"></span>
-                <span>비밀번호 찾기</span>
-                <span className="w-px h-3 bg-gray-200 my-auto"></span>
-                <button className="text-gray-600 font-bold" onClick={() => setCurrentPage('signup')}>회원가입</button>
+              <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400 px-2 mt-4 whitespace-nowrap gap-2">
+                <span className="cursor-pointer hover:text-gray-600">아이디 찾기</span>
+                <span className="w-px h-3 bg-gray-200"></span>
+                <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
+                <span className="w-px h-3 bg-gray-200"></span>
+                <button className="text-gray-600 font-bold hover:underline" onClick={() => setCurrentPage('signup')}>회원가입</button>
               </div>
 
               {/* Social Login */}
@@ -680,23 +683,23 @@ export default function HomePortal() {
                     <span>체크된 필수항목만 작성하시면 회원가입 가능합니다.</span>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">아이디 <span className="text-red-500">*</span></label>
-                    <div className="col-span-3">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">아이디 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 w-full">
                       <input type="text" placeholder="4~15자 영문/숫자" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="col-span-3">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">비밀번호 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 w-full">
                       <input type="password" placeholder="4~12자 이상" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">비번확인 <span className="text-red-500">*</span></label>
-                    <div className="col-span-3">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">비번확인 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 w-full">
                       <input type="password" placeholder="비밀번호 재입력" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
@@ -745,26 +748,26 @@ export default function HomePortal() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">휴대폰 <span className="text-red-500">*</span></label>
-                    <div className="col-span-3">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">휴대폰 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 w-full">
                       <input type="tel" placeholder="휴대폰 번호 (- 제외)" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">이메일</label>
-                    <div className="col-span-3">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">이메일</label>
+                    <div className="col-span-3 w-full">
                       <input type="email" placeholder="example@email.com" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4 items-start">
-                    <label className="text-right text-sm font-bold text-gray-600 pt-2">수신동의</label>
-                    <div className="col-span-3 pt-2">
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-1 sm:gap-4 items-start">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto sm:pt-2">수신동의</label>
+                    <div className="col-span-3 pt-0 sm:pt-2">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" className="w-4 h-4" defaultChecked />
-                        <span className="text-sm text-gray-600">SMS 수신 동의 (채용/지원 알림을 받을 수 있습니다)</span>
+                        <span className="text-xs sm:text-sm text-gray-600 break-keep">SMS 수신 동의 (채용/지원 알림을 받을 수 있습니다)</span>
                       </label>
                     </div>
                   </div>
@@ -798,7 +801,7 @@ export default function HomePortal() {
                 <p className="text-gray-500 mb-8">
                   {brand.displayName}의 회원이 되신 것을 환영합니다.<br />
                   {signupType === 'corporate'
-                    ? '관리자 승인 후 서비스 이용이 가능합니다. (최대 24시간 소요)'
+                    ? <span className="block mt-1 sm:inline">관리자 승인 후 서비스 이용이 가능합니다.<br className="block sm:hidden" />(최대 24시간 소요)</span>
                     : '이제부터 다양한 서비스를 이용하실 수 있습니다.'}
                 </p>
                 <button
