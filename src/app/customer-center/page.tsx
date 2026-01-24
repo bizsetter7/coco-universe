@@ -35,12 +35,12 @@ export default function CustomerCenterPage() {
             {/* Header */}
             {/* Header */}
             <header className="bg-white border-b sticky top-0 z-10">
-                <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+                <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between pt-2">
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.back()} className="text-gray-600">
                             <ArrowLeft size={24} />
                         </button>
-                        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2 pt-1">
+                        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2">
                             <Headphones className="text-pink-500" size={24} />
                             고객센터
                         </h1>

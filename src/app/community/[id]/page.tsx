@@ -71,11 +71,11 @@ export default function PostDetailPage() {
 
             {/* Header */}
             <header className="sticky top-0 bg-white border-b z-10 flex items-center justify-between px-4 h-14">
-                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
+                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 pt-2">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px] pt-1">{post.category}</h1>
-                <div className="flex gap-1">
+                <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px] pt-3">{post.category}</h1>
+                <div className="flex gap-1 pt-2">
                     <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
                         <Home size={24} />
                     </button>

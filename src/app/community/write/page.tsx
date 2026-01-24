@@ -49,11 +49,11 @@ export default function WritePostPage() {
         <div className="min-h-screen bg-white">
             {/* Header */}
             <header className="sticky top-0 bg-white border-b z-10 flex items-center justify-between px-4 h-14">
-                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
+                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 pt-2">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-base font-bold text-gray-800 pt-1">글쓰기</h1>
-                <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-gray-800 pt-3">글쓰기</h1>
+                <div className="flex items-center gap-2 pt-2">
                     <button onClick={() => router.push('/')} className="text-gray-400 hover:text-gray-600">
                         <Home size={24} />
                     </button>
