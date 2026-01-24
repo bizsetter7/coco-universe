@@ -40,7 +40,7 @@ export default function CustomerCenterPage() {
                         <button onClick={() => router.back()} className="text-gray-600">
                             <ArrowLeft size={24} />
                         </button>
-                        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2 pt-1">
                             <Headphones className="text-pink-500" size={24} />
                             고객센터
                         </h1>

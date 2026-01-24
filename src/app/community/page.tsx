@@ -13,7 +13,8 @@ import {
     ChevronRight,
     User,
     Briefcase,
-    Home
+    Home,
+    ArrowLeft
 } from 'lucide-react';
 
 // --- Mock Data & Types ---
@@ -117,10 +118,15 @@ export default function CommunityPage() {
             {/* --- Top Navigation / Header --- */}
             <header className="bg-white border-b sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-                    <h1 className="text-xl font-black text-pink-500 flex items-center gap-2">
-                        <MessageCircle className="fill-pink-500" size={24} />
-                        그녀들의 수다
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
+                            <ArrowLeft size={24} />
+                        </button>
+                        <h1 className="text-xl font-black text-pink-500 flex items-center gap-2 pt-1">
+                            <MessageCircle className="fill-pink-500" size={24} />
+                            그녀들의 수다
+                        </h1>
+                    </div>
                     <div className="flex gap-2">
                         <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
                             <Home size={24} />

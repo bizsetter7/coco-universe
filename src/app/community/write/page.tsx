@@ -52,14 +52,19 @@ export default function WritePostPage() {
                 <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-base font-bold text-gray-800">글쓰기</h1>
-                <button
-                    onClick={handleSubmit}
-                    className="px-4 py-1.5 bg-pink-500 text-white rounded-full text-sm font-bold shadow-sm hover:bg-pink-600 transition disabled:opacity-50"
-                    disabled={!title.trim() || !content.trim()}
-                >
-                    등록
-                </button>
+                <h1 className="text-base font-bold text-gray-800 pt-1">글쓰기</h1>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => router.push('/')} className="text-gray-400 hover:text-gray-600">
+                        <Home size={24} />
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        className="px-4 py-1.5 bg-pink-500 text-white rounded-full text-sm font-bold shadow-sm hover:bg-pink-600 transition disabled:opacity-50"
+                        disabled={!title.trim() || !content.trim()}
+                    >
+                        등록
+                    </button>
+                </div>
             </header>
 
             {/* Form */}

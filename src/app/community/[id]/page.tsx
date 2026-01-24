@@ -74,7 +74,7 @@ export default function PostDetailPage() {
                 <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px]">{post.category}</h1>
+                <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px] pt-1">{post.category}</h1>
                 <div className="flex gap-1">
                     <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
                         <Home size={24} />
