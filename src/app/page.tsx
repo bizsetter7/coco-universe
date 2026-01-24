@@ -3,6 +3,7 @@
 import { useBrand } from '@/components/BrandProvider';
 import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import EventPopup from '@/components/EventPopup';
 import shopsData from '@/lib/data/shops.json';
@@ -34,6 +35,7 @@ interface Shop {
 }
 
 export default function HomePortal() {
+  const router = useRouter();
   const brand = useBrand();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [currentPage, _setCurrentPage] = useState('home');
@@ -893,7 +895,7 @@ export default function HomePortal() {
         <button onClick={() => setCurrentPage('home')} className="flex flex-col items-center gap-1 hover:text-brand-primary active:text-brand-primary">
           <Home size={20} /> 홈
         </button>
-        <button onClick={() => setCurrentPage('community')} className="flex flex-col items-center gap-1 hover:text-brand-primary">
+        <button onClick={() => router.push('/community')} className="flex flex-col items-center gap-1 hover:text-brand-primary">
           <MessageCircle size={20} /> 커뮤니티
         </button>
         <button onClick={() => setCurrentPage('payment')} className="flex flex-col items-center gap-1 font-bold" style={{ color: brand.primaryColor }}>

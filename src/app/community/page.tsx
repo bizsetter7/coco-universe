@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     MessageCircle,
     Heart,
@@ -92,6 +93,7 @@ const MOCK_POSTS: Post[] = [
 ];
 
 export default function CommunityPage() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState('밤 문화 Talk');
     const [userType, setUserType] = useState<UserType>('individual'); // Default to individual for dev
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,12 +101,12 @@ export default function CommunityPage() {
     // Filter posts by active tab
     const filteredPosts = MOCK_POSTS.filter(post => post.category === activeTab);
 
-    const handlePostClick = () => {
+    const handlePostClick = (postId: number) => {
         if (userType === 'corporate') {
             setIsModalOpen(true);
         } else {
-            // Navigate to detail page (Mock alert for now)
-            alert('게시글 상세 페이지로 이동합니다. (구현 예정)');
+            // Navigate to detail page
+            router.push(`/community/${postId}`);
         }
     };
 
@@ -131,8 +133,8 @@ export default function CommunityPage() {
                                 key={cat}
                                 onClick={() => setActiveTab(cat)}
                                 className={`flex-shrink-0 px-4 py-3 text-sm font-bold border-b-2 transition-colors duration-200 whitespace-nowrap ${activeTab === cat
-                                        ? 'border-pink-500 text-pink-500'
-                                        : 'border-transparent text-gray-400 hover:text-gray-600'
+                                    ? 'border-pink-500 text-pink-500'
+                                    : 'border-transparent text-gray-400 hover:text-gray-600'
                                     }`}
                             >
                                 {cat}
@@ -183,7 +185,7 @@ export default function CommunityPage() {
                     {filteredPosts.map((post) => (
                         <div
                             key={post.id}
-                            onClick={handlePostClick}
+                            onClick={() => handlePostClick(post.id)}
                             className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-[0.99] transition-transform cursor-pointer"
                         >
                             <div className="flex justify-between items-start mb-2">
@@ -233,7 +235,7 @@ export default function CommunityPage() {
             {/* --- Floating Action Button (Write) --- */}
             {userType !== 'corporate' && (
                 <button
-                    onClick={() => alert('글쓰기 모달 오픈 (구현 예정)')}
+                    onClick={() => router.push('/community/write')}
                     className="fixed bottom-24 right-4 bg-pink-500 text-white p-4 rounded-full shadow-lg hover:bg-pink-600 transition-colors z-20"
                 >
                     <PenLine size={24} />
