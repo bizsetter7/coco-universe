@@ -545,7 +545,7 @@ export default function HomePortal() {
               >
                 로그인
               </button>
-              <div className="flex justify-center items-center text-xs text-gray-400 mt-4 whitespace-nowrap gap-3 sm:gap-4">
+              <div className="flex justify-center items-center text-[13px] text-gray-400 mt-4 whitespace-nowrap gap-2 sm:gap-4">
                 <span className="cursor-pointer hover:text-gray-600">아이디 찾기</span>
                 <span className="w-px h-3 bg-gray-200"></span>
                 <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
