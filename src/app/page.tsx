@@ -193,6 +193,12 @@ export default function HomePortal() {
                     onClick={() => {
                       if (item.label === '지역별채용') {
                         document.getElementById('region-section')?.scrollIntoView({ behavior: 'smooth' });
+                      } else if (item.link === 'community') {
+                        router.push('/community');
+                      } else if (item.label === '무료법률자문') {
+                        router.push('/community');
+                      } else if (item.label === '광고문의') {
+                        router.push('/customer-center');
                       } else {
                         setCurrentPage(item.link);
                       }
@@ -208,7 +214,7 @@ export default function HomePortal() {
               </div>
 
               {/* 베스트 썰 (유입용) */}
-              <div onClick={() => setCurrentPage('community')} className={`border p-4 rounded-xl shadow-sm mb-10 cursor-pointer hover:opacity-90 transition ${brand.theme === 'dark' ? 'bg-gray-800 border-pink-900' : 'bg-white border-pink-200'}`}>
+              <div onClick={() => router.push('/community')} className={`border p-4 rounded-xl shadow-sm mb-10 cursor-pointer hover:opacity-90 transition ${brand.theme === 'dark' ? 'bg-gray-800 border-pink-900' : 'bg-white border-pink-200'}`}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-bold text-pink-500 flex items-center gap-1"><Flame size={16} /> 실시간 핫 이슈</span>
                   <span className="text-xs text-gray-400">더보기 &gt;</span>
