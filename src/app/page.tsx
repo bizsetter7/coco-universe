@@ -308,39 +308,42 @@ export default function HomePortal() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
+                      <div className="flex items-center w-full">
+                        {/* Fixed Icon - Left */}
+                        <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden mr-3 ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
                           {shop.site === 'catalba' ? 'C' : shop.site === 'badalba' ? 'B' : shop.site === 'ladyalba' ? 'L' : 'Q'}
                         </div>
-                        <div>
+
+                        {/* Flexible Content - Center */}
+                        <div className="flex-1 min-w-0 pr-2">
                           <div className="flex items-center gap-1 mb-0.5">
-                            <p className="text-[10px] text-gray-400">{shop.region}</p>
-                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                            <p className="text-[10px] text-gray-400 truncate max-w-[80px] sm:max-w-none">{shop.region}</p>
+                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500 shrink-0" />}
                           </div>
 
-                          {/* Title with Options (Upselling applied) */}
-                          <div className="flex flex-wrap items-center gap-1">
+                          <div className="flex flex-wrap items-center gap-1 h-[20px] overflow-hidden">
                             {shop.options?.icons?.map((icon, idx) => (
-                              <span key={idx} className="text-[9px] px-1 rounded-sm font-bold bg-red-100 text-red-600 border border-red-200">
+                              <span key={idx} className="text-[8px] px-1 rounded-sm font-bold bg-red-100 text-red-600 border border-red-200 whitespace-nowrap shrink-0">
                                 {icon}
                               </span>
                             ))}
                             <h4 className={`
-                                text-sm flex items-center gap-1 transition-colors
+                                text-xs sm:text-sm flex items-center gap-1 transition-colors truncate w-full
                                 ${shop.options?.bold ? 'font-black' : 'font-bold'}
                                 ${shop.options?.blink ? 'animate-blink' : ''}
                                 ${shop.options?.color || 'group-hover:text-pink-500'}
                               `}>
-                              {shop.name}
-                              {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50" />}
-                              {shop.is_placeholder && <span className="ml-1 text-[10px] font-normal text-gray-400">(상호비공개)</span>}
+                              <span className="truncate block">{shop.name}</span>
+                              {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50 shrink-0" />}
                             </h4>
                           </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-red-500 font-bold text-xs mb-1">{shop.pay}</p>
-                        <p className="text-[10px] text-gray-400">{shop.workType}</p>
+
+                        {/* Fixed Pay - Right */}
+                        <div className="shrink-0 w-[70px] text-right flex flex-col justify-center">
+                          <p className="text-red-500 font-bold text-[11px] sm:text-xs mb-0.5 whitespace-nowrap truncate">{shop.pay}</p>
+                          <p className="text-[10px] text-gray-400 whitespace-nowrap truncate">{shop.workType}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -806,7 +809,7 @@ export default function HomePortal() {
 
           {/* Copyright */}
           <div className="text-[10px] text-gray-300 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-8">
-            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved. (v2.2 Layout Compact)</p>
+            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved. (v2.4 Grid Layout Final)</p>
             <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
           </div>
         </div>
