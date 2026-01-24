@@ -12,7 +12,8 @@ import {
     PenLine,
     ChevronRight,
     User,
-    Briefcase
+    Briefcase,
+    Home
 } from 'lucide-react';
 
 // --- Mock Data & Types ---
@@ -120,9 +121,14 @@ export default function CommunityPage() {
                         <MessageCircle className="fill-pink-500" size={24} />
                         그녀들의 수다
                     </h1>
-                    <button className="p-2 text-gray-400 hover:text-gray-600">
-                        <Search size={24} />
-                    </button>
+                    <div className="flex gap-2">
+                        <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
+                            <Home size={24} />
+                        </button>
+                        <button className="p-2 text-gray-400 hover:text-gray-600">
+                            <Search size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Categories (Horizontal Scroll) */}

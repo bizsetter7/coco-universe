@@ -7,7 +7,8 @@ import {
     Heart,
     MessageSquare,
     Share2,
-    Send
+    Send,
+    Home
 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -74,9 +75,14 @@ export default function PostDetailPage() {
                     <ArrowLeft size={24} />
                 </button>
                 <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px]">{post.category}</h1>
-                <button className="p-2 -mr-2 text-gray-400">
-                    <MoreVertical size={24} />
-                </button>
+                <div className="flex gap-1">
+                    <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
+                        <Home size={24} />
+                    </button>
+                    <button className="p-2 -mr-2 text-gray-400">
+                        <MoreVertical size={24} />
+                    </button>
+                </div>
             </header>
 
             {/* Content */}

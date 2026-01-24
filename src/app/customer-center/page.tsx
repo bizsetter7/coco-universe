@@ -8,7 +8,8 @@ import {
     PhoneCall,
     Mail,
     MessageSquare,
-    ArrowLeft
+    ArrowLeft,
+    Home
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -44,6 +45,9 @@ export default function CustomerCenterPage() {
                             고객센터
                         </h1>
                     </div>
+                    <button onClick={() => router.push('/')} className="text-gray-400 hover:text-gray-600">
+                        <Home size={24} />
+                    </button>
                 </div>
             </header>
 
