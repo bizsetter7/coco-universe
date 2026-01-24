@@ -3,7 +3,7 @@
 import { useBrand } from '@/components/BrandProvider';
 import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import EventPopup from '@/components/EventPopup';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
@@ -35,10 +35,31 @@ interface Shop {
 
 export default function HomePortal() {
   const brand = useBrand();
-  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [currentPage, _setCurrentPage] = useState('home');
+
+  // History Management
+  const setCurrentPage = useCallback((page: string) => {
+    _setCurrentPage(page);
+    if (page !== 'home') {
+      window.history.pushState({ page }, '', `?page=${page}`);
+    } else {
+      window.history.pushState({ page: 'home' }, '', '/');
+    }
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const page = event.state?.page || 'home';
+      _setCurrentPage(page);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [visibleCount, setVisibleCount] = useState(10);
-  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
 
   // Signup States
   const [signupStep, setSignupStep] = useState(1); // 1: Terms, 2: Form, 3: Complete
@@ -524,12 +545,12 @@ export default function HomePortal() {
               >
                 로그인
               </button>
-              <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400 px-2 mt-4 whitespace-nowrap gap-2">
-                <span className="cursor-pointer hover:text-gray-600">아이디 찾기</span>
-                <span className="w-px h-3 bg-gray-200"></span>
-                <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
-                <span className="w-px h-3 bg-gray-200"></span>
-                <button className="text-gray-600 font-bold hover:underline" onClick={() => setCurrentPage('signup')}>회원가입</button>
+              <div className="flex justify-between items-center text-[10px] sm:text-sm text-gray-400 px-0 mt-4 whitespace-nowrap gap-0">
+                <span className="cursor-pointer hover:text-gray-600 px-2 flex-1 text-center">아이디 찾기</span>
+                <span className="w-px h-2.5 bg-gray-200 shrink-0"></span>
+                <span className="cursor-pointer hover:text-gray-600 px-2 flex-1 text-center">비밀번호 찾기</span>
+                <span className="w-px h-2.5 bg-gray-200 shrink-0"></span>
+                <button className="text-gray-600 font-bold hover:underline px-2 flex-1 text-center" onClick={() => setCurrentPage('signup')}>회원가입</button>
               </div>
 
               {/* Social Login */}
