@@ -44,6 +44,7 @@ export default function HomePortal() {
   const [signupStep, setSignupStep] = useState(1); // 1: Terms, 2: Form, 3: Complete
   const [signupType, setSignupType] = useState<'individual' | 'corporate'>('individual'); // individual: 구직자, corporate: 구인자
   const [agreements, setAgreements] = useState({ terms: false, privacy: false });
+  const [businessLicense, setBusinessLicense] = useState<File | null>(null); // 사업자등록증 파일
 
   const [shops] = useState<Shop[]>(shopsData as Shop[]);
   const [regions] = useState<string[]>(regionsData as string[]);
@@ -520,7 +521,7 @@ export default function HomePortal() {
               >
                 로그인
               </button>
-              <div className="flex justify-between text-sm text-gray-400 px-2 mt-4">
+              <div className="flex justify-center gap-8 text-sm text-gray-400 px-2 mt-4">
                 <span>아이디 찾기</span>
                 <span className="w-px h-3 bg-gray-200 my-auto"></span>
                 <span>비밀번호 찾기</span>
@@ -648,13 +649,9 @@ export default function HomePortal() {
                   <button
                     onClick={() => setSignupType('individual')}
                     style={{
-                      borderColor: signupType === 'individual' ? '#EC4899' : undefined, // Keep pink for individual/job-seeker as convention or brand color? User asked for blue replacement. Keeping Pink for contrast usually good but let's stick to user request "concept color". Actually user said "Blue text... change to concept color". Individual was Pink. I will keep Pink for Individual to differentiate, or use brand color for BOTH if the brand assumes one identity. But usually Job Seeker = Brand Color 1, Shop = Brand Color 2?
-                      // Wait, "현재 회원가입에 보이는 파랑색으로 뜨는 글씨들은... 변경해봐줘". Individual is Pink. Corporate is Blue.
-                      // So I only need to change Corporate (Blue) to Brand Color.
-                      // What if Brand Color is Pink? Then both align. 
-                      // Let's keep Pink manual for now unless requested otherwise, and change Blue to Brand Color.
-                      color: signupType === 'individual' ? '#EC4899' : undefined,
-                      backgroundColor: signupType === 'individual' ? '#fdf2f8' : undefined
+                      borderColor: signupType === 'individual' ? brand.primaryColor : undefined,
+                      color: signupType === 'individual' ? brand.primaryColor : undefined,
+                      backgroundColor: signupType === 'individual' ? `${brand.primaryColor}10` : undefined
                     }}
                     className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors whitespace-nowrap ${signupType === 'individual' ? 'border-pink-500 text-pink-500 bg-pink-50/50' : 'border-gray-200 text-gray-400'}`}
                   >
@@ -705,26 +702,53 @@ export default function HomePortal() {
                   </div>
 
                   {signupType === 'corporate' && (
-                    <div className="grid grid-cols-4 gap-4 items-center">
-                      <label className="text-right text-sm font-bold text-gray-600">업소명 <span className="text-red-500">*</span></label>
-                      <div className="col-span-3">
+                    <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                      <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">업소명 <span className="text-red-500">*</span></label>
+                      <div className="col-span-3 w-full space-y-2">
                         <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
+
+                        <div className="flex gap-2 items-center">
+                          <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition ${businessLicense ? 'border-brand-primary bg-blue-50/10' : 'border-gray-300'}`} style={{ borderColor: businessLicense ? brand.primaryColor : undefined }}>
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*,.pdf"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  setBusinessLicense(e.target.files[0]);
+                                }
+                              }}
+                            />
+                            {businessLicense ? (
+                              <span className="text-xs font-bold truncate flex items-center gap-1" style={{ color: brand.primaryColor }}>
+                                <CheckCircle2 size={14} /> {businessLicense.name}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-500 flex items-center gap-1">
+                                <PlusSquare size={14} /> 사업자등록증 첨부 (필수)
+                              </span>
+                            )}
+                          </label>
+                          <span className="text-[10px] text-gray-400 break-keep">
+                            * 관리자 승인 후 가입이 완료됩니다.
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <label className="text-right text-sm font-bold text-gray-600">이름 <span className="text-red-500">*</span></label>
-                    <div className="col-span-3 flex gap-2">
-                      <input type="text" placeholder="실명 입력 (본인인증)" className="flex-1 p-3 border rounded-lg text-sm bg-gray-50" readOnly />
-                      <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap">본인인증 하기</button>
+                  <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                    <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">이름 <span className="text-red-500">*</span></label>
+                    <div className="col-span-3 flex gap-2 w-full">
+                      <input type="text" placeholder="실명 입력 (본인인증)" className="flex-1 p-3 border rounded-lg text-sm min-w-0" />
+                      <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap shrink-0 hover:bg-gray-300 transition">본인인증 하기</button>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-4 gap-4 items-center">
                     <label className="text-right text-sm font-bold text-gray-600">휴대폰 <span className="text-red-500">*</span></label>
                     <div className="col-span-3">
-                      <input type="tel" placeholder="휴대폰 번호 (- 제외)" className="w-full p-3 border rounded-lg text-sm bg-gray-50 text-gray-500" readOnly />
+                      <input type="tel" placeholder="휴대폰 번호 (- 제외)" className="w-full p-3 border rounded-lg text-sm" />
                     </div>
                   </div>
 
@@ -748,7 +772,12 @@ export default function HomePortal() {
                   <div className="flex justify-center gap-4 pt-8">
                     <button onClick={() => setSignupStep(1)} className="px-8 py-4 rounded-xl border border-gray-300 text-gray-500 font-bold hover:bg-gray-50">이전단계</button>
                     <button
-                      onClick={() => setSignupStep(3)}
+                      onClick={() => {
+                        if (signupType === 'corporate' && !businessLicense) {
+                          return alert('사업자등록증을 첨부해주세요.');
+                        }
+                        setSignupStep(3);
+                      }}
                       style={primaryBgStyle}
                       className="px-12 py-4 rounded-xl text-white font-bold shadow-lg hover:opacity-90 transition-all"
                     >
@@ -768,7 +797,9 @@ export default function HomePortal() {
                 <h2 className="text-3xl font-black mb-4">회원가입 완료!</h2>
                 <p className="text-gray-500 mb-8">
                   {brand.displayName}의 회원이 되신 것을 환영합니다.<br />
-                  이제부터 다양한 서비스를 이용하실 수 있습니다.
+                  {signupType === 'corporate'
+                    ? '관리자 승인 후 서비스 이용이 가능합니다. (최대 24시간 소요)'
+                    : '이제부터 다양한 서비스를 이용하실 수 있습니다.'}
                 </p>
                 <button
                   onClick={() => {
@@ -827,7 +858,7 @@ export default function HomePortal() {
 
           {/* Copyright */}
           <div className="text-[10px] text-gray-300 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-8 break-keep">
-            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved. (v2.5 Fixed Layout)</p>
+            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved.</p>
             <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
           </div>
         </div>
