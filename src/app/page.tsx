@@ -545,12 +545,12 @@ export default function HomePortal() {
               >
                 로그인
               </button>
-              <div className="flex justify-between items-center text-[10px] sm:text-sm text-gray-400 px-0 mt-4 whitespace-nowrap gap-0">
-                <span className="cursor-pointer hover:text-gray-600 px-2 flex-1 text-center">아이디 찾기</span>
-                <span className="w-px h-2.5 bg-gray-200 shrink-0"></span>
-                <span className="cursor-pointer hover:text-gray-600 px-2 flex-1 text-center">비밀번호 찾기</span>
-                <span className="w-px h-2.5 bg-gray-200 shrink-0"></span>
-                <button className="text-gray-600 font-bold hover:underline px-2 flex-1 text-center" onClick={() => setCurrentPage('signup')}>회원가입</button>
+              <div className="flex justify-center items-center text-xs text-gray-400 mt-4 whitespace-nowrap gap-3 sm:gap-4">
+                <span className="cursor-pointer hover:text-gray-600">아이디 찾기</span>
+                <span className="w-px h-3 bg-gray-200"></span>
+                <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
+                <span className="w-px h-3 bg-gray-200"></span>
+                <button className="text-gray-600 font-bold hover:underline" onClick={() => setCurrentPage('signup')}>회원가입</button>
               </div>
 
               {/* Social Login */}
