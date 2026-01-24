@@ -806,7 +806,7 @@ export default function HomePortal() {
 
           {/* Copyright */}
           <div className="text-[10px] text-gray-300 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-8">
-            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved. (v2.1 Mobile Patch)</p>
+            <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved. (v2.2 Layout Compact)</p>
             <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
           </div>
         </div>
