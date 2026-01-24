@@ -96,19 +96,24 @@ export default function HomePortal() {
               </span>
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="text-sm text-gray-500 hover:text-gray-900" onClick={() => setCurrentPage('login')}>로그인</button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button className="text-xs sm:text-sm text-gray-500 hover:text-gray-900 whitespace-nowrap" onClick={() => setCurrentPage('login')}>로그인</button>
             <button
               style={primaryBgStyle}
-              className="text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:opacity-90 transition flex items-center gap-1"
+              className="text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:opacity-90 transition flex items-center gap-1 whitespace-nowrap"
               onClick={() => setCurrentPage('payment')}
             >
-              <Pencil size={14} /> 사장님 무료등록
+              <Pencil size={12} className="sm:w-[14px] sm:h-[14px]" />
+              <span className="hidden sm:inline">사장님 무료등록</span>
+              <span className="sm:hidden">무료등록</span>
             </button>
           </div>
         </div>
       </header>
 
+      {/* ... skipping to footer ... */}
+
+      {/* Footer */}
       <main>
         {currentPage === 'home' && (
           <div className="page-home animate-in fade-in duration-500">
