@@ -125,17 +125,17 @@ export default function HomePortal() {
               <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/80 z-0"></div>
               <div className="relative z-10 px-4">
                 <span className="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold mb-2 inline-block animate-pulse">GRAND OPEN</span>
-                <h2 className="text-3xl md:text-5xl font-bold mb-4">사장님! <span style={primaryStyle}>3개월 광고 무료</span> 이벤트</h2>
-                <p className="text-lg text-gray-300 mb-8">지금 가입하면 유료 상품 300만원 상당이 0원!</p>
-                <div className="flex gap-4 justify-center">
+                <h2 className="text-2xl md:text-5xl font-bold mb-4 break-keep">사장님! <span style={primaryStyle} className="whitespace-nowrap">3개월 광고 무료</span> 이벤트</h2>
+                <p className="text-lg text-gray-300 mb-8 break-keep">지금 가입하면 <span className="whitespace-nowrap">유료 상품 300만원 상당이</span> 0원!</p>
+                <div className="flex gap-3 justify-center">
                   <button
-                    className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition"
+                    className="bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-200 transition whitespace-nowrap"
                     onClick={() => setCurrentPage('payment')}
                   >
                     무료로 광고 올리기
                   </button>
                   <button
-                    className="border border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition"
+                    className="border border-white text-white px-6 py-3 rounded-full font-bold hover:bg-white/10 transition whitespace-nowrap"
                     onClick={() => setCurrentPage('signup')}
                   >
                     이력서 등록하기
@@ -783,11 +783,11 @@ export default function HomePortal() {
           </div>
 
           {/* Links */}
-          <div className="flex justify-center gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">이용약관</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors text-gray-600 dark:text-gray-300">개인정보처리방침</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">청소년보호정책</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">광고/제휴문의</span>
+          <div className="flex justify-center flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">이용약관</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors text-gray-600 dark:text-gray-300 whitespace-nowrap">개인정보처리방침</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">청소년보호정책</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">광고/제휴문의</span>
           </div>
 
           {/* Info */}
@@ -798,12 +798,16 @@ export default function HomePortal() {
               사업자등록번호: 226-13-91078
             </p>
             <p className="mt-1">
-              주소: 서울특별시 강남구 테헤란로 123, 4층 |
-              직업정보제공사업 신고번호: 2024-서울강남-1234
+              주소: 서울특별시 강남구 테헤란로 123, 4층
+              <span className="hidden sm:inline"> | </span>
+              <br className="block sm:hidden" />
+              <span className="whitespace-nowrap">직업정보제공사업 신고번호: 2024-서울강남-1234</span>
             </p>
             <p className="mt-1">
-              고객센터: 1544-0000 (평일 09:00 ~ 18:00) |
-              이메일: bizsetter7@gmail.com
+              고객센터: 1544-0000 (평일 09:00 ~ 18:00)
+              <span className="hidden sm:inline"> | </span>
+              <br className="block sm:hidden" />
+              <span className="whitespace-nowrap">이메일: bizsetter7@gmail.com</span>
             </p>
           </div>
 
