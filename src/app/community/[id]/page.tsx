@@ -80,7 +80,7 @@ export default function PostDetailPage() {
             </header>
 
             {/* Content */}
-            <main className="max-w-md mx-auto">
+            <main className="max-w-4xl mx-auto">
                 <div className="p-5 border-b-8 border-gray-50">
                     {/* Post Info */}
                     <div className="flex items-center gap-3 mb-4">
@@ -107,8 +107,8 @@ export default function PostDetailPage() {
                         <button
                             onClick={handleLike}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-colors ${post.isLiked
-                                    ? 'border-pink-500 text-pink-500 bg-pink-50'
-                                    : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                                ? 'border-pink-500 text-pink-500 bg-pink-50'
+                                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
                                 }`}
                         >
                             <Heart size={16} className={post.isLiked ? 'fill-pink-500' : ''} />
@@ -155,7 +155,7 @@ export default function PostDetailPage() {
             </main>
 
             {/* Comment Input Bar (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 pb-8 sm:pb-3 max-w-md mx-auto">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 pb-8 sm:pb-3 max-w-4xl mx-auto">
                 <form onSubmit={handleSubmitComment} className="flex gap-2">
                     <input
                         type="text"

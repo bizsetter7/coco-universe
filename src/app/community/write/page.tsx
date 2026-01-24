@@ -62,7 +62,7 @@ export default function WritePostPage() {
             </header>
 
             {/* Form */}
-            <main className="max-w-md mx-auto p-5 space-y-6">
+            <main className="max-w-4xl mx-auto p-5 space-y-6">
 
                 {/* Category Select */}
                 <div>
@@ -73,8 +73,8 @@ export default function WritePostPage() {
                                 key={cat}
                                 onClick={() => setCategory(cat)}
                                 className={`px-3 py-2 rounded-lg text-xs font-bold border transition-colors ${category === cat
-                                        ? 'border-pink-500 bg-pink-50 text-pink-500'
-                                        : 'border-gray-200 text-gray-500 bg-white'
+                                    ? 'border-pink-500 bg-pink-50 text-pink-500'
+                                    : 'border-gray-200 text-gray-500 bg-white'
                                     }`}
                             >
                                 {cat}

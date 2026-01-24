@@ -115,7 +115,7 @@ export default function CommunityPage() {
 
             {/* --- Top Navigation / Header --- */}
             <header className="bg-white border-b sticky top-0 z-10">
-                <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
                     <h1 className="text-xl font-black text-pink-500 flex items-center gap-2">
                         <MessageCircle className="fill-pink-500" size={24} />
                         그녀들의 수다
@@ -126,7 +126,7 @@ export default function CommunityPage() {
                 </div>
 
                 {/* Categories (Horizontal Scroll) */}
-                <div className="max-w-md mx-auto overflow-x-auto scrollbar-hide">
+                <div className="max-w-4xl mx-auto overflow-x-auto scrollbar-hide">
                     <div className="flex px-4 border-b">
                         {CATEGORIES.map((cat) => (
                             <button
@@ -145,7 +145,7 @@ export default function CommunityPage() {
             </header>
 
             {/* --- Dev Tool: User Type Toggle (For Verification) --- */}
-            <div className="max-w-md mx-auto p-2 bg-yellow-50 border-b border-yellow-200 flex items-center justify-between text-xs text-yellow-800">
+            <div className="max-w-4xl mx-auto p-2 bg-yellow-50 border-b border-yellow-200 flex items-center justify-between text-xs text-yellow-800">
                 <span className="font-bold">👀 [관리자 모드] 현재 접속 권한:</span>
                 <div className="flex gap-1">
                     <button
@@ -164,7 +164,7 @@ export default function CommunityPage() {
             </div>
 
             {/* --- Main Content --- */}
-            <main className="max-w-md mx-auto p-4 space-y-4">
+            <main className="max-w-4xl mx-auto p-4 space-y-4">
 
                 {/* Notice Banner (Optional) */}
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-pink-100 flex items-start gap-3">
