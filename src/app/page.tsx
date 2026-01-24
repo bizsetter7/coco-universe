@@ -1,9 +1,10 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
-import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase } from 'lucide-react';
+import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
+import EventPopup from '@/components/EventPopup';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
 
@@ -111,6 +112,9 @@ export default function HomePortal() {
       <main>
         {currentPage === 'home' && (
           <div className="page-home animate-in fade-in duration-500">
+            {/* Event Popup */}
+            <EventPopup brand={brand} />
+
             {/* 롤링 배너 */}
             <div className="bg-gray-900 h-64 md:h-80 relative overflow-hidden flex items-center justify-center text-white text-center">
               <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/80 z-0"></div>
@@ -118,16 +122,59 @@ export default function HomePortal() {
                 <span className="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold mb-2 inline-block animate-pulse">GRAND OPEN</span>
                 <h2 className="text-3xl md:text-5xl font-bold mb-4">사장님! <span style={primaryStyle}>3개월 광고 무료</span> 이벤트</h2>
                 <p className="text-lg text-gray-300 mb-8">지금 가입하면 유료 상품 300만원 상당이 0원!</p>
-                <button
-                  className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition"
-                  onClick={() => setCurrentPage('payment')}
-                >
-                  무료로 광고 올리기
-                </button>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition"
+                    onClick={() => setCurrentPage('payment')}
+                  >
+                    무료로 광고 올리기
+                  </button>
+                  <button
+                    className="border border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition"
+                    onClick={() => setCurrentPage('signup')}
+                  >
+                    이력서 등록하기
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-8">
+              {/* Quick Icon Grid (Mobile First) */}
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-10">
+                {[
+                  { label: '업종별채용', icon: <Briefcase />, bg: 'bg-purple-100', color: 'text-purple-600', link: 'home' },
+                  { label: '지역별채용', icon: <Home />, bg: 'bg-blue-100', color: 'text-blue-600', link: 'home' },
+                  { label: '무료법률자문', icon: <Scale />, bg: 'bg-gray-100', color: 'text-gray-600', link: 'community' },
+                  { label: '중고거래', icon: <ShoppingBag />, bg: 'bg-green-100', color: 'text-green-600', link: 'community' },
+                  { label: '커뮤니티', icon: <Moon />, bg: 'bg-indigo-100', color: 'text-indigo-600', link: 'community' },
+                  { label: '친구찾기', icon: <Users />, bg: 'bg-pink-100', color: 'text-pink-600', link: 'community' },
+                  { label: '베스트글', icon: <Trophy />, bg: 'bg-yellow-100', color: 'text-yellow-600', link: 'community' },
+                  { label: '인재정보', icon: <User />, bg: 'bg-teal-100', color: 'text-teal-600', link: 'login' },
+                  { label: '이력서등록', icon: <FileText />, bg: 'bg-red-100', color: 'text-red-500', link: 'signup' },
+                  { label: '채용공고등록', icon: <PlusSquare />, bg: 'bg-orange-100', color: 'text-orange-600', link: 'payment' },
+                  { label: '광고문의', icon: <Megaphone />, bg: 'bg-slate-100', color: 'text-slate-600', link: 'home' },
+                  { label: '이벤트', icon: <Gift />, bg: 'bg-rose-100', color: 'text-rose-500', link: 'home' },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    onClick={() => {
+                      if (item.label === '지역별채용') {
+                        document.getElementById('region-section')?.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        setCurrentPage(item.link);
+                      }
+                    }}
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl cursor-pointer hover:scale-105 transition-transform border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100 shadow-sm'}`}
+                  >
+                    <div className={`w-12 h-12 rounded-full mb-2 flex items-center justify-center ${item.bg} ${item.color}`}>
+                      {item.icon}
+                    </div>
+                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+
               {/* 베스트 썰 (유입용) */}
               <div onClick={() => setCurrentPage('community')} className={`border p-4 rounded-xl shadow-sm mb-10 cursor-pointer hover:opacity-90 transition ${brand.theme === 'dark' ? 'bg-gray-800 border-pink-900' : 'bg-white border-pink-200'}`}>
                 <div className="flex justify-between items-center mb-2">
