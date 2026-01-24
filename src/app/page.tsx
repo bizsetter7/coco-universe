@@ -555,19 +555,19 @@ export default function HomePortal() {
           <div className="max-w-3xl mx-auto px-4 py-8 animate-in fade-in duration-500">
             {/* Step Indicator */}
             <div className="flex justify-between items-center mb-10 border-b pb-4">
-              <div className={`flex items-center gap-2 ${signupStep >= 1 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>1</div>
-                <span>약관동의</span>
+              <div className={`flex items-center gap-2 ${signupStep >= 1 ? 'font-bold' : 'text-gray-300'}`} style={{ color: signupStep >= 1 ? brand.primaryColor : undefined }}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 1 ? 'text-white' : 'bg-gray-100'}`} style={{ backgroundColor: signupStep >= 1 ? brand.primaryColor : undefined }}>1</div>
+                <span className="whitespace-nowrap text-sm sm:text-base">약관동의</span>
               </div>
-              <div className="h-px bg-gray-200 flex-1 mx-4"></div>
-              <div className={`flex items-center gap-2 ${signupStep >= 2 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>2</div>
-                <span>정보입력</span>
+              <div className="h-px bg-gray-200 flex-1 mx-2 sm:mx-4"></div>
+              <div className={`flex items-center gap-2 ${signupStep >= 2 ? 'font-bold' : 'text-gray-300'}`} style={{ color: signupStep >= 2 ? brand.primaryColor : undefined }}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 2 ? 'text-white' : 'bg-gray-100'}`} style={{ backgroundColor: signupStep >= 2 ? brand.primaryColor : undefined }}>2</div>
+                <span className="whitespace-nowrap text-sm sm:text-base">정보입력</span>
               </div>
-              <div className="h-px bg-gray-200 flex-1 mx-4"></div>
-              <div className={`flex items-center gap-2 ${signupStep >= 3 ? 'text-blue-600 font-bold' : 'text-gray-300'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>3</div>
-                <span>가입완료</span>
+              <div className="h-px bg-gray-200 flex-1 mx-2 sm:mx-4"></div>
+              <div className={`flex items-center gap-2 ${signupStep >= 3 ? 'font-bold' : 'text-gray-300'}`} style={{ color: signupStep >= 3 ? brand.primaryColor : undefined }}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${signupStep >= 3 ? 'text-white' : 'bg-gray-100'}`} style={{ backgroundColor: signupStep >= 3 ? brand.primaryColor : undefined }}>3</div>
+                <span className="whitespace-nowrap text-sm sm:text-base">가입완료</span>
               </div>
             </div>
 
@@ -647,19 +647,33 @@ export default function HomePortal() {
                 <div className="flex mb-8">
                   <button
                     onClick={() => setSignupType('individual')}
-                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors ${signupType === 'individual' ? 'border-pink-500 text-pink-500 bg-pink-50/50' : 'border-gray-200 text-gray-400'}`}
+                    style={{
+                      borderColor: signupType === 'individual' ? '#EC4899' : undefined, // Keep pink for individual/job-seeker as convention or brand color? User asked for blue replacement. Keeping Pink for contrast usually good but let's stick to user request "concept color". Actually user said "Blue text... change to concept color". Individual was Pink. I will keep Pink for Individual to differentiate, or use brand color for BOTH if the brand assumes one identity. But usually Job Seeker = Brand Color 1, Shop = Brand Color 2?
+                      // Wait, "현재 회원가입에 보이는 파랑색으로 뜨는 글씨들은... 변경해봐줘". Individual is Pink. Corporate is Blue.
+                      // So I only need to change Corporate (Blue) to Brand Color.
+                      // What if Brand Color is Pink? Then both align. 
+                      // Let's keep Pink manual for now unless requested otherwise, and change Blue to Brand Color.
+                      color: signupType === 'individual' ? '#EC4899' : undefined,
+                      backgroundColor: signupType === 'individual' ? '#fdf2f8' : undefined
+                    }}
+                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors whitespace-nowrap ${signupType === 'individual' ? 'border-pink-500 text-pink-500 bg-pink-50/50' : 'border-gray-200 text-gray-400'}`}
                   >
                     <User className="inline-block mr-2 mb-1" size={18} />
-                    개인회원 (구직자용)
-                    <p className="text-[10px] font-normal mt-1">이력서 등록 및 입사지원</p>
+                    개인회원 (구직)
+                    <p className="text-[10px] font-normal mt-1 break-keep">이력서 등록 및 입사지원</p>
                   </button>
                   <button
                     onClick={() => setSignupType('corporate')}
-                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors ${signupType === 'corporate' ? 'border-blue-500 text-blue-500 bg-blue-50/50' : 'border-gray-200 text-gray-400'}`}
+                    style={{
+                      borderColor: signupType === 'corporate' ? brand.primaryColor : undefined,
+                      color: signupType === 'corporate' ? brand.primaryColor : undefined,
+                      backgroundColor: signupType === 'corporate' ? `${brand.primaryColor}10` : undefined // 10% opacity hex approximation
+                    }}
+                    className={`flex-1 py-4 font-bold text-center border-b-2 transition-colors whitespace-nowrap ${signupType === 'corporate' ? 'border-blue-500 text-blue-500 bg-blue-50/50' : 'border-gray-200 text-gray-400'}`}
                   >
                     <Briefcase className="inline-block mr-2 mb-1" size={18} />
-                    기업회원 (구인자용)
-                    <p className="text-[10px] font-normal mt-1">채용공고 등록 및 인재열람</p>
+                    업소회원 (구인)
+                    <p className="text-[10px] font-normal mt-1 break-keep">채용공고 등록 및 인재열람</p>
                   </button>
                 </div>
 
@@ -785,7 +799,7 @@ export default function HomePortal() {
           {/* Links */}
           <div className="flex justify-center flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
             <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">이용약관</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors text-gray-600 dark:text-gray-300 whitespace-nowrap">개인정보처리방침</span>
+            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors font-bold whitespace-nowrap">개인정보처리방침</span>
             <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">청소년보호정책</span>
             <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">광고/제휴문의</span>
           </div>
