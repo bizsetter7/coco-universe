@@ -732,7 +732,7 @@ export default function HomePortal() {
                         <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
 
                         <div className="flex gap-2 items-center">
-                          <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition ${businessLicense ? 'border-brand-primary bg-blue-50/10' : 'border-gray-300'}`} style={{ borderColor: businessLicense ? brand.primaryColor : undefined }}>
+                          <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition min-w-0 ${businessLicense ? 'border-brand-primary bg-blue-50/10' : 'border-gray-300'}`} style={{ borderColor: businessLicense ? brand.primaryColor : undefined }}>
                             <input
                               type="file"
                               className="hidden"
@@ -753,7 +753,7 @@ export default function HomePortal() {
                               </span>
                             )}
                           </label>
-                          <span className="text-[10px] text-gray-400 break-keep">
+                          <span className="text-[10px] text-gray-400 break-keep shrink-0">
                             * 관리자 승인 후 가입이 완료됩니다.
                           </span>
                         </div>
