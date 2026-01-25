@@ -22,7 +22,14 @@ const RIGHT_BANNERS: Banner[] = [
 ];
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
+    const [mounted, setMounted] = React.useState(false);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
 
     return (
         <aside
