@@ -22,71 +22,28 @@ const RIGHT_BANNERS: Banner[] = [
 ];
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
-    const sidebarRef = React.useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = React.useState(false);
-    const [scrollProgress, setScrollProgress] = React.useState(0);
-    const [sidebarHeight, setSidebarHeight] = React.useState(0);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
-
-        const updateHeight = () => {
-            if (sidebarRef.current) {
-                setSidebarHeight(sidebarRef.current.offsetHeight);
-            }
-        };
-
-        const handleScroll = () => {
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            if (docHeight > 0) {
-                setScrollProgress(window.scrollY / docHeight);
-            }
-            updateHeight();
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', updateHeight);
-
-        // Initial height measure and periodically check
-        const timers = [
-            setTimeout(updateHeight, 100),
-            setTimeout(updateHeight, 500),
-            setTimeout(updateHeight, 2000)
-        ];
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', updateHeight);
-            timers.forEach(clearTimeout);
-        };
     }, []);
 
     if (!mounted) return null;
 
-    // Proportional Follower Math
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const scrollOffset = 115;
-    const bottomMargin = 40;
-
-    // Total distance the sidebar needs to travel up to reveal its bottom
-    const maxTravel = Math.max(0, sidebarHeight + scrollOffset + bottomMargin - viewportHeight);
-    const dynamicTop = scrollOffset - (scrollProgress * maxTravel);
-
     return (
         <aside
-            ref={sidebarRef}
-            className={`hidden 2xl:flex flex-col fixed z-40 animate-in fade-in duration-700 w-[120px]`}
+            className={`hidden 2xl:flex flex-col fixed top-[115px] z-40 animate-in fade-in duration-700 h-[calc(100vh-135px)] w-[120px]`}
             style={{
                 [side]: `calc(50% - 510px - 130px)`,
-                top: `${dynamicTop}px`
+                // 510px is half of 1020px stage, 130px is sidebar width(120) + 10px gap
             }}
         >
             <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
                 {side === 'left' ? 'BEST AD' : 'PREMIUM'}
             </div>
 
-            <div className="py-2">
+            <div className="flex-1 overflow-y-auto no-scrollbar py-2">
                 <div className="flex flex-col gap-2 p-1 bg-white/50 backdrop-blur-md rounded-b-xl border border-gray-100 shadow-xl overflow-hidden mb-3">
                     {banners.map((banner) => (
                         <div
@@ -110,6 +67,16 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                     <p className="text-sm font-black text-gray-800">1544-5568</p>
                 </div>
             </div>
+
+            <style jsx global>{`
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </aside>
     );
 };
