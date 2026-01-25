@@ -38,6 +38,11 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         setMounted(true);
         if (typeof window === 'undefined') return;
 
+        // Set initial transition programmatically to avoid React conflicts
+        if (asideRef.current) {
+            asideRef.current.style.transition = 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        }
+
         const updatePosition = (options: { immediate?: boolean } = {}) => {
             if (!asideRef.current) return;
 
@@ -49,15 +54,10 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // Default target: Scroll Position + Header Offset (16px)
             let targetTop = scrollY + 16;
 
-            // Smart Bottom-Align Logic (for small screens/tall banners)
-            // If banner is taller than viewport, we stick it such that the bottom is visible
+            // Smart Bottom-Align Logic
             const isTall = sidebarHeight + 16 > viewportHeight;
             if (isTall) {
-                // Calculate the point where the sidebar bottom touches the viewport bottom
-                // Target = Scroll + Viewport - SidebarHeight - BottomGap
                 targetTop = scrollY + viewportHeight - sidebarHeight - 40;
-
-                // But don't go ABOVE the original start point (16px absolute) if we are at the top
                 if (targetTop < 16) targetTop = 16;
             }
 
@@ -65,23 +65,27 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // const maxTop = docHeight - sidebarHeight - 40; 
             // targetTop = Math.min(targetTop, maxTop);
 
-            // Distance Check: If moving huge distance (e.g. layout change), snap instantly
+            // Distance Check: Lower threshold to 150px to catch smaller layout shifts
             const currentTop = parseFloat(asideRef.current.style.top || '16');
-            if (Math.abs(targetTop - currentTop) > 300) {
+            if (Math.abs(targetTop - currentTop) > 150) {
                 options.immediate = true;
             }
 
             if (options.immediate) {
-                setTransition(false);
+                setTransition(false); // Force None
                 asideRef.current.style.top = `${targetTop}px`;
-                // Force reflow
-                void asideRef.current.offsetHeight;
-                // Restore transition with slight delay to ensure 'none' applied
+                void asideRef.current.offsetHeight; // Force Reflow
+
+                // Restore separately to avoid race conditions
                 setTimeout(() => {
                     setTransition(true);
-                }, 50);
+                }, 100);
             } else {
-                setTransition(true);
+                // Ensure transition is ON for normal movement
+                // We access the ref directly to avoid React state/prop interference
+                if (asideRef.current.style.transition === 'none') {
+                    setTransition(true);
+                }
                 asideRef.current.style.top = `${targetTop}px`;
             }
         };
@@ -104,8 +108,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('scroll', () => updatePosition());
-            window.removeEventListener('resize', () => updatePosition());
+            window.removeEventListener('scroll', () => updatePosition({ immediate: false })); // Fix cleanup signature
+            window.removeEventListener('resize', () => updatePosition({ immediate: true }));
         };
     }, []);
 
@@ -133,8 +137,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             style={{
                 top: '16px', // Initial static position
                 [side]: `calc(50% - 510px - 130px)`, // Restore horizontal position
-                // Transition handled by ref/JS to toggle between 'none' and 'cubic-bezier'
-                transition: 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                // Transition REMOVED from here to prevent React hydration/update overrides.
+                // It is fully managed by the JS side-effect above.
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
