@@ -8,6 +8,7 @@ import Link from 'next/link';
 export default function LoungePage() {
     const brand = useBrand();
     const [activeTab, setActiveTab] = useState('main'); // 'main', 'diet', 'mbti', 'fortune'
+    const [showResult, setShowResult] = useState(false);
 
     const primaryStyle = { color: brand.primaryColor };
     const primaryBgStyle = { backgroundColor: brand.primaryColor };
@@ -15,6 +16,7 @@ export default function LoungePage() {
     // Scroll to top when tab changes
     useEffect(() => {
         window.scrollTo(0, 0);
+        setShowResult(false);
     }, [activeTab]);
 
     return (
@@ -115,43 +117,62 @@ export default function LoungePage() {
                 {activeTab === 'diet' && (
                     <div className="animate-in slide-in-from-right duration-500">
                         <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
-                            <div className="text-center mb-8">
-                                <div className="bg-emerald-100 text-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3 shadow-lg shadow-emerald-500/10">
-                                    <Apple size={40} />
-                                </div>
-                                <h2 className="text-3xl font-black mb-2 tracking-tight">프리미엄 식단 관리</h2>
-                                <p className="text-gray-500 text-sm">과학적인 BMI 분석과 맞춤 식단으로 관리하세요.</p>
-                            </div>
+                            {!showResult ? (
+                                <>
+                                    <div className="text-center mb-8">
+                                        <div className="bg-emerald-100 text-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3 shadow-lg shadow-emerald-500/10">
+                                            <Apple size={40} />
+                                        </div>
+                                        <h2 className="text-3xl font-black mb-2 tracking-tight">프리미엄 식단 관리</h2>
+                                        <p className="text-gray-500 text-sm">과학적인 BMI 분석과 맞춤 식단으로 관리하세요.</p>
+                                    </div>
 
-                            <div className="space-y-8">
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Height (cm)</label>
-                                        <div className="relative">
-                                            <input type="number" placeholder="165" className={`w-full p-4 pl-12 rounded-2xl border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'}`} />
-                                            <Calculator size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <div className="space-y-8">
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Height (cm)</label>
+                                                <div className="relative">
+                                                    <input type="number" placeholder="165" className={`w-full p-4 pl-12 rounded-2xl border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'}`} />
+                                                    <Calculator size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Weight (kg)</label>
+                                                <div className="relative">
+                                                    <input type="number" placeholder="50" className={`w-full p-4 pl-12 rounded-2xl border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'}`} />
+                                                    <Heart size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            style={{ backgroundColor: '#10b981' }}
+                                            className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-[0.98] transition-transform text-lg"
+                                            onClick={() => setShowResult(true)}
+                                        >
+                                            맞춤형 식단 리포트 받기
+                                        </button>
+
+                                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
+                                            💡 **Tip**: 균형 잡힌 식단은 피부 건강과 체력 유지의 핵심입니다. 무리한 단식보다는 규칙적인 연어, 견과류 섭취를 추천드려요!
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Weight (kg)</label>
-                                        <div className="relative">
-                                            <input type="number" placeholder="50" className={`w-full p-4 pl-12 rounded-2xl border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'}`} />
-                                            <Heart size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                </>
+                            ) : (
+                                <div className="text-center py-6 animate-in zoom-in-95 duration-300">
+                                    <h3 className="text-2xl font-black mb-6">분석 결과: <span className="text-emerald-500">정상체중</span></h3>
+                                    <div className="space-y-4 text-left">
+                                        <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl">
+                                            <p className="font-bold text-emerald-600 mb-1">📋 맞춤 가이드</p>
+                                            <p className="text-sm text-gray-600">현재 매우 건강한 상태입니다. 근육량 유지를 위해 단백질 위주의 식단을 추천합니다.</p>
+                                        </div>
+                                        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+                                            <p className="font-bold text-gray-700 mb-1">🥦 오늘의 추천 식단</p>
+                                            <p className="text-sm text-gray-500">아침: 귀리 요거트 / 점심: 닭가슴살 샐러드 / 저녁: 구운 생선과 야채</p>
                                         </div>
                                     </div>
+                                    <button onClick={() => setShowResult(false)} className="mt-8 text-sm text-gray-400 underline">다시 계산하기</button>
                                 </div>
-                                <button
-                                    style={{ backgroundColor: '#10b981' }}
-                                    className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-[0.98] transition-transform text-lg"
-                                    onClick={() => alert('BMI 계산 중... 전문 식단 가이드가 곧 공개됩니다!')}
-                                >
-                                    맞춤형 식단 리포트 받기
-                                </button>
-
-                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
-                                    💡 **Tip**: 균형 잡힌 식단은 피부 건강과 체력 유지의 핵심입니다. 무리한 단식보다는 규칙적인 연어, 견과류 섭취를 추천드려요!
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -178,7 +199,7 @@ export default function LoungePage() {
                                 <button
                                     style={{ backgroundColor: '#a855f7' }}
                                     className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-purple-500/20 hover:scale-[0.98] transition-transform text-lg"
-                                    onClick={() => alert('테스트가 준비 중입니다!')}
+                                    onClick={() => alert('본 테스트는 회원가입 후 이용 가능합니다!')}
                                 >
                                     테스트 시작하기 (무료)
                                 </button>
@@ -191,35 +212,47 @@ export default function LoungePage() {
                 {activeTab === 'fortune' && (
                     <div className="animate-in slide-in-from-right duration-500">
                         <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
-                            <div className="text-center mb-10">
-                                <div className="bg-amber-100 text-amber-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/20">
-                                    <Moon size={40} />
+                            {!showResult ? (
+                                <>
+                                    <div className="text-center mb-10">
+                                        <div className="bg-amber-100 text-amber-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/20">
+                                            <Moon size={40} />
+                                        </div>
+                                        <h2 className="text-3xl font-black mb-2 tracking-tight">오늘의 프리미엄 사주</h2>
+                                        <p className="text-gray-500 text-sm">재물, 연애, 비즈니스 운세를 매일 아침 확인하세요.</p>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Birth Date</label>
+                                            <input type="date" className={`w-full p-5 rounded-2xl border text-lg ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'} outline-none focus:border-amber-500 transition-all`} />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button className={`p-4 rounded-xl border-2 font-black transition-all ${brand.theme === 'dark' ? 'border-gray-700 text-gray-500' : 'border-stone-100 text-stone-400'}`}>오전 생</button>
+                                            <button className="p-4 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-600 font-black shadow-md shadow-amber-500/10">오후 생</button>
+                                        </div>
+
+                                        <button
+                                            style={{ backgroundColor: '#f59e0b' }}
+                                            className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-[0.98] transition-transform text-lg"
+                                            onClick={() => setShowResult(true)}
+                                        >
+                                            지금 운세 확인하기
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center py-6 animate-in slide-in-from-bottom-4 duration-300">
+                                    <div className="text-5xl mb-6">💰</div>
+                                    <h3 className="text-2xl font-black mb-4">오늘의 재물운: <span className="text-amber-500">최상(★★★★★)</span></h3>
+                                    <div className="p-6 bg-amber-50 dark:bg-amber-900/10 rounded-3xl text-left border border-amber-100">
+                                        <p className="font-bold text-amber-700 mb-2 italic">"동쪽에서 귀인이 나타나 큰 재물을 가져다줄 기운입니다."</p>
+                                        <p className="text-sm text-gray-600 leading-relaxed">오늘은 새로운 인연보다는 기존의 인연에서 큰 득이 있을 날입니다. 오후 3시에서 5시 사이가 가장 길한 시간대이니 참고하세요.</p>
+                                    </div>
+                                    <button onClick={() => setShowResult(false)} className="mt-8 text-sm text-gray-400 underline">다른 생일로 확인하기</button>
                                 </div>
-                                <h2 className="text-3xl font-black mb-2 tracking-tight">오늘의 프리미엄 사주</h2>
-                                <p className="text-gray-500 text-sm">재물, 연애, 비즈니스 운세를 매일 아침 확인하세요.</p>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Birth Date</label>
-                                    <input type="date" className={`w-full p-5 rounded-2xl border text-lg ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-stone-50 border-stone-200'} outline-none focus:border-amber-500 transition-all`} />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button className={`p-4 rounded-xl border-2 font-black transition-all ${brand.theme === 'dark' ? 'border-gray-700 text-gray-500' : 'border-stone-100 text-stone-400'}`}>오전 생</button>
-                                    <button className="p-4 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-600 font-black shadow-md shadow-amber-500/10">오후 생</button>
-                                </div>
-
-                                <button
-                                    style={{ backgroundColor: '#f59e0b' }}
-                                    className="w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-amber-500/20 hover:scale-[0.98] transition-transform text-lg"
-                                    onClick={() => alert('오늘의 운세 데이터를 불러오는 중입니다!')}
-                                >
-                                    지금 운세 확인하기
-                                </button>
-
-                                <p className="text-center text-[10px] text-gray-400">※ 입력하신 생년월일 정보는 운세 분석 후 즉시 파기됩니다.</p>
-                            </div>
+                            )}
                         </div>
                     </div>
                 )}

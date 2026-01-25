@@ -193,9 +193,13 @@ export default function HomePortal() {
                     onClick={() => {
                       if (item.label === '지역별채용') {
                         document.getElementById('region-section')?.scrollIntoView({ behavior: 'smooth' });
-                      } else if (item.link === 'community') {
-                        router.push('/community');
                       } else if (item.label === '무료법률자문') {
+                        router.push('/community?category=무료법률상담');
+                      } else if (item.label === '중고거래') {
+                        router.push('/community?category=중고거래');
+                      } else if (item.label === '친구찾기') {
+                        router.push('/community?category=친구찾기');
+                      } else if (item.link === 'community') {
                         router.push('/community');
                       } else if (item.label === '광고문의') {
                         router.push('/customer-center');
@@ -220,8 +224,9 @@ export default function HomePortal() {
                   <span className="text-xs text-gray-400">더보기 &gt;</span>
                 </div>
                 <div className="space-y-2">
-                  <p className="truncate text-sm">🔥 <strong>[블랙]</strong> 강남 ㅇㅇ가게 절대 가지마세요 (녹취 있음)</p>
-                  <p className="truncate text-sm">💬 어제 팁으로만 100만원 받은 썰 푼다 ㅋㅋ</p>
+                  <p className="truncate text-sm">🔥 <strong>[Talk]</strong> 언니들 오늘 손님 진상 썰 푼다...ㅠㅠ (댓글 5)</p>
+                  <p className="truncate text-sm">💬 <strong>[Talk]</strong> 팁으로만 100만원 찍은 썰 ㅋㅋ (추천 45)</p>
+                  <p className="truncate text-sm">⭐ <strong>[뷰티]</strong> 홀복 예쁜 쇼핑몰 추천 리스트 공유!</p>
                 </div>
               </div>
 
@@ -861,10 +866,10 @@ export default function HomePortal() {
 
           {/* Links */}
           <div className="flex justify-center flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">이용약관</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors font-bold whitespace-nowrap">개인정보처리방침</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">청소년보호정책</span>
-            <span className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">광고/제휴문의</span>
+            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">이용약관</span>
+            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors font-bold whitespace-nowrap">개인정보처리방침</span>
+            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">청소년보호정책</span>
+            <span onClick={() => router.push('/customer-center')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">광고/제휴문의</span>
           </div>
 
           {/* Info */}
@@ -898,20 +903,20 @@ export default function HomePortal() {
 
       {/* Mobile Nav */}
       <nav className={`md:hidden fixed bottom-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <button onClick={() => setCurrentPage('home')} className="flex flex-col items-center gap-1 hover:text-brand-primary active:text-brand-primary">
+        <button onClick={() => setCurrentPage('home')} className="flex flex-col items-center gap-1 hover:text-brand-primary active:text-brand-primary transition-colors">
           <Home size={20} /> 홈
         </button>
-        <button onClick={() => router.push('/community')} className="flex flex-col items-center gap-1 hover:text-brand-primary">
+        <button onClick={() => router.push('/community')} className="flex flex-col items-center gap-1 hover:text-brand-primary transition-colors">
           <MessageCircle size={20} /> 커뮤니티
         </button>
-        <button onClick={() => setCurrentPage('payment')} className="flex flex-col items-center gap-1 font-bold" style={{ color: brand.primaryColor }}>
-          <PlusCircle size={32} className="-mt-4 bg-white rounded-full shadow-lg" />
-          광고등록
+        <button onClick={() => setCurrentPage('payment')} className="flex flex-col items-center gap-1 font-bold group" style={{ color: brand.primaryColor }}>
+          <PlusCircle size={36} className="-mt-6 bg-white rounded-full shadow-lg border-4 border-white group-active:scale-95 transition-transform" />
+          <span className="mt-1">광고등록</span>
         </button>
-        <Link href="/lounge" className="flex flex-col items-center gap-1 hover:text-brand-primary">
+        <Link href="/lounge" className="flex flex-col items-center gap-1 hover:text-brand-primary transition-colors">
           <Sparkles size={20} /> 라운지
         </Link>
-        <button className="flex flex-col items-center gap-1 hover:text-brand-primary">
+        <button onClick={() => setCurrentPage('login')} className="flex flex-col items-center gap-1 hover:text-brand-primary transition-colors">
           <User size={20} /> MY
         </button>
       </nav>
