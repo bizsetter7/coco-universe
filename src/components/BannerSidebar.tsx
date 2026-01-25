@@ -74,6 +74,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                 if (targetTop < 16) targetTop = 16;
             }
 
+            const currentTop = parseFloat(asideRef.current.style.top || '16');
+
             // Critical Safety Clamp during Layout Shifts (Snap Mode)
             // If the document shrunk, we MUST NOT position the sidebar below the new footer.
             // We only enforce this hard clamp when shifting layouts to fix "stuck at bottom" issues on short pages.
@@ -86,12 +88,24 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // Should never be above 16
             if (targetTop < 16) targetTop = 16;
 
-            const currentTop = parseFloat(asideRef.current.style.top || '16');
-
             // Forced Snap Check: Snap Mode OR Huge Distance (>100px)
             if (isSnapMode.current || Math.abs(targetTop - currentTop) > 100) {
                 options.immediate = true;
             }
+
+            // GLOBAL SAFETY CLAMP (Always Active)
+            // Prevents sidebar from EVER being below the footer, regardless of mode.
+            const maxTop = docHeight - sidebarHeight - 40;
+            if (targetTop > maxTop) {
+                targetTop = maxTop;
+                // If we are clamping, likely we hit bottom, so snap to it prevents 'bouncing' at bottom
+                // But let's keep elastic if the user is just scrolling down. 
+                // However, for layout shifts (doc shrinking), this clamp is critical.
+            }
+
+            if (targetTop < 16) targetTop = 16;
+
+            const currentTop = parseFloat(asideRef.current.style.top || '16');
 
             if (options.immediate) {
                 setSnapClass(true); // Disable transition via !important class
@@ -125,9 +139,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             updatePosition({ immediate: true });
         });
 
-        if (document.body) {
-            resizeObserver.observe(document.body);
-        }
+        // Observe the ROOT element for height changes (more reliable for full page size)
+        resizeObserver.observe(document.documentElement);
 
         window.addEventListener('scroll', () => updatePosition({ immediate: false }), { passive: true });
         window.addEventListener('resize', () => updatePosition({ immediate: true }));
@@ -142,22 +155,27 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         };
     }, []);
 
-    // Navigation Snap
+    // Navigation Cloaking & Snap
     React.useLayoutEffect(() => {
         if (!asideRef.current) return;
 
-        // 1. Immediately kill transition and reset top
+        // 1. Cloak (Hide) and Reset
+        asideRef.current.style.opacity = '0';
         setSnapClass(true);
         asideRef.current.style.top = '16px';
-        void asideRef.current.offsetHeight; // Force Paint
+        void asideRef.current.offsetHeight;
 
-        // 2. Enable strict snap mode for 300ms to catch any browser scroll restoration lag
+        // 2. Enable strict snap mode logic
         isSnapMode.current = true;
 
+        // 3. Reveal after layout settles (200ms)
         const timer = setTimeout(() => {
-            isSnapMode.current = false;
-            setSnapClass(false); // Re-enable elastic feel
-        }, 300);
+            if (asideRef.current) {
+                asideRef.current.style.opacity = '1';
+                isSnapMode.current = false;
+                setSnapClass(false);
+            }
+        }, 200);
 
         return () => clearTimeout(timer);
     }, [pathname]);
