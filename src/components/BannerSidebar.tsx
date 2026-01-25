@@ -33,7 +33,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
     return (
         <aside
-            className={`hidden 2xl:flex flex-col mt-[138px] w-[120px] shrink-0 animate-in fade-in duration-700`}
+            className={`hidden 2xl:flex flex-col mt-[16px] w-[120px] shrink-0 animate-in fade-in duration-700`}
             style={{
                 [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
             }}
