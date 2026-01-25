@@ -22,63 +22,20 @@ const RIGHT_BANNERS: Banner[] = [
 ];
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
-    const asideRef = React.useRef<HTMLElement>(null);
     const [mounted, setMounted] = React.useState(false);
-    const [stickyTop, setStickyTop] = React.useState(115);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
-        if (typeof window === 'undefined') return;
-
-        const calculateSticky = () => {
-            if (!asideRef.current) return;
-
-            const viewportHeight = window.innerHeight;
-            const sidebarHeight = asideRef.current.offsetHeight;
-            const defaultTop = 115;
-            const bottomGap = 40;
-
-            // If sidebar is taller than viewport (fitting logic)
-            // We want it to stick such that the bottom is visible (aligned to viewport bottom - gap)
-            // Formula: stickyTop = ViewportHeight - SidebarHeight - BottomGap
-            if (sidebarHeight + defaultTop > viewportHeight) {
-                setStickyTop(viewportHeight - sidebarHeight - bottomGap);
-            } else {
-                setStickyTop(defaultTop);
-            }
-        };
-
-        const resizeObserver = new ResizeObserver(() => {
-            calculateSticky();
-        });
-
-        if (asideRef.current) {
-            resizeObserver.observe(asideRef.current);
-        }
-
-        window.addEventListener('resize', calculateSticky);
-
-        // Initial calculation delay to ensure rendering
-        const timer = setTimeout(calculateSticky, 100);
-
-        return () => {
-            resizeObserver.disconnect();
-            window.removeEventListener('resize', calculateSticky);
-            clearTimeout(timer);
-        };
     }, []);
 
     if (!mounted) return null;
 
     return (
         <aside
-            ref={asideRef}
-            className={`hidden 2xl:flex flex-col sticky z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
+            className={`hidden 2xl:flex flex-col mt-[138px] w-[120px] shrink-0 animate-in fade-in duration-700`}
             style={{
-                top: `${stickyTop}px`,
                 [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
-                transition: 'top 0.3s ease-out' // Smooth adjustment on resize
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
