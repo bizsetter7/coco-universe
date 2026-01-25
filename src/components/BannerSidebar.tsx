@@ -33,21 +33,22 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
     return (
         <aside
-            className={`hidden 2xl:flex flex-col sticky top-[115px] z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
+            className={`hidden 2xl:flex flex-col fixed top-[115px] z-40 animate-in fade-in duration-700 w-[120px] shadow-sm`}
             style={{
-                [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
+                [side]: `calc(50% - 510px - 130px)`,
+                // 510px is half of 1020px stage, 130px is sidebar width(120) + 10px gap
             }}
         >
-            <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
+            <div className={`py-1.5 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
                 {side === 'left' ? 'BEST AD' : 'PREMIUM'}
             </div>
 
-            <div className="py-2">
-                <div className="flex flex-col gap-2 p-1 bg-white/50 backdrop-blur-md rounded-b-xl border border-gray-100 shadow-xl overflow-hidden mb-3">
+            <div className="bg-white/50 backdrop-blur-md rounded-b-xl border border-gray-100 shadow-xl overflow-hidden p-1">
+                <div className="flex flex-col gap-1.5">
                     {banners.map((banner) => (
                         <div
                             key={banner.id}
-                            className="relative w-full aspect-[1/2] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
+                            className="relative w-full aspect-[1.1/1] rounded-lg overflow-hidden border border-gray-50 hover:border-pink-500 transition-all cursor-pointer group"
                         >
                             <img
                                 src={banner.imageUrl}
@@ -55,27 +56,17 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="text-[9px] text-white font-bold bg-black/60 px-2 py-1 rounded-full backdrop-blur-sm">상세보기</span>
+                                <span className="text-[8px] text-white font-bold bg-black/60 px-1.5 py-0.5 rounded-full backdrop-blur-sm">보기</span>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-gray-200 text-center shadow-lg group hover:bg-pink-50 transition-colors cursor-pointer">
-                    <p className="text-[10px] font-black text-gray-400 mb-1 group-hover:text-pink-500">배너 광고 문의</p>
-                    <p className="text-sm font-black text-gray-800">1544-5568</p>
+                <div className="mt-2 bg-gradient-to-br from-white to-gray-50 p-2 rounded-xl border border-gray-100 text-center shadow-inner group hover:bg-pink-50 transition-colors cursor-pointer">
+                    <p className="text-[9px] font-black text-gray-400 mb-0.5 group-hover:text-pink-500">광고 문의</p>
+                    <p className="text-xs font-black text-gray-800 tabular-nums">1544-5568</p>
                 </div>
             </div>
-
-            <style jsx global>{`
-                .no-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .no-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
         </aside>
     );
 };

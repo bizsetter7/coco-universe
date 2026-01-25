@@ -34,13 +34,11 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
             <div className="relative min-h-screen">
-              <div className="flex justify-center items-start min-h-screen">
-                <BannerSidebar side="left" />
-                <main className="w-full max-w-[1020px] shrink-0">
-                  {children}
-                </main>
-                <BannerSidebar side="right" />
-              </div>
+              <BannerSidebar side="left" />
+              <main className="w-full">
+                {children}
+              </main>
+              <BannerSidebar side="right" />
             </div>
           </BrandProvider>
         </Suspense>
