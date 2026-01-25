@@ -24,48 +24,60 @@ const RIGHT_BANNERS: Banner[] = [
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const asideRef = React.useRef<HTMLElement>(null);
     const [mounted, setMounted] = React.useState(false);
-    const [stickyTop, setStickyTop] = React.useState(16);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
         if (typeof window === 'undefined') return;
 
-        const calculateSticky = () => {
+        const updatePosition = () => {
             if (!asideRef.current) return;
 
+            const scrollY = window.scrollY;
             const viewportHeight = window.innerHeight;
             const sidebarHeight = asideRef.current.offsetHeight;
-            const defaultTop = 16;
-            const bottomGap = 40;
+            const docHeight = document.documentElement.scrollHeight;
 
-            // If sidebar is taller than viewport (fitting logic)
-            // We want it to stick such that the bottom is visible (aligned to viewport bottom - gap)
-            // Formula: stickyTop = ViewportHeight - SidebarHeight - BottomGap
-            if (sidebarHeight + defaultTop > viewportHeight) {
-                setStickyTop(viewportHeight - sidebarHeight - bottomGap);
-            } else {
-                setStickyTop(defaultTop);
+            // Default target: Scroll Position + Header Offset (16px)
+            let targetTop = scrollY + 16;
+
+            // Smart Bottom-Align Logic (for small screens/tall banners)
+            // If banner is taller than viewport, we stick it such that the bottom is visible
+            const isTall = sidebarHeight + 16 > viewportHeight;
+            if (isTall) {
+                // Calculate the point where the sidebar bottom touches the viewport bottom
+                // Target = Scroll + Viewport - SidebarHeight - BottomGap
+                targetTop = scrollY + viewportHeight - sidebarHeight - 40;
+
+                // But don't go ABOVE the original start point (16px absolute) if we are at the top
+                if (targetTop < 16) targetTop = 16;
             }
+
+            // Boundary check: Don't push past the bottom of the document
+            const maxTop = docHeight - sidebarHeight - 40;
+            targetTop = Math.min(targetTop, maxTop);
+
+            asideRef.current.style.top = `${targetTop}px`;
         };
 
         const resizeObserver = new ResizeObserver(() => {
-            calculateSticky();
+            updatePosition();
         });
 
         if (asideRef.current) {
             resizeObserver.observe(asideRef.current);
         }
 
-        window.addEventListener('resize', calculateSticky);
+        window.addEventListener('scroll', updatePosition, { passive: true });
+        window.addEventListener('resize', updatePosition);
 
-        // Initial calculation delay to ensure rendering
-        const timer = setTimeout(calculateSticky, 100);
+        // Initial update
+        updatePosition();
 
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('resize', calculateSticky);
-            clearTimeout(timer);
+            window.removeEventListener('scroll', updatePosition);
+            window.removeEventListener('resize', updatePosition);
         };
     }, []);
 
@@ -74,11 +86,11 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     return (
         <aside
             ref={asideRef}
-            className={`hidden 2xl:flex flex-col sticky z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
+            className={`hidden 2xl:flex flex-col absolute z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
             style={{
-                top: `${stickyTop}px`,
+                top: '16px', // Initial static position
                 [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
-                transition: 'top 0.3s ease-out'
+                transition: 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' // The "Elastic Chase" effect
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
