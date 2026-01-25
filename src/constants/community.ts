@@ -17,7 +17,8 @@ export const CATEGORIES = [
     '중고거래',
     '무료법률상담',
     '친구찾기',
-    '뷰티·패션·이벤트'
+    '뷰티·패션·이벤트',
+    '프리미엄 라운지'
 ];
 
 export const MOCK_POSTS: Post[] = [

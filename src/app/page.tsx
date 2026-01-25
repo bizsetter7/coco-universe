@@ -196,11 +196,11 @@ export default function HomePortal() {
                   { label: '지역별채용', icon: <Home />, bg: 'bg-blue-100', color: 'text-blue-600', link: 'home' },
                   { label: '무료법률자문', icon: <Scale />, bg: 'bg-gray-100', color: 'text-gray-600', link: 'community' },
                   { label: '중고거래', icon: <ShoppingBag />, bg: 'bg-green-100', color: 'text-green-600', link: 'community' },
-                  { label: '커뮤니티', icon: <Moon />, bg: 'bg-indigo-100', color: 'text-indigo-600', link: 'community' },
+                  { label: '익명 라운지', icon: <Moon />, bg: 'bg-indigo-100', color: 'text-indigo-600', link: 'community' },
                   { label: '친구찾기', icon: <Users />, bg: 'bg-pink-100', color: 'text-pink-600', link: 'community' },
-                  { label: '베스트글', icon: <Trophy />, bg: 'bg-yellow-100', color: 'text-yellow-600', link: 'community' },
+                  { label: '블랙리스트', icon: <Siren />, bg: 'bg-red-100', color: 'text-red-500', link: 'community' },
                   { label: '인재정보', icon: <User />, bg: 'bg-teal-100', color: 'text-teal-600', link: 'login' },
-                  { label: '이력서등록', icon: <FileText />, bg: 'bg-red-100', color: 'text-red-500', link: 'signup' },
+                  { label: '이력서등록', icon: <FileText />, bg: 'bg-red-50', color: 'text-red-600', link: 'signup' },
                   { label: '채용공고등록', icon: <PlusSquare />, bg: 'bg-orange-100', color: 'text-orange-600', link: 'payment' },
                   { label: '광고문의', icon: <Megaphone />, bg: 'bg-slate-100', color: 'text-slate-600', link: 'home' },
                   { label: '이벤트', icon: <Gift />, bg: 'bg-rose-100', color: 'text-rose-500', link: 'home' },
@@ -216,6 +216,10 @@ export default function HomePortal() {
                         router.push('/community?category=중고거래');
                       } else if (item.label === '친구찾기') {
                         router.push('/community?category=친구찾기');
+                      } else if (item.label === '익명 라운지') {
+                        router.push('/community?category=라운지(익명)');
+                      } else if (item.label === '블랙리스트') {
+                        router.push('/community?category=블랙리스트');
                       } else if (item.link === 'community') {
                         router.push('/community');
                       } else if (item.label === '광고문의') {
@@ -256,75 +260,23 @@ export default function HomePortal() {
                 <span>그랜드 프리미엄</span>
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { region: '수원', title: '인계동 1등', pay: 'TC 130,000 / 당일' },
-                  { region: '평택', title: '텃세없는 곳', pay: '일 50만 보장' },
-                  { region: '강남', title: '단기 고수익', pay: '월 1000만 가능' },
-                  { region: '부산', title: '해운대 신규', pay: '당일 현금 지급' },
-                ].map((item, i) => (
-                  <div key={i} className={`border-2 rounded-lg overflow-hidden shadow-md relative ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white'}`} style={{ borderColor: i === 0 ? brand.primaryColor : undefined }}>
+                {shops.filter(s => s.tier === 'grand').slice(0, 4).map((shop, i) => (
+                  <div
+                    key={shop.id}
+                    onClick={() => setSelectedShop(shop)}
+                    className={`border-2 rounded-lg overflow-hidden shadow-md relative cursor-pointer hover:scale-[1.02] transition-transform ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white'}`}
+                    style={{ borderColor: i === 0 ? brand.primaryColor : undefined }}
+                  >
                     {i === 0 && <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] px-2 py-0.5 font-bold z-10">급구</span>}
-                    <div className={`h-32 flex items-center justify-center text-gray-400 text-xs ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>이미지</div>
+                    <div className={`h-24 sm:h-32 flex items-center justify-center text-gray-400 text-[10px] break-keep text-center px-4 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                      {shop.name.split(' ').slice(0, 2).join(' ')}<br />전경사진
+                    </div>
                     <div className="p-3">
-                      <h4 className="font-bold text-sm truncate">[{item.region}] {item.title}</h4>
-                      <p className="text-red-500 font-bold text-xs">{item.pay}</p>
+                      <h4 className="font-bold text-sm truncate">{shop.name}</h4>
+                      <p className="text-red-500 font-bold text-[10px]">{shop.pay}</p>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {/* 프리미엄 라운지 (여성 타겟 리텐션 도구) */}
-              <div className="mt-12">
-                <div className="flex justify-between items-end mb-6">
-                  <h3 className="flex items-center gap-2 text-xl font-bold">
-                    <Sparkles size={20} className="text-amber-500" />
-                    <span>프리미엄 라운지</span>
-                  </h3>
-                  <Link href="/lounge" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">전체보기 &gt;</Link>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Link
-                    href="/lounge"
-                    className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-green-900/20 to-gray-800 border-green-900/30' : 'bg-gradient-to-br from-green-50 to-white border-green-100'}`}
-                  >
-                    <div className="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-green-500/20">
-                      <Apple size={24} />
-                    </div>
-                    <h4 className="font-bold text-lg mb-1">식단 & BMI 관리</h4>
-                    <p className="text-sm text-gray-500 mb-4">내 건강 점수와 맞춤 식단을 확인하세요.</p>
-                    <div className="flex items-center text-xs font-bold text-green-500">
-                      바로가기 <ArrowRight size={14} className="ml-1" />
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/lounge"
-                    className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-purple-900/20 to-gray-800 border-purple-900/30' : 'bg-gradient-to-br from-purple-50 to-white border-purple-100'}`}
-                  >
-                    <div className="bg-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-purple-500/20">
-                      <Sparkles size={24} />
-                    </div>
-                    <h4 className="font-bold text-lg mb-1">성향 & 컬러 테스트</h4>
-                    <p className="text-sm text-gray-500 mb-4">나에게 맞는 메이크업과 직업 성향은?</p>
-                    <div className="flex items-center text-xs font-bold text-purple-500">
-                      테스트 시작 <ArrowRight size={14} className="ml-1" />
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/lounge"
-                    className={`p-6 rounded-2xl cursor-pointer hover:scale-[1.02] transition-transform shadow-sm border ${brand.theme === 'dark' ? 'bg-gradient-to-br from-amber-900/20 to-gray-800 border-amber-900/30' : 'bg-gradient-to-br from-amber-50 to-white border-amber-100'}`}
-                  >
-                    <div className="bg-amber-500 w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 shadow-lg shadow-amber-500/20">
-                      <Moon size={24} />
-                    </div>
-                    <h4 className="font-bold text-lg mb-1">오늘의 사주 & 운세</h4>
-                    <p className="text-sm text-gray-500 mb-4">오늘의 재물운과 연애운을 무료로 확인!</p>
-                    <div className="flex items-center text-xs font-bold text-amber-500">
-                      운세 보기 <ArrowRight size={14} className="ml-1" />
-                    </div>
-                  </Link>
-                </div>
               </div>
 
               {/* 지역별 구인 공고 (Real Data) */}

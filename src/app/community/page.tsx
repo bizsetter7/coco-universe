@@ -13,9 +13,14 @@ import {
     Home,
     ArrowLeft,
     User,
-    ShieldAlert
+    ShieldAlert,
+    Sparkles,
+    Apple,
+    Moon,
+    ArrowRight
 } from 'lucide-react';
 import { CATEGORIES, MOCK_POSTS } from '@/constants/community';
+import Link from 'next/link';
 
 // --- Types ---
 type UserType = 'individual' | 'corporate' | 'admin';
@@ -126,51 +131,110 @@ function CommunityContent() {
             </div>
 
             <main className="max-w-4xl mx-auto p-4 space-y-4">
-                {/* Post List */}
-                <div className="grid grid-cols-1 gap-3">
-                    {filteredPosts.map((post) => (
-                        <div
-                            key={post.id}
-                            onClick={() => handlePostClick(post.id)}
-                            className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group"
-                        >
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="bg-gray-50 text-gray-400 px-3 py-1 rounded-full text-[10px] font-bold group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
-                                    {post.category}
-                                </span>
-                                <span className="text-[10px] text-gray-300 font-medium">{post.time}</span>
-                            </div>
-
-                            <h3 className="font-bold text-gray-800 mb-1 lg:text-lg">
-                                {post.isHot && <span className="text-red-500 mr-2 inline-flex items-center gap-0.5"><ShieldAlert size={14} /> HOT</span>}
-                                {post.title}
-                            </h3>
-
-                            <p className="text-sm text-gray-500 line-clamp-1 mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
-                                <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[4px] select-none' : ''}>
-                                    {post.content}
-                                </span>
-                            </p>
-
-                            <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
-                                        <User size={12} />
-                                    </div>
-                                    <span className="font-bold text-gray-500">{post.author}</span>
-                                </div>
-                                <div className="flex gap-4">
-                                    <span className="flex items-center gap-1.5 text-pink-400 font-black">
-                                        <Heart size={14} className="fill-current" /> {post.likes}
-                                    </span>
-                                    <span className="flex items-center gap-1.5 text-blue-400 font-black">
-                                        <MessageSquare size={14} className="fill-current" /> {post.comments}
-                                    </span>
-                                </div>
-                            </div>
+                {activeTab === '프리미엄 라운지' ? (
+                    /* Lounge View within Community */
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-500">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Sparkles className="text-amber-500" size={20} />
+                            <h3 className="text-xl font-black text-gray-900">프리미엄 라운지</h3>
                         </div>
-                    ))}
-                </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <Link href="/lounge" className="p-6 rounded-3xl bg-white border border-green-100 shadow-sm hover:scale-[1.02] transition-all group">
+                                <div className="bg-green-500 w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-green-500/20 group-hover:rotate-6 transition-transform">
+                                    <Apple size={28} />
+                                </div>
+                                <h4 className="font-black text-lg mb-2">식단 & BMI 관리</h4>
+                                <p className="text-xs text-gray-400 leading-relaxed mb-4">나의 체형분석과 맞춤형 식단 정보를 무료로 받아보세요.</p>
+                                <div className="flex items-center text-xs font-black text-green-500 ring-1 ring-green-100 rounded-full w-fit px-3 py-1.5 bg-green-50/30">
+                                    분석 시작하기 <ArrowRight size={14} className="ml-1" />
+                                </div>
+                            </Link>
+
+                            <Link href="/lounge" className="p-6 rounded-3xl bg-white border border-amber-100 shadow-sm hover:scale-[1.02] transition-all group">
+                                <div className="bg-amber-500 w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-amber-500/20 group-hover:rotate-6 transition-transform">
+                                    <Moon size={28} />
+                                </div>
+                                <h4 className="font-black text-lg mb-2">오늘의 사주 & 운세</h4>
+                                <p className="text-xs text-gray-400 leading-relaxed mb-4">재물운, 연애운, 건강운까지 코코 유니버스에서 확인하세요.</p>
+                                <div className="flex items-center text-xs font-black text-amber-500 ring-1 ring-amber-100 rounded-full w-fit px-3 py-1.5 bg-amber-50/30">
+                                    운세 보러가기 <ArrowRight size={14} className="ml-1" />
+                                </div>
+                            </Link>
+
+                            <Link href="/lounge" className="p-6 rounded-3xl bg-white border border-blue-100 shadow-sm hover:scale-[1.02] transition-all group">
+                                <div className="bg-blue-500 w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-blue-500/20 group-hover:rotate-6 transition-transform">
+                                    <Sparkles size={28} />
+                                </div>
+                                <h4 className="font-black text-lg mb-2">성향 & 컬러 테스트</h4>
+                                <p className="text-xs text-gray-400 leading-relaxed mb-4">나에게 맞는 메이크업과 최적의 직종을 찾아드립니다.</p>
+                                <div className="flex items-center text-xs font-black text-blue-500 ring-1 ring-blue-100 rounded-full w-fit px-3 py-1.5 bg-blue-50/30">
+                                    테스트 시작 <ArrowRight size={14} className="ml-1" />
+                                </div>
+                            </Link>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-[40px] p-8 text-white relative overflow-hidden shadow-2xl">
+                            <div className="absolute top-0 right-0 p-4 opacity-20">
+                                <ShieldAlert size={120} />
+                            </div>
+                            <h4 className="text-2xl font-black mb-2">그녀들만의 비밀스러운 대화 🤫</h4>
+                            <p className="text-white/80 text-sm mb-6 leading-relaxed font-medium">
+                                익명이 보장되는 안전한 공간에서<br />
+                                더 깊은 이야기를 나누고 싶다면 커뮤니티 게시판을 이용하세요.
+                            </p>
+                            <button onClick={() => setActiveTab('전체')} className="bg-white text-pink-500 px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-pink-900/20 active:scale-95 transition-all">
+                                수다 떨러 가기
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    /* Post List */
+                    <div className="grid grid-cols-1 gap-3">
+                        {filteredPosts.map((post) => (
+                            <div
+                                key={post.id}
+                                onClick={() => handlePostClick(post.id)}
+                                className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group"
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="bg-gray-50 text-gray-400 px-3 py-1 rounded-full text-[10px] font-bold group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+                                        {post.category}
+                                    </span>
+                                    <span className="text-[10px] text-gray-300 font-medium">{post.time}</span>
+                                </div>
+
+                                <h3 className="font-bold text-gray-800 mb-1 lg:text-lg">
+                                    {post.isHot && <span className="text-red-500 mr-2 inline-flex items-center gap-0.5"><ShieldAlert size={14} /> HOT</span>}
+                                    {post.title}
+                                </h3>
+
+                                <p className="text-sm text-gray-500 line-clamp-1 mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[4px] select-none' : ''}>
+                                        {post.content}
+                                    </span>
+                                </p>
+
+                                <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
+                                            <User size={12} />
+                                        </div>
+                                        <span className="font-bold text-gray-500">{post.author}</span>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <span className="flex items-center gap-1.5 text-pink-400 font-black">
+                                            <Heart size={14} className="fill-current" /> {post.likes}
+                                        </span>
+                                        <span className="flex items-center gap-1.5 text-blue-400 font-black">
+                                            <MessageSquare size={14} className="fill-current" /> {post.comments}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </main>
 
             {/* Login Required Modal */}
@@ -234,7 +298,7 @@ function CommunityContent() {
             )}
 
             {/* Floating Action Button */}
-            {isLoggedIn && userType !== 'corporate' && (
+            {isLoggedIn && userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
                 <button
                     onClick={() => alert('게시글 작성은 정식 출시 후 가능합니다!')}
                     className="fixed bottom-24 right-6 bg-pink-500 text-white p-5 rounded-full shadow-2xl hover:bg-pink-600 active:scale-90 transition-all z-20"

@@ -1,5 +1,1222 @@
 [
   {
+    "name": "[강남] 아틀란티스 (텐카페)",
+    "region": "[서울] 강남구",
+    "phone": "010-3344-5566",
+    "kakao": "atl-gangnam",
+    "telegram": "atl5566",
+    "pay": "TC 150,000 + α",
+    "workType": "텐카페",
+    "url": "https://queenalba.net/guin_detail.php?num=34001",
+    "site": "queenalba",
+    "id": "bait-seoul-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-600",
+      "icons": [
+        "상위1%",
+        "고수익보장"
+      ]
+    }
+  },
+  {
+    "name": "[논현] 달리기 셔츠룸",
+    "region": "[서울] 강남구",
+    "phone": "010-9988-7766",
+    "kakao": "run-run",
+    "telegram": "",
+    "pay": "TC 130,000 + 당일지급",
+    "workType": "셔츠룸",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5901",
+    "site": "ladyalba",
+    "id": "bait-seoul-02",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:05:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "신입환영",
+        "초보환영"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 인계동 시크릿",
+    "region": "[경기] 수원시",
+    "phone": "010-1234-5678",
+    "kakao": "secret-sw",
+    "telegram": "",
+    "pay": "일 50만 이상 보장",
+    "workType": "룸싸롱",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012507",
+    "site": "foxalba",
+    "id": "bait-suwon-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-blue-600",
+      "icons": [
+        "인계동1등",
+        "급구"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 해운대 파라다이스",
+    "region": "[부산] 해운대구",
+    "phone": "010-5555-8888",
+    "kakao": "para-busan",
+    "telegram": "pbusan1",
+    "pay": "월 1500만 가능",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/guin_detail.php?num=34002",
+    "site": "queenalba",
+    "id": "bait-busan-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:15:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "해운대메이저",
+        "숙소지원"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 수성구 바르샤",
+    "region": "[대구] 수성구",
+    "phone": "010-7777-2222",
+    "kakao": "barca-dg",
+    "telegram": "",
+    "pay": "TC 150,000 상향",
+    "workType": "노래주점",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012508",
+    "site": "foxalba",
+    "id": "bait-daegu-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:20:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-purple-600",
+      "icons": [
+        "대구최고가",
+        "당일무조건"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 부평 주안 갤럭시",
+    "region": "[인천] 전지역",
+    "phone": "010-6666-4444",
+    "kakao": "galaxy-ic",
+    "telegram": "",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5902",
+    "site": "ladyalba",
+    "id": "bait-incheon-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-cyan-600",
+      "icons": [
+        "인천넘버원",
+        "고수익알바"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 상무지구 1번가",
+    "region": "[광주] 서구",
+    "phone": "010-2222-3333",
+    "kakao": "gv1-st",
+    "telegram": "",
+    "pay": "T.C 13만 보장",
+    "workType": "단란주점",
+    "url": "https://queenalba.net/guin_detail.php?num=34003",
+    "site": "queenalba",
+    "id": "bait-gwangju-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:30:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-600",
+      "icons": [
+        "상무지구TOP",
+        "초보환영"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 둔산동 타임",
+    "region": "[대전] 서구",
+    "phone": "010-8888-9999",
+    "kakao": "time-dj",
+    "telegram": "timedj1",
+    "pay": "일 50만+팁별도",
+    "workType": "노래주점",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012509",
+    "site": "foxalba",
+    "id": "bait-daejeon-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:35:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-orange-500",
+      "icons": [
+        "둔산메인",
+        "매출1위"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 안성 삼성셔츠",
+    "region": "[경기] 평택시",
+    "phone": "010-4444-1111",
+    "kakao": "ss-pt",
+    "telegram": "",
+    "pay": "TC 14만 (상향)",
+    "workType": "셔츠룸",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5903",
+    "site": "ladyalba",
+    "id": "bait-pyeongtaek-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-600",
+      "icons": [
+        "고덕넘버원",
+        "당일지급"
+      ]
+    }
+  },
+  {
+    "name": "[창원] 상남동 명작",
+    "region": "[경남] 창원시",
+    "phone": "010-9000-8000",
+    "kakao": "mj-cw",
+    "telegram": "",
+    "pay": "일 60만 보장",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/guin_detail.php?num=34005",
+    "site": "queenalba",
+    "id": "bait-changwon-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:45:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-green-600",
+      "icons": [
+        "상남동1등",
+        "안전보장"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 투썸 셔츠룸",
+    "region": "[서울] 강남구",
+    "phone": "010-3333-2222",
+    "kakao": "twosome82",
+    "telegram": "",
+    "pay": "TC 130,000 + 보너스",
+    "workType": "셔츠룸",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012510",
+    "site": "foxalba",
+    "id": "bait-seoul-03",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T03:50:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "강남정식",
+        "고수익"
+      ]
+    }
+  },
+  {
+    "name": "[천안] 두정동 골드",
+    "region": "[충남] 천안시",
+    "phone": "010-1111-2222",
+    "kakao": "gold-ca",
+    "telegram": "",
+    "pay": "월 1000만 보장",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/guin_detail.php?num=34006",
+    "site": "queenalba",
+    "id": "bait-cheonan-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T03:55:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-amber-500",
+      "icons": [
+        "두정메이저",
+        "현금당일"
+      ]
+    }
+  },
+  {
+    "name": "[울산] 삼산동 갤럭시",
+    "region": "[울산] 남구",
+    "phone": "010-4444-5555",
+    "kakao": "galaxy-us",
+    "telegram": "",
+    "pay": "TC 140,000",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5904",
+    "site": "ladyalba",
+    "id": "bait-ulsan-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:00:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "삼산동1위",
+        "매출최고"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 인계동 골드",
+    "region": "[경기] 수원시",
+    "phone": "010-9999-1111",
+    "kakao": "gold-sw",
+    "telegram": "",
+    "pay": "일 50만↑",
+    "workType": "룸싸롱",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012511",
+    "site": "foxalba",
+    "id": "bait-suwon-02",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T04:05:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": false,
+      "color": "text-yellow-600",
+      "icons": [
+        "급구",
+        "초보우대"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 선릉 플레이",
+    "region": "[서울] 강남구",
+    "phone": "010-2222-1111",
+    "kakao": "play-gangnam",
+    "telegram": "playgn",
+    "pay": "TC 150,000",
+    "workType": "텐카페",
+    "url": "https://queenalba.net/guin_detail.php?num=34007",
+    "site": "queenalba",
+    "id": "bait-seoul-04",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-rose-500",
+      "icons": [
+        "상위클래스",
+        "지원금"
+      ]
+    }
+  },
+  {
+    "name": "[청주] 복대동 아모르",
+    "region": "[충북] 청주시",
+    "phone": "010-8000-9000",
+    "kakao": "amor-cj",
+    "telegram": "",
+    "pay": "TC 13만 보장",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5905",
+    "site": "ladyalba",
+    "id": "bait-cheongju-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "청주매인",
+        "당일"
+      ]
+    }
+  },
+  {
+    "name": "[신림] 아이린 노래주점",
+    "region": "[서울] 관악구",
+    "phone": "010-4444-6666",
+    "kakao": "irene-sl",
+    "telegram": "",
+    "pay": "TC 130,000 + α",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/guin_detail.php?num=34010",
+    "site": "queenalba",
+    "id": "bait-seoul-05",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T04:20:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-pink-400",
+      "icons": [
+        "신림1등",
+        "당일"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 아우라 셔츠룸",
+    "region": "[서울] 강남구",
+    "phone": "010-7777-5555",
+    "kakao": "aura-gn",
+    "telegram": "aura_gn",
+    "pay": "TC 140,000",
+    "workType": "셔츠룸",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012512",
+    "site": "foxalba",
+    "id": "bait-seoul-06",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-600",
+      "icons": [
+        "정통셔츠",
+        "메이저"
+      ]
+    }
+  },
+  {
+    "name": "[부천] 상동 오딧세이",
+    "region": "[경기] 부천시",
+    "phone": "010-1111-9999",
+    "kakao": "ody-bc",
+    "telegram": "",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5910",
+    "site": "ladyalba",
+    "id": "bait-bucheon-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-blue-600",
+      "icons": [
+        "부천TOP",
+        "매출1등"
+      ]
+    }
+  },
+  {
+    "name": "[안산] 중앙동 큐브",
+    "region": "[경기] 안산시",
+    "phone": "010-2222-9999",
+    "kakao": "cube-as",
+    "telegram": "",
+    "pay": "TC 15만 상향",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/guin_detail.php?num=34011",
+    "site": "queenalba",
+    "id": "bait-ansan-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T04:35:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-orange-600",
+      "icons": [
+        "안산최고",
+        "숙소문의"
+      ]
+    }
+  },
+  {
+    "name": "[일산] 라페스타 오딧세이",
+    "region": "[경기] 고양시",
+    "phone": "010-3333-9999",
+    "kakao": "ody-is",
+    "telegram": "",
+    "pay": "TC 140,000",
+    "workType": "룸싸롱",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012513",
+    "site": "foxalba",
+    "id": "bait-ilsan-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-indigo-600",
+      "icons": [
+        "일산메이저",
+        "현금결제"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 가라오케 원픽",
+    "region": "[서울] 강남구",
+    "phone": "010-5555-1111",
+    "kakao": "onepick-gn",
+    "telegram": "",
+    "pay": "최고대우 협의",
+    "workType": "가라오케",
+    "url": "https://queenalba.net/guin_detail.php?num=34012",
+    "site": "queenalba",
+    "id": "bait-seoul-07",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T04:45:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": false,
+      "color": "text-gray-600",
+      "icons": [
+        "강남하이엔드"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 고덕 1번가",
+    "region": "[경기] 평택시",
+    "phone": "010-6666-1111",
+    "kakao": "gd-1st",
+    "telegram": "",
+    "pay": "월 1200만 보장",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5911",
+    "site": "ladyalba",
+    "id": "bait-pyeongtaek-02",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T04:50:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "삼성단지",
+        "최고수익"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 인계동 샴페인",
+    "region": "[경기] 수원시",
+    "phone": "010-8888-2222",
+    "kakao": "sw-champ",
+    "telegram": "",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://www.foxalba.com/offer/offer_content.asp?idx=2026012514",
+    "site": "foxalba",
+    "id": "bait-suwon-03",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T04:55:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "인계동명소",
+        "당일머니"
+      ]
+    }
+  },
+  {
+    "name": "[김포] 구래동 라임",
+    "region": "[경기] 김포시",
+    "phone": "010-9999-3333",
+    "kakao": "lime-gp",
+    "telegram": "",
+    "pay": "TC 140,000",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/guin_detail.php?num=34015",
+    "site": "queenalba",
+    "id": "bait-gimpo-01",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T05:00:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-green-500",
+      "icons": [
+        "구래동1번",
+        "초보환영"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 역삼 달리기",
+    "region": "[서울] 강남구",
+    "phone": "010-1111-4444",
+    "kakao": "run-ys",
+    "telegram": "",
+    "pay": "월 1500만 이상",
+    "workType": "셔츠룸",
+    "url": "https://ladyalba.co.kr/guin_detail.php?num=5912",
+    "site": "ladyalba",
+    "id": "bait-seoul-08",
+    "is_placeholder": false,
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:05:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-rose-600",
+      "icons": [
+        "역삼신상",
+        "무조건당일"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 서면 갤럭시",
+    "region": "[부산] 부산진구",
+    "phone": "010-3333-7777",
+    "kakao": "galaxy-sm",
+    "pay": "일 50만보장",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/1",
+    "site": "queenalba",
+    "id": "bait-busan-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-blue-600",
+      "icons": [
+        "서면1등",
+        "당일"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 연산동 아우라",
+    "region": "[부산] 연제구",
+    "phone": "010-4444-8888",
+    "kakao": "aura-ys",
+    "pay": "TC 15만이상",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/2",
+    "site": "foxalba",
+    "id": "bait-busan-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T05:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "연산동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 센텀 갤러리",
+    "region": "[부산] 해운대구",
+    "phone": "010-5555-9999",
+    "kakao": "centum-gl",
+    "pay": "최고우대 협의",
+    "workType": "마사지",
+    "url": "https://ladyalba.co.kr/3",
+    "site": "ladyalba",
+    "id": "bait-busan-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-600",
+      "icons": [
+        "상위1%",
+        "숙소"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 동성로 샤넬",
+    "region": "[대구] 중구",
+    "phone": "010-1111-2222",
+    "kakao": "chanel-dg",
+    "pay": "TC 15만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/4",
+    "site": "queenalba",
+    "id": "bait-daegu-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-amber-600",
+      "icons": [
+        "동성로메인"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 두산동 에르메스",
+    "region": "[대구] 수성구",
+    "phone": "010-2222-3333",
+    "kakao": "hermes-dg",
+    "pay": "월 1500만+α",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/5",
+    "site": "foxalba",
+    "id": "bait-daegu-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-600",
+      "icons": [
+        "수성구1등",
+        "안전보장"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 광장코아 명작",
+    "region": "[대구] 달서구",
+    "phone": "010-3333-4444",
+    "kakao": "mj-dg",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/6",
+    "site": "ladyalba",
+    "id": "bait-daegu-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T05:35:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-green-600",
+      "icons": [
+        "광코TOP",
+        "초보"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 주안 아모르",
+    "region": "[인천] 미추홀구",
+    "phone": "010-4444-5555",
+    "kakao": "amor-ic",
+    "pay": "TC 14만상향",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/7",
+    "site": "queenalba",
+    "id": "bait-incheon-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T05:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-rose-500",
+      "icons": [
+        "주안1등",
+        "급구"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 송도 디올",
+    "region": "[인천] 연수구",
+    "phone": "010-5555-6666",
+    "kakao": "dior-sd",
+    "pay": "고수익 보장",
+    "workType": "마사지",
+    "url": "https://foxalba.com/8",
+    "site": "foxalba",
+    "id": "bait-incheon-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:45:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-cyan-600",
+      "icons": [
+        "송도명소",
+        "비상권"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 상무지구 로즈",
+    "region": "[광주] 서구",
+    "phone": "010-1111-8888",
+    "kakao": "rose-gv",
+    "pay": "TC 13만 당일",
+    "workType": "단란주점",
+    "url": "https://ladyalba.co.kr/9",
+    "site": "ladyalba",
+    "id": "bait-gwangju-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T05:50:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-400",
+      "icons": [
+        "상무1번",
+        "이벤트"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 첨단지구 잭팟",
+    "region": "[광주] 광산구",
+    "phone": "010-2222-9999",
+    "kakao": "jack-gv",
+    "pay": "일 50만이상",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/10",
+    "site": "queenalba",
+    "id": "bait-gwangju-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T05:55:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "첨단TOP",
+        "텃세X"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 둔산동 디올",
+    "region": "[대전] 서구",
+    "phone": "010-3333-0000",
+    "kakao": "dior-dj",
+    "pay": "TC 15만상향",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/11",
+    "site": "foxalba",
+    "id": "bait-daejeon-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "둔산1번가",
+        "매출"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 유성 아모르",
+    "region": "[대전] 유성구",
+    "phone": "010-4444-1111",
+    "kakao": "amor-ys",
+    "pay": "최고대우 협의",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/12",
+    "site": "ladyalba",
+    "id": "bait-daejeon-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T06:05:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "유성메인"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 인계동 로열",
+    "region": "[경기] 수원시",
+    "phone": "010-7777-9999",
+    "kakao": "royal-sw",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/13",
+    "site": "queenalba",
+    "id": "bait-suwon-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-amber-500",
+      "icons": [
+        "인계동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 송탄 시크릿",
+    "region": "[경기] 평택시",
+    "phone": "010-8888-0000",
+    "kakao": "sec-st",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/14",
+    "site": "foxalba",
+    "id": "bait-pyeongtaek-03",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T06:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-cyan-500",
+      "icons": [
+        "송탄1등"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 청라 큐브",
+    "region": "[인천] 서구",
+    "phone": "010-9999-1111",
+    "kakao": "cube-cr",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/15",
+    "site": "ladyalba",
+    "id": "bait-incheon-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "청라명소",
+        "숙소"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 당리동 비타민",
+    "region": "[부산] 사하구",
+    "phone": "010-1111-5555",
+    "kakao": "vit-busan",
+    "pay": "TC 13만상향",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/16",
+    "site": "queenalba",
+    "id": "bait-busan-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T06:25:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-yellow-500",
+      "icons": [
+        "사하구1등"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 칠곡 보물섬",
+    "region": "[대구] 북구",
+    "phone": "010-2222-6666",
+    "kakao": "is-dg",
+    "pay": "일 50만보장",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/17",
+    "site": "foxalba",
+    "id": "bait-daegu-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "칠곡메인"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 구시청 블루문",
+    "region": "[광주] 동구",
+    "phone": "010-3333-7777",
+    "kakao": "blue-gv",
+    "pay": "TC 14만 고정",
+    "workType": "단란주점",
+    "url": "https://ladyalba.co.kr/18",
+    "site": "ladyalba",
+    "id": "bait-gwangju-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T06:35:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-400",
+      "icons": [
+        "구시청TOP"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 복합터미널 갤럭시",
+    "region": "[대전] 동구",
+    "phone": "010-4444-8888",
+    "kakao": "galaxy-dj",
+    "pay": "일 60만+α",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/19",
+    "site": "queenalba",
+    "id": "bait-daejeon-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-rose-600",
+      "icons": [
+        "터미널1번"
+      ]
+    }
+  },
+  {
+    "name": "[창원] 상남동 아우라",
+    "region": "[경남] 창원시",
+    "phone": "010-5555-9999",
+    "kakao": "aura-cw",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/20",
+    "site": "foxalba",
+    "id": "bait-changwon-02",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:45:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-green-600",
+      "icons": [
+        "상남동메인"
+      ]
+    }
+  },
+  {
+    "name": "[전주] 신시가지 시크릿",
+    "region": "[전북] 전주시",
+    "phone": "010-6666-0000",
+    "kakao": "sec-jj",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/21",
+    "site": "ladyalba",
+    "id": "bait-jeonju-01",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T06:50:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "전주TOP",
+        "당일지급"
+      ]
+    }
+  },
+  {
+    "name": "[서울] 신천 오딧세이",
+    "region": "[서울] 송파구",
+    "phone": "010-7777-1111",
+    "kakao": "ody-sp",
+    "pay": "TC 14만상향",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/22",
+    "site": "queenalba",
+    "id": "bait-seoul-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T06:55:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "신천메인",
+        "초보"
+      ]
+    }
+  },
+  {
+    "name": "[강남] 논현 아이린",
+    "region": "[서울] 강남구",
+    "phone": "010-8888-2222",
+    "kakao": "irene-nh",
+    "pay": "TC 15만 고정",
+    "workType": "셔츠룸",
+    "url": "https://foxalba.com/23",
+    "site": "foxalba",
+    "id": "bait-seoul-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "논현1등",
+        "지원금"
+      ]
+    }
+  },
+  {
     "name": "김포 구래동 셔츠 12만원",
     "region": "[경기] 김포시",
     "phone": "010-8358-8308",
@@ -214,6 +1431,949 @@
       "icons": []
     },
     "realName": ""
+  },
+  {
+    "name": "[부산] 해운대 오딧세이",
+    "region": "[부산] 해운대구",
+    "phone": "010-1234-5678",
+    "kakao": "ody-h",
+    "pay": "일 60만보장",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/24",
+    "site": "queenalba",
+    "id": "bait-busan-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-600",
+      "icons": [
+        "해운대명품"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 수영구 명작",
+    "region": "[부산] 수영구",
+    "phone": "010-2345-6789",
+    "kakao": "mj-sy",
+    "pay": "TC 15만상향",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/25",
+    "site": "foxalba",
+    "id": "bait-busan-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T07:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "민락동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 동래구 시크릿",
+    "region": "[부산] 동래구",
+    "phone": "010-3456-7890",
+    "kakao": "sec-dr",
+    "pay": "일 50만보장",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/26",
+    "site": "ladyalba",
+    "id": "bait-busan-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "온천장1위"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 가야동 갤러리",
+    "region": "[부산] 부산진구",
+    "phone": "010-4567-8901",
+    "kakao": "gl-gy",
+    "pay": "TC 14만 당일",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/27",
+    "site": "queenalba",
+    "id": "bait-busan-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T07:25:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "개금동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[부산] 사상구 보물섬",
+    "region": "[부산] 사상구",
+    "phone": "010-5678-9012",
+    "kakao": "is-ss",
+    "pay": "최고대우 협의",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/28",
+    "site": "foxalba",
+    "id": "bait-busan-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "사상1번가"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 수성구 플레이",
+    "region": "[대구] 수성구",
+    "phone": "010-6789-0123",
+    "kakao": "play-dg",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/29",
+    "site": "ladyalba",
+    "id": "bait-daegu-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:35:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-600",
+      "icons": [
+        "범어동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 성서 갤럭시",
+    "region": "[대구] 달서구",
+    "phone": "010-7890-1234",
+    "kakao": "gl-ss",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://queenalba.net/30",
+    "site": "queenalba",
+    "id": "bait-daegu-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T07:40:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "성서메인"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 죽전동 아우라",
+    "region": "[대구] 달서구",
+    "phone": "010-8901-2345",
+    "kakao": "aura-jj",
+    "pay": "월 1200만보장",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/31",
+    "site": "foxalba",
+    "id": "bait-daegu-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:45:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-blue-600",
+      "icons": [
+        "죽전네거리"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 대명동 시크릿",
+    "region": "[대구] 남구",
+    "phone": "010-9012-3456",
+    "kakao": "sec-dm",
+    "pay": "TC 14만 당일",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/32",
+    "site": "ladyalba",
+    "id": "bait-daegu-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T07:50:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-orange-500",
+      "icons": [
+        "영대병원역"
+      ]
+    }
+  },
+  {
+    "name": "[대구] 상인동 명작",
+    "region": "[대구] 달서구",
+    "phone": "010-0123-4567",
+    "kakao": "mj-si",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/33",
+    "site": "queenalba",
+    "id": "bait-daegu-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T07:55:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-green-600",
+      "icons": [
+        "상인동1등"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 상무지구 갤럭시",
+    "region": "[광주] 서구",
+    "phone": "010-1234-9999",
+    "kakao": "gl-gv",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/34",
+    "site": "foxalba",
+    "id": "bait-gwangju-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "상무메이저"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 수완지구 시크릿",
+    "region": "[광주] 광산구",
+    "phone": "010-2345-0001",
+    "kakao": "sec-sw",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/35",
+    "site": "ladyalba",
+    "id": "bait-gwangju-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T08:05:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "수완지구1위"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 용봉동 아우라",
+    "region": "[광주] 북구",
+    "phone": "010-3456-1111",
+    "kakao": "aura-yb",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/36",
+    "site": "queenalba",
+    "id": "bait-gwangju-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "전남대TOP"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 하남지구 명작",
+    "region": "[광주] 광산구",
+    "phone": "010-4567-2222",
+    "kakao": "mj-hn",
+    "pay": "최고우대 협의",
+    "workType": "단란주점",
+    "url": "https://foxalba.com/37",
+    "site": "foxalba",
+    "id": "bait-gwangju-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T08:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "하남메인"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 쌍촌동 보물섬",
+    "region": "[광주] 서구",
+    "phone": "010-5678-3333",
+    "kakao": "is-sc",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/38",
+    "site": "ladyalba",
+    "id": "bait-gwangju-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "쌍촌동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[광주] 상무지구 아모르",
+    "region": "[광주] 서구",
+    "phone": "010-6789-4444",
+    "kakao": "amor-gv",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/39",
+    "site": "queenalba",
+    "id": "bait-gwangju-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-600",
+      "icons": [
+        "상무1번가"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 둔산동 오딧세이",
+    "region": "[대전] 서구",
+    "phone": "010-1111-5555",
+    "kakao": "ody-dj",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/40",
+    "site": "foxalba",
+    "id": "bait-daejeon-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "둔산메이저"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 월평동 시크릿",
+    "region": "[대전] 서구",
+    "phone": "010-2222-6666",
+    "kakao": "sec-wp",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/41",
+    "site": "ladyalba",
+    "id": "bait-daejeon-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T08:35:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "월평동1위"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 봉명동 아우라",
+    "region": "[대전] 유성구",
+    "phone": "010-3333-7777",
+    "kakao": "aura-bm",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/42",
+    "site": "queenalba",
+    "id": "bait-daejeon-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "유성TOP"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 관평동 명작",
+    "region": "[대전] 유성구",
+    "phone": "010-4444-8888",
+    "kakao": "mj-gp",
+    "pay": "최고우대 협의",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/43",
+    "site": "foxalba",
+    "id": "bait-daejeon-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T08:45:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "관평메인"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 탄방동 보물섬",
+    "region": "[대전] 서구",
+    "phone": "010-5555-9999",
+    "kakao": "is-tb",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/44",
+    "site": "ladyalba",
+    "id": "bait-daejeon-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:50:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "탄방동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[대전] 둔산동 갤러리",
+    "region": "[대전] 서구",
+    "phone": "010-6666-0000",
+    "kakao": "gl-dj",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/45",
+    "site": "queenalba",
+    "id": "bait-daejeon-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T08:55:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "둔산동1등"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 부평 디올",
+    "region": "[인천] 부평구",
+    "phone": "010-1234-1111",
+    "kakao": "dior-bp",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/46",
+    "site": "foxalba",
+    "id": "bait-incheon-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "부평메이저"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 구월동 시크릿",
+    "region": "[인천] 남동구",
+    "phone": "010-2345-2222",
+    "kakao": "sec-gw",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/47",
+    "site": "ladyalba",
+    "id": "bait-incheon-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T09:05:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "구월동1위"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 연수동 아우라",
+    "region": "[인천] 연수구",
+    "phone": "010-3456-3333",
+    "kakao": "aura-ys",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/48",
+    "site": "queenalba",
+    "id": "bait-incheon-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "연수구TOP"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 계산동 명작",
+    "region": "[인천] 계양구",
+    "phone": "010-4567-4444",
+    "kakao": "mj-ks",
+    "pay": "최고대우 협의",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/49",
+    "site": "foxalba",
+    "id": "bait-incheon-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T09:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "계산동메인"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 검단 보물섬",
+    "region": "[인천] 서구",
+    "phone": "010-5678-5555",
+    "kakao": "is-gd",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/50",
+    "site": "ladyalba",
+    "id": "bait-incheon-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "검단신도시"
+      ]
+    }
+  },
+  {
+    "name": "[인천] 부평 갤러리",
+    "region": "[인천] 부평구",
+    "phone": "010-6666-6666",
+    "kakao": "gl-bp",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/51",
+    "site": "queenalba",
+    "id": "bait-incheon-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "부평1등"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 영통 디올",
+    "region": "[경기] 수원시",
+    "phone": "010-1234-7777",
+    "kakao": "dior-yt",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/52",
+    "site": "foxalba",
+    "id": "bait-suwon-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "영통메이저"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 광교 시크릿",
+    "region": "[경기] 수원시",
+    "phone": "010-2345-8888",
+    "kakao": "sec-gg",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/53",
+    "site": "ladyalba",
+    "id": "bait-suwon-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T09:35:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "광교1위"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 수원역 아우라",
+    "region": "[경기] 수원시",
+    "phone": "010-3456-9999",
+    "kakao": "aura-sr",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/54",
+    "site": "queenalba",
+    "id": "bait-suwon-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:40:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "수원역TOP"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 권선동 명작",
+    "region": "[경기] 수원시",
+    "phone": "010-4567-0000",
+    "kakao": "mj-ks",
+    "pay": "최고대우 협의",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/55",
+    "site": "foxalba",
+    "id": "bait-suwon-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T09:45:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "권선메인"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 매탄동 보물섬",
+    "region": "[경기] 수원시",
+    "phone": "010-5678-1111",
+    "kakao": "is-mt",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/56",
+    "site": "ladyalba",
+    "id": "bait-suwon-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:50:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "삼성전자TOP"
+      ]
+    }
+  },
+  {
+    "name": "[수원] 인계동 갤러리",
+    "region": "[경기] 수원시",
+    "phone": "010-6666-2222",
+    "kakao": "gl-sw",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/57",
+    "site": "queenalba",
+    "id": "bait-suwon-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T09:55:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "인계동1등"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 안중 테라스",
+    "region": "[경기] 평택시",
+    "phone": "010-1234-3333",
+    "kakao": "ter-aj",
+    "pay": "TC 15만상향",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/58",
+    "site": "foxalba",
+    "id": "bait-pyeongtaek-04",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T10:00:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-red-500",
+      "icons": [
+        "안중메이저"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 서정동 시크릿",
+    "region": "[경기] 평택시",
+    "phone": "010-2345-4444",
+    "kakao": "sec-sj",
+    "pay": "일 50만보장",
+    "workType": "노래주점",
+    "url": "https://ladyalba.co.kr/59",
+    "site": "ladyalba",
+    "id": "bait-pyeongtaek-05",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T10:05:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-blue-500",
+      "icons": [
+        "송탄역1위"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 평택역 아우라",
+    "region": "[경기] 평택시",
+    "phone": "010-3456-5555",
+    "kakao": "aura-py",
+    "pay": "TC 14만 당일",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/60",
+    "site": "queenalba",
+    "id": "bait-pyeongtaek-06",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T10:10:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-purple-500",
+      "icons": [
+        "평택역TOP"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 청북 명작",
+    "region": "[경기] 평택시",
+    "phone": "010-4567-6666",
+    "kakao": "mj-cb",
+    "pay": "최고대우 협의",
+    "workType": "노래주점",
+    "url": "https://foxalba.com/61",
+    "site": "foxalba",
+    "id": "bait-pyeongtaek-07",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "premium",
+    "updatedAt": "2026-01-25T10:15:00.000Z",
+    "options": {
+      "blink": false,
+      "bold": true,
+      "color": "text-indigo-500",
+      "icons": [
+        "청북메인"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 비전동 보물섬",
+    "region": "[경기] 평택시",
+    "phone": "010-5678-7777",
+    "kakao": "is-bj",
+    "pay": "일 60만+α",
+    "workType": "룸싸롱",
+    "url": "https://ladyalba.co.kr/62",
+    "site": "ladyalba",
+    "id": "bait-pyeongtaek-08",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T10:20:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-yellow-600",
+      "icons": [
+        "비전동TOP"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 고덕 갤러리",
+    "region": "[경기] 평택시",
+    "phone": "010-6666-8888",
+    "kakao": "gl-gd",
+    "pay": "TC 15만 고정",
+    "workType": "룸싸롱",
+    "url": "https://queenalba.net/63",
+    "site": "queenalba",
+    "id": "bait-pyeongtaek-09",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T10:25:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-pink-500",
+      "icons": [
+        "고덕1등"
+      ]
+    }
+  },
+  {
+    "name": "[평택] 포승 오딧세이",
+    "region": "[경기] 평택시",
+    "phone": "010-7777-9999",
+    "kakao": "ody-ps",
+    "pay": "최고우대 당일",
+    "workType": "룸싸롱",
+    "url": "https://foxalba.com/64",
+    "site": "foxalba",
+    "id": "bait-pyeongtaek-10",
+    "is_premium": true,
+    "is_verified": true,
+    "tier": "grand",
+    "updatedAt": "2026-01-25T10:30:00.000Z",
+    "options": {
+      "blink": true,
+      "bold": true,
+      "color": "text-orange-600",
+      "icons": [
+        "포승공단"
+      ]
+    }
   },
   {
     "name": "★★청솔★★",
