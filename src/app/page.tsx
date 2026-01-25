@@ -153,7 +153,7 @@ export default function HomePortal() {
     <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} pb-20`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}>
-        <div className="w-full h-16 flex items-center justify-between">
+        <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
             {currentPage !== 'home' ? (
               <ChevronLeft className="md:hidden mr-1" size={24} />
@@ -213,7 +213,7 @@ export default function HomePortal() {
               </div>
             </div>
 
-            <div className="w-full px-4 py-8">
+            <div className="max-w-[1020px] mx-auto px-4 py-8">
               {/* Quick Icon Grid (Mobile First) */}
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-10">
                 {[
@@ -965,7 +965,7 @@ export default function HomePortal() {
 
       {/* Footer */}
       <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-500'}`}>
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="max-w-[1020px] mx-auto px-4 text-center">
           {/* Logo */}
           <div className="mb-6">
             <h2 className="text-2xl font-black tracking-tighter inline-block" style={primaryStyle}>

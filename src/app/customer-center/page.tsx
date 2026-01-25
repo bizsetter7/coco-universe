@@ -110,7 +110,7 @@ function CustomerCenterContent() {
         <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} pb-20`}>
             {/* Header */}
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}>
-                <div className="w-full px-4 h-14 flex items-center justify-between">
+                <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2 pt-2">
                         <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 hover:text-gray-900">
                             <ArrowLeft size={24} />
@@ -125,7 +125,7 @@ function CustomerCenterContent() {
                 </div>
             </header>
 
-            <main className="w-full p-4 md:py-10">
+            <main className="max-w-[1020px] mx-auto p-4 md:py-10">
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar (Desktop) / Top Nav (Mobile) */}
                     <aside className="md:w-64 shrink-0">

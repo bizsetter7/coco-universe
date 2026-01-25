@@ -73,7 +73,7 @@ function CommunityContent() {
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
             <header className="bg-white border-b sticky top-0 z-40">
-                <div className="w-full px-4 h-14 flex items-center justify-between">
+                <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2 pt-2">
                         <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
                             <ArrowLeft size={24} />
@@ -94,7 +94,7 @@ function CommunityContent() {
                 </div>
 
                 {/* Categories */}
-                <div className="w-full overflow-x-auto scrollbar-hide">
+                <div className="max-w-[1020px] mx-auto overflow-x-auto scrollbar-hide">
                     <div className="flex px-4 border-b">
                         {CATEGORIES.map((cat) => (
                             <button
@@ -113,7 +113,7 @@ function CommunityContent() {
             </header>
 
             {/* Admin/Mock Controls */}
-            <div className="w-full p-3 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between text-[11px] text-indigo-700">
+            <div className="max-w-[1020px] mx-auto p-3 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between text-[11px] text-indigo-700">
                 <div className="flex items-center gap-2">
                     <span className="font-bold">🔑 상태 테스트:</span>
                     <button
@@ -132,7 +132,7 @@ function CommunityContent() {
                 <span className="opacity-60 hidden sm:inline">로그인 안 됨 상태에서 게시글을 클릭해보세요!</span>
             </div>
 
-            <main className="w-full p-4 space-y-4">
+            <main className="max-w-[1020px] mx-auto p-4 space-y-4">
                 {activeTab === '프리미엄 라운지' ? (
                     /* Lounge View within Community */
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-500">
