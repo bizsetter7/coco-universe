@@ -33,17 +33,16 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
     return (
         <aside
-            className={`hidden 2xl:flex flex-col fixed top-[115px] z-40 animate-in fade-in duration-700 h-[calc(100vh-135px)] w-[120px]`}
+            className={`hidden 2xl:flex flex-col sticky top-[115px] z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
             style={{
-                [side]: `calc(50% - 510px - 130px)`,
-                // 510px is half of 1020px stage, 130px is sidebar width(120) + 10px gap
+                [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
             }}
         >
             <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
                 {side === 'left' ? 'BEST AD' : 'PREMIUM'}
             </div>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar py-2">
+            <div className="py-2">
                 <div className="flex flex-col gap-2 p-1 bg-white/50 backdrop-blur-md rounded-b-xl border border-gray-100 shadow-xl overflow-hidden mb-3">
                     {banners.map((banner) => (
                         <div
