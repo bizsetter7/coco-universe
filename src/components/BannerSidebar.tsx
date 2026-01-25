@@ -89,7 +89,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             className={`hidden 2xl:flex flex-col absolute z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
             style={{
                 top: '16px', // Initial static position
-                [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
+                [side]: `calc(50% - 510px - 130px)`, // Restore horizontal position
                 transition: 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' // The "Elastic Chase" effect
             }}
         >
