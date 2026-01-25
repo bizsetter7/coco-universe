@@ -38,8 +38,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             const scrollY = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
             const viewportHeight = window.innerHeight;
-            const offsetTop = 115;
-            const marginBottom = 40;
+            const offsetTop = 80;
+            const marginBottom = 20;
 
             if (docHeight <= 0) {
                 asideRef.current.style.transform = `translateY(0px)`;
@@ -82,7 +82,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     return (
         <aside
             ref={asideRef}
-            className={`hidden 2xl:flex flex-col fixed top-[115px] z-40 animate-in fade-in duration-700 w-[120px]`}
+            className={`hidden 2xl:flex flex-col fixed top-[80px] z-40 animate-in fade-in duration-700 w-[120px]`}
             style={{
                 [side]: `calc(50% - 510px - 130px)`,
             }}
@@ -96,7 +96,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                     {banners.map((banner) => (
                         <div
                             key={banner.id}
-                            className="relative w-full aspect-[1.1/1] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
+                            className="relative w-full aspect-[1/2] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
                         >
                             <img
                                 src={banner.imageUrl}
