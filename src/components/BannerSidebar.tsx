@@ -65,15 +65,21 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // const maxTop = docHeight - sidebarHeight - 40; 
             // targetTop = Math.min(targetTop, maxTop);
 
+            // Distance Check: If moving huge distance (e.g. layout change), snap instantly
+            const currentTop = parseFloat(asideRef.current.style.top || '16');
+            if (Math.abs(targetTop - currentTop) > 300) {
+                options.immediate = true;
+            }
+
             if (options.immediate) {
                 setTransition(false);
                 asideRef.current.style.top = `${targetTop}px`;
                 // Force reflow
                 void asideRef.current.offsetHeight;
-                // Restore transition (next frame)
-                requestAnimationFrame(() => {
+                // Restore transition with slight delay to ensure 'none' applied
+                setTimeout(() => {
                     setTransition(true);
-                });
+                }, 50);
             } else {
                 setTransition(true);
                 asideRef.current.style.top = `${targetTop}px`;
