@@ -72,7 +72,7 @@ function CommunityContent() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-40">
+            <header className="bg-white border-b sticky top-0 z-50">
                 <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2 pt-2">
                         <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
