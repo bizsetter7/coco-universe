@@ -28,6 +28,9 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const [mounted, setMounted] = React.useState(false);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
+    const isSnapMode = React.useRef(false); // Ref to track snap mode state
+    const lastDocHeight = React.useRef(0); // Track document height to detect shifts
+
     // Helper to manage transition
     const setTransition = (enable: boolean) => {
         if (!asideRef.current) return;
@@ -37,6 +40,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     React.useEffect(() => {
         setMounted(true);
         if (typeof window === 'undefined') return;
+
+        lastDocHeight.current = document.documentElement.scrollHeight;
 
         // Set initial transition programmatically to avoid React conflicts
         if (asideRef.current) {
@@ -49,7 +54,6 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             const scrollY = window.scrollY;
             const viewportHeight = window.innerHeight;
             const sidebarHeight = asideRef.current.offsetHeight;
-            const docHeight = document.documentElement.scrollHeight;
 
             // Default target: Scroll Position + Header Offset (16px)
             let targetTop = scrollY + 16;
@@ -65,9 +69,9 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // const maxTop = docHeight - sidebarHeight - 40; 
             // targetTop = Math.min(targetTop, maxTop);
 
-            // Distance Check: Lower threshold to 150px to catch smaller layout shifts
+            // Forced Snap Check: Snap Mode OR Huge Distance
             const currentTop = parseFloat(asideRef.current.style.top || '16');
-            if (Math.abs(targetTop - currentTop) > 150) {
+            if (isSnapMode.current || Math.abs(targetTop - currentTop) > 150) {
                 options.immediate = true;
             }
 
@@ -76,10 +80,13 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                 asideRef.current.style.top = `${targetTop}px`;
                 void asideRef.current.offsetHeight; // Force Reflow
 
-                // Restore separately to avoid race conditions
-                setTimeout(() => {
-                    setTransition(true);
-                }, 100);
+                // If in snap mode, we DONT restore transition immediately. We wait for the mode to end.
+                // If just a one-off snap, restore shortly.
+                if (!isSnapMode.current) {
+                    setTimeout(() => {
+                        setTransition(true);
+                    }, 100);
+                }
             } else {
                 // Ensure transition is ON for normal movement
                 // We access the ref directly to avoid React state/prop interference
@@ -91,7 +98,21 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         };
 
         const resizeObserver = new ResizeObserver(() => {
-            // If body resizes, it might be a layout change. Update immediately to prevent ghost sliding.
+            const newHeight = document.documentElement.scrollHeight;
+            const delta = Math.abs(newHeight - lastDocHeight.current);
+            lastDocHeight.current = newHeight;
+
+            // If layout changed significantly (>200px), engage Snap Mode for 500ms
+            if (delta > 200) {
+                isSnapMode.current = true;
+                // Clear any existing timer if we wanted debouncing, but simple timeout is fine
+                setTimeout(() => {
+                    isSnapMode.current = false;
+                    setTransition(true); // Re-enable transition after chaos settles
+                }, 500);
+            }
+
+            // Always update immediately on resize
             updatePosition({ immediate: true });
         });
 
