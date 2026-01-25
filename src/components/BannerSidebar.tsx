@@ -24,60 +24,48 @@ const RIGHT_BANNERS: Banner[] = [
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const asideRef = React.useRef<HTMLElement>(null);
     const [mounted, setMounted] = React.useState(false);
+    const [stickyTop, setStickyTop] = React.useState(80);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
         if (typeof window === 'undefined') return;
 
-        let sidebarHeight = 0;
-
-        const updatePosition = () => {
+        const calculateSticky = () => {
             if (!asideRef.current) return;
 
-            const scrollY = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
             const viewportHeight = window.innerHeight;
-            const offsetTop = 80;
-            const marginBottom = 20;
+            const sidebarHeight = asideRef.current.offsetHeight;
+            const defaultTop = 80;
+            const bottomGap = 40;
 
-            if (docHeight <= 0) {
-                asideRef.current.style.transform = `translateY(0px)`;
-                return;
+            // If sidebar is taller than viewport (fitting logic)
+            // We want it to stick such that the bottom is visible (aligned to viewport bottom - gap)
+            // Formula: stickyTop = ViewportHeight - SidebarHeight - BottomGap
+            if (sidebarHeight + defaultTop > viewportHeight) {
+                setStickyTop(viewportHeight - sidebarHeight - bottomGap);
+            } else {
+                setStickyTop(defaultTop);
             }
-
-            // Calculate progress (0 to 1)
-            const progress = Math.min(Math.max(scrollY / docHeight, 0), 1);
-
-            // Calculate how much the sidebar needs to "travel up" to show its bottom
-            const maxTravel = Math.max(0, sidebarHeight + offsetTop + marginBottom - viewportHeight);
-
-            // Apply transform with transition for the "Delayed Chase" effect
-            asideRef.current.style.transform = `translateY(-${progress * maxTravel}px)`;
         };
 
-        const resizeObserver = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                sidebarHeight = entry.contentRect.height;
-                updatePosition();
-            }
+        const resizeObserver = new ResizeObserver(() => {
+            calculateSticky();
         });
 
         if (asideRef.current) {
             resizeObserver.observe(asideRef.current);
         }
 
-        window.addEventListener('scroll', updatePosition, { passive: true });
-        window.addEventListener('resize', updatePosition);
+        window.addEventListener('resize', calculateSticky);
 
-        // Periodically check in case content changes without resize
-        const timer = setInterval(updatePosition, 1000);
+        // Initial calculation delay to ensure rendering
+        const timer = setTimeout(calculateSticky, 100);
 
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('scroll', updatePosition);
-            window.removeEventListener('resize', updatePosition);
-            clearInterval(timer);
+            window.removeEventListener('resize', calculateSticky);
+            clearTimeout(timer);
         };
     }, []);
 
@@ -86,10 +74,11 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     return (
         <aside
             ref={asideRef}
-            className={`hidden 2xl:flex flex-col fixed top-[80px] z-40 animate-in fade-in duration-700 w-[120px]`}
+            className={`hidden 2xl:flex flex-col sticky z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
             style={{
-                [side]: `calc(50% - 510px - 130px)`,
-                transition: 'transform 0.45s ease-out' // 0.45s delay follower effect
+                top: `${stickyTop}px`,
+                [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
+                transition: 'top 0.3s ease-out' // Smooth adjustment on resize
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
