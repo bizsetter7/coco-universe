@@ -33,13 +33,13 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
     return (
         <aside
-            className={`hidden 2xl:flex flex-col fixed top-20 z-40 animate-in fade-in duration-700 h-[calc(100vh-100px)] w-[130px]`}
+            className={`hidden 2xl:flex flex-col fixed top-20 z-40 animate-in fade-in duration-700 h-[calc(100vh-100px)] w-[120px]`}
             style={{
-                [side]: `calc(50% - 640px - 150px)`,
-                // 640px is half of 1280px (max-w-7xl), 150px is sidebar width + margin
+                [side]: `calc(50% - 640px - 130px)`,
+                // 640px is half of 1280 (max-w-7xl), 130px is sidebar width + tight 10px margin
             }}
         >
-            <div className={`p-2 rounded-t-xl text-center text-[10px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
+            <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
                 {side === 'left' ? 'BEST AD' : 'PREMIUM'}
             </div>
 

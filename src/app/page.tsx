@@ -355,38 +355,48 @@ export default function HomePortal() {
                     <ShoppingBag size={20} className="text-blue-500" />
                     <span>실시간 채용 공고</span>
                   </h3>
-                  <div className="flex gap-2">
-                    <select
-                      className={`text-[11px] font-bold p-2.5 rounded-xl border appearance-none pr-8 bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em] ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-600 shadow-sm'}`}
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")` }}
-                      value={selectedRegion}
-                      onChange={(e) => {
-                        setSelectedRegion(e.target.value);
-                        setSelectedSubRegion('전체');
-                        setVisibleCount(10);
-                      }}
-                    >
-                      <option value="전체">지역 전체</option>
-                      {Object.keys(REGIONS_MAP).map(reg => (
-                        <option key={reg} value={reg}>{reg}</option>
-                      ))}
-                    </select>
-
-                    {selectedRegion !== '전체' && (
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                        <Home size={14} />
+                      </div>
                       <select
-                        className={`text-[11px] font-bold p-2.5 rounded-xl border appearance-none pr-8 bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em] animate-in fade-in slide-in-from-left-2 duration-300 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-600 shadow-sm'}`}
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")` }}
-                        value={selectedSubRegion}
+                        className={`text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-100 text-gray-700 shadow-sm hover:border-gray-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-50'}`}
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d1d5db' stroke-width='3' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                        value={selectedRegion}
                         onChange={(e) => {
-                          setSelectedSubRegion(e.target.value);
+                          setSelectedRegion(e.target.value);
+                          setSelectedSubRegion('전체');
                           setVisibleCount(10);
                         }}
                       >
-                        <option value="전체">군/구 전체</option>
-                        {REGIONS_MAP[selectedRegion]?.map(sub => (
-                          <option key={sub} value={sub}>{sub}</option>
+                        <option value="전체">지역전체</option>
+                        {Object.keys(REGIONS_MAP).map(reg => (
+                          <option key={reg} value={reg}>{reg}</option>
                         ))}
                       </select>
+                    </div>
+
+                    {selectedRegion !== '전체' && (
+                      <div className="relative group animate-in zoom-in-95 duration-200">
+                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                          <ShoppingBag size={14} />
+                        </div>
+                        <select
+                          className={`text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-100 text-gray-700 shadow-sm hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50'}`}
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d1d5db' stroke-width='3' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                          value={selectedSubRegion}
+                          onChange={(e) => {
+                            setSelectedSubRegion(e.target.value);
+                            setVisibleCount(10);
+                          }}
+                        >
+                          <option value="전체">상세지역전체</option>
+                          {REGIONS_MAP[selectedRegion]?.map(sub => (
+                            <option key={sub} value={sub}>{sub}</option>
+                          ))}
+                        </select>
+                      </div>
                     )}
                   </div>
                 </div>
