@@ -223,7 +223,9 @@ export default function HomePortal() {
                       } else if (item.link === 'community') {
                         router.push('/community');
                       } else if (item.label === '광고문의') {
-                        router.push('/customer-center');
+                        router.push('/customer-center?tab=ad');
+                      } else if (item.label === '이벤트') {
+                        router.push('/customer-center?tab=notice');
                       } else {
                         setCurrentPage(item.link);
                       }
@@ -355,6 +357,9 @@ export default function HomePortal() {
                           <p className="text-[10px] text-gray-400 whitespace-nowrap truncate">{shop.workType}</p>
                         </div>
                       </div>
+                      <div className="mt-2 pt-2 border-t border-gray-50 text-center w-full">
+                        <p className="text-[9px] text-gray-300">"{brand.name}를 통해 연락했다고 말씀해주세요!"</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -422,7 +427,7 @@ export default function HomePortal() {
                     </div>
                   </div>
                   <div className="p-4 bg-gray-50 text-center border-t border-gray-100">
-                    <p className="text-[10px] text-gray-400">코코 유니버스를 통해 연락했다고 말씀해주세요!</p>
+                    <p className="text-[10px] text-gray-400">{brand.name}를 통해 연락했다고 말씀해주세요!</p>
                   </div>
                 </div>
               </div>

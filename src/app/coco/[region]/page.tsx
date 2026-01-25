@@ -35,7 +35,7 @@ export async function generateMetadata(props: { params: Params }): Promise<Metad
     const regionName = region.mainRegion;
 
     return {
-        title: `${regionName} 구인구직 - 1위 여성알바 코코 유니버스`,
+        title: `${regionName} 구인구직 - 1위 여성알바 코코알바`,
         description: `${regionName} 지역 고소득 알바, 룸알바, 노래방알바 실시간 공고 보유. ${regionName} 업소 상세 정보와 연락처를 확인하세요.`,
         keywords: `${regionName}알바, ${regionName}룸알바, ${regionName}밤알바, 고소득알바`,
     };
@@ -71,7 +71,7 @@ export default async function RegionPage(props: { params: Params }) {
                 <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-1 text-pink-500 font-black">
                         <Home size={20} />
-                        <span>COCO UNIVERSE</span>
+                        <span>COCOALBA</span>
                     </Link>
                     <div className="text-sm font-bold text-gray-900">{regionName} 실시간 현황</div>
                 </div>
@@ -160,6 +160,10 @@ export default async function RegionPage(props: { params: Params }) {
                                         <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
                                         <p className="text-xs font-bold text-gray-700">{shop.workType}</p>
                                     </div>
+                                </div>
+
+                                <div className="mb-4 text-center">
+                                    <p className="text-[10px] text-gray-400 italic">"코코알바를 통해 연락했다고 말씀해주세요!"</p>
                                 </div>
 
                                 <div className="flex gap-2">

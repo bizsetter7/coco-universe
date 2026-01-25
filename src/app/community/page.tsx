@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { CATEGORIES, MOCK_POSTS } from '@/constants/community';
 import Link from 'next/link';
+import { useBrand } from '@/components/BrandProvider';
 
 // --- Types ---
 type UserType = 'individual' | 'corporate' | 'admin';
@@ -41,6 +42,7 @@ function CommunityContent() {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulate login state
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
+    const brand = useBrand();
 
     // Sync tab with URL param
     useEffect(() => {
@@ -156,7 +158,7 @@ function CommunityContent() {
                                     <Moon size={28} />
                                 </div>
                                 <h4 className="font-black text-lg mb-2">오늘의 사주 & 운세</h4>
-                                <p className="text-xs text-gray-400 leading-relaxed mb-4">재물운, 연애운, 건강운까지 코코 유니버스에서 확인하세요.</p>
+                                <p className="text-xs text-gray-400 leading-relaxed mb-4">재물운, 연애운, 건강운까지 {brand.name}에서 확인하세요.</p>
                                 <div className="flex items-center text-xs font-black text-amber-500 ring-1 ring-amber-100 rounded-full w-fit px-3 py-1.5 bg-amber-50/30">
                                     운세 보러가기 <ArrowRight size={14} className="ml-1" />
                                 </div>

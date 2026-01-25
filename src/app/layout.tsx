@@ -21,6 +21,8 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import { BannerSidebar } from "@/components/BannerSidebar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +33,13 @@ export default function RootLayout({
       <body className={`${inter.className} overflow-x-hidden`}>
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
-            {children}
+            <div className="relative min-h-screen">
+              <BannerSidebar side="left" />
+              <div className="max-w-screen-xl mx-auto">
+                {children}
+              </div>
+              <BannerSidebar side="right" />
+            </div>
           </BrandProvider>
         </Suspense>
       </body>
