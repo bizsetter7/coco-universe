@@ -153,7 +153,7 @@ export default function HomePortal() {
     <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} pb-20`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}>
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="w-full h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
             {currentPage !== 'home' ? (
               <ChevronLeft className="md:hidden mr-1" size={24} />
@@ -213,7 +213,7 @@ export default function HomePortal() {
               </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="w-full px-4 py-8">
               {/* Quick Icon Grid (Mobile First) */}
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-10">
                 {[

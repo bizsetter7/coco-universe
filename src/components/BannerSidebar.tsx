@@ -35,8 +35,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         <aside
             className={`hidden 2xl:flex flex-col fixed top-20 z-40 animate-in fade-in duration-700 h-[calc(100vh-100px)] w-[120px]`}
             style={{
-                [side]: `calc(50% - 640px - 130px)`,
-                // 640px is half of 1280 (max-w-7xl), 130px is sidebar width + tight 10px margin
+                [side]: `calc(50% - 590px - 130px)`,
+                // 590px is half of 1180px stage, 130px is sidebar width(120) + 10px gap
             }}
         >
             <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
