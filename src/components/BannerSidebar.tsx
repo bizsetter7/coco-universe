@@ -24,7 +24,7 @@ const RIGHT_BANNERS: Banner[] = [
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const asideRef = React.useRef<HTMLElement>(null);
     const [mounted, setMounted] = React.useState(false);
-    const [stickyTop, setStickyTop] = React.useState(80);
+    const [stickyTop, setStickyTop] = React.useState(115);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
@@ -36,7 +36,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
             const viewportHeight = window.innerHeight;
             const sidebarHeight = asideRef.current.offsetHeight;
-            const defaultTop = 80;
+            const defaultTop = 115;
             const bottomGap = 40;
 
             // If sidebar is taller than viewport (fitting logic)
