@@ -154,36 +154,14 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         };
     }, []);
 
-    // Navigation Cloaking & Snap
-    React.useLayoutEffect(() => {
-        if (!asideRef.current) return;
-
-        // 1. Cloak (Hide) and Reset
-        asideRef.current.style.opacity = '0';
-        setSnapClass(true);
-        asideRef.current.style.top = '16px';
-        void asideRef.current.offsetHeight;
-
-        // 2. Enable strict snap mode logic
-        isSnapMode.current = true;
-
-        // 3. Reveal after layout settles (200ms)
-        const timer = setTimeout(() => {
-            if (asideRef.current) {
-                asideRef.current.style.opacity = '1';
-                isSnapMode.current = false;
-                setSnapClass(false);
-            }
-        }, 200);
-
-        return () => clearTimeout(timer);
-    }, [pathname]);
-
     if (!mounted) return null;
 
     return (
         <aside
             ref={asideRef}
+            // KEY PROP: Forces React to destroy and recreate this DOM node when pathname changes.
+            // This is the NUCLEAR option to prevent "ghost" transitions from old pages.
+            key={pathname + side}
             className={`hidden 2xl:flex flex-col absolute z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
             style={{
                 top: '16px',
