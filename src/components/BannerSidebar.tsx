@@ -53,9 +53,9 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                 if (targetTop < 16) targetTop = 16;
             }
 
-            // Boundary check: Don't push past the bottom of the document
-            const maxTop = docHeight - sidebarHeight - 40;
-            targetTop = Math.min(targetTop, maxTop);
+            // Boundary check removed to maintain "Chase" effect at the very bottom
+            // const maxTop = docHeight - sidebarHeight - 40; 
+            // targetTop = Math.min(targetTop, maxTop);
 
             asideRef.current.style.top = `${targetTop}px`;
         };
