@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 interface Banner {
     id: string;
@@ -22,21 +23,129 @@ const RIGHT_BANNERS: Banner[] = [
 ];
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
+    const asideRef = React.useRef<HTMLElement>(null);
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // UNIQUE KEY: Forces complete unmount/remount on any URL/Param change.
+    // This is the "Nuclear Option" against state persistence bugs.
+    const uniqueKey = `${pathname}?${searchParams.toString()}-${side}`;
+
+    const [mounted, setMounted] = React.useState(false);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
+
+    const isInitialLoad = React.useRef(true);
+    const animationFrameRef = React.useRef<number>(0);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    React.useLayoutEffect(() => {
+        if (typeof window === 'undefined' || !asideRef.current) return;
+
+        // 1. INITIAL INSTANT PLACEMENT (Frame 0)
+        // We calculate position immediately without waiting for an animation frame.
+        // This prevents the user from seeing the sidebar at top:0 if we are scrolled down.
+        const setInitialPosition = () => {
+            const scrollY = window.scrollY;
+            const viewportHeight = window.innerHeight;
+            const sidebarHeight = asideRef.current!.offsetHeight;
+
+            // Measure MAIN (True Content Height)
+            const mainEl = document.querySelector('main');
+            const contentHeight = mainEl ? mainEl.offsetHeight : document.documentElement.scrollHeight;
+
+            // The Maximum allowed top (Stick to bottom of content)
+            const maxSafeTop = Math.max(16, contentHeight - sidebarHeight);
+
+            // Ideal Top (Chase Mode)
+            let targetTop = scrollY + 16;
+
+            // Bottom-Align Logic for small screens
+            if (sidebarHeight + 16 > viewportHeight) {
+                targetTop = scrollY + viewportHeight - sidebarHeight - 40;
+                if (targetTop < 16) targetTop = 16;
+            }
+
+            // INSTANT CLAMP: If the new page/tab is shorter than current scroll + sidebar,
+            // clamp strict immediately.
+            if (targetTop > maxSafeTop) {
+                targetTop = maxSafeTop;
+            }
+
+            // Apply Instantly
+            asideRef.current!.style.transition = 'none';
+            asideRef.current!.style.top = `${targetTop}px`;
+
+            // Force Reflow
+            void asideRef.current!.offsetHeight;
+
+            // Enable Transition for subsequent moves after a small delay
+            // This delay mask any initial layout trashing
+            setTimeout(() => {
+                if (asideRef.current) {
+                    asideRef.current.style.transition = 'top 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)';
+                    isInitialLoad.current = false;
+                }
+            }, 300);
+        };
+
+        setInitialPosition();
+
+        // 2. SCROLL LOOP (Elastic Chase)
+        // Using requestAnimationFrame for silky smooth updates instead of scroll listener
+        const updatePosition = () => {
+            if (!asideRef.current) return;
+
+            const scrollY = window.scrollY;
+            const viewportHeight = window.innerHeight;
+            const sidebarHeight = asideRef.current.offsetHeight;
+
+            const mainEl = document.querySelector('main');
+            const contentHeight = mainEl ? mainEl.offsetHeight : document.documentElement.scrollHeight;
+            const maxSafeTop = Math.max(16, contentHeight - sidebarHeight);
+
+            let targetTop = scrollY + 16;
+
+            if (sidebarHeight + 16 > viewportHeight) {
+                targetTop = scrollY + viewportHeight - sidebarHeight - 40;
+                if (targetTop < 16) targetTop = 16;
+            }
+
+            // ALWAYS CLAMP
+            // This is the fix for "Stuck at Bottom".
+            // Even if scrolling wildly, checking this every frame ensures
+            // we never float below the footer.
+            if (targetTop > maxSafeTop) {
+                targetTop = maxSafeTop;
+            }
+
+            asideRef.current.style.top = `${targetTop}px`;
+
+            animationFrameRef.current = requestAnimationFrame(updatePosition);
+        };
+
+        // Start Loop
+        animationFrameRef.current = requestAnimationFrame(updatePosition);
+
+        return () => {
+            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        };
+    }, []);
+
+    if (!mounted) return null;
 
     return (
         <aside
-            // FIXED POS: Pinned to the viewport glass. Never moves with scroll.
-            // Z-INDEX: 40 ensures it floats above most content but below modals (z-50).
-            className={`hidden 2xl:flex flex-col fixed top-4 z-40 w-[120px] shrink-0 h-fit`}
+            ref={asideRef}
+            key={uniqueKey}
+            className={`hidden 2xl:flex flex-col absolute z-40 animate-in fade-in duration-500 w-[120px] shrink-0`}
             style={{
-                // Center alignment logic: 50% screen width - (Half Main Content 510px) - (Sidebar Width 120px + Gap 10px)
-                // gap is included in the offset logic usually.
-                // Previous logic: calc(50% - 510px - 130px) -> This places it 130px to the left of the center-left edge.
-                left: side === 'left' ? 'auto' : '50%',
-                right: side === 'right' ? 'auto' : '50%',
-                marginLeft: side === 'right' ? '520px' : '0', // 510px (half main) + 10px gap
-                marginRight: side === 'left' ? '520px' : '0',
+                top: '16px',
+                [side]: `calc(50% - 510px - 130px)`,
+                // Initial Transition None to prevent jump
+                transition: 'none'
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
