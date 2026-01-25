@@ -24,30 +24,54 @@ const RIGHT_BANNERS: Banner[] = [
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const sidebarRef = React.useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = React.useState(false);
-    const [scrollY, setScrollY] = React.useState(0);
+    const [scrollProgress, setScrollProgress] = React.useState(0);
     const [sidebarHeight, setSidebarHeight] = React.useState(0);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
-        const handleScroll = () => setScrollY(window.scrollY);
+
+        const updateHeight = () => {
+            if (sidebarRef.current) {
+                setSidebarHeight(sidebarRef.current.offsetHeight);
+            }
+        };
+
+        const handleScroll = () => {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (docHeight > 0) {
+                setScrollProgress(window.scrollY / docHeight);
+            }
+            updateHeight();
+        };
+
         window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', updateHeight);
 
-        // Measure height after mount
-        if (sidebarRef.current) {
-            setSidebarHeight(sidebarRef.current.offsetHeight);
-        }
+        // Initial height measure and periodically check
+        const timers = [
+            setTimeout(updateHeight, 100),
+            setTimeout(updateHeight, 500),
+            setTimeout(updateHeight, 2000)
+        ];
 
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', updateHeight);
+            timers.forEach(clearTimeout);
+        };
     }, []);
 
     if (!mounted) return null;
 
-    // Calculate dynamic top for "Smooth Follower" effect
-    // Only scrolls up if the sidebar is taller than the available viewport space
+    // Proportional Follower Math
     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const maxScrollUp = Math.max(0, sidebarHeight + 115 + 20 - viewportHeight);
-    const dynamicTop = 115 - Math.min(scrollY, maxScrollUp);
+    const scrollOffset = 115;
+    const bottomMargin = 40;
+
+    // Total distance the sidebar needs to travel up to reveal its bottom
+    const maxTravel = Math.max(0, sidebarHeight + scrollOffset + bottomMargin - viewportHeight);
+    const dynamicTop = scrollOffset - (scrollProgress * maxTravel);
 
     return (
         <aside
