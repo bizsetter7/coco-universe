@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 
 interface Banner {
     id: string;
@@ -23,14 +24,21 @@ const RIGHT_BANNERS: Banner[] = [
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
     const asideRef = React.useRef<HTMLElement>(null);
+    const pathname = usePathname();
     const [mounted, setMounted] = React.useState(false);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
+
+    // Helper to manage transition
+    const setTransition = (enable: boolean) => {
+        if (!asideRef.current) return;
+        asideRef.current.style.transition = enable ? 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none';
+    };
 
     React.useEffect(() => {
         setMounted(true);
         if (typeof window === 'undefined') return;
 
-        const updatePosition = () => {
+        const updatePosition = (options: { immediate?: boolean } = {}) => {
             if (!asideRef.current) return;
 
             const scrollY = window.scrollY;
@@ -57,29 +65,58 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // const maxTop = docHeight - sidebarHeight - 40; 
             // targetTop = Math.min(targetTop, maxTop);
 
-            asideRef.current.style.top = `${targetTop}px`;
+            if (options.immediate) {
+                setTransition(false);
+                asideRef.current.style.top = `${targetTop}px`;
+                // Force reflow
+                void asideRef.current.offsetHeight;
+                // Restore transition (next frame)
+                requestAnimationFrame(() => {
+                    setTransition(true);
+                });
+            } else {
+                setTransition(true);
+                asideRef.current.style.top = `${targetTop}px`;
+            }
         };
 
         const resizeObserver = new ResizeObserver(() => {
-            updatePosition();
+            // If body resizes, it might be a layout change. Update immediately to prevent ghost sliding.
+            updatePosition({ immediate: true });
         });
 
-        if (asideRef.current) {
-            resizeObserver.observe(asideRef.current);
+        // Observe the body for layout changes (e.g., content loading, images resizing)
+        if (document.body) {
+            resizeObserver.observe(document.body);
         }
 
-        window.addEventListener('scroll', updatePosition, { passive: true });
-        window.addEventListener('resize', updatePosition);
+        window.addEventListener('scroll', () => updatePosition({ immediate: false }), { passive: true });
+        window.addEventListener('resize', () => updatePosition({ immediate: true })); // Window resize should be immediate snap
 
         // Initial update
-        updatePosition();
+        updatePosition({ immediate: true });
 
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('scroll', updatePosition);
-            window.removeEventListener('resize', updatePosition);
+            window.removeEventListener('scroll', () => updatePosition());
+            window.removeEventListener('resize', () => updatePosition());
         };
     }, []);
+
+    // Effect to handle Pathname Changes (Navigation)
+    React.useEffect(() => {
+        // Reset to top immediately on page change
+        if (!asideRef.current) return;
+        setTransition(false);
+        // We use 16px as the baseline for new pages
+        asideRef.current.style.top = '16px';
+
+        // Allow layout to settle then re-enable
+        const timer = setTimeout(() => {
+            setTransition(true);
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [pathname]);
 
     if (!mounted) return null;
 
@@ -90,7 +127,8 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             style={{
                 top: '16px', // Initial static position
                 [side]: `calc(50% - 510px - 130px)`, // Restore horizontal position
-                transition: 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' // The "Elastic Chase" effect
+                // Transition handled by ref/JS to toggle between 'none' and 'cubic-bezier'
+                transition: 'top 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
