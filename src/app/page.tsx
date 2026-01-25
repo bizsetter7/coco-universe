@@ -1,7 +1,7 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
-import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
+import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { MOCK_POSTS } from '@/constants/community';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -240,19 +240,61 @@ export default function HomePortal() {
                 ))}
               </div>
 
-              {/* 베스트 썰 (유입용) */}
-              <div onClick={() => router.push('/community')} className={`border p-4 rounded-xl shadow-sm mb-10 cursor-pointer hover:opacity-90 transition ${brand.theme === 'dark' ? 'bg-gray-800 border-pink-900' : 'bg-white border-pink-200'}`}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold text-pink-500 flex items-center gap-1"><Flame size={16} /> 실시간 핫 이슈</span>
-                  <span className="text-xs text-gray-400">더보기 &gt;</span>
+              {/* 3-Section Dashboard (PC) */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                {/* 실시간 핫 이슈 */}
+                <div onClick={() => router.push('/community')} className={`border p-5 rounded-[24px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-pink-100'}`}>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-black text-pink-500 flex items-center gap-2"><Flame size={18} /> 실시간 핫 이슈</span>
+                    <span className="text-[10px] text-gray-400 font-bold">더보기</span>
+                  </div>
+                  <div className="space-y-3">
+                    {MOCK_POSTS.filter(p => p.isHot).slice(0, 3).map(post => (
+                      <div key={post.id} className="flex items-center gap-2 group">
+                        <span className="shrink-0 w-6 h-6 rounded-full bg-pink-50 flex items-center justify-center text-[10px] group-hover:scale-110 transition-transform">
+                          {post.id === 1 ? '🔥' : post.id === 3 ? '⭐' : '💬'}
+                        </span>
+                        <p className="truncate text-xs font-bold text-gray-600 dark:text-gray-300">
+                          {post.title}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  {MOCK_POSTS.filter(p => p.isHot).slice(0, 3).map(post => (
-                    <p key={post.id} className="truncate text-sm">
-                      {post.id === 1 ? '🔥' : post.id === 3 ? '⭐' : '💬'}
-                      <strong>[{post.category.split(' ')[0]}]</strong> {post.title}
-                    </p>
-                  ))}
+
+                {/* 실시간 공지사항 (New Section) */}
+                <div onClick={() => router.push('/customer-center?tab=notice')} className={`border p-5 rounded-[24px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-blue-100'}`}>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-black text-blue-500 flex items-center gap-2"><Megaphone size={18} /> 최신 공지사항</span>
+                    <span className="text-[10px] text-gray-400 font-bold">전체보기</span>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { title: 'PC 사이드배너 광고 시스템 도입', isNew: true },
+                      { title: '3개월 무료 일일 조회수 1만 달성', isNew: false },
+                      { title: '여성전용 안심번호 서비스 강화', isNew: false }
+                    ].map((n, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 border-b border-gray-50 dark:border-gray-700 pb-1.5 last:border-0">
+                        <p className="truncate text-xs font-bold text-gray-500 dark:text-gray-400">{n.title}</p>
+                        {n.isNew && <span className="shrink-0 w-1 h-1 bg-red-500 rounded-full"></span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 오늘의 운세/가이드 (Quick Link) */}
+                <div onClick={() => router.push('/community')} className={`border p-5 rounded-[24px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-amber-100'}`}>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-black text-amber-500 flex items-center gap-2"><Sparkles size={18} /> {brand.name} 가이드</span>
+                  </div>
+                  <div className="bg-amber-50 dark:bg-amber-900/10 p-3 rounded-2xl">
+                    <p className="text-[11px] font-black text-amber-700 dark:text-amber-400 mb-1 leading-tight">"광고 효과 200% 올리는 법"</p>
+                    <p className="text-[9px] text-amber-600/70 dark:text-amber-500 leading-relaxed">프로필 사진과 상세 급여를 적을수록 구직자의 연락률이 높아집니다.</p>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <span className="text-[9px] px-2 py-1 bg-white dark:bg-gray-700 rounded-full border border-amber-200 text-amber-600 font-bold">내 주변 추천</span>
+                    <span className="text-[9px] px-2 py-1 bg-white dark:bg-gray-700 rounded-full border border-amber-200 text-amber-600 font-bold">운세보기</span>
+                  </div>
                 </div>
               </div>
 
@@ -303,62 +345,68 @@ export default function HomePortal() {
                   </select>
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredShops.slice(0, visibleCount).map((shop, i) => (
                     <div
                       key={i}
                       onClick={() => setSelectedShop(shop)}
-                      className={`p-4 rounded-xl border flex items-center justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden 
-                        ${shop.is_premium ? 'bg-amber-50/30 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}
-                        ${shop.tier === 'grand' ? 'border-amber-400 border-2 shadow-amber-100' : ''}
+                      className={`p-5 rounded-[24px] border flex flex-col justify-between hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden 
+                        ${shop.is_premium ? 'bg-amber-50/20 border-amber-200' : brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}
+                        ${shop.tier === 'grand' ? 'border-amber-400 border-2 shadow-lg shadow-amber-50' : ''}
                       `}
                     >
                       {/* Premium/Grand Badge */}
                       {(shop.is_premium || shop.tier === 'grand') && (
-                        <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-lg">
+                        <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-3 py-1 rounded-bl-xl shadow-sm">
                           PREMIUM
                         </div>
                       )}
 
-                      <div className="flex items-center w-full">
-                        {/* Fixed Icon - Left */}
-                        <div className={`shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden mr-3 ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
-                          {shop.site === 'catalba' ? 'C' : shop.site === 'badalba' ? 'B' : shop.site === 'ladyalba' ? 'L' : 'Q'}
-                        </div>
-
-                        {/* Flexible Content - Center */}
-                        <div className="flex-1 min-w-0 pr-2">
-                          <div className="flex items-center gap-1 mb-0.5">
-                            <p className="text-[10px] text-gray-400 truncate max-w-[80px] sm:max-w-none">{shop.region}</p>
-                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500 shrink-0" />}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3">
+                          {/* Fixed Icon */}
+                          <div className={`shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center text-[11px] font-black overflow-hidden shadow-inner ${shop.is_premium ? 'bg-amber-100 text-amber-600' : 'bg-gray-50 dark:bg-gray-700 text-gray-400'}`}>
+                            {shop.site === 'catalba' ? 'CA' : shop.site === 'badalba' ? 'BB' : shop.site === 'ladyalba' ? 'LA' : 'CO'}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1 h-[20px] overflow-hidden">
-                            {shop.options?.icons?.map((icon, idx) => (
-                              <span key={idx} className="text-[8px] px-1 rounded-sm font-bold bg-red-100 text-red-600 border border-red-200 whitespace-nowrap shrink-0">
-                                {icon}
-                              </span>
-                            ))}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <p className="text-[10px] text-gray-400 font-bold">{shop.region}</p>
+                              {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                            </div>
                             <h4 className={`
-                                text-xs sm:text-sm flex items-center gap-1 transition-colors truncate w-full
+                                text-sm flex items-center gap-1 transition-colors
                                 ${shop.options?.bold ? 'font-black' : 'font-bold'}
                                 ${shop.options?.blink ? 'animate-blink' : ''}
                                 ${shop.options?.color || 'group-hover:text-pink-500'}
                               `}>
-                              <span className="truncate block">{shop.name}</span>
+                              <span className="truncate">{shop.name}</span>
                               {shop.is_verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-50 shrink-0" />}
                             </h4>
                           </div>
                         </div>
 
-                        {/* Fixed Pay - Right */}
-                        <div className="shrink-0 w-[70px] text-right flex flex-col justify-center">
-                          <p className="text-red-500 font-bold text-[11px] sm:text-xs mb-0.5 whitespace-nowrap truncate">{shop.pay}</p>
-                          <p className="text-[10px] text-gray-400 whitespace-nowrap truncate">{shop.workType}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {shop.options?.icons?.map((icon, idx) => (
+                            <span key={idx} className="text-[8px] px-2 py-0.5 rounded-full font-black bg-rose-50 text-rose-500 border border-rose-100">
+                              {icon}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-700/50">
+                          <div className="flex flex-col">
+                            <p className="text-red-500 font-black text-xs">{shop.pay}</p>
+                            <p className="text-[10px] text-gray-400 font-bold">{shop.workType}</p>
+                          </div>
+                          <div className="flex items-center text-[9px] text-gray-400 italic">
+                            상세보기 <ChevronRight size={10} />
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-2 pt-2 border-t border-gray-50 text-center w-full">
-                        <p className="text-[9px] text-gray-300">"{brand.name}를 통해 연락했다고 말씀해주세요!"</p>
+
+                      <div className="mt-3 text-center border-t border-gray-50 dark:border-gray-700/50 pt-2 pb-1">
+                        <p className="text-[8px] text-gray-300 font-medium">"{brand.name}를 통해 연락했다고 말씀해주세요!"</p>
                       </div>
                     </div>
                   ))}
