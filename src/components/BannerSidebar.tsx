@@ -78,7 +78,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             style={{
                 top: `${stickyTop}px`,
                 [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
-                transition: 'top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)' // Enhanced "Chase" feeling
+                transition: 'top 0.3s ease-out' // Smooth adjustment on resize
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
