@@ -90,7 +90,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                     {banners.map((banner) => (
                         <div
                             key={banner.id}
-                            className="relative w-full aspect-[1/2] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
+                            className="relative w-full aspect-[3/5] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
                         >
                             <img
                                 src={banner.imageUrl}
