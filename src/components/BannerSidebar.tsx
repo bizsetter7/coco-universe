@@ -22,20 +22,40 @@ const RIGHT_BANNERS: Banner[] = [
 ];
 
 export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
+    const sidebarRef = React.useRef<HTMLDivElement>(null);
     const [mounted, setMounted] = React.useState(false);
+    const [scrollY, setScrollY] = React.useState(0);
+    const [sidebarHeight, setSidebarHeight] = React.useState(0);
     const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
 
     React.useEffect(() => {
         setMounted(true);
+        const handleScroll = () => setScrollY(window.scrollY);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // Measure height after mount
+        if (sidebarRef.current) {
+            setSidebarHeight(sidebarRef.current.offsetHeight);
+        }
+
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     if (!mounted) return null;
 
+    // Calculate dynamic top for "Smooth Follower" effect
+    // Only scrolls up if the sidebar is taller than the available viewport space
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const maxScrollUp = Math.max(0, sidebarHeight + 115 + 20 - viewportHeight);
+    const dynamicTop = 115 - Math.min(scrollY, maxScrollUp);
+
     return (
         <aside
-            className={`hidden 2xl:flex flex-col sticky top-[115px] z-40 animate-in fade-in duration-700 w-[120px] shrink-0`}
+            ref={sidebarRef}
+            className={`hidden 2xl:flex flex-col fixed z-40 animate-in fade-in duration-700 w-[120px]`}
             style={{
-                [side === 'left' ? 'marginRight' : 'marginLeft']: '10px',
+                [side]: `calc(50% - 510px - 130px)`,
+                top: `${dynamicTop}px`
             }}
         >
             <div className={`p-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
@@ -66,16 +86,6 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
                     <p className="text-sm font-black text-gray-800">1544-5568</p>
                 </div>
             </div>
-
-            <style jsx global>{`
-                .no-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .no-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
         </aside>
     );
 };
