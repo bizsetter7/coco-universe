@@ -115,7 +115,10 @@ function CustomerCenterContent() {
                         <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 hover:text-gray-900">
                             <ArrowLeft size={24} />
                         </button>
-                        <h1 className="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                        <h1
+                            onClick={() => router.push('/')}
+                            className="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                        >
                             고객지원센터
                         </h1>
                     </div>

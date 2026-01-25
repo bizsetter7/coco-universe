@@ -78,7 +78,10 @@ function CommunityContent() {
                         <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
                             <ArrowLeft size={24} />
                         </button>
-                        <h1 className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter">
+                        <h1
+                            onClick={() => router.push('/')}
+                            className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
+                        >
                             <MessageCircle className="fill-pink-500" size={24} />
                             그녀들의 수다
                         </h1>

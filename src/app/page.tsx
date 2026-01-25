@@ -154,7 +154,7 @@ export default function HomePortal() {
       {/* Header */}
       <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}>
         <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
+          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setCurrentPage('home')}>
             {currentPage !== 'home' ? (
               <ChevronLeft className="md:hidden mr-1" size={24} />
             ) : null}
