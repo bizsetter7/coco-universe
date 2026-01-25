@@ -62,14 +62,29 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             const scrollY = window.scrollY;
             const viewportHeight = window.innerHeight;
             const sidebarHeight = asideRef.current.offsetHeight;
+            const docHeight = document.documentElement.scrollHeight;
 
+            // Default target: Scroll Position + Header Offset (16px)
             let targetTop = scrollY + 16;
 
+            // Smart Bottom-Align Logic
             const isTall = sidebarHeight + 16 > viewportHeight;
             if (isTall) {
                 targetTop = scrollY + viewportHeight - sidebarHeight - 40;
                 if (targetTop < 16) targetTop = 16;
             }
+
+            // Critical Safety Clamp during Layout Shifts (Snap Mode)
+            // If the document shrunk, we MUST NOT position the sidebar below the new footer.
+            // We only enforce this hard clamp when shifting layouts to fix "stuck at bottom" issues on short pages.
+            // For normal scrolling, we leave it uncapped to allow elastic over-scroll if desired.
+            if (isSnapMode.current) {
+                const maxTop = docHeight - sidebarHeight - 40;
+                targetTop = Math.min(targetTop, maxTop);
+            }
+
+            // Should never be above 16
+            if (targetTop < 16) targetTop = 16;
 
             const currentTop = parseFloat(asideRef.current.style.top || '16');
 
