@@ -35,7 +35,7 @@ export default function RootLayout({
           <BrandProvider>
             <div className="relative min-h-screen">
               <BannerSidebar side="left" />
-              <main id="main-stage" className="w-full max-w-[1180px] mx-auto px-4 md:px-0">
+              <main id="main-stage" className="w-full max-w-[1020px] mx-auto px-4 md:px-0">
                 {children}
               </main>
               <BannerSidebar side="right" />
