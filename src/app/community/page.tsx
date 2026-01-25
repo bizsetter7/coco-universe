@@ -191,7 +191,7 @@ function CommunityContent() {
                             </p>
                             <div className="grid grid-cols-1 w-full gap-3">
                                 <button
-                                    onClick={() => router.push('/')}
+                                    onClick={() => router.push('/?page=signup')}
                                     className="w-full py-5 bg-pink-500 text-white rounded-3xl font-black text-lg hover:bg-pink-600 hover:scale-[1.02] transition-all shadow-xl shadow-pink-200"
                                 >
                                     지금 가입하고 확인하기

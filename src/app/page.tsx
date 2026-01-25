@@ -4,8 +4,8 @@ import { useBrand } from '@/components/BrandProvider';
 import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { MOCK_POSTS } from '@/constants/community';
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import EventPopup from '@/components/EventPopup';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
@@ -37,6 +37,7 @@ interface Shop {
 
 export default function HomePortal() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const brand = useBrand();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [currentPage, _setCurrentPage] = useState('home');
@@ -51,6 +52,27 @@ export default function HomePortal() {
     }
   }, []);
 
+  // Signup States
+  const [signupStep, setSignupStep] = useState(1); // 1: Terms, 2: Form, 3: Complete
+  const [signupType, setSignupType] = useState<'individual' | 'corporate'>('individual'); // individual: 구직자, corporate: 구인자
+  const [agreements, setAgreements] = useState({ terms: false, privacy: false });
+  const [businessLicense, setBusinessLicense] = useState<File | null>(null); // 사업자등록증 파일
+  const [businessLicenseNumber, setBusinessLicenseNumber] = useState(''); // 사업자등록번호
+
+  // Simulation: Registered business numbers
+  const REGISTERED_BUSINESS_NUMBERS = ['123-45-67890', '226-13-91078'];
+
+  // URL Parameter Handling
+  useEffect(() => {
+    const page = searchParams.get('page');
+    if (page === 'signup') {
+      _setCurrentPage('signup');
+      setSignupStep(1);
+    } else if (page === 'login') {
+      _setCurrentPage('login');
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const page = event.state?.page || 'home';
@@ -63,12 +85,6 @@ export default function HomePortal() {
 
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [visibleCount, setVisibleCount] = useState(10);
-
-  // Signup States
-  const [signupStep, setSignupStep] = useState(1); // 1: Terms, 2: Form, 3: Complete
-  const [signupType, setSignupType] = useState<'individual' | 'corporate'>('individual'); // individual: 구직자, corporate: 구인자
-  const [agreements, setAgreements] = useState({ terms: false, privacy: false });
-  const [businessLicense, setBusinessLicense] = useState<File | null>(null); // 사업자등록증 파일
 
   const [shops] = useState<Shop[]>(shopsData as Shop[]);
   const [regions] = useState<string[]>(regionsData as string[]);
@@ -743,39 +759,59 @@ export default function HomePortal() {
                   </div>
 
                   {signupType === 'corporate' && (
-                    <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
-                      <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">업소명 <span className="text-red-500">*</span></label>
-                      <div className="col-span-3 w-full space-y-2">
-                        <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
-
-                        <div className="flex gap-2 items-center">
-                          <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition min-w-0 ${businessLicense ? 'border-brand-primary bg-blue-50/10' : 'border-gray-300'}`} style={{ borderColor: businessLicense ? brand.primaryColor : undefined }}>
-                            <input
-                              type="file"
-                              className="hidden"
-                              accept="image/*,.pdf"
-                              onChange={(e) => {
-                                if (e.target.files && e.target.files[0]) {
-                                  setBusinessLicense(e.target.files[0]);
-                                }
-                              }}
-                            />
-                            {businessLicense ? (
-                              <span className="text-xs font-bold truncate flex items-center gap-1" style={{ color: brand.primaryColor }}>
-                                <CheckCircle2 size={14} /> {businessLicense.name}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-gray-500 flex items-center gap-1">
-                                <PlusSquare size={14} /> 사업자등록증 첨부 (필수)
-                              </span>
-                            )}
-                          </label>
-                          <span className="text-[10px] text-gray-400 break-keep shrink-0">
-                            * 관리자 승인 후 가입이 완료됩니다.
-                          </span>
+                    <>
+                      <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                        <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">업소명 <span className="text-red-500">*</span></label>
+                        <div className="col-span-3 w-full">
+                          <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
                         </div>
                       </div>
-                    </div>
+
+                      <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                        <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">사업자번호 <span className="text-red-500">*</span></label>
+                        <div className="col-span-3 w-full">
+                          <input
+                            type="text"
+                            placeholder="000-00-00000"
+                            value={businessLicenseNumber}
+                            onChange={(e) => setBusinessLicenseNumber(e.target.value)}
+                            className="w-full p-3 border rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
+                        <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">증빙서류 <span className="text-red-500">*</span></label>
+                        <div className="col-span-3 w-full">
+                          <div className="flex gap-2 items-center">
+                            <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border border-dashed cursor-pointer hover:bg-gray-50 transition min-w-0 ${businessLicense ? 'border-brand-primary bg-blue-50/10' : 'border-gray-300'}`} style={{ borderColor: businessLicense ? brand.primaryColor : undefined }}>
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept="image/*,.pdf"
+                                onChange={(e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    setBusinessLicense(e.target.files[0]);
+                                  }
+                                }}
+                              />
+                              {businessLicense ? (
+                                <span className="text-xs font-bold truncate flex items-center gap-1" style={{ color: brand.primaryColor }}>
+                                  <CheckCircle2 size={14} /> {businessLicense.name}
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                  <PlusSquare size={14} /> 사업자등록증 첨부 (필수)
+                                </span>
+                              )}
+                            </label>
+                            <span className="text-[10px] text-gray-400 break-keep shrink-0">
+                              * 관리자 승인 후 가입이 완료됩니다.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   )}
 
                   <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
@@ -814,8 +850,16 @@ export default function HomePortal() {
                     <button onClick={() => setSignupStep(1)} className="px-8 py-4 rounded-xl border border-gray-300 text-gray-500 font-bold hover:bg-gray-50">이전단계</button>
                     <button
                       onClick={() => {
-                        if (signupType === 'corporate' && !businessLicense) {
-                          return alert('사업자등록증을 첨부해주세요.');
+                        if (signupType === 'corporate') {
+                          if (!businessLicenseNumber) {
+                            return alert('사업자등록번호를 입력해주세요.');
+                          }
+                          if (REGISTERED_BUSINESS_NUMBERS.includes(businessLicenseNumber)) {
+                            return alert('이미 등록된 사업자번호입니다.\n고객센터로 문의해주시기 바랍니다.');
+                          }
+                          if (!businessLicense) {
+                            return alert('사업자등록증을 첨부해주세요.');
+                          }
                         }
                         setSignupStep(3);
                       }}
