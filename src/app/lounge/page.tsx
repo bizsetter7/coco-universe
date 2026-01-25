@@ -49,7 +49,7 @@ export default function LoungePage() {
                         <div className="relative overflow-hidden rounded-3xl bg-gray-900 aspect-[16/7] flex items-center px-8 text-white shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10"></div>
                             <div className="absolute inset-0 z-0">
-                                <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+                                <div className="w-full h-full bg-[url('/lounge-fitness.png')] bg-cover bg-center opacity-70"></div>
                             </div>
                             <div className="relative z-20 space-y-2">
                                 <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold tracking-widest uppercase">Premium Membership</span>

@@ -1,183 +1,148 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
     ArrowLeft,
-    MoreVertical,
+    Home,
     Heart,
     MessageSquare,
+    User,
+    MoreVertical,
     Share2,
-    Send,
-    Home
+    ShieldCheck
 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
+import { MOCK_POSTS, MOCK_COMMENTS } from '@/constants/community';
 
-// Mock Data for a single post (In a real app, fetch by ID)
-const MOCK_POST_DETAIL = {
-    id: 1,
-    category: '밤 문화 Talk',
-    title: '언니들 오늘 손님 진상 썰 푼다...ㅠㅠ',
-    content: `오늘 진짜 역대급 진상을 만났어...\n
-아니 들어오자마자 반말은 기본이고, 술 따르라면서 잔을 던지듯이 주는거야.\n
-진짜 참다 참다 실장님 불렀는데, 실장님이 잘 처리해주셔서 다행이지\n
-안그랬으면 나 진짜 오늘 멘탈 터져서 그만둘 뻔 했어 ㅠㅠ\n
-다들 이런 손님 만나면 어떻게 대처해? 꿀팁 좀 공유해줘... 휴`,
-    author: '익명123',
-    time: '10분 전',
-    views: 128,
-    likes: 12,
-    isLiked: false,
-    comments: [
-        { id: 1, author: '지나가던언니', content: '헐 진짜 고생했어 ㅠㅠ 맛있는거 먹고 털어버려!', time: '5분 전', likes: 2 },
-        { id: 2, author: '멘탈갑', content: '난 그냥 무시하고 웃으면서 영혼없이 대해줌 ㅋㅋ', time: '8분 전', likes: 5 },
-    ]
-};
-
-export default function PostDetailPage() {
+export default function CommunityDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
-    const params = useParams(); // Get ID from URL
-    const [post, setPost] = useState(MOCK_POST_DETAIL);
-    const [commentText, setCommentText] = useState('');
+    const postId = parseInt(params.id);
+    const post = MOCK_POSTS.find(p => p.id === postId);
+    const comments = MOCK_COMMENTS.filter(c => c.postId === postId);
 
-    const handleLike = () => {
-        setPost(prev => ({
-            ...prev,
-            likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
-            isLiked: !prev.isLiked
-        }));
-    };
-
-    const handleSubmitComment = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!commentText.trim()) return;
-
-        const newComment = {
-            id: Date.now(),
-            author: '나(익명)',
-            content: commentText,
-            time: '방금 전',
-            likes: 0
-        };
-
-        setPost(prev => ({
-            ...prev,
-            comments: [...prev.comments, newComment]
-        }));
-        setCommentText('');
-    };
+    if (!post) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                <p className="text-gray-500 font-bold mb-4">존재하지 않는 게시글입니다.</p>
+                <button onClick={() => router.back()} className="text-pink-500 font-bold underline">뒤로 가기</button>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-white pb-20">
-
+        <div className="min-h-screen bg-white pb-20 font-sans">
             {/* Header */}
-            <header className="sticky top-0 bg-white border-b z-10 flex items-center justify-between px-4 h-14">
-                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 pt-2">
-                    <ArrowLeft size={24} />
-                </button>
-                <h1 className="text-base font-bold text-gray-800 truncate max-w-[200px] pt-3">{post.category}</h1>
-                <div className="flex gap-1 pt-2">
-                    <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
-                        <Home size={24} />
-                    </button>
-                    <button className="p-2 -mr-2 text-gray-400">
-                        <MoreVertical size={24} />
-                    </button>
+            <header className="fixed top-0 w-full bg-white border-b z-40 bg-white/80 backdrop-blur-md">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-800">
+                            <ArrowLeft size={24} />
+                        </button>
+                        <span className="font-black text-lg text-gray-900 truncate max-w-[150px]">{post.category}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={() => router.push('/')} className="p-2 text-gray-500 hover:text-gray-900">
+                            <Home size={22} />
+                        </button>
+                        <button className="p-2 text-gray-500 hover:text-gray-900">
+                            <Share2 size={22} />
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            {/* Content */}
-            <main className="max-w-4xl mx-auto">
-                <div className="p-5 border-b-8 border-gray-50">
-                    {/* Post Info */}
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 font-bold text-xs">
-                            익명
-                        </div>
-                        <div>
-                            <div className="font-bold text-gray-800 text-sm">{post.author}</div>
-                            <div className="text-xs text-gray-400 flex gap-2">
-                                <span>{post.time}</span>
-                                <span>조회 {post.views}</span>
+            <main className="max-w-4xl mx-auto pt-20 px-4">
+                {/* Post Content */}
+                <article className="py-6 border-b border-gray-100">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-500 ring-2 ring-pink-50">
+                                <User size={24} />
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="font-black text-gray-900">{post.author}</span>
+                                    {post.likes > 20 && (
+                                        <span className="bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5">
+                                            <ShieldCheck size={10} /> BEST
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-xs text-gray-400 font-medium">{post.time} · 조회 1.2k</span>
                             </div>
                         </div>
+                        <button className="p-2 text-gray-400">
+                            <MoreVertical size={20} />
+                        </button>
                     </div>
 
-                    {/* Title & Body */}
-                    <h2 className="text-xl font-bold text-gray-900 mb-4 leading-snug">{post.title}</h2>
-                    <div className="text-gray-700 whitespace-pre-wrap leading-relaxed text-sm min-h-[100px] mb-6">
+                    <h2 className="text-2xl font-black text-gray-900 mb-6 leading-tight">
+                        {post.isHot && <span className="text-red-500 mr-2">🔥</span>}
+                        {post.title}
+                    </h2>
+
+                    <div className="text-gray-700 leading-loose text-lg mb-10 whitespace-pre-wrap break-words">
                         {post.content}
+                        <br /><br />
+                        진짜 다들 어떻게 생각하세요? 너무 궁금해서 남겨봅니다 ㅠㅠ
+                        비슷한 경험 있으신 분들 댓글 좀 달아주세요!
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={handleLike}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-colors ${post.isLiked
-                                ? 'border-pink-500 text-pink-500 bg-pink-50'
-                                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                                }`}
-                        >
-                            <Heart size={16} className={post.isLiked ? 'fill-pink-500' : ''} />
-                            공감 {post.likes}
+                    <div className="flex items-center gap-6 py-4 px-6 bg-gray-50 rounded-3xl w-fit">
+                        <button className="flex items-center gap-2 text-pink-500 font-black hover:scale-110 transition-transform">
+                            <Heart size={20} className={post.likes > 10 ? 'fill-pink-500' : ''} />
+                            {post.likes}
                         </button>
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border border-gray-200 text-gray-500 hover:bg-gray-50">
-                            <MessageSquare size={16} />
-                            댓글 {post.comments.length}
+                        <button className="flex items-center gap-2 text-blue-500 font-black">
+                            <MessageSquare size={20} />
+                            {post.comments}
                         </button>
                     </div>
-                </div>
+                </article>
 
                 {/* Comments Section */}
-                <div className="p-5">
-                    <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        댓글 <span className="text-pink-500">{post.comments.length}</span>
-                    </h3>
+                <section className="py-8">
+                    <h4 className="font-black text-gray-900 mb-6 flex items-center gap-2">
+                        댓글 <span className="text-pink-500">{comments.length > 0 ? comments.length : post.comments}</span>
+                    </h4>
 
-                    <div className="space-y-6">
-                        {post.comments.map((comment) => (
-                            <div key={comment.id} className="flex gap-3">
-                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 font-bold text-[10px] shrink-0">
-                                    익명
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="text-xs font-bold text-gray-700">{comment.author}</span>
-                                        <span className="text-[10px] text-gray-400">{comment.time}</span>
+                    {comments.length > 0 ? (
+                        <div className="space-y-6">
+                            {comments.map((comment) => (
+                                <div key={comment.id} className="flex gap-4 group">
+                                    <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
+                                        <User size={18} />
                                     </div>
-                                    <p className="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-r-lg rounded-bl-lg">
-                                        {comment.content}
-                                    </p>
-                                    <div className="flex gap-4 mt-1.5 ml-1">
-                                        <button className="text-[10px] text-gray-400 font-bold hover:text-gray-600">답글달기</button>
-                                        <button className="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-1">
-                                            <Heart size={10} /> {comment.likes > 0 ? comment.likes : '좋아요'}
-                                        </button>
+                                    <div className="flex-1 space-y-1 bg-gray-50/50 p-4 rounded-2xl group-hover:bg-gray-50 transition-colors">
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-black text-sm text-gray-800">{comment.author}</span>
+                                            <span className="text-[10px] text-gray-400">{comment.time}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-600 leading-relaxed font-medium">{comment.content}</p>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10 bg-gray-50 rounded-3xl">
+                            <p className="text-gray-400 text-sm font-bold">첫 번째 댓글을 남겨보세요! 💬</p>
+                        </div>
+                    )}
+                </section>
             </main>
 
-            {/* Comment Input Bar (Fixed Bottom) */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-3 pb-8 sm:pb-3 max-w-4xl mx-auto">
-                <form onSubmit={handleSubmitComment} className="flex gap-2">
+            {/* Comment Input Sticky */}
+            <div className="fixed bottom-0 w-full bg-white border-t p-3 max-w-4xl mx-auto left-0 right-0 z-40">
+                <div className="flex gap-3 items-center">
                     <input
                         type="text"
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="따뜻한 댓글을 남겨주세요 :)"
-                        className="flex-1 bg-gray-100 border-none rounded-full px-4 py-2.5 text-sm focus:ring-1 focus:ring-pink-500 outline-none transition-shadow"
+                        placeholder="따뜻한 댓글을 남겨주세요."
+                        className="flex-1 bg-gray-100 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-pink-500 outline-none transition-shadow"
                     />
-                    <button
-                        type="submit"
-                        disabled={!commentText.trim()}
-                        className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white shrink-0 disabled:bg-gray-300 transition-colors"
-                    >
-                        <Send size={18} className="translate-x-[1px] translate-y-[1px]" />
+                    <button className="bg-pink-100 text-pink-600 font-black px-6 py-3.5 rounded-2xl hover:bg-pink-500 hover:text-white transition-all shadow-sm">
+                        등록
                     </button>
-                </form>
+                </div>
             </div>
         </div>
     );

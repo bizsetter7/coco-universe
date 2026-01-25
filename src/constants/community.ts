@@ -1,0 +1,186 @@
+export interface Post {
+    id: number;
+    category: string;
+    title: string;
+    content: string;
+    author: string;
+    time: string;
+    likes: number;
+    comments: number;
+    isHot?: boolean;
+}
+
+export const CATEGORIES = [
+    '전체',
+    '밤 문화 Talk',
+    '같이일할단짝',
+    '중고거래',
+    '무료법률상담',
+    '친구찾기',
+    '뷰티·패션·이벤트'
+];
+
+export const MOCK_POSTS: Post[] = [
+    {
+        id: 1,
+        category: '밤 문화 Talk',
+        title: '언니들 오늘 손님 진상 썰 푼다...ㅠㅠ',
+        content: '진짜 오늘 역대급이었어.. 들어보실? 술도 안 마시고 계속 말만 거는데 진짜 기빨려 죽는 줄..',
+        author: '익명123',
+        time: '10분 전',
+        likes: 12,
+        comments: 5,
+        isHot: true,
+    },
+    {
+        id: 2,
+        category: '같이일할단짝',
+        title: '강남 지역 같이 출근하실 분 구해요!',
+        content: '혼자 가기 너무 심심해요 ㅠㅠ 같이 화이팅해요! 텃세 없는 곳 알고 있어서 정보 공유도 할게요.',
+        author: '귀요미',
+        time: '30분 전',
+        likes: 5,
+        comments: 2,
+    },
+    {
+        id: 3,
+        category: '뷰티·패션·이벤트',
+        title: '이번에 새로 나온 립스틱 발색 대박임',
+        content: '사진 첨부했어 봐봐.. 이거 진짜 톤 상관없이 다 잘어울릴듯. 입생로랑 신상인데 텍스처 미쳤음.',
+        author: '코덕',
+        time: '1시간 전',
+        likes: 24,
+        comments: 10,
+        isHot: true,
+    },
+    {
+        id: 4,
+        category: '무료법률상담',
+        title: '급여가 계속 밀리는데 어떡하죠?',
+        content: '도와주세요 변호사님.. 벌써 한 달째에요. 계약서도 안 썼는데 신고 가능한가요?',
+        author: '고민녀',
+        time: '2시간 전',
+        likes: 3,
+        comments: 1,
+    },
+    {
+        id: 5,
+        category: '중고거래',
+        title: '샤넬 립스틱 새거 싸게 팔아요',
+        content: '선물 받았는데 제가 안쓰는 색이라서요 ㅠㅠ 연락주세요. 박스 풀셋 그대로입니다.',
+        author: '미니멀',
+        time: '3시간 전',
+        likes: 7,
+        comments: 3,
+    },
+    {
+        id: 6,
+        category: '친구찾기',
+        title: '강남 쪽 술 한잔 하실 분 계신가요?',
+        content: '일 끝나고 너무 심심해서요! 건전하게 한잔해요. 주말에도 일하니까 너무 외롭네요.',
+        author: '술친구',
+        time: '4시간 전',
+        likes: 9,
+        comments: 6,
+    },
+    {
+        id: 7,
+        category: '밤 문화 Talk',
+        title: '팁으로만 100만원 찍은 썰 ㅋㅋ',
+        content: '진짜 운 좋았다 오늘... 에이스 대우 제대로 받음. 역시 서비스 마인드가 중요함.',
+        author: '럭키걸',
+        time: '5시간 전',
+        likes: 45,
+        comments: 18,
+        isHot: true,
+    },
+    {
+        id: 8,
+        category: '무료법률상담',
+        title: '퇴직금 정산 문제로 고민입니다',
+        content: '이거 노동청 신고해야 하나요? 조언 부탁드려요. 사장님이 줄 생각이 없으신 듯.',
+        author: '직장인A',
+        time: '6시간 전',
+        likes: 4,
+        comments: 2,
+    },
+    {
+        id: 9,
+        category: '뷰티·패션·이벤트',
+        title: '성형외과 추천 좀 해주세요! 코 수술 예정',
+        content: '자연스럽게 잘하는 곳 아시는 분? 리얼 후기 부탁해요. 압구정 쪽이면 더 좋구여.',
+        author: '예비여신',
+        time: '7시간 전',
+        likes: 12,
+        comments: 15,
+    },
+    {
+        id: 10,
+        category: '중고거래',
+        title: '시스템 다이어리 팝니다',
+        content: '상태 깨끗해요! 직거래 선호합니다. 다이어리 잘 안 쓰게 되네요.',
+        author: '정리퀸',
+        time: '8시간 전',
+        likes: 2,
+        comments: 0,
+    },
+    {
+        id: 11,
+        category: '밤 문화 Talk',
+        title: '가게 옮길까 고민중인 언니들 필독',
+        content: '현재 경기도권 시세 정리해준다... 참고해. 수원이랑 인계동 쪽 분위기 알려줄게.',
+        author: '베테랑',
+        time: '9시간 전',
+        likes: 31,
+        comments: 22,
+        isHot: true,
+    },
+    {
+        id: 12,
+        category: '친구찾기',
+        title: '운동 같이 시작할 언니 구함!',
+        content: '필라테스 등록했는데 혼자 다니기 민망해요. 건강도 챙기고 수다도 떨어요.',
+        author: '운동덕후',
+        time: '10시간 전',
+        likes: 8,
+        comments: 4,
+    },
+    {
+        id: 13,
+        category: '같이일할단짝',
+        title: '대구 지역 고수익 출장 파트너 급구',
+        content: '페이 보장합니다 DM 주세요! 경력자 면접 없이 바로 가능.',
+        author: '실장님',
+        time: '11시간 전',
+        likes: 1,
+        comments: 1,
+    },
+    {
+        id: 14,
+        category: '밤 문화 Talk',
+        title: '[블랙] 강남 ㅇㅇ가게 대기할 때 조심',
+        content: '거기 실장 양아치임.. 내 돈 떼먹으려고 함. 언니들 속지 마시길.',
+        author: '정의구현',
+        time: '12시간 전',
+        likes: 88,
+        comments: 34,
+        isHot: true,
+    },
+    {
+        id: 15,
+        category: '무료법률상담',
+        title: '성추행 관련 법적 대응 가능한가요?',
+        content: '손님이 선을 넘어서요.. 증거 수집 끝났습니다. 형사 고소 절차 아시는 분?',
+        author: '강해지자',
+        time: '13시간 전',
+        likes: 15,
+        comments: 8,
+    },
+];
+
+export const MOCK_COMMENTS = [
+    { id: 101, postId: 1, author: '공감봇', content: '진짜 극혐이네요.. 고생하셨어요 ㅠㅠ', time: '5분 전' },
+    { id: 102, postId: 1, author: '언니야', content: '저도 그런 손님 만나봤는데 차단이 답임..', time: '2분 전' },
+    { id: 103, postId: 7, author: '에이스', content: '축하드려요! 기운 받아갑니다 ㅎㅎ', time: '1시간 전' },
+    { id: 104, postId: 3, author: '메이크업러버', content: '호수 몇 번 쓰시는 거예요?', time: '30분 전' },
+];

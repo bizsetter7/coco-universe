@@ -3,6 +3,7 @@
 import { useBrand } from '@/components/BrandProvider';
 import { Crown, Flame, Home, MessageCircle, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { MOCK_POSTS } from '@/constants/community';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import EventPopup from '@/components/EventPopup';
@@ -224,9 +225,12 @@ export default function HomePortal() {
                   <span className="text-xs text-gray-400">더보기 &gt;</span>
                 </div>
                 <div className="space-y-2">
-                  <p className="truncate text-sm">🔥 <strong>[Talk]</strong> 언니들 오늘 손님 진상 썰 푼다...ㅠㅠ (댓글 5)</p>
-                  <p className="truncate text-sm">💬 <strong>[Talk]</strong> 팁으로만 100만원 찍은 썰 ㅋㅋ (추천 45)</p>
-                  <p className="truncate text-sm">⭐ <strong>[뷰티]</strong> 홀복 예쁜 쇼핑몰 추천 리스트 공유!</p>
+                  {MOCK_POSTS.filter(p => p.isHot).slice(0, 3).map(post => (
+                    <p key={post.id} className="truncate text-sm">
+                      {post.id === 1 ? '🔥' : post.id === 3 ? '⭐' : '💬'}
+                      <strong>[{post.category.split(' ')[0]}]</strong> {post.title}
+                    </p>
+                  ))}
                 </div>
               </div>
 
