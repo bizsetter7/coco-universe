@@ -52,7 +52,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             // Calculate how much the sidebar needs to "travel up" to show its bottom
             const maxTravel = Math.max(0, sidebarHeight + offsetTop + marginBottom - viewportHeight);
 
-            // Apply transform for 0-lag performance
+            // Apply transform with transition for the "Delayed Chase" effect
             asideRef.current.style.transform = `translateY(-${progress * maxTravel}px)`;
         };
 
@@ -70,10 +70,14 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
         window.addEventListener('scroll', updatePosition, { passive: true });
         window.addEventListener('resize', updatePosition);
 
+        // Periodically check in case content changes without resize
+        const timer = setInterval(updatePosition, 1000);
+
         return () => {
             resizeObserver.disconnect();
             window.removeEventListener('scroll', updatePosition);
             window.removeEventListener('resize', updatePosition);
+            clearInterval(timer);
         };
     }, []);
 
@@ -85,6 +89,7 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
             className={`hidden 2xl:flex flex-col fixed top-[80px] z-40 animate-in fade-in duration-700 w-[120px]`}
             style={{
                 [side]: `calc(50% - 510px - 130px)`,
+                transition: 'transform 0.45s ease-out' // 0.45s delay follower effect
             }}
         >
             <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
