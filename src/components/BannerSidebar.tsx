@@ -105,7 +105,6 @@ export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
 
             if (targetTop < 16) targetTop = 16;
 
-            const currentTop = parseFloat(asideRef.current.style.top || '16');
 
             if (options.immediate) {
                 setSnapClass(true); // Disable transition via !important class
