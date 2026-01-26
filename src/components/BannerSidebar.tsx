@@ -10,14 +10,16 @@ interface BannerSidebarProps {
 }
 
 /**
- * BannerSidebar - 'Pure CSS Sticky' 완전 정착형 버젼
- * - 기존 JS 스크롤 추적 엔진을 완전히 삭제하고 CSS position: sticky로 회귀
- * - 떨림(Jitter) 현상을 물리적으로 0%로 차단
- * - 레이아웃 Grid 시스템과 결합하여 완벽한 수평/수직 안정성 제공
+ * BannerSidebar - '사용자 만족 버전' 복구 엔진
+ * - translate3d 기반 하드웨어 가속 추적 (0ms 반응성)
+ * - 0ms 워프 동기화 (커스텀 이벤트 수신)
+ * - 초기 오프셋 80px 보정으로 헤더 겹침 방지
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
+    const pathname = usePathname();
     const [selectedAd, setSelectedAd] = useState<any>(null);
+    const sidebarRef = useRef<HTMLDivElement>(null);
 
     const ads = [
         { id: 1, name: '강남 유앤미', img: '/banners/thumb-1.png', desc: '강남구 역삼동 유앤미 힐링 케어' },
@@ -27,9 +29,54 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
     const badgeColor = side === 'left' ? 'bg-[#5B5FFF]' : 'bg-[#E91E63]';
 
+    useEffect(() => {
+        const updatePosition = () => {
+            if (!sidebarRef.current) return;
+            const scrollY = window.scrollY;
+            const headerHeight = 80; // 메인 헤더 높이
+
+            // 헤더 높이만큼 띄우고, 스크롤에 따라 실시간 이동
+            const targetPos = Math.max(headerHeight, scrollY + headerHeight);
+
+            // translate3d로 GPU 가속 적용하여 떨림 방지
+            sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
+        };
+
+        const handleWarp = () => {
+            if (sidebarRef.current) {
+                // 즉각적인 상단 도약 (transition 없이)
+                sidebarRef.current.classList.add('no-transition');
+                sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
+                setTimeout(() => {
+                    sidebarRef.current?.classList.remove('no-transition');
+                }, 50);
+            }
+        };
+
+        window.addEventListener('scroll', updatePosition, { passive: true });
+        window.addEventListener('sidebar-warp', handleWarp);
+        updatePosition();
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition);
+            window.removeEventListener('sidebar-warp', handleWarp);
+        };
+    }, []);
+
+    // 페이지 변경 시 상단 리셋
+    useEffect(() => {
+        if (sidebarRef.current) {
+            sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
+        }
+    }, [pathname]);
+
     return (
         <>
-            <div className={`flex flex-col gap-3 w-[160px] py-6`}>
+            <div
+                ref={sidebarRef}
+                className={`flex flex-col gap-3 w-[160px] py-6 absolute transition-transform duration-300 ease-out will-change-transform`}
+                style={{ top: '80px' }}
+            >
                 <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
                     {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>

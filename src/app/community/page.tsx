@@ -100,9 +100,9 @@ function CommunityContent() {
                     </div>
                 </div>
 
-                {/* Categories */}
-                <div className="max-w-[1020px] mx-auto overflow-x-auto scrollbar-hide">
-                    <div className="flex px-4 border-b">
+                {/* Categories - Sticky 고정 적용 */}
+                <div className="max-w-[1020px] mx-auto overflow-x-auto scrollbar-hide sticky top-14 bg-white/95 backdrop-blur-md z-40 border-b">
+                    <div className="flex px-4">
                         {CATEGORIES.map((cat) => (
                             <button
                                 key={cat}

@@ -38,31 +38,29 @@ export default function RootLayout({
                 - py-0으로 헤더 밀착 유지
             */}
             {/* 
-                Grid-Based Master Layout
-                - PC: [160px 사이드바 | 1020px 메인 | 160px 사이드바] 고정 설계
-                - Mobile: 1컬럼 유연 레이아웃 전환
-                - item-start로 스티키 사이드바의 독립적 가동 보장
+                Flex-Based Master Layout (복구 버전)
+                - 중앙 1020px 고정 및 양옆 사이드바 독립 구동 보장
+                - item-start로 JS 추적 엔진의 자유도 확보
             */}
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center">
-              <div className="w-full max-w-[1400px] px-0 lg:px-4 grid grid-cols-1 xl:grid-cols-[160px_minmax(0,1020px)_160px] gap-0 xl:gap-6">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-start">
+              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-0 lg:px-4 relative min-h-screen">
 
-                {/* 왼쪽 사이드바 (PC 전용 Sticky) */}
-                <aside className="hidden xl:block h-full pt-20">
-                  <div className="sticky top-20">
-                    <BannerSidebar side="left" />
-                  </div>
+                {/* 
+                  왼쪽 사이드바 영역
+                  - h-full relative: 사이드바가 이 높이 안에서 자유롭게 움직일 수 있도록 함
+                */}
+                <aside className="hidden xl:block w-[160px] relative h-full">
+                  <BannerSidebar side="left" />
                 </aside>
 
                 {/* 중앙 메인 콘텐츠 (물리적 중앙축 고정) */}
-                <main className="w-full min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none">
+                <main className="w-full max-w-[1020px] flex-1 min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none min-h-screen">
                   {children}
                 </main>
 
-                {/* 오른쪽 사이드바 (PC 전용 Sticky) */}
-                <aside className="hidden xl:block h-full pt-20">
-                  <div className="sticky top-20">
-                    <BannerSidebar side="right" />
-                  </div>
+                {/* 오른쪽 사이드바 영역 */}
+                <aside className="hidden xl:block w-[160px] relative h-full">
+                  <BannerSidebar side="right" />
                 </aside>
 
               </div>
