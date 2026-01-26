@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function EventPopup({ brand }: { brand: any }) {
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export default function EventPopup({ brand }: { brand: any }) {
                 </button>
 
                 <div className="p-6 text-center">
-                    <span className="inline-block px-3 py-1 rounded-full bg-red-100 text-red-600 font-bold text-xs mb-4 animate-bounce">
+                    <span className="inline-block px-3 py-1 rounded-full bg-red-100 text-red-600 font-bold text-xs mb-4">
                         🚀 GRAND OPEN EVENT
                     </span>
                     <h2 className="text-2xl font-black mb-2 text-gray-800">
@@ -56,7 +58,7 @@ export default function EventPopup({ brand }: { brand: any }) {
                     <div className="space-y-3">
                         <button
                             onClick={() => {
-                                window.location.href = '?page=payment'; // Simple redirect approach or utilize context if needed context is global
+                                router.push('/my-shop'); // 즉각적인 탭 전환
                                 closePopup(false);
                             }}
                             style={{ backgroundColor: brand.primaryColor }}

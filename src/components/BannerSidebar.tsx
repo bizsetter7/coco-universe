@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useBrand } from './BrandProvider';
-import { useSearchParams } from 'next/navigation';
 import { X, PhoneCall } from 'lucide-react';
 
 interface BannerSidebarProps {
@@ -10,60 +9,13 @@ interface BannerSidebarProps {
 }
 
 /**
- * BannerSidebar - 'Extreme Speed' 로직 적용 버젼
- * - 사용자의 스크롤에 맞춰 0.1초의 짧은 지연시간으로 기민하게 반응
- * - 페이지 전환이나 도약 스크롤 시 'Transition-None' 즉시 이동 강제
+ * BannerSidebar - 'Portal Standard' 디자인 적용 버젼
+ * - z-index를 낮추어(z-10) 중앙 모달 팝업 시 배경 뒤로 숨도록 함
+ * - 상단 여백 제거된 레이아웃에 맞춰 stick 위치 유지
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
-    const searchParams = useSearchParams();
     const [selectedAd, setSelectedAd] = useState<any>(null);
-    const [topOffset, setTopOffset] = useState(16);
-    const [isInstant, setIsInstant] = useState(true);
-    const lastScrollY = useRef(0);
-
-    // 1. 페이지/탭 전환 시 지연 없는 즉시 고정
-    useEffect(() => {
-        setIsInstant(true);
-        setTopOffset(16);
-        lastScrollY.current = 0;
-
-        // 브라우저 렌더링 동기화를 위해 매우 짧은 대기 후 해제
-        const timer = setTimeout(() => setIsInstant(false), 50);
-        return () => clearTimeout(timer);
-    }, [searchParams]);
-
-    // 2. 가속 스크롤 및 상단 복귀 감지
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScroll = Math.max(0, window.scrollY);
-            const scrollDiff = Math.abs(currentScroll - lastScrollY.current);
-
-            // 1. 스크롤이 상단(0) 근처면 애니메이션 없이 칼같이 16px 고정
-            if (currentScroll < 5) {
-                setIsInstant(true);
-                setTopOffset(16);
-                lastScrollY.current = 0;
-                return;
-            }
-
-            // 2. 50px 이상 큰 폭으로 움직이면 워프 모드 (transition-none)
-            if (scrollDiff > 50) {
-                setIsInstant(true);
-                setTopOffset(currentScroll + 16);
-                // 워프 직후 바로 부드러운 모드 복구
-                requestAnimationFrame(() => setIsInstant(false));
-            } else {
-                // 3. 미세 스크롤 시에는 0.1초의 매우 빠른 속도로 따라옴
-                setTopOffset(currentScroll + 16);
-            }
-
-            lastScrollY.current = currentScroll;
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const ads = [
         { id: 1, name: '강남 유앤미', img: '/banners/thumb-1.png', desc: '강남구 역삼동 유앤미 힐링 케어' },
@@ -76,13 +28,15 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
     return (
         <>
+            {/* 
+                z-index를 z-10으로 하향 조정
+                - 모달 팝업(z-50) 발생 시 사이드바가 모달 배경 뒤로 올바르게 숨겨짐
+                - sticky top-4: 브라우저 상단에서 16px 여백 유지
+            */}
             <aside
-                className={`hidden xl:flex absolute ${side === 'left' ? 'left-[calc(50%-680px)]' : 'right-[calc(50%-680px)]'} w-[160px] flex-col gap-3 pointer-events-none z-40
-                    ${isInstant ? 'transition-none' : 'transition-all duration-100 ease-out'}
-                `}
-                style={{ top: `${topOffset}px` }}
+                className={`hidden xl:flex sticky top-4 w-[160px] flex-col gap-3 z-10 h-fit`}
             >
-                <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
+                <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm`}>
                     {badgeText}
                 </div>
 
@@ -91,7 +45,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                         <div
                             key={ad.id}
                             onClick={() => setSelectedAd(ad)}
-                            className="group pointer-events-auto bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all active:scale-95"
+                            className="group bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow active:scale-95"
                         >
                             <div className="p-2.5 flex flex-col gap-2">
                                 <div className="flex items-center gap-2">
@@ -108,7 +62,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                     ))}
                 </div>
 
-                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1">
+                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm text-center space-y-1">
                     <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
                     <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>
