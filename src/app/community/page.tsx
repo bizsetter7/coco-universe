@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import {
     MessageCircle,
     Heart,
@@ -37,24 +37,30 @@ export default function CommunityPage() {
 function CommunityContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState('전체');
+    const pathname = usePathname();
+    // URL 파라미터로부터 현재 탭 도출 (새로고침 무결성 확보)
+    const activeTab = searchParams.get('category') || '전체';
     const [userType, setUserType] = useState<UserType>('individual');
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulate login state
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
     const brand = useBrand();
 
-    // Sync tab with URL param
-    useEffect(() => {
-        const cat = searchParams.get('category');
-        if (cat && CATEGORIES.includes(cat)) {
-            setActiveTab(cat);
-            requestAnimationFrame(() => {
-                window.scrollTo({ top: 0, behavior: 'auto' });
-                window.dispatchEvent(new CustomEvent('sidebar-warp'));
-            });
+    // 탭 변경 시 URL 동기화 및 스크롤 핸들링
+    const handleTabChange = (cat: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (cat === '전체') {
+            params.delete('category');
+        } else {
+            params.set('category', cat);
         }
-    }, [searchParams]);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            window.dispatchEvent(new CustomEvent('sidebar-warp'));
+        });
+    };
 
     const filteredPosts = activeTab === '전체'
         ? MOCK_POSTS
@@ -113,13 +119,7 @@ function CommunityContent() {
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
-                            onClick={() => {
-                                setActiveTab(cat);
-                                requestAnimationFrame(() => {
-                                    window.scrollTo({ top: 0, behavior: 'auto' });
-                                    window.dispatchEvent(new CustomEvent('sidebar-warp'));
-                                });
-                            }}
+                            onClick={() => handleTabChange(cat)}
                             className={`flex-shrink-0 px-4 h-full text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap flex items-center ${activeTab === cat
                                 ? 'border-pink-500 text-pink-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-900'
@@ -208,7 +208,7 @@ function CommunityContent() {
                                     익명이 보장되는 안전한 공간에서<br />
                                     더 깊은 이야기를 나누고 싶다면 커뮤니티 게시판을 이용하세요.
                                 </p>
-                                <button onClick={() => setActiveTab('전체')} className="bg-white text-pink-600 px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-pink-900/20 active:scale-95 transition-all outline-none">
+                                <button onClick={() => handleTabChange('전체')} className="bg-white text-pink-600 px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-pink-900/20 active:scale-95 transition-all outline-none">
                                     수다 떨러 가기
                                 </button>
                             </div>

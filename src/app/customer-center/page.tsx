@@ -25,7 +25,7 @@ import {
     Zap,
     Crown
 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 
 // --- Mock Data ---
@@ -80,26 +80,41 @@ export default function CustomerCenterPage() {
 function CustomerCenterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
     const brand = useBrand();
 
-    const [activeTab, setActiveTab] = useState('공지사항');
+    // URL 파라미터로부터 탭 ID 도출
+    const getActiveTabId = () => {
+        const tab = searchParams.get('tab');
+        if (tab === 'notice') return '공지사항';
+        if (tab === 'ad') return '광고안내';
+        if (tab === 'guide') return '이용방법';
+        if (tab === 'faq') return '자주묻는질문';
+        if (tab === 'inquiry') return '1:1문의';
+        return '공지사항';
+    };
+
+    const activeTab = getActiveTabId();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-    useEffect(() => {
-        const tab = searchParams.get('tab');
-        let targetId = '공지사항';
-        if (tab === 'notice') targetId = '공지사항';
-        else if (tab === 'ad') targetId = '광고안내';
-        else if (tab === 'guide') targetId = '이용방법';
-        else if (tab === 'faq') targetId = '자주묻는질문';
-        else if (tab === 'inquiry') targetId = '1:1문의';
+    // 탭 변경 시 URL 동기화 및 스크롤 핸들링
+    const handleTabChange = (tabName: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        let tabParam = 'notice';
+        if (tabName === '공지사항') tabParam = 'notice';
+        else if (tabName === '광고안내') tabParam = 'ad';
+        else if (tabName === '이용방법') tabParam = 'guide';
+        else if (tabName === '자주묻는질문') tabParam = 'faq';
+        else if (tabName === '1:1문의') tabParam = 'inquiry';
 
-        setActiveTab(targetId);
+        params.set('tab', tabParam);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
         requestAnimationFrame(() => {
             window.scrollTo({ top: 0, behavior: 'auto' });
             window.dispatchEvent(new CustomEvent('sidebar-warp'));
         });
-    }, [searchParams]);
+    };
 
     const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
@@ -145,13 +160,7 @@ function CustomerCenterContent() {
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
-                                        onClick={() => {
-                                            setActiveTab(tab.id);
-                                            requestAnimationFrame(() => {
-                                                window.scrollTo({ top: 0, behavior: 'auto' });
-                                                window.dispatchEvent(new CustomEvent('sidebar-warp'));
-                                            });
-                                        }}
+                                        onClick={() => handleTabChange(tab.id)}
                                         className={`flex items-center gap-4 px-6 py-5 text-sm font-black transition-all whitespace-nowrap border-b-2 md:border-b-0 md:border-l-4 ${activeTab === tab.id
                                             ? 'bg-pink-50 text-pink-600 border-pink-500 dark:bg-pink-900/20'
                                             : 'text-gray-600 border-transparent hover:text-gray-900 dark:hover:text-white'}`}
