@@ -6,6 +6,8 @@
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
   scroll-behavior: auto !important;
+  scrollbar-gutter: stable;
+  overflow-x: hidden;
 }
 
 @theme inline {

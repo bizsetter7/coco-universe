@@ -65,7 +65,10 @@ export default function HomePortal() {
   // History Management
   const setCurrentPage = useCallback((page: string) => {
     _setCurrentPage(page);
-    window.scrollTo(0, 0); // 즉시 상단으로 이동
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.dispatchEvent(new CustomEvent('sidebar-warp'));
+    });
     if (page !== 'home') {
       window.history.pushState({ page }, '', `?page=${page}`);
     } else {

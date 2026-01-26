@@ -15,7 +15,10 @@ export default function LoungePage() {
 
     // Scroll to top when tab changes
     useEffect(() => {
-        window.scrollTo(0, 0);
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            window.dispatchEvent(new CustomEvent('sidebar-warp'));
+        });
         setShowResult(false);
     }, [activeTab]);
 

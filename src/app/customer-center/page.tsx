@@ -87,11 +87,18 @@ function CustomerCenterContent() {
 
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab === 'notice') setActiveTab('공지사항');
-        else if (tab === 'ad') setActiveTab('광고안내');
-        else if (tab === 'guide') setActiveTab('이용방법');
-        else if (tab === 'faq') setActiveTab('자주묻는질문');
-        else if (tab === 'inquiry') setActiveTab('1:1문의');
+        let targetId = '공지사항';
+        if (tab === 'notice') targetId = '공지사항';
+        else if (tab === 'ad') targetId = '광고안내';
+        else if (tab === 'guide') targetId = '이용방법';
+        else if (tab === 'faq') targetId = '자주묻는질문';
+        else if (tab === 'inquiry') targetId = '1:1문의';
+
+        setActiveTab(targetId);
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            window.dispatchEvent(new CustomEvent('sidebar-warp'));
+        });
     }, [searchParams]);
 
     const primaryStyle = { color: brand.primaryColor };
@@ -140,7 +147,13 @@ function CustomerCenterContent() {
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
+                                        onClick={() => {
+                                            setActiveTab(tab.id);
+                                            requestAnimationFrame(() => {
+                                                window.scrollTo({ top: 0, behavior: 'auto' });
+                                                window.dispatchEvent(new CustomEvent('sidebar-warp'));
+                                            });
+                                        }}
                                         className={`flex items-center gap-3 px-5 py-4 text-sm font-bold transition-all whitespace-nowrap border-b-2 md:border-b-0 md:border-l-4 ${activeTab === tab.id
                                             ? 'bg-pink-50/30 text-pink-500 border-pink-500 dark:bg-pink-900/10'
                                             : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'}`}
