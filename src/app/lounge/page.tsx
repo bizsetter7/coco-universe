@@ -44,7 +44,7 @@ export default function LoungePage() {
 
             <main className="max-w-4xl mx-auto px-4 py-8">
                 {activeTab === 'main' && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="space-y-8">
                         {/* 상단 배너 */}
                         <div className="relative overflow-hidden rounded-3xl bg-gray-900 aspect-[16/7] flex items-center px-8 text-white shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10"></div>
@@ -115,7 +115,7 @@ export default function LoungePage() {
 
                 {/* 식단 관리 페이지 */}
                 {activeTab === 'diet' && (
-                    <div className="animate-in slide-in-from-right duration-500">
+                    <div>
                         <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                             {!showResult ? (
                                 <>
@@ -158,7 +158,7 @@ export default function LoungePage() {
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center py-6 animate-in zoom-in-95 duration-300">
+                                <div className="text-center py-6">
                                     <h3 className="text-2xl font-black mb-6">분석 결과: <span className="text-emerald-500">정상체중</span></h3>
                                     <div className="space-y-4 text-left">
                                         <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl">
@@ -179,7 +179,7 @@ export default function LoungePage() {
 
                 {/* MBTI 성향 테스트 */}
                 {activeTab === 'mbti' && (
-                    <div className="animate-in slide-in-from-right duration-500">
+                    <div>
                         <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                             <div className="text-center mb-10">
                                 <div className="bg-purple-100 text-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/10 scale-110">
@@ -210,7 +210,7 @@ export default function LoungePage() {
 
                 {/* 사주/운세 */}
                 {activeTab === 'fortune' && (
-                    <div className="animate-in slide-in-from-right duration-500">
+                    <div>
                         <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                             {!showResult ? (
                                 <>
@@ -243,7 +243,7 @@ export default function LoungePage() {
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center py-6 animate-in slide-in-from-bottom-4 duration-300">
+                                <div className="text-center py-6">
                                     <div className="text-5xl mb-6">💰</div>
                                     <h3 className="text-2xl font-black mb-4">오늘의 재물운: <span className="text-amber-500">최상(★★★★★)</span></h3>
                                     <div className="p-6 bg-amber-50 dark:bg-amber-900/10 rounded-3xl text-left border border-amber-100">

@@ -1,181 +1,140 @@
 'use client';
 
-import React from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useBrand } from './BrandProvider';
+import { useSearchParams } from 'next/navigation';
+import { X, PhoneCall } from 'lucide-react';
 
-interface Banner {
-    id: string;
-    imageUrl: string;
-    link: string;
-    alt: string;
+interface BannerSidebarProps {
+    side: 'left' | 'right';
 }
 
-const LEFT_BANNERS: Banner[] = [
-    { id: 'l1', imageUrl: '/side_banner_sample_1.png', link: '#', alt: '강남 유앤미' },
-    { id: 'l2', imageUrl: '/side_banner_sample_2.png', link: '#', alt: '송파 루비' },
-    { id: 'l3', imageUrl: '/side_banner_sample_3.png', link: '#', alt: '인천 스카이' },
-];
-
-const RIGHT_BANNERS: Banner[] = [
-    { id: 'r1', imageUrl: '/side_banner_sample_3.png', link: '#', alt: '인천 스카이' },
-    { id: 'r2', imageUrl: '/side_banner_sample_1.png', link: '#', alt: '강남 유앤미' },
-    { id: 'r3', imageUrl: '/side_banner_sample_2.png', link: '#', alt: '송파 루비' },
-];
-
-export const BannerSidebar = ({ side }: { side: 'left' | 'right' }) => {
-    const asideRef = React.useRef<HTMLElement>(null);
-    const pathname = usePathname();
+/**
+ * BannerSidebar - 'Extreme Speed' 로직 적용 버젼
+ * - 사용자의 스크롤에 맞춰 0.1초의 짧은 지연시간으로 기민하게 반응
+ * - 페이지 전환이나 도약 스크롤 시 'Transition-None' 즉시 이동 강제
+ */
+export const BannerSidebar = ({ side }: BannerSidebarProps) => {
+    const brand = useBrand();
     const searchParams = useSearchParams();
+    const [selectedAd, setSelectedAd] = useState<any>(null);
+    const [topOffset, setTopOffset] = useState(16);
+    const [isInstant, setIsInstant] = useState(true);
+    const lastScrollY = useRef(0);
 
-    // UNIQUE KEY: Forces complete unmount/remount on any URL/Param change.
-    // This is the "Nuclear Option" against state persistence bugs.
-    const uniqueKey = `${pathname}?${searchParams.toString()}-${side}`;
+    // 1. 페이지/탭 전환 시 지연 없는 즉시 고정
+    useEffect(() => {
+        setIsInstant(true);
+        setTopOffset(16);
+        lastScrollY.current = 0;
 
-    const [mounted, setMounted] = React.useState(false);
-    const banners = side === 'left' ? LEFT_BANNERS : RIGHT_BANNERS;
+        // 브라우저 렌더링 동기화를 위해 매우 짧은 대기 후 해제
+        const timer = setTimeout(() => setIsInstant(false), 50);
+        return () => clearTimeout(timer);
+    }, [searchParams]);
 
-    const isInitialLoad = React.useRef(true);
-    const animationFrameRef = React.useRef<number>(0);
+    // 2. 가속 스크롤 및 상단 복귀 감지
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScroll = Math.max(0, window.scrollY);
+            const scrollDiff = Math.abs(currentScroll - lastScrollY.current);
 
-    React.useEffect(() => {
-        setMounted(true);
+            // 1. 스크롤이 상단(0) 근처면 애니메이션 없이 칼같이 16px 고정
+            if (currentScroll < 5) {
+                setIsInstant(true);
+                setTopOffset(16);
+                lastScrollY.current = 0;
+                return;
+            }
+
+            // 2. 50px 이상 큰 폭으로 움직이면 워프 모드 (transition-none)
+            if (scrollDiff > 50) {
+                setIsInstant(true);
+                setTopOffset(currentScroll + 16);
+                // 워프 직후 바로 부드러운 모드 복구
+                requestAnimationFrame(() => setIsInstant(false));
+            } else {
+                // 3. 미세 스크롤 시에는 0.1초의 매우 빠른 속도로 따라옴
+                setTopOffset(currentScroll + 16);
+            }
+
+            lastScrollY.current = currentScroll;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    React.useLayoutEffect(() => {
-        if (typeof window === 'undefined' || !asideRef.current) return;
+    const ads = [
+        { id: 1, name: '강남 유앤미', img: '/banners/thumb-1.png', desc: '강남구 역삼동 유앤미 힐링 케어' },
+        { id: 2, name: '송파 루비', img: '/banners/thumb-2.png', desc: '송파 지역 1등 프리미엄 라운지' },
+        { id: 3, name: '인천 스카이', img: '/banners/thumb-3.png', desc: '인천 연수동 스카이 테라피' },
+    ];
 
-        // 1. INITIAL INSTANT PLACEMENT (Frame 0)
-        // We calculate position immediately without waiting for an animation frame.
-        // This prevents the user from seeing the sidebar at top:0 if we are scrolled down.
-        const setInitialPosition = () => {
-            const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            const sidebarHeight = asideRef.current!.offsetHeight;
-
-            // Measure MAIN (True Content Height)
-            const mainEl = document.querySelector('main');
-            const contentHeight = mainEl ? mainEl.offsetHeight : document.documentElement.scrollHeight;
-
-            // The Maximum allowed top (Stick to bottom of content)
-            const maxSafeTop = Math.max(16, contentHeight - sidebarHeight);
-
-            // Ideal Top (Chase Mode)
-            let targetTop = scrollY + 16;
-
-            // Bottom-Align Logic for small screens
-            if (sidebarHeight + 16 > viewportHeight) {
-                targetTop = scrollY + viewportHeight - sidebarHeight - 40;
-                if (targetTop < 16) targetTop = 16;
-            }
-
-            // INSTANT CLAMP: If the new page/tab is shorter than current scroll + sidebar,
-            // clamp strict immediately.
-            if (targetTop > maxSafeTop) {
-                targetTop = maxSafeTop;
-            }
-
-            // Apply Instantly
-            asideRef.current!.style.transition = 'none';
-            asideRef.current!.style.top = `${targetTop}px`;
-
-            // Force Reflow
-            void asideRef.current!.offsetHeight;
-
-            // Enable Transition for subsequent moves after a small delay
-            // This delay mask any initial layout trashing
-            setTimeout(() => {
-                if (asideRef.current) {
-                    asideRef.current.style.transition = 'top 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)';
-                    isInitialLoad.current = false;
-                }
-            }, 300);
-        };
-
-        setInitialPosition();
-
-        // 2. SCROLL LOOP (Elastic Chase)
-        // Using requestAnimationFrame for silky smooth updates instead of scroll listener
-        const updatePosition = () => {
-            if (!asideRef.current) return;
-
-            const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            const sidebarHeight = asideRef.current.offsetHeight;
-
-            const mainEl = document.querySelector('main');
-            const contentHeight = mainEl ? mainEl.offsetHeight : document.documentElement.scrollHeight;
-            const maxSafeTop = Math.max(16, contentHeight - sidebarHeight);
-
-            let targetTop = scrollY + 16;
-
-            if (sidebarHeight + 16 > viewportHeight) {
-                targetTop = scrollY + viewportHeight - sidebarHeight - 40;
-                if (targetTop < 16) targetTop = 16;
-            }
-
-            // ALWAYS CLAMP
-            // This is the fix for "Stuck at Bottom".
-            // Even if scrolling wildly, checking this every frame ensures
-            // we never float below the footer.
-            if (targetTop > maxSafeTop) {
-                targetTop = maxSafeTop;
-            }
-
-            asideRef.current.style.top = `${targetTop}px`;
-
-            animationFrameRef.current = requestAnimationFrame(updatePosition);
-        };
-
-        // Start Loop
-        animationFrameRef.current = requestAnimationFrame(updatePosition);
-
-        return () => {
-            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-        };
-    }, []);
-
-    if (!mounted) return null;
+    const badgeText = side === 'left' ? 'BEST AD' : 'PREMIUM';
+    const badgeColor = side === 'left' ? 'bg-[#5B5FFF]' : 'bg-[#E91E63]';
 
     return (
-        <aside
-            ref={asideRef}
-            key={uniqueKey}
-            className={`hidden 2xl:flex flex-col absolute z-40 animate-in fade-in duration-500 w-[120px] shrink-0`}
-            style={{
-                top: '16px',
-                [side]: `calc(50% - 510px - 130px)`,
-                // Initial Transition None to prevent jump
-                transition: 'none'
-            }}
-        >
-            <div className={`py-2 rounded-t-xl text-center text-[9px] font-black text-white ${side === 'left' ? 'bg-indigo-600 shadow-indigo-100' : 'bg-pink-600 shadow-pink-100'} shadow-lg`}>
-                {side === 'left' ? 'BEST AD' : 'PREMIUM'}
-            </div>
+        <>
+            <aside
+                className={`hidden xl:flex absolute ${side === 'left' ? 'left-[calc(50%-680px)]' : 'right-[calc(50%-680px)]'} w-[160px] flex-col gap-3 pointer-events-none z-40
+                    ${isInstant ? 'transition-none' : 'transition-all duration-100 ease-out'}
+                `}
+                style={{ top: `${topOffset}px` }}
+            >
+                <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
+                    {badgeText}
+                </div>
 
-            <div className="bg-white/50 backdrop-blur-md rounded-b-xl border border-gray-100 shadow-xl overflow-hidden p-1.5">
-                <div className="flex flex-col gap-2">
-                    {banners.map((banner) => (
+                <div className="flex flex-col gap-2.5">
+                    {ads.map((ad) => (
                         <div
-                            key={banner.id}
-                            className="relative w-full aspect-[3/5] rounded-lg overflow-hidden border border-gray-100 hover:border-pink-500 transition-all cursor-pointer group"
+                            key={ad.id}
+                            onClick={() => setSelectedAd(ad)}
+                            className="group pointer-events-auto bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all active:scale-95"
                         >
-                            <img
-                                src={banner.imageUrl}
-                                alt={banner.alt}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <span className="text-[9px] text-white font-bold bg-black/60 px-2 py-1 rounded-full backdrop-blur-sm">상세보기</span>
+                            <div className="p-2.5 flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="relative w-8 h-8 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                        <img src={ad.img} alt={ad.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <span className="text-[11px] font-black text-gray-700 dark:text-gray-200 truncate">{ad.name}</span>
+                                </div>
+                                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700">
+                                    <img src={ad.img} alt={ad.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="mt-3 bg-gradient-to-br from-white to-gray-50 p-2.5 rounded-xl border border-gray-100 text-center shadow-inner group hover:bg-pink-50 transition-colors cursor-pointer">
-                    <p className="text-[10px] font-black text-gray-400 mb-0.5 group-hover:text-pink-500">배너 광고 문의</p>
-                    <p className="text-sm font-black text-gray-800 tabular-nums">1544-5568</p>
+                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1">
+                    <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
+                    <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>
-            </div>
-        </aside>
+            </aside>
+
+            {selectedAd && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setSelectedAd(null)}>
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <div className="relative aspect-video">
+                            <img src={selectedAd.img} alt={selectedAd.name} className="w-full h-full object-cover" />
+                            <button onClick={() => setSelectedAd(null)} className="absolute top-4 right-4 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <h2 className="text-xl font-black mb-2 dark:text-white">{selectedAd.name}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed break-keep mb-6">
+                                {selectedAd.desc}
+                            </p>
+                            <a href={`tel:1544-5568`} className="flex items-center justify-center gap-2 w-full py-4 bg-[#E91E63] hover:bg-[#D81B60] text-white font-black rounded-2xl transition-all shadow-lg shadow-pink-100 dark:shadow-none">
+                                <PhoneCall size={20} /> 실시간 문의하기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };

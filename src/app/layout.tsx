@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { BrandProvider } from "@/components/BrandProvider";
 import { Suspense } from "react";
+import { BannerSidebar } from "@/components/BannerSidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +22,6 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-import { BannerSidebar } from "@/components/BannerSidebar";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,13 +33,13 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
             <div className="relative min-h-screen">
+              <BannerSidebar side="left" />
               <div className="flex justify-center items-start min-h-screen">
-                <BannerSidebar side="left" />
                 <main className="w-full max-w-[1020px] shrink-0">
                   {children}
                 </main>
-                <BannerSidebar side="right" />
               </div>
+              <BannerSidebar side="right" />
             </div>
           </BrandProvider>
         </Suspense>

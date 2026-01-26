@@ -49,6 +49,7 @@ function CommunityContent() {
         const cat = searchParams.get('category');
         if (cat && CATEGORIES.includes(cat)) {
             setActiveTab(cat);
+            window.scrollTo(0, 0); // 즉시 상단 이동
         }
     }, [searchParams]);
 
@@ -102,7 +103,10 @@ function CommunityContent() {
                         {CATEGORIES.map((cat) => (
                             <button
                                 key={cat}
-                                onClick={() => setActiveTab(cat)}
+                                onClick={() => {
+                                    setActiveTab(cat);
+                                    window.scrollTo(0, 0); // 탭 전환 시 즉시 상단 이동
+                                }}
                                 className={`flex-shrink-0 px-4 py-3 text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap ${activeTab === cat
                                     ? 'border-pink-500 text-pink-500'
                                     : 'border-transparent text-gray-400 hover:text-gray-600'
@@ -138,7 +142,7 @@ function CommunityContent() {
             <main className="max-w-[1020px] mx-auto p-4 space-y-4">
                 {activeTab === '프리미엄 라운지' ? (
                     /* Lounge View within Community */
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom duration-500">
+                    <div className="space-y-6">
                         <div className="flex items-center gap-2 mb-2">
                             <Sparkles className="text-amber-500" size={20} />
                             <h3 className="text-xl font-black text-gray-900">프리미엄 라운지</h3>
@@ -246,7 +250,7 @@ function CommunityContent() {
             {loginModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setLoginModalOpen(false)}></div>
-                    <div className="bg-white rounded-[40px] w-full max-w-sm p-10 relative z-10 shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="bg-white rounded-[40px] w-full max-w-sm p-10 relative z-10 shadow-2xl">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center mb-8 text-pink-500 ring-8 ring-pink-50">
                                 <Lock size={48} strokeWidth={2.5} />

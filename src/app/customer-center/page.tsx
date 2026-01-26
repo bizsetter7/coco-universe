@@ -177,7 +177,7 @@ function CustomerCenterContent() {
                     <div className="flex-1 min-w-0">
                         {/* 1. Notice Board */}
                         {activeTab === '공지사항' && (
-                            <div className="space-y-4 animate-in fade-in duration-300">
+                            <div className="space-y-4">
                                 <div className="flex items-center justify-between mb-2">
                                     <h2 className="text-2xl font-black">공지사항</h2>
                                     <span className="text-xs text-gray-400">총 {NOTICES.length}건</span>
@@ -208,7 +208,7 @@ function CustomerCenterContent() {
 
                         {/* 2. Ad Guide */}
                         {activeTab === '광고안내' && (
-                            <div className="space-y-6 animate-in fade-in duration-300">
+                            <div className="space-y-6">
                                 <div className="text-center py-10 bg-gradient-to-br from-gray-800 to-gray-900 rounded-[32px] text-white shadow-xl mb-8 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 p-10 opacity-10">
                                         <Zap size={150} />
@@ -312,7 +312,7 @@ function CustomerCenterContent() {
 
                         {/* 3. Usage Guide */}
                         {activeTab === '이용방법' && (
-                            <div className="space-y-10 animate-in fade-in duration-300">
+                            <div className="space-y-10">
                                 <section>
                                     <div className="flex items-center gap-2 mb-6">
                                         <div className="w-1.5 h-6 bg-pink-500 rounded-full"></div>
@@ -386,7 +386,7 @@ function CustomerCenterContent() {
 
                         {/* 4. FAQ */}
                         {activeTab === '자주묻는질문' && (
-                            <div className="space-y-4 animate-in fade-in duration-300">
+                            <div className="space-y-4">
                                 <h2 className="text-2xl font-black mb-6">자주 묻는 질문</h2>
                                 <div className="space-y-3">
                                     {FAQS.map(faq => (
@@ -401,7 +401,7 @@ function CustomerCenterContent() {
                                                 {expandedFaq === faq.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
                                             </button>
                                             {expandedFaq === faq.id && (
-                                                <div className="bg-gray-50 dark:bg-gray-900/50 p-6 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 leading-relaxed animate-in slide-in-from-top-2 duration-300">
+                                                <div className="bg-gray-50 dark:bg-gray-900/50 p-6 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                                                     {faq.answer}
                                                 </div>
                                             )}
@@ -413,7 +413,7 @@ function CustomerCenterContent() {
 
                         {/* 5. 1:1 Inquiry */}
                         {activeTab === '1:1문의' && (
-                            <div className="space-y-8 animate-in fade-in duration-300">
+                            <div className="space-y-8">
                                 <div className="bg-pink-50 dark:bg-pink-900/10 p-6 rounded-3xl border border-pink-100 dark:border-pink-800/30 flex items-start gap-4">
                                     <div className="p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
                                         <MessageCircle className="text-pink-500" />

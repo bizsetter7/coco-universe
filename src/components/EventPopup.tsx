@@ -26,8 +26,8 @@ export default function EventPopup({ brand }: { brand: any }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-            <div className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl">
                 {/* Top Bar for Brand Color */}
                 <div className="h-2 w-full" style={{ backgroundColor: brand.primaryColor }}></div>
 

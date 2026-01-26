@@ -5,6 +5,7 @@
   --foreground: #171717;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
+  scroll-behavior: auto !important;
 }
 
 @theme inline {

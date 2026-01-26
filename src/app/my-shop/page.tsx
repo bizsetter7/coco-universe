@@ -233,7 +233,7 @@ export default function MyShopPage() {
     const proceedToForm = () => {
         setShowWarningModal(false);
         setView('form');
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0); // 즉시 상단 이동
     };
 
     const validateForm = () => {
@@ -269,6 +269,7 @@ export default function MyShopPage() {
         if (validateForm()) {
             alert('저장 및 심사 요청이 완료되었습니다!');
             setView('dashboard');
+            window.scrollTo(0, 0); // 메인으로 돌아올 때도 즉시 상단 이동
         }
     };
 
@@ -439,7 +440,7 @@ export default function MyShopPage() {
     // --- Components ---
 
     const WarningModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
                     <AlertTriangle size={32} />
@@ -468,7 +469,7 @@ export default function MyShopPage() {
     );
 
     const DesignRequestModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-blue-500 mb-2">
                     <Laptop size={32} />
@@ -496,7 +497,7 @@ export default function MyShopPage() {
     );
 
     const PreviewModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh]">
                 <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
                     <h3 className="font-bold text-lg flex items-center gap-2 text-gray-900"><Eye size={20} className="text-pink-500" /> 채용공고 미리보기</h3>
@@ -552,7 +553,7 @@ export default function MyShopPage() {
     const MobileMenu = () => (
         <div className="fixed inset-0 z-50 flex justify-end">
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileMenu(false)} />
-            <div className="relative w-72 bg-white h-full shadow-2xl animate-in slide-in-from-right duration-300 p-6">
+            <div className="relative w-72 bg-white h-full shadow-2xl p-6">
                 <button onClick={() => setShowMobileMenu(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <X size={24} />
                 </button>
@@ -690,7 +691,7 @@ export default function MyShopPage() {
                     </div>
                 </div>
             ) : (
-                <div className="max-w-5xl mx-auto p-4 md:py-8 space-y-6 animate-in slide-in-from-right duration-300">
+                <div className="max-w-5xl mx-auto p-4 md:py-8 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-6">
                             <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">

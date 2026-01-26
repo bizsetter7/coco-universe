@@ -65,6 +65,7 @@ export default function HomePortal() {
   // History Management
   const setCurrentPage = useCallback((page: string) => {
     _setCurrentPage(page);
+    window.scrollTo(0, 0); // 즉시 상단으로 이동
     if (page !== 'home') {
       window.history.pushState({ page }, '', `?page=${page}`);
     } else {
@@ -185,7 +186,7 @@ export default function HomePortal() {
       {/* Footer */}
       <main>
         {currentPage === 'home' && (
-          <div className="page-home animate-in fade-in duration-500">
+          <div className="page-home">
             {/* Event Popup */}
             <EventPopup brand={brand} />
 
@@ -242,7 +243,7 @@ export default function HomePortal() {
                       } else if (item.label === '친구찾기') {
                         router.push('/community?category=친구찾기');
                       } else if (item.label === '익명 라운지') {
-                        router.push('/community?category=라운지(익명)');
+                        router.push('/community?category=프리미엄 라운지');
                       } else if (item.label === '블랙리스트') {
                         router.push('/community?category=블랙리스트');
                       } else if (item.link === 'community') {
@@ -542,7 +543,7 @@ export default function HomePortal() {
         )}
 
         {currentPage === 'payment' && (
-          <div className="max-w-2xl mx-auto px-4 py-8 animate-in slide-in-from-bottom duration-500">
+          <div className="max-w-2xl mx-auto px-4 py-8">
             <div className={`p-6 md:p-8 rounded-2xl shadow-lg border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} style={{ borderColor: brand.primaryColor }}>
               <h2 className="text-2xl font-bold mb-2 text-center">사장님 전용 상품 안내</h2>
               <div className="bg-red-50 text-red-600 text-center text-sm p-2 rounded mb-6 font-bold">
@@ -577,7 +578,7 @@ export default function HomePortal() {
         )}
 
         {currentPage === 'community' && (
-          <div className="max-w-4xl mx-auto px-4 py-8 animate-in slide-in-from-right duration-500">
+          <div className="max-w-4xl mx-auto px-4 py-8">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <Siren className="text-red-500" /> 블랙리스트 공유
             </h2>
@@ -626,7 +627,7 @@ export default function HomePortal() {
 
         {/* 로그인 페이지 */}
         {currentPage === 'login' && (
-          <div className="max-w-md mx-auto px-4 py-16 animate-in fade-in duration-500">
+          <div className="max-w-md mx-auto px-4 py-16">
             <div className="text-center mb-10">
               <h2 className="text-3xl font-black mb-2" style={primaryStyle}>{brand.displayName}</h2>
               <p className="text-gray-500">더 나은 미래를 위한 첫 걸음</p>
@@ -673,7 +674,7 @@ export default function HomePortal() {
 
         {/* 회원가입 페이지 (Multi-step Wizard) */}
         {currentPage === 'signup' && (
-          <div className="max-w-3xl mx-auto px-4 py-8 animate-in fade-in duration-500">
+          <div className="max-w-3xl mx-auto px-4 py-8">
             {/* Step Indicator */}
             <div className="flex justify-between items-center mb-10 border-b pb-4">
               <div className={`flex items-center gap-2 ${signupStep >= 1 ? 'font-bold' : 'text-gray-300'}`} style={{ color: signupStep >= 1 ? brand.primaryColor : undefined }}>
@@ -694,7 +695,7 @@ export default function HomePortal() {
 
             {/* Step 1: 약관동의 */}
             {signupStep === 1 && (
-              <div className="space-y-8 animate-in slide-in-from-right duration-300">
+              <div className="space-y-8">
                 <div>
                   <h3 className="text-lg font-bold mb-2">이용약관 (필수)</h3>
                   <div className="h-40 overflow-y-auto border p-4 text-xs text-gray-500 bg-gray-50 rounded-lg section-terms leading-relaxed">
@@ -763,7 +764,7 @@ export default function HomePortal() {
 
             {/* Step 2: 정보입력 */}
             {signupStep === 2 && (
-              <div className="animate-in slide-in-from-right duration-300">
+              <div>
                 {/* Type Selection Tabs */}
                 <div className="flex mb-8">
                   <button
@@ -938,7 +939,7 @@ export default function HomePortal() {
 
             {/* Step 3: 가입완료 */}
             {signupStep === 3 && (
-              <div className="text-center py-20 animate-in zoom-in duration-500">
+              <div className="text-center py-20">
                 <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 size={48} className="text-green-600" />
                 </div>
