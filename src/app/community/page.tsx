@@ -38,33 +38,45 @@ function CommunityContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    // URL 파라미터로부터 현재 탭 도출 (새로고침 무결성 확보)
-    const activeTab = searchParams.get('category') || '전체';
+    // [새로고침 무결성] URL 파라미터로부터 현재 탭을 강제 도출
+    // 클라이언트 사이드에서 즉각적으로 반영되도록 useMemo로 래핑
+    const activeTab = React.useMemo(() => {
+        if (typeof window === 'undefined') return '전체';
+        const params = new URLSearchParams(window.location.search);
+        return params.get('category') || '전체';
+    }, [searchParams]);
+
     const [userType, setUserType] = useState<UserType>('individual');
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulate login state
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
     const brand = useBrand();
 
-    // 탭 변경 시 URL 동기화 및 스크롤 핸들링
+    // 탭 변경 시 URL 즉시 업데이트 및 스크롤 핸들링
     const handleTabChange = (cat: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(window.location.search);
         if (cat === '전체') {
             params.delete('category');
         } else {
             params.set('category', cat);
         }
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
+        // window.history를 사용하여 강제로 URL을 동기화하여 Hydration 이슈 차단
+        window.history.pushState({}, '', `${pathname}?${params.toString()}`);
 
         requestAnimationFrame(() => {
             window.scrollTo({ top: 0, behavior: 'auto' });
             window.dispatchEvent(new CustomEvent('sidebar-warp'));
+            // pushState는 searchParams를 즉시 트리거하지 않으므로 강제 리랜더링 유도 (Next.js router.push 병행 가능)
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
         });
     };
 
-    const filteredPosts = activeTab === '전체'
-        ? MOCK_POSTS
-        : MOCK_POSTS.filter(post => post.category === activeTab);
+    const filteredPosts = React.useMemo(() => {
+        return activeTab === '전체'
+            ? MOCK_POSTS
+            : MOCK_POSTS.filter(post => post.category === activeTab);
+    }, [activeTab]);
 
     const handlePostClick = (postId: number) => {
         if (!isLoggedIn) {

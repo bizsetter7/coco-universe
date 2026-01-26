@@ -83,23 +83,24 @@ function CustomerCenterContent() {
     const pathname = usePathname();
     const brand = useBrand();
 
-    // URL 파라미터로부터 탭 ID 도출
-    const getActiveTabId = () => {
-        const tab = searchParams.get('tab');
+    // URL 파라미터로부터 탭 ID 실시간 도출 (Resilience 강화)
+    const activeTab = React.useMemo(() => {
+        if (typeof window === 'undefined') return '공지사항';
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
         if (tab === 'notice') return '공지사항';
         if (tab === 'ad') return '광고안내';
         if (tab === 'guide') return '이용방법';
         if (tab === 'faq') return '자주묻는질문';
         if (tab === 'inquiry') return '1:1문의';
         return '공지사항';
-    };
+    }, [searchParams]);
 
-    const activeTab = getActiveTabId();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-    // 탭 변경 시 URL 동기화 및 스크롤 핸들링
+    // 탭 변경 시 URL 강제 동기화
     const handleTabChange = (tabName: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(window.location.search);
         let tabParam = 'notice';
         if (tabName === '공지사항') tabParam = 'notice';
         else if (tabName === '광고안내') tabParam = 'ad';
@@ -108,11 +109,12 @@ function CustomerCenterContent() {
         else if (tabName === '1:1문의') tabParam = 'inquiry';
 
         params.set('tab', tabParam);
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        window.history.pushState({}, '', `${pathname}?${params.toString()}`);
 
         requestAnimationFrame(() => {
             window.scrollTo({ top: 0, behavior: 'auto' });
             window.dispatchEvent(new CustomEvent('sidebar-warp'));
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
         });
     };
 
