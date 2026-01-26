@@ -13,7 +13,7 @@ interface BannerSidebarProps {
  * BannerSidebar - '16px 황금 정렬' 마스터 버전
  * - 홈 버튼 / 사장님 무료등록 버튼과 상단 16px 라인을 완벽히 일치시킴
  * - translate3d 기반 하드웨어 가속 추적 (0ms 반응성)
- * - 전역 추적 무결성 보장
+ * - z-[100] 설정으로 헤더 위로 노출 보장
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
@@ -36,13 +36,12 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
             // [16px 마스터링]
             // 헤더 내부 버튼들과 정렬하기 위해 초기 위치를 16px로 셋팅
-            // 스크롤 시에도 이 16px 여백을 유지하며 추적
+            // translate3d로 GPU 가속 적용하여 부드럽게 추적
             sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
         };
 
         const handleWarp = () => {
             if (sidebarRef.current) {
-                // 즉각적인 상단 도약
                 sidebarRef.current.classList.add('no-transition');
                 sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
                 setTimeout(() => {
@@ -72,7 +71,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         <>
             <div
                 ref={sidebarRef}
-                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-30`}
+                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-[100]`}
                 style={{ top: '16px' }}
             >
                 {/* 상단 배지 (버튼 높이 정렬을 위해 마진 제거 및 핏 조정) */}
@@ -80,7 +79,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                     {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>
 
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2.5 px-0.5">
                     {ads.map((ad) => (
                         <div
                             key={ad.id}
@@ -102,7 +101,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                     ))}
                 </div>
 
-                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1">
+                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1 mx-0.5">
                     <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
                     <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>

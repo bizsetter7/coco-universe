@@ -33,33 +33,28 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
             {/* 
-                Center-Aligned Layout for Absolute Tracking Sidebars
-                - relative 컨테이너를 기준으로 사이드바가 absolute하게 움직입니다.
-                - py-0으로 헤더 밀착 유지
+                Flex-Based Master Layout (16px 마스터 버전)
+                - items-stretch: 사이드바 영역(aside)이 메인 콘텐츠와 동일한 높이를 갖게 함 (전역 추적 필수)
+                - relative: 사이드바의 absolute 추적 기준점
             */}
-            {/* 
-                Flex-Based Master Layout (복구 버전)
-                - 중앙 1020px 고정 및 양옆 사이드바 독립 구동 보장
-                - item-start로 JS 추적 엔진의 자유도 확보
-            */}
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-start">
-              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-0 lg:px-4 relative min-h-screen">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-stretch">
+              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-0 lg:px-4 relative">
 
                 {/* 
                   왼쪽 사이드바 영역
-                  - h-full relative: 사이드바가 이 높이 안에서 자유롭게 움직일 수 있도록 함
+                  - h-auto + relative: 부모의 items-stretch 덕분에 메인과 동일한 높이 확보
                 */}
-                <aside className="hidden xl:block w-[160px] relative h-full">
+                <aside className="hidden xl:block w-[160px] relative">
                   <BannerSidebar side="left" />
                 </aside>
 
                 {/* 중앙 메인 콘텐츠 (물리적 중앙축 고정) */}
-                <main className="w-full max-w-[1020px] flex-1 min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none min-h-screen">
+                <main className="w-full max-w-[1020px] flex-1 min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none">
                   {children}
                 </main>
 
                 {/* 오른쪽 사이드바 영역 */}
-                <aside className="hidden xl:block w-[160px] relative h-full">
+                <aside className="hidden xl:block w-[160px] relative">
                   <BannerSidebar side="right" />
                 </aside>
 

@@ -75,34 +75,37 @@ function CommunityContent() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            {/* Header */}
-            <header className="bg-white/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all shadow-sm">
-                <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
-                    <div className="flex items-center gap-2 pt-2">
-                        <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
-                            <ArrowLeft size={24} />
-                        </button>
-                        <h1
-                            onClick={() => router.push('/')}
-                            className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
-                        >
-                            <MessageCircle className="fill-pink-500" size={24} />
-                            그녀들의 수다
-                        </h1>
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                        <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
-                            <Home size={24} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-gray-600">
-                            <Search size={24} />
-                        </button>
+            {/* 2단 독립 Sticky Header 시스템 (확정 버전) */}
+            <div className="z-50">
+                {/* 1단 상단바: 로고 및 홈 버튼 (sticky top-0) */}
+                <div className="bg-white/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all shadow-sm">
+                    <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
+                        <div className="flex items-center gap-2 pt-2">
+                            <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
+                                <ArrowLeft size={24} />
+                            </button>
+                            <h1
+                                onClick={() => router.push('/')}
+                                className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
+                            >
+                                <MessageCircle className="fill-pink-500" size={24} />
+                                그녀들의 수다
+                            </h1>
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                            <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
+                                <Home size={24} />
+                            </button>
+                            <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <Search size={24} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Categories - Sticky 고정 적용 */}
-                <div className="max-w-[1020px] mx-auto overflow-x-auto scrollbar-hide sticky top-14 bg-white/95 backdrop-blur-md z-40 border-b">
-                    <div className="flex px-4">
+                {/* 2단 카테고리 탭: 스크롤 시 상단바 바로 밑에 고정 (sticky top-14) */}
+                <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-40 overflow-x-auto scrollbar-hide">
+                    <div className="max-w-[1020px] mx-auto flex px-4">
                         {CATEGORIES.map((cat) => (
                             <button
                                 key={cat}
@@ -123,7 +126,7 @@ function CommunityContent() {
                         ))}
                     </div>
                 </div>
-            </header>
+            </div>
 
             {/* Admin/Mock Controls */}
             <div className="max-w-[1020px] mx-auto p-3 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between text-[11px] text-indigo-700">
