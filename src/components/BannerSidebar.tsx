@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useBrand } from './BrandProvider';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { X, PhoneCall } from 'lucide-react';
 
 interface BannerSidebarProps {
@@ -9,13 +10,71 @@ interface BannerSidebarProps {
 }
 
 /**
- * BannerSidebar - 'Portal Standard' 디자인 적용 버젼
- * - z-index를 낮추어(z-10) 중앙 모달 팝업 시 배경 뒤로 숨도록 함
- * - 상단 여백 제거된 레이아웃에 맞춰 stick 위치 유지
+ * BannerSidebar - 'Global Zero-Lag Tracking' 전용 버젼 (궁극의 완성본)
+ * - 사용자님이 원하시는 '내 가게 관리'의 부드러움을 전역으로 확장
+ * - 상향 이동(리셋)은 '물리적 0ms', 하향 이동만 '프리미엄 Chasing'
+ * - 커뮤니티 탭 전환 등 모든 내부 뷰 변화에 즉각 대응
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
     const [selectedAd, setSelectedAd] = useState<any>(null);
+    const asideRef = useRef<HTMLElement>(null);
+    const lastScrollY = useRef(0);
+    const isLocked = useRef(false);
+
+    // 1. 초강력 위치 리셋 함수 (Force Snap)
+    const snapToTop = () => {
+        const aside = asideRef.current;
+        if (!aside) return;
+
+        isLocked.current = true;
+        aside.style.transition = 'none'; // 애니메이션 씨를 말림
+        aside.style.transform = `translate3d(0, 0, 0)`; // 0px로 즉시 텔레포트
+        lastScrollY.current = 0;
+
+        // 브라우저 렌더링 동기화 후 하향 추적 모드만 다시 켬
+        setTimeout(() => {
+            isLocked.current = false;
+        }, 100);
+    };
+
+    // 2. 전역 변화 감지 (URL, Params, Custom Event)
+    useEffect(() => {
+        snapToTop();
+        window.addEventListener('sidebar-warp', snapToTop);
+        return () => window.removeEventListener('sidebar-warp', snapToTop);
+    }, [pathname, searchParams]);
+
+    // 3. 지능형 방향성 스크롤 엔진
+    useEffect(() => {
+        const handleScroll = () => {
+            if (isLocked.current) return;
+
+            const aside = asideRef.current;
+            if (!aside) return;
+
+            const currentScroll = Math.max(0, window.scrollY);
+
+            // [방향 기반 애니메이션 정책]
+            // - 위로 올라가거나 최상단(0) 근처면 -> 0ms (즉시 정지)
+            // - 아래로 내려가면 -> 500ms (부드러운 추적)
+            if (currentScroll < lastScrollY.current || currentScroll < 10) {
+                aside.style.transition = 'none';
+                aside.style.transform = `translate3d(0, ${currentScroll}px, 0)`;
+                if (currentScroll === 0) lastScrollY.current = 0;
+            } else {
+                aside.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                aside.style.transform = `translate3d(0, ${currentScroll}px, 0)`;
+            }
+
+            lastScrollY.current = currentScroll;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const ads = [
         { id: 1, name: '강남 유앤미', img: '/banners/thumb-1.png', desc: '강남구 역삼동 유앤미 힐링 케어' },
@@ -23,21 +82,20 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         { id: 3, name: '인천 스카이', img: '/banners/thumb-3.png', desc: '인천 연수동 스카이 테라피' },
     ];
 
-    const badgeText = side === 'left' ? 'BEST AD' : 'PREMIUM';
     const badgeColor = side === 'left' ? 'bg-[#5B5FFF]' : 'bg-[#E91E63]';
 
     return (
         <>
-            {/* 
-                z-index를 z-10으로 하향 조정
-                - 모달 팝업(z-50) 발생 시 사이드바가 모달 배경 뒤로 올바르게 숨겨짐
-                - sticky top-4: 브라우저 상단에서 16px 여백 유지
-            */}
             <aside
-                className={`hidden xl:flex sticky top-4 w-[160px] flex-col gap-3 z-10 h-fit`}
+                ref={asideRef}
+                className={`flex absolute ${side === 'left' ? 'left-0' : 'right-0'} w-[160px] flex-col gap-3 z-10 will-change-transform`}
+                style={{
+                    top: '26px',
+                    transform: 'translate3d(0, 0, 0)'
+                }}
             >
-                <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm`}>
-                    {badgeText}
+                <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
+                    {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>
 
                 <div className="flex flex-col gap-2.5">
@@ -45,7 +103,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                         <div
                             key={ad.id}
                             onClick={() => setSelectedAd(ad)}
-                            className="group bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow active:scale-95"
+                            className="group pointer-events-auto bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all active:scale-95"
                         >
                             <div className="p-2.5 flex flex-col gap-2">
                                 <div className="flex items-center gap-2">
@@ -62,7 +120,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                     ))}
                 </div>
 
-                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm text-center space-y-1">
+                <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1">
                     <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
                     <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>

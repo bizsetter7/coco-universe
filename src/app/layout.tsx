@@ -33,30 +33,28 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
             {/* 
-                Portalized Center-Wing Architecture v2.1
-                - mt-4 보정을 통해 사이드바 시작점을 가변적인 페이지 헤더(홈 버튼 등) 높이와 시각적 일치
+                Center-Aligned Layout for Absolute Tracking Sidebars
+                - relative 컨테이너를 기준으로 사이드바가 absolute하게 움직입니다.
+                - py-0으로 헤더 밀착 유지
             */}
             <div className="flex justify-center items-start min-h-screen bg-gray-50 dark:bg-gray-950">
-              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-4 relative">
+              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-4 relative min-h-screen">
 
                 {/* 
-                  왼쪽 사이드바 
-                  - mt-1.5 (약 6px): 헤더 내 아이콘 수직 중앙과 시각적 동기화
+                  왼쪽 사이드바 영역
+                  - h-full relative: 사이드바가 이 높이 안에서 자유롭게 움직일 수 있도록 함
                 */}
-                <div className="hidden xl:block mt-[26px]">
+                <div className="hidden xl:block w-[160px] relative">
                   <BannerSidebar side="left" />
                 </div>
 
-                {/* 중앙 메인 콘텐츠 */}
+                {/* 중앙 메인 콘텐츠 (기존 1020px 규격 유지) */}
                 <main className="w-full max-w-[1020px] shrink-0">
                   {children}
                 </main>
 
-                {/* 
-                  오른쪽 사이드바 
-                  - mt-1.5: 헤더 내 아이콘 수직 중앙과 시각적 동기화
-                */}
-                <div className="hidden xl:block mt-[26px]">
+                {/* 오른쪽 사이드바 영역 */}
+                <div className="hidden xl:block w-[160px] relative">
                   <BannerSidebar side="right" />
                 </div>
 

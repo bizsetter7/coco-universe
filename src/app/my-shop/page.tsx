@@ -233,7 +233,11 @@ export default function MyShopPage() {
     const proceedToForm = () => {
         setShowWarningModal(false);
         setView('form');
-        window.scrollTo(0, 0); // 즉시 상단 이동
+        // 브라우저 렌더링 동기화 후 즉시 이동
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            window.dispatchEvent(new CustomEvent('sidebar-warp'));
+        });
     };
 
     const validateForm = () => {
@@ -269,7 +273,10 @@ export default function MyShopPage() {
         if (validateForm()) {
             alert('저장 및 심사 요청이 완료되었습니다!');
             setView('dashboard');
-            window.scrollTo(0, 0); // 메인으로 돌아올 때도 즉시 상단 이동
+            requestAnimationFrame(() => {
+                window.scrollTo({ top: 0, behavior: 'auto' });
+                window.dispatchEvent(new CustomEvent('sidebar-warp'));
+            });
         }
     };
 

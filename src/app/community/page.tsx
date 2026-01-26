@@ -49,7 +49,10 @@ function CommunityContent() {
         const cat = searchParams.get('category');
         if (cat && CATEGORIES.includes(cat)) {
             setActiveTab(cat);
-            window.scrollTo(0, 0); // 즉시 상단 이동
+            requestAnimationFrame(() => {
+                window.scrollTo({ top: 0, behavior: 'auto' });
+                window.dispatchEvent(new CustomEvent('sidebar-warp'));
+            });
         }
     }, [searchParams]);
 
@@ -105,7 +108,10 @@ function CommunityContent() {
                                 key={cat}
                                 onClick={() => {
                                     setActiveTab(cat);
-                                    window.scrollTo(0, 0); // 탭 전환 시 즉시 상단 이동
+                                    requestAnimationFrame(() => {
+                                        window.scrollTo({ top: 0, behavior: 'auto' });
+                                        window.dispatchEvent(new CustomEvent('sidebar-warp'));
+                                    });
                                 }}
                                 className={`flex-shrink-0 px-4 py-3 text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap ${activeTab === cat
                                     ? 'border-pink-500 text-pink-500'
