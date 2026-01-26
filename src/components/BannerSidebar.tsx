@@ -34,9 +34,8 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
             if (!sidebarRef.current) return;
             const scrollY = window.scrollY;
 
-            // [16px 마스터링]
-            // 헤더 내부 버튼들과 정렬하기 위해 초기 위치를 16px로 셋팅
-            // requestAnimationFrame 대신 direct DOM manipulation으로 0ms 반응성 구현
+            // [16px 마스터링 - 원복 완료]
+            // 지연 시간(Transition)을 제거하여 스크롤 시 즉각적으로 고정 위치를 고수함
             sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
         };
 
@@ -60,10 +59,12 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         };
     }, []);
 
-    // 페이지 변경 시 상단 리셋
+    // 페이지 변경 시 상단 리셋 및 즉시 동기화
     useEffect(() => {
         if (sidebarRef.current) {
             sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
+            const scrollY = window.scrollY;
+            sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
         }
     }, [pathname]);
 
@@ -71,10 +72,10 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         <>
             <div
                 ref={sidebarRef}
-                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-20`}
+                className={`flex flex-col gap-3 w-[160px] absolute will-change-transform z-[70]`}
                 style={{ top: '16px' }}
             >
-                {/* 상단 배지 (버튼 높이 정렬을 위해 마진 제거 및 핏 조정) */}
+                {/* 상단 배지 (버튼 높이 정렬 16px 마스터링) */}
                 <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
                     {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>

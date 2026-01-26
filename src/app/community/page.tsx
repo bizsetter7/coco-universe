@@ -160,8 +160,8 @@ function CommunityContent() {
                         /* Lounge View */
                         <div className="space-y-6">
                             <div className="flex items-center gap-2 mb-2">
-                                <Sparkles className="text-amber-500" size={20} />
-                                <h3 className="text-xl font-black text-gray-900">프리미엄 라운지</h3>
+                                <Sparkles className="fill-amber-500 text-amber-500" size={20} />
+                                <h3 className="text-xl font-black text-black underline decoration-amber-400 decoration-8 underline-offset-[-2px]">프리미엄 라운지</h3>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -135,11 +135,11 @@ function CustomerCenterContent() {
 
             <main className="max-w-[1020px] mx-auto px-4 pt-[80px] md:pt-[100px]">
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar / Mobile Nav */}
-                    <aside className="md:w-64 shrink-0">
+                    {/* Sidebar / Mobile Nav (Sticky 지원) */}
+                    <aside className="md:w-64 shrink-0 sticky top-14 md:top-[80px] h-fit md:h-fit z-[45]">
                         <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden`}>
-                            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <p className="text-[11px] text-gray-900 dark:text-gray-100 font-black uppercase tracking-widest">메뉴</p>
+                            <div className="p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                <p className="text-[15px] text-gray-900 dark:text-gray-100 font-black uppercase tracking-widest">MENU</p>
                             </div>
                             <nav className="flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
                                 {TABS.map((tab) => (
@@ -163,21 +163,21 @@ function CustomerCenterContent() {
                             </nav>
                         </div>
 
-                        {/* Customer Service Box */}
-                        <div className={`mt-6 p-7 rounded-[32px] border-2 border-pink-500 bg-white dark:bg-gray-800 shadow-xl shadow-pink-100 dark:shadow-none`}>
+                        {/* Customer Service Box (Desktop Only) */}
+                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border-2 border-gray-900 bg-white dark:bg-gray-800 shadow-xl`}>
                             <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg" style={primaryBgStyle}>
+                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gray-900">
                                     <PhoneCall size={20} />
                                 </div>
-                                <span className="font-black text-gray-900 dark:text-white">고객행복센터</span>
+                                <span className="font-black text-black dark:text-white text-lg">고객센터</span>
                             </div>
-                            <p className="text-2xl font-black mb-2 text-gray-900 dark:text-white">1544-5568</p>
-                            <p className="text-[12px] text-gray-700 dark:text-gray-300 leading-relaxed font-bold">
+                            <p className="text-3xl font-black mb-2 text-black dark:text-white tracking-tighter">1544-5568</p>
+                            <p className="text-[13px] text-black dark:text-gray-200 leading-relaxed font-black">
                                 평일 09:30 ~ 19:00<br />
                                 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-sky-500 text-white rounded-2xl text-sm font-black hover:bg-sky-600 transition shadow-lg shadow-sky-100 dark:shadow-none">
+                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-sky-500 text-white rounded-2xl text-sm font-black hover:bg-sky-600 transition shadow-lg">
                                 <MessageCircle size={18} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
@@ -274,17 +274,17 @@ function CustomerCenterContent() {
                                             { pos: '우측 고정 배너', type: 'PC 스크롤 고정형', size: '120 x 600', price: '500,000원' },
                                             { pos: '모바일 상단 롤링', type: '메인 상단 롤링형', size: '720 x 150', price: '300,000원' },
                                         ].map((row, i) => (
-                                            <div key={i} className="p-7 rounded-[30px] bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 flex flex-col justify-between group hover:border-pink-200 transition-colors">
+                                            <div key={i} className="p-7 rounded-[30px] bg-gray-50 dark:bg-gray-900/50 border-2 border-gray-200 dark:border-gray-800 flex flex-col justify-between group hover:border-pink-500 transition-colors">
                                                 <div className="space-y-4">
                                                     <div className="flex justify-between items-start">
                                                         <span className="text-lg font-black text-gray-900 dark:text-white">{row.pos}</span>
-                                                        <span className="text-[10px] bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 font-bold text-gray-500">{row.size}</span>
+                                                        <span className="text-[10px] bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 font-bold text-gray-900">{row.size}</span>
                                                     </div>
-                                                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400">{row.type}</p>
+                                                    <p className="text-xs font-black text-gray-700 dark:text-gray-400">{row.type}</p>
                                                 </div>
                                                 <div className="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700">
-                                                    <p className="text-[10px] text-gray-400 font-black mb-1 uppercase tracking-widest">Pricing</p>
-                                                    <p className="text-xl font-black text-pink-600">{row.price}</p>
+                                                    <p className="text-[10px] text-gray-500 font-black mb-1 uppercase tracking-widest">Montly Pricing</p>
+                                                    <p className="text-2xl font-black text-pink-600">{row.price}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -406,13 +406,13 @@ function CustomerCenterContent() {
                         {/* 5. 1:1 Inquiry */}
                         {activeTab === '1:1문의' && (
                             <div className="space-y-10">
-                                <div className="bg-white dark:bg-gray-800 p-10 rounded-[45px] border-2 border-pink-500 shadow-xl shadow-pink-100 dark:shadow-none flex flex-col md:flex-row items-center gap-8">
-                                    <div className="p-5 bg-pink-50 dark:bg-pink-900/20 rounded-[30px] text-pink-600 shadow-inner">
+                                <div className="bg-white dark:bg-gray-800 p-10 rounded-[45px] border-2 border-gray-900 shadow-xl flex flex-col md:flex-row items-center gap-8">
+                                    <div className="p-5 bg-gray-100 dark:bg-gray-900 rounded-[30px] text-gray-900 shadow-inner">
                                         <MessageCircle size={36} />
                                     </div>
                                     <div className="text-center md:text-left">
                                         <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">무엇을 도와드릴까요?</h3>
-                                        <p className="text-sm text-gray-700 dark:text-gray-400 leading-relaxed font-bold">궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
+                                        <p className="text-sm text-gray-900 dark:text-gray-400 leading-relaxed font-black">궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
                                     </div>
                                 </div>
 
@@ -420,7 +420,7 @@ function CustomerCenterContent() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div>
                                             <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">문의 유형 <span className="text-pink-600">*</span></label>
-                                            <select className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-bold focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer">
+                                            <select className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer">
                                                 <option>광고 상품 문의 (사장님)</option>
                                                 <option>채용 관련 문의 (구직자)</option>
                                                 <option>신고 및 운영 정책</option>
@@ -429,20 +429,20 @@ function CustomerCenterContent() {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">연락처/회신처 <span className="text-pink-600">*</span></label>
-                                            <input type="text" placeholder="회신 받을 번호나 메일을 적어주세요" className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-bold focus:ring-4 focus:ring-pink-500/10 outline-none" />
+                                            <input type="text" placeholder="회신 받을 번호나 메일을 적어주세요" className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none" />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">문의 제목 <span className="text-pink-600">*</span></label>
-                                        <input type="text" placeholder="핵심 내용을 한 문장으로 요약해주세요" className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-bold focus:ring-4 focus:ring-pink-500/10 outline-none" />
+                                        <input type="text" placeholder="핵심 내용을 한 문장으로 요약해주세요" className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none" />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">상세 내용 <span className="text-pink-600">*</span></label>
-                                        <textarea placeholder="구체적인 상황을 적어주시면 더 정확한 답변이 가능합니다." className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[35px] p-8 text-sm font-bold h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none" />
+                                        <textarea placeholder="구체적인 상황을 적어주시면 더 정확한 답변이 가능합니다." className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none" />
                                     </div>
 
                                     <button
-                                        className="w-full bg-pink-600 text-white font-black py-6 rounded-[28px] text-xl shadow-2xl shadow-pink-100 dark:shadow-none transition-all hover:bg-pink-700 hover:scale-[1.01] active:scale-95 outline-none"
+                                        className="w-full bg-gray-900 text-white font-black py-6 rounded-[28px] text-xl shadow-2xl transition-all hover:bg-black hover:scale-[1.01] active:scale-95 outline-none"
                                         onClick={() => alert('접수되었습니다. 담당자 확인 후 빠르게 답변 드리겠습니다!')}
                                     >
                                         상담 등록하기
@@ -450,6 +450,24 @@ function CustomerCenterContent() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Customer Service Box (Mobile Lower Position) */}
+                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border-4 border-gray-900 bg-white dark:bg-gray-800 shadow-2xl`}>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gray-900">
+                                    <PhoneCall size={24} />
+                                </div>
+                                <span className="font-black text-gray-900 dark:text-white text-xl">고객센터</span>
+                            </div>
+                            <p className="text-4xl font-black mb-3 text-gray-900 dark:text-white tracking-tighter">1544-5568</p>
+                            <p className="text-[14px] text-gray-900 dark:text-gray-200 leading-relaxed font-black">
+                                평일 09:30 ~ 19:00 / 점심 12:00 ~ 13:30<br />
+                                <span className="text-pink-600 font-black mt-2 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
+                            </p>
+                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-sky-500 text-white rounded-[24px] text-base font-black hover:bg-sky-600 transition shadow-xl">
+                                <MessageCircle size={20} /> 텔레그렘 실시간 상담
+                            </a>
+                        </div>
                     </div>
                 </div>
             </main>
