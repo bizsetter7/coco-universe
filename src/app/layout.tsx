@@ -47,8 +47,8 @@ export default function RootLayout({
               <div className="w-full max-w-[1400px] px-0 lg:px-4 grid grid-cols-1 xl:grid-cols-[160px_minmax(0,1020px)_160px] gap-0 xl:gap-6">
 
                 {/* 왼쪽 사이드바 (PC 전용 Sticky) */}
-                <aside className="hidden xl:block h-full">
-                  <div className="sticky top-[80px]">
+                <aside className="hidden xl:block h-full pt-20">
+                  <div className="sticky top-20">
                     <BannerSidebar side="left" />
                   </div>
                 </aside>
@@ -59,8 +59,8 @@ export default function RootLayout({
                 </main>
 
                 {/* 오른쪽 사이드바 (PC 전용 Sticky) */}
-                <aside className="hidden xl:block h-full">
-                  <div className="sticky top-[80px]">
+                <aside className="hidden xl:block h-full pt-20">
+                  <div className="sticky top-20">
                     <BannerSidebar side="right" />
                   </div>
                 </aside>

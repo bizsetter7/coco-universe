@@ -2,13 +2,21 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { BrandConfig, BRANDS, DEFAULT_BRAND } from '@/lib/brand-config';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 const BrandContext = createContext<BrandConfig>(DEFAULT_BRAND);
 
 export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
     const [brand, setBrand] = useState<BrandConfig>(DEFAULT_BRAND);
+    const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    // 0. Global Scroll to Top on Route Change
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+    }, [pathname]);
 
     useEffect(() => {
         // 1. Check search param first (for testing/development)
