@@ -1,4 +1,8 @@
-@import "tailwindcss";
+html {
+  scrollbar-gutter: stable !important;
+  overflow-x: hidden;
+  height: 100%;
+}
 
 :root {
   --background: #ffffff;
@@ -6,8 +10,6 @@
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
   scroll-behavior: auto !important;
-  scrollbar-gutter: stable;
-  overflow-x: hidden;
 }
 
 @theme inline {
