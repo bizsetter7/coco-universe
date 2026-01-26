@@ -74,7 +74,7 @@ function CommunityContent() {
     };
 
     return (
-        <div className="relative bg-gray-50 pb-20">
+        <div className="bg-gray-50 pb-20">
             {/* 2단 독립 Sticky Header 시스템 (확정 버전 - 래퍼 제거 및 구조 최적화) */}
 
             {/* 1단 상단바: 로고 및 홈 버튼 (sticky top-0) */}
@@ -104,7 +104,7 @@ function CommunityContent() {
             </div>
 
             {/* 2단 카테고리 탭: 스크롤 시 상단바 바로 밑에 고정 (sticky top-14) */}
-            <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-50 overflow-x-auto scrollbar-hide">
+            <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-[45] overflow-x-auto scrollbar-hide">
                 <div className="max-w-[1020px] mx-auto flex px-4">
                     {CATEGORIES.map((cat) => (
                         <button

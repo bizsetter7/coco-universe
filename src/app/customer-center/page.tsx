@@ -270,7 +270,8 @@ function CustomerCenterContent() {
                                         </div>
                                     </div>
 
-                                    <div className="overflow-x-auto">
+                                    {/* Desktop Table: Hidden on Mobile */}
+                                    <div className="hidden md:block overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
                                                 <tr className="bg-gray-50 dark:bg-gray-900/50">
@@ -280,27 +281,49 @@ function CustomerCenterContent() {
                                                     <th className="px-4 py-4 text-left font-bold rounded-r-xl">단가 (1개월)</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
-                                                <tr>
-                                                    <td className="px-4 py-5 font-bold">좌측 고정 배너</td>
-                                                    <td className="px-4 py-5 text-gray-500">스크롤 고정형 (PC)</td>
-                                                    <td className="px-4 py-5 font-mono text-gray-400">120 x 600</td>
-                                                    <td className="px-4 py-5 font-black text-pink-500">500,000원</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="px-4 py-5 font-bold">우측 고정 배너</td>
-                                                    <td className="px-4 py-5 text-gray-500">스크롤 고정형 (PC)</td>
-                                                    <td className="px-4 py-5 font-mono text-gray-400">120 x 600</td>
-                                                    <td className="px-4 py-5 font-black text-pink-500">500,000원</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="px-4 py-5 font-bold">모바일 상단 롤링</td>
-                                                    <td className="px-4 py-5 text-gray-500">롤링형 (Mobile)</td>
-                                                    <td className="px-4 py-5 font-mono text-gray-400">720 x 150</td>
-                                                    <td className="px-4 py-5 font-black text-pink-500">300,000원</td>
-                                                </tr>
+                                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                {[
+                                                    { pos: '좌측 고정 배너', type: '스크롤 고정형 (PC)', size: '120 x 600', price: '500,000원' },
+                                                    { pos: '우측 고정 배너', type: '스크롤 고정형 (PC)', size: '120 x 600', price: '500,000원' },
+                                                    { pos: '모바일 상단 롤링', type: '롤링형 (Mobile)', size: '720 x 150', price: '300,000원' },
+                                                ].map((row, i) => (
+                                                    <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                                                        <td className="px-4 py-5 font-bold text-gray-800 dark:text-gray-200">{row.pos}</td>
+                                                        <td className="px-4 py-5 text-gray-600 dark:text-gray-400">{row.type}</td>
+                                                        <td className="px-4 py-5 font-mono text-gray-500 dark:text-gray-500">{row.size}</td>
+                                                        <td className="px-4 py-5 font-black text-pink-500">{row.price}</td>
+                                                    </tr>
+                                                ))}
                                             </tbody>
                                         </table>
+                                    </div>
+
+                                    {/* Mobile Cards: Hidden on Desktop */}
+                                    <div className="md:hidden space-y-4">
+                                        {[
+                                            { pos: '좌측 고정 배너', type: '스크롤 고정형 (PC)', size: '120 x 600', price: '500,000원' },
+                                            { pos: '우측 고정 배너', type: '스크롤 고정형 (PC)', size: '120 x 600', price: '500,000원' },
+                                            { pos: '모바일 상단 롤링', type: '롤링형 (Mobile)', size: '720 x 150', price: '300,000원' },
+                                        ].map((row, i) => (
+                                            <div key={i} className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase">광고 위치</span>
+                                                    <span className="text-sm font-black text-gray-800 dark:text-gray-200">{row.pos}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase">노출 방식</span>
+                                                    <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{row.type}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase">규격 (px)</span>
+                                                    <span className="text-xs font-mono text-gray-500">{row.size}</span>
+                                                </div>
+                                                <div className="pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                                    <span className="text-xs font-bold text-gray-500 uppercase">한달 단가</span>
+                                                    <span className="text-lg font-black text-pink-500 underline decoration-pink-500/30 underline-offset-4">{row.price}</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -344,7 +367,7 @@ function CustomerCenterContent() {
                                                     {item.icon}
                                                 </div>
                                                 <h4 className="font-bold text-sm mb-1 relative z-10">{item.title}</h4>
-                                                <p className="text-[10px] text-gray-400 relative z-10">{item.desc}</p>
+                                                <p className="text-[10px] text-gray-500 relative z-10">{item.desc}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -362,7 +385,7 @@ function CustomerCenterContent() {
                                             </div>
                                             <div className="text-center md:text-left">
                                                 <h4 className="text-lg font-black mb-1">인증된 사장님만 공고 등록이 가능합니다.</h4>
-                                                <p className="text-xs text-gray-400">깨끗하고 안전한 구인구직 환경을 위해 사업자등록증 확인 절차를 진행하고 있습니다.</p>
+                                                <p className="text-xs text-gray-500">깨끗하고 안전한 구인구직 환경을 위해 사업자등록증 확인 절차를 진행하고 있습니다.</p>
                                             </div>
                                             <button className="md:ml-auto px-6 py-3 bg-blue-500 text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 whitespace-nowrap">
                                                 사업자 인증하러 가기
@@ -388,7 +411,7 @@ function CustomerCenterContent() {
                                                 <span className="text-2xl font-black text-blue-200">3</span>
                                                 <div>
                                                     <h5 className="font-bold text-sm mb-1">인재 직접 컨택</h5>
-                                                    <p className="text-xs text-gray-400">이력서 열람권을 통해 우리 업소에 딱 맞는 인재에게 먼저 연락하세요.</p>
+                                                    <p className="text-xs text-gray-500">이력서 열람권을 통해 우리 업소에 딱 맞는 인재에게 먼저 연락하세요.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -411,7 +434,7 @@ function CustomerCenterContent() {
                                                 <span className="font-bold text-sm text-gray-700 dark:text-gray-200 flex gap-3">
                                                     <span className="text-pink-500">Q.</span> {faq.question}
                                                 </span>
-                                                {expandedFaq === faq.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+                                                {expandedFaq === faq.id ? <ChevronUp size={18} className="text-gray-500" /> : <ChevronDown size={18} className="text-gray-500" />}
                                             </button>
                                             {expandedFaq === faq.id && (
                                                 <div className="bg-gray-50 dark:bg-gray-900/50 p-6 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
