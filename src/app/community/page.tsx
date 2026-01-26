@@ -74,7 +74,7 @@ function CommunityContent() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="relative bg-gray-50 pb-20">
             {/* 2단 독립 Sticky Header 시스템 (확정 버전 - 래퍼 제거 및 구조 최적화) */}
 
             {/* 1단 상단바: 로고 및 홈 버튼 (sticky top-0) */}
@@ -104,7 +104,7 @@ function CommunityContent() {
             </div>
 
             {/* 2단 카테고리 탭: 스크롤 시 상단바 바로 밑에 고정 (sticky top-14) */}
-            <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-40 overflow-x-auto scrollbar-hide">
+            <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-50 overflow-x-auto scrollbar-hide">
                 <div className="max-w-[1020px] mx-auto flex px-4">
                     {CATEGORIES.map((cat) => (
                         <button
@@ -130,7 +130,7 @@ function CommunityContent() {
             {/* Admin/Mock Controls */}
             <div className="max-w-[1020px] mx-auto p-3 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between text-[11px] text-indigo-700">
                 <div className="flex items-center gap-2">
-                    <span className="font-bold">🔑 상태 테스트:</span>
+                    <span className="font-bold text-indigo-800">🔑 상태 테스트:</span>
                     <button
                         onClick={() => setIsLoggedIn(!isLoggedIn)}
                         className={`px-2 py-1 rounded font-bold transition ${isLoggedIn ? 'bg-indigo-500 text-white' : 'bg-white border border-indigo-200'}`}
@@ -144,7 +144,7 @@ function CommunityContent() {
                         전환: {userType === 'individual' ? '개인' : '업소'}
                     </button>
                 </div>
-                <span className="opacity-60 hidden sm:inline">로그인 안 됨 상태에서 게시글을 클릭해보세요!</span>
+                <span className="opacity-80 text-indigo-500 hidden sm:inline">로그인 안 됨 상태에서 게시글을 클릭해보세요!</span>
             </div>
 
             <main className="max-w-[1020px] mx-auto p-4 space-y-4">
@@ -184,7 +184,7 @@ function CommunityContent() {
                                     <Sparkles size={28} />
                                 </div>
                                 <h4 className="font-black text-lg mb-2">성향 & 컬러 테스트</h4>
-                                <p className="text-xs text-gray-400 leading-relaxed mb-4">나에게 맞는 메이크업과 최적의 직종을 찾아드립니다.</p>
+                                <p className="text-xs text-gray-500 leading-relaxed mb-4">나에게 맞는 메이크업과 최적의 직종을 찾아드립니다.</p>
                                 <div className="flex items-center text-xs font-black text-blue-500 ring-1 ring-blue-100 rounded-full w-fit px-3 py-1.5 bg-blue-50/30">
                                     테스트 시작 <ArrowRight size={14} className="ml-1" />
                                 </div>
@@ -215,10 +215,10 @@ function CommunityContent() {
                                 className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group"
                             >
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="bg-gray-50 text-gray-400 px-3 py-1 rounded-full text-[10px] font-bold group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+                                    <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-[10px] font-bold group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
                                         {post.category}
                                     </span>
-                                    <span className="text-[10px] text-gray-300 font-medium">{post.time}</span>
+                                    <span className="text-[10px] text-gray-400 font-medium">{post.time}</span>
                                 </div>
 
                                 <h3 className="font-bold text-gray-800 mb-1 lg:text-lg">
@@ -226,24 +226,24 @@ function CommunityContent() {
                                     {post.title}
                                 </h3>
 
-                                <p className="text-sm text-gray-500 line-clamp-1 mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                                <p className="text-sm text-gray-600 line-clamp-1 mb-4 opacity-90 group-hover:opacity-100 transition-opacity">
                                     <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[4px] select-none' : ''}>
                                         {post.content}
                                     </span>
                                 </p>
 
-                                <div className="flex items-center justify-between text-xs text-gray-400 border-t border-gray-50 pt-4">
+                                <div className="flex items-center justify-between text-xs text-gray-600 border-t border-gray-100 pt-4">
                                     <div className="flex items-center gap-2">
                                         <div className="w-6 h-6 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
                                             <User size={12} />
                                         </div>
-                                        <span className="font-bold text-gray-500">{post.author}</span>
+                                        <span className="font-bold text-gray-700">{post.author}</span>
                                     </div>
                                     <div className="flex gap-4">
-                                        <span className="flex items-center gap-1.5 text-pink-400 font-black">
+                                        <span className="flex items-center gap-1.5 text-pink-500 font-black">
                                             <Heart size={14} className="fill-current" /> {post.likes}
                                         </span>
-                                        <span className="flex items-center gap-1.5 text-blue-400 font-black">
+                                        <span className="flex items-center gap-1.5 text-blue-500 font-black">
                                             <MessageSquare size={14} className="fill-current" /> {post.comments}
                                         </span>
                                     </div>
@@ -256,7 +256,7 @@ function CommunityContent() {
 
             {/* Login Required Modal */}
             {loginModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setLoginModalOpen(false)}></div>
                     <div className="bg-white rounded-[40px] w-full max-w-sm p-10 relative z-10 shadow-2xl">
                         <div className="flex flex-col items-center text-center">
@@ -291,7 +291,7 @@ function CommunityContent() {
 
             {/* Corporate Access Denied Modal */}
             {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCorporateModalOpen(false)}></div>
                     <div className="bg-white rounded-3xl w-full max-w-xs p-8 relative z-10 shadow-2xl">
                         <div className="flex flex-col items-center text-center">

@@ -141,7 +141,7 @@ function CustomerCenterContent() {
                     <aside className="md:w-64 shrink-0">
                         <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden`}>
                             <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">메뉴</p>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">메뉴</p>
                             </div>
                             <nav className="flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
                                 {TABS.map((tab) => (
@@ -156,7 +156,7 @@ function CustomerCenterContent() {
                                         }}
                                         className={`flex items-center gap-3 px-5 py-4 text-sm font-bold transition-all whitespace-nowrap border-b-2 md:border-b-0 md:border-l-4 ${activeTab === tab.id
                                             ? 'bg-pink-50/30 text-pink-500 border-pink-500 dark:bg-pink-900/10'
-                                            : 'text-gray-400 border-transparent hover:text-gray-600 dark:hover:text-gray-200'}`}
+                                            : 'text-gray-500 border-transparent hover:text-gray-700 dark:hover:text-gray-200'}`}
                                         style={activeTab === tab.id ? { color: brand.primaryColor, borderColor: brand.primaryColor, backgroundColor: `${brand.primaryColor}08` } : {}}
                                     >
                                         <span className={activeTab === tab.id ? '' : 'text-gray-300'}>{tab.icon}</span>
@@ -175,7 +175,7 @@ function CustomerCenterContent() {
                                 <span className="font-extrabold text-sm">고객행복센터</span>
                             </div>
                             <p className="text-2xl font-black mb-1">1544-5568</p>
-                            <p className="text-[10px] text-gray-400 leading-relaxed">
+                            <p className="text-[10px] text-gray-500 leading-relaxed">
                                 평일 09:30 ~ 19:00<br />
                                 점심 12:00 ~ 13:30<br />
                                 * 공휴일 및 토, 일요일은 휴무입니다.
@@ -210,7 +210,7 @@ function CustomerCenterContent() {
                                                 </span>
                                                 {notice.isNew && <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>}
                                             </div>
-                                            <span className="text-xs text-gray-400 flex items-center gap-1">
+                                            <span className="text-xs text-gray-500 flex items-center gap-1">
                                                 <Clock size={12} /> {notice.date}
                                             </span>
                                         </div>
@@ -227,7 +227,7 @@ function CustomerCenterContent() {
                                         <Zap size={150} />
                                     </div>
                                     <h2 className="text-3xl font-black mb-2">효과적인 구인의 시작 🚀</h2>
-                                    <p className="text-gray-400 text-sm">{brand.name}만의 프리미엄 광고 시스템을 경험하세요.</p>
+                                    <p className="text-gray-300 text-sm">{brand.name}만의 프리미엄 광고 시스템을 경험하세요.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">

@@ -199,7 +199,7 @@ export default function HomePortal() {
               <div className="relative z-10 px-4">
                 <span className="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold mb-2 inline-block animate-pulse">GRAND OPEN</span>
                 <h2 className="text-2xl md:text-5xl font-bold mb-4 break-keep">사장님! <span style={primaryStyle} className="whitespace-nowrap">3개월 광고 무료</span> 이벤트</h2>
-                <p className="text-base md:text-lg text-gray-300 mb-8 break-keep">지금 가입하면 <span className="whitespace-nowrap">유료 상품 300만원 상당이 0원!</span></p>
+                <p className="text-base md:text-lg text-gray-200 mb-8 break-keep">지금 가입하면 <span className="whitespace-nowrap">유료 상품 300만원 상당이 0원!</span></p>
                 <div className="flex gap-3 md:gap-4 justify-center">
                   <button
                     className="bg-white text-black px-6 md:px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition whitespace-nowrap"
@@ -264,7 +264,7 @@ export default function HomePortal() {
                     <div className={`w-12 h-12 rounded-full mb-2 flex items-center justify-center ${item.bg} ${item.color}`}>
                       {item.icon}
                     </div>
-                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{item.label}</span>
+                    <span className="text-xs font-bold text-gray-700 dark:text-gray-200">{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -275,7 +275,7 @@ export default function HomePortal() {
                 <div onClick={() => router.push('/community')} className={`border p-5 rounded-[24px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-pink-100'}`}>
                   <div className="flex justify-between items-center mb-4">
                     <span className="font-black text-pink-500 flex items-center gap-2"><Flame size={18} /> 실시간 핫 이슈</span>
-                    <span className="text-[10px] text-gray-400 font-bold">더보기</span>
+                    <span className="text-[10px] text-gray-500 font-bold">더보기</span>
                   </div>
                   <div className="space-y-3">
                     {MOCK_POSTS.filter(p => p.isHot).slice(0, 3).map(post => (
@@ -283,7 +283,7 @@ export default function HomePortal() {
                         <span className="shrink-0 w-6 h-6 rounded-full bg-pink-50 flex items-center justify-center text-[10px] group-hover:scale-110 transition-transform">
                           {post.id === 1 ? '🔥' : post.id === 3 ? '⭐' : '💬'}
                         </span>
-                        <p className="truncate text-xs font-bold text-gray-600 dark:text-gray-300">
+                        <p className="truncate text-xs font-bold text-gray-700 dark:text-gray-200">
                           {post.title}
                         </p>
                       </div>

@@ -71,7 +71,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         <>
             <div
                 ref={sidebarRef}
-                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-[100]`}
+                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-20`}
                 style={{ top: '16px' }}
             >
                 {/* 상단 배지 (버튼 높이 정렬을 위해 마진 제거 및 핏 조정) */}
@@ -102,7 +102,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                 </div>
 
                 <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm pointer-events-auto text-center space-y-1 mx-0.5">
-                    <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
+                    <p className="text-[9px] text-gray-500 font-bold">배너 광고 문의</p>
                     <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>
             </div>
