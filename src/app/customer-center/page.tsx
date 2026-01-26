@@ -202,7 +202,7 @@ function CustomerCenterContent() {
                                                 <span className={`px-2.5 py-1 rounded text-[11px] font-black ${notice.category === '공지' ? 'bg-blue-600 text-white' : notice.category === '점검' ? 'bg-amber-500 text-white' : 'bg-pink-600 text-white'}`}>
                                                     {notice.category}
                                                 </span>
-                                                <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600'}`}>
+                                                <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-300'}`}>
                                                     {notice.title}
                                                 </span>
                                                 {notice.isNew && <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>}
@@ -224,7 +224,7 @@ function CustomerCenterContent() {
                                         <Zap size={150} strokeWidth={3} />
                                     </div>
                                     <h2 className="text-3xl font-black mb-3 tracking-tighter">효과적인 구인의 시작 🚀</h2>
-                                    <p className="text-gray-400 text-sm font-bold tracking-tight">가장 확실한 구인은 {brand.name} 프리미엄 광고와 함께하세요.</p>
+                                    <p className="text-gray-100 text-sm font-black tracking-tight opacity-90">가장 확실한 구인은 {brand.name} 프리미엄 광고와 함께하세요.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -263,7 +263,7 @@ function CustomerCenterContent() {
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-black text-gray-900 dark:text-white">사이드 배너 광고</h3>
-                                            <p className="text-sm text-gray-500 font-bold">PC/모바일 공통 고정 노출 상품</p>
+                                            <p className="text-sm text-gray-800 dark:text-gray-200 font-black">PC/모바일 공통 고정 노출 상품</p>
                                         </div>
                                     </div>
 
@@ -300,7 +300,7 @@ function CustomerCenterContent() {
                                         </div>
                                         <div className="p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-3xl flex items-start gap-4 border border-indigo-100/50 dark:border-indigo-900/30">
                                             <Megaphone size={20} className="text-indigo-600 shrink-0 mt-0.5" />
-                                            <p className="text-[13px] text-gray-900 dark:text-gray-300 leading-relaxed font-bold">
+                                            <p className="text-[13px] text-gray-900 dark:text-gray-100 leading-relaxed font-black">
                                                 <strong className="text-indigo-600">한정 구좌 운영:</strong><br />
                                                 클린한 구인 환경을 위해 매월 한정 수량만 판매되며, 연장 우선순위가 적용됩니다.
                                             </p>

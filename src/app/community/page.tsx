@@ -234,7 +234,7 @@ function CommunityContent() {
                                         {post.title}
                                     </h3>
 
-                                    <p className="text-sm text-gray-700 line-clamp-2 mb-5 font-bold opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <p className="text-sm text-black line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity">
                                         <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[5px] select-none' : ''}>
                                             {post.content}
                                         </span>
