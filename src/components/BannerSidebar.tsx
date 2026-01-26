@@ -13,7 +13,7 @@ interface BannerSidebarProps {
  * BannerSidebar - '16px 황금 정렬' 마스터 버전
  * - 홈 버튼 / 사장님 무료등록 버튼과 상단 16px 라인을 완벽히 일치시킴
  * - translate3d 기반 하드웨어 가속 추적 (0ms 반응성)
- * - z-[100] 설정으로 헤더 위로 노출 보장
+ * - z-[100] 및 pointer-events 설정으로 간섭 최소화
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
@@ -36,7 +36,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
             // [16px 마스터링]
             // 헤더 내부 버튼들과 정렬하기 위해 초기 위치를 16px로 셋팅
-            // translate3d로 GPU 가속 적용하여 부드럽게 추적
+            // requestAnimationFrame 대신 direct DOM manipulation으로 0ms 반응성 구현
             sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
         };
 

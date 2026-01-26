@@ -32,29 +32,22 @@ export default function RootLayout({
       <body className={`${inter.className} overflow-x-hidden`}>
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
-            {/* 
-                Flex-Based Master Layout (16px 마스터 버전)
-                - items-stretch: 사이드바 영역(aside)이 메인 콘텐츠와 동일한 높이를 갖게 함 (전역 추적 필수)
-                - relative: 사이드바의 absolute 추적 기준점
-            */}
+            {/* 16px 마스터 레이아웃: 사이드바 추적을 위한 items-stretch 강제 */}
             <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center items-stretch">
-              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-0 lg:px-4 relative">
+              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-0 lg:px-4 relative min-h-full">
 
-                {/* 
-                  왼쪽 사이드바 영역
-                  - h-auto + relative: 부모의 items-stretch 덕분에 메인과 동일한 높이 확보
-                */}
-                <aside className="hidden xl:block w-[160px] relative">
+                {/* 왼쪽 사이드바 컨테이너: flex-1과 동일하게 stretch되어 추적 범위 확보 */}
+                <aside className="hidden xl:block w-[160px] relative self-stretch">
                   <BannerSidebar side="left" />
                 </aside>
 
-                {/* 중앙 메인 콘텐츠 (물리적 중앙축 고정) */}
+                {/* 중앙 메인: 콘텐츠 길이에 따라 부모 높이를 늘림 */}
                 <main className="w-full max-w-[1020px] flex-1 min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none">
                   {children}
                 </main>
 
-                {/* 오른쪽 사이드바 영역 */}
-                <aside className="hidden xl:block w-[160px] relative">
+                {/* 오른쪽 사이드바 컨테이너 */}
+                <aside className="hidden xl:block w-[160px] relative self-stretch">
                   <BannerSidebar side="right" />
                 </aside>
 

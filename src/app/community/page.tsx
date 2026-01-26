@@ -75,56 +75,55 @@ function CommunityContent() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            {/* 2단 독립 Sticky Header 시스템 (확정 버전) */}
-            <div className="z-50">
-                {/* 1단 상단바: 로고 및 홈 버튼 (sticky top-0) */}
-                <div className="bg-white/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all shadow-sm">
-                    <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
-                        <div className="flex items-center gap-2 pt-2">
-                            <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
-                                <ArrowLeft size={24} />
-                            </button>
-                            <h1
-                                onClick={() => router.push('/')}
-                                className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
-                            >
-                                <MessageCircle className="fill-pink-500" size={24} />
-                                그녀들의 수다
-                            </h1>
-                        </div>
-                        <div className="flex gap-2 pt-2">
-                            <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
-                                <Home size={24} />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-gray-600">
-                                <Search size={24} />
-                            </button>
-                        </div>
+            {/* 2단 독립 Sticky Header 시스템 (확정 버전 - 래퍼 제거 및 구조 최적화) */}
+
+            {/* 1단 상단바: 로고 및 홈 버튼 (sticky top-0) */}
+            <div className="bg-white/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all shadow-sm">
+                <div className="max-w-[1020px] mx-auto px-4 h-14 flex items-center justify-between">
+                    <div className="flex items-center gap-2 pt-2">
+                        <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-600">
+                            <ArrowLeft size={24} />
+                        </button>
+                        <h1
+                            onClick={() => router.push('/')}
+                            className="text-xl font-black text-pink-500 flex items-center gap-2 tracking-tighter cursor-pointer hover:opacity-80 transition-opacity"
+                        >
+                            <MessageCircle className="fill-pink-500" size={24} />
+                            그녀들의 수다
+                        </h1>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                        <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-600">
+                            <Home size={24} />
+                        </button>
+                        <button className="p-2 text-gray-400 hover:text-gray-600">
+                            <Search size={24} />
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                {/* 2단 카테고리 탭: 스크롤 시 상단바 바로 밑에 고정 (sticky top-14) */}
-                <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-40 overflow-x-auto scrollbar-hide">
-                    <div className="max-w-[1020px] mx-auto flex px-4">
-                        {CATEGORIES.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => {
-                                    setActiveTab(cat);
-                                    requestAnimationFrame(() => {
-                                        window.scrollTo({ top: 0, behavior: 'auto' });
-                                        window.dispatchEvent(new CustomEvent('sidebar-warp'));
-                                    });
-                                }}
-                                className={`flex-shrink-0 px-4 py-3 text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap ${activeTab === cat
-                                    ? 'border-pink-500 text-pink-500'
-                                    : 'border-transparent text-gray-400 hover:text-gray-600'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
+            {/* 2단 카테고리 탭: 스크롤 시 상단바 바로 밑에 고정 (sticky top-14) */}
+            <div className="bg-white/95 backdrop-blur-md border-b sticky top-14 z-40 overflow-x-auto scrollbar-hide">
+                <div className="max-w-[1020px] mx-auto flex px-4">
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => {
+                                setActiveTab(cat);
+                                requestAnimationFrame(() => {
+                                    window.scrollTo({ top: 0, behavior: 'auto' });
+                                    window.dispatchEvent(new CustomEvent('sidebar-warp'));
+                                });
+                            }}
+                            className={`flex-shrink-0 px-4 py-3 text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap ${activeTab === cat
+                                ? 'border-pink-500 text-pink-500'
+                                : 'border-transparent text-gray-400 hover:text-gray-600'
+                                }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
                 </div>
             </div>
 
