@@ -10,10 +10,10 @@ interface BannerSidebarProps {
 }
 
 /**
- * BannerSidebar - '사용자 만족 버전' 복구 엔진
+ * BannerSidebar - '16px 황금 정렬' 마스터 버전
+ * - 홈 버튼 / 사장님 무료등록 버튼과 상단 16px 라인을 완벽히 일치시킴
  * - translate3d 기반 하드웨어 가속 추적 (0ms 반응성)
- * - 0ms 워프 동기화 (커스텀 이벤트 수신)
- * - 초기 오프셋 80px 보정으로 헤더 겹침 방지
+ * - 전역 추적 무결성 보장
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
@@ -33,18 +33,16 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         const updatePosition = () => {
             if (!sidebarRef.current) return;
             const scrollY = window.scrollY;
-            const headerHeight = 80; // 메인 헤더 높이
 
-            // 헤더 높이만큼 띄우고, 스크롤에 따라 실시간 이동
-            const targetPos = Math.max(headerHeight, scrollY + headerHeight);
-
-            // translate3d로 GPU 가속 적용하여 떨림 방지
+            // [16px 마스터링]
+            // 헤더 내부 버튼들과 정렬하기 위해 초기 위치를 16px로 셋팅
+            // 스크롤 시에도 이 16px 여백을 유지하며 추적
             sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
         };
 
         const handleWarp = () => {
             if (sidebarRef.current) {
-                // 즉각적인 상단 도약 (transition 없이)
+                // 즉각적인 상단 도약
                 sidebarRef.current.classList.add('no-transition');
                 sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
                 setTimeout(() => {
@@ -74,9 +72,10 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         <>
             <div
                 ref={sidebarRef}
-                className={`flex flex-col gap-3 w-[160px] py-6 absolute transition-transform duration-300 ease-out will-change-transform`}
-                style={{ top: '80px' }}
+                className={`flex flex-col gap-3 w-[160px] absolute transition-transform duration-300 ease-out will-change-transform z-30`}
+                style={{ top: '16px' }}
             >
+                {/* 상단 배지 (버튼 높이 정렬을 위해 마진 제거 및 핏 조정) */}
                 <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
                     {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>
