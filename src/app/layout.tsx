@@ -37,26 +37,33 @@ export default function RootLayout({
                 - relative 컨테이너를 기준으로 사이드바가 absolute하게 움직입니다.
                 - py-0으로 헤더 밀착 유지
             */}
-            <div className="flex justify-center items-start min-h-screen bg-gray-50 dark:bg-gray-950">
-              <div className="flex gap-6 w-full max-w-[1400px] justify-center px-4 relative min-h-screen">
+            {/* 
+                Grid-Based Master Layout
+                - PC: [160px 사이드바 | 1020px 메인 | 160px 사이드바] 고정 설계
+                - Mobile: 1컬럼 유연 레이아웃 전환
+                - item-start로 스티키 사이드바의 독립적 가동 보장
+            */}
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex justify-center">
+              <div className="w-full max-w-[1400px] px-0 lg:px-4 grid grid-cols-1 xl:grid-cols-[160px_minmax(0,1020px)_160px] gap-0 xl:gap-6">
 
-                {/* 
-                  왼쪽 사이드바 영역
-                  - h-full relative: 사이드바가 이 높이 안에서 자유롭게 움직일 수 있도록 함
-                */}
-                <div className="hidden xl:block w-[160px] relative">
-                  <BannerSidebar side="left" />
-                </div>
+                {/* 왼쪽 사이드바 (PC 전용 Sticky) */}
+                <aside className="hidden xl:block h-full">
+                  <div className="sticky top-[80px]">
+                    <BannerSidebar side="left" />
+                  </div>
+                </aside>
 
-                {/* 중앙 메인 콘텐츠 (기존 1020px 규격 유지, 모바일에서 유연하게 축소) */}
-                <main className="w-full max-w-[1020px] flex-1 min-w-0">
+                {/* 중앙 메인 콘텐츠 (물리적 중앙축 고정) */}
+                <main className="w-full min-w-0 bg-white dark:bg-gray-900 shadow-sm xl:shadow-none">
                   {children}
                 </main>
 
-                {/* 오른쪽 사이드바 영역 */}
-                <div className="hidden xl:block w-[160px] relative">
-                  <BannerSidebar side="right" />
-                </div>
+                {/* 오른쪽 사이드바 (PC 전용 Sticky) */}
+                <aside className="hidden xl:block h-full">
+                  <div className="sticky top-[80px]">
+                    <BannerSidebar side="right" />
+                  </div>
+                </aside>
 
               </div>
             </div>

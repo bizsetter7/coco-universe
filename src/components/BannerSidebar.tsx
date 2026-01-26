@@ -10,71 +10,14 @@ interface BannerSidebarProps {
 }
 
 /**
- * BannerSidebar - 'Global Zero-Lag Tracking' 전용 버젼 (궁극의 완성본)
- * - 사용자님이 원하시는 '내 가게 관리'의 부드러움을 전역으로 확장
- * - 상향 이동(리셋)은 '물리적 0ms', 하향 이동만 '프리미엄 Chasing'
- * - 커뮤니티 탭 전환 등 모든 내부 뷰 변화에 즉각 대응
+ * BannerSidebar - 'Pure CSS Sticky' 완전 정착형 버젼
+ * - 기존 JS 스크롤 추적 엔진을 완전히 삭제하고 CSS position: sticky로 회귀
+ * - 떨림(Jitter) 현상을 물리적으로 0%로 차단
+ * - 레이아웃 Grid 시스템과 결합하여 완벽한 수평/수직 안정성 제공
  */
 export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const brand = useBrand();
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
     const [selectedAd, setSelectedAd] = useState<any>(null);
-    const asideRef = useRef<HTMLElement>(null);
-    const lastScrollY = useRef(0);
-    const isLocked = useRef(false);
-
-    // 1. 초강력 위치 리셋 함수 (Force Snap)
-    const snapToTop = () => {
-        const aside = asideRef.current;
-        if (!aside) return;
-
-        isLocked.current = true;
-        aside.style.transition = 'none'; // 애니메이션 씨를 말림
-        aside.style.transform = `translate3d(0, 0, 0)`; // 0px로 즉시 텔레포트
-        lastScrollY.current = 0;
-
-        // 브라우저 렌더링 동기화 후 하향 추적 모드만 다시 켬
-        setTimeout(() => {
-            isLocked.current = false;
-        }, 100);
-    };
-
-    // 2. 전역 변화 감지 (URL, Params, Custom Event)
-    useEffect(() => {
-        snapToTop();
-        window.addEventListener('sidebar-warp', snapToTop);
-        return () => window.removeEventListener('sidebar-warp', snapToTop);
-    }, [pathname, searchParams]);
-
-    // 3. 지능형 방향성 스크롤 엔진
-    useEffect(() => {
-        const handleScroll = () => {
-            if (isLocked.current) return;
-
-            const aside = asideRef.current;
-            if (!aside) return;
-
-            const currentScroll = Math.max(0, window.scrollY);
-
-            // [방향 기반 애니메이션 정책]
-            // - 위로 올라가거나 최상단(0) 근처면 -> 0ms (즉시 정지)
-            // - 아래로 내려가면 -> 500ms (부드러운 추적)
-            if (currentScroll < lastScrollY.current || currentScroll < 10) {
-                aside.style.transition = 'none';
-                aside.style.transform = `translate3d(0, ${currentScroll}px, 0)`;
-                if (currentScroll === 0) lastScrollY.current = 0;
-            } else {
-                aside.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                aside.style.transform = `translate3d(0, ${currentScroll}px, 0)`;
-            }
-
-            lastScrollY.current = currentScroll;
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const ads = [
         { id: 1, name: '강남 유앤미', img: '/banners/thumb-1.png', desc: '강남구 역삼동 유앤미 힐링 케어' },
@@ -86,14 +29,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
     return (
         <>
-            <aside
-                ref={asideRef}
-                className={`flex absolute ${side === 'left' ? 'left-0' : 'right-0'} w-[160px] flex-col gap-3 z-10 will-change-transform`}
-                style={{
-                    top: '26px',
-                    transform: 'translate3d(0, 0, 0)'
-                }}
-            >
+            <div className={`flex flex-col gap-3 w-[160px] py-6`}>
                 <div className={`${badgeColor} text-white text-[10px] font-black py-1.5 rounded-t-xl text-center shadow-sm pointer-events-auto`}>
                     {side === 'left' ? 'BEST AD' : 'PREMIUM'}
                 </div>
@@ -124,7 +60,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                     <p className="text-[9px] text-gray-400 font-bold">배너 광고 문의</p>
                     <p className="text-[13px] font-black text-gray-800 dark:text-gray-100 italic">1544-5568</p>
                 </div>
-            </aside>
+            </div>
 
             {selectedAd && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setSelectedAd(null)}>

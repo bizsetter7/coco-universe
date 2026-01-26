@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-html,
-body {
+html {
+  /* [궁극의 울렁증 방지] 스크롤바 유무와 상관없이 화면 너비 고정 */
+  scrollbar-gutter: stable both-edges;
   overflow-x: hidden;
   height: 100%;
 }
@@ -14,10 +15,10 @@ body {
   scroll-behavior: auto !important;
 }
 
-/* PC에서만 스크롤바 흔들림 방지 적용 (모바일에서는 제외) */
-@media (min-width: 1024px) {
+/* 모바일에서는 gutter를 제거하여 풀스크린 가용성 확보 */
+@media (max-width: 1024px) {
   html {
-    scrollbar-gutter: stable;
+    scrollbar-gutter: auto;
   }
 }
 
@@ -39,8 +40,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 .no-transition {
   transition: none !important;
+}
+
+/* 스티키 헤더의 가시성을 위한 미세 상단 패딩 보정 */
+.sticky-header-active {
+  scroll-padding-top: 80px;
 }
