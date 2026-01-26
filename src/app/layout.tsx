@@ -48,8 +48,8 @@ export default function RootLayout({
                   <BannerSidebar side="left" />
                 </div>
 
-                {/* 중앙 메인 콘텐츠 (기존 1020px 규격 유지) */}
-                <main className="w-full max-w-[1020px] shrink-0">
+                {/* 중앙 메인 콘텐츠 (기존 1020px 규격 유지, 모바일에서 유연하게 축소) */}
+                <main className="w-full max-w-[1020px] flex-1 min-w-0">
                   {children}
                 </main>
 
