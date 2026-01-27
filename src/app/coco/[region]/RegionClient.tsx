@@ -109,7 +109,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                 <div className="space-y-4">
                     {/* [VIRTUAL AD] 지역 최상단 그랜드 프리미엄 (SEO 최적화 타겟팅) */}
                     <div className="bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600 p-0.5 rounded-3xl shadow-xl shadow-amber-200/50 group cursor-pointer hover:-translate-y-1 transition-all">
-                        <div className={`rounded-[22px] p-6 relative overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                        <div className={`rounded-[22px] p-6 relative overflow-hidden border-[3px] !border-amber-400 ring-4 ring-amber-400/20 shadow-xl shadow-amber-400/20 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                             <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-black px-4 py-1 rounded-bl-2xl shadow-sm">REGION GRAND</div>
                             <div className="flex gap-5 items-center mb-6">
                                 <div className={`aspect-square w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-amber-50'}`}>✨</div>
@@ -136,7 +136,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                         onClick={() => { }}
                                         className={`rounded-[22px] p-4 shadow-lg border-[3px] transition-all group relative overflow-hidden cursor-pointer
                                             ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-white'}
-                                            ${shop.tier === 'grand' ? '!border-amber-400 ring-4 ring-amber-400/20 shadow-amber-100/20' :
+                                            ${shop.tier === 'grand' ? '!border-amber-400 ring-4 ring-amber-400/20 shadow-xl shadow-amber-400/10' :
                                                 shop.tier === 'preferential' ? '!border-gray-300' : ''}
                                         `}
                                     >
