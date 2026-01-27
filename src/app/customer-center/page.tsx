@@ -139,9 +139,9 @@ function CustomerCenterContent() {
                         </button>
                         <h1
                             onClick={() => router.push('/')}
-                            className="text-xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                            className="text-lg md:text-xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
                         >
-                            고객지원센터
+                            <span className="text-pink-600">■</span> 고객지원센터
                         </h1>
                     </div>
                     <button onClick={() => router.push('/')} className="p-2 text-gray-500 hover:text-gray-900 transition-colors">
@@ -155,19 +155,22 @@ function CustomerCenterContent() {
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
                     <aside className="md:w-64 shrink-0 sticky top-14 md:top-[80px] h-fit md:h-fit z-[45]">
                         <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden`}>
-                            <div className="p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                            <div className="hidden md:block p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <p className="text-[15px] text-gray-900 dark:text-gray-100 font-black uppercase tracking-widest">MENU</p>
                             </div>
-                            <nav className="flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
+                            {/* Mobile Grid Layout vs Desktop List Layout */}
+                            <nav className="grid grid-cols-2 md:flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`flex items-center gap-4 px-6 py-5 text-sm font-black transition-all whitespace-nowrap border-b-2 md:border-b-0 md:border-l-4 ${activeTab === tab.id
+                                        className={`flex flex-col md:flex-row items-center md:items-start md:gap-4 px-4 py-4 md:px-6 md:py-5 text-[13px] md:text-sm font-black transition-all whitespace-nowrap border-b border-r md:border-r-0 md:border-b-0 md:border-l-4 ${activeTab === tab.id
                                             ? 'bg-pink-50 text-pink-600 border-pink-500 dark:bg-pink-900/20'
-                                            : 'text-gray-600 border-transparent hover:text-gray-900 dark:hover:text-white'}`}
+                                            : 'text-gray-600 border-gray-100 md:border-transparent hover:text-gray-900 dark:hover:text-white dark:border-gray-700'}`}
                                     >
-                                        {tab.icon}
+                                        <div className={`mb-1 md:mb-0 ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-400'}`}>
+                                            {tab.icon}
+                                        </div>
                                         {tab.id}
                                     </button>
                                 ))}
