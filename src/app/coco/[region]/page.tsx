@@ -1,7 +1,10 @@
-import React from 'react';
+'use client';
+
+import React, { use } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home } from 'lucide-react';
+import { useBrand } from '@/components/BrandProvider';
 import shopsData from '@/lib/data/shops.json';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 
@@ -43,8 +46,9 @@ export async function generateMetadata(props: { params: Params }): Promise<Metad
     };
 }
 
-export default async function RegionPage(props: { params: Params }) {
-    const { region: rawRegionId } = await props.params;
+export default function RegionPage(props: { params: Params }) {
+    const brand = useBrand();
+    const { region: rawRegionId } = use(props.params);
     const regionId = decodeURIComponent(rawRegionId);
     const regionData = seoRegionsMaster.find((r) => r.id === regionId);
     const regionName = regionData ? regionData.mainRegion : regionId.replace(/-/g, ' ');
@@ -78,15 +82,15 @@ export default async function RegionPage(props: { params: Params }) {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className={`min-h-screen pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+            <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-1 text-pink-500 font-black">
                         <Home size={20} />
                         <span>COCOALBA</span>
                     </Link>
-                    <div className="text-sm font-bold text-gray-900">{regionName} 실시간 현황</div>
+                    <div className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{regionName} 실시간 현황</div>
                 </div>
             </header>
 
@@ -108,28 +112,28 @@ export default async function RegionPage(props: { params: Params }) {
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-10">
-                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+                    <div className={`p-4 rounded-2xl shadow-sm border flex items-center gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                         <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center">
                             <TrendingUp size={20} />
                         </div>
                         <div>
                             <p className="text-[10px] text-gray-400">일일 조회수</p>
-                            <p className="text-lg font-bold text-gray-900">1,240+</p>
+                            <p className={`text-lg font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1,240+</p>
                         </div>
                     </div>
-                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+                    <div className={`p-4 rounded-2xl shadow-sm border flex items-center gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                         <div className="w-10 h-10 bg-amber-50 text-amber-500 rounded-lg flex items-center justify-center">
                             <Sparkles size={20} />
                         </div>
                         <div>
                             <p className="text-[10px] text-gray-400">진행 중인 공고</p>
-                            <p className="text-lg font-bold text-gray-900">{shops.length}개</p>
+                            <p className={`text-lg font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shops.length}개</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         추천 업소 리스트
                         <span className="bg-amber-100 text-amber-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-pulse">AD OPEN</span>
                     </h2>
@@ -139,21 +143,21 @@ export default async function RegionPage(props: { params: Params }) {
                 <div className="space-y-4">
                     {/* [VIRTUAL AD] 지역 최상단 그랜드 프리미엄 (SEO 최적화 타겟팅) */}
                     <div className="bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600 p-0.5 rounded-3xl shadow-xl shadow-amber-200/50 group cursor-pointer hover:-translate-y-1 transition-all">
-                        <div className="bg-white dark:bg-gray-900 rounded-[22px] p-6 relative overflow-hidden">
+                        <div className={`rounded-[22px] p-6 relative overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                             <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-black px-4 py-1 rounded-bl-2xl shadow-sm">REGION GRAND</div>
                             <div className="flex gap-5 items-center mb-6">
-                                <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform">✨</div>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-amber-50'}`}>✨</div>
                                 <div>
                                     <p className="text-[10px] font-black text-amber-600 mb-1 tracking-tighter uppercase">가장 먼저 만나는 {regionName} 대표 업소</p>
-                                    <h3 className="text-xl font-black text-gray-900 leading-tight">광고주님, 이 자리를 선점하세요!</h3>
+                                    <h3 className={`text-xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>광고주님, 이 자리를 선점하세요!</h3>
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-2 mb-6">
-                                <span className="text-[10px] px-3 py-1 rounded-full bg-gray-50 font-bold border border-gray-100 text-gray-500">#지역1위</span>
-                                <span className="text-[10px] px-3 py-1 rounded-full bg-gray-50 font-bold border border-gray-100 text-gray-500">#노출보장</span>
-                                <span className="text-[10px] px-3 py-1 rounded-full bg-amber-50 font-bold border border-amber-100 text-amber-600">#우대혜택</span>
+                                <span className={`text-[10px] px-3 py-1 rounded-full font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>#지역1위</span>
+                                <span className={`text-[10px] px-3 py-1 rounded-full font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>#노출보장</span>
+                                <span className={`text-[10px] px-3 py-1 rounded-full font-bold border ${brand.theme === 'dark' ? 'bg-amber-900/20 border-amber-900/30 text-amber-500' : 'bg-amber-50 border-amber-100 text-amber-600'}`}>#우대혜택</span>
                             </div>
-                            <button className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black text-sm shadow-lg shadow-gray-200 group-hover:bg-amber-600 transition-colors">상세보기 및 광고문의</button>
+                            <button className={`w-full py-4 rounded-2xl font-black text-sm transition-colors ${brand.theme === 'dark' ? 'bg-amber-600 text-white shadow-xl shadow-amber-950/20 hover:bg-amber-700' : 'bg-gray-900 text-white shadow-lg shadow-gray-200 hover:bg-amber-600'}`}>상세보기 및 광고문의</button>
                         </div>
                     </div>
                     {sortedShops.length > 0 ? (
@@ -163,13 +167,22 @@ export default async function RegionPage(props: { params: Params }) {
                             return (
                                 <React.Fragment key={shop.id || i}>
                                     <div
-                                        className={`bg-white rounded-2xl p-5 shadow-sm border transition-all group relative overflow-hidden
-                                            ${shop.tier === 'grand' ? 'border-amber-400 ring-2 ring-amber-100 shadow-xl' :
-                                                shop.tier === 'preferential' ? 'border-gray-400 ring-2 ring-gray-100 shadow-lg' :
-                                                    shop.tier === 'premium' ? 'border-blue-300' :
-                                                        shop.tier === 'special' ? 'border-rose-300' :
-                                                            shop.tier === 'urgent' ? 'border-red-400 bg-red-50/5' :
-                                                                shop.tier === 'recommended' ? 'border-green-300' : 'border-gray-100'}
+                                        className={`rounded-2xl p-5 shadow-sm border transition-all group relative overflow-hidden
+                                            ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
+                                            ${brand.theme === 'dark' ?
+                                                (shop.tier === 'grand' ? 'border-amber-500 ring-2 ring-amber-900/30' :
+                                                    shop.tier === 'preferential' ? 'border-gray-500 ring-2 ring-gray-800/30' :
+                                                        shop.tier === 'premium' ? 'border-blue-700' :
+                                                            shop.tier === 'special' ? 'border-rose-700' :
+                                                                shop.tier === 'urgent' ? 'border-red-900/50 bg-red-950/10' :
+                                                                    shop.tier === 'recommended' ? 'border-green-700' : 'border-gray-800')
+                                                :
+                                                (shop.tier === 'grand' ? 'border-amber-400 ring-2 ring-amber-100 shadow-xl' :
+                                                    shop.tier === 'preferential' ? 'border-gray-400 ring-2 ring-gray-100 shadow-lg' :
+                                                        shop.tier === 'premium' ? 'border-blue-300' :
+                                                            shop.tier === 'special' ? 'border-rose-300' :
+                                                                shop.tier === 'urgent' ? 'border-red-400 bg-red-50/5' :
+                                                                    shop.tier === 'recommended' ? 'border-green-300' : 'border-gray-100')}
                                         `}
                                     >
                                         {shop.tier && shop.tier !== 'common' && (
@@ -195,7 +208,7 @@ export default async function RegionPage(props: { params: Params }) {
                                                     <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
                                                     {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
                                                 </div>
-                                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                                <h3 className={`text-lg font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                                     <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
                                                         {shop.name}
                                                     </a>
@@ -209,13 +222,13 @@ export default async function RegionPage(props: { params: Params }) {
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-2 mb-4">
-                                            <div className="bg-gray-50 p-2 rounded-lg">
+                                            <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                                                 <p className="text-[10px] text-gray-400 mb-0.5">급여 조건</p>
                                                 <p className="text-xs font-bold text-rose-500">{shop.pay}</p>
                                             </div>
-                                            <div className="bg-gray-50 p-2 rounded-lg">
+                                            <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                                                 <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
-                                                <p className="text-xs font-bold text-gray-700">{shop.workType}</p>
+                                                <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{shop.workType}</p>
                                             </div>
                                         </div>
 
@@ -226,7 +239,7 @@ export default async function RegionPage(props: { params: Params }) {
                                         <div className="flex gap-2">
                                             <a
                                                 href={shop.phone ? `tel:${shop.phone}` : '#'}
-                                                className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                                className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700' : 'bg-gray-900 text-white hover:bg-black'}`}
                                             >
                                                 <Phone size={16} /> 전화상담
                                             </a>
@@ -258,7 +271,7 @@ export default async function RegionPage(props: { params: Params }) {
                             );
                         })
                     ) : (
-                        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                        <div className={`text-center py-20 rounded-3xl border border-dashed ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
                             <p className="text-gray-400 text-sm">해당 지역의 상세 공고가 업데이트 중입니다.</p>
                             <Link href="/" className="text-pink-500 font-bold text-sm mt-4 inline-block">전체 공고 보러가기</Link>
                         </div>
@@ -266,7 +279,7 @@ export default async function RegionPage(props: { params: Params }) {
                 </div>
 
                 {/* Bottom CTA */}
-                <div className="mt-12 p-6 bg-gray-900 rounded-3xl text-white text-center">
+                <div className={`mt-12 p-6 rounded-3xl text-center ${brand.theme === 'dark' ? 'bg-gray-900 text-white border border-gray-800' : 'bg-gray-900 text-white'}`}>
                     <h4 className="font-bold mb-2">사장님이신가요?</h4>
                     <p className="text-xs text-gray-400 mb-6">{regionName} 지역 1위 노출을 지금 시작하세요.</p>
                     <Link href="/" className="bg-pink-500 text-white px-8 py-3 rounded-full text-sm font-bold inline-block">

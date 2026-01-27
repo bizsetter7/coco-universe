@@ -12,6 +12,7 @@ import {
     Zap, Star, Crown
 } from 'lucide-react';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
+import { useBrand } from '@/components/BrandProvider';
 
 // --- Data Constants ---
 const REGION_DATA: Record<string, string[]> = {
@@ -162,6 +163,7 @@ const AD_HIGHLIGHTERS = [
 
 export default function MyShopPage() {
     const router = useRouter();
+    const brand = useBrand();
     const [view, setView] = useState<'dashboard' | 'form'>('dashboard');
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showDesignModal, setShowDesignModal] = useState(false);
@@ -596,28 +598,28 @@ export default function MyShopPage() {
 
     const WarningModal = () => (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200">
-                <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-sm">
+            <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-pink-50 border-white'}`}>
                     <AlertTriangle size={40} className="text-pink-500" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 tracking-tight">게시글 작성 전 필독! 📢</h3>
-                <div className="text-left text-[13px] text-gray-700 bg-gray-50/80 p-6 rounded-2xl space-y-3 leading-relaxed border border-gray-100 font-bold">
+                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>게시글 작성 전 필독! 📢</h3>
+                <div className={`text-left text-[13px] p-6 rounded-2xl space-y-3 leading-relaxed border font-bold ${brand.theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border-gray-700' : 'bg-gray-50/80 text-gray-700 border-gray-100'}`}>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">1.</span>
-                        <span>한 달 수정한도는 <strong className="text-gray-900 font-black">무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
+                        <span>한 달 수정한도는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">2.</span>
-                        <span>7단계 등급 시스템에 따라 <strong className="text-gray-900 font-black">노출 위치</strong>가 결정됩니다.</span>
+                        <span>7단계 등급 시스템에 따라 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>노출 위치</strong>가 결정됩니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">3.</span>
-                        <span>최적의 홍보 효과를 위해 <strong className="text-gray-900 font-black">제목에 특수문자</strong> 사용을 권장합니다.</span>
+                        <span>최적의 홍보 효과를 위해 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>제목에 특수문자</strong> 사용을 권장합니다.</span>
                     </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button onClick={() => setShowWarningModal(false)} className="py-4 rounded-xl border-2 border-gray-100 font-bold text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
-                    <button onClick={proceedToForm} className="py-4 rounded-xl bg-[#ff3399] text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-pink-100">확인 후 작성</button>
+                    <button onClick={() => setShowWarningModal(false)} className={`py-4 rounded-xl border-2 font-bold transition-colors ${brand.theme === 'dark' ? 'border-gray-800 text-gray-500 hover:bg-gray-800' : 'border-gray-100 text-gray-500 hover:bg-gray-50'}`}>취소</button>
+                    <button onClick={proceedToForm} className="py-4 rounded-xl bg-[#ff3399] text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-pink-100/10">확인 후 작성</button>
                 </div>
             </div>
         </div>
@@ -625,23 +627,23 @@ export default function MyShopPage() {
 
     const DesignRequestModal = () => (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200">
-                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-sm">
+            <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-blue-900/30 border-gray-800' : 'bg-blue-50 border-white'}`}>
                     <Laptop size={40} className="text-blue-500" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 tracking-tight">상세페이지 디자인 의뢰</h3>
-                <p className="text-gray-800 text-sm leading-relaxed">
+                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세페이지 디자인 의뢰</h3>
+                <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} text-sm leading-relaxed`}>
                     전문 디자이너가 사장님만의 <br />
                     <strong className="text-pink-500 font-black text-lg">고퀄리티 상세페이지</strong>를 제작해드립니다.
                 </p>
-                <div className="bg-blue-50/50 p-6 rounded-2xl text-left space-y-3 text-xs md:text-sm text-gray-700 border border-blue-100 font-bold">
+                <div className={`p-6 rounded-2xl text-left space-y-3 text-xs md:text-sm border font-bold ${brand.theme === 'dark' ? 'bg-blue-900/10 text-blue-200 border-blue-900/30' : 'bg-blue-50/50 text-gray-700 border-blue-100'}`}>
                     <p className="flex items-center gap-2">• 브랜드 전용 1:1 맞춤형 고해상도 디자인</p>
                     <p className="flex items-center gap-2">• 7단계 노출 등급에 최적화된 레이아웃 제공</p>
                     <p className="flex items-center gap-2">• 움직이는 GIF 및 프리미엄 움짤 무료 제작</p>
                     <p className="flex items-center gap-2">• 제작 기간: 영업일 기준 평균 1~2일</p>
                 </div>
                 <div className="grid grid-cols-1 gap-3 pt-2">
-                    <button onClick={() => alert('고객센터로 디자인 제작 문의가 접수되었습니다.')} className="py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-2">
+                    <button onClick={() => alert('고객센터로 디자인 제작 문의가 접수되었습니다.')} className="py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-100/10 transition-all flex items-center justify-center gap-2">
                         실시간 1:1 문의 / 고객센터 연결
                     </button>
                     <button onClick={() => setShowDesignModal(false)} className="py-3 text-gray-400 font-bold hover:text-gray-600">
@@ -654,29 +656,29 @@ export default function MyShopPage() {
 
     const PreviewModal = () => (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className="bg-white rounded-[32px] shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] transform animate-in fade-in fill-mode-both duration-300">
-                <div className="p-6 border-b flex justify-between items-center bg-gray-50/50 rounded-t-[32px]">
-                    <h3 className="font-black text-xl flex items-center gap-2 text-gray-900"><Eye size={24} className="text-pink-500" /> 채용공고 최종 미리보기</h3>
+            <div className={`rounded-[32px] shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] transform animate-in fade-in fill-mode-both duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                <div className={`p-6 border-b flex justify-between items-center rounded-t-[32px] ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50/50'}`}>
+                    <h3 className={`font-black text-xl flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}><Eye size={24} className="text-pink-500" /> 채용공고 최종 미리보기</h3>
                     <button onClick={() => setShowPreviewModal(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={24} /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-6">
                     <div>
                         <span className="inline-block px-2 py-1 bg-pink-100 text-pink-600 text-xs font-bold rounded mb-2">{industrySub}</span>
-                        <h2 className="text-2xl font-black text-gray-900 leading-tight">{title}</h2>
-                        <p className="text-sm text-gray-600 mt-1">{shopName} | {regionCity} {regionGu}</p>
+                        <h2 className={`text-2xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h2>
+                        <p className="text-sm text-gray-500 mt-1">{shopName} | {regionCity} {regionGu}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl text-sm text-gray-800">
+                    <div className={`grid grid-cols-2 gap-4 p-4 rounded-xl text-sm ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-50 text-gray-800'}`}>
                         <div><span className="text-gray-500 block text-xs">급여</span><strong className="text-blue-600 text-lg">{payType} {payAmount}</strong></div>
-                        <div><span className="text-gray-500 block text-xs">나이</span><strong className="text-gray-900">{ageMin}세 ~ {ageMax}세</strong></div>
-                        <div><span className="text-gray-500 block text-xs">담당자 / 연락처</span><strong className="text-gray-900">{managerName} / {managerPhone}</strong></div>
+                        <div><span className="text-gray-500 block text-xs">나이</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{ageMin}세 ~ {ageMax}세</strong></div>
+                        <div><span className="text-gray-500 block text-xs">담당자 / 연락처</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{managerName} / {managerPhone}</strong></div>
                         <div>
                             <span className="text-gray-500 block text-xs">메신저</span>
                             <div className="flex flex-col gap-1 mt-1">
-                                {messengers.kakao && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-yellow-100 text-[10px] text-yellow-800 rounded font-bold">카카오</span><span className="text-sm font-bold text-gray-900">{messengers.kakao}</span></div>}
-                                {messengers.line && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-green-100 text-[10px] text-green-800 rounded font-bold">라인</span><span className="text-sm font-bold text-gray-900">{messengers.line}</span></div>}
-                                {messengers.telegram && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-blue-100 text-[10px] text-blue-800 rounded font-bold">텔레그램</span><span className="text-sm font-bold text-gray-900">{messengers.telegram}</span></div>}
-                                {!messengers.kakao && !messengers.line && !messengers.telegram && <span className="text-gray-400 text-xs">-</span>}
+                                {messengers.kakao && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-yellow-100 text-[10px] text-yellow-800 rounded font-bold">카카오</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.kakao}</span></div>}
+                                {messengers.line && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-green-100 text-[10px] text-green-800 rounded font-bold">라인</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.line}</span></div>}
+                                {messengers.telegram && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-blue-100 text-[10px] text-blue-800 rounded font-bold">텔레그램</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.telegram}</span></div>}
+                                {!messengers.kakao && !messengers.line && !messengers.telegram && <span className="text-gray-500 text-xs">-</span>}
                             </div>
                         </div>
                     </div>
@@ -691,16 +693,16 @@ export default function MyShopPage() {
                     </div>
                 </div>
 
-                <div className="p-4 bg-gray-50 border-t text-left">
-                    <p className="text-[10px] text-gray-400 font-bold mb-2">KEYWORD & INFO</p>
-                    <div className="flex flex-wrap gap-1 text-[10px] text-gray-400">
+                <div className={`p-4 border-t text-left ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className="text-[10px] text-gray-500 font-bold mb-2 uppercase">Keyword & Info</p>
+                    <div className="flex flex-wrap gap-1 text-[10px] text-gray-500">
                         {selectedConvenience.map(c => <span key={c}>#{c}</span>)}
                         {selectedKeywords.map(k => <span key={k}>#{k}</span>)}
                     </div>
                 </div>
 
-                <div className="p-4 border-t bg-gray-50 rounded-b-2xl text-right">
-                    <button onClick={() => setShowPreviewModal(false)} className="px-6 py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900">닫기</button>
+                <div className={`p-4 border-t rounded-b-2xl text-right ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <button onClick={() => setShowPreviewModal(false)} className={`px-6 py-3 font-bold rounded-xl transition ${brand.theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-800 text-white hover:bg-gray-900'}`}>닫기</button>
                 </div>
             </div>
         </div>
@@ -709,23 +711,23 @@ export default function MyShopPage() {
     const MobileMenu = () => (
         <div className="fixed inset-0 z-50 flex justify-end">
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileMenu(false)} />
-            <div className="relative w-72 bg-white h-full shadow-2xl p-6">
+            <div className={`relative w-72 h-full shadow-2xl p-6 transform animate-in slide-in-from-right duration-300 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                 <button onClick={() => setShowMobileMenu(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <X size={24} />
                 </button>
 
                 <div className="mt-8 text-center">
-                    <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-2 border-pink-100 flex items-center justify-center text-gray-400">
+                    <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 flex items-center justify-center text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'}`}>
                         <Store size={32} />
                     </div>
-                    <h2 className="font-black text-gray-900 text-lg">{shopName}</h2>
+                    <h2 className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
                     <p className="text-sm text-gray-500 mb-6">프리미엄 회원</p>
-                    <button className="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700">
+                    <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                         사진 등록/수정
                     </button>
                 </div>
 
-                <nav className="mt-8 space-y-2 text-sm font-bold text-gray-600">
+                <nav className={`mt-8 space-y-2 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><List size={18} /> 진행중인 공고</div>
                     <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
                     <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
@@ -736,22 +738,21 @@ export default function MyShopPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24" style={{ scrollbarGutter: 'stable' }}>
+        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24`}>
             {showWarningModal && <WarningModal />}
             {showDesignModal && <DesignRequestModal />}
             {showPreviewModal && <PreviewModal />}
             {showMobileMenu && <MobileMenu />}
 
             {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => view === 'form' ? setView('dashboard') : router.back()} className="text-gray-600">
-                            <ArrowLeft size={24} />
+            <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+                <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => router.back()} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-700'}`}>
+                            <ArrowLeft size={20} />
                         </button>
-                        <h1 className="text-xl font-black text-gray-800 flex items-center gap-2">
-                            <Store className="text-purple-600" size={24} />
-                            {view === 'dashboard' ? '내 가게 관리' : '공고 등록/수정'}
+                        <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
+                            MY SHOP <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-black uppercase">Admin</span>
                         </h1>
                     </div>
                     <div className="flex items-center gap-3">
@@ -769,17 +770,17 @@ export default function MyShopPage() {
                 <div className="max-w-6xl mx-auto p-4 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Sidebar (PC Only) */}
                     <aside className="hidden md:block col-span-1 space-y-2">
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm text-center">
-                            <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden border-2 border-pink-100">
+                        <div className={`p-6 rounded-2xl border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                            <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'}`}>
                                 <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
                             </div>
-                            <h2 className="font-black text-gray-900">{shopName}</h2>
+                            <h2 className={`font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
                             <p className="text-xs text-gray-500 mb-4">프리미엄 회원</p>
-                            <button className="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700">
+                            <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                                 사진 등록/수정
                             </button>
                         </div>
-                        <nav className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-sm font-bold text-gray-600">
+                        <nav className={`rounded-2xl border shadow-sm overflow-hidden text-sm font-bold ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-100 text-gray-600'}`}>
                             <div className="p-4 hover:bg-pink-50 hover:text-pink-500 border-l-4 border-transparent hover:border-pink-500 transition cursor-pointer flex items-center gap-3"><List size={18} /> 진행중인 공고</div>
                             <div className="p-4 hover:bg-pink-50 hover:text-pink-500 border-l-4 border-transparent hover:border-pink-500 transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
                             <div className="p-4 hover:bg-pink-50 hover:text-pink-500 border-l-4 border-transparent hover:border-pink-500 transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
@@ -789,16 +790,45 @@ export default function MyShopPage() {
 
                     {/* Main Content */}
                     <div className="col-span-1 md:col-span-3 space-y-6">
+                        <header className="flex flex-col gap-4 mb-8">
+                            <div className={`p-6 sm:rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-pink-600'}`}>
+                                            <Store size={32} />
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h2 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
+                                                {isVerified && <Check size={16} className="text-blue-500" strokeWidth={3} />}
+                                            </div>
+                                            <p className="text-sm text-gray-500 font-bold flex items-center gap-1">
+                                                <MapPin size={14} /> 서울 강남구 테헤란로
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 w-full md:w-auto">
+                                        <button className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl font-black text-sm transition ${brand.theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                                            정보수정
+                                        </button>
+                                        <button onClick={() => setView('form')} className="flex-1 md:flex-none px-6 py-2.5 bg-pink-600 text-white rounded-xl font-black text-sm shadow-lg shadow-pink-200 hover:bg-pink-700 transition">
+                                            공고등록
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+
                         <div className="grid grid-cols-3 gap-2 md:gap-4 h-24 md:h-auto">
-                            <div className="bg-white p-2 md:p-4 rounded-2xl border border-gray-100 shadow-sm text-center flex flex-col justify-center">
+                            <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                                 <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">채용공고 등록수</div>
                                 <div className="text-lg md:text-3xl font-black text-pink-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
-                            <div className="bg-white p-2 md:p-4 rounded-2xl border border-gray-100 shadow-sm text-center flex flex-col justify-center">
+                            <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                                 <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">진행중인 공고</div>
                                 <div className="text-lg md:text-3xl font-black text-blue-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
-                            <div className="bg-white p-2 md:p-4 rounded-2xl border border-gray-100 shadow-sm text-center opacity-60 flex flex-col justify-center">
+                            <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center opacity-60 flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                                 <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">마감된 공고</div>
                                 <div className="text-lg md:text-3xl font-black text-gray-500">0<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
@@ -812,21 +842,21 @@ export default function MyShopPage() {
                             채용공고 등록하기
                         </button>
 
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                                <h3 className="font-bold text-gray-800">진행중인 채용 정보</h3>
+                        <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                            <div className={`p-4 border-b flex justify-between items-center ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                <h3 className={`font-bold ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>진행중인 채용 정보</h3>
                                 <span className="text-xs text-gray-400">최근 12개월 내역만 표시됩니다.</span>
                             </div>
 
-                            <div className="p-4 border-b hover:bg-gray-50 transition">
+                            <div className={`p-4 border-b transition ${brand.theme === 'dark' ? 'border-gray-800 hover:bg-gray-800/30' : 'border-gray-100 hover:bg-gray-50'}`}>
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
                                     <div className="space-y-2">
                                         <div className="flex gap-2 text-xs items-center">
                                             <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded font-black">진행중</span>
                                             <span className="text-gray-400">마감일: 2026-02-25</span>
                                         </div>
-                                        <h4 className="font-bold text-gray-900 line-clamp-1">🔥 [강남 쩜오] 갯수보장 / 팁별도 / 당일지급 확실합니다!</h4>
-                                        <div className="text-xs text-gray-600">
+                                        <h4 className={`font-bold line-clamp-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>🔥 [강남 쩜오] 갯수보장 / 팁별도 / 당일지급 확실합니다!</h4>
+                                        <div className={`text-xs ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                             {shopName} | 서울 강남구 | 룸싸롱 | 아가씨
                                         </div>
                                     </div>
@@ -837,9 +867,9 @@ export default function MyShopPage() {
                                         <button className="flex items-center gap-1 px-3 py-2 bg-blue-500 text-white text-xs font-bold rounded hover:bg-blue-600 shadow-sm">
                                             <Calendar size={12} /> 연장
                                         </button>
-                                        <span className="w-px h-3 bg-gray-300 mx-1"></span>
-                                        <button onClick={handleAdClick} className="px-3 py-2 border border-blue-500 text-blue-600 text-xs font-bold rounded hover:bg-blue-50">수정</button>
-                                        <button className="px-3 py-2 border border-gray-300 text-gray-700 text-xs font-bold rounded hover:bg-gray-50">마감</button>
+                                        <span className={`w-px h-3 mx-1 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></span>
+                                        <button onClick={handleAdClick} className={`px-3 py-2 border text-xs font-bold rounded transition ${brand.theme === 'dark' ? 'border-blue-500/50 text-blue-400 hover:bg-blue-900/20' : 'border-blue-500 text-blue-600 hover:bg-blue-50'}`}>수정</button>
+                                        <button className={`px-3 py-2 border text-xs font-bold rounded transition ${brand.theme === 'dark' ? 'border-gray-700 text-gray-400 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>마감</button>
                                     </div>
                                 </div>
                             </div>
@@ -862,7 +892,7 @@ export default function MyShopPage() {
                                             type="text"
                                             value={shopName}
                                             onChange={(e) => setShopName(e.target.value)}
-                                            className="w-full border rounded-lg p-2 text-sm font-bold bg-gray-50 text-gray-900 focus:ring-1 focus:ring-purple-500 outline-none"
+                                            className={`w-full border rounded-lg p-2 text-sm font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-purple-900/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:ring-purple-500'}`}
                                         />
                                     </div>
                                     <div>
@@ -875,7 +905,7 @@ export default function MyShopPage() {
                                                 인증 완료
                                             </div>
                                         ) : (
-                                            <button className="w-full py-2 border border-dashed border-gray-200 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                            <button className={`w-full py-2 border border-dashed rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'}`}>
                                                 <Camera size={16} /> 촬영/업로드
                                             </button>
                                         )}
@@ -883,8 +913,8 @@ export default function MyShopPage() {
                                 </div>
                             </section>
 
-                            <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
-                                <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
+                            <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                <h2 className={`font-black mb-2.5 flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
                                     <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
                                     담당자 정보
                                 </h2>
@@ -892,51 +922,51 @@ export default function MyShopPage() {
                                     <div className="grid grid-cols-2 gap-2.5">
                                         <div>
                                             <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>성함</label>
-                                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className="w-full border rounded-lg p-2 text-base text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-blue-500 outline-none" />
+                                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-blue-500'}`} />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연락처</label>
-                                            <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className="w-full border rounded-lg p-2 text-base text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-blue-500 outline-none" />
+                                            <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-blue-500'}`} />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-2">
                                         <div className="flex flex-col gap-1.5">
                                             <span className="text-xs font-black text-yellow-600 ml-1">카톡</span>
-                                            <input type="text" placeholder="ID" value={messengers.kakao} onChange={e => setMessengers({ ...messengers, kakao: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
+                                            <input type="text" placeholder="ID" value={messengers.kakao} onChange={e => setMessengers({ ...messengers, kakao: e.target.value })} className={`w-full border rounded-md p-1.5 text-sm placeholder-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                         </div>
                                         <div className="flex flex-col gap-1.5">
                                             <span className="text-xs font-black text-green-600 ml-1">라인</span>
-                                            <input type="text" placeholder="ID" value={messengers.line} onChange={e => setMessengers({ ...messengers, line: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
+                                            <input type="text" placeholder="ID" value={messengers.line} onChange={e => setMessengers({ ...messengers, line: e.target.value })} className={`w-full border rounded-md p-1.5 text-sm placeholder-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                         </div>
                                         <div className="flex flex-col gap-1.5">
                                             <span className="text-xs font-black text-blue-600 ml-1">텔레</span>
-                                            <input type="text" placeholder="ID" value={messengers.telegram} onChange={e => setMessengers({ ...messengers, telegram: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
+                                            <input type="text" placeholder="ID" value={messengers.telegram} onChange={e => setMessengers({ ...messengers, telegram: e.target.value })} className={`w-full border rounded-md p-1.5 text-sm placeholder-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                         </div>
                                     </div>
                                 </div>
                             </section>
                         </div>
 
-                        <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
-                            <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
+                        <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                            <h2 className={`font-black mb-2.5 flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
                                 <span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>
                                 채용 공고 정보
                             </h2>
                             <div className="space-y-2.5">
                                 <div>
                                     <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                                    <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border rounded-lg p-2 text-base font-black focus:ring-1 focus:ring-pink-500 outline-none text-gray-900 placeholder-gray-400" />
+                                    <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-2 text-base font-black placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-pink-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-pink-500'}`} />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2.5">
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>직종</label>
                                         <div className="flex gap-1.5">
-                                            <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                            <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">1차</option>
                                                 {Object.keys(INDUSTRY_DATA).map(i => <option key={i} value={i}>{i}</option>)}
                                             </select>
-                                            <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                            <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">2차</option>
                                                 {INDUSTRY_DATA[industryMain]?.map(j => <option key={j} value={j}>{j}</option>)}
                                             </select>
@@ -945,11 +975,11 @@ export default function MyShopPage() {
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연령</label>
                                         <div className="flex items-center gap-1.5">
-                                            <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                            <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
                                             </select>
                                             <span className="text-gray-300 text-[10px]">-</span>
-                                            <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                            <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
                                             </select>
                                         </div>
@@ -960,11 +990,11 @@ export default function MyShopPage() {
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
                                         <div className="flex gap-1.5">
-                                            <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                            <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">시/도</option>
                                                 {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
                                             </select>
-                                            <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                            <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">구/군</option>
                                                 {REGION_DATA[regionCity]?.map(g => <option key={g} value={g}>{g}</option>)}
                                             </select>
@@ -972,20 +1002,20 @@ export default function MyShopPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5">근무시간</label>
-                                        <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className="w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none" />
+                                        <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2.5">
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여 방식</label>
-                                        <select value={payType} onChange={(e) => setPayType(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                        <select value={payType} onChange={(e) => setPayType(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                             {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
-                                        <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} className="w-full border rounded-lg p-2 text-base font-black text-right outline-none text-gray-900" />
+                                        <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} className={`w-full border rounded-lg p-2 text-base font-black text-right outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                     </div>
                                 </div>
 
@@ -994,14 +1024,14 @@ export default function MyShopPage() {
                                         <label className="block text-sm font-black text-gray-500 uppercase tracking-tighter">편의사항 및 키워드</label>
                                         <span className="text-xs text-pink-500 font-bold">{selectedConvenience.length + selectedKeywords.length}/10</span>
                                     </div>
-                                    <div className="flex flex-wrap gap-1.5 p-2 bg-gray-50 rounded-lg border border-gray-100 max-h-[100px] overflow-y-auto">
+                                    <div className={`flex flex-wrap gap-1.5 p-2 rounded-lg border max-h-[100px] overflow-y-auto ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                                         {CONVENIENCE_ITEMS.map(item => (
-                                            <button key={item} onClick={() => toggleConvenience(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedConvenience.includes(item) ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-400 border-gray-200'}`}>
+                                            <button key={item} onClick={() => toggleConvenience(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedConvenience.includes(item) ? 'bg-blue-500 text-white border-blue-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-white text-gray-400 border-gray-200')}`}>
                                                 {item}
                                             </button>
                                         ))}
                                         {KEYWORDS.map(item => (
-                                            <button key={item} onClick={() => toggleKeyword(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedKeywords.includes(item) ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-400 border-gray-200'}`}>
+                                            <button key={item} onClick={() => toggleKeyword(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedKeywords.includes(item) ? 'bg-pink-500 text-white border-pink-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-white text-gray-400 border-gray-200')}`}>
                                                 {item}
                                             </button>
                                         ))}
@@ -1013,9 +1043,9 @@ export default function MyShopPage() {
 
                     {/* 에디터와 상세 정보 미리보기는 전체 너비로 배치하여 수직 공간 효율 극대화 */}
                     <div className="space-y-4">
-                        <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                        <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                             <div className="flex justify-between items-center mb-2">
-                                <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm">
+                                <h2 className={`font-black flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
                                     <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
                                     상세내용 (에디터)
                                 </h2>
@@ -1024,35 +1054,35 @@ export default function MyShopPage() {
                                 </button>
                             </div>
                             <div className="border rounded-xl overflow-hidden">
-                                <div className="bg-gray-50 border-b p-1.5 flex gap-1 flex-wrap items-center">
-                                    <select onChange={handleFontChange} value={currentFont} className="h-6 text-[10px] border rounded bg-white px-1 outline-none text-gray-900 w-16">
+                                <div className={`border-b p-1.5 flex gap-1 flex-wrap items-center ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                    <select onChange={handleFontChange} value={currentFont} className={`h-6 text-[10px] border rounded px-1 outline-none w-16 ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                         {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
                                     </select>
-                                    <select onChange={(e) => execCmd('fontSize', e.target.value)} value={currentFontSize} className="h-6 text-[10px] border rounded bg-white px-1 outline-none text-gray-900 w-12">
+                                    <select onChange={(e) => execCmd('fontSize', e.target.value)} value={currentFontSize} className={`h-6 text-[10px] border rounded px-1 outline-none w-12 ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                         {FONT_SIZES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
                                     </select>
-                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
-                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }} className={`p-1 rounded ${isBold ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Bold size={14} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('italic'); }} className={`p-1 rounded ${isItalic ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Italic size={14} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('underline'); }} className={`p-1 rounded ${isUnderline ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Underline size={14} /></button>
-                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
-                                    <select value={currentForeColor} onChange={(e) => execCmd('foreColor', e.target.value)} className="h-6 text-[10px] bg-transparent outline-none w-16 text-gray-900 border rounded">
+                                    <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }} className={`p-1 rounded ${isBold ? 'bg-gray-300' : (brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100')}`}><Bold size={14} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('italic'); }} className={`p-1 rounded ${isItalic ? 'bg-gray-300' : (brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100')}`}><Italic size={14} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('underline'); }} className={`p-1 rounded ${isUnderline ? 'bg-gray-300' : (brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100')}`}><Underline size={14} /></button>
+                                    <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
+                                    <select value={currentForeColor} onChange={(e) => execCmd('foreColor', e.target.value)} className={`h-6 text-[10px] outline-none w-16 border rounded ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                         <option value="black">글자색</option>
                                         {TEXT_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
                                     </select>
-                                    <select onChange={(e) => execCmd('hiliteColor', e.target.value)} className="h-6 text-[10px] bg-transparent outline-none w-16 text-gray-900 border rounded">
+                                    <select onChange={(e) => execCmd('hiliteColor', e.target.value)} className={`h-6 text-[10px] outline-none w-16 border rounded ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                         <option value="transparent">배경색</option>
                                         {BG_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
                                     </select>
-                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
-                                    <button onClick={() => execCmd('justifyLeft')} className="p-1 hover:bg-gray-100 rounded"><AlignLeft size={14} /></button>
-                                    <button onClick={() => execCmd('justifyCenter')} className="p-1 hover:bg-gray-100 rounded"><AlignCenter size={14} /></button>
-                                    <button onClick={() => execCmd('justifyRight')} className="p-1 hover:bg-gray-100 rounded"><AlignRight size={14} /></button>
+                                    <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
+                                    <button onClick={() => execCmd('justifyLeft')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignLeft size={14} /></button>
+                                    <button onClick={() => execCmd('justifyCenter')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignCenter size={14} /></button>
+                                    <button onClick={() => execCmd('justifyRight')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignRight size={14} /></button>
                                 </div>
                                 <div
                                     ref={editorRef}
                                     contentEditable
-                                    className="w-full h-[180px] md:h-[220px] p-3 text-sm outline-none overflow-y-auto leading-relaxed text-gray-900"
+                                    className={`w-full h-[180px] md:h-[220px] p-3 text-sm outline-none overflow-y-auto leading-relaxed ${brand.theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
                                     suppressContentEditableWarning={true}
                                     onMouseUp={handleEditorInteract}
                                     onKeyUp={handleEditorInteract}
@@ -1061,17 +1091,17 @@ export default function MyShopPage() {
                             </div>
                         </section>
 
-                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 flex items-center justify-between">
+                        <div className={`p-3 md:p-4 rounded-xl border flex items-center justify-between ${brand.theme === 'dark' ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50 border-blue-100'}`}>
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-blue-500" />
-                                <span className="text-xs font-bold text-blue-700">SEO 태그 프리뷰:</span>
+                                <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-blue-300' : 'text-blue-700'}`}>SEO 태그 프리뷰:</span>
                                 <div className="flex gap-1.5 flex-wrap">
-                                    {seoTags.map((tag, idx) => <span key={idx} className="text-[10px] bg-white text-blue-600 px-1.5 py-0.5 rounded border border-blue-200">#{tag}</span>)}
+                                    {seoTags.map((tag, idx) => <span key={idx} className={`text-[10px] px-1.5 py-0.5 rounded border ${brand.theme === 'dark' ? 'bg-gray-800 text-blue-400 border-blue-900/50' : 'bg-white text-blue-600 border-blue-200'}`}>#{tag}</span>)}
                                 </div>
                             </div>
                         </div>
 
-                        <section className="bg-white p-0 rounded-xl shadow-sm border-2 border-pink-100 overflow-hidden">
+                        <section className={`p-0 rounded-xl shadow-sm border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-950 border-pink-900/30' : 'bg-white border-pink-100'}`}>
                             <div className="bg-gradient-to-r from-purple-700 to-pink-600 text-white p-2.5 flex justify-between items-center">
                                 <h2 className="font-black text-xs flex items-center gap-2">
                                     <Crown size={14} className="text-yellow-400" />
@@ -1082,15 +1112,15 @@ export default function MyShopPage() {
                                 </div>
                             </div>
 
-                            <div className="divide-y divide-gray-100">
+                            <div className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-100'}`}>
                                 {DETAILED_PRICING.filter(p => p.isMain).map((product: any, idx) => (
-                                    <div key={product.id} className={`flex items-center p-2 gap-3 hover:bg-pink-50/10 transition-colors ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                                        <div className="w-16 h-20 bg-gray-50 rounded border border-gray-100 flex-shrink-0 flex flex-col items-center justify-center text-[10px] font-black text-gray-300">
+                                    <div key={product.id} className={`flex items-center p-2 gap-3 transition-colors ${brand.theme === 'dark' ? 'hover:bg-pink-900/10' : 'hover:bg-pink-50/10'} ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
+                                        <div className={`w-16 h-20 rounded border flex-shrink-0 flex flex-col items-center justify-center text-[10px] font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-700' : 'bg-gray-50 border-gray-100 text-gray-300'}`}>
                                             IMG
                                         </div>
                                         <div className="flex-1 min-w-0 py-1">
                                             <div className="flex items-center gap-1.5 mb-0.5">
-                                                <span className="text-base font-black text-gray-800 leading-tight">{idx + 1}. {product.name}</span>
+                                                <span className={`text-base font-black leading-tight ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{idx + 1}. {product.name}</span>
                                                 {product.id === 'p7' && <span className="text-[10px] bg-red-500 text-white px-1.5 font-black rounded uppercase shrink-0">Best</span>}
                                             </div>
                                             <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed">
@@ -1111,7 +1141,7 @@ export default function MyShopPage() {
                                         </div>
                                         <div className="flex gap-2 shrink-0">
                                             {[30, 60, 90].map((days) => (
-                                                <label key={days} className={`flex flex-col items-center justify-center w-[85px] h-[48px] rounded-xl cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'bg-pink-50 border-pink-500 text-pink-600 shadow-md ring-2 ring-pink-100' : 'border-gray-100 bg-white text-gray-400 hover:border-pink-200'}`}>
+                                                <label key={days} className={`flex flex-col items-center justify-center w-[85px] h-[48px] rounded-xl cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'bg-pink-50 border-pink-500 text-pink-600 shadow-md ring-2 ring-pink-100' : (brand.theme === 'dark' ? 'border-gray-800 bg-gray-900 text-gray-500 hover:border-pink-900' : 'border-gray-100 bg-white text-gray-400 hover:border-pink-200')}`}>
                                                     <input
                                                         type="radio"
                                                         className="hidden"
@@ -1127,7 +1157,7 @@ export default function MyShopPage() {
                                                         </div>
                                                     )}
                                                     <span className="text-[10px] font-bold uppercase leading-none mb-1">{days}일</span>
-                                                    <span className="text-xs font-black tracking-tighter">{(product as any)[`d${days}`].toLocaleString()}원</span>
+                                                    <span className={`text-xs font-black tracking-tighter ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`}>{(product as any)[`d${days}`].toLocaleString()}원</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -1137,8 +1167,8 @@ export default function MyShopPage() {
                         </section>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-[#666] text-white p-2.5 px-3">
+                            <section className={`rounded-xl shadow-sm border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-2.5 px-3 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-[#666] text-white'}`}>
                                     <h2 className="font-black text-xs md:text-sm flex items-center gap-2">아이콘 선택</h2>
                                 </div>
                                 <div className="p-3">
@@ -1152,18 +1182,18 @@ export default function MyShopPage() {
                                     </div>
                                     <div className="grid grid-cols-5 gap-1.5">
                                         {AD_ICONS.slice(0, 10).map(icon => (
-                                            <label key={icon.id} className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all ${selectedIcon === icon.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : 'border-gray-50 hover:border-pink-100'}`}>
+                                            <label key={icon.id} className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all cursor-pointer ${selectedIcon === icon.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : (brand.theme === 'dark' ? 'border-gray-800 hover:border-pink-900' : 'border-gray-50 hover:border-pink-100')}`}>
                                                 <input type="radio" checked={selectedIcon === icon.id} onChange={() => setSelectedIcon(icon.id)} className="hidden" />
                                                 <span className="text-xl mb-1">{icon.icon}</span>
-                                                <span className="text-[10px] md:text-xs font-black text-gray-700 truncate w-full text-center leading-none">{icon.name}</span>
+                                                <span className={`text-[10px] md:text-xs font-black truncate w-full text-center leading-none ${selectedIcon === icon.id ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-700')}`}>{icon.name}</span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
                             </section>
 
-                            <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="bg-[#666] text-white p-2.5 px-3">
+                            <section className={`rounded-xl shadow-sm border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                <div className={`p-2.5 px-3 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-[#666] text-white'}`}>
                                     <h2 className="font-black text-xs md:text-sm flex items-center gap-2">형광펜 선택</h2>
                                 </div>
                                 <div className="p-3">
@@ -1177,7 +1207,7 @@ export default function MyShopPage() {
                                     </div>
                                     <div className="grid grid-cols-4 gap-1.5">
                                         {AD_HIGHLIGHTERS.map(hl => (
-                                            <label key={hl.id} className={`flex items-center justify-center p-2 rounded-lg border-2 transition-all cursor-pointer ${selectedHighlighter === hl.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : 'border-gray-50 hover:border-pink-100'}`}>
+                                            <label key={hl.id} className={`flex items-center justify-center p-2 rounded-lg border-2 transition-all cursor-pointer ${selectedHighlighter === hl.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : (brand.theme === 'dark' ? 'border-gray-800 hover:border-pink-900' : 'border-gray-50 hover:border-pink-100')}`}>
                                                 <input type="radio" checked={selectedHighlighter === hl.id} onChange={() => setSelectedHighlighter(hl.id)} className="hidden" />
                                                 <span className="text-[11px] md:text-sm font-black text-gray-800 w-[45px] text-center" style={{ backgroundColor: hl.color, padding: '2px 0px', borderRadius: '4px' }}>{hl.name}</span>
                                             </label>
@@ -1199,7 +1229,7 @@ export default function MyShopPage() {
                         </div>
                     </div>
 
-                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-20">
+                    <div className={`fixed bottom-0 left-0 right-0 border-t p-4 z-20 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
                         <div className="max-w-5xl mx-auto flex gap-3">
                             <button onClick={handlePreview} className="flex-[2] py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-sm md:text-base">
                                 <Eye size={18} /> 미리보기

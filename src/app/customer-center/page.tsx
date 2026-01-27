@@ -171,7 +171,7 @@ function CustomerCenterContent() {
                         </button>
                         <h1
                             onClick={() => router.push('/')}
-                            className="text-[17px] md:text-xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                            className={`text-[17px] md:text-xl font-black flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}
                         >
                             <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
                             고객지원센터
@@ -187,9 +187,9 @@ function CustomerCenterContent() {
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
                     <aside className="md:w-64 shrink-0 sticky top-14 md:top-[80px] h-fit md:h-fit z-[45]">
-                        <div className={`bg-white dark:bg-gray-800 rounded-[32px] md:rounded-3xl shadow-sm md:border border-gray-100 dark:border-gray-700 overflow-hidden`}>
-                            <div className="hidden md:block p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
-                                <p className="text-[13px] text-gray-400 dark:text-gray-100 font-black uppercase tracking-widest">Customer Support</p>
+                        <div className={`rounded-[32px] md:rounded-3xl shadow-sm md:border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'} overflow-hidden`}>
+                            <div className={`hidden md:block p-5 border-b ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                <p className={`text-[13px] font-black uppercase tracking-widest ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-400'}`}>Customer Support</p>
                             </div>
                             {/* Mobile Grid Layout vs Desktop List Layout */}
                             <nav className="grid grid-cols-2 p-3 md:p-0 gap-2 md:gap-0 md:flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
@@ -198,8 +198,8 @@ function CustomerCenterContent() {
                                         key={tab.id}
                                         onClick={() => handleTabChange(tab.id)}
                                         className={`flex flex-col md:flex-row items-center md:items-start md:gap-4 px-4 py-5 md:px-6 md:py-5 text-[13px] md:text-sm font-black transition-all whitespace-nowrap rounded-2xl md:rounded-none md:border-l-4 ${activeTab === tab.id
-                                            ? 'bg-gradient-to-br from-pink-50 to-white text-pink-600 border-pink-500 shadow-sm md:shadow-none dark:bg-pink-900/20'
-                                            : 'bg-white text-gray-500 border-transparent hover:text-gray-900 dark:hover:text-white dark:bg-gray-800'}`}
+                                            ? `bg-gradient-to-br border-pink-500 shadow-sm md:shadow-none ${brand.theme === 'dark' ? 'from-pink-900/20 to-gray-800 text-pink-400' : 'from-pink-50 to-white text-pink-600'}`
+                                            : `${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:text-white' : 'bg-white text-gray-500 hover:text-gray-900'} border-transparent`}`}
                                     >
                                         <div className={`mb-2 md:mb-0 ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-300'}`}>
                                             {tab.icon}
@@ -211,15 +211,15 @@ function CustomerCenterContent() {
                         </div>
 
                         {/* Customer Service Box (Desktop Only) */}
-                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border border-gray-100 bg-white dark:bg-gray-800 shadow-xl shadow-pink-100/10`}>
+                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'} shadow-xl`}>
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
                                     <PhoneCall size={20} />
                                 </div>
-                                <span className="font-black text-gray-900 dark:text-white text-lg">고객센터</span>
+                                <span className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
                             </div>
-                            <p className="text-3xl font-black mb-2 text-gray-900 dark:text-white tracking-tighter">1544-5568</p>
-                            <p className="text-[13px] text-gray-500 dark:text-gray-200 leading-relaxed font-black">
+                            <p className={`text-3xl font-black mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
+                            <p className={`text-[13px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                                 평일 09:30 ~ 19:00<br />
                                 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무</span>
@@ -236,20 +236,20 @@ function CustomerCenterContent() {
                         {activeTab === '공지사항' && (
                             <div className="space-y-5">
                                 <div className="flex items-center justify-between mb-2">
-                                    <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">공지사항</h2>
-                                    <span className="text-xs bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-gray-100 px-3 py-1 rounded-full font-black">총 {NOTICES.length}건</span>
+                                    <h2 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>공지사항</h2>
+                                    <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {NOTICES.length}건</span>
                                 </div>
-                                <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                                <div className={`rounded-3xl border overflow-hidden shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                     {NOTICES.map((notice, idx) => (
                                         <div
                                             key={notice.id}
-                                            className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors ${idx !== NOTICES.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''}`}
+                                            className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}
                                         >
                                             <div className="flex items-center gap-4">
                                                 <span className={`px-2.5 py-1 rounded text-[11px] font-black ${notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-pink-600 text-white'}`}>
                                                     {notice.category}
                                                 </span>
-                                                <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-300'}`}>
+                                                <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900') : (brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}`}>
                                                     {notice.title}
                                                 </span>
                                                 {notice.isNew && <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>}
@@ -277,26 +277,26 @@ function CustomerCenterContent() {
                                 {/* Mobile: Horizontal Scroll / Desktop: Grid */}
                                 <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-hidden -mx-5 px-5 md:mx-0 md:px-0 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
                                     {AD_TIERS.map((tier) => (
-                                        <div key={tier.id} className={`flex-none w-[280px] md:w-auto bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 snap-center ${tier.id === 'grand' ? 'border-pink-300 shadow-lg shadow-pink-100/50' : 'border-gray-100 dark:border-gray-700'}`}>
+                                        <div key={tier.id} className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}>
                                             <div className="flex items-center justify-between mb-5 md:mb-6">
-                                                <div className="p-4 md:p-4 bg-pink-50 dark:bg-gray-700 rounded-2xl shadow-inner text-pink-600">
+                                                <div className={`p-4 md:p-4 rounded-2xl shadow-inner text-pink-600 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-pink-50'}`}>
                                                     {React.cloneElement(tier.icon as React.ReactElement<{ size?: number }>, { size: 24 })}
                                                 </div>
                                                 {tier.id === 'grand' && <span className="bg-pink-600 text-white text-[10px] md:text-[11px] px-3 py-1 rounded-full font-black uppercase tracking-widest">Top Tier</span>}
                                             </div>
-                                            <h3 className="text-xl md:text-xl font-black mb-1 md:mb-2 text-gray-900 dark:text-white tracking-tighter">{tier.name}</h3>
+                                            <h3 className={`text-xl md:text-xl font-black mb-1 md:mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
                                             <p className="text-pink-600 font-black text-lg md:text-lg mb-6 md:mb-8 tracking-tighter leading-none">{tier.price.split(' ')[0]}</p>
 
                                             <div className="flex-1 space-y-3.5 md:space-y-4 mb-8">
                                                 {tier.benefits.map((benefit, i) => (
-                                                    <p key={i} className="text-xs md:text-xs text-gray-400 dark:text-gray-300 flex items-start gap-2.5 font-bold leading-relaxed">
+                                                    <p key={i} className={`text-xs md:text-xs flex items-start gap-2.5 font-bold leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-400'}`}>
                                                         <CheckCircle2 size={14} className="text-pink-600 shrink-0 mt-0.5" />
                                                         <span className="">{benefit}</span>
                                                     </p>
                                                 ))}
                                             </div>
 
-                                            <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : 'bg-gray-900 text-white hover:bg-black dark:bg-gray-700'}`}>
+                                            <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}>
                                                 상담 후 신청하기
                                             </button>
                                         </div>
@@ -304,11 +304,11 @@ function CustomerCenterContent() {
                                 </div>
 
                                 {/* Detailed Pricing Table Section */}
-                                <div className="bg-white dark:bg-gray-800 rounded-[32px] md:rounded-[40px] border border-gray-100 dark:border-gray-800 p-6 md:p-10 shadow-sm space-y-8">
+                                <div className={`rounded-[32px] md:rounded-[40px] border p-6 md:p-10 shadow-sm space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-800' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
                                         <div className="flex flex-col gap-1">
-                                            <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">상세 단가표</h3>
+                                            <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세 단가표</h3>
                                             <p className="text-[12px] md:text-[13px] text-gray-500 font-bold leading-relaxed">
                                                 모든 상품은 <span className="text-pink-600">PC+모바일 통합 노출</span>되며, 리전 필터 등 최신 기술이 적용된 전략적 구좌를 제공합니다.
                                             </p>
@@ -319,29 +319,29 @@ function CustomerCenterContent() {
                                     <div className="hidden md:block">
                                         <table className="w-full border-collapse">
                                             <thead>
-                                                <tr className="border-b-2 border-pink-100 dark:border-gray-700">
+                                                <tr className={`border-b-2 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-pink-100'}`}>
                                                     <th className="py-5 text-left text-[13px] font-black text-gray-400 uppercase tracking-widest w-24">구분</th>
                                                     <th className="py-5 text-left text-[13px] font-black text-gray-600 uppercase tracking-widest">상품명 및 혜택</th>
                                                     <th className="py-5 text-right text-[13px] font-black text-pink-600 uppercase tracking-widest pr-4">30일</th>
-                                                    <th className="py-5 text-right text-[13px] font-black text-gray-900 dark:text-white uppercase tracking-widest pr-4">60일 (10%↓)</th>
-                                                    <th className="py-5 text-right text-[13px] font-black text-gray-900 dark:text-white uppercase tracking-widest pr-4">90일 (20%↓)</th>
+                                                    <th className={`py-5 text-right text-[13px] font-black uppercase tracking-widest pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>60일 (10%↓)</th>
+                                                    <th className={`py-5 text-right text-[13px] font-black uppercase tracking-widest pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>90일 (20%↓)</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+                                            <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-700' : 'divide-gray-50'}`}>
                                                 {DETAILED_PRICING.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-pink-50/20 transition-colors group">
                                                         <td className="py-5 text-[12px] font-black text-gray-400 group-hover:text-pink-500 transition-colors">{item.type}</td>
                                                         <td className="py-5">
                                                             <div className="flex flex-col">
-                                                                <span className="text-[15px] font-black text-gray-900 dark:text-white mb-1">{item.name}</span>
-                                                                <span className="text-[11px] text-gray-400 font-bold bg-gray-50 dark:bg-gray-700 self-start px-2 py-0.5 rounded-md">
+                                                                <span className={`text-[15px] font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</span>
+                                                                <span className={`text-[11px] text-gray-400 font-bold self-start px-2 py-0.5 rounded-md ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                                                                     {item.benefit}
                                                                 </span>
                                                             </div>
                                                         </td>
                                                         <td className="py-5 text-right text-[15px] font-black text-pink-600 pr-4 tabular-nums">{item.d30.toLocaleString()}원</td>
-                                                        <td className="py-5 text-right text-[15px] font-black text-gray-900 dark:text-white pr-4 tabular-nums">{item.d60.toLocaleString()}원</td>
-                                                        <td className="py-5 text-right text-[15px] font-black text-gray-900 dark:text-white pr-4 tabular-nums">{item.d90.toLocaleString()}원</td>
+                                                        <td className={`py-5 text-right text-[15px] font-black pr-4 tabular-nums ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d60.toLocaleString()}원</td>
+                                                        <td className={`py-5 text-right text-[15px] font-black pr-4 tabular-nums ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d90.toLocaleString()}원</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -351,60 +351,60 @@ function CustomerCenterContent() {
                                     {/* Mobile View Cards (Remove Scroll) - 2 Columns Grid */}
                                     <div className="md:hidden grid grid-cols-2 gap-3">
                                         {DETAILED_PRICING.map((item, idx) => (
-                                            <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-[28px] border border-gray-100 dark:border-gray-700 flex flex-col justify-between shadow-sm">
+                                            <div key={idx} className={`p-4 rounded-[28px] border flex flex-col justify-between shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                                                 <div className="space-y-3">
                                                     <div className="flex flex-col">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <span className="text-[9px] font-black text-pink-600 uppercase">{item.type}</span>
                                                             <div className="w-1.5 h-1.5 rounded-full bg-pink-200"></div>
                                                         </div>
-                                                        <h4 className="text-[13px] font-black text-gray-900 dark:text-white leading-tight break-keep">{item.name}</h4>
+                                                        <h4 className={`text-[13px] font-black leading-tight break-keep ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</h4>
                                                     </div>
 
-                                                    <div className="bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100">
-                                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold leading-[1.4] line-clamp-2">
+                                                    <div className={`p-2.5 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                                                        <p className={`text-[10px] font-bold leading-[1.4] line-clamp-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             {item.benefit}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-1.5 font-mono">
-                                                    <div className="flex justify-between items-center bg-pink-50 dark:bg-pink-900/10 px-2 py-1.5 rounded-lg">
+                                                <div className={`mt-4 pt-3 border-t space-y-1.5 font-mono ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                    <div className={`flex justify-between items-center px-2 py-1.5 rounded-lg ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                                                         <span className="text-[8px] font-black text-pink-400 uppercase">30일</span>
                                                         <span className="text-[11px] font-black text-pink-600 tabular-nums">{item.d30.toLocaleString()}원</span>
                                                     </div>
                                                     <div className="flex justify-between items-center px-2 py-1 rounded-lg">
                                                         <span className="text-[8px] font-black text-gray-400 uppercase">60일</span>
-                                                        <span className="text-[11px] font-black text-gray-800 dark:text-gray-200 tabular-nums">{item.d60.toLocaleString()}원</span>
+                                                        <span className={`text-[11px] font-black tabular-nums ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{item.d60.toLocaleString()}원</span>
                                                     </div>
                                                     <div className="flex justify-between items-center px-2 py-1 rounded-lg">
                                                         <span className="text-[8px] font-black text-gray-400 uppercase">90일</span>
-                                                        <span className="text-[11px] font-black text-gray-800 dark:text-gray-200 tabular-nums">{item.d90.toLocaleString()}원</span>
+                                                        <span className={`text-[11px] font-black tabular-nums ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{item.d90.toLocaleString()}원</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2">
+                                    <div className={`p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
                                         <p className="text-[11px] md:text-[13px] text-gray-400 font-black">※ 모든 가격 부가세 별도 (VAT 별도)</p>
                                         <p className="text-[11px] md:text-[13px] text-gray-500 font-black">연간 패키지 결제 시 <span className="text-pink-600 font-black">25% 할인 혜택</span></p>
                                     </div>
 
                                     {/* [VIRTUAL PREVIEW] 실시간 광고 노출 예시 */}
-                                    <div className="mt-12 pt-12 border-t border-gray-100 dark:border-gray-700">
+                                    <div className={`mt-12 pt-12 border-t ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                                         <div className="flex items-center gap-3 mb-8">
                                             <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                            <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">실시간 노출 폼 레퍼런스</h3>
+                                            <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>실시간 노출 폼 레퍼런스</h3>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                             {/* 메인/지역 최상단 (Grand) */}
                                             <div className="group space-y-3">
                                                 <p className="text-[11px] font-black text-amber-600 uppercase tracking-widest ml-1">Grand / Region Top</p>
                                                 <div className="bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 rounded-3xl shadow-lg group-hover:scale-[1.02] transition-transform">
-                                                    <div className="bg-white dark:bg-gray-800 p-5 rounded-[22px] text-center">
-                                                        <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-xl mx-auto mb-3 shadow-inner">🏆</div>
-                                                        <h4 className="font-black text-sm text-gray-900 dark:text-white mb-1">우리 업소 무조건 1위</h4>
+                                                    <div className={`p-5 rounded-[22px] text-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl mx-auto mb-3 shadow-inner ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-amber-50'}`}>🏆</div>
+                                                        <h4 className={`font-black text-sm mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>우리 업소 무조건 1위</h4>
                                                         <p className="text-[10px] text-gray-400 font-bold">골드 보더 + 상단 고정 효과</p>
                                                     </div>
                                                 </div>
@@ -412,11 +412,11 @@ function CustomerCenterContent() {
                                             {/* 커뮤니티/리스트 중간 (Native) */}
                                             <div className="group space-y-3">
                                                 <p className="text-[11px] font-black text-rose-600 uppercase tracking-widest ml-1">Community / List Native</p>
-                                                <div className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 border-2 border-dashed border-rose-200 p-5 rounded-3xl group-hover:scale-[1.02] transition-transform">
+                                                <div className={`border-2 border-dashed p-5 rounded-3xl group-hover:scale-[1.02] transition-transform ${brand.theme === 'dark' ? 'from-gray-800 to-gray-900 border-gray-700 bg-gradient-to-br' : 'from-rose-50 to-pink-50 border-rose-200 bg-gradient-to-br'}`}>
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shrink-0">✨</div>
                                                         <div className="text-left">
-                                                            <h4 className="font-black text-[13px] text-gray-900 dark:text-white leading-tight">사장님, 광고 한 칸<br />어떠세요?</h4>
+                                                            <h4 className={`font-black text-[13px] leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사장님, 광고 한 칸<br />어떠세요?</h4>
                                                             <p className="text-[9px] text-rose-500 font-bold mt-1 uppercase">Recommended Ad</p>
                                                         </div>
                                                     </div>
@@ -445,12 +445,12 @@ function CustomerCenterContent() {
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">디자인 가이드</h3>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>디자인 가이드</h3>
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-8 md:p-10 rounded-[32px] md:rounded-[45px] border border-gray-100 shadow-xl shadow-pink-100/10 space-y-8">
+                                    <div className={`p-8 md:p-10 rounded-[32px] md:rounded-[45px] border shadow-xl space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'}`}>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <div className="p-6 md:p-8 bg-pink-50/50 dark:bg-gray-700/30 rounded-[32px] border border-pink-100">
-                                                <h4 className="text-[17px] font-black mb-6 flex items-center gap-2.5 text-gray-900">
+                                            <div className={`p-6 md:p-8 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-700/30 border-pink-900/30' : 'bg-pink-50/50 border-pink-100'}`}>
+                                                <h4 className={`text-[17px] font-black mb-6 flex items-center gap-2.5 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                                     <div className="p-2 bg-pink-600 text-white rounded-xl shadow-sm"><Clock size={16} /></div> 이미지 제작 기반 안내
                                                 </h4>
                                                 <ul className="space-y-4 text-[13px] md:text-[14px] text-gray-500 font-bold leading-relaxed">
@@ -468,9 +468,9 @@ function CustomerCenterContent() {
                                                     </li>
                                                 </ul>
                                             </div>
-                                            <div className="p-6 md:p-8 bg-gray-50/50 dark:bg-gray-700/30 rounded-[32px] border border-gray-100">
-                                                <h4 className="text-[17px] font-black mb-6 flex items-center gap-2.5 text-gray-900">
-                                                    <div className="p-2 bg-gray-900 text-white rounded-xl shadow-sm"><CheckCircle2 size={16} /></div> 수정 및 유의사항
+                                            <div className={`p-6 md:p-8 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-700/30 border-gray-700' : 'bg-gray-50/50 border-gray-100'}`}>
+                                                <h4 className={`text-[17px] font-black mb-6 flex items-center gap-2.5 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                    <div className={`p-2 rounded-xl shadow-sm ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-900 text-white'}`}><CheckCircle2 size={16} /></div> 수정 및 유의사항
                                                 </h4>
                                                 <ul className="space-y-4 text-[13px] md:text-[14px] text-gray-500 font-bold leading-relaxed">
                                                     <li className="flex items-start gap-3">
@@ -511,17 +511,17 @@ function CustomerCenterContent() {
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">노출 영역 안내</h3>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>노출 영역 안내</h3>
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-6 md:p-10 rounded-[32px] md:rounded-[45px] border border-gray-100 shadow-xl shadow-pink-100/10 space-y-10">
+                                    <div className={`p-6 md:p-10 rounded-[32px] md:rounded-[45px] border shadow-xl space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'}`}>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                                             <div className="space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className="text-[16px] font-black text-gray-900 dark:text-white">PC 레이아웃 노출 영역</h4>
-                                                    <span className="text-[10px] bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md font-bold text-gray-500 uppercase">PC 화면</span>
+                                                    <h4 className={`text-[16px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>PC 레이아웃 노출 영역</h4>
+                                                    <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>PC 화면</span>
                                                 </div>
                                                 <div
-                                                    className="aspect-[4/3] bg-gray-50 dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 relative group cursor-pointer"
+                                                    className={`aspect-[4/3] rounded-3xl overflow-hidden border relative group cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}
                                                     onClick={() => setSelectedImage('/banners/pc_placement.png')}
                                                 >
                                                     <img src="/banners/pc_placement.png" alt="PC Ad Placement" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -532,11 +532,11 @@ function CustomerCenterContent() {
                                             </div>
                                             <div className="space-y-4">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className="text-[16px] font-black text-gray-900 dark:text-white">모바일 레이아웃 노출 영역</h4>
-                                                    <span className="text-[10px] bg-pink-50 dark:bg-pink-900/20 px-2 py-1 rounded-md font-bold text-pink-600 uppercase">모바일 화면</span>
+                                                    <h4 className={`text-[16px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>모바일 레이아웃 노출 영역</h4>
+                                                    <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase ${brand.theme === 'dark' ? 'bg-pink-900/20 text-pink-400' : 'bg-pink-50 text-pink-600'}`}>모바일 화면</span>
                                                 </div>
                                                 <div
-                                                    className="aspect-[4/3] bg-gray-50 dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 relative group cursor-pointer"
+                                                    className={`aspect-[4/3] rounded-3xl overflow-hidden border relative group cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}
                                                     onClick={() => setSelectedImage('/banners/mobile_placement.png')}
                                                 >
                                                     <img src="/banners/mobile_placement.png" alt="Mobile Ad Placement" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -546,8 +546,8 @@ function CustomerCenterContent() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-6 bg-pink-50/50 dark:bg-pink-900/10 rounded-3xl border border-pink-100 dark:border-pink-900/30">
-                                            <p className="text-[13px] text-gray-700 dark:text-gray-300 leading-relaxed font-bold">
+                                        <div className={`p-6 rounded-3xl border ${brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50/50 border-pink-100'}`}>
+                                            <p className={`text-[13px] leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                                 <strong className="text-pink-600">※ 통합 노출 정책:</strong> 모든 광고 상품은 PC와 모바일 버전에 최적화된 형태로 동시 노출됩니다. 사이드 배너의 경우 PC에서는 스크롤 고정형으로, 모바일에서는 메인 상단 롤링 배너 형태로 전략적 변환 노출됩니다.
                                             </p>
                                         </div>
@@ -558,7 +558,7 @@ function CustomerCenterContent() {
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full shadow-[0_0_15px_rgba(219,39,119,0.3)]"></div>
-                                        <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">지역 기반 스마트 매칭</h3>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>지역 기반 스마트 매칭</h3>
                                     </div>
                                     <div className="bg-gradient-to-br from-pink-600 to-pink-500 p-8 md:p-10 rounded-[32px] md:rounded-[45px] text-white shadow-2xl shadow-pink-200 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-10 opacity-20 transform translate-x-1/4 -translate-y-1/4">
@@ -593,7 +593,7 @@ function CustomerCenterContent() {
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">점프 서비스</h3>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>점프 서비스</h3>
                                     </div>
                                     <div className="bg-gradient-to-br from-gray-900 to-black p-8 md:p-10 rounded-[32px] md:rounded-[45px] text-white shadow-2xl space-y-8 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-10 opacity-10">
@@ -626,15 +626,15 @@ function CustomerCenterContent() {
                                 </section>
 
                                 {/* Sidebar Ad Card Section (Remove Table for Mobile) */}
-                                <div className="bg-white dark:bg-gray-800 rounded-[32px] md:rounded-[40px] border border-gray-100 dark:border-gray-800 p-8 md:p-10 shadow-sm space-y-8">
+                                <div className={`rounded-[32px] md:rounded-[40px] border p-8 md:p-10 shadow-sm space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-800' : 'bg-white border-gray-100'}`}>
                                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 bg-pink-50 dark:bg-pink-900/20 rounded-[22px] flex items-center justify-center text-pink-600 shadow-inner">
+                                            <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center text-pink-600 shadow-inner ${brand.theme === 'dark' ? 'bg-pink-900/20' : 'bg-pink-50'}`}>
                                                 <Megaphone size={28} />
                                             </div>
                                             <div>
-                                                <h3 className="text-2xl font-black text-gray-900 dark:text-white">사이드 배너 광고</h3>
-                                                <p className="text-sm text-gray-800 dark:text-gray-200 font-black">PC/모바일 통합 고정 노출 시스템</p>
+                                                <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사이드 배너 광고</h3>
+                                                <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>PC/모바일 통합 고정 노출 시스템</p>
                                             </div>
                                         </div>
                                         <div className="bg-pink-600 text-white px-4 py-2 rounded-2xl text-[11px] font-black animate-pulse shadow-lg shadow-pink-200 inline-flex items-center gap-2">
@@ -679,23 +679,23 @@ function CustomerCenterContent() {
                                                 feature: '거부감 없는 자연스러운 노출 / PC+M 통합'
                                             },
                                         ].map((row, i) => (
-                                            <div key={i} className="p-4 md:p-8 rounded-[24px] md:rounded-[35px] bg-gray-50 dark:bg-gray-900/50 border-2 border-gray-100 dark:border-gray-800 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20">
+                                            <div key={i} className={`p-4 md:p-8 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
                                                 <div className="space-y-4">
                                                     <div className="flex justify-between items-start">
                                                         <div className="space-y-1">
-                                                            <span className="text-[13px] md:text-xl font-black text-gray-900 dark:text-white block">{row.pos}</span>
+                                                            <span className={`text-[13px] md:text-xl font-black block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{row.pos}</span>
                                                             <span className="text-[8px] md:text-[10px] text-pink-500 font-bold uppercase tracking-wider">{row.feature}</span>
                                                         </div>
-                                                        <span className="hidden md:block text-[9px] bg-white dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 font-black text-gray-500">{row.size.split(' ')[0]}</span>
+                                                        <span className={`hidden md:block text-[9px] px-2 py-1 rounded-lg border font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>{row.size.split(' ')[0]}</span>
                                                     </div>
-                                                    <p className="text-[11px] md:text-[13px] font-bold text-gray-600 dark:text-gray-400 leading-tight md:leading-relaxed">{row.type}</p>
+                                                    <p className={`text-[11px] md:text-[13px] font-bold leading-tight md:leading-relaxed ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{row.type}</p>
                                                 </div>
-                                                <div className="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                                <div className={`mt-4 md:mt-8 pt-4 md:pt-6 border-t flex items-center justify-between ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                                                     <div className="flex-1 text-left">
                                                         <p className="text-[8px] md:text-[9px] text-gray-400 font-black mb-0.5 uppercase tracking-widest leading-none">30일 기준</p>
                                                         <p className="text-sm md:text-2xl font-black text-pink-600 leading-none tabular-nums">{row.price}</p>
                                                     </div>
-                                                    <div className="hidden sm:flex w-10 h-10 rounded-full bg-white dark:bg-gray-800 border-2 border-gray-100 items-center justify-center text-pink-600 group-hover:bg-pink-600 group-hover:text-white group-hover:border-pink-600 transition-all shadow-sm">
+                                                    <div className={`hidden sm:flex w-10 h-10 rounded-full border-2 items-center justify-center text-pink-600 group-hover:bg-pink-600 group-hover:text-white group-hover:border-pink-600 transition-all shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                                         <ArrowRight size={20} />
                                                     </div>
                                                 </div>
@@ -704,20 +704,20 @@ function CustomerCenterContent() {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="p-6 bg-pink-50/50 dark:bg-pink-900/10 rounded-[32px] flex items-start gap-4 border border-pink-100/50 dark:border-pink-900/30">
-                                            <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-pink-600 shadow-sm shrink-0">
+                                        <div className={`p-6 rounded-[32px] flex items-start gap-4 border ${brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50/50 border-pink-100/50'}`}>
+                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-pink-600 shadow-sm shrink-0 ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
                                                 <Star size={20} />
                                             </div>
-                                            <p className="text-[13px] text-gray-900 dark:text-gray-300 leading-relaxed font-bold">
+                                            <p className={`text-[13px] leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>
                                                 <strong className="text-pink-600">사이드 배너 광고 특전:</strong><br />
                                                 배너 광고를 진행하시면 해당 지역의 <span className="text-gray-900 font-black">최상단 우대등록 및 반짝이 아이콘 효과</span>를 무료로 지원해 드립니다.
                                             </p>
                                         </div>
-                                        <div className="p-6 bg-gray-50/50 dark:bg-gray-900/10 rounded-[32px] flex items-start gap-4 border border-gray-100/50 dark:border-gray-900/30">
-                                            <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-gray-900 shadow-sm shrink-0">
+                                        <div className={`p-6 rounded-[32px] flex items-start gap-4 border ${brand.theme === 'dark' ? 'bg-gray-900/10 border-gray-900/30' : 'bg-gray-50/50 border-gray-100/50'}`}>
+                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm shrink-0 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-900'}`}>
                                                 <Crown size={20} />
                                             </div>
-                                            <p className="text-[13px] text-gray-900 dark:text-gray-100 leading-relaxed font-black">
+                                            <p className={`text-[13px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
                                                 <strong className="text-gray-900">한정 구좌 우선순위:</strong><br />
                                                 사이드 배너는 쾌적한 사이트 환경을 위해 지역별 한정 수량만 판매되며, <span className="text-pink-600">기존 광고주의 연장 우선권</span>이 보장됩니다.
                                             </p>
@@ -733,7 +733,7 @@ function CustomerCenterContent() {
                                 <section>
                                     <div className="flex items-center gap-3 mb-8">
                                         <div className="w-2 h-8 bg-pink-600 rounded-full shadow-lg shadow-pink-200"></div>
-                                        <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">구직자 이용가이드</h3>
+                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구직자 이용가이드</h3>
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                         {[
@@ -742,13 +742,13 @@ function CustomerCenterContent() {
                                             { step: '03', title: '업소 서칭', icon: <Search />, desc: '맞춤 필터링 시스템' },
                                             { step: '04', title: '1:1 상담', icon: <MessageSquare />, desc: '안심 면접을 위한 소통' },
                                         ].map((item, i) => (
-                                            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-[30px] border border-gray-200 dark:border-gray-700 text-center relative overflow-hidden group hover:shadow-xl transition-all">
-                                                <span className="absolute -top-3 -left-3 text-5xl font-black text-gray-50 dark:text-gray-700 group-hover:text-pink-50/50 transition-colors pointer-events-none">{item.step}</span>
+                                            <div key={i} className={`p-6 rounded-[30px] border text-center relative overflow-hidden group hover:shadow-xl transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                <span className={`absolute -top-3 -left-3 text-5xl font-black transition-colors pointer-events-none ${brand.theme === 'dark' ? 'text-gray-700' : 'text-gray-50'} group-hover:text-pink-50/50`}>{item.step}</span>
                                                 <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-5 relative z-10 shadow-inner">
                                                     {item.icon}
                                                 </div>
-                                                <h4 className="font-black text-[15px] mb-1 relative z-10 text-gray-900 dark:text-white">{item.title}</h4>
-                                                <p className="text-[11px] text-gray-600 dark:text-gray-400 relative z-10 font-bold">{item.desc}</p>
+                                                <h4 className={`font-black text-[15px] mb-1 relative z-10 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h4>
+                                                <p className={`text-[11px] relative z-10 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{item.desc}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -757,9 +757,9 @@ function CustomerCenterContent() {
                                 <section>
                                     <div className="flex items-center gap-3 mb-8">
                                         <div className="w-2 h-8 bg-pink-600 rounded-full shadow-lg shadow-pink-200"></div>
-                                        <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">구인자(사장님) 가이드</h3>
+                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구인자(사장님) 가이드</h3>
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-8 md:p-10 rounded-[45px] text-gray-900 border border-gray-100 shadow-xl shadow-pink-100/10 space-y-10">
+                                    <div className={`p-8 md:p-10 rounded-[45px] border shadow-xl shadow-pink-100/10 space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
                                         <div className="flex flex-col md:flex-row items-center gap-8">
                                             <div className="w-20 h-20 bg-pink-50 text-pink-600 rounded-[28px] flex items-center justify-center shrink-0 border border-pink-100">
                                                 <Briefcase size={36} />
@@ -782,7 +782,7 @@ function CustomerCenterContent() {
                                                 { num: '2', title: '공고 등록', sub: '상세한 업소 정보는 채용 성공률을 높입니다.' },
                                                 { num: '3', title: '컨택 & 매칭', sub: '열람권을 통해 적합한 인재를 먼저 선점하세요.' }
                                             ].map((box, i) => (
-                                                <div key={i} className="flex items-start gap-4 md:gap-5 p-6 md:p-0 bg-gray-50 md:bg-transparent rounded-3xl border md:border-0 border-gray-100 dark:border-gray-700">
+                                                <div key={i} className={`flex items-start gap-4 md:gap-5 p-6 md:p-0 rounded-3xl border md:border-0 ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 md:bg-transparent border-gray-100'}`}>
                                                     <span className="text-4xl md:text-5xl font-black text-pink-500/20 shrink-0 leading-none w-[36px] md:w-12 text-center">{box.num}</span>
                                                     <div className="flex flex-col items-start text-left pt-1 md:pt-2">
                                                         <h5 className="font-black text-base md:text-lg text-gray-900 leading-none mb-2">{box.title}</h5>
@@ -801,21 +801,21 @@ function CustomerCenterContent() {
                         {/* 4. FAQ */}
                         {activeTab === '자주묻는질문' && (
                             <div className="space-y-6">
-                                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-8">자주 묻는 질문</h2>
+                                <h2 className={`text-2xl font-black tracking-tight mb-8 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h2>
                                 <div className="space-y-4">
                                     {FAQS.map(faq => (
-                                        <div key={faq.id} className="bg-white dark:bg-gray-800 rounded-[28px] shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all">
+                                        <div key={faq.id} className={`rounded-[28px] shadow-sm border overflow-hidden transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                             <button
                                                 onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
-                                                className="w-full p-7 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                                className={`w-full p-7 flex items-center justify-between text-left transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
                                             >
-                                                <span className="font-black text-[15px] text-gray-900 dark:text-white flex gap-4 pr-4">
+                                                <span className={`font-black text-[15px] flex gap-4 pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                                     <span className="text-pink-600">Q.</span> {faq.question}
                                                 </span>
-                                                {expandedFaq === faq.id ? <ChevronUp size={24} className="text-gray-900 dark:text-white" /> : <ChevronDown size={24} className="text-gray-400" />}
+                                                {expandedFaq === faq.id ? <ChevronUp size={24} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} /> : <ChevronDown size={24} className="text-gray-400" />}
                                             </button>
                                             {expandedFaq === faq.id && (
-                                                <div className="bg-gray-50 dark:bg-gray-900/50 p-8 border-t border-gray-100 dark:border-gray-700 text-[15px] text-gray-800 dark:text-gray-300 leading-loose font-bold">
+                                                <div className={`p-8 border-t text-[15px] leading-loose font-bold ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-800'}`}>
                                                     {faq.answer}
                                                 </div>
                                             )}
@@ -829,22 +829,22 @@ function CustomerCenterContent() {
                         {activeTab === '1:1문의' && (
                             <div className="space-y-10">
                                 <div className="bg-gradient-to-br from-pink-50 to-white p-8 md:p-10 rounded-[40px] border border-pink-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
-                                    <div className="p-5 bg-white dark:bg-gray-900 rounded-[30px] text-pink-600 shadow-sm border border-pink-100">
+                                    <div className={`p-5 rounded-[30px] text-pink-600 shadow-sm border border-pink-100 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                                         <MessageCircle size={36} />
                                     </div>
                                     <div className="text-center md:text-left">
-                                        <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">무엇을 도와드릴까요?</h3>
-                                        <p className="text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed font-black">궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
+                                        <h3 className={`text-2xl font-black mb-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>무엇을 도와드릴까요?</h3>
+                                        <p className={`text-[14px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-gray-800 p-10 rounded-[45px] border border-gray-200 dark:border-gray-700 shadow-sm space-y-10">
+                                <div className={`p-10 rounded-[45px] border shadow-sm space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div>
-                                            <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">문의 유형 <span className="text-pink-600">*</span></label>
+                                            <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 유형 <span className="text-pink-600">*</span></label>
                                             <select
-                                                className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer"
-                                                onChange={(e) => setInquiryTitle(`[${e.target.value}] ` + inquiryTitle)}
+                                                className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                onChange={(e) => setInquiryTitle(`[${e.target.value}] ` + (inquiryTitle || ''))}
                                             >
                                                 <option>광고 상품 문의 (사장님)</option>
                                                 <option>채용 관련 문의 (구직자)</option>
@@ -853,38 +853,38 @@ function CustomerCenterContent() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">연락처/회신처 <span className="text-pink-600">*</span></label>
+                                            <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>연락처/회신처 <span className="text-pink-600">*</span></label>
                                             <input
                                                 type="text"
                                                 value={inquiryContact}
                                                 onChange={(e) => setInquiryContact(e.target.value)}
                                                 placeholder="회신 받을 번호나 메일을 적어주세요"
-                                                className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none"
+                                                className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">문의 제목 <span className="text-pink-600">*</span></label>
+                                        <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 제목 <span className="text-pink-600">*</span></label>
                                         <input
                                             type="text"
                                             value={inquiryTitle}
                                             onChange={(e) => setInquiryTitle(e.target.value)}
                                             placeholder="핵심 내용을 한 문장으로 요약해주세요"
-                                            className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none"
+                                            className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-black text-gray-900 dark:text-white mb-3 ml-2 uppercase tracking-widest">상세 내용 <span className="text-pink-600">*</span></label>
+                                        <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세 내용 <span className="text-pink-600">*</span></label>
                                         <textarea
                                             value={inquiryContent}
                                             onChange={(e) => setInquiryContent(e.target.value)}
                                             placeholder="구체적인 상황을 적어주시면 더 정확한 답변이 가능합니다."
-                                            className="w-full border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none"
+                                            className={`w-full border-2 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                         />
                                     </div>
 
                                     <button
-                                        className="w-full bg-gray-900 text-white font-black py-6 rounded-[28px] text-xl shadow-2xl transition-all hover:bg-black hover:scale-[1.01] active:scale-95 outline-none"
+                                        className={`w-full font-black py-6 rounded-[28px] text-xl shadow-2xl transition-all hover:scale-[1.01] active:scale-95 outline-none ${brand.theme === 'dark' ? 'bg-pink-600 text-white hover:bg-pink-700' : 'bg-gray-900 text-white hover:bg-black'}`}
                                         onClick={() => alert('접수되었습니다. 담당자 확인 후 빠르게 답변 드리겠습니다!')}
                                     >
                                         상담 등록하기
@@ -894,15 +894,15 @@ function CustomerCenterContent() {
                         )}
 
                         {/* Customer Service Box (Mobile Lower Position) */}
-                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border border-pink-100 bg-gradient-to-br from-white to-pink-50/30 shadow-xl shadow-pink-100/20`}>
+                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border shadow-xl shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-white to-pink-50/30 border-pink-100'}`}>
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
                                     <PhoneCall size={24} />
                                 </div>
-                                <span className="font-black text-gray-900 dark:text-white text-xl">고객센터</span>
+                                <span className={`font-black text-xl ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
                             </div>
-                            <p className="text-4xl font-black mb-3 text-gray-900 dark:text-white tracking-tighter">1544-5568</p>
-                            <p className="text-[14px] text-gray-500 dark:text-gray-200 leading-relaxed font-black">
+                            <p className={`text-4xl font-black mb-3 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
+                            <p className={`text-[14px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
                                 평일 09:30 ~ 19:00 / 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-2 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
                             </p>

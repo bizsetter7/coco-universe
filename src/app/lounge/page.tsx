@@ -29,11 +29,11 @@ export default function LoungePage() {
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         {activeTab === 'main' ? (
-                            <Link href="/" className="p-2 hover:bg-stone-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                            <Link href="/" className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-100 text-gray-700'}`}>
                                 <ArrowLeft size={20} />
                             </Link>
                         ) : (
-                            <button onClick={() => setActiveTab('main')} className="p-2 hover:bg-stone-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                            <button onClick={() => setActiveTab('main')} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-100 text-gray-700'}`}>
                                 <ArrowLeft size={20} />
                             </button>
                         )}
@@ -100,17 +100,17 @@ export default function LoungePage() {
                         </div>
 
                         {/* [VIRTUAL AD] 라운지 스타 프리미엄 (개인/모델/스타 타겟팅) */}
-                        <div className="bg-white dark:bg-gray-800 rounded-[40px] p-8 shadow-xl border border-stone-100 dark:border-gray-700 relative overflow-hidden group hover:border-amber-200 transition-all">
+                        <div className={`rounded-[40px] p-8 shadow-xl border relative overflow-hidden group hover:border-amber-200 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                             <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-black px-6 py-1.5 rounded-bl-3xl shadow-sm z-10">STAR PREMIUM</div>
                             <div className="flex flex-col md:flex-row gap-8 items-center">
                                 <div className="w-32 h-32 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-1 shadow-lg group-hover:scale-105 transition-transform">
-                                    <div className="w-full h-full bg-white dark:bg-gray-900 rounded-[22px] flex items-center justify-center text-4xl">⭐</div>
+                                    <div className={`w-full h-full rounded-[22px] flex items-center justify-center text-4xl ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>⭐</div>
                                 </div>
                                 <div className="flex-1 text-center md:text-left">
                                     <span className="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black mb-3">#인기모델 #조회수1위</span>
                                     <h3 className="text-2xl font-black mb-2 leading-tight">주목받는 별이 되고 싶나요? 🌟</h3>
                                     <p className="text-sm text-gray-500 font-medium mb-6">라운지 최상단 노출로 당신의 브랜드 가치를 높이세요.<br />하루 평균 5,000회 이상의 노출을 보장합니다.</p>
-                                    <button className="bg-gray-900 text-white dark:bg-amber-600 px-8 py-3.5 rounded-2xl font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">스타 멤버십 안내보기</button>
+                                    <button className={`px-8 py-3.5 rounded-2xl font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all ${brand.theme === 'dark' ? 'bg-amber-600 text-white shadow-amber-900/20' : 'bg-gray-900 text-white shadow-gray-200'}`}>스타 멤버십 안내보기</button>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +123,7 @@ export default function LoungePage() {
                                     <div className="text-2xl font-black mb-1" style={primaryStyle}>98%</div>
                                     <div className="text-[10px] text-gray-500">사용자 만족도</div>
                                 </div>
-                                <div className="border-x border-gray-200 dark:border-gray-700">
+                                <div className={`border-x ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                                     <div className="text-2xl font-black mb-1" style={primaryStyle}>1.2k</div>
                                     <div className="text-[10px] text-gray-500">오늘의 방문자</div>
                                 </div>
@@ -175,7 +175,7 @@ export default function LoungePage() {
                                             맞춤형 식단 리포트 받기
                                         </button>
 
-                                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl text-xs text-emerald-800 dark:text-emerald-400 leading-relaxed">
+                                        <div className={`p-4 rounded-xl text-xs leading-relaxed ${brand.theme === 'dark' ? 'bg-emerald-900/10 text-emerald-400' : 'bg-emerald-50 text-emerald-800'}`}>
                                             💡 **Tip**: 균형 잡힌 식단은 피부 건강과 체력 유지의 핵심입니다. 무리한 단식보다는 규칙적인 연어, 견과류 섭취를 추천드려요!
                                         </div>
                                     </div>
@@ -184,11 +184,11 @@ export default function LoungePage() {
                                 <div className="text-center py-6">
                                     <h3 className="text-2xl font-black mb-6">분석 결과: <span className="text-emerald-500">정상체중</span></h3>
                                     <div className="space-y-4 text-left">
-                                        <div className="p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl">
+                                        <div className={`p-4 rounded-2xl ${brand.theme === 'dark' ? 'bg-emerald-900/10' : 'bg-emerald-50'}`}>
                                             <p className="font-bold text-emerald-600 mb-1">📋 맞춤 가이드</p>
                                             <p className="text-sm text-gray-600">현재 매우 건강한 상태입니다. 근육량 유지를 위해 단백질 위주의 식단을 추천합니다.</p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+                                        <div className={`p-4 rounded-2xl ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                                             <p className="font-bold text-gray-700 mb-1">🥦 오늘의 추천 식단</p>
                                             <p className="text-sm text-gray-500">아침: 귀리 요거트 / 점심: 닭가슴살 샐러드 / 저녁: 구운 생선과 야채</p>
                                         </div>
@@ -269,9 +269,9 @@ export default function LoungePage() {
                                 <div className="text-center py-6">
                                     <div className="text-5xl mb-6">💰</div>
                                     <h3 className="text-2xl font-black mb-4">오늘의 재물운: <span className="text-amber-500">최상(★★★★★)</span></h3>
-                                    <div className="p-6 bg-amber-50 dark:bg-amber-900/10 rounded-3xl text-left border border-amber-100">
+                                    <div className={`p-6 rounded-3xl text-left border ${brand.theme === 'dark' ? 'bg-amber-900/10 border-amber-900/40' : 'bg-amber-50 border-amber-100'}`}>
                                         <p className="font-bold text-amber-700 mb-2 italic">"동쪽에서 귀인이 나타나 큰 재물을 가져다줄 기운입니다."</p>
-                                        <p className="text-sm text-gray-600 leading-relaxed">오늘은 새로운 인연보다는 기존의 인연에서 큰 득이 있을 날입니다. 오후 3시에서 5시 사이가 가장 길한 시간대이니 참고하세요.</p>
+                                        <p className={`text-sm leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>오늘은 새로운 인연보다는 기존의 인연에서 큰 득이 있을 날입니다. 오후 3시에서 5시 사이가 가장 길한 시간대이니 참고하세요.</p>
                                     </div>
                                     <button onClick={() => setShowResult(false)} className="mt-8 text-sm text-gray-400 underline">다른 생일로 확인하기</button>
                                 </div>

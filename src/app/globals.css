@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 html {
-  /* [궁극의 울렁증 방지] 스크롤바 유무와 상관없이 화면 너비 고정 */
-  scrollbar-gutter: stable both-edges;
+
+  /* [궁극의 울렁증 방지] 스크롤바 유무와 상관없이 화면 너비 고정 (데스크탑 이상) */
+  @media (min-width: 1280px) {
+    scrollbar-gutter: stable both-edges;
+  }
+
   /* 스티키 작동을 위해 오버플로우 강제 허용 */
   overflow: visible !important;
 }
@@ -16,7 +20,7 @@ html {
 }
 
 /* 모바일에서는 gutter를 제거하여 풀스크린 가용성 확보 */
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   html {
     scrollbar-gutter: auto;
   }
@@ -29,11 +33,11 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* [시스템 다크모드 연결 해제] 
+   브랜드 설정(brand.theme)에 의해서만 테마가 결정되도록 prefers-color-scheme 배제 */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 body {

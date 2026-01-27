@@ -43,14 +43,8 @@ export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
                 :root {
                     --brand-primary: ${brand.primaryColor};
                 }
-                .dark-theme {
-                    background-color: #111827;
-                    color: white;
-                }
             ` }} />
-            <div className={brand.theme === 'dark' ? 'dark-theme min-h-screen' : 'min-h-screen'}>
-                {children}
-            </div>
+            {children}
         </BrandContext.Provider>
     );
 };

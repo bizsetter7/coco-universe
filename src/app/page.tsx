@@ -2,7 +2,7 @@
 
 import { useBrand } from '@/components/BrandProvider';
 import { useLocation } from '@/hooks/useLocation';
-import { REGIONS_MAP } from '@/constants/regions';
+import { REGIONS_MAP } from '../constants/regions';
 import { Crown, Flame, Home, MessageCircle, MessageSquare, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft, ChevronRight, MapPin, Star, Zap, Search } from 'lucide-react';
 import Link from 'next/link';
 import { MOCK_POSTS } from '@/constants/community';
@@ -27,6 +27,7 @@ interface Shop {
   is_placeholder: boolean;
   is_premium?: boolean;
   is_verified?: boolean;
+  recommended?: boolean;
   tier?: 'grand' | 'preferential' | 'premium' | 'special' | 'urgent' | 'recommended' | 'common' | 'basic';
   updatedAt?: string;
   options?: {
@@ -146,7 +147,7 @@ export default function HomePortal() {
   const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
   return (
-    <div className={`min-h-screen relative ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'} pb-20`}>
+    <div className={`min-h-screen relative pb-20`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all`}>
         <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
@@ -245,7 +246,7 @@ export default function HomePortal() {
                     <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full mb-2 flex items-center justify-center ${item.bg} ${item.color}`}>
                       {item.icon}
                     </div>
-                    <span className="text-[10px] md:text-xs font-bold text-gray-700 dark:text-gray-200 text-center break-keep">{item.label}</span>
+                    <span className={`text-[10px] md:text-xs font-bold text-center break-keep ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -255,16 +256,16 @@ export default function HomePortal() {
                 <div onClick={() => router.push('/community')} className={`border p-4 md:p-6 rounded-[28px] md:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-pink-100'}`}>
                   <div className="flex justify-between items-center mb-4 md:mb-5">
                     <span className="font-bold text-pink-600 flex items-center gap-1.5 md:gap-2.5 text-sm md:text-lg"><MessageSquare size={18} /> 커뮤니티</span>
-                    <span className="text-[9px] md:text-[11px] text-gray-400 font-bold bg-gray-50 dark:bg-gray-700/50 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block">자유게시판</span>
+                    <span className={`text-[9px] md:text-[11px] font-bold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>자유게시판</span>
                   </div>
                   <div className="space-y-3 md:space-y-4">
                     {MOCK_POSTS.slice(0, 3).map(post => (
                       <div key={post.id} className="flex items-center justify-between group">
                         <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
-                          <span className="shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-pink-50 dark:bg-pink-900/10 flex items-center justify-center text-[10px] md:text-[12px] group-hover:bg-pink-600 group-hover:text-white transition-all">
+                          <span className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center text-[10px] md:text-[12px] group-hover:bg-pink-600 group-hover:text-white transition-all ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                             {post.category === '친구찾기' ? '👥' : post.category === '블랙리스트' ? '🚨' : '💬'}
                           </span>
-                          <p className="truncate text-[11px] md:text-[13px] font-bold text-gray-700 dark:text-gray-200">
+                          <p className={`truncate text-[11px] md:text-[13px] font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
                             {post.title}
                           </p>
                         </div>
@@ -277,7 +278,7 @@ export default function HomePortal() {
                 <div onClick={() => router.push('/customer-center?tab=notice')} className={`border p-4 md:p-6 rounded-[28px] md:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-blue-100'}`}>
                   <div className="flex justify-between items-center mb-4 md:mb-5">
                     <span className="font-bold text-blue-600 flex items-center gap-1.5 md:gap-2.5 text-sm md:text-lg"><Megaphone size={18} /> 공지사항</span>
-                    <span className="text-[9px] md:text-[11px] text-gray-400 font-bold bg-gray-50 dark:bg-gray-700/50 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block">업데이트</span>
+                    <span className={`text-[9px] md:text-[11px] font-bold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>업데이트</span>
                   </div>
                   <div className="space-y-3 md:space-y-4">
                     {[
@@ -285,10 +286,10 @@ export default function HomePortal() {
                       { title: 'PC 사이드배너 광고 시스템 정식 도입', isNew: false },
                       { title: '브랜드 통합 시스템 리뉴얼 안내', isNew: false }
                     ].map((n, i) => (
-                      <div key={i} className="flex items-center justify-between gap-2 md:gap-3 border-b border-gray-50 dark:border-gray-700/50 pb-2 md:pb-2.5 last:border-0 last:pb-0">
+                      <div key={i} className={`flex items-center justify-between gap-2 md:gap-3 border-b pb-2 md:pb-2.5 last:border-0 last:pb-0 ${brand.theme === 'dark' ? 'border-gray-700/50' : 'border-gray-50'}`}>
                         <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
                           <div className={`shrink-0 w-1 md:w-1.5 h-1 md:h-1.5 rounded-full ${n.isNew ? 'bg-blue-600 animate-pulse' : 'bg-gray-300'}`}></div>
-                          <p className="truncate text-[11px] md:text-[13px] font-bold text-gray-600 dark:text-gray-400">{n.title}</p>
+                          <p className={`truncate text-[11px] md:text-[13px] font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{n.title}</p>
                         </div>
                       </div>
                     ))}
@@ -304,7 +305,7 @@ export default function HomePortal() {
                 </h3>
                 <button
                   onClick={() => router.push('/customer-center?tab=ad')}
-                  className="text-[10px] md:text-[11px] font-black bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all flex items-center gap-1"
+                  className={`text-[10px] md:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
                 >
                   <PlusCircle size={12} className="text-pink-500" />
                   광고신청 +
@@ -316,7 +317,7 @@ export default function HomePortal() {
                     key={shop.id || i}
                     onClick={() => setSelectedShop(shop)}
                     className={`group relative border-2 rounded-[22px] overflow-hidden shadow-md transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-white'}
-                      ${shop.tier === 'grand' ? 'ring-2 ring-amber-400 ring-offset-2 dark:ring-offset-gray-900 animate-pulse-subtle' : ''}
+                      ${shop.tier === 'grand' ? `ring-2 ring-amber-400 ring-offset-2 ${brand.theme === 'dark' ? 'ring-offset-gray-900' : 'ring-offset-white'} animate-pulse-subtle` : ''}
                     `}
                   >
                     <div className={`h-28 sm:h-36 flex items-center justify-center text-gray-400 text-[10px] break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
@@ -326,7 +327,7 @@ export default function HomePortal() {
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className="font-black text-[13px] md:text-[15px] truncate mb-1 text-gray-900 dark:text-white">{shop.name}</h4>
+                      <h4 className={`font-black text-[13px] md:text-[15px] truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h4>
                       <p className="text-red-600 font-black text-xs md:text-sm">{shop.pay}</p>
                       <p className="text-[10px] text-gray-400 mt-1 font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</p>
                     </div>
@@ -337,7 +338,7 @@ export default function HomePortal() {
               {/* [PC/M 통합] 오늘의 추천 업소 (가로 스크롤) */}
               <div className="mb-14">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                  <div className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                     <span className="text-2xl">|</span>
                     <span>오늘의 추천 업소 (PC/M 통합 노출)</span>
                   </div>
@@ -354,7 +355,7 @@ export default function HomePortal() {
                         ${shop.tier === 'grand' ? 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg' : 'bg-gradient-to-br from-blue-400 to-blue-600'}
                       `}
                     >
-                      <div className="bg-white dark:bg-gray-800 rounded-[20px] p-3 h-full">
+                      <div className={`${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-[20px] p-3 h-full`}>
                         <div className={`h-24 md:h-32 rounded-xl mb-3 flex items-center justify-center text-[10px] font-bold text-center
                           ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : 'bg-blue-50 text-blue-500'}
                         `}>
@@ -372,7 +373,7 @@ export default function HomePortal() {
               {/* 지역별 구인 공고 (검색창 + 전략 광고) */}
               <div className="mt-8 mb-14">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <h3 className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                     <span className="text-2xl">|</span>
                     <span>지역을 선택해주세요</span>
                   </h3>
@@ -382,31 +383,31 @@ export default function HomePortal() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                   <div
                     onClick={() => router.push('/customer-center?tab=ad')}
-                    className="md:col-span-1 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4 flex flex-col justify-center items-center text-center cursor-pointer hover:shadow-md transition-all group"
+                    className={`md:col-span-1 border rounded-2xl p-4 flex flex-col justify-center items-center text-center cursor-pointer hover:shadow-md transition-all group ${brand.theme === 'dark' ? 'bg-amber-900/10 border-amber-900/30' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100'}`}
                   >
-                    <span className="text-[8px] font-black text-amber-600 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full mb-2 uppercase tracking-widest">Grand Region AD</span>
-                    <h4 className="text-sm font-black text-gray-900 dark:text-white mb-1 group-hover:text-amber-600">이 지역 1등 프리미엄 💎</h4>
+                    <span className={`text-[8px] font-black px-2 py-0.5 rounded-full mb-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-amber-500 bg-amber-900/30' : 'text-amber-600 bg-amber-100'}`}>Grand Region AD</span>
+                    <h4 className={`text-sm font-black mb-1 group-hover:text-amber-600 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>이 지역 1등 프리미엄 💎</h4>
                     <p className="text-[10px] text-gray-500 font-bold italic">지금 바로 입점하고 상단 노출!</p>
                   </div>
                   <div
                     onClick={() => router.push('/customer-center?tab=ad')}
-                    className="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 flex items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all"
+                    className={`md:col-span-2 border rounded-2xl p-4 flex items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-pink-50 dark:bg-pink-900/10 flex items-center justify-center text-pink-500">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-pink-500 ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                         <Crown size={24} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-black text-gray-900 dark:text-white">준비된 인재들이 기다립니다! 👑</h4>
+                        <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>준비된 인재들이 기다립니다! 👑</h4>
                         <p className="text-[10px] text-gray-500 font-bold">지역별 맞춤 구인으로 정규직 채용 완료</p>
                       </div>
                     </div>
-                    <div className="px-4 py-2 bg-pink-600 text-white text-[11px] font-black rounded-xl shadow-lg shadow-pink-200 dark:shadow-none">광고신청</div>
+                    <div className={`px-4 py-2 bg-pink-600 text-white text-[11px] font-black rounded-xl shadow-lg ${brand.theme === 'dark' ? 'shadow-none' : 'shadow-pink-200'}`}>광고신청</div>
                   </div>
                 </div>
 
                 {/* 2단계 필터 + 검색 버튼 유닛 */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-gray-100/50 dark:bg-gray-800/50 p-4 rounded-[28px] border border-gray-200/50 dark:border-gray-700/50">
+                <div className={`flex flex-wrap items-center gap-2 sm:gap-3 p-4 rounded-[28px] border ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700/50' : 'bg-gray-100/50 border-gray-200/50'}`}>
                   <div className="flex gap-2 flex-1 min-w-[200px]">
                     {/* 1단계: 지역 선택 */}
                     <div className="relative group flex-1">
@@ -458,7 +459,7 @@ export default function HomePortal() {
                     onClick={() => {
                       document.getElementById('job-list-section')?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="bg-pink-600 text-white px-6 py-3 rounded-2xl font-black text-[13px] shadow-lg shadow-pink-200 dark:shadow-none hover:bg-pink-700 active:scale-95 transition-all flex items-center gap-2 group whitespace-nowrap"
+                    className={`bg-pink-600 text-white px-6 py-3 rounded-2xl font-black text-[13px] shadow-lg hover:bg-pink-700 active:scale-95 transition-all flex items-center gap-2 group whitespace-nowrap ${brand.theme === 'dark' ? 'shadow-none' : 'shadow-pink-200'}`}
                   >
                     <Search size={16} className="group-hover:animate-pulse" />
                     지역 검색하기
@@ -469,13 +470,13 @@ export default function HomePortal() {
               {/* [QUEEN STYLE] 4번 스페셜 채용정보 */}
               <div className="mb-14">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                     <span className="text-2xl">|</span>
                     <span>스페셜채용정보</span>
                   </h3>
                   <button
                     onClick={() => router.push('/customer-center?tab=ad')}
-                    className="text-[10px] md:text-[11px] font-black bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all flex items-center gap-1"
+                    className={`text-[10px] md:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
                   >
                     <PlusCircle size={12} className="text-purple-500" />
                     광고신청 +
@@ -486,14 +487,14 @@ export default function HomePortal() {
                     <div
                       key={i}
                       onClick={() => setSelectedShop(shop)}
-                      className="group bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl p-0.5 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden"
+                      className={`group border rounded-xl p-0.5 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
-                      <div className="relative aspect-[4/3] bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-[10px] text-gray-300 font-bold overflow-hidden mb-2">
+                      <div className={`relative aspect-[4/3] rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-300'}`}>
                         {shop.name.substring(0, 1)}
                         <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic">HOT</div>
                       </div>
                       <div className="px-1.5 pb-2 text-center">
-                        <h5 className="text-[11px] font-black truncate text-gray-800 dark:text-gray-100 mb-0.5">{shop.name}</h5>
+                        <h5 className={`text-[11px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{shop.name}</h5>
                         <p className="text-[9px] text-gray-400 font-bold mb-1">{shop.region.split(' ')[1]}</p>
                         <p className="text-[11px] font-black text-red-500">{shop.pay.split(' ')[1] || shop.pay}</p>
                         <div className="mt-1 flex justify-center">
@@ -510,13 +511,13 @@ export default function HomePortal() {
                 {/* 5번 급구채용 (Left Column: 4/12) */}
                 <div className="md:col-span-4">
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                       <span className="text-2xl">|</span>
                       <span>급구채용</span>
                     </h3>
                     <button
                       onClick={() => router.push('/customer-center?tab=ad')}
-                      className="text-[9px] font-black bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-sm shadow-sm flex items-center gap-1"
+                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
                     >
                       광고신청 +
                     </button>
@@ -526,15 +527,15 @@ export default function HomePortal() {
                       <div
                         key={i}
                         onClick={() => setSelectedShop(shop)}
-                        className="bg-white dark:bg-gray-800 border-2 border-purple-100 dark:border-purple-900/30 rounded-2xl p-3 flex gap-3 hover:border-purple-500 transition-all cursor-pointer shadow-sm"
+                        className={`border-2 rounded-2xl p-3 flex gap-3 hover:border-purple-500 transition-all cursor-pointer shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-900/30' : 'bg-white border-purple-100'}`}
                       >
-                        <div className="w-14 h-14 bg-gray-50 dark:bg-gray-900 rounded-lg flex items-center justify-center text-xs text-blue-300 font-black shrink-0 overflow-hidden">
+                        <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs text-blue-300 font-black shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
                           {shop.name.substring(0, 1)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h5 className="text-[12px] font-black truncate text-gray-900 dark:text-white mb-0.5">{shop.name}</h5>
+                          <h5 className={`text-[12px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h5>
                           <p className="text-[10px] font-bold text-gray-400 mb-1">{shop.region.split(' ')[1]}</p>
-                          <div className="text-[9px] bg-purple-50 dark:bg-purple-900/10 text-purple-600 px-1.5 py-0.5 rounded-md inline-block font-black">⭐ NEW 전용</div>
+                          <div className={`text-[9px] px-1.5 py-0.5 rounded-md inline-block font-black ${brand.theme === 'dark' ? 'bg-purple-900/10 text-purple-600' : 'bg-purple-50 text-purple-600'}`}>⭐ NEW 전용</div>
                         </div>
                       </div>
                     ))}
@@ -544,32 +545,32 @@ export default function HomePortal() {
                 {/* 6번 추천채용 (Right Column: 8/12) */}
                 <div className="md:col-span-8">
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                       <span className="text-2xl">|</span>
                       <span>추천채용</span>
                     </h3>
                     <button
                       onClick={() => router.push('/customer-center?tab=ad')}
-                      className="text-[9px] font-black bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-sm shadow-sm flex items-center gap-1"
+                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
                     >
                       광고신청 +
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {shops.filter(s => s.tier === 'recommended').slice(0, 6).map((shop, i) => (
+                    {shops.filter((s, idx) => s.recommended || (idx < 6 && s.tier === 'recommended')).slice(0, 6).map((shop, i) => (
                       <div
                         key={i}
                         onClick={() => setSelectedShop(shop)}
-                        className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 hover:border-rose-400 transition-all cursor-pointer group"
+                        className={`border rounded-2xl p-4 hover:border-rose-400 transition-all cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-100/50 border-gray-200'}`}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <p className="text-[10px] font-bold text-gray-400 mb-0.5">{shop.region.split(' ')[1]}</p>
-                            <h5 className="font-black text-gray-900 dark:text-white text-[13px] group-hover:text-rose-500 transition-colors">{shop.name}</h5>
+                            <h5 className={`font-black text-[13px] group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h5>
                           </div>
                           <div className="text-[10px] font-black text-white bg-rose-500 px-2 py-0.5 rounded-full">REC</div>
                         </div>
-                        <p className="text-[11px] font-bold text-gray-500 truncate mb-3">"{shop.name}에서 함께 일할 메이트를 찾아요!"</p>
+                        <p className={`text-[11px] font-bold truncate mb-3 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>"{shop.name}에서 함께 일할 메이트를 찾아요!"</p>
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-black text-rose-600">{shop.pay}</span>
                           <span className="text-[10px] text-gray-400 font-bold">{shop.workType}</span>
@@ -583,7 +584,7 @@ export default function HomePortal() {
               {/* 줄광고 리스트 */}
               <div id="job-list-section" className="mt-12">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <h3 className="flex items-center gap-2 text-xl font-black text-purple-700 dark:text-purple-400">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
                     <span className="text-2xl">|</span>
                     <span>최신채용정보 (줄광고)</span>
                   </h3>
@@ -604,7 +605,7 @@ export default function HomePortal() {
                                   shop.tier === 'special' ? 'bg-gradient-to-br from-rose-400 via-pink-100 to-rose-600 shadow-rose-200/30' :
                                     shop.tier === 'urgent' ? 'border-2 border-red-500 shadow-md shadow-red-100' :
                                       shop.tier === 'recommended' ? 'border-2 border-green-400 bg-green-50/10' :
-                                        'bg-gray-200 dark:bg-gray-700'}
+                                        brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}
                           `}
                         >
                           <div className={`flex flex-col h-full w-full p-4 md:p-5 rounded-[24px] transition-colors
@@ -668,19 +669,19 @@ export default function HomePortal() {
 
                             <div className="flex flex-wrap gap-1.5 mb-5 min-h-[18px]">
                               {shop.options?.icons?.map((icon, idx) => (
-                                <span key={idx} className="text-[8px] md:text-[10px] px-2 py-0.5 rounded-lg font-black bg-gray-50 dark:bg-gray-800 text-gray-500 border border-gray-100 dark:border-gray-700">
+                                <span key={idx} className={`text-[8px] md:text-[10px] px-2 py-0.5 rounded-lg font-black border ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
                                   {icon}
                                 </span>
                               ))}
                             </div>
 
-                            <div className="mt-auto pt-4 border-t border-gray-50 dark:border-gray-800 flex items-end justify-between">
+                            <div className={`mt-auto pt-4 border-t flex items-end justify-between ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-50'}`}>
                               <div>
                                 <p className="text-[9px] md:text-[11px] text-gray-400 font-bold mb-0.5">{shop.workType}</p>
                                 <p className="text-sm md:text-lg text-red-500 font-black tracking-tight">{shop.pay}</p>
                               </div>
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors
-                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : 'bg-gray-50 text-gray-300'}
+                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-300')}
                               `}>
                                 <ChevronRight size={16} />
                               </div>
@@ -690,13 +691,13 @@ export default function HomePortal() {
 
                         {/* 리스트 네이티브 광고 (3번째마다 삽입) */}
                         {((i + 1) % 3 === 0) && (
-                          <div className="col-span-1 bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/10 dark:to-pink-900/10 border-2 border-dashed border-rose-200 dark:border-rose-900/30 rounded-[26px] p-5 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-rose-400 transition-all">
+                          <div className={`col-span-1 border-2 border-dashed rounded-[26px] p-5 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-rose-400 transition-all ${brand.theme === 'dark' ? 'bg-rose-900/10 border-rose-900/30' : 'bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200'}`}>
                             <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center text-white mb-3 shadow-lg shadow-rose-200">
                               <Star size={20} fill="currentColor" />
                             </div>
                             <p className="text-[10px] font-black text-rose-500 mb-1">LIST NATIVE AD</p>
-                            <h5 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-2">사장님, 광고 한 칸 어떠세요?</h5>
-                            <button className="text-[10px] font-black bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm text-gray-600 dark:text-gray-400">문의하기</button>
+                            <h5 className={`text-sm font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>사장님, 광고 한 칸 어떠세요?</h5>
+                            <button className={`text-[10px] font-black px-4 py-2 rounded-full shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>문의하기</button>
                           </div>
                         )}
                       </React.Fragment>
@@ -730,10 +731,10 @@ export default function HomePortal() {
                     <Link href="/lounge" className="text-xs text-blue-500 font-bold hover:underline">인재 전체보기</Link>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl overflow-hidden">
+                  <div className={`rounded-3xl border shadow-xl overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-[12px] md:text-sm">
-                        <thead className="bg-gray-50/50 dark:bg-gray-900/50 border-bottom border-gray-100 dark:border-gray-700">
+                        <thead className={`border-b ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-50/50 border-gray-100'}`}>
                           <tr>
                             <th className="px-6 py-4 font-black text-gray-500">이름/나이</th>
                             <th className="px-6 py-4 font-black text-gray-500">희망지역</th>
@@ -741,7 +742,7 @@ export default function HomePortal() {
                             <th className="px-6 py-4 font-black text-gray-500 text-right">등록일</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                        <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-50'}`}>
                           {[
                             { name: '김지O', age: '22세', region: '서울 강남구', desc: '밝고 긍정적인 에너지! 성실하게 일하겠습니다.', date: '방금 전' },
                             { name: '이소O', age: '25세', region: '인천 연수구', desc: '경력 2년, 센스 만점! 즉시 출근 가능합니다.', date: '5분 전' },
@@ -749,12 +750,12 @@ export default function HomePortal() {
                             { name: '최혜O', age: '24세', region: '서울 서초구', desc: '평일 오후 파트타임 구합니다. 약속 잘 지킵니다.', date: '30분 전' },
                             { name: '정유O', age: '23세', region: '부산 해운대구', desc: '주말 고정 알바 찾고 있어요. 활발한 성격입니다.', date: '1시간 전' },
                           ].map((person, idx) => (
-                            <tr key={idx} className="hover:bg-rose-50/30 dark:hover:bg-rose-900/10 transition-colors cursor-pointer group">
+                            <tr key={idx} className={`transition-colors cursor-pointer group ${brand.theme === 'dark' ? 'hover:bg-rose-900/10' : 'hover:bg-rose-50/30'}`}>
                               <td className="px-6 py-4">
-                                <span className="font-black text-gray-900 dark:text-gray-100 group-hover:text-rose-500">{person.name}</span>
+                                <span className={`font-black group-hover:text-rose-500 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{person.name}</span>
                                 <span className="text-gray-400 ml-2">({person.age})</span>
                               </td>
-                              <td className="px-6 py-4 text-gray-600 dark:text-gray-400 font-bold">{person.region}</td>
+                              <td className={`px-6 py-4 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{person.region}</td>
                               <td className="px-6 py-4 text-gray-400 hidden md:table-cell truncate max-w-xs">{person.desc}</td>
                               <td className="px-6 py-4 text-right text-gray-300 font-medium">{person.date}</td>
                             </tr>
@@ -871,7 +872,7 @@ export default function HomePortal() {
             </div>
 
             <div className="space-y-3">
-              <div className={`p-4 rounded-lg shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <div className={`p-4 rounded-lg shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-100 text-gray-700'}`}>
                 <div className="flex justify-between mb-2">
                   <span className="bg-gray-700 text-white text-xs px-2 py-1 rounded">강남/논현</span>
                   <span className="text-xs text-gray-400">2024.01.20</span>
@@ -1257,16 +1258,16 @@ export default function HomePortal() {
 
           {/* Links */}
           <div className="flex justify-center flex-wrap gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-gray-400 mb-8">
-            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">이용약관</span>
-            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors font-bold whitespace-nowrap">개인정보처리방침</span>
-            <span onClick={() => setCurrentPage('home')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">청소년보호정책</span>
-            <span onClick={() => router.push('/customer-center')} className="cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap">광고/제휴문의</span>
+            <span onClick={() => setCurrentPage('home')} className={`cursor-pointer transition-colors whitespace-nowrap ${brand.theme === 'dark' ? 'hover:text-white text-gray-400' : 'hover:text-gray-900 text-gray-600'}`}>이용약관</span>
+            <span onClick={() => setCurrentPage('home')} className={`cursor-pointer transition-colors font-bold whitespace-nowrap ${brand.theme === 'dark' ? 'hover:text-white text-gray-400' : 'hover:text-gray-900 text-gray-600'}`}>개인정보처리방침</span>
+            <span onClick={() => setCurrentPage('home')} className={`cursor-pointer transition-colors whitespace-nowrap ${brand.theme === 'dark' ? 'hover:text-white text-gray-400' : 'hover:text-gray-900 text-gray-600'}`}>청소년보호정책</span>
+            <span onClick={() => router.push('/customer-center')} className={`cursor-pointer transition-colors whitespace-nowrap ${brand.theme === 'dark' ? 'hover:text-white text-gray-400' : 'hover:text-gray-900 text-gray-600'}`}>광고/제휴문의</span>
           </div>
 
           {/* Info */}
           <div className="text-[11px] sm:text-xs text-gray-400 leading-relaxed opacity-80 mb-8">
             <p>
-              <span className="font-bold text-gray-500 dark:text-gray-300">{brand.displayName}</span> |
+              <span className={`font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{brand.displayName}</span> |
               대표: 김코코 |
               사업자등록번호: 226-13-91078
             </p>
@@ -1285,7 +1286,7 @@ export default function HomePortal() {
           </div>
 
           {/* Copyright */}
-          <div className="text-[10px] text-gray-300 dark:text-gray-600 border-t border-gray-100 dark:border-gray-800 pt-8 break-keep">
+          <div className={`text-[10px] pt-8 break-keep border-t ${brand.theme === 'dark' ? 'text-gray-600 border-gray-800' : 'text-gray-300 border-gray-100'}`}>
             <p className="mb-1">© {new Date().getFullYear()} {brand.name} UNIVERSE. All Rights Reserved.</p>
             <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
           </div>
