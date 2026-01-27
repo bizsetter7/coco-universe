@@ -112,7 +112,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                         <div className={`rounded-[22px] p-6 relative overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                             <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-black px-4 py-1 rounded-bl-2xl shadow-sm">REGION GRAND</div>
                             <div className="flex gap-5 items-center mb-6">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-amber-50'}`}>✨</div>
+                                <div className={`aspect-square w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-amber-50'}`}>✨</div>
                                 <div>
                                     <p className="text-[10px] font-black text-amber-600 mb-1 tracking-tighter uppercase">가장 먼저 만나는 {regionName} 대표 업소</p>
                                     <h3 className={`text-xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>광고주님, 이 자리를 선점하세요!</h3>
@@ -160,12 +160,12 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                                 shop.tier === 'urgent' ? 'bg-red-600 animate-pulse' :
                                                                     shop.tier === 'recommended' ? 'bg-green-500' : 'bg-gray-400'}
                                             `}>
-                                                {shop.tier === 'grand' ? '1번 - GRAND' :
-                                                    shop.tier === 'preferential' ? '2번 - 우대' :
-                                                        shop.tier === 'premium' ? '3번 - PREMIUM' :
-                                                            shop.tier === 'special' ? '4번 - SPECIAL' :
-                                                                shop.tier === 'urgent' ? '5번 - 급구' :
-                                                                    shop.tier === 'recommended' ? '6번 - 추천' : '7번 - 일반'}
+                                                {shop.tier === 'grand' ? 'GRAND' :
+                                                    shop.tier === 'preferential' ? '우대' :
+                                                        shop.tier === 'premium' ? 'PREMIUM' :
+                                                            shop.tier === 'special' ? 'SPECIAL' :
+                                                                shop.tier === 'urgent' ? '급구' :
+                                                                    shop.tier === 'recommended' ? '추천' : '일반'}
                                             </div>
                                         )}
                                         <div className="flex justify-between items-start mb-4">
@@ -205,15 +205,15 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                         <div className="flex gap-2">
                                             <a
                                                 href={shop.phone ? `tel:${shop.phone}` : '#'}
-                                                className={`flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700' : 'bg-gray-900 text-white hover:bg-black'}`}
+                                                className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700' : 'bg-gray-900 text-white hover:bg-black'}`}
                                             >
-                                                <Phone size={16} /> 전화상담
+                                                <Phone size={14} /> 전화
                                             </a>
                                             <a
                                                 href={shop.kakao ? `https://pf.kakao.com/_` : '#'}
-                                                className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                                className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
                                             >
-                                                <MessageSquare size={16} /> 카톡문의
+                                                <MessageSquare size={14} /> 카톡
                                             </a>
                                         </div>
                                     </div>

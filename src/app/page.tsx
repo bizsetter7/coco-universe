@@ -317,10 +317,10 @@ export default function HomePortal() {
                     key={shop.id || i}
                     onClick={() => setSelectedShop(shop)}
                     className={`group relative border-2 rounded-[22px] overflow-hidden shadow-md transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-transparent'}
-                      ${shop.tier === 'grand' ? `ring-2 ring-amber-400 animate-pulse-subtle` : ''}
+                      ${shop.tier === 'grand' ? `ring-2 ring-amber-400 !border-amber-400 animate-pulse-subtle` : ''}
                     `}
                   >
-                    <div className={`aspect-square sm:aspect-auto sm:h-36 flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                    <div className={`aspect-square flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                       {shop.name.split(' ').slice(0, 2).join(' ')}<br />매장 이미지
                       {shop.options?.blink && (
                         <div className="absolute top-2 left-2 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-bounce shadow-sm">급구</div>
@@ -489,7 +489,7 @@ export default function HomePortal() {
                       onClick={() => setSelectedShop(shop)}
                       className={`group border rounded-xl p-1 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
-                      <div className={`relative aspect-square sm:aspect-[4/3] rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
+                      <div className={`relative aspect-square rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
                         {shop.name.substring(0, 1)}
                         <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic shadow-sm">HOT</div>
                       </div>
@@ -506,78 +506,42 @@ export default function HomePortal() {
                 </div>
               </div>
 
-              {/* [QUEEN STYLE] 5번 급구채용 & 6번 추천채용 듀얼 섹션 */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-16">
-                {/* 5번 급구채용 (Left Column: 4/12) */}
-                <div className="md:col-span-4">
-                  <div className="flex items-center justify-between mb-5">
-                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
-                      <span className="text-2xl text-purple-600">|</span>
-                      <span>급구채용</span>
-                    </h3>
-                    <button
-                      onClick={() => router.push('/customer-center?tab=ad')}
-                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-black'}`}
-                    >
-                      광고신청 +
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    {shops.filter(s => s.tier === 'urgent').slice(0, 5).map((shop, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setSelectedShop(shop)}
-                        className={`border-2 rounded-2xl p-3.5 flex gap-3 hover:border-purple-500 transition-all cursor-pointer shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-900/30' : 'bg-white border-purple-100'}`}
-                      >
-                        <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs text-blue-400 font-extrabold shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-700' : 'bg-gray-50 border border-gray-100'}`}>
-                          {shop.name.substring(0, 1)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h5 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
-                          <p className="text-[10px] font-bold text-gray-500 mb-1">{shop.region.split(' ')[1]}</p>
-                          <div className={`text-[9px] px-1.5 py-0.5 rounded-md inline-block font-black ${brand.theme === 'dark' ? 'bg-purple-900/40 text-purple-400' : 'bg-purple-50 text-purple-600'}`}>⭐ NEW 전용</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              {/* 5번 급구 및 추천채용 통합 섹션 */}
+              <div className="mb-16">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
+                    <span className="text-2xl text-purple-600">|</span>
+                    <span>급구 및 추천채용</span>
+                  </h3>
+                  <button
+                    onClick={() => router.push('/customer-center?tab=ad')}
+                    className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-black'}`}
+                  >
+                    광고신청 +
+                  </button>
                 </div>
-
-                {/* 6번 추천채용 (Right Column: 8/12) */}
-                <div className="md:col-span-8">
-                  <div className="flex items-center justify-between mb-5">
-                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
-                      <span className="text-2xl text-purple-600">|</span>
-                      <span>추천채용</span>
-                    </h3>
-                    <button
-                      onClick={() => router.push('/customer-center?tab=ad')}
-                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-black'}`}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {shops.filter(s => s.tier === 'urgent' || s.tier === 'recommended' || s.recommended).slice(0, 6).map((shop, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setSelectedShop(shop)}
+                      className={`border rounded-2xl p-4 sm:p-5 hover:border-rose-400 transition-all cursor-pointer group flex gap-4 ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-inner'}`}
                     >
-                      광고신청 +
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {shops.filter((s, idx) => s.recommended || (idx < 6 && s.tier === 'recommended')).slice(0, 6).map((shop, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setSelectedShop(shop)}
-                        className={`border rounded-2xl p-4 sm:p-5 hover:border-rose-400 transition-all cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-inner'}`}
-                      >
-                        <div className="flex justify-between items-start mb-2.5">
-                          <div>
-                            <p className="text-[10px] font-bold text-gray-400 mb-0.5">{shop.region.split(' ')[1]}</p>
-                            <h5 className={`font-black text-[14px] group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
-                          </div>
-                          <div className="text-[10px] font-black text-white bg-rose-500 px-2 py-0.5 rounded-full shadow-sm">REC</div>
-                        </div>
-                        <p className={`text-[11px] font-bold truncate mb-3.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>"{shop.name}에서 함께 일할 메이트를 찾아요!"</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-black text-red-600 tracking-tight">{shop.pay}</span>
-                          <span className="text-[10px] text-gray-400 font-bold">{shop.workType}</span>
-                        </div>
+                      <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-700 text-blue-400' : 'bg-white border border-gray-100 text-blue-400'}`}>
+                        {shop.name.substring(0, 1)}
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <h5 className={`font-black text-[14px] truncate group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
+                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${shop.tier === 'urgent' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                            {shop.tier === 'urgent' ? '급구' : '추천'}
+                          </span>
+                        </div>
+                        <p className={`text-[11px] font-bold text-gray-500 mb-1`}>{shop.region.split(' ').slice(0, 2).join(' ')} | {shop.workType}</p>
+                        <p className="text-xs font-black text-red-600 tracking-tight">{shop.pay}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
               {/* 줄광고 리스트 */}
@@ -597,106 +561,51 @@ export default function HomePortal() {
                       <React.Fragment key={i}>
                         <div
                           onClick={() => setSelectedShop(shop)}
-                          className={`group relative flex flex-col p-0.5 rounded-[26px] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer overflow-hidden
-                            ${shop.tier === 'grand' ? 'bg-gradient-to-br from-amber-400 via-yellow-200 to-amber-600 shadow-xl shadow-amber-200/50' :
-                              shop.tier === 'preferential' ? 'bg-gradient-to-br from-gray-400 via-stone-100 to-gray-600 shadow-lg shadow-gray-200/30' :
-                                shop.tier === 'premium' ? 'bg-gradient-to-br from-blue-400 via-sky-100 to-blue-600 shadow-blue-200/30' :
-                                  shop.tier === 'special' ? 'bg-gradient-to-br from-rose-400 via-pink-100 to-rose-600 shadow-rose-200/30' :
-                                    shop.tier === 'urgent' ? 'border-2 border-red-500 shadow-md shadow-red-100' :
-                                      shop.tier === 'recommended' ? 'border-2 border-green-400 bg-green-50/10' :
-                                        brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
+                          className={`group relative flex flex-col p-3 md:p-5 rounded-[24px] border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer overflow-hidden
+                            ${shop.tier === 'grand' ? 'border-amber-400 bg-amber-50/5 shadow-amber-100/20' :
+                              shop.tier === 'preferential' ? 'border-gray-300 bg-gray-50/5' :
+                                shop.tier === 'premium' ? 'border-blue-200 bg-blue-50/5' :
+                                  shop.tier === 'special' ? 'border-rose-200 bg-rose-50/5' :
+                                    shop.tier === 'urgent' ? 'border-red-400 bg-red-50/5' :
+                                      shop.tier === 'recommended' ? 'border-green-300 bg-green-50/5' :
+                                        brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}
                           `}
                         >
-                          <div className={`flex flex-col h-full w-full p-3 md:p-5 rounded-[24px] transition-colors
-                            ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
-                          `}>
-                            {/* 지역 매칭 뱃지 (국내 최초 사용자 타겟팅 시각화) */}
-                            {userLocation.isDetected && shop.region.includes(userLocation.region) && (
-                              <div className="absolute top-3 left-3 z-10 bg-rose-500 text-white text-[7px] md:text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm animate-bounce">
-                                <MapPin size={8} /> 내 주변 Hot!
-                              </div>
-                            )}
-
-                            {/* 등급 뱃지 */}
-                            <div className={`absolute top-0 right-6 px-3 py-1 rounded-b-xl text-[8px] md:text-[9px] font-black text-white shadow-md z-10
-                                ${shop.tier === 'grand' ? 'bg-gradient-to-r from-amber-500 to-amber-600' :
-                                shop.tier === 'preferential' ? 'bg-gradient-to-r from-gray-500 to-gray-600' :
-                                  shop.tier === 'premium' ? 'bg-blue-500' :
-                                    shop.tier === 'special' ? 'bg-rose-500' :
-                                      shop.tier === 'urgent' ? 'bg-red-600 animate-pulse' :
-                                        shop.tier === 'recommended' ? 'bg-green-500' : 'bg-gray-500'}
-                              `}>
-                              {shop.tier === 'grand' ? '1번 - GRAND' :
-                                shop.tier === 'preferential' ? '2번 - 우대' :
-                                  shop.tier === 'premium' ? '3번 - 프리미엄' :
-                                    shop.tier === 'special' ? '4번 - 스페셜' :
-                                      shop.tier === 'urgent' ? '5번 - 급구' :
-                                        shop.tier === 'recommended' ? '6번 - 추천' : '7번 - 일반'}
+                          {/* 간결한 배치 */}
+                          <div className="flex items-center gap-3">
+                            <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black
+                              ${shop.tier === 'grand' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500'}
+                            `}>
+                              {shop.tier === 'grand' ? <Crown size={18} fill="currentColor" /> : shop.name.substring(0, 1)}
                             </div>
-
-                            <div className="flex gap-4 mb-4">
-                              <div className={`shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-[22px] flex items-center justify-center text-xs md:text-lg font-black shadow-inner
-                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-600 ring-4 ring-amber-100' :
-                                  shop.tier === 'preferential' ? 'bg-gray-50 text-gray-700 ring-4 ring-gray-100' :
-                                    shop.tier === 'premium' ? 'bg-blue-50 text-blue-600' :
-                                      shop.tier === 'special' ? 'bg-rose-50 text-rose-600' :
-                                        shop.tier === 'urgent' ? 'bg-red-50 text-red-600' :
-                                          shop.tier === 'recommended' ? 'bg-green-50 text-green-600' :
-                                            'bg-gray-50 text-gray-400'}
-                              `}>
-                                {shop.tier === 'grand' ? <Crown size={22} fill="currentColor" /> :
-                                  shop.tier === 'special' ? <Trophy size={20} /> :
-                                    shop.tier === 'urgent' ? <AlertCircle size={20} /> :
-                                      shop.tier === 'recommended' ? <ThumbsUp size={20} /> :
-                                        shop.name.substring(0, 1)}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <span className="text-[10px] text-gray-500 font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</span>
+                                {shop.tier !== 'common' && (
+                                  <span className={`text-[8px] px-1 rounded-sm font-black text-white
+                                    ${shop.tier === 'grand' ? 'bg-amber-500' : 'bg-gray-400'}
+                                  `}>等级 {shop.tier === 'grand' ? 'G' : 'P'}</span>
+                                )}
                               </div>
-                              <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                <div className="flex items-center gap-1.5 mb-1">
-                                  <span className="text-[9px] md:text-[11px] text-gray-400 font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</span>
-                                </div>
-                                <h4 className={`text-xs md:text-[15px] truncate mb-1 leading-tight
-                                  ${shop.options?.bold ? 'font-black' : 'font-bold'}
-                                  ${shop.options?.blink ? 'animate-pulse text-rose-600' : ''}
-                                  ${shop.tier === 'urgent' ? 'text-red-700' :
-                                    shop.options?.color || (brand.theme === 'dark' ? 'text-white' : 'text-gray-900')}
-                                `}>
-                                  {shop.name}
-                                  {shop.tier === 'urgent' && <span className="ml-2 text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md">HOT</span>}
-                                </h4>
-                              </div>
+                              <h4 className={`text-sm font-bold truncate ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                                {shop.name}
+                              </h4>
                             </div>
-
-                            <div className="flex flex-wrap gap-1.5 mb-5 min-h-[18px]">
-                              {shop.options?.icons?.map((icon, idx) => (
-                                <span key={idx} className={`text-[8px] sm:text-[10px] px-2 py-0.5 rounded-lg font-black border ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
-                                  {icon}
-                                </span>
-                              ))}
-                            </div>
-
-                            <div className={`mt-auto pt-4 border-t flex items-end justify-between ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-100'}`}>
-                              <div>
-                                <p className="text-[9px] sm:text-[11px] text-gray-500 font-black mb-0.5">{shop.workType}</p>
-                                <p className="text-sm sm:text-lg text-red-600 font-extrabold tracking-tight">{shop.pay}</p>
-                              </div>
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors
-                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400')}
-                              `}>
-                                <ChevronRight size={16} />
-                              </div>
+                            <div className="text-right">
+                              <p className="text-xs font-black text-red-600">{shop.pay.split(' ')[1] || shop.pay}</p>
+                              <p className="text-[9px] text-gray-400 font-bold">{shop.workType}</p>
                             </div>
                           </div>
                         </div>
 
-                        {/* 리스트 네이티브 광고 (3번째마다 삽입) */}
-                        {((i + 1) % 3 === 0) && (
-                          <div className={`col-span-1 border-2 border-dashed rounded-[26px] p-5 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-rose-400 transition-all ${brand.theme === 'dark' ? 'bg-rose-900/10 border-rose-900/30' : 'bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200'}`}>
-                            <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center text-white mb-3 shadow-lg shadow-rose-200">
-                              <Star size={20} fill="currentColor" />
+                        {/* 리스트 네이티브 광고 (간소화) */}
+                        {((i + 1) % 5 === 0) && (
+                          <div className={`col-span-1 border rounded-[22px] px-5 py-3 flex items-center justify-between group cursor-pointer hover:border-rose-400 transition-all ${brand.theme === 'dark' ? 'bg-rose-900/10 border-rose-900/30' : 'bg-rose-50 border-rose-100'}`}>
+                            <div className="flex items-center gap-3">
+                              <Star size={18} className="text-rose-500" fill="currentColor" />
+                              <h5 className={`text-xs font-black ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>사장님, 광고 한 칸 어떠세요?</h5>
                             </div>
-                            <p className="text-[10px] font-black text-rose-500 mb-1">LIST NATIVE AD</p>
-                            <h5 className={`text-sm font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>사장님, 광고 한 칸 어떠세요?</h5>
-                            <button className={`text-[10px] font-black px-4 py-2 rounded-full shadow-md active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-950 border border-gray-100'}`}>문의하기</button>
+                            <button className={`text-[10px] font-black px-3 py-1.5 rounded-full bg-white text-rose-500 shadow-sm border border-rose-100`}>문의</button>
                           </div>
                         )}
                       </React.Fragment>
