@@ -133,88 +133,38 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                             return (
                                 <React.Fragment key={shop.id || i}>
                                     <div
-                                        className={`rounded-2xl p-5 shadow-sm border transition-all group relative overflow-hidden
-                                            ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
-                                            ${brand.theme === 'dark' ?
-                                                (shop.tier === 'grand' ? 'border-amber-500 ring-2 ring-amber-900/30' :
-                                                    shop.tier === 'preferential' ? 'border-gray-500 ring-2 ring-gray-800/30' :
-                                                        shop.tier === 'premium' ? 'border-blue-700' :
-                                                            shop.tier === 'special' ? 'border-rose-700' :
-                                                                shop.tier === 'urgent' ? 'border-red-900/50 bg-red-950/10' :
-                                                                    shop.tier === 'recommended' ? 'border-green-700' : 'border-gray-800')
-                                                :
-                                                (shop.tier === 'grand' ? 'border-amber-400 ring-2 ring-amber-100 shadow-xl' :
-                                                    shop.tier === 'preferential' ? 'border-gray-400 ring-2 ring-gray-100 shadow-lg' :
-                                                        shop.tier === 'premium' ? 'border-blue-400' :
-                                                            shop.tier === 'special' ? 'border-rose-400' :
-                                                                shop.tier === 'urgent' ? 'border-red-500 bg-red-50/5' :
-                                                                    shop.tier === 'recommended' ? 'border-green-400' : 'border-gray-200')}
+                                        onClick={() => { }}
+                                        className={`rounded-[22px] p-4 shadow-md border-2 transition-all group relative overflow-hidden cursor-pointer
+                                            ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}
+                                            ${shop.tier === 'grand' ? '!border-amber-400 ring-1 ring-amber-400/50 shadow-amber-100/20' :
+                                                shop.tier === 'preferential' ? '!border-gray-400' : ''}
                                         `}
                                     >
-                                        {shop.tier && shop.tier !== 'common' && (
-                                            <div className={`absolute top-0 right-0 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl z-10
-                                                ${shop.tier === 'grand' ? 'bg-amber-500' :
-                                                    shop.tier === 'preferential' ? 'bg-gray-600' :
-                                                        shop.tier === 'premium' ? 'bg-blue-500' :
-                                                            shop.tier === 'special' ? 'bg-rose-500' :
-                                                                shop.tier === 'urgent' ? 'bg-red-600 animate-pulse' :
-                                                                    shop.tier === 'recommended' ? 'bg-green-500' : 'bg-gray-400'}
-                                            `}>
-                                                {shop.tier === 'grand' ? 'GRAND' :
-                                                    shop.tier === 'preferential' ? '우대' :
-                                                        shop.tier === 'premium' ? 'PREMIUM' :
-                                                            shop.tier === 'special' ? 'SPECIAL' :
-                                                                shop.tier === 'urgent' ? '급구' :
-                                                                    shop.tier === 'recommended' ? '추천' : '일반'}
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shrink-0 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500' : 'bg-gray-50 text-gray-400'}`}>
+                                                {shop.name.substring(0, 1)}
                                             </div>
-                                        )}
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <div className="flex items-center gap-1 mb-1">
-                                                    <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
-                                                    {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded ${shop.tier === 'grand' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                        {shop.tier === 'grand' ? 'GRAND' : shop.tier?.toUpperCase() || 'COMMON'}
+                                                    </span>
+                                                    <span className="text-[10px] font-bold text-gray-400">{shop.region}</span>
                                                 </div>
-                                                <h3 className={`text-lg font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                                                    <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
-                                                        {shop.name}
-                                                    </a>
-                                                    {shop.is_verified && <CheckCircle2 size={14} className="text-blue-500 fill-blue-50" />}
-                                                </h3>
-                                                <div className="flex items-center gap-1 mt-1 text-gray-400">
-                                                    <MapPin size={12} />
-                                                    <span className="text-xs">{shop.region}</span>
+                                                <h3 className={`text-lg font-black truncate ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h3>
+                                                <div className="flex items-center gap-3 mt-1.5">
+                                                    <span className="text-red-600 font-black text-sm">{shop.pay}</span>
+                                                    <span className="text-[11px] text-gray-400 font-bold">{shop.workType}</span>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div className="grid grid-cols-2 gap-2 mb-4">
-                                            <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                <p className="text-[10px] text-gray-500 font-bold mb-0.5">급여 조건</p>
-                                                <p className="text-xs font-black text-rose-600">{shop.pay}</p>
-                                            </div>
-                                            <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                <p className="text-[10px] text-gray-500 font-bold mb-0.5">근무 형태</p>
-                                                <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>{shop.workType}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-4 text-center">
-                                            <p className="text-[10px] text-gray-400 italic">"코코알바를 통해 연락했다고 말씀해주세요!"</p>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <a
-                                                href={shop.phone ? `tel:${shop.phone}` : '#'}
-                                                className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700' : 'bg-gray-900 text-white hover:bg-black'}`}
-                                            >
-                                                <Phone size={14} /> 전화
+                                        <div className="mt-4 flex gap-2">
+                                            <a href={`tel:${shop.phone}`} className={`flex-1 py-3 rounded-xl text-xs font-black flex items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-900 text-white hover:bg-black'}`}>
+                                                <Phone size={14} /> 전화하기
                                             </a>
-                                            <a
-                                                href={shop.kakao ? `https://pf.kakao.com/_` : '#'}
-                                                className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
-                                            >
-                                                <MessageSquare size={14} /> 카톡
-                                            </a>
+                                            <div className="flex-1 bg-yellow-400 text-yellow-900 py-3 rounded-xl text-xs font-black flex items-center justify-center gap-2">
+                                                <MessageSquare size={14} /> 카톡상담
+                                            </div>
                                         </div>
                                     </div>
 
