@@ -49,14 +49,14 @@ const AD_TIERS = [
     {
         id: 'grand',
         name: 'Grand Premium',
-        icon: <Crown className="text-amber-500" />,
+        icon: <Crown className="text-pink-600" />,
         price: '300,000원 / 1개월',
         benefits: ['메인 페이지 최상단 고정 노출', '지역별 검색 리스트 1순위 노출', '블링블링 효과 및 굵은 폰트 적용', '인재열람권 무제한 제공']
     },
     {
         id: 'premium',
         name: 'Premium',
-        icon: <Zap className="text-pink-500" />,
+        icon: <Zap className="text-pink-400" />,
         price: '150,000원 / 1개월',
         benefits: ['지역별 검색 리스트 상단 노출', '인증 마크(Shield) 부여', '강조 색상 텍스트 적용', '실시간 채팅 지원']
     },
@@ -179,20 +179,20 @@ function CustomerCenterContent() {
                         </div>
 
                         {/* Customer Service Box (Desktop Only) */}
-                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border-2 border-gray-900 bg-white dark:bg-gray-800 shadow-xl`}>
+                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border border-gray-100 bg-white dark:bg-gray-800 shadow-xl shadow-pink-100/10`}>
                             <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gray-900">
+                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
                                     <PhoneCall size={20} />
                                 </div>
-                                <span className="font-black text-black dark:text-white text-lg">고객센터</span>
+                                <span className="font-black text-gray-900 dark:text-white text-lg">고객센터</span>
                             </div>
-                            <p className="text-3xl font-black mb-2 text-black dark:text-white tracking-tighter">1544-5568</p>
-                            <p className="text-[13px] text-black dark:text-gray-200 leading-relaxed font-black">
+                            <p className="text-3xl font-black mb-2 text-gray-900 dark:text-white tracking-tighter">1544-5568</p>
+                            <p className="text-[13px] text-gray-500 dark:text-gray-200 leading-relaxed font-black">
                                 평일 09:30 ~ 19:00<br />
                                 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-sky-500 text-white rounded-2xl text-sm font-black hover:bg-sky-600 transition shadow-lg">
+                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg">
                                 <MessageCircle size={18} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
@@ -214,7 +214,7 @@ function CustomerCenterContent() {
                                             className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors ${idx !== NOTICES.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''}`}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <span className={`px-2.5 py-1 rounded text-[11px] font-black ${notice.category === '공지' ? 'bg-blue-600 text-white' : notice.category === '점검' ? 'bg-amber-500 text-white' : 'bg-pink-600 text-white'}`}>
+                                                <span className={`px-2.5 py-1 rounded text-[11px] font-black ${notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-pink-600 text-white'}`}>
                                                     {notice.category}
                                                 </span>
                                                 <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-300'}`}>
@@ -244,26 +244,26 @@ function CustomerCenterContent() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {AD_TIERS.map((tier) => (
-                                        <div key={tier.id} className={`bg-white dark:bg-gray-800 p-8 rounded-[32px] border-2 shadow-sm flex flex-col transition-transform hover:scale-[1.02] ${tier.id === 'grand' ? 'border-amber-400' : 'border-gray-200 dark:border-gray-700'}`}>
+                                        <div key={tier.id} className={`bg-white dark:bg-gray-800 p-8 rounded-[32px] border-2 shadow-sm flex flex-col transition-transform hover:scale-[1.02] ${tier.id === 'grand' ? 'border-pink-200 shadow-lg shadow-pink-100/50' : 'border-gray-100 dark:border-gray-700'}`}>
                                             <div className="flex items-center justify-between mb-6">
-                                                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl shadow-inner">
+                                                <div className="p-4 bg-pink-50 dark:bg-gray-700 rounded-2xl shadow-inner text-pink-600">
                                                     {tier.icon}
                                                 </div>
-                                                {tier.id === 'grand' && <span className="bg-amber-400 text-white text-[11px] px-3 py-1 rounded-full font-black">TOP TIAR</span>}
+                                                {tier.id === 'grand' && <span className="bg-pink-600 text-white text-[11px] px-3 py-1 rounded-full font-black">TOP TIER</span>}
                                             </div>
                                             <h3 className="text-xl font-black mb-2 text-gray-900 dark:text-white">{tier.name}</h3>
-                                            <p className="text-red-600 font-black text-lg mb-8">{tier.price}</p>
+                                            <p className="text-pink-600 font-black text-lg mb-8">{tier.price}</p>
 
                                             <div className="flex-1 space-y-4 mb-8">
                                                 {tier.benefits.map((benefit, i) => (
-                                                    <p key={i} className="text-xs text-gray-700 dark:text-gray-300 flex items-start gap-2.5 font-bold">
-                                                        <CheckCircle2 size={16} className="text-green-600 shrink-0 mt-0.5" />
+                                                    <p key={i} className="text-xs text-gray-500 dark:text-gray-300 flex items-start gap-2.5 font-bold">
+                                                        <CheckCircle2 size={16} className="text-pink-600 shrink-0 mt-0.5" />
                                                         {benefit}
                                                     </p>
                                                 ))}
                                             </div>
 
-                                            <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-amber-400 text-white shadow-xl shadow-amber-100/50 hover:bg-amber-500' : 'bg-gray-900 text-white hover:bg-black dark:bg-gray-700'}`}>
+                                            <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-xl shadow-pink-100/50 hover:bg-pink-700' : 'bg-gray-900 text-white hover:bg-black dark:bg-gray-700'}`}>
                                                 광고 신청하기
                                             </button>
                                         </div>
@@ -313,10 +313,10 @@ function CustomerCenterContent() {
                                                 배너 진행 시 지역 상단 우대등록 및 강조 효과를 무료로 적용해 드립니다.
                                             </p>
                                         </div>
-                                        <div className="p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-3xl flex items-start gap-4 border border-indigo-100/50 dark:border-indigo-900/30">
-                                            <Megaphone size={20} className="text-indigo-600 shrink-0 mt-0.5" />
+                                        <div className="p-6 bg-gray-50/50 dark:bg-gray-900/10 rounded-3xl flex items-start gap-4 border border-gray-100/50 dark:border-gray-900/30">
+                                            <Megaphone size={20} className="text-gray-900 shrink-0 mt-0.5" />
                                             <p className="text-[13px] text-gray-900 dark:text-gray-100 leading-relaxed font-black">
-                                                <strong className="text-indigo-600">한정 구좌 운영:</strong><br />
+                                                <strong className="text-gray-900">한정 구좌 운영:</strong><br />
                                                 클린한 구인 환경을 위해 매월 한정 수량만 판매되며, 연장 우선순위가 적용됩니다.
                                             </p>
                                         </div>
@@ -354,23 +354,23 @@ function CustomerCenterContent() {
 
                                 <section>
                                     <div className="flex items-center gap-3 mb-8">
-                                        <div className="w-2 h-8 bg-blue-600 rounded-full shadow-lg shadow-blue-200"></div>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full shadow-lg shadow-pink-200"></div>
                                         <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Employer Guide</h3>
                                     </div>
-                                    <div className="bg-gray-900 dark:bg-gray-800 p-10 rounded-[45px] text-white shadow-2xl space-y-10">
+                                    <div className="bg-white dark:bg-gray-800 p-8 md:p-10 rounded-[45px] text-gray-900 border border-gray-100 shadow-xl shadow-pink-100/10 space-y-10">
                                         <div className="flex flex-col md:flex-row items-center gap-8">
-                                            <div className="w-24 h-24 bg-white/10 text-blue-400 rounded-[30px] flex items-center justify-center shrink-0 border border-white/10">
-                                                <Briefcase size={40} />
+                                            <div className="w-20 h-20 bg-pink-50 text-pink-600 rounded-[28px] flex items-center justify-center shrink-0 border border-pink-100">
+                                                <Briefcase size={36} />
                                             </div>
                                             <div className="text-center md:text-left">
-                                                <h4 className="text-xl font-black mb-2 tracking-tight">사장님, 안심하고 이용하세요!</h4>
-                                                <p className="text-sm text-gray-400 font-bold leading-relaxed">철저한 사업자 인증을 통해 클린하고 신뢰할 수 있는 구인 공고 문화를 만들어갑니다.</p>
+                                                <h4 className="text-xl font-black mb-2 tracking-tight text-gray-900">사장님, 안심하고 이용하세요!</h4>
+                                                <p className="text-[13px] text-gray-500 font-bold leading-relaxed">철저한 사업자 인증을 통해 클린하고 신뢰할 수 있는 구인 공고 문화를 만들어갑니다.</p>
                                             </div>
-                                            <button className="md:ml-auto px-10 py-5 bg-blue-600 text-white rounded-[22px] text-base font-black shadow-2xl shadow-blue-900/50 hover:bg-blue-700 transition">
+                                            <button className="w-full md:w-auto md:ml-auto px-8 py-4 bg-gray-900 text-white rounded-2xl text-[15px] font-black shadow-xl hover:bg-black transition">
                                                 사업자 인증하러 가기
                                             </button>
                                         </div>
-                                        <div className="h-px bg-white/10 w-full" />
+                                        <div className="h-px bg-gray-100 w-full" />
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                                             {[
                                                 { num: '1', title: '상품 선택', sub: '효율적인 광고 상품을 직접 픽업하세요.' },
@@ -378,10 +378,10 @@ function CustomerCenterContent() {
                                                 { num: '3', title: '컨택 & 매칭', sub: '열람권을 통해 적합한 인재를 먼저 선점하세요.' }
                                             ].map((box, i) => (
                                                 <div key={i} className="flex gap-5">
-                                                    <span className="text-4xl font-black text-blue-500/30">{box.num}</span>
+                                                    <span className="text-4xl font-black text-pink-500/20">{box.num}</span>
                                                     <div>
-                                                        <h5 className="font-black text-lg mb-1">{box.title}</h5>
-                                                        <p className="text-sm text-gray-400 font-bold leading-relaxed">{box.sub}</p>
+                                                        <h5 className="font-black text-lg mb-1 text-gray-900">{box.title}</h5>
+                                                        <p className="text-[13px] text-gray-500 font-bold leading-relaxed">{box.sub}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -421,13 +421,13 @@ function CustomerCenterContent() {
                         {/* 5. 1:1 Inquiry */}
                         {activeTab === '1:1문의' && (
                             <div className="space-y-10">
-                                <div className="bg-white dark:bg-gray-800 p-10 rounded-[45px] border-2 border-gray-900 shadow-xl flex flex-col md:flex-row items-center gap-8">
-                                    <div className="p-5 bg-gray-100 dark:bg-gray-900 rounded-[30px] text-gray-900 shadow-inner">
+                                <div className="bg-white dark:bg-gray-800 p-8 md:p-10 rounded-[40px] border border-pink-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
+                                    <div className="p-5 bg-pink-50 dark:bg-gray-900 rounded-[30px] text-pink-600 shadow-inner">
                                         <MessageCircle size={36} />
                                     </div>
                                     <div className="text-center md:text-left">
                                         <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">무엇을 도와드릴까요?</h3>
-                                        <p className="text-sm text-gray-900 dark:text-gray-400 leading-relaxed font-black">궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
+                                        <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed font-black">궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
                                     </div>
                                 </div>
 
@@ -479,7 +479,7 @@ function CustomerCenterContent() {
                                 평일 09:30 ~ 19:00 / 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-2 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-sky-500 text-white rounded-[24px] text-base font-black hover:bg-sky-600 transition shadow-xl shadow-sky-100">
+                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-pink-600 text-white rounded-[24px] text-base font-black hover:bg-pink-700 transition shadow-xl shadow-pink-100">
                                 <MessageCircle size={20} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
