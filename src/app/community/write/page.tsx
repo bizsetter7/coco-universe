@@ -9,6 +9,7 @@ import {
     Home
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { usePreventLeave } from '@/hooks/usePreventLeave';
 
 const CATEGORIES = [
     '밤 문화 Talk',
@@ -23,6 +24,8 @@ export default function WritePostPage() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [images, setImages] = useState<string[]>([]);
+
+    usePreventLeave(title.trim() !== '' || content.trim() !== '');
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {

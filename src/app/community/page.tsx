@@ -40,10 +40,12 @@ function CommunityContent() {
     const pathname = usePathname();
     // [새로고침 무결성] URL 파라미터로부터 현재 탭을 강제 도출
     // 클라이언트 사이드에서 즉각적으로 반영되도록 useMemo로 래핑
-    const activeTab = React.useMemo(() => {
-        if (typeof window === 'undefined') return '전체';
+    const [activeTab, setActiveTab] = useState('전체');
+
+    useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        return params.get('category') || '전체';
+        const cat = params.get('category') || '전체';
+        setActiveTab(cat);
     }, [searchParams]);
 
     const [userType, setUserType] = useState<UserType>('individual');
@@ -99,8 +101,8 @@ function CommunityContent() {
                 기존 Sticky 방식 대신 Fixed 방식을 사용하여 스크롤 유실 문제를 원천 봉쇄함. 
             */}
 
-            {/* 1단 상단바 (Fixed z-60) */}
-            <div className="fixed top-0 left-0 right-0 z-[60] bg-white border-b shadow-sm h-14">
+            {/* 1단 상단바 (Fixed z-60) - 보더 제거로 개방감 확보 */}
+            <div className="fixed top-0 left-0 right-0 z-[60] bg-white shadow-sm h-14">
                 <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.push('/')} className="p-2 -ml-2 text-gray-700 hover:text-gray-900 transition-colors">
@@ -125,8 +127,8 @@ function CommunityContent() {
                 </div>
             </div>
 
-            {/* 2단 카테고리 탭 (Fixed z-50, top-14) */}
-            <div className="fixed top-14 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b h-[48px] overflow-hidden">
+            {/* 2단 카테고리 탭 (Fixed z-50, top-14) - 보더 제거로 일체감 조성 */}
+            <div className="fixed top-14 left-0 right-0 z-50 bg-white/95 backdrop-blur-md h-[48px] overflow-hidden">
                 <div className="max-w-[1020px] mx-auto flex px-4 h-full overflow-x-auto scrollbar-hide">
                     {CATEGORIES.map((cat) => (
                         <button
@@ -168,6 +170,21 @@ function CommunityContent() {
                 </div>
 
                 <main className="max-w-[1020px] mx-auto px-4 space-y-4">
+                    {/* 커뮤니티 상단 브랜드 광고 (Brand Slider 대용) */}
+                    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden group mb-6 cursor-pointer">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                        <div className="relative z-10 flex items-center justify-between">
+                            <div>
+                                <span className="inline-block px-2 py-0.5 rounded-lg bg-white/20 text-[10px] font-black mb-2 tracking-widest uppercase">Community Prime Ad</span>
+                                <h3 className="text-lg md:text-xl font-black mb-1 leading-tight">그녀들의 이야기가<br />수익이 되는 순간! 💰</h3>
+                                <p className="text-[10px] md:text-[12px] opacity-80 font-bold">광고 문의하고 커뮤니티 상단 선점하세요</p>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md p-4 rounded-full group-hover:scale-110 transition-transform">
+                                <MessageCircle size={32} />
+                            </div>
+                        </div>
+                    </div>
+
                     {activeTab === '프리미엄 라운지' ? (
                         /* Lounge View */
                         <div className="space-y-6">
@@ -228,48 +245,69 @@ function CommunityContent() {
                     ) : (
                         /* Post List */
                         <div className="grid grid-cols-1 gap-4">
-                            {filteredPosts.map((post) => (
-                                <div
-                                    key={post.id}
-                                    onClick={() => handlePostClick(post.id)}
-                                    className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group"
-                                >
-                                    <div className="flex justify-between items-start mb-3">
-                                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors">
-                                            {post.category}
-                                        </span>
-                                        <span className="text-[11px] text-gray-500 font-bold">{post.time}</span>
-                                    </div>
+                            {filteredPosts.map((post, idx) => {
+                                const isAdPos = (idx + 1) % 4 === 0;
 
-                                    <h3 className="font-black text-gray-900 mb-1 lg:text-xl leading-snug">
-                                        {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1"><ShieldAlert size={16} className="fill-red-600 text-white" /> HOT</span>}
-                                        {post.title}
-                                    </h3>
-
-                                    <p className="text-sm text-black line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity">
-                                        <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[5px] select-none' : ''}>
-                                            {post.content}
-                                        </span>
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-xs border-t border-gray-50 pt-5">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
-                                                <User size={16} />
+                                return (
+                                    <React.Fragment key={post.id}>
+                                        <div
+                                            onClick={() => handlePostClick(post.id)}
+                                            className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group"
+                                        >
+                                            <div className="flex justify-between items-start mb-3">
+                                                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors">
+                                                    {post.category}
+                                                </span>
+                                                <span className="text-[11px] text-gray-500 font-bold">{post.time}</span>
                                             </div>
-                                            <span className="font-black text-gray-800">{post.author}</span>
+
+                                            <h3 className="font-black text-gray-900 mb-1 lg:text-xl leading-snug">
+                                                {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1"><ShieldAlert size={16} className="fill-red-600 text-white" /> HOT</span>}
+                                                {post.title}
+                                            </h3>
+
+                                            <p className="text-sm text-black line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity">
+                                                <span className={userType === 'corporate' || !isLoggedIn ? 'blur-[5px] select-none' : ''}>
+                                                    {post.content}
+                                                </span>
+                                            </p>
+
+                                            <div className="flex items-center justify-between text-xs border-t border-gray-50 pt-5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
+                                                        <User size={16} />
+                                                    </div>
+                                                    <span className="font-black text-gray-800">{post.author}</span>
+                                                </div>
+                                                <div className="flex gap-5">
+                                                    <span className="flex items-center gap-1.5 text-pink-600 font-black">
+                                                        <Heart size={16} className="fill-current" /> {post.likes}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5 text-blue-600 font-black">
+                                                        <MessageSquare size={16} className="fill-current" /> {post.comments}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex gap-5">
-                                            <span className="flex items-center gap-1.5 text-pink-600 font-black">
-                                                <Heart size={16} className="fill-current" /> {post.likes}
-                                            </span>
-                                            <span className="flex items-center gap-1.5 text-blue-600 font-black">
-                                                <MessageSquare size={16} className="fill-current" /> {post.comments}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+
+                                        {/* 커뮤니티 네이티브 광고 (4번째 게시글마다 삽입) */}
+                                        {isAdPos && (
+                                            <div className="bg-gradient-to-br from-rose-50 to-orange-50 border border-orange-100 rounded-[32px] p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all group">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
+                                                        <Sparkles size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Sponsored Content</p>
+                                                        <h4 className="font-black text-gray-900 leading-tight">[VIP 추천] {brand.name} 런칭 기념<br />역대급 혜택 받는 법! ✨</h4>
+                                                    </div>
+                                                </div>
+                                                <button className="bg-orange-600 text-white text-[11px] font-black px-6 py-3 rounded-2xl group-hover:scale-105 transition-transform shadow-lg shadow-orange-200/50">지금 확인하기</button>
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
                         </div>
                     )}
                 </main>

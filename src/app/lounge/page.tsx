@@ -99,6 +99,22 @@ export default function LoungePage() {
                             />
                         </div>
 
+                        {/* [VIRTUAL AD] 라운지 스타 프리미엄 (개인/모델/스타 타겟팅) */}
+                        <div className="bg-white dark:bg-gray-800 rounded-[40px] p-8 shadow-xl border border-stone-100 dark:border-gray-700 relative overflow-hidden group hover:border-amber-200 transition-all">
+                            <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-black px-6 py-1.5 rounded-bl-3xl shadow-sm z-10">STAR PREMIUM</div>
+                            <div className="flex flex-col md:flex-row gap-8 items-center">
+                                <div className="w-32 h-32 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-1 shadow-lg group-hover:scale-105 transition-transform">
+                                    <div className="w-full h-full bg-white dark:bg-gray-900 rounded-[22px] flex items-center justify-center text-4xl">⭐</div>
+                                </div>
+                                <div className="flex-1 text-center md:text-left">
+                                    <span className="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black mb-3">#인기모델 #조회수1위</span>
+                                    <h3 className="text-2xl font-black mb-2 leading-tight">주목받는 별이 되고 싶나요? 🌟</h3>
+                                    <p className="text-sm text-gray-500 font-medium mb-6">라운지 최상단 노출로 당신의 브랜드 가치를 높이세요.<br />하루 평균 5,000회 이상의 노출을 보장합니다.</p>
+                                    <button className="bg-gray-900 text-white dark:bg-amber-600 px-8 py-3.5 rounded-2xl font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">스타 멤버십 안내보기</button>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* 하단 섹션 - 고객 만족도 */}
                         <div className={`p-6 rounded-2xl border ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-stone-100'} shadow-sm text-center`}>
                             <h4 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-widest">Lounge Statistics</h4>

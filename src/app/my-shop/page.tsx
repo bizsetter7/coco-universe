@@ -8,8 +8,10 @@ import {
     Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette,
     FileText, User, CreditCard, LogOut, Settings, Bell,
     LayoutDashboard, List, PlusSquare, ChevronDown, HelpCircle, Laptop,
-    RefreshCw, Calendar, Eye, Highlighter, Smile, Menu, MousePointerClick
+    RefreshCw, Calendar, Eye, Highlighter, Smile, Menu, MousePointerClick,
+    Zap, Star, Crown
 } from 'lucide-react';
+import { usePreventLeave } from '@/hooks/usePreventLeave';
 
 // --- Data Constants ---
 const REGION_DATA: Record<string, string[]> = {
@@ -106,6 +108,58 @@ const FONT_SIZES = [
 
 const EMOJIS = ['❤️', '⭐', '✨', '🔥', '💰', '👍', '✔️', '👑', '💎', '📢', '🎵', '👀', '🎁', '🚀', '✅', '🎶', '🎀'];
 
+// shared Pricing Data
+const AD_TIERS = [
+    {
+        id: 'grand',
+        name: 'Grand Premium (Tier 1)',
+        price: '350,000원 / 30일',
+        benefits: ['메인 최상단 0순위 고정', '검색 리스트 최상단 노출', '블링블링 Glow/굵은폰트', '인재열람권 무제한 제공']
+    },
+    {
+        id: 'preferential',
+        name: 'Preferential (Tier 2)',
+        price: '200,000원 / 30일',
+        benefits: ['메인 상단 전략적 노출', '실버/연금색 강조 보더', '제목 강조/아이콘 효과 기본', '실시간 채팅 지원']
+    },
+];
+
+const DETAILED_PRICING = [
+    { id: 'p7', name: '7번 - 줄광고 (Basic)', desc: '리스트 하단에 배치됩니다. (지역 1개 노출/자동점프 일 10회 설정 제공)', d30: 60000, d60: 100000, d90: 140000, isMain: true },
+    { id: 'p1', name: '1번 - 그랜드 (Grand)', desc: '메인 독점! 최상단 0순위에 배치됩니다. (전 지역 검색 결과 압도적 선점 / Glow 효과)', d30: 350000, d60: 630000, d90: 840000, isMain: true },
+    { id: 'p2', name: '2번 - 우대 (Preferential)', desc: '메인 중단의 가장 눈에 띄는 위치에 배치됩니다. (실버 보더 적용 / 자동점프 일 30회)', d30: 200000, d60: 360000, d90: 480000, isMain: true },
+    { id: 'p3', name: '3번 - 프리미엄 (Premium)', desc: '메인페이지 우대등록 하단의 위치에 배치됩니다. (블루 보더 적용 / 자동점프 일 30회)', d30: 120000, d60: 215000, d90: 280000, isMain: true },
+    { id: 'region_prime', name: '지역 프라임 (Region)', desc: '지역 선택 영역 전용 노출! 타겟 지역 유저 집중 공략 (검색 버튼 상단 배치)', d30: 150000, d60: 270000, d90: 360000, isMain: true },
+    { id: 'p4', name: '4번 - 스페셜 (Special)', desc: '리스트 중간 상단에 배치됩니다. (핑크 보더 적용 / 자동점프 일 20회)', d30: 100000, d60: 180000, d90: 240000, isMain: true },
+    { id: 'p5', name: '5번 - 급구 (Urgent)', desc: '강렬한 빨간 제목으로 주목도를 높입니다. (목록 강조 노출 / 자동점프 일 20회)', d30: 80000, d60: 145000, d90: 190000, isMain: true },
+    { id: 'p6', name: '6번 - 추천 (Recommended)', desc: '배경 포인트 컬러와 추천 배지가 적용됩니다. (목록 노출 / 자동점프 일 20회)', d30: 80000, d60: 145000, d90: 190000, isMain: true },
+    { id: 'bold', name: '굵은글씨 적용', desc: '채용정보의 제목을 굵게 표시되어 어디든 눈에 띌 수 있도록 표시', d30: 30000, d60: 55000, d90: 70000, isMain: false },
+];
+
+const AD_ICONS = [
+    { id: 1, name: '초보환영', icon: '❤️' },
+    { id: 2, name: '원룸제공', icon: '👄' },
+    { id: 3, name: '최고급시설', icon: '💥' },
+    { id: 4, name: '블랙관리', icon: '⬛', bg: 'black', color: 'white' },
+    { id: 5, name: '꽁비지급', icon: '😜' },
+    { id: 6, name: '사이즈X', icon: '❌', color: 'red' },
+    { id: 7, name: '셋트환영', icon: '👯' },
+    { id: 8, name: '픽업가능', icon: '🚗' },
+    { id: 9, name: '회원제운영', icon: '❗', color: 'orange' },
+    { id: 10, name: '급전가능', icon: '✨' },
+];
+
+const AD_HIGHLIGHTERS = [
+    { id: 1, name: '연두', color: '#ccff00' },
+    { id: 2, name: '초록', color: '#00ff00' },
+    { id: 3, name: '하늘', color: '#00ffff' },
+    { id: 4, name: '보라', color: '#cc99ff' },
+    { id: 5, name: '오렌지', color: '#ffcc00' },
+    { id: 6, name: '연파랑', color: '#99ccff' },
+    { id: 7, name: '분홍', color: '#ff99ff' },
+    { id: 8, name: '핫핑크', color: '#ff00ff' },
+];
+
 export default function MyShopPage() {
     const router = useRouter();
     const [view, setView] = useState<'dashboard' | 'form'>('dashboard');
@@ -165,7 +219,64 @@ export default function MyShopPage() {
     // SEO Tags
     const [seoTags, setSeoTags] = useState<string[]>([]);
 
-    // --- Effects ---
+    // --- Ad Product Selection States ---
+    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(null);
+    const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(30);
+
+    const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
+    const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(0); // 0 means not using icon
+
+    const [selectedHighlighter, setSelectedHighlighter] = useState<number | null>(null);
+    const [highlighterPeriod, setHighlighterPeriod] = useState<30 | 60 | 90 | 0>(0);
+
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]); // Bold etc
+    const [optionPeriods, setOptionPeriods] = useState<Record<string, 30 | 60 | 90>>({});
+
+    const [totalAmount, setTotalAmount] = useState(0);
+
+    // --- Prevent Leave Logic ---
+    // 에디터 내용 추출 (태그 제외 순수 텍스트)
+    const isEditorDirty = editorRef.current ? editorRef.current.innerText.trim() !== '' : false;
+
+    const isDirty = view === 'form' && (
+        (shopName !== '' && shopName !== '코코 라운지') ||
+        managerName !== '' ||
+        managerPhone !== '' ||
+        title !== '' ||
+        industryMain !== '' ||
+        regionCity !== '' ||
+        payAmount !== '0' ||
+        isEditorDirty ||
+        selectedKeywords.length > 0 ||
+        selectedConvenience.length > 0
+    );
+
+    usePreventLeave(isDirty);
+
+    // --- Effects & Logic ---
+
+    // Manage body class for layout focus (hiding scroll/dimming)
+    useEffect(() => {
+        const isAnyModalOpen = showWarningModal || showDesignModal || showPreviewModal;
+        const isFormView = view === 'form';
+
+        if (isAnyModalOpen) {
+            document.body.classList.add('modal-active');
+        } else {
+            document.body.classList.remove('modal-active');
+        }
+
+        if (isFormView) {
+            document.body.classList.add('form-mode');
+        } else {
+            document.body.classList.remove('form-mode');
+        }
+
+        return () => {
+            document.body.classList.remove('modal-active');
+            document.body.classList.remove('form-mode');
+        };
+    }, [showWarningModal, showDesignModal, showPreviewModal, view]);
     useEffect(() => {
         // Enable CSS-based styling for cleaner HTML and better sync
         document.execCommand('styleWithCSS', false, 'true');
@@ -196,6 +307,44 @@ export default function MyShopPage() {
         ].filter(Boolean);
         setSeoTags(tags);
     }, [regionCity, regionGu, industryMain, industrySub, selectedKeywords, selectedConvenience, payType, payAmount]);
+
+    // Calculate Total Amount
+    useEffect(() => {
+        let total = 0;
+
+        // Main Ad
+        if (selectedAdProduct) {
+            const product = DETAILED_PRICING.find(p => p.id === selectedAdProduct);
+            if (product) {
+                const key = `d${selectedAdPeriod}` as keyof typeof product;
+                total += product[key] as number;
+            }
+        }
+
+        // Icon
+        if (selectedIcon && iconPeriod > 0) {
+            const iconPrice = iconPeriod === 30 ? 30000 : iconPeriod === 60 ? 55000 : 70000;
+            total += iconPrice;
+        }
+
+        // Highlighter
+        if (selectedHighlighter && highlighterPeriod > 0) {
+            const hlPrice = highlighterPeriod === 30 ? 30000 : highlighterPeriod === 60 ? 55000 : 70000;
+            total += hlPrice;
+        }
+
+        // Other Options (Bold etc)
+        selectedOptions.forEach(optId => {
+            const opt = DETAILED_PRICING.find(p => p.id === optId);
+            if (opt) {
+                const period = optionPeriods[optId] || 30;
+                const key = `d${period}` as keyof typeof opt;
+                total += opt[key] as number;
+            }
+        });
+
+        setTotalAmount(total);
+    }, [selectedAdProduct, selectedAdPeriod, selectedIcon, iconPeriod, selectedHighlighter, highlighterPeriod, selectedOptions, optionPeriods]);
 
 
     // --- Handlers ---
@@ -233,10 +382,10 @@ export default function MyShopPage() {
     const proceedToForm = () => {
         setShowWarningModal(false);
         setView('form');
-        // 브라우저 렌더링 동기화 후 즉시 이동
+
+        // Prevent sidebar-warp by resetting layout and scrolling to top safely
         requestAnimationFrame(() => {
             window.scrollTo({ top: 0, behavior: 'auto' });
-            window.dispatchEvent(new CustomEvent('sidebar-warp'));
         });
     };
 
@@ -275,7 +424,6 @@ export default function MyShopPage() {
             setView('dashboard');
             requestAnimationFrame(() => {
                 window.scrollTo({ top: 0, behavior: 'auto' });
-                window.dispatchEvent(new CustomEvent('sidebar-warp'));
             });
         }
     };
@@ -447,55 +595,56 @@ export default function MyShopPage() {
     // --- Components ---
 
     const WarningModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
-                    <AlertTriangle size={32} />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200">
+                <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-sm">
+                    <AlertTriangle size={40} className="text-pink-500" />
                 </div>
-                <h3 className="text-xl font-black text-gray-900">게시글 작성 전 필독!</h3>
-                <div className="text-left text-sm text-gray-800 bg-gray-50 p-4 rounded-xl space-y-2">
-                    <p className="flex gap-2">
-                        <span className="text-red-500 font-bold">1.</span>
-                        <span>월 수정한도는 <strong className="text-gray-900">30회</strong>입니다.</span>
+                <h3 className="text-2xl font-black text-gray-900 tracking-tight">게시글 작성 전 필독! 📢</h3>
+                <div className="text-left text-[13px] text-gray-700 bg-gray-50/80 p-6 rounded-2xl space-y-3 leading-relaxed border border-gray-100 font-bold">
+                    <p className="flex gap-3">
+                        <span className="text-pink-500 font-black shrink-0">1.</span>
+                        <span>한 달 수정한도는 <strong className="text-gray-900 font-black">무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
                     </p>
-                    <p className="flex gap-2">
-                        <span className="text-red-500 font-bold">2.</span>
-                        <span>금칙어 사용 시 <strong className="text-gray-900">삭제/차단</strong>될 수 있습니다.</span>
+                    <p className="flex gap-3">
+                        <span className="text-pink-500 font-black shrink-0">2.</span>
+                        <span>7단계 등급 시스템에 따라 <strong className="text-gray-900 font-black">노출 위치</strong>가 결정됩니다.</span>
                     </p>
-                    <p className="flex gap-2">
-                        <span className="text-red-500 font-bold">3.</span>
-                        <span>최적의 SEO를 위해 <strong className="text-gray-900">키워드는 10개</strong>로 제한됩니다.</span>
+                    <p className="flex gap-3">
+                        <span className="text-pink-500 font-black shrink-0">3.</span>
+                        <span>최적의 홍보 효과를 위해 <strong className="text-gray-900 font-black">제목에 특수문자</strong> 사용을 권장합니다.</span>
                     </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button onClick={() => setShowWarningModal(false)} className="py-3 rounded-xl border font-bold text-gray-700 hover:bg-gray-100">취소</button>
-                    <button onClick={proceedToForm} className="py-3 rounded-xl bg-pink-500 text-white font-bold hover:bg-pink-600 shadow-lg">확인 후 작성</button>
+                    <button onClick={() => setShowWarningModal(false)} className="py-4 rounded-xl border-2 border-gray-100 font-bold text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
+                    <button onClick={proceedToForm} className="py-4 rounded-xl bg-[#ff3399] text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-pink-100">확인 후 작성</button>
                 </div>
             </div>
         </div>
     );
 
     const DesignRequestModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-blue-500 mb-2">
-                    <Laptop size={32} />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200">
+                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-sm">
+                    <Laptop size={40} className="text-blue-500" />
                 </div>
-                <h3 className="text-xl font-black text-gray-900">상세페이지 디자인 의뢰</h3>
-                <p className="text-gray-800 text-sm">
+                <h3 className="text-2xl font-black text-gray-900 tracking-tight">상세페이지 디자인 의뢰</h3>
+                <p className="text-gray-800 text-sm leading-relaxed">
                     전문 디자이너가 사장님만의 <br />
-                    <strong>고퀄리티 상세페이지</strong>를 제작해드립니다. (유료)
+                    <strong className="text-pink-500 font-black text-lg">고퀄리티 상세페이지</strong>를 제작해드립니다.
                 </p>
-                <div className="bg-gray-50 p-4 rounded-xl text-left space-y-2 text-sm text-gray-700">
-                    <p>• 1:1 맞춤 디자인</p>
-                    <p>• 움직이는 GIF 포함 가능</p>
-                    <p>• 제작 기간: 1~2일 소요</p>
+                <div className="bg-blue-50/50 p-6 rounded-2xl text-left space-y-3 text-xs md:text-sm text-gray-700 border border-blue-100 font-bold">
+                    <p className="flex items-center gap-2">• 브랜드 전용 1:1 맞춤형 고해상도 디자인</p>
+                    <p className="flex items-center gap-2">• 7단계 노출 등급에 최적화된 레이아웃 제공</p>
+                    <p className="flex items-center gap-2">• 움직이는 GIF 및 프리미엄 움짤 무료 제작</p>
+                    <p className="flex items-center gap-2">• 제작 기간: 영업일 기준 평균 1~2일</p>
                 </div>
                 <div className="grid grid-cols-1 gap-3 pt-2">
-                    <button onClick={() => alert('고객센터로 문의 접수되었습니다.')} className="py-3 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-600 shadow-lg">
-                        1:1 문의 / 고객센터 연결
+                    <button onClick={() => alert('고객센터로 디자인 제작 문의가 접수되었습니다.')} className="py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-2">
+                        실시간 1:1 문의 / 고객센터 연결
                     </button>
-                    <button onClick={() => setShowDesignModal(false)} className="py-3 rounded-xl text-gray-400 font-bold hover:text-gray-600">
+                    <button onClick={() => setShowDesignModal(false)} className="py-3 text-gray-400 font-bold hover:text-gray-600">
                         닫기
                     </button>
                 </div>
@@ -504,11 +653,11 @@ export default function MyShopPage() {
     );
 
     const PreviewModal = () => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                    <h3 className="font-bold text-lg flex items-center gap-2 text-gray-900"><Eye size={20} className="text-pink-500" /> 채용공고 미리보기</h3>
-                    <button onClick={() => setShowPreviewModal(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-600"><X size={20} /></button>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] transform animate-in fade-in fill-mode-both duration-300">
+                <div className="p-6 border-b flex justify-between items-center bg-gray-50/50 rounded-t-[32px]">
+                    <h3 className="font-black text-xl flex items-center gap-2 text-gray-900"><Eye size={24} className="text-pink-500" /> 채용공고 최종 미리보기</h3>
+                    <button onClick={() => setShowPreviewModal(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={24} /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-6">
                     <div>
@@ -587,7 +736,7 @@ export default function MyShopPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="min-h-screen bg-gray-50 pb-24" style={{ scrollbarGutter: 'stable' }}>
             {showWarningModal && <WarningModal />}
             {showDesignModal && <DesignRequestModal />}
             {showPreviewModal && <PreviewModal />}
@@ -672,8 +821,8 @@ export default function MyShopPage() {
                             <div className="p-4 border-b hover:bg-gray-50 transition">
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
                                     <div className="space-y-2">
-                                        <div className="flex gap-2 text-[10px] items-center">
-                                            <span className="bg-pink-100 text-pink-600 px-1.5 py-0.5 rounded font-bold">진행중</span>
+                                        <div className="flex gap-2 text-xs items-center">
+                                            <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded font-black">진행중</span>
                                             <span className="text-gray-400">마감일: 2026-02-25</span>
                                         </div>
                                         <h4 className="font-bold text-gray-900 line-clamp-1">🔥 [강남 쩜오] 갯수보장 / 팁별도 / 당일지급 확실합니다!</h4>
@@ -689,7 +838,7 @@ export default function MyShopPage() {
                                             <Calendar size={12} /> 연장
                                         </button>
                                         <span className="w-px h-3 bg-gray-300 mx-1"></span>
-                                        <button onClick={handleAdClick} className="px-3 py-2 border border-gray-300 text-gray-700 text-xs font-bold rounded hover:bg-gray-50">수정</button>
+                                        <button onClick={handleAdClick} className="px-3 py-2 border border-blue-500 text-blue-600 text-xs font-bold rounded hover:bg-blue-50">수정</button>
                                         <button className="px-3 py-2 border border-gray-300 text-gray-700 text-xs font-bold rounded hover:bg-gray-50">마감</button>
                                     </div>
                                 </div>
@@ -698,293 +847,355 @@ export default function MyShopPage() {
                     </div>
                 </div>
             ) : (
-                <div className="max-w-5xl mx-auto p-4 md:py-8 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-6">
-                            <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                                <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                <div className="max-w-5xl mx-auto p-4 md:py-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-3">
+                            <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                                <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
+                                    <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
                                     기본 정보
                                 </h2>
-                                <div className="space-y-4">
+                                <div className="space-y-2.5">
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>상호명</label>
+                                        <label className="block text-xs font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>상호명</label>
                                         <input
                                             type="text"
                                             value={shopName}
                                             onChange={(e) => setShopName(e.target.value)}
-                                            className="w-full border rounded-xl p-3 text-sm font-bold bg-gray-50 text-gray-900"
+                                            className="w-full border rounded-lg p-2 text-sm font-bold bg-gray-50 text-gray-900 focus:ring-1 focus:ring-purple-500 outline-none"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">사업자 인증</label>
+                                        <label className="block text-xs font-black text-gray-500 mb-1.5">사업자 인증</label>
                                         {isVerified ? (
-                                            <div className="w-full py-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm font-bold flex items-center justify-center gap-2">
-                                                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white">
-                                                    <Check size={14} strokeWidth={3} />
+                                            <div className="w-full py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs font-bold flex items-center justify-center gap-2">
+                                                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white">
+                                                    <Check size={12} strokeWidth={3} />
                                                 </div>
-                                                인증 완료된 회원입니다
+                                                인증 완료
                                             </div>
                                         ) : (
-                                            <button className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-400 text-sm font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                                                <Camera size={18} /> 사업자등록증 촬영/업로드
+                                            <button className="w-full py-2 border border-dashed border-gray-200 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                                <Camera size={16} /> 촬영/업로드
                                             </button>
                                         )}
                                     </div>
                                 </div>
                             </section>
 
-                            <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                                <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                            <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                                <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
+                                    <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
                                     담당자 정보
                                 </h2>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>담당자 성함</label>
-                                        <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className="w-full border rounded-xl p-3 text-sm text-gray-900 placeholder-gray-400" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>연락처</label>
-                                        <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className="w-full border rounded-xl p-3 text-sm text-gray-900 placeholder-gray-400" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-gray-500">메신저 ID (선택)</label>
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-20 text-xs font-bold bg-yellow-100 text-yellow-800 py-2 rounded text-center shrink-0">카카오</span>
-                                            <input type="text" placeholder="Kakao ID" value={messengers.kakao} onChange={e => setMessengers({ ...messengers, kakao: e.target.value })} className="w-full border rounded-lg p-2 text-sm text-gray-900 placeholder-gray-400" />
+                                <div className="space-y-2.5">
+                                    <div className="grid grid-cols-2 gap-2.5">
+                                        <div>
+                                            <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>성함</label>
+                                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className="w-full border rounded-lg p-2 text-base text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-blue-500 outline-none" />
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-20 text-xs font-bold bg-green-100 text-green-800 py-2 rounded text-center shrink-0">라인</span>
-                                            <input type="text" placeholder="Line ID" value={messengers.line} onChange={e => setMessengers({ ...messengers, line: e.target.value })} className="w-full border rounded-lg p-2 text-sm text-gray-900 placeholder-gray-400" />
+                                        <div>
+                                            <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연락처</label>
+                                            <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className="w-full border rounded-lg p-2 text-base text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-blue-500 outline-none" />
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="w-20 text-xs font-bold bg-blue-100 text-blue-800 py-2 rounded text-center shrink-0">텔레그램</span>
-                                            <input type="text" placeholder="Telegram ID" value={messengers.telegram} onChange={e => setMessengers({ ...messengers, telegram: e.target.value })} className="w-full border rounded-lg p-2 text-sm text-gray-900 placeholder-gray-400" />
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="flex flex-col gap-1.5">
+                                            <span className="text-xs font-black text-yellow-600 ml-1">카톡</span>
+                                            <input type="text" placeholder="ID" value={messengers.kakao} onChange={e => setMessengers({ ...messengers, kakao: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <span className="text-xs font-black text-green-600 ml-1">라인</span>
+                                            <input type="text" placeholder="ID" value={messengers.line} onChange={e => setMessengers({ ...messengers, line: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <span className="text-xs font-black text-blue-600 ml-1">텔레</span>
+                                            <input type="text" placeholder="ID" value={messengers.telegram} onChange={e => setMessengers({ ...messengers, telegram: e.target.value })} className="w-full border rounded-md p-1.5 text-sm text-gray-900 placeholder-gray-400" />
                                         </div>
                                     </div>
                                 </div>
                             </section>
                         </div>
 
-                        <div className="space-y-6">
-                            <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 h-full">
-                                <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-6 bg-pink-500 rounded-full"></span>
-                                    채용 공고 내용
-                                </h2>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                                        <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border rounded-xl p-3 text-sm font-bold focus:ring-1 focus:ring-pink-500 outline-none text-gray-900 placeholder-gray-400" />
-                                    </div>
+                        <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                            <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
+                                <span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>
+                                채용 공고 정보
+                            </h2>
+                            <div className="space-y-2.5">
+                                <div>
+                                    <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>공고 제목</label>
+                                    <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border rounded-lg p-2 text-base font-black focus:ring-1 focus:ring-pink-500 outline-none text-gray-900 placeholder-gray-400" />
+                                </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>1차 직종</label>
-                                            <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className="w-full border rounded-xl p-3 text-sm outline-none text-gray-900">
-                                                <option value="">1차 직종 선택</option>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>직종</label>
+                                        <div className="flex gap-1.5">
+                                            <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                                <option value="">1차</option>
                                                 {Object.keys(INDUSTRY_DATA).map(i => <option key={i} value={i}>{i}</option>)}
                                             </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>2차 직종</label>
-                                            <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className="w-full border rounded-xl p-3 text-sm outline-none text-gray-900">
-                                                <option value="">2차 직종 선택</option>
+                                            <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                                <option value="">2차</option>
                                                 {INDUSTRY_DATA[industryMain]?.map(j => <option key={j} value={j}>{j}</option>)}
                                             </select>
                                         </div>
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연령</label>
+                                        <div className="flex items-center gap-1.5">
+                                            <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                                {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                            </select>
+                                            <span className="text-gray-300 text-[10px]">-</span>
+                                            <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                                {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <label className="block text-xs font-bold text-gray-500"><span className="text-red-500 mr-1">*</span>근무 지역</label>
-                                        <div className="flex gap-2">
-                                            <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-xl p-3 text-sm outline-none text-gray-900">
-                                                <option value="">지역 선택</option>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
+                                        <div className="flex gap-1.5">
+                                            <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                                <option value="">시/도</option>
                                                 {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
                                             </select>
-                                            <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-xl p-3 text-sm outline-none text-gray-900">
-                                                <option value="">세부지역 선택</option>
+                                            <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none text-gray-900">
+                                                <option value="">구/군</option>
                                                 {REGION_DATA[regionCity]?.map(g => <option key={g} value={g}>{g}</option>)}
                                             </select>
                                         </div>
-                                        <input type="text" placeholder="상세 주소 (선택)" value={addressDetail} onChange={(e) => setAddressDetail(e.target.value)} className="w-full border rounded-xl p-3 text-sm text-gray-900 placeholder-gray-400" />
                                     </div>
-
-                                    <div className="grid grid-cols-[1.6fr_1fr] gap-3">
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>모집 연령</label>
-                                            <div className="flex items-center gap-1">
-                                                <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className="w-full border rounded-xl p-2 md:p-3 text-sm outline-none text-gray-900">
-                                                    {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
-                                                </select>
-                                                <span className="text-gray-400">~</span>
-                                                <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className="w-full border rounded-xl p-2 md:p-3 text-sm outline-none text-gray-900">
-                                                    {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1">근무시간</label>
-                                            <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className="w-full border rounded-xl p-3 text-sm outline-none text-gray-900 placeholder-gray-400" />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div className="col-span-1">
-                                            <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>급여 방식</label>
-                                            <select value={payType} onChange={(e) => setPayType(e.target.value)} className="w-full border rounded-xl p-1.5 md:p-3 text-xs md:text-sm outline-none text-gray-900">
-                                                {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="col-span-2">
-                                            <label className="block text-xs font-bold text-gray-500 mb-1"><span className="text-red-500 mr-1">*</span>급여액</label>
-                                            <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} className="w-full border rounded-xl p-3 text-sm font-bold outline-none text-right text-gray-900" />
-                                        </div>
-                                    </div>
-
                                     <div>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <label className="block text-xs font-bold text-gray-500">편의사항 및 우대사항 (총 10개 제한)</label>
-                                            <span className="text-xs text-pink-500 font-bold">{selectedConvenience.length + selectedKeywords.length}/10</span>
-                                        </div>
-
-                                        <div className="bg-gray-50 p-3 rounded-xl mb-3">
-                                            <h4 className="text-xs font-bold text-gray-400 mb-2">편의시설 / 지원</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {CONVENIENCE_ITEMS.map(item => (
-                                                    <button key={item} onClick={() => toggleConvenience(item)} className={`px-2 py-1 rounded text-[11px] font-bold border transition ${selectedConvenience.includes(item) ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                                        {selectedConvenience.includes(item) && <Check size={10} className="inline mr-1" />}{item}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gray-50 p-3 rounded-xl">
-                                            <h4 className="text-xs font-bold text-gray-400 mb-2">키워드 / 조건</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {KEYWORDS.map(item => (
-                                                    <button key={item} onClick={() => toggleKeyword(item)} className={`px-2 py-1 rounded text-[11px] font-bold border transition ${selectedKeywords.includes(item) ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                                        {selectedKeywords.includes(item) && <Check size={10} className="inline mr-1" />}{item}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5">근무시간</label>
+                                        <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className="w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none" />
                                     </div>
+                                </div>
 
+                                <div className="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <div className="flex justify-between items-center mb-1">
-                                            <label className="block text-xs font-bold text-gray-500"><span className="text-red-500 mr-1">*</span>상세내용(에디터)</label>
-                                            <button onClick={() => setShowDesignModal(true)} className="text-xs font-bold text-blue-500 flex items-center gap-1 hover:underline">
-                                                <HelpCircle size={12} />
-                                                디자인을 원하시나요?
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여 방식</label>
+                                        <select value={payType} onChange={(e) => setPayType(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none text-gray-900">
+                                            {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
+                                        <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} className="w-full border rounded-lg p-2 text-base font-black text-right outline-none text-gray-900" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="block text-sm font-black text-gray-500 uppercase tracking-tighter">편의사항 및 키워드</label>
+                                        <span className="text-xs text-pink-500 font-bold">{selectedConvenience.length + selectedKeywords.length}/10</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5 p-2 bg-gray-50 rounded-lg border border-gray-100 max-h-[100px] overflow-y-auto">
+                                        {CONVENIENCE_ITEMS.map(item => (
+                                            <button key={item} onClick={() => toggleConvenience(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedConvenience.includes(item) ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-400 border-gray-200'}`}>
+                                                {item}
                                             </button>
+                                        ))}
+                                        {KEYWORDS.map(item => (
+                                            <button key={item} onClick={() => toggleKeyword(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedKeywords.includes(item) ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-400 border-gray-200'}`}>
+                                                {item}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* 에디터와 상세 정보 미리보기는 전체 너비로 배치하여 수직 공간 효율 극대화 */}
+                    <div className="space-y-4">
+                        <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm">
+                                    <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
+                                    상세내용 (에디터)
+                                </h2>
+                                <button onClick={() => setShowDesignModal(true)} className="text-xs font-black text-blue-500 flex items-center gap-1 hover:underline">
+                                    <HelpCircle size={12} /> 디자인이 필요한가요?
+                                </button>
+                            </div>
+                            <div className="border rounded-xl overflow-hidden">
+                                <div className="bg-gray-50 border-b p-1.5 flex gap-1 flex-wrap items-center">
+                                    <select onChange={handleFontChange} value={currentFont} className="h-6 text-[10px] border rounded bg-white px-1 outline-none text-gray-900 w-16">
+                                        {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                                    </select>
+                                    <select onChange={(e) => execCmd('fontSize', e.target.value)} value={currentFontSize} className="h-6 text-[10px] border rounded bg-white px-1 outline-none text-gray-900 w-12">
+                                        {FONT_SIZES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                                    </select>
+                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }} className={`p-1 rounded ${isBold ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Bold size={14} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('italic'); }} className={`p-1 rounded ${isItalic ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Italic size={14} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); execCmd('underline'); }} className={`p-1 rounded ${isUnderline ? 'bg-gray-200' : 'hover:bg-gray-100'}`}><Underline size={14} /></button>
+                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+                                    <select value={currentForeColor} onChange={(e) => execCmd('foreColor', e.target.value)} className="h-6 text-[10px] bg-transparent outline-none w-16 text-gray-900 border rounded">
+                                        <option value="black">글자색</option>
+                                        {TEXT_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
+                                    </select>
+                                    <select onChange={(e) => execCmd('hiliteColor', e.target.value)} className="h-6 text-[10px] bg-transparent outline-none w-16 text-gray-900 border rounded">
+                                        <option value="transparent">배경색</option>
+                                        {BG_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
+                                    </select>
+                                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+                                    <button onClick={() => execCmd('justifyLeft')} className="p-1 hover:bg-gray-100 rounded"><AlignLeft size={14} /></button>
+                                    <button onClick={() => execCmd('justifyCenter')} className="p-1 hover:bg-gray-100 rounded"><AlignCenter size={14} /></button>
+                                    <button onClick={() => execCmd('justifyRight')} className="p-1 hover:bg-gray-100 rounded"><AlignRight size={14} /></button>
+                                </div>
+                                <div
+                                    ref={editorRef}
+                                    contentEditable
+                                    className="w-full h-[180px] md:h-[220px] p-3 text-sm outline-none overflow-y-auto leading-relaxed text-gray-900"
+                                    suppressContentEditableWarning={true}
+                                    onMouseUp={handleEditorInteract}
+                                    onKeyUp={handleEditorInteract}
+                                    onBlur={saveSelection}
+                                />
+                            </div>
+                        </section>
+
+                        <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} className="text-blue-500" />
+                                <span className="text-xs font-bold text-blue-700">SEO 태그 프리뷰:</span>
+                                <div className="flex gap-1.5 flex-wrap">
+                                    {seoTags.map((tag, idx) => <span key={idx} className="text-[10px] bg-white text-blue-600 px-1.5 py-0.5 rounded border border-blue-200">#{tag}</span>)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <section className="bg-white p-0 rounded-xl shadow-sm border-2 border-pink-100 overflow-hidden">
+                            <div className="bg-gradient-to-r from-purple-700 to-pink-600 text-white p-2.5 flex justify-between items-center">
+                                <h2 className="font-black text-xs flex items-center gap-2">
+                                    <Crown size={14} className="text-yellow-400" />
+                                    광고 등급 서비스 선택 (7-Tier System)
+                                </h2>
+                                <div className="flex items-center gap-2 bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                                    <span className="text-[11px] font-bold">실시간 노출 최적화 적용됨</span>
+                                </div>
+                            </div>
+
+                            <div className="divide-y divide-gray-100">
+                                {DETAILED_PRICING.filter(p => p.isMain).map((product: any, idx) => (
+                                    <div key={product.id} className={`flex items-center p-2 gap-3 hover:bg-pink-50/10 transition-colors ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
+                                        <div className="w-16 h-20 bg-gray-50 rounded border border-gray-100 flex-shrink-0 flex flex-col items-center justify-center text-[10px] font-black text-gray-300">
+                                            IMG
                                         </div>
-                                        <div className="border rounded-xl bg-white overflow-hidden shadow-sm">
-                                            {/* Toolbar Synced */}
-                                            <div
-                                                className="bg-gray-50 border-b p-2 flex gap-1 flex-wrap items-center select-none"
-                                                onMouseDown={(e) => {
-                                                    if ((e.target as HTMLElement).tagName !== 'SELECT') {
-                                                        e.preventDefault();
-                                                    }
-                                                }}
-                                            >
-                                                <select
-                                                    onChange={handleFontChange}
-                                                    value={currentFont}
-                                                    className="h-7 text-xs border rounded bg-white px-1 outline-none mr-1 text-gray-900 w-20"
-                                                >
-                                                    {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                                                </select>
-
-                                                <select
-                                                    onChange={(e) => execCmd('fontSize', e.target.value)}
-                                                    value={currentFontSize}
-                                                    className="h-7 text-xs border rounded bg-white px-1 outline-none mr-1 text-gray-900 w-16"
-                                                >
-                                                    {FONT_SIZES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                                                </select>
-
-                                                <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-                                                <button
-                                                    onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }}
-                                                    className={`p-1.5 rounded text-gray-700 ${isBold ? 'bg-gray-300 shadow-inner' : 'hover:bg-gray-200'}`}
-                                                >
-                                                    <Bold size={16} />
-                                                </button>
-                                                <button
-                                                    onMouseDown={(e) => { e.preventDefault(); execCmd('italic'); }}
-                                                    className={`p-1.5 rounded text-gray-700 ${isItalic ? 'bg-gray-300 shadow-inner' : 'hover:bg-gray-200'}`}
-                                                >
-                                                    <Italic size={16} />
-                                                </button>
-                                                <button
-                                                    onMouseDown={(e) => { e.preventDefault(); execCmd('underline'); }}
-                                                    className={`p-1.5 rounded text-gray-700 ${isUnderline ? 'bg-gray-300 shadow-inner' : 'hover:bg-gray-200'}`}
-                                                >
-                                                    <Underline size={16} />
-                                                </button>
-
-                                                <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-                                                <div className="flex items-center gap-1 border rounded px-1 ml-1 group relative">
-                                                    <Palette size={16} className="text-gray-600" />
-                                                    <select value={currentForeColor} onChange={(e) => execCmd('foreColor', e.target.value)} className="h-7 text-xs bg-transparent outline-none w-14 text-gray-900">
-                                                        <option value="black">글자색</option>
-                                                        {TEXT_COLORS.map(c => <option key={c.value} value={c.value} style={{ color: c.value, backgroundColor: c.value === '#FFFFFF' ? 'black' : 'transparent' }}>{c.name}</option>)}
-                                                    </select>
-                                                </div>
-
-                                                <div className="flex items-center gap-1 border rounded px-1 ml-1 group relative">
-                                                    <Highlighter size={16} className="text-gray-600" />
-                                                    <select onChange={(e) => execCmd('hiliteColor', e.target.value)} className="h-7 text-xs bg-transparent outline-none w-14 text-gray-900">
-                                                        <option value="transparent">형광펜</option>
-                                                        {BG_COLORS.map(c => <option key={c.value} value={c.value} style={{ backgroundColor: c.value }}>{c.name}</option>)}
-                                                    </select>
-                                                </div>
-
-                                                <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-                                                <div className="flex items-center gap-1 border rounded px-1 hover:bg-gray-50">
-                                                    <Smile size={16} className="text-gray-600" />
-                                                    <select onChange={(e) => { insertEmoji(e.target.value); e.target.value = ''; }} className="h-7 text-xs bg-transparent outline-none w-10 text-gray-900">
-                                                        <option value="">이모티콘</option>
-                                                        {EMOJIS.map(e => <option key={e} value={e}>{e}</option>)}
-                                                    </select>
-                                                </div>
-
-                                                <div className="w-px h-4 bg-gray-300 mx-1"></div>
-
-                                                <button onClick={() => execCmd('justifyLeft')} className="p-1.5 hover:bg-gray-200 rounded text-gray-700"><AlignLeft size={16} /></button>
-                                                <button onClick={() => execCmd('justifyCenter')} className="p-1.5 hover:bg-gray-200 rounded text-gray-700"><AlignCenter size={16} /></button>
-                                                <button onClick={() => execCmd('justifyRight')} className="p-1.5 hover:bg-gray-200 rounded text-gray-700"><AlignRight size={16} /></button>
+                                        <div className="flex-1 min-w-0 py-1">
+                                            <div className="flex items-center gap-1.5 mb-0.5">
+                                                <span className="text-base font-black text-gray-800 leading-tight">{idx + 1}. {product.name}</span>
+                                                {product.id === 'p7' && <span className="text-[10px] bg-red-500 text-white px-1.5 font-black rounded uppercase shrink-0">Best</span>}
                                             </div>
-                                            <div
-                                                ref={editorRef}
-                                                contentEditable
-                                                className="w-full h-[300px] p-4 text-sm outline-none overflow-y-auto leading-relaxed text-gray-900"
-                                                suppressContentEditableWarning={true}
-                                                onMouseUp={handleEditorInteract}
-                                                onKeyUp={handleEditorInteract}
-                                                onBlur={saveSelection}
-                                            />
+                                            <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed">
+                                                {(() => {
+                                                    if (!product.desc.includes('. (')) return product.desc;
+                                                    const [main, sub] = product.desc.split('. (');
+                                                    return (
+                                                        <>
+                                                            <span className="block mb-0.5 md:mb-0">{main}.</span>
+                                                            <span className="flex items-start gap-1 text-pink-500/90 md:text-gray-400 text-[10px] md:text-xs font-black">
+                                                                <span className="md:hidden shrink-0 mt-0.5 text-[8px]">✨</span>
+                                                                <span>({sub}</span>
+                                                            </span>
+                                                        </>
+                                                    );
+                                                })()}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2 shrink-0">
+                                            {[30, 60, 90].map((days) => (
+                                                <label key={days} className={`flex flex-col items-center justify-center w-[85px] h-[48px] rounded-xl cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'bg-pink-50 border-pink-500 text-pink-600 shadow-md ring-2 ring-pink-100' : 'border-gray-100 bg-white text-gray-400 hover:border-pink-200'}`}>
+                                                    <input
+                                                        type="radio"
+                                                        className="hidden"
+                                                        checked={selectedAdProduct === product.id && selectedAdPeriod === days}
+                                                        onChange={() => {
+                                                            setSelectedAdProduct(product.id);
+                                                            setSelectedAdPeriod(days as any);
+                                                        }}
+                                                    />
+                                                    {selectedAdProduct === product.id && selectedAdPeriod === days && (
+                                                        <div className="absolute top-0 right-0 bg-pink-500 text-white p-0.5 rounded-bl-lg">
+                                                            <Check size={10} strokeWidth={4} />
+                                                        </div>
+                                                    )}
+                                                    <span className="text-[10px] font-bold uppercase leading-none mb-1">{days}일</span>
+                                                    <span className="text-xs font-black tracking-tighter">{(product as any)[`d${days}`].toLocaleString()}원</span>
+                                                </label>
+                                            ))}
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        </section>
 
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Search size={16} className="text-blue-500" />
-                                            <span className="text-xs font-bold text-blue-700">SEO 자동 태그 미리보기</span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {seoTags.length > 0 ? seoTags.map((tag, idx) => <span key={idx} className="text-xs bg-white text-blue-600 px-2 py-1 rounded border border-blue-200 shadow-sm font-bold">{tag}</span>) : <span className="text-xs text-blue-400">입력 정보를 바탕으로 태그가 자동 생성됩니다.</span>}
-                                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="bg-[#666] text-white p-2.5 px-3">
+                                    <h2 className="font-black text-xs md:text-sm flex items-center gap-2">아이콘 선택</h2>
+                                </div>
+                                <div className="p-3">
+                                    <div className="flex items-center gap-3 text-xs md:text-sm font-black border-b border-gray-50 pb-2.5 mb-3 overflow-x-auto whitespace-nowrap">
+                                        {[0, 30, 60, 90].map(d => (
+                                            <label key={d} className="flex items-center gap-1.5 cursor-pointer">
+                                                <input type="radio" checked={iconPeriod === d} onChange={() => setIconPeriod(d as any)} className="w-4 h-4 text-pink-500" />
+                                                {d === 0 ? '안함' : `${d}일`}
+                                            </label>
+                                        ))}
                                     </div>
-
+                                    <div className="grid grid-cols-5 gap-1.5">
+                                        {AD_ICONS.slice(0, 10).map(icon => (
+                                            <label key={icon.id} className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all ${selectedIcon === icon.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : 'border-gray-50 hover:border-pink-100'}`}>
+                                                <input type="radio" checked={selectedIcon === icon.id} onChange={() => setSelectedIcon(icon.id)} className="hidden" />
+                                                <span className="text-xl mb-1">{icon.icon}</span>
+                                                <span className="text-[10px] md:text-xs font-black text-gray-700 truncate w-full text-center leading-none">{icon.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
                             </section>
+
+                            <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="bg-[#666] text-white p-2.5 px-3">
+                                    <h2 className="font-black text-xs md:text-sm flex items-center gap-2">형광펜 선택</h2>
+                                </div>
+                                <div className="p-3">
+                                    <div className="flex items-center gap-3 text-xs md:text-sm font-black border-b border-gray-50 pb-2.5 mb-3 overflow-x-auto whitespace-nowrap">
+                                        {[0, 30, 60, 90].map(d => (
+                                            <label key={d} className="flex items-center gap-1.5 cursor-pointer">
+                                                <input type="radio" checked={highlighterPeriod === d} onChange={() => setHighlighterPeriod(d as any)} className="w-4 h-4 text-pink-500" />
+                                                {d === 0 ? '안함' : `${d}일`}
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-1.5">
+                                        {AD_HIGHLIGHTERS.map(hl => (
+                                            <label key={hl.id} className={`flex items-center justify-center p-2 rounded-lg border-2 transition-all cursor-pointer ${selectedHighlighter === hl.id ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-100' : 'border-gray-50 hover:border-pink-100'}`}>
+                                                <input type="radio" checked={selectedHighlighter === hl.id} onChange={() => setSelectedHighlighter(hl.id)} className="hidden" />
+                                                <span className="text-[11px] md:text-sm font-black text-gray-800 w-[45px] text-center" style={{ backgroundColor: hl.color, padding: '2px 0px', borderRadius: '4px' }}>{hl.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="bg-[#e6007e] p-5 text-white flex flex-col md:flex-row justify-between items-center rounded-2xl shadow-xl border-2 border-white/20 gap-4 md:gap-0">
+                            <div className="flex flex-col gap-1 text-center md:text-left">
+                                <p className="text-[13px] md:text-sm font-black opacity-90 leading-tight">결제는 PC와 모바일 모두 가능합니다.</p>
+                                <p className="text-[10px] md:text-[11px] font-bold opacity-70">모든 광고 상품은 결제 및 심사 후 즉시 최신 기술(Region Filter)이 적용되어 노출됩니다.</p>
+                            </div>
+                            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
+                                <span className="text-sm md:text-base font-black opacity-80">총 신청 금액</span>
+                                <span className="text-3xl md:text-4xl font-black bg-white/20 px-6 py-2 rounded-xl border border-white/30 text-center w-full md:w-auto shadow-inner">{totalAmount.toLocaleString()}원</span>
+                            </div>
                         </div>
                     </div>
 
@@ -999,9 +1210,9 @@ export default function MyShopPage() {
                             </button>
                         </div>
                     </div>
-
                 </div>
-            )}
+            )
+            }
         </div>
     );
 }

@@ -16,7 +16,6 @@ export const CATEGORIES = [
     '같이일할단짝',
     '중고거래',
     '무료법률상담',
-    '친구찾기',
     '뷰티·패션·이벤트',
     '프리미엄 라운지'
 ];
@@ -76,7 +75,7 @@ export const MOCK_POSTS: Post[] = [
     },
     {
         id: 6,
-        category: '친구찾기',
+        category: '같이일할단짝',
         title: '강남 쪽 술 한잔 하실 분 계신가요?',
         content: '일 끝나고 너무 심심해서요! 건전하게 한잔해요. 주말에도 일하니까 너무 외롭네요.',
         author: '술친구',
@@ -138,7 +137,7 @@ export const MOCK_POSTS: Post[] = [
     },
     {
         id: 12,
-        category: '친구찾기',
+        category: '같이일할단짝',
         title: '운동 같이 시작할 언니 구함!',
         content: '필라테스 등록했는데 혼자 다니기 민망해요. 건강도 챙기고 수다도 떨어요.',
         author: '운동덕후',

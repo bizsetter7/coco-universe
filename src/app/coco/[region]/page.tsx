@@ -1,3 +1,4 @@
+import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home } from 'lucide-react';
@@ -18,6 +19,7 @@ interface Shop {
     is_placeholder: boolean;
     is_premium?: boolean;
     is_verified?: boolean;
+    tier?: 'grand' | 'preferential' | 'premium' | 'special' | 'urgent' | 'recommended' | 'common';
 }
 
 // Next.js 15 requires params to be handled as a Promise
@@ -57,8 +59,19 @@ export default async function RegionPage(props: { params: Params }) {
     });
 
     const sortedShops = [...shops].sort((a, b) => {
-        if (a.is_premium && !b.is_premium) return -1;
-        if (!a.is_premium && b.is_premium) return 1;
+        const tierOrder = {
+            'grand': 7,
+            'preferential': 6,
+            'premium': 5,
+            'special': 4,
+            'urgent': 3,
+            'recommended': 2,
+            'common': 1
+        };
+        const tierA = tierOrder[a.tier as keyof typeof tierOrder] || 0;
+        const tierB = tierOrder[b.tier as keyof typeof tierOrder] || 0;
+
+        if (tierA !== tierB) return tierB - tierA;
         if (a.is_verified && !b.is_verified) return -1;
         if (!a.is_verified && b.is_verified) return 1;
         return 0;
@@ -116,72 +129,134 @@ export default async function RegionPage(props: { params: Params }) {
                 </div>
 
                 <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-gray-900">추천 업소 리스트</h2>
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        추천 업소 리스트
+                        <span className="bg-amber-100 text-amber-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-pulse">AD OPEN</span>
+                    </h2>
                     <span className="text-xs text-blue-500 font-bold">인기순</span>
                 </div>
 
                 <div className="space-y-4">
-                    {sortedShops.length > 0 ? (
-                        sortedShops.map((shop, i) => (
-                            <div
-                                key={shop.id || i}
-                                className={`bg-white rounded-2xl p-5 shadow-sm border ${shop.is_premium ? 'border-amber-200 bg-amber-50/20' : 'border-gray-100'} hover:shadow-md transition-all group relative overflow-hidden`}
-                            >
-                                {shop.is_premium && (
-                                    <div className="absolute top-0 right-0 bg-amber-400 text-white text-[8px] font-bold px-3 py-1 rounded-bl-xl">
-                                        PREMIUM
-                                    </div>
-                                )}
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <div className="flex items-center gap-1 mb-1">
-                                            <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
-                                            {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
-                                        </div>
-                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                            <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
-                                                {shop.name}
-                                            </a>
-                                            {shop.is_verified && <CheckCircle2 size={14} className="text-blue-500 fill-blue-50" />}
-                                        </h3>
-                                        <div className="flex items-center gap-1 mt-1 text-gray-400">
-                                            <MapPin size={12} />
-                                            <span className="text-xs">{shop.region}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2 mb-4">
-                                    <div className="bg-gray-50 p-2 rounded-lg">
-                                        <p className="text-[10px] text-gray-400 mb-0.5">급여 조건</p>
-                                        <p className="text-xs font-bold text-rose-500">{shop.pay}</p>
-                                    </div>
-                                    <div className="bg-gray-50 p-2 rounded-lg">
-                                        <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
-                                        <p className="text-xs font-bold text-gray-700">{shop.workType}</p>
-                                    </div>
-                                </div>
-
-                                <div className="mb-4 text-center">
-                                    <p className="text-[10px] text-gray-400 italic">"코코알바를 통해 연락했다고 말씀해주세요!"</p>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <a
-                                        href={shop.phone ? `tel:${shop.phone}` : '#'}
-                                        className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-                                    >
-                                        <Phone size={16} /> 전화상담
-                                    </a>
-                                    <a
-                                        href={shop.kakao ? `https://pf.kakao.com/_` : '#'}
-                                        className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-                                    >
-                                        <MessageSquare size={16} /> 카톡문의
-                                    </a>
+                    {/* [VIRTUAL AD] 지역 최상단 그랜드 프리미엄 (SEO 최적화 타겟팅) */}
+                    <div className="bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600 p-0.5 rounded-3xl shadow-xl shadow-amber-200/50 group cursor-pointer hover:-translate-y-1 transition-all">
+                        <div className="bg-white dark:bg-gray-900 rounded-[22px] p-6 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-black px-4 py-1 rounded-bl-2xl shadow-sm">REGION GRAND</div>
+                            <div className="flex gap-5 items-center mb-6">
+                                <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform">✨</div>
+                                <div>
+                                    <p className="text-[10px] font-black text-amber-600 mb-1 tracking-tighter uppercase">가장 먼저 만나는 {regionName} 대표 업소</p>
+                                    <h3 className="text-xl font-black text-gray-900 leading-tight">광고주님, 이 자리를 선점하세요!</h3>
                                 </div>
                             </div>
-                        ))
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                <span className="text-[10px] px-3 py-1 rounded-full bg-gray-50 font-bold border border-gray-100 text-gray-500">#지역1위</span>
+                                <span className="text-[10px] px-3 py-1 rounded-full bg-gray-50 font-bold border border-gray-100 text-gray-500">#노출보장</span>
+                                <span className="text-[10px] px-3 py-1 rounded-full bg-amber-50 font-bold border border-amber-100 text-amber-600">#우대혜택</span>
+                            </div>
+                            <button className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black text-sm shadow-lg shadow-gray-200 group-hover:bg-amber-600 transition-colors">상세보기 및 광고문의</button>
+                        </div>
+                    </div>
+                    {sortedShops.length > 0 ? (
+                        sortedShops.map((shop, i) => {
+                            const isAdPos = (i + 1) % 5 === 0;
+
+                            return (
+                                <React.Fragment key={shop.id || i}>
+                                    <div
+                                        className={`bg-white rounded-2xl p-5 shadow-sm border transition-all group relative overflow-hidden
+                                            ${shop.tier === 'grand' ? 'border-amber-400 ring-2 ring-amber-100 shadow-xl' :
+                                                shop.tier === 'preferential' ? 'border-gray-400 ring-2 ring-gray-100 shadow-lg' :
+                                                    shop.tier === 'premium' ? 'border-blue-300' :
+                                                        shop.tier === 'special' ? 'border-rose-300' :
+                                                            shop.tier === 'urgent' ? 'border-red-400 bg-red-50/5' :
+                                                                shop.tier === 'recommended' ? 'border-green-300' : 'border-gray-100'}
+                                        `}
+                                    >
+                                        {shop.tier && shop.tier !== 'common' && (
+                                            <div className={`absolute top-0 right-0 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl z-10
+                                                ${shop.tier === 'grand' ? 'bg-amber-500' :
+                                                    shop.tier === 'preferential' ? 'bg-gray-600' :
+                                                        shop.tier === 'premium' ? 'bg-blue-500' :
+                                                            shop.tier === 'special' ? 'bg-rose-500' :
+                                                                shop.tier === 'urgent' ? 'bg-red-600 animate-pulse' :
+                                                                    shop.tier === 'recommended' ? 'bg-green-500' : 'bg-gray-400'}
+                                            `}>
+                                                {shop.tier === 'grand' ? '1번 - GRAND' :
+                                                    shop.tier === 'preferential' ? '2번 - 우대' :
+                                                        shop.tier === 'premium' ? '3번 - PREMIUM' :
+                                                            shop.tier === 'special' ? '4번 - SPECIAL' :
+                                                                shop.tier === 'urgent' ? '5번 - 급구' :
+                                                                    shop.tier === 'recommended' ? '6번 - 추천' : '7번 - 일반'}
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <div className="flex items-center gap-1 mb-1">
+                                                    <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
+                                                    {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                                                </div>
+                                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                                    <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
+                                                        {shop.name}
+                                                    </a>
+                                                    {shop.is_verified && <CheckCircle2 size={14} className="text-blue-500 fill-blue-50" />}
+                                                </h3>
+                                                <div className="flex items-center gap-1 mt-1 text-gray-400">
+                                                    <MapPin size={12} />
+                                                    <span className="text-xs">{shop.region}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mb-4">
+                                            <div className="bg-gray-50 p-2 rounded-lg">
+                                                <p className="text-[10px] text-gray-400 mb-0.5">급여 조건</p>
+                                                <p className="text-xs font-bold text-rose-500">{shop.pay}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-2 rounded-lg">
+                                                <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
+                                                <p className="text-xs font-bold text-gray-700">{shop.workType}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4 text-center">
+                                            <p className="text-[10px] text-gray-400 italic">"코코알바를 통해 연락했다고 말씀해주세요!"</p>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <a
+                                                href={shop.phone ? `tel:${shop.phone}` : '#'}
+                                                className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                            >
+                                                <Phone size={16} /> 전화상담
+                                            </a>
+                                            <a
+                                                href={shop.kakao ? `https://pf.kakao.com/_` : '#'}
+                                                className="flex-1 bg-[#FEE500] text-[#3c1e1e] py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                                            >
+                                                <MessageSquare size={16} /> 카톡문의
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    {/* [VIRTUAL AD] 리스트 중간 네이티브 광고 (Special) */}
+                                    {isAdPos && (
+                                        <div className="bg-rose-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                <Sparkles size={80} />
+                                            </div>
+                                            <div className="relative z-10 flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-[10px] font-black text-rose-100 uppercase tracking-widest mb-1 italic">Special Listing AD</p>
+                                                    <h4 className="text-lg font-black leading-tight">여기는 광고 자리입니다! 💎<br />우리 가게를 돋보이게 하세요.</h4>
+                                                </div>
+                                                <div className="bg-white text-rose-600 p-3 rounded-2xl font-black text-[12px] shadow-xl group-hover:scale-110 transition-transform">문의하기</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            );
+                        })
                     ) : (
                         <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
                             <p className="text-gray-400 text-sm">해당 지역의 상세 공고가 업데이트 중입니다.</p>
