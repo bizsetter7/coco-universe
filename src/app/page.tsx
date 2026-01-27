@@ -316,20 +316,24 @@ export default function HomePortal() {
                   <div
                     key={shop.id || i}
                     onClick={() => setSelectedShop(shop)}
-                    className={`group relative border-2 rounded-[22px] overflow-hidden shadow-md transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-100'}
-                      ${shop.tier === 'grand' ? `!border-amber-400 ring-1 ring-amber-400/50` : shop.tier === 'preferential' ? `!border-gray-400` : ''}
+                    className={`group relative border-[3px] rounded-[22px] overflow-hidden shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl cursor-pointer aspect-square ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-white'}
+                      ${shop.tier === 'grand' ? `!border-amber-400 ring-4 ring-amber-400/20` : shop.tier === 'preferential' ? `!border-gray-300` : ''}
                     `}
                   >
-                    <div className={`aspect-square flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                    <div className={`w-full h-full flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                       {shop.name.split(' ').slice(0, 2).join(' ')}<br />매장 이미지
                       {shop.options?.blink && (
                         <div className="absolute top-2 left-2 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-bounce shadow-sm">급구</div>
                       )}
-                    </div>
-                    <div className="p-3.5 sm:p-4">
-                      <h4 className={`font-black text-[13px] sm:text-[15px] truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h4>
-                      <p className="text-red-500 font-extrabold text-xs sm:text-sm tracking-tight">{shop.pay}</p>
-                      <p className={`text-[10px] mt-1 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{shop.region.split(' ').slice(0, 2).join(' ')}</p>
+
+                      {/* 카드 하단 정보 오버레이 (정사각형 유지를 위해 내부 배치) */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-left">
+                        <h4 className="text-white font-black text-[13px] sm:text-[14px] truncate mb-0.5">{shop.name}</h4>
+                        <div className="flex justify-between items-end">
+                          <p className="text-amber-400 font-extrabold text-[11px] sm:text-[12px]">{shop.pay}</p>
+                          <p className="text-gray-300 text-[9px] font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -453,18 +457,16 @@ export default function HomePortal() {
                     <div
                       key={i}
                       onClick={() => setSelectedShop(shop)}
-                      className={`group border rounded-xl p-1 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                      className={`group border rounded-xl p-1 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden aspect-square ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
-                      <div className={`relative aspect-square rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
+                      <div className={`relative w-full h-full rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
                         {shop.name.substring(0, 1)}
                         <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic shadow-sm">HOT</div>
-                      </div>
-                      <div className="px-1.5 pb-2 text-center">
-                        <h5 className={`text-[12px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{shop.name}</h5>
-                        <p className="text-[9px] text-gray-500 font-bold mb-1">{shop.region.split(' ')[1]}</p>
-                        <p className="text-[11px] font-black text-red-500">{shop.pay.split(' ')[1] || shop.pay}</p>
-                        <div className="mt-1 flex justify-center">
-                          <div className={`text-[8px] border px-1.5 py-0.5 rounded-sm font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-950 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600'}`}>💎 24회 720일</div>
+
+                        {/* 스페셜 오버레이 */}
+                        <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-black/60 text-left">
+                          <h5 className="text-white text-[10px] font-black truncate">{shop.name}</h5>
+                          <p className="text-red-400 text-[9px] font-black">{shop.pay.split(' ')[1] || shop.pay}</p>
                         </div>
                       </div>
                     </div>
@@ -532,22 +534,25 @@ export default function HomePortal() {
                       <React.Fragment key={i}>
                         <div
                           onClick={() => setSelectedShop(shop)}
-                          className={`group relative flex items-center p-3 sm:p-4 rounded-xl border transition-all hover:border-pink-200 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                          className={`group relative flex items-center p-4 rounded-2xl border-b transition-all hover:bg-gray-50 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                         >
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xs font-black shrink-0 mr-3 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black shrink-0 mr-4 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500' : 'bg-pink-50 text-pink-500 animate-pulse-subtle'}`}>
                             {shop.name.substring(0, 1)}
                           </div>
-                          <div className="flex-1 min-w-0 mr-2">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                              <span className="text-[10px] text-pink-500 font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</span>
-                              {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-1 text-[10px] sm:text-xs">
+                              <span className="text-blue-600 font-black">{shop.region.split(' ').slice(0, 2).join(' ')}</span>
+                              <span className="text-gray-300">|</span>
+                              <span className="text-gray-500 font-bold">{shop.workType}</span>
                             </div>
-                            <h4 className={`text-sm font-bold truncate ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h4>
-                            <p className="text-[10px] text-gray-500 font-medium truncate">{shop.workType}</p>
+                            <h4 className={`text-base font-black truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h4>
+                            <div className="flex items-center gap-3">
+                              <p className="text-sm font-black text-red-600 tracking-tighter">{shop.pay}</p>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500' : 'bg-gray-100 text-gray-400'}`}>방금 전</span>
+                            </div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-xs font-black text-red-600 mb-0.5">{shop.pay}</p>
-                            <span className="text-[9px] text-gray-400 font-bold">방금 전</span>
+                          <div className="shrink-0 ml-3">
+                            <ChevronRight size={20} className="text-gray-300 group-hover:text-pink-500 transition-colors" />
                           </div>
                         </div>
 

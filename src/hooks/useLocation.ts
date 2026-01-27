@@ -16,15 +16,19 @@ export function useLocation() {
     });
 
     useEffect(() => {
-        async function fetchLocation() {
+        const fetchLocation = async () => {
             try {
-                // ipapi.co (무료 티어 사용 - 하루 1,000건 제한)
-                const response = await fetch('https://ipapi.co/json/');
+                // 타임아웃 처리를 위한 AbortController
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
 
                 if (data && data.region) {
-                    // API 응답의 region(예: Seoul)을 우리 사이트의 한국어 명칭과 매칭하는 로직 필요
-                    // 여기서는 데모를 위해 간단한 매칭 테이블 사용
                     const regionMap: Record<string, { kr: string, city: string }> = {
                         'Seoul': { kr: '서울', city: '강남구' },
                         'Gyeonggi-do': { kr: '경기', city: '수원시' },
@@ -43,12 +47,12 @@ export function useLocation() {
                         city: matched.city,
                         isDetected: true
                     });
-                    console.log(`[Location Detected] ${matched.kr} ${matched.city}`);
                 }
             } catch (error) {
-                console.error('Failed to detect location:', error);
+                // 에러 발생 시 무음 처리하여 UI 방해 금지
+                console.warn('Location detection failed, using defaults.');
             }
-        }
+        };
 
         fetchLocation();
     }, []);

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home, Star } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home, Star, ChevronRight } from 'lucide-react';
 
 interface Shop {
     name: string;
@@ -134,19 +134,19 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                 <React.Fragment key={shop.id || i}>
                                     <div
                                         onClick={() => { }}
-                                        className={`rounded-[22px] p-4 shadow-md border-2 transition-all group relative overflow-hidden cursor-pointer
-                                            ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}
-                                            ${shop.tier === 'grand' ? '!border-amber-400 ring-1 ring-amber-400/50 shadow-amber-100/20' :
-                                                shop.tier === 'preferential' ? '!border-gray-400' : ''}
+                                        className={`rounded-[22px] p-4 shadow-lg border-[3px] transition-all group relative overflow-hidden cursor-pointer
+                                            ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-white'}
+                                            ${shop.tier === 'grand' ? '!border-amber-400 ring-4 ring-amber-400/20 shadow-amber-100/20' :
+                                                shop.tier === 'preferential' ? '!border-gray-300' : ''}
                                         `}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shrink-0 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500' : 'bg-gray-50 text-gray-400'}`}>
+                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shrink-0 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500' : 'bg-pink-50 text-pink-500'}`}>
                                                 {shop.name.substring(0, 1)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded ${shop.tier === 'grand' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded ${shop.tier === 'grand' ? 'bg-amber-400 text-white' : 'bg-gray-100 text-gray-500'}`}>
                                                         {shop.tier === 'grand' ? 'GRAND' : shop.tier?.toUpperCase() || 'COMMON'}
                                                     </span>
                                                     <span className="text-[10px] font-bold text-gray-400">{shop.region}</span>
@@ -156,6 +156,9 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                     <span className="text-red-600 font-black text-sm">{shop.pay}</span>
                                                     <span className="text-[11px] text-gray-400 font-bold">{shop.workType}</span>
                                                 </div>
+                                            </div>
+                                            <div className="shrink-0">
+                                                <ChevronRight size={20} className="text-gray-300 group-hover:text-pink-500 transition-colors" />
                                             </div>
                                         </div>
                                         <div className="mt-4 flex gap-2">
