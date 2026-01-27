@@ -131,7 +131,7 @@ function CustomerCenterContent() {
     return (
         <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} pb-20`}>
             {/* [Fixed Mastery] Header */}
-            <header className={`fixed top-0 left-0 right-0 z-[60] border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-sm'} h-14`}>
+            <header className={`fixed top-0 left-0 right-0 z-[60] border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'} h-14`}>
                 <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors">
@@ -139,12 +139,13 @@ function CustomerCenterContent() {
                         </button>
                         <h1
                             onClick={() => router.push('/')}
-                            className="text-lg md:text-xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                            className="text-[17px] md:text-xl font-black text-gray-900 dark:text-gray-100 flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
                         >
-                            <span className="text-pink-600">■</span> 고객지원센터
+                            <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
+                            고객지원센터
                         </h1>
                     </div>
-                    <button onClick={() => router.push('/')} className="p-2 text-gray-500 hover:text-gray-900 transition-colors">
+                    <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
                         <Home size={24} />
                     </button>
                 </div>
@@ -154,21 +155,21 @@ function CustomerCenterContent() {
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
                     <aside className="md:w-64 shrink-0 sticky top-14 md:top-[80px] h-fit md:h-fit z-[45]">
-                        <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden`}>
-                            <div className="hidden md:block p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <p className="text-[15px] text-gray-900 dark:text-gray-100 font-black uppercase tracking-widest">MENU</p>
+                        <div className={`bg-white dark:bg-gray-800 rounded-[32px] md:rounded-3xl shadow-sm md:border border-gray-100 dark:border-gray-700 overflow-hidden`}>
+                            <div className="hidden md:block p-5 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                <p className="text-[13px] text-gray-400 dark:text-gray-100 font-black uppercase tracking-widest">Customer Support</p>
                             </div>
                             {/* Mobile Grid Layout vs Desktop List Layout */}
-                            <nav className="grid grid-cols-2 md:flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
+                            <nav className="grid grid-cols-2 p-3 md:p-0 gap-2 md:gap-0 md:flex md:flex-col overflow-x-auto md:overflow-visible scrollbar-hide">
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`flex flex-col md:flex-row items-center md:items-start md:gap-4 px-4 py-4 md:px-6 md:py-5 text-[13px] md:text-sm font-black transition-all whitespace-nowrap border-b border-r md:border-r-0 md:border-b-0 md:border-l-4 ${activeTab === tab.id
-                                            ? 'bg-pink-50 text-pink-600 border-pink-500 dark:bg-pink-900/20'
-                                            : 'text-gray-600 border-gray-100 md:border-transparent hover:text-gray-900 dark:hover:text-white dark:border-gray-700'}`}
+                                        className={`flex flex-col md:flex-row items-center md:items-start md:gap-4 px-4 py-5 md:px-6 md:py-5 text-[13px] md:text-sm font-black transition-all whitespace-nowrap rounded-2xl md:rounded-none md:border-l-4 ${activeTab === tab.id
+                                            ? 'bg-gradient-to-br from-pink-50 to-white text-pink-600 border-pink-500 shadow-sm md:shadow-none dark:bg-pink-900/20'
+                                            : 'bg-white text-gray-500 border-transparent hover:text-gray-900 dark:hover:text-white dark:bg-gray-800'}`}
                                     >
-                                        <div className={`mb-1 md:mb-0 ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-400'}`}>
+                                        <div className={`mb-2 md:mb-0 ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-300'}`}>
                                             {tab.icon}
                                         </div>
                                         {tab.id}
@@ -233,12 +234,12 @@ function CustomerCenterContent() {
                         {/* 2. Ad Guide: Mobile Detox Design */}
                         {activeTab === '광고안내' && (
                             <div className="space-y-8">
-                                <div className="text-center py-12 bg-gray-900 rounded-[40px] text-white shadow-2xl relative overflow-hidden border border-gray-800">
-                                    <div className="absolute top-0 right-0 p-10 opacity-10">
-                                        <Zap size={150} strokeWidth={3} />
+                                <div className="text-center py-12 bg-gradient-to-br from-pink-50 via-white to-gray-50 rounded-[40px] text-gray-900 shadow-sm relative overflow-hidden border border-pink-100/50">
+                                    <div className="absolute top-0 right-0 p-10 opacity-5">
+                                        <Zap size={150} strokeWidth={3} className="text-pink-600" />
                                     </div>
-                                    <h2 className="text-3xl font-black mb-3 tracking-tighter">효과적인 구인의 시작 🚀</h2>
-                                    <p className="text-gray-100 text-sm font-black tracking-tight opacity-90">가장 확실한 구인은 {brand.name} 프리미엄 광고와 함께하세요.</p>
+                                    <h2 className="text-2xl md:text-3xl font-black mb-3 tracking-tighter text-gray-900">효과적인 구인의 시작 🚀</h2>
+                                    <p className="text-gray-600 text-[13px] md:text-sm font-black tracking-tight">가장 확실한 구인은 {brand.name} 프리미엄 광고와 함께하세요.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -466,19 +467,19 @@ function CustomerCenterContent() {
                         )}
 
                         {/* Customer Service Box (Mobile Lower Position) */}
-                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border-4 border-gray-900 bg-white dark:bg-gray-800 shadow-2xl`}>
+                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border border-pink-100 bg-gradient-to-br from-white to-pink-50/30 shadow-xl shadow-pink-100/20`}>
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gray-900">
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
                                     <PhoneCall size={24} />
                                 </div>
                                 <span className="font-black text-gray-900 dark:text-white text-xl">고객센터</span>
                             </div>
                             <p className="text-4xl font-black mb-3 text-gray-900 dark:text-white tracking-tighter">1544-5568</p>
-                            <p className="text-[14px] text-gray-900 dark:text-gray-200 leading-relaxed font-black">
+                            <p className="text-[14px] text-gray-500 dark:text-gray-200 leading-relaxed font-black">
                                 평일 09:30 ~ 19:00 / 점심 12:00 ~ 13:30<br />
                                 <span className="text-pink-600 font-black mt-2 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-sky-500 text-white rounded-[24px] text-base font-black hover:bg-sky-600 transition shadow-xl">
+                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-sky-500 text-white rounded-[24px] text-base font-black hover:bg-sky-600 transition shadow-xl shadow-sky-100">
                                 <MessageCircle size={20} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
