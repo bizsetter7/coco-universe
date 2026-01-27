@@ -86,7 +86,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
             className={`group border overflow-hidden cursor-pointer hover:shadow-md transition-all active:scale-95 shadow-sm
                 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
                 ${isGrand ?
-                    `rounded-[18px] border-2 ${brand.theme === 'dark' ? 'border-amber-900/30 ring-1 ring-amber-900/10' : 'border-amber-100 ring-1 ring-amber-50'}` :
+                    `rounded-[18px] border-2 shadow-[0_0_15px_rgba(251,191,36,0.15)] ${brand.theme === 'dark' ? 'border-amber-600 ring-1 ring-amber-900/40' : 'border-amber-400 ring-1 ring-amber-100'}` :
                     `rounded-[14px] ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-100'}`
                 }
             `}
@@ -103,7 +103,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                             {ad.name.substring(0, 1)}
                         </div>
                     </div>
-                    <span className={`text-[10px] font-black truncate tracking-tighter ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{ad.name}</span>
+                    <span className={`text-[10px] font-black truncate tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{ad.name}</span>
                 </div>
                 <div className={`relative w-full aspect-[4/3] rounded-lg overflow-hidden border 
                     ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}

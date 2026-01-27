@@ -85,16 +85,16 @@ export default function RegionPage(props: { params: Params }) {
         <div className={`min-h-screen pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
             {/* Header */}
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+                <div className="max-w-4xl mx-auto px-3 h-14 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-1 text-pink-500 font-black">
                         <Home size={20} />
                         <span>COCOALBA</span>
                     </Link>
-                    <div className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{regionName} 실시간 현황</div>
+                    <div className={`text-sm font-black ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{regionName} 실시간 현황</div>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto px-4 py-8">
+            <main className="max-w-4xl mx-auto px-3 py-8">
                 {/* Hero Section */}
                 <section className="mb-10 text-center py-10 bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl text-white shadow-xl shadow-rose-200">
                     <div className="inline-block bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold mb-4">
@@ -117,8 +117,8 @@ export default function RegionPage(props: { params: Params }) {
                             <TrendingUp size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] text-gray-400">일일 조회수</p>
-                            <p className={`text-lg font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1,240+</p>
+                            <p className="text-[10px] text-gray-500 font-bold">일일 조회수</p>
+                            <p className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>1,240+</p>
                         </div>
                     </div>
                     <div className={`p-4 rounded-2xl shadow-sm border flex items-center gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
@@ -126,8 +126,8 @@ export default function RegionPage(props: { params: Params }) {
                             <Sparkles size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] text-gray-400">진행 중인 공고</p>
-                            <p className={`text-lg font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shops.length}개</p>
+                            <p className="text-[10px] text-gray-500 font-bold">진행 중인 공고</p>
+                            <p className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shops.length}개</p>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@ export default function RegionPage(props: { params: Params }) {
                         추천 업소 리스트
                         <span className="bg-amber-100 text-amber-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-pulse">AD OPEN</span>
                     </h2>
-                    <span className="text-xs text-blue-500 font-bold">인기순</span>
+                    <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>인기순</span>
                 </div>
 
                 <div className="space-y-4">
@@ -149,7 +149,7 @@ export default function RegionPage(props: { params: Params }) {
                                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:rotate-3 transition-transform ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-amber-50'}`}>✨</div>
                                 <div>
                                     <p className="text-[10px] font-black text-amber-600 mb-1 tracking-tighter uppercase">가장 먼저 만나는 {regionName} 대표 업소</p>
-                                    <h3 className={`text-xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>광고주님, 이 자리를 선점하세요!</h3>
+                                    <h3 className={`text-xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>광고주님, 이 자리를 선점하세요!</h3>
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-2 mb-6">
@@ -179,10 +179,10 @@ export default function RegionPage(props: { params: Params }) {
                                                 :
                                                 (shop.tier === 'grand' ? 'border-amber-400 ring-2 ring-amber-100 shadow-xl' :
                                                     shop.tier === 'preferential' ? 'border-gray-400 ring-2 ring-gray-100 shadow-lg' :
-                                                        shop.tier === 'premium' ? 'border-blue-300' :
-                                                            shop.tier === 'special' ? 'border-rose-300' :
-                                                                shop.tier === 'urgent' ? 'border-red-400 bg-red-50/5' :
-                                                                    shop.tier === 'recommended' ? 'border-green-300' : 'border-gray-100')}
+                                                        shop.tier === 'premium' ? 'border-blue-400' :
+                                                            shop.tier === 'special' ? 'border-rose-400' :
+                                                                shop.tier === 'urgent' ? 'border-red-500 bg-red-50/5' :
+                                                                    shop.tier === 'recommended' ? 'border-green-400' : 'border-gray-200')}
                                         `}
                                     >
                                         {shop.tier && shop.tier !== 'common' && (
@@ -208,7 +208,7 @@ export default function RegionPage(props: { params: Params }) {
                                                     <span className="text-[10px] font-medium text-gray-400">{shop.site}</span>
                                                     {shop.is_verified && <ShieldCheck size={10} className="text-blue-500" />}
                                                 </div>
-                                                <h3 className={`text-lg font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                <h3 className={`text-lg font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                                                     <a href={shop.url || '#'} target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors">
                                                         {shop.name}
                                                     </a>
@@ -223,12 +223,12 @@ export default function RegionPage(props: { params: Params }) {
 
                                         <div className="grid grid-cols-2 gap-2 mb-4">
                                             <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                <p className="text-[10px] text-gray-400 mb-0.5">급여 조건</p>
-                                                <p className="text-xs font-bold text-rose-500">{shop.pay}</p>
+                                                <p className="text-[10px] text-gray-500 font-bold mb-0.5">급여 조건</p>
+                                                <p className="text-xs font-black text-rose-600">{shop.pay}</p>
                                             </div>
                                             <div className={`p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                <p className="text-[10px] text-gray-400 mb-0.5">근무 형태</p>
-                                                <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{shop.workType}</p>
+                                                <p className="text-[10px] text-gray-500 font-bold mb-0.5">근무 형태</p>
+                                                <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>{shop.workType}</p>
                                             </div>
                                         </div>
 

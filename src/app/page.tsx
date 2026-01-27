@@ -149,13 +149,13 @@ export default function HomePortal() {
   return (
     <div className={`min-h-screen relative pb-20`}>
       {/* Header */}
-      <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all`}>
-        <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
+      <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+        <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setCurrentPage('home')}>
             {currentPage !== 'home' ? (
               <ChevronLeft className="md:hidden mr-1" size={24} />
             ) : null}
-            <span className="text-2xl font-black tracking-tighter">
+            <span className="text-xl sm:text-2xl font-black tracking-tighter">
               {brand.displayName.split(' ')[0]}
               <span style={primaryStyle} className="ml-1">
                 {brand.displayName.split(' ').slice(1).join(' ')}
@@ -204,7 +204,7 @@ export default function HomePortal() {
               </div>
             </div>
 
-            <div className="max-w-[1020px] mx-auto px-4 py-8">
+            <div className="max-w-[1020px] mx-auto px-3 py-6 sm:py-8">
               {/* Quick Icon Grid - Perfect 9 alignment */}
               <div className="grid grid-cols-3 md:grid-cols-9 gap-3 md:gap-4 mb-10">
                 {[
@@ -241,31 +241,31 @@ export default function HomePortal() {
                         setCurrentPage(item.link);
                       }
                     }}
-                    className={`flex flex-col items-center justify-center p-3 md:p-4 rounded-2xl cursor-pointer hover:scale-105 transition-transform border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100 shadow-sm'}`}
+                    className={`flex flex-col items-center justify-center p-2.5 sm:p-4 rounded-2xl cursor-pointer hover:scale-105 transition-transform border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100 shadow-sm'}`}
                   >
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full mb-2 flex items-center justify-center ${item.bg} ${item.color}`}>
+                    <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-full mb-1.5 sm:mb-2 flex items-center justify-center ${item.bg} ${item.color}`}>
                       {item.icon}
                     </div>
-                    <span className={`text-[10px] md:text-xs font-bold text-center break-keep ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{item.label}</span>
+                    <span className={`text-[10px] sm:text-xs font-black text-center break-keep ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-950'}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
 
               {/* Dashboard (PC/Mobile 2-Columns) */}
               <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-10">
-                <div onClick={() => router.push('/community')} className={`border p-4 md:p-6 rounded-[28px] md:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-pink-100'}`}>
-                  <div className="flex justify-between items-center mb-4 md:mb-5">
-                    <span className="font-bold text-pink-600 flex items-center gap-1.5 md:gap-2.5 text-sm md:text-lg"><MessageSquare size={18} /> 커뮤니티</span>
-                    <span className={`text-[9px] md:text-[11px] font-bold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>자유게시판</span>
+                <div onClick={() => router.push('/community')} className={`border p-3.5 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-pink-100'}`}>
+                  <div className="flex justify-between items-center mb-3 sm:mb-5">
+                    <span className="font-extrabold text-pink-600 flex items-center gap-1.5 sm:gap-2.5 text-sm sm:text-lg"><MessageSquare size={18} /> 커뮤니티</span>
+                    <span className={`text-[9px] sm:text-[11px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>자유게시판</span>
                   </div>
-                  <div className="space-y-3 md:space-y-4">
+                  <div className="space-y-2.5 sm:space-y-4">
                     {MOCK_POSTS.slice(0, 3).map(post => (
                       <div key={post.id} className="flex items-center justify-between group">
-                        <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
-                          <span className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center text-[10px] md:text-[12px] group-hover:bg-pink-600 group-hover:text-white transition-all ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
+                        <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                          <span className={`shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center text-[10px] sm:text-[12px] group-hover:bg-pink-600 group-hover:text-white transition-all ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                             {post.category === '친구찾기' ? '👥' : post.category === '블랙리스트' ? '🚨' : '💬'}
                           </span>
-                          <p className={`truncate text-[11px] md:text-[13px] font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                          <p className={`truncate text-[11px] sm:text-[13px] font-black ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
                             {post.title}
                           </p>
                         </div>
@@ -275,21 +275,21 @@ export default function HomePortal() {
                 </div>
 
                 {/* 실시간 공지사항 */}
-                <div onClick={() => router.push('/customer-center?tab=notice')} className={`border p-4 md:p-6 rounded-[28px] md:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-blue-100'}`}>
-                  <div className="flex justify-between items-center mb-4 md:mb-5">
-                    <span className="font-bold text-blue-600 flex items-center gap-1.5 md:gap-2.5 text-sm md:text-lg"><Megaphone size={18} /> 공지사항</span>
-                    <span className={`text-[9px] md:text-[11px] font-bold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>업데이트</span>
+                <div onClick={() => router.push('/customer-center?tab=notice')} className={`border p-3.5 sm:p-6 rounded-[28px] sm:rounded-[32px] shadow-sm cursor-pointer hover:shadow-md transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-blue-100'}`}>
+                  <div className="flex justify-between items-center mb-3 sm:mb-5">
+                    <span className="font-extrabold text-blue-600 flex items-center gap-1.5 sm:gap-2.5 text-sm sm:text-lg"><Megaphone size={18} /> 공지사항</span>
+                    <span className={`text-[9px] sm:text-[11px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full hidden sm:block ${brand.theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-50 text-gray-400'}`}>업데이트</span>
                   </div>
-                  <div className="space-y-3 md:space-y-4">
+                  <div className="space-y-2.5 sm:space-y-4">
                     {[
                       { title: '[중요] 서비스 전면 개편 및 광고 상품 단가 확정 안내', isNew: true },
                       { title: 'PC 사이드배너 광고 시스템 정식 도입', isNew: false },
                       { title: '브랜드 통합 시스템 리뉴얼 안내', isNew: false }
                     ].map((n, i) => (
-                      <div key={i} className={`flex items-center justify-between gap-2 md:gap-3 border-b pb-2 md:pb-2.5 last:border-0 last:pb-0 ${brand.theme === 'dark' ? 'border-gray-700/50' : 'border-gray-50'}`}>
-                        <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
-                          <div className={`shrink-0 w-1 md:w-1.5 h-1 md:h-1.5 rounded-full ${n.isNew ? 'bg-blue-600 animate-pulse' : 'bg-gray-300'}`}></div>
-                          <p className={`truncate text-[11px] md:text-[13px] font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{n.title}</p>
+                      <div key={i} className={`flex items-center justify-between gap-2 sm:gap-3 border-b pb-2 sm:pb-2.5 last:border-0 last:pb-0 ${brand.theme === 'dark' ? 'border-gray-700/50' : 'border-gray-50'}`}>
+                        <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                          <div className={`shrink-0 w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full ${n.isNew ? 'bg-blue-600 animate-pulse' : 'bg-gray-300'}`}></div>
+                          <p className={`truncate text-[11px] sm:text-[13px] font-black ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{n.title}</p>
                         </div>
                       </div>
                     ))}
@@ -305,7 +305,7 @@ export default function HomePortal() {
                 </h3>
                 <button
                   onClick={() => router.push('/customer-center?tab=ad')}
-                  className={`text-[10px] md:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-sm hover:shadow-md transition-all flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
+                  className={`text-[10px] sm:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-md hover:shadow-lg transition-all flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black'}`}
                 >
                   <PlusCircle size={12} className="text-pink-500" />
                   광고신청 +
@@ -316,20 +316,20 @@ export default function HomePortal() {
                   <div
                     key={shop.id || i}
                     onClick={() => setSelectedShop(shop)}
-                    className={`group relative border-2 rounded-[22px] overflow-hidden shadow-md transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-white'}
-                      ${shop.tier === 'grand' ? `ring-2 ring-amber-400 ring-offset-2 ${brand.theme === 'dark' ? 'ring-offset-gray-900' : 'ring-offset-white'} animate-pulse-subtle` : ''}
+                    className={`group relative border-2 rounded-[22px] overflow-hidden shadow-md transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-transparent'}
+                      ${shop.tier === 'grand' ? `ring-2 ring-amber-400 animate-pulse-subtle` : ''}
                     `}
                   >
-                    <div className={`h-28 sm:h-36 flex items-center justify-center text-gray-400 text-[10px] break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                    <div className={`aspect-square sm:aspect-auto sm:h-36 flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                       {shop.name.split(' ').slice(0, 2).join(' ')}<br />매장 이미지
                       {shop.options?.blink && (
-                        <div className="absolute top-2 left-2 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-bounce">급구</div>
+                        <div className="absolute top-2 left-2 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-bounce shadow-sm">급구</div>
                       )}
                     </div>
-                    <div className="p-4">
-                      <h4 className={`font-black text-[13px] md:text-[15px] truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h4>
-                      <p className="text-red-600 font-black text-xs md:text-sm">{shop.pay}</p>
-                      <p className="text-[10px] text-gray-400 mt-1 font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</p>
+                    <div className="p-3.5 sm:p-4">
+                      <h4 className={`font-black text-[13px] sm:text-[15px] truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h4>
+                      <p className="text-red-500 font-extrabold text-xs sm:text-sm tracking-tight">{shop.pay}</p>
+                      <p className={`text-[10px] mt-1 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{shop.region.split(' ').slice(0, 2).join(' ')}</p>
                     </div>
                   </div>
                 ))}
@@ -338,8 +338,8 @@ export default function HomePortal() {
               {/* [PC/M 통합] 오늘의 추천 업소 (가로 스크롤) */}
               <div className="mb-14">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                    <span className="text-2xl">|</span>
+                  <div className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-black' : 'text-black'}`}>
+                    <span className="text-2xl text-black">|</span>
                     <span>오늘의 추천 업소 (PC/M 통합 노출)</span>
                   </div>
                   {userLocation.isDetected && (
@@ -361,9 +361,9 @@ export default function HomePortal() {
                         `}>
                           {shop.name.split(' ').slice(0, 2).join(' ')}<br />전경사진
                         </div>
-                        <h5 className="text-[12px] md:text-sm font-black truncate mb-1">{shop.name}</h5>
+                        <h5 className={`text-[12px] md:text-sm font-black truncate mb-1 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{shop.name}</h5>
                         <p className="text-[10px] md:text-xs text-red-500 font-black">{shop.pay}</p>
-                        <p className="text-[8px] md:text-[10px] text-gray-400 mt-1">{shop.region.split(' ').slice(0, 2).join(' ')}</p>
+                        <p className={`text-[8px] md:text-[10px] font-bold mt-1 ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>{shop.region.split(' ').slice(0, 2).join(' ')}</p>
                       </div>
                     </div>
                   ))}
@@ -373,8 +373,8 @@ export default function HomePortal() {
               {/* 지역별 구인 공고 (검색창 + 전략 광고) */}
               <div className="mt-8 mb-14">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                    <span className="text-2xl">|</span>
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-black' : 'text-black'}`}>
+                    <span className="text-2xl text-black">|</span>
                     <span>지역을 선택해주세요</span>
                   </h3>
                 </div>
@@ -386,8 +386,8 @@ export default function HomePortal() {
                     className={`md:col-span-1 border rounded-2xl p-4 flex flex-col justify-center items-center text-center cursor-pointer hover:shadow-md transition-all group ${brand.theme === 'dark' ? 'bg-amber-900/10 border-amber-900/30' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100'}`}
                   >
                     <span className={`text-[8px] font-black px-2 py-0.5 rounded-full mb-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-amber-500 bg-amber-900/30' : 'text-amber-600 bg-amber-100'}`}>Grand Region AD</span>
-                    <h4 className={`text-sm font-black mb-1 group-hover:text-amber-600 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>이 지역 1등 프리미엄 💎</h4>
-                    <p className="text-[10px] text-gray-500 font-bold italic">지금 바로 입점하고 상단 노출!</p>
+                    <h4 className={`text-sm font-black mb-1 group-hover:text-amber-600 ${brand.theme === 'dark' ? 'text-gray-900' : 'text-gray-900'}`}>이 지역 1등 프리미엄 💎</h4>
+                    <p className={`text-[10px] font-bold italic ${brand.theme === 'dark' ? 'text-gray-600' : 'text-gray-600'}`}>지금 바로 입점하고 상단 노출!</p>
                   </div>
                   <div
                     onClick={() => router.push('/customer-center?tab=ad')}
@@ -398,8 +398,8 @@ export default function HomePortal() {
                         <Crown size={24} />
                       </div>
                       <div>
-                        <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>준비된 인재들이 기다립니다! 👑</h4>
-                        <p className="text-[10px] text-gray-500 font-bold">지역별 맞춤 구인으로 정규직 채용 완료</p>
+                        <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-gray-900' : 'text-black'}`}>준비된 인재들이 기다립니다! 👑</h4>
+                        <p className={`text-[10px] font-bold ${brand.theme === 'dark' ? 'text-gray-600' : 'text-gray-600'}`}>지역별 맞춤 구인으로 정규직 채용 완료</p>
                       </div>
                     </div>
                     <div className={`px-4 py-2 bg-pink-600 text-white text-[11px] font-black rounded-xl shadow-lg ${brand.theme === 'dark' ? 'shadow-none' : 'shadow-pink-200'}`}>광고신청</div>
@@ -415,7 +415,7 @@ export default function HomePortal() {
                         <Home size={14} />
                       </div>
                       <select
-                        className={`w-full text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-100 text-gray-700 shadow-sm hover:border-gray-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-50'}`}
+                        className={`w-full text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-100 text-black shadow-sm hover:border-gray-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-50'}`}
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d1d5db' stroke-width='3' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
                         value={selectedRegion}
                         onChange={(e) => {
@@ -438,7 +438,7 @@ export default function HomePortal() {
                       </div>
                       <select
                         disabled={selectedRegion === '전체'}
-                        className={`w-full text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-100 text-gray-700 shadow-sm hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50'}`}
+                        className={`w-full text-[12px] font-black pl-9 pr-10 py-3 rounded-2xl border-2 appearance-none transition-all cursor-pointer disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-100 text-black shadow-sm hover:border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50'}`}
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d1d5db' stroke-width='3' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
                         value={selectedSubRegion}
                         onChange={(e) => {
@@ -482,23 +482,23 @@ export default function HomePortal() {
                     광고신청 +
                   </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                   {shops.filter(s => s.tier === 'special').slice(0, 12).map((shop, i) => (
                     <div
                       key={i}
                       onClick={() => setSelectedShop(shop)}
-                      className={`group border rounded-xl p-0.5 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                      className={`group border rounded-xl p-1 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
-                      <div className={`relative aspect-[4/3] rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-300'}`}>
+                      <div className={`relative aspect-square sm:aspect-[4/3] rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden mb-2 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
                         {shop.name.substring(0, 1)}
-                        <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic">HOT</div>
+                        <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic shadow-sm">HOT</div>
                       </div>
                       <div className="px-1.5 pb-2 text-center">
-                        <h5 className={`text-[11px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{shop.name}</h5>
-                        <p className="text-[9px] text-gray-400 font-bold mb-1">{shop.region.split(' ')[1]}</p>
+                        <h5 className={`text-[12px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{shop.name}</h5>
+                        <p className="text-[9px] text-gray-500 font-bold mb-1">{shop.region.split(' ')[1]}</p>
                         <p className="text-[11px] font-black text-red-500">{shop.pay.split(' ')[1] || shop.pay}</p>
                         <div className="mt-1 flex justify-center">
-                          <div className="text-[8px] border border-purple-200 text-purple-600 px-1.5 py-0.5 rounded-sm font-bold">💎 24회 720일</div>
+                          <div className={`text-[8px] border px-1.5 py-0.5 rounded-sm font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-950 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600'}`}>💎 24회 720일</div>
                         </div>
                       </div>
                     </div>
@@ -511,13 +511,13 @@ export default function HomePortal() {
                 {/* 5번 급구채용 (Left Column: 4/12) */}
                 <div className="md:col-span-4">
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                      <span className="text-2xl">|</span>
+                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
+                      <span className="text-2xl text-purple-600">|</span>
                       <span>급구채용</span>
                     </h3>
                     <button
                       onClick={() => router.push('/customer-center?tab=ad')}
-                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-black'}`}
                     >
                       광고신청 +
                     </button>
@@ -527,15 +527,15 @@ export default function HomePortal() {
                       <div
                         key={i}
                         onClick={() => setSelectedShop(shop)}
-                        className={`border-2 rounded-2xl p-3 flex gap-3 hover:border-purple-500 transition-all cursor-pointer shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-900/30' : 'bg-white border-purple-100'}`}
+                        className={`border-2 rounded-2xl p-3.5 flex gap-3 hover:border-purple-500 transition-all cursor-pointer shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-purple-900/30' : 'bg-white border-purple-100'}`}
                       >
-                        <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs text-blue-300 font-black shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                        <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs text-blue-400 font-extrabold shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-700' : 'bg-gray-50 border border-gray-100'}`}>
                           {shop.name.substring(0, 1)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h5 className={`text-[12px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h5>
-                          <p className="text-[10px] font-bold text-gray-400 mb-1">{shop.region.split(' ')[1]}</p>
-                          <div className={`text-[9px] px-1.5 py-0.5 rounded-md inline-block font-black ${brand.theme === 'dark' ? 'bg-purple-900/10 text-purple-600' : 'bg-purple-50 text-purple-600'}`}>⭐ NEW 전용</div>
+                          <h5 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
+                          <p className="text-[10px] font-bold text-gray-500 mb-1">{shop.region.split(' ')[1]}</p>
+                          <div className={`text-[9px] px-1.5 py-0.5 rounded-md inline-block font-black ${brand.theme === 'dark' ? 'bg-purple-900/40 text-purple-400' : 'bg-purple-50 text-purple-600'}`}>⭐ NEW 전용</div>
                         </div>
                       </div>
                     ))}
@@ -545,13 +545,13 @@ export default function HomePortal() {
                 {/* 6번 추천채용 (Right Column: 8/12) */}
                 <div className="md:col-span-8">
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                      <span className="text-2xl">|</span>
+                    <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
+                      <span className="text-2xl text-purple-600">|</span>
                       <span>추천채용</span>
                     </h3>
                     <button
                       onClick={() => router.push('/customer-center?tab=ad')}
-                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                      className={`text-[9px] font-black border px-2 py-1 rounded-sm shadow-sm flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-black'}`}
                     >
                       광고신청 +
                     </button>
@@ -561,18 +561,18 @@ export default function HomePortal() {
                       <div
                         key={i}
                         onClick={() => setSelectedShop(shop)}
-                        className={`border rounded-2xl p-4 hover:border-rose-400 transition-all cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-100/50 border-gray-200'}`}
+                        className={`border rounded-2xl p-4 sm:p-5 hover:border-rose-400 transition-all cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-inner'}`}
                       >
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-2.5">
                           <div>
                             <p className="text-[10px] font-bold text-gray-400 mb-0.5">{shop.region.split(' ')[1]}</p>
-                            <h5 className={`font-black text-[13px] group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shop.name}</h5>
+                            <h5 className={`font-black text-[14px] group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
                           </div>
-                          <div className="text-[10px] font-black text-white bg-rose-500 px-2 py-0.5 rounded-full">REC</div>
+                          <div className="text-[10px] font-black text-white bg-rose-500 px-2 py-0.5 rounded-full shadow-sm">REC</div>
                         </div>
-                        <p className={`text-[11px] font-bold truncate mb-3 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>"{shop.name}에서 함께 일할 메이트를 찾아요!"</p>
+                        <p className={`text-[11px] font-bold truncate mb-3.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>"{shop.name}에서 함께 일할 메이트를 찾아요!"</p>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-black text-rose-600">{shop.pay}</span>
+                          <span className="text-xs font-black text-red-600 tracking-tight">{shop.pay}</span>
                           <span className="text-[10px] text-gray-400 font-bold">{shop.workType}</span>
                         </div>
                       </div>
@@ -580,7 +580,6 @@ export default function HomePortal() {
                   </div>
                 </div>
               </div>
-
               {/* 줄광고 리스트 */}
               <div id="job-list-section" className="mt-12">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -605,10 +604,10 @@ export default function HomePortal() {
                                   shop.tier === 'special' ? 'bg-gradient-to-br from-rose-400 via-pink-100 to-rose-600 shadow-rose-200/30' :
                                     shop.tier === 'urgent' ? 'border-2 border-red-500 shadow-md shadow-red-100' :
                                       shop.tier === 'recommended' ? 'border-2 border-green-400 bg-green-50/10' :
-                                        brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}
+                                        brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}
                           `}
                         >
-                          <div className={`flex flex-col h-full w-full p-4 md:p-5 rounded-[24px] transition-colors
+                          <div className={`flex flex-col h-full w-full p-3 md:p-5 rounded-[24px] transition-colors
                             ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
                           `}>
                             {/* 지역 매칭 뱃지 (국내 최초 사용자 타겟팅 시각화) */}
@@ -669,19 +668,19 @@ export default function HomePortal() {
 
                             <div className="flex flex-wrap gap-1.5 mb-5 min-h-[18px]">
                               {shop.options?.icons?.map((icon, idx) => (
-                                <span key={idx} className={`text-[8px] md:text-[10px] px-2 py-0.5 rounded-lg font-black border ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
+                                <span key={idx} className={`text-[8px] sm:text-[10px] px-2 py-0.5 rounded-lg font-black border ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
                                   {icon}
                                 </span>
                               ))}
                             </div>
 
-                            <div className={`mt-auto pt-4 border-t flex items-end justify-between ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-50'}`}>
+                            <div className={`mt-auto pt-4 border-t flex items-end justify-between ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-100'}`}>
                               <div>
-                                <p className="text-[9px] md:text-[11px] text-gray-400 font-bold mb-0.5">{shop.workType}</p>
-                                <p className="text-sm md:text-lg text-red-500 font-black tracking-tight">{shop.pay}</p>
+                                <p className="text-[9px] sm:text-[11px] text-gray-500 font-black mb-0.5">{shop.workType}</p>
+                                <p className="text-sm sm:text-lg text-red-600 font-extrabold tracking-tight">{shop.pay}</p>
                               </div>
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors
-                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-300')}
+                                ${shop.tier === 'grand' ? 'bg-amber-50 text-amber-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400')}
                               `}>
                                 <ChevronRight size={16} />
                               </div>
@@ -696,8 +695,8 @@ export default function HomePortal() {
                               <Star size={20} fill="currentColor" />
                             </div>
                             <p className="text-[10px] font-black text-rose-500 mb-1">LIST NATIVE AD</p>
-                            <h5 className={`text-sm font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>사장님, 광고 한 칸 어떠세요?</h5>
-                            <button className={`text-[10px] font-black px-4 py-2 rounded-full shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>문의하기</button>
+                            <h5 className={`text-sm font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>사장님, 광고 한 칸 어떠세요?</h5>
+                            <button className={`text-[10px] font-black px-4 py-2 rounded-full shadow-md active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-950 border border-gray-100'}`}>문의하기</button>
                           </div>
                         )}
                       </React.Fragment>
@@ -723,7 +722,7 @@ export default function HomePortal() {
                 {/* 인재 정보 섹션 (퀸알바/레이디알바 벤치마킹 핵심) */}
                 <div className="mt-16 mb-12">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="flex items-center gap-2 text-xl font-bold">
+                    <h3 className={`flex items-center gap-2 text-xl font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                       <User size={22} className="text-rose-500" />
                       <span>실시간 인재 발굴</span>
                       <span className="text-xs font-normal text-gray-400 ml-2">언니들이 사장님을 기다리고 있어요!</span>
@@ -733,13 +732,13 @@ export default function HomePortal() {
 
                   <div className={`rounded-3xl border shadow-xl overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-[12px] md:text-sm">
-                        <thead className={`border-b ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-50/50 border-gray-100'}`}>
+                      <table className="w-full text-left text-[11px] sm:text-sm">
+                        <thead className={`border-b ${brand.theme === 'dark' ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                           <tr>
-                            <th className="px-6 py-4 font-black text-gray-500">이름/나이</th>
-                            <th className="px-6 py-4 font-black text-gray-500">희망지역</th>
-                            <th className="px-6 py-4 font-black text-gray-500 hidden md:table-cell">자기소개</th>
-                            <th className="px-6 py-4 font-black text-gray-500 text-right">등록일</th>
+                            <th className="px-3 sm:px-6 py-4 font-black text-gray-500">이름/나이</th>
+                            <th className="px-3 sm:px-6 py-4 font-black text-gray-500">희망지역</th>
+                            <th className="px-3 sm:px-6 py-4 font-black text-gray-500 hidden md:table-cell">자기소개</th>
+                            <th className="px-3 sm:px-6 py-4 font-black text-gray-500 text-right">등록일</th>
                           </tr>
                         </thead>
                         <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-50'}`}>
@@ -750,14 +749,14 @@ export default function HomePortal() {
                             { name: '최혜O', age: '24세', region: '서울 서초구', desc: '평일 오후 파트타임 구합니다. 약속 잘 지킵니다.', date: '30분 전' },
                             { name: '정유O', age: '23세', region: '부산 해운대구', desc: '주말 고정 알바 찾고 있어요. 활발한 성격입니다.', date: '1시간 전' },
                           ].map((person, idx) => (
-                            <tr key={idx} className={`transition-colors cursor-pointer group ${brand.theme === 'dark' ? 'hover:bg-rose-900/10' : 'hover:bg-rose-50/30'}`}>
-                              <td className="px-6 py-4">
-                                <span className={`font-black group-hover:text-rose-500 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{person.name}</span>
-                                <span className="text-gray-400 ml-2">({person.age})</span>
+                            <tr key={idx} className={`transition-colors cursor-pointer group ${brand.theme === 'dark' ? 'hover:bg-rose-900/20' : 'hover:bg-rose-50/50'}`}>
+                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                                <span className={`font-black group-hover:text-rose-600 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>{person.name}</span>
+                                <span className="text-gray-500 ml-1.5 font-bold">({person.age})</span>
                               </td>
-                              <td className={`px-6 py-4 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{person.region}</td>
-                              <td className="px-6 py-4 text-gray-400 hidden md:table-cell truncate max-w-xs">{person.desc}</td>
-                              <td className="px-6 py-4 text-right text-gray-300 font-medium">{person.date}</td>
+                              <td className={`px-3 sm:px-6 py-4 font-black whitespace-nowrap ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-900'}`}>{person.region}</td>
+                              <td className="px-3 sm:px-6 py-4 text-gray-500 hidden md:table-cell truncate max-w-xs">{person.desc}</td>
+                              <td className="px-3 sm:px-6 py-4 text-right text-gray-400 font-extrabold whitespace-nowrap">{person.date}</td>
                             </tr>
                           ))}
                         </tbody>

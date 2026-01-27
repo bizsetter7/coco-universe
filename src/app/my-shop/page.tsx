@@ -602,19 +602,19 @@ export default function MyShopPage() {
                 <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-pink-50 border-white'}`}>
                     <AlertTriangle size={40} className="text-pink-500" />
                 </div>
-                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>게시글 작성 전 필독! 📢</h3>
+                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>게시글 작성 전 필독! 📢</h3>
                 <div className={`text-left text-[13px] p-6 rounded-2xl space-y-3 leading-relaxed border font-bold ${brand.theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border-gray-700' : 'bg-gray-50/80 text-gray-700 border-gray-100'}`}>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">1.</span>
-                        <span>한 달 수정한도는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
+                        <span>한 달 수정한도는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">2.</span>
-                        <span>7단계 등급 시스템에 따라 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>노출 위치</strong>가 결정됩니다.</span>
+                        <span>7단계 등급 시스템에 따라 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>노출 위치</strong>가 결정됩니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">3.</span>
-                        <span>최적의 홍보 효과를 위해 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} font-black`}>제목에 특수문자</strong> 사용을 권장합니다.</span>
+                        <span>최적의 홍보 효과를 위해 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>제목에 특수문자</strong> 사용을 권장합니다.</span>
                     </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-2">
@@ -746,9 +746,9 @@ export default function MyShopPage() {
 
             {/* Header */}
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
-                <div className="max-w-[1020px] mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-700'}`}>
+                        <button onClick={() => router.back()} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-800'}`}>
                             <ArrowLeft size={20} />
                         </button>
                         <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
@@ -767,15 +767,17 @@ export default function MyShopPage() {
             </header>
 
             {view === 'dashboard' ? (
-                <div className="max-w-6xl mx-auto p-4 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="max-w-6xl mx-auto p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Sidebar (PC Only) */}
                     <aside className="hidden md:block col-span-1 space-y-2">
                         <div className={`p-6 rounded-2xl border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                             <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'}`}>
                                 <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
                             </div>
-                            <h2 className={`font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
-                            <p className="text-xs text-gray-500 mb-4">프리미엄 회원</p>
+                            <div>
+                                <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shopName}</h2>
+                                <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>프리미엄 인증 업소</p>
+                            </div>
                             <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                                 사진 등록/수정
                             </button>
@@ -821,15 +823,15 @@ export default function MyShopPage() {
 
                         <div className="grid grid-cols-3 gap-2 md:gap-4 h-24 md:h-auto">
                             <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                                <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">채용공고 등록수</div>
+                                <div className="text-[11px] md:text-sm font-black mb-1 text-black">채용공고 등록수</div>
                                 <div className="text-lg md:text-3xl font-black text-pink-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
                             <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                                <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">진행중인 공고</div>
+                                <div className="text-[11px] md:text-sm font-black mb-1 text-black">진행중인 공고</div>
                                 <div className="text-lg md:text-3xl font-black text-blue-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
                             <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center opacity-60 flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                                <div className="text-gray-500 text-[11px] md:text-sm font-bold mb-1">마감된 공고</div>
+                                <div className="text-[11px] md:text-sm font-black mb-1 text-black">마감된 공고</div>
                                 <div className="text-lg md:text-3xl font-black text-gray-500">0<span className="text-xs text-gray-400 ml-1">개</span></div>
                             </div>
                         </div>
@@ -887,16 +889,16 @@ export default function MyShopPage() {
                                 </h2>
                                 <div className="space-y-2.5">
                                     <div>
-                                        <label className="block text-xs font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>상호명</label>
+                                        <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>상호명</label>
                                         <input
                                             type="text"
                                             value={shopName}
                                             onChange={(e) => setShopName(e.target.value)}
-                                            className={`w-full border rounded-lg p-2 text-sm font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-purple-900/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:ring-purple-500'}`}
+                                            className={`w-full border rounded-lg p-2 text-sm font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-purple-900/50' : 'bg-gray-50 border-gray-200 text-black focus:ring-purple-500'}`}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-black text-gray-500 mb-1.5">사업자 인증</label>
+                                        <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}>사업자 인증</label>
                                         {isVerified ? (
                                             <div className="w-full py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs font-bold flex items-center justify-center gap-2">
                                                 <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white">
@@ -921,12 +923,12 @@ export default function MyShopPage() {
                                 <div className="space-y-2.5">
                                     <div className="grid grid-cols-2 gap-2.5">
                                         <div>
-                                            <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>성함</label>
-                                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-blue-500'}`} />
+                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>성함</label>
+                                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-black focus:ring-blue-500'}`} />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연락처</label>
-                                            <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-blue-500'}`} />
+                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>연락처</label>
+                                            <input type="tel" placeholder="010-0000-0000" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-white border-gray-200 text-black focus:ring-blue-500'}`} />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 gap-2">
@@ -954,13 +956,13 @@ export default function MyShopPage() {
                             </h2>
                             <div className="space-y-2.5">
                                 <div>
-                                    <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                                    <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-2 text-base font-black placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-pink-900/50' : 'bg-white border-gray-200 text-gray-900 focus:ring-pink-500'}`} />
+                                    <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>공고 제목</label>
+                                    <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-2 text-base font-black placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-pink-900/50' : 'bg-white border-gray-200 text-black focus:ring-pink-500'}`} />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>직종</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>직종</label>
                                         <div className="flex gap-1.5">
                                             <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">1차</option>
@@ -973,7 +975,7 @@ export default function MyShopPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>연령</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>연령</label>
                                         <div className="flex items-center gap-1.5">
                                             <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
@@ -988,7 +990,7 @@ export default function MyShopPage() {
 
                                 <div className="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>근무 지역</label>
                                         <div className="flex gap-1.5">
                                             <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                                 <option value="">시/도</option>
@@ -1001,20 +1003,20 @@ export default function MyShopPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5">근무시간</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}>근무시간</label>
                                         <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여 방식</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여 방식</label>
                                         <select value={payType} onChange={(e) => setPayType(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                                             {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-black text-gray-500 mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
+                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여액</label>
                                         <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} className={`w-full border rounded-lg p-2 text-base font-black text-right outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                     </div>
                                 </div>
