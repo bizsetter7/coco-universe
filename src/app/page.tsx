@@ -974,121 +974,151 @@ export default function HomePortal() {
 
         {/* Region Page (Redesigned) */}
         {currentPage === 'region' && (
-          <div className="max-w-[1020px] mx-auto px-0 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white">
+          <div className="max-w-[1300px] mx-auto px-0 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white lg:flex lg:gap-8 items-start">
+            <div className="flex-1 min-w-0 max-w-[1020px] mx-auto w-full">
 
-            {/* 1. Hero Banner Carousel */}
-            <div className="relative w-full h-[160px] md:h-[180px] bg-gray-900 overflow-hidden md:rounded-3xl mb-0 md:mb-8 group">
-              <div
-                className="flex transition-transform duration-500 ease-in-out h-full"
-                style={{ transform: `translateX(-${bannerIndex * 100}%)` }}
-              >
-                {REGION_BANNERS.map((banner) => (
-                  <div key={banner.id} className={`w-full h-full flex-shrink-0 relative ${banner.color}`}>
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-pulse"></div>
+              {/* 1. Hero Banner Carousel */}
+              <div className="relative w-full h-[160px] md:h-[180px] bg-gray-900 overflow-hidden md:rounded-3xl mb-0 md:mb-8 group">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out h-full"
+                  style={{ transform: `translateX(-${bannerIndex * 100}%)` }}
+                >
+                  {REGION_BANNERS.map((banner) => (
+                    <div key={banner.id} className={`w-full h-full flex-shrink-0 relative ${banner.color}`}>
+                      {/* Background Pattern */}
+                      <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-pulse"></div>
 
-                    <div className="absolute inset-0 flex items-center justify-between px-8 md:px-16">
-                      <div className="z-10 space-y-2">
-                        <span className={`text-[10px] md:text-xs font-black px-2 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/20 uppercase tracking-widest ${banner.text}`}>{banner.brand}</span>
-                        <h3 className="text-xl md:text-3xl font-black text-white leading-tight break-keep drop-shadow-lg">{banner.title}</h3>
-                        <p className="text-xs md:text-sm font-bold text-gray-300 drop-shadow-md">{banner.desc}</p>
-                      </div>
-                      <div className="hidden md:flex w-16 h-16 rounded-full bg-white/10 items-center justify-center border border-white/20 shadow-2xl backdrop-blur-md">
-                        <Crown className={banner.text} size={32} />
+                      <div className="absolute inset-0 flex items-center justify-between px-8 md:px-16">
+                        <div className="z-10 space-y-2">
+                          <span className={`text-[10px] md:text-xs font-black px-2 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/20 uppercase tracking-widest ${banner.text}`}>{banner.brand}</span>
+                          <h3 className="text-xl md:text-3xl font-black text-white leading-tight break-keep drop-shadow-lg">{banner.title}</h3>
+                          <p className="text-xs md:text-sm font-bold text-gray-300 drop-shadow-md">{banner.desc}</p>
+                        </div>
+                        <div className="hidden md:flex w-16 h-16 rounded-full bg-white/10 items-center justify-center border border-white/20 shadow-2xl backdrop-blur-md">
+                          <Crown className={banner.text} size={32} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Arrows */}
-              <button
-                onClick={(e) => { e.stopPropagation(); setBannerIndex((prev) => (prev === 0 ? REGION_BANNERS.length - 1 : prev - 1)); }}
-                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-md rounded-full text-white/50 hover:bg-white/20 hover:text-white transition-all border border-white/10"
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setBannerIndex((prev) => (prev + 1) % REGION_BANNERS.length); }}
-                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-md rounded-full text-white/50 hover:bg-white/20 hover:text-white transition-all border border-white/10"
-              >
-                <ChevronRight size={24} />
-              </button>
-
-              {/* Dots */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-                {REGION_BANNERS.map((_, i) => (
-                  <div
-                    key={i}
-                    onClick={(e) => { e.stopPropagation(); setBannerIndex(i); }}
-                    className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all cursor-pointer ${i === bannerIndex ? 'bg-white w-4 md:w-6' : 'bg-white/30 hover:bg-white/50'}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="px-4 py-6 md:px-0">
-              {/* 2. Page Title Area */}
-              {/* 2. Page Title Area & Notice Bar */}
-              <div className="flex flex-col gap-4 mb-6">
-                <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                  <span className="text-pink-600">|</span> 지역별채용
-                </h3>
-
-                {/* Notice Bar (Separated) */}
-                <div
-                  onClick={() => router.push('/customer-center?tab=notice')}
-                  className={`cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:bg-opacity-50 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                >
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <span className="bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md whitespace-nowrap">공지사항</span>
-                    <span className={`text-[12px] md:text-sm font-bold truncate ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                      [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
-                    </span>
-                  </div>
-                  <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                  ))}
                 </div>
 
-                {/* 3. Navigation Tabs */}
-                <div className="flex border-b-2 border-gray-100 mt-2">
-                  {['업종별채용', '지역별채용', '오늘본광고'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveRegionTab(tab === '지역별채용' ? 'region' : 'other')}
-                      className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${(tab === '지역별채용')
-                        ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5'
-                        : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                    >
-                      {tab}
-                    </button>
+                {/* Arrows */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); setBannerIndex((prev) => (prev === 0 ? REGION_BANNERS.length - 1 : prev - 1)); }}
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-md rounded-full text-white/50 hover:bg-white/20 hover:text-white transition-all border border-white/10"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setBannerIndex((prev) => (prev + 1) % REGION_BANNERS.length); }}
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-md rounded-full text-white/50 hover:bg-white/20 hover:text-white transition-all border border-white/10"
+                >
+                  <ChevronRight size={24} />
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+                  {REGION_BANNERS.map((_, i) => (
+                    <div
+                      key={i}
+                      onClick={(e) => { e.stopPropagation(); setBannerIndex(i); }}
+                      className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all cursor-pointer ${i === bannerIndex ? 'bg-white w-4 md:w-6' : 'bg-white/30 hover:bg-white/50'}`}
+                    />
                   ))}
                 </div>
               </div>
 
-              {/* 4. Search Form Section (Ultra-Compact) */}
-              <div className={`p-3.5 md:p-6 rounded-[20px] md:rounded-[32px] border shadow-sm space-y-2 md:space-y-0 md:flex md:items-center md:gap-3 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <div className="px-4 py-6 md:px-0">
+                {/* 2. Page Title Area */}
+                {/* 2. Page Title Area & Notice Bar */}
+                <div className="flex flex-col gap-4 mb-6">
+                  <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <span className="text-pink-600">|</span> 지역별채용
+                  </h3>
 
-                {/* Mobile: Labels (Hidden on Desktop) */}
-                <div className="md:hidden grid grid-cols-1 gap-1">
-                  <label className="text-[10px] font-black text-gray-500 pl-1">지역</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Notice Bar (Separated) */}
+                  <div
+                    onClick={() => router.push('/customer-center?tab=notice')}
+                    className={`cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:bg-opacity-50 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span className="bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md whitespace-nowrap">공지사항</span>
+                      <span className={`text-[12px] md:text-sm font-bold truncate ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                        [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
+                      </span>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                  </div>
+
+                  {/* 3. Navigation Tabs */}
+                  <div className="flex border-b-2 border-gray-100 mt-2">
+                    {['업종별채용', '지역별채용', '오늘본광고'].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveRegionTab(tab === '지역별채용' ? 'region' : 'other')}
+                        className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${(tab === '지역별채용')
+                          ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5'
+                          : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Search Form Section (Ultra-Compact) */}
+                <div className={`p-3.5 md:p-6 rounded-[20px] md:rounded-[32px] border shadow-sm space-y-2 md:space-y-0 md:flex md:items-center md:gap-3 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+
+                  {/* Mobile: Labels (Hidden on Desktop) */}
+                  <div className="md:hidden grid grid-cols-1 gap-1">
+                    <label className="text-[10px] font-black text-gray-500 pl-1">지역</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                        value={selectedRegion}
+                        onChange={(e) => {
+                          setSelectedRegion(e.target.value);
+                          setSelectedSubRegion('전체');
+                        }}
+                      >
+                        <option value="전체">지역선택</option>
+                        {Object.keys(REGIONS_MAP).map(reg => (
+                          <option key={reg} value={reg}>{reg}</option>
+                        ))}
+                      </select>
+                      <select
+                        disabled={selectedRegion === '전체'}
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 focus:border-blue-500 focus:bg-white'} disabled:opacity-50`}
+                        value={selectedSubRegion}
+                        onChange={(e) => setSelectedSubRegion(e.target.value)}
+                      >
+                        <option value="전체">세부지역</option>
+                        {selectedRegion !== '전체' && (REGIONS_MAP[selectedRegion] as string[])?.map((sub: string) => (
+                          <option key={sub} value={sub}>{sub}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Desktop: Region Selects */}
+                  <div className="hidden md:flex items-center gap-2 flex-[2]">
                     <select
-                      className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                      className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-pink-200'}`}
                       value={selectedRegion}
                       onChange={(e) => {
                         setSelectedRegion(e.target.value);
                         setSelectedSubRegion('전체');
                       }}
                     >
-                      <option value="전체">지역선택</option>
+                      <option value="전체">지역전체</option>
                       {Object.keys(REGIONS_MAP).map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
                     </select>
                     <select
                       disabled={selectedRegion === '전체'}
-                      className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 focus:border-blue-500 focus:bg-white'} disabled:opacity-50`}
+                      className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer disabled:opacity-50 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-200'}`}
                       value={selectedSubRegion}
                       onChange={(e) => setSelectedSubRegion(e.target.value)}
                     >
@@ -1098,81 +1128,54 @@ export default function HomePortal() {
                       ))}
                     </select>
                   </div>
-                </div>
 
-                {/* Desktop: Region Selects */}
-                <div className="hidden md:flex items-center gap-2 flex-[2]">
-                  <select
-                    className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-pink-200'}`}
-                    value={selectedRegion}
-                    onChange={(e) => {
-                      setSelectedRegion(e.target.value);
-                      setSelectedSubRegion('전체');
-                    }}
-                  >
-                    <option value="전체">지역전체</option>
-                    {Object.keys(REGIONS_MAP).map(reg => (
-                      <option key={reg} value={reg}>{reg}</option>
-                    ))}
-                  </select>
-                  <select
-                    disabled={selectedRegion === '전체'}
-                    className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer disabled:opacity-50 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-200'}`}
-                    value={selectedSubRegion}
-                    onChange={(e) => setSelectedSubRegion(e.target.value)}
-                  >
-                    <option value="전체">세부지역</option>
-                    {selectedRegion !== '전체' && (REGIONS_MAP[selectedRegion] as string[])?.map((sub: string) => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))}
-                  </select>
-                </div>
+                  {/* Job Select */}
+                  <div className="grid grid-cols-1 gap-1 md:gap-0 flex-1">
+                    <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">직종</label>
+                    <select
+                      className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white md:hover:border-purple-200'}`}
+                      value={selectedJobType}
+                      onChange={(e) => setSelectedJobType(e.target.value)}
+                    >
+                      <option value="전체">직종선택</option>
+                      {JOB_TYPES.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                {/* Job Select */}
-                <div className="grid grid-cols-1 gap-1 md:gap-0 flex-1">
-                  <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">직종</label>
-                  <select
-                    className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white md:hover:border-purple-200'}`}
-                    value={selectedJobType}
-                    onChange={(e) => setSelectedJobType(e.target.value)}
-                  >
-                    <option value="전체">직종선택</option>
-                    {JOB_TYPES.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
+                  {/* Keyword Input */}
+                  <div className="grid grid-cols-1 gap-1 md:gap-0 flex-[2]">
+                    <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">검색어</label>
+                    <input
+                      type="text"
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
+                      placeholder="키워드 검색 (예: 강남)"
+                      className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-medium text-xs md:text-sm border md:border-2 transition-all ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:bg-white md:hover:border-gray-200'}`}
+                    />
+                  </div>
 
-                {/* Keyword Input */}
-                <div className="grid grid-cols-1 gap-1 md:gap-0 flex-[2]">
-                  <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">검색어</label>
-                  <input
-                    type="text"
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder="키워드 검색 (예: 강남)"
-                    className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-medium text-xs md:text-sm border md:border-2 transition-all ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:bg-white md:hover:border-gray-200'}`}
-                  />
-                </div>
-
-                {/* Search Button */}
-                <div className="pt-1 md:pt-0 w-full md:w-auto">
-                  <button
-                    onClick={() => {
-                      setCurrentPage('home');
-                      setTimeout(() => {
-                        document.getElementById('job-list-section')?.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
-                    }}
-                    className="w-full md:w-auto md:px-6 py-3 md:py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl font-black text-[13px] md:text-sm shadow-md hover:from-black hover:to-black active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
-                  >
-                    <Search size={16} />
-                    <span className="md:hidden">검색하기</span>
-                    <span className="hidden md:inline">검색</span>
-                  </button>
+                  {/* Search Button */}
+                  <div className="pt-1 md:pt-0 w-full md:w-auto">
+                    <button
+                      onClick={() => {
+                        setCurrentPage('home');
+                        setTimeout(() => {
+                          document.getElementById('job-list-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                      }}
+                      className="w-full md:w-auto md:px-6 py-3 md:py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl font-black text-[13px] md:text-sm shadow-md hover:from-black hover:to-black active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                      <Search size={16} />
+                      <span className="md:hidden">검색하기</span>
+                      <span className="hidden md:inline">검색</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <RightSidebar />
           </div>
         )}
 
