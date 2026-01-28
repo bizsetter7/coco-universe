@@ -12,7 +12,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     const brand = useBrand();
 
     return (
-        <div className={`min-h-screen w-full flex justify-center overflow-x-hidden ${brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <div className={`min-h-screen w-full flex justify-center ${brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <div className="flex gap-0 xl:gap-6 w-full max-w-[1400px] justify-center px-0 xl:px-4 relative">
 
                 {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}

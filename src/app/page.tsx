@@ -901,20 +901,31 @@ export default function HomePortal() {
                   🎉 오픈 기념 선착순 100업소 3개월 무료 체험 진행 중!
                 </div>
 
-                <div className="space-y-4 mb-8">
-                  <label className="block p-4 border-2 border-red-500 bg-red-50/50 rounded-xl cursor-pointer relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-red-500 text-white text-xs px-3 py-1 font-bold">EVENT</div>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="block font-bold text-lg">기본 광고 (3개월)</span>
-                        <span className="text-sm text-gray-500">배너 노출 + 인재 열람권 포함</span>
+                <div className="space-y-3 mb-8">
+                  {[
+                    { id: 1, name: '1번 - 그랜드 (Grand)', desc: '메인/지역 최상단 0순위 독점 노출 (Glow 효과)', price: '350,000원' },
+                    { id: 2, name: '2번 - 우대 (Preferential)', desc: '메인 상단 전략적 고정 (실버 보더 적용)', price: '200,000원' },
+                    { id: 3, name: '3번 - 프리미엄 (Premium)', desc: '메인 중앙 집중 노출 (블루 보더 적용)', price: '150,000원' },
+                    { id: 4, name: '4번 - 스페셜 (Special)', desc: '리스트 상단 핑크 보더 노출 (관심 집중)', price: '120,000원' },
+                    { id: 5, name: '5번 - 급구 및 추천 (Urgent/Rec)', desc: '빨간 제목 + 추천 배지로 가독성 극대화', price: '100,000원' },
+                    { id: 6, name: '6번 - 리스트 네이티브 (Native)', desc: '일반 리스트 노출 (네이티브 스타일)', price: '80,000원' },
+                    { id: 7, name: '7번 - 줄광고 (Basic)', desc: '일반 리스트 노출 (실속형 구인 상품)', price: '60,000원' },
+                    { id: 8, name: '8번 - 강조옵션 (Emphasis)', desc: '아이콘/형광펜 효과 (주목도 200% 상승)', price: '30,000원' },
+                  ].map((pkg) => (
+                    <label key={pkg.id} className={`block p-4 border rounded-xl cursor-pointer relative overflow-hidden transition-all hover:border-red-500 hover:bg-red-50/30 ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : pkg.id === 1 ? 'border-red-500 bg-red-50/50' : 'border-gray-200 bg-white shadow-sm'}`}>
+                      {pkg.id === 1 && <div className="absolute top-0 right-0 bg-red-500 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter">Event</div>}
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1 min-w-0 pr-3">
+                          <span className={`block font-black text-sm md:text-base ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{pkg.name}</span>
+                          <span className="text-[11px] md:text-xs text-gray-500 font-bold truncate block">{pkg.desc}</span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          {pkg.id === 1 && <span className="block text-gray-400 line-through text-[10px] mb-[-2px]">350,000원</span>}
+                          <span className={`text-base md:text-lg font-black ${pkg.id === 1 ? 'text-red-500' : (brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800')}`}>{pkg.id === 1 ? '0원' : pkg.price}</span>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <span className="block text-gray-400 line-through text-xs">300,000원</span>
-                        <span className="text-2xl font-black text-red-500">0원</span>
-                      </div>
-                    </div>
-                  </label>
+                    </label>
+                  ))}
                 </div>
 
                 <button
