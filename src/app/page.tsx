@@ -9,6 +9,7 @@ import { MOCK_POSTS } from '@/constants/community';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import EventPopup from '@/components/EventPopup';
+import RightSidebar from '@/components/RightSidebar';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
 
