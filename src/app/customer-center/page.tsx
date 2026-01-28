@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import {
     Headphones,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     PhoneCall,
     MessageSquare,
     ArrowLeft,
@@ -156,6 +158,20 @@ function CustomerCenterContent() {
         { id: '1:1문의', icon: <MessageSquare size={16} /> },
     ];
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: -280, behavior: 'smooth' });
+        }
+    };
+
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: 280, behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} pb-20`}>
             {/* [Fixed Mastery] Header */}
@@ -280,37 +296,41 @@ function CustomerCenterContent() {
                                 </div>
 
                                 {/* Mobile: Horizontal Scroll / Desktop: Grid */}
-                                <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-hidden -mx-5 px-5 md:mx-0 md:px-0 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
-                                    {AD_TIERS.map((tier) => (
-                                        <div key={tier.id} className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}>
-                                            <div className="flex items-center justify-between mb-5 md:mb-6">
-                                                <div className={`p-4 md:p-4 rounded-2xl shadow-inner text-pink-600 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-pink-50'}`}>
-                                                    {React.cloneElement(tier.icon as React.ReactElement<{ size?: number }>, { size: 24 })}
+                                <div className="relative group px-1">
+                                    {/* Scroll Buttons (Mobile Only) */}
+                                    <button onClick={scrollLeft} className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/90 shadow-lg rounded-full text-gray-800 border border-gray-100 active:scale-95 transition-transform" aria-label="Previous">
+                                        <ChevronLeft size={20} />
+                                    </button>
+                                    <button onClick={scrollRight} className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/90 shadow-lg rounded-full text-gray-800 border border-gray-100 active:scale-95 transition-transform" aria-label="Next">
+                                        <ChevronRight size={20} />
+                                    </button>
+
+                                    <div ref={scrollContainerRef} className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-hidden -mx-5 px-5 md:mx-0 md:px-0 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide scroll-smooth">
+                                        {AD_TIERS.map((tier) => (
+                                            <div key={tier.id} className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}>
+                                                <div className="flex items-center justify-between mb-5 md:mb-6">
+                                                    <div className={`p-4 md:p-4 rounded-2xl shadow-inner text-pink-600 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-pink-50'}`}>
+                                                        {React.cloneElement(tier.icon as React.ReactElement<{ size?: number }>, { size: 24 })}
+                                                    </div>
+                                                    {tier.id === 'grand' && <span className="bg-pink-600 text-white text-[10px] md:text-[11px] px-3 py-1 rounded-full font-black uppercase tracking-widest">Top Tier</span>}
                                                 </div>
-                                                {tier.id === 'grand' && <span className="bg-pink-600 text-white text-[10px] md:text-[11px] px-3 py-1 rounded-full font-black uppercase tracking-widest">Top Tier</span>}
-                                            </div>
-                                            <h3 className={`text-xl md:text-xl font-black mb-1 md:mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
-                                            <p className="text-pink-600 font-black text-lg md:text-lg mb-6 md:mb-8 tracking-tighter leading-none">{tier.price.split(' ')[0]}</p>
+                                                <h3 className={`text-xl md:text-xl font-black mb-1 md:mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
+                                                <p className="text-pink-600 font-black text-lg md:text-lg mb-6 md:mb-8 tracking-tighter leading-none">{tier.price.split(' ')[0]}</p>
 
-                                            <div className="flex-1 space-y-3.5 md:space-y-4 mb-8">
-                                                {tier.benefits.map((benefit, i) => (
-                                                    <p key={i} className={`text-xs md:text-xs flex items-start gap-2.5 font-bold leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-400'}`}>
-                                                        <CheckCircle2 size={14} className="text-pink-600 shrink-0 mt-0.5" />
-                                                        <span className="">{benefit}</span>
-                                                    </p>
-                                                ))}
-                                            </div>
+                                                <div className="flex-1 space-y-3.5 md:space-y-4 mb-8">
+                                                    {tier.benefits.map((benefit, i) => (
+                                                        <p key={i} className={`text-xs md:text-xs flex items-start gap-2.5 font-bold leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-400'}`}>
+                                                            <CheckCircle2 size={14} className="text-pink-600 shrink-0 mt-0.5" />
+                                                            <span className="">{benefit}</span>
+                                                        </p>
+                                                    ))}
+                                                </div>
 
-                                            <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}>
-                                                상담 후 신청하기
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {/* Scroll Indicator Gradient */}
-                                    <div className="absolute top-0 bottom-4 right-0 w-12 bg-gradient-to-l from-white/90 to-transparent pointer-events-none md:hidden rounded-r-[32px] flex items-center justify-end pr-2">
-                                        <div className="animate-bounce-horizontal text-pink-500/80">
-                                            <ArrowRight size={20} strokeWidth={3} />
-                                        </div>
+                                                <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}>
+                                                    상담 후 신청하기
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -662,7 +682,7 @@ function CustomerCenterContent() {
                                             <Search size={100} />
                                         </div>
                                         <p className="text-xs font-bold text-pink-400 uppercase tracking-widest">Smart Marketing Point</p>
-                                        <h4 className="text-lg md:text-xl font-black leading-tight break-keep">사용자의 현재 위치를 찾아내는<br />AI 스마트 노출 시스템 🛰️</h4>
+                                        <h4 className="text-[15px] md:text-xl font-black leading-tight"><span className="whitespace-nowrap">사용자의 현재 위치를 찾아내는</span><br />AI 스마트 노출 시스템 🛰️</h4>
                                         <p className="text-[13px] text-gray-300 font-medium leading-relaxed max-w-2xl">
                                             사장님의 업소가 위치한 지역의 구직자들에게 가장 먼저 배너가 노출됩니다.
                                             유저의 접속 지역을 실시간으로 감지하여 광고 효율을 극대화하는 {brand.name}만의 기술력을 경험하세요.
