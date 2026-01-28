@@ -353,10 +353,10 @@ function CustomerCenterContent() {
                                         </table>
                                     </div>
 
-                                    {/* Mobile View Cards (Remove Scroll) - 2 Columns Grid */}
-                                    <div className="md:hidden grid grid-cols-2 gap-3">
+                                    {/* Mobile View Cards (Remove Scroll) - 2 Columns Grid (Optimized Spacing) */}
+                                    <div className="md:hidden grid grid-cols-2 gap-2">
                                         {DETAILED_PRICING.map((item, idx) => (
-                                            <div key={idx} className={`p-4 rounded-[28px] border flex flex-col justify-between shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                            <div key={idx} className={`p-3 rounded-[24px] border flex flex-col justify-between shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                                                 <div className="space-y-3">
                                                     <div className="flex flex-col">
                                                         <div className="flex items-center justify-between mb-1">
@@ -366,7 +366,7 @@ function CustomerCenterContent() {
                                                         <h4 className={`text-[13px] font-black leading-tight break-keep ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</h4>
                                                     </div>
 
-                                                    <div className={`p-2.5 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                                                    <div className={`p-2 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                                         <p className={`text-[10px] font-bold leading-[1.4] break-keep ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             {item.benefit}
                                                         </p>

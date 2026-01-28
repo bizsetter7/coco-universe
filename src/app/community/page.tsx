@@ -101,8 +101,8 @@ function CommunityContent() {
                 기존 Sticky 방식 대신 Fixed 방식을 사용하여 스크롤 유실 문제를 원천 봉쇄함. 
             */}
 
-            {/* 1단 상단바 (Fixed z-60) - 보더 제거로 개방감 확보 */}
-            <div className={`fixed top-0 left-0 right-0 z-[60] shadow-sm h-14 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+            {/* 1단 상단바 (Sticky z-60) - 보더 제거로 개방감 확보 */}
+            <div className={`sticky top-0 left-0 right-0 z-[60] shadow-sm h-14 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                 <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.push('/')} className={`p-2 -ml-2 transition-colors ${brand.theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>
@@ -127,8 +127,8 @@ function CommunityContent() {
                 </div>
             </div>
 
-            {/* 2단 카테고리 탭 (Fixed z-50, top-14) - 보더 제거로 일체감 조성 */}
-            <div className={`fixed top-14 left-0 right-0 z-50 backdrop-blur-md min-h-[48px] py-1 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
+            {/* 2단 카테고리 탭 (Sticky z-50, top-14) - 보더 제거로 일체감 조성 */}
+            <div className={`sticky top-14 left-0 right-0 z-50 backdrop-blur-md min-h-[48px] py-1 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
                 <div className="max-w-[1020px] mx-auto flex flex-wrap justify-start px-4 h-full gap-y-1">
                     {CATEGORIES.map((cat) => (
                         <button
@@ -145,8 +145,8 @@ function CommunityContent() {
                 </div>
             </div>
 
-            {/* Content Body: Fixed 헤더 높이(56+48=104px) 만큼 패딩 부여 */}
-            <div className="pt-[115px] pb-20">
+            {/* Content Body: Sticky 헤더 사용으로 패딩 제거 (자연스러운 흐름) */}
+            <div className="pt-0 pb-20">
                 {/* Admin/Mock Controls */}
                 <div className="max-w-[1020px] mx-auto mb-4 px-4">
                     <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between text-[11px] text-indigo-700">
