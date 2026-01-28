@@ -656,7 +656,7 @@ function CustomerCenterContent() {
                                             <Search size={100} />
                                         </div>
                                         <p className="text-xs font-bold text-pink-400 uppercase tracking-widest">Smart Marketing Point</p>
-                                        <h4 className="text-lg md:text-xl font-black leading-tight">접속 위치를 감지하여 해당지역 광고를<br className="hidden md:block" /> 우선 노출하는 위치기반 스마트 시스템 🛰️</h4>
+                                        <h4 className="text-lg md:text-xl font-black leading-tight">사용자의 현재 위치를 찾아내는<br className="hidden md:block" /> AI 스마트 노출 시스템 🛰️</h4>
                                         <p className="text-[13px] text-gray-300 font-medium leading-relaxed max-w-2xl">
                                             사장님의 업소가 위치한 지역의 구직자들에게 가장 먼저 배너가 노출됩니다.
                                             유저의 접속 지역을 실시간으로 감지하여 광고 효율을 극대화하는 {brand.name}만의 기술력을 경험하세요.
@@ -667,14 +667,14 @@ function CustomerCenterContent() {
                                     <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-5">
                                         {[
                                             {
-                                                pos: '그랜드 사이드 배너',
+                                                pos: (<>그랜드<br />사이드 배너</>),
                                                 type: 'PC 스크롤 좌우측 동시 고정 노출',
                                                 size: '120 x 600 (PC) / 720 x 150 (M)',
                                                 price: '350,000원',
                                                 feature: (<span>최상위 고정 / 압도적 구인 효과<br />PC+M 통합</span>)
                                             },
                                             {
-                                                pos: '프리미엄 사이드 배너',
+                                                pos: (<>프리미엄<br />사이드 배너</>),
                                                 type: 'PC 스크롤 좌/우 택 1 고정 노출',
                                                 size: '120 x 600 (PC) / 720 x 150 (M)',
                                                 price: '200,000원',
@@ -685,14 +685,14 @@ function CustomerCenterContent() {
                                                 type: '리스트 중간 흐름 삽입형 광고',
                                                 size: '980 x 120 (PC / Mobile)',
                                                 price: '180,000원',
-                                                feature: (<span>거부감 없는 자연스러운 노출<br />PC+M 통합</span>)
+                                                feature: (<span>거부감없는 자연스러운 노출<br />PC+M 통합</span>)
                                             },
                                         ].map((row, i) => (
                                             <div key={i} className={`p-4 md:p-8 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
                                                 <div className="space-y-4">
                                                     <div className="flex justify-between items-start">
                                                         <div className="space-y-1">
-                                                            <span className={`text-[13px] md:text-xl font-black block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{row.pos}</span>
+                                                            <span className={`text-[13px] md:text-xl font-black block leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{row.pos}</span>
                                                             <span className="text-[8px] md:text-[10px] text-pink-500 font-bold uppercase tracking-wider">{row.feature}</span>
                                                         </div>
                                                         <span className={`hidden md:block text-[9px] px-2 py-1 rounded-lg border font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>{row.size.split(' ')[0]}</span>
