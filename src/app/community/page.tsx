@@ -128,13 +128,13 @@ function CommunityContent() {
             </div>
 
             {/* 2단 카테고리 탭 (Fixed z-50, top-14) - 보더 제거로 일체감 조성 */}
-            <div className={`fixed top-14 left-0 right-0 z-50 backdrop-blur-md h-[48px] overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
-                <div className="max-w-[1020px] mx-auto flex px-4 h-full overflow-x-auto scrollbar-hide">
+            <div className={`fixed top-14 left-0 right-0 z-50 backdrop-blur-md min-h-[48px] py-1 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
+                <div className="max-w-[1020px] mx-auto flex flex-wrap justify-start px-4 h-full gap-y-1">
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => handleTabChange(cat)}
-                            className={`flex-shrink-0 px-4 h-full text-sm font-bold border-b-2 transition-all duration-200 whitespace-nowrap flex items-center ${activeTab === cat
+                            className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center ${activeTab === cat
                                 ? 'border-pink-500 text-pink-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-900'
                                 }`}

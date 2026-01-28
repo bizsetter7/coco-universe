@@ -367,7 +367,7 @@ function CustomerCenterContent() {
                                                     </div>
 
                                                     <div className={`p-2.5 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                                                        <p className={`text-[10px] font-bold leading-[1.4] ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        <p className={`text-[10px] font-bold leading-[1.4] break-keep ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             {item.benefit}
                                                         </p>
                                                     </div>
