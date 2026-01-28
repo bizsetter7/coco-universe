@@ -306,6 +306,12 @@ function CustomerCenterContent() {
                                             </button>
                                         </div>
                                     ))}
+                                    {/* Scroll Indicator Gradient */}
+                                    <div className="absolute top-0 bottom-4 right-0 w-12 bg-gradient-to-l from-white/90 to-transparent pointer-events-none md:hidden rounded-r-[32px] flex items-center justify-end pr-2">
+                                        <div className="animate-bounce-horizontal text-pink-500/80">
+                                            <ArrowRight size={20} strokeWidth={3} />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Detailed Pricing Table Section */}
@@ -656,7 +662,7 @@ function CustomerCenterContent() {
                                             <Search size={100} />
                                         </div>
                                         <p className="text-xs font-bold text-pink-400 uppercase tracking-widest">Smart Marketing Point</p>
-                                        <h4 className="text-lg md:text-xl font-black leading-tight">사용자의 현재 위치를 찾아내는<br />AI 스마트 노출 시스템 🛰️</h4>
+                                        <h4 className="text-lg md:text-xl font-black leading-tight break-keep">사용자의 현재 위치를 찾아내는<br />AI 스마트 노출 시스템 🛰️</h4>
                                         <p className="text-[13px] text-gray-300 font-medium leading-relaxed max-w-2xl">
                                             사장님의 업소가 위치한 지역의 구직자들에게 가장 먼저 배너가 노출됩니다.
                                             유저의 접속 지역을 실시간으로 감지하여 광고 효율을 극대화하는 {brand.name}만의 기술력을 경험하세요.
@@ -675,7 +681,7 @@ function CustomerCenterContent() {
                                             },
                                             {
                                                 pos: (<>프리미엄<br />사이드 배너</>),
-                                                type: 'PC 스크롤 좌/우 택 1 고정 노출',
+                                                type: (<>PC스크롤 좌/우 택1<br />고정노출</>),
                                                 size: '120 x 600 (PC) / 720 x 150 (M)',
                                                 price: '200,000원',
                                                 feature: (<span>시선 집중<br />높은 가성비 전략<br />PC+모바일 통합</span>)
@@ -691,9 +697,9 @@ function CustomerCenterContent() {
                                             <div key={i} className={`p-4 md:p-8 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
                                                 <div className="space-y-4">
                                                     <div className="flex justify-between items-start">
-                                                        <div className="space-y-1">
+                                                        <div className="space-y-0.5">
                                                             <span className={`text-[13px] md:text-xl font-black block leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{row.pos}</span>
-                                                            <span className="text-[8px] md:text-[10px] text-pink-500 font-bold uppercase tracking-wider">{row.feature}</span>
+                                                            <span className="text-[8px] md:text-[10px] text-pink-500 font-bold uppercase tracking-wider leading-tight block pt-1">{row.feature}</span>
                                                         </div>
                                                         <span className={`hidden md:block text-[9px] px-2 py-1 rounded-lg border font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>{row.size.split(' ')[0]}</span>
                                                     </div>
