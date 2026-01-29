@@ -65,7 +65,10 @@ export default function RightSidebar() {
                     {Object.keys(REGIONS_MAP).slice(0, 16).map(region => (
                         <button
                             key={region}
-                            onClick={() => router.push(`/?region=${region}`)}
+                            onClick={() => {
+                                router.push(`/?region=${region}`);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
                             className={`text-[11px] font-medium text-center hover:underline ${brand.theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'}`}
                         >
                             {region}
@@ -81,7 +84,10 @@ export default function RightSidebar() {
                 </h3>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-2">
                     {JOB_TYPES.map(job => (
-                        <div key={job} className="flex items-center gap-1 cursor-pointer group">
+                        <div key={job} className="flex items-center gap-1 cursor-pointer group" onClick={() => {
+                            router.push(`/?region=전체&job=${job}`);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}>
                             <div className="w-1 h-1 rounded-full bg-gray-300 group-hover:bg-purple-500 transition-colors"></div>
                             <span className={`text-[11px] font-medium group-hover:underline ${brand.theme === 'dark' ? 'text-gray-400 group-hover:text-white' : 'text-gray-500 group-hover:text-black'}`}>{job}</span>
                         </div>
@@ -96,7 +102,10 @@ export default function RightSidebar() {
                 </h3>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-2">
                     {WORK_TYPES.map(type => (
-                        <div key={type} className="flex items-center gap-1 cursor-pointer group">
+                        <div key={type} className="flex items-center gap-1 cursor-pointer group" onClick={() => {
+                            router.push(`/?region=전체&workType=${type}`);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}>
                             <div className="w-1 h-1 rounded-full bg-gray-300 group-hover:bg-gray-600 transition-colors"></div>
                             <span className={`text-[11px] font-medium group-hover:underline ${brand.theme === 'dark' ? 'text-gray-400 group-hover:text-white' : 'text-gray-500 group-hover:text-black'}`}>{type}</span>
                         </div>
