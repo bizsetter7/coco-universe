@@ -66,7 +66,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
     });
 
     return (
-        <div className={`min-h-screen pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className={`min-h-screen pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-black'}`}>
             {/* Header */}
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="max-w-4xl mx-auto px-3 h-14 flex items-center justify-between">
@@ -117,7 +117,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                 </div>
 
                 <div className="mt-1 mb-5 flex items-center justify-between w-full">
-                    <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                         <MapPin size={22} className="text-blue-500" />
                         <span>{regionName} 추천 업소</span>
                         <span className="bg-amber-100 text-amber-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-pulse">AD OPEN</span>
@@ -238,7 +238,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                                         AD
                                                                     </div>
                                                                     <div>
-                                                                        <h4 className="text-[15px] font-black text-gray-900 mb-0.5">사장님, 광고 한칸 어떠세요?</h4>
+                                                                        <h4 className="text-[15px] font-black text-black mb-0.5">사장님, 광고 한칸 어떠세요?</h4>
                                                                         <p className="text-xs text-amber-600 font-bold">합리적인 비용으로 최고의 효율을 선사합니다.</p>
                                                                     </div>
                                                                 </div>
@@ -272,7 +272,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                 className={`p-4 active:bg-gray-50 transition-colors flex justify-between items-start gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 active:bg-gray-800' : 'bg-white'}`}
                                             >
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className={`text-[15px] font-bold mb-1.5 break-keep line-clamp-1 truncate ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                                    <h3 className={`text-[15px] font-bold mb-1.5 break-keep line-clamp-1 truncate ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
                                                         {shop.tier === 'urgent' && <span className="text-red-500 mr-1">♥</span>}
                                                         {shop.name}에서 함께 일할 가족을 모집합니다.
                                                     </h3>
@@ -318,7 +318,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
 
                                                             return (
                                                                 <div className="flex items-center gap-1">
-                                                                    <span className="font-black text-gray-900">{amount}</span>
+                                                                    <span className="font-black text-black">{amount}</span>
                                                                     <span className={`${badgeColor} text-white px-1 rounded text-[9px] font-bold`}>{badgeLabel}</span>
                                                                 </div>
                                                             );
@@ -339,7 +339,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                             AD
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="text-[14px] font-black text-gray-900 truncate">사장님, 광고 한칸 어떠세요?</h4>
+                                                            <h4 className="text-[14px] font-black text-black truncate">사장님, 광고 한칸 어떠세요?</h4>
                                                             <p className="text-[11px] text-amber-600 font-bold">합리적인 비용으로 최고의 효율을 선사합니다.</p>
                                                         </div>
                                                         <ChevronRight size={18} className="text-amber-400" />

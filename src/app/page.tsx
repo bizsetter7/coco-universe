@@ -796,7 +796,7 @@ export default function HomePortal() {
                       </div>
                       <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
                         <p className="text-xs text-gray-400 mb-1">근무형태</p>
-                        <p className="text-gray-700 font-bold text-sm">{selectedShop.workType}</p>
+                        <p className="text-black font-bold text-sm">{selectedShop.workType}</p>
                       </div>
                     </div>
 
@@ -889,7 +889,7 @@ export default function HomePortal() {
               </div>
 
               <div className="space-y-3">
-                <div className={`p-4 rounded-lg shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-100 text-gray-700'}`}>
+                <div className={`p-4 rounded-lg shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-100 text-black'}`}>
                   <div className="flex justify-between mb-2">
                     <span className="bg-gray-700 text-white text-xs px-2 py-1 rounded">강남/논현</span>
                     <span className="text-xs text-gray-400">2024.01.20</span>
@@ -960,7 +960,7 @@ export default function HomePortal() {
                       <span className="font-black text-lg">N</span> 네이버로 시작하기
                     </button>
                     <button
-                      className="w-full py-4 rounded-xl border border-gray-200 bg-white text-gray-700 font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition shadow-sm"
+                      className="w-full py-4 rounded-xl border border-gray-200 bg-white text-black font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition shadow-sm"
                       onClick={() => alert('구글 로그인 연동 준비 중입니다.')}
                     >
                       <span className="font-black text-lg text-blue-500">G</span> 구글로 시작하기
@@ -1031,7 +1031,7 @@ export default function HomePortal() {
               {/* 2. Page Title Area */}
               {/* 2. Page Title Area & Notice Bar */}
               <div className="flex flex-col gap-4 mb-6">
-                <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                   <span className="text-pink-600">|</span> 지역별채용
                 </h3>
 
@@ -1042,7 +1042,7 @@ export default function HomePortal() {
                 >
                   <div className="flex items-center gap-2 overflow-hidden">
                     <span className="bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md whitespace-nowrap">공지사항</span>
-                    <span className={`text-[12px] md:text-sm font-bold truncate ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <span className={`text-[12px] md:text-sm font-black truncate ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
                       [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
                     </span>
                   </div>
