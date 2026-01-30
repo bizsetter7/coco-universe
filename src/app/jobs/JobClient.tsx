@@ -148,7 +148,7 @@ export default function JobClient({ shops }: JobClientProps) {
             </header>
 
             {/* No max-width constraint for mobile to keep it 'wild' */}
-            <div className="max-w-[1020px] mx-auto px-0 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white">
+            <div className="w-full max-w-[1020px] mx-auto px-4 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white overflow-x-hidden">
 
                 {/* 1. Hero Banner Carousel */}
                 <div className="relative w-full h-[160px] md:h-[180px] bg-gray-900 overflow-hidden md:rounded-3xl mb-0 md:mb-8 group">
@@ -178,7 +178,7 @@ export default function JobClient({ shops }: JobClientProps) {
                     </div>
                 </div>
 
-                <div className="flex gap-6">
+                <div className="flex flex-col lg:flex-row gap-0 lg:gap-6">
                     {/* Left Sidebar (PC) */}
                     <LeftSidebar
                         selectedRegion={selectedRegion}
