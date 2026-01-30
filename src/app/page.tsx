@@ -1114,7 +1114,7 @@ export default function HomePortal() {
 
         {/* Region Page (Redesigned) */}
         {currentPage === 'region' && (
-          <div className="w-full max-w-[1020px] mx-auto px-4 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white overflow-x-hidden">
+          <div className="w-full max-w-[1020px] mx-auto px-0 md:px-4 py-0 md:py-8 min-h-screen bg-gray-50 md:bg-white overflow-x-hidden">
 
             {/* 1. Hero Banner Carousel */}
             <div className="relative w-full h-[160px] md:h-[180px] bg-gray-900 overflow-hidden md:rounded-3xl mb-0 md:mb-8 group">
