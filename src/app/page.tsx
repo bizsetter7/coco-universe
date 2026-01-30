@@ -219,7 +219,7 @@ export default function HomePortal() {
   const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
   return (
-    <div className={`min-h-screen relative pb-20 overflow-x-hidden`}>
+    <div className={`w-full max-w-full min-h-screen relative pb-20 overflow-x-hidden`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
         <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
