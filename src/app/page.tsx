@@ -219,7 +219,7 @@ export default function HomePortal() {
   const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
   return (
-    <div className={`min-h-screen relative pb-20`}>
+    <div className={`min-h-screen relative pb-20 overflow-x-hidden`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
         <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
@@ -1791,7 +1791,7 @@ export default function HomePortal() {
       </footer >
 
       {/* Mobile Nav */}
-      < nav className={`md:hidden fixed bottom-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <button onClick={() => setCurrentPage('home')} className="flex flex-col items-center gap-1 hover:text-brand-primary active:text-brand-primary transition-colors">
           <Home size={20} /> 홈
         </button>

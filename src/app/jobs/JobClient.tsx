@@ -119,7 +119,7 @@ export default function JobClient({ shops }: JobClientProps) {
     };
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 md:bg-white text-black'}`}>
+        <div className={`min-h-screen overflow-x-hidden ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 md:bg-white text-black'}`}>
             {/* Standard Header */}
             <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
@@ -472,7 +472,7 @@ export default function JobClient({ shops }: JobClientProps) {
             )}
 
             {/* Mobile Nav */}
-            <nav className={`md:hidden fixed bottom-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]'}`}>
+            <nav className={`md:hidden fixed bottom-0 left-0 right-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]'}`}>
                 <button onClick={() => router.push('/')} className="flex flex-col items-center gap-1 hover:text-brand-primary active:text-brand-primary transition-colors">
                     <Home size={20} /> <span>홈</span>
                 </button>
