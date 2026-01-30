@@ -57,7 +57,15 @@ export default function HomePortal() {
   const searchParams = useSearchParams();
   const brand = useBrand();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  const [currentPage, _setCurrentPage] = useState('home');
+
+  // Initialize state based on URL search params immediately to avoid flashing 'home'
+  const [currentPage, _setCurrentPage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('page') || 'home';
+    }
+    return 'home';
+  });
 
   // Stable random number generator
   const getStableNumber = useCallback((seed: string, min: number, max: number) => {

@@ -59,6 +59,14 @@ export default function JobClient({ shops }: JobClientProps) {
     const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
     const [searchKeyword, setSearchKeyword] = useState('');
 
+    // Pre-fetch for smoother navigation
+    useEffect(() => {
+        router.prefetch('/?page=region');
+        router.prefetch('/');
+        router.prefetch('/community');
+        router.prefetch('/lounge');
+    }, [router]);
+
     // Banner Auto Scroll
     useEffect(() => {
         const interval = setInterval(() => {
@@ -215,8 +223,8 @@ export default function JobClient({ shops }: JobClientProps) {
                                     <button
                                         key={tab}
                                         onClick={() => {
-                                            if (tab === '지역별 채용') router.push('/?page=region');
-                                            else if (tab === '오늘본광고') router.push('/');
+                                            if (tab === '지역별 채용') router.push('/?page=region', { scroll: false });
+                                            else if (tab === '오늘본광고') router.push('/', { scroll: false });
                                         }}
                                         className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${tab === '업종별채용' ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5' : 'text-gray-400 hover:text-gray-600'}`}
                                     >
