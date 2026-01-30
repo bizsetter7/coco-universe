@@ -1759,10 +1759,10 @@ export default function HomePortal() {
                   )}
                 </>
               )}
-          </main>
+                    </div></div></div></div>) }      </main>
 
         {/* Footer */}
-        < footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-500'}`}>
+        <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-500'}`}>
           <div className="max-w-[1020px] mx-auto px-4 text-center">
             {/* Logo */}
             <div className="mb-6">
