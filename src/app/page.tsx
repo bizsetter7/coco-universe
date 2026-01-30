@@ -1716,9 +1716,9 @@ export default function HomePortal() {
               {/* 12. 최신 구인정보 리스트 (Standardized Style) - Standard Home Alignment */}
               <div id="latest-job-info-region" className="w-full clear-both mt-1 px-4 md:px-0">
                 <div className="flex items-center justify-between mb-5 w-full">
-                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
+                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
                     <MapPin size={22} className="text-pink-500" />
-                    <span>최신 구인정보</span>
+                    <span>최신 구인정보 (수정됨)</span>
                     <span className="bg-rose-100 text-rose-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-bounce uppercase">Live</span>
                   </h2>
                   <div className="flex items-center gap-2">
