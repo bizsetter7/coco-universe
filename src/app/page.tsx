@@ -1492,7 +1492,7 @@ export default function HomePortal() {
                         <div
                           key={shop.id}
                           onClick={() => setSelectedShop(shop)}
-                          className={`rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}
+                          className={`rounded-xl overflow-hidden border shadow-sm cursor-pointer md:hover:shadow-lg md:hover:-translate-y-1 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}
                         >
                           <div className={`h-20 md:h-24 ${tier.bg} relative flex items-center justify-center`}>
                             <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-black ${tier.bg} ${tier.text} shadow-sm border border-white/20`}>
@@ -1677,7 +1677,7 @@ export default function HomePortal() {
                             <div
                               key={shop.id}
                               onClick={() => setSelectedShop(shop)}
-                              className={`rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}
+                              className={`rounded-xl overflow-hidden border shadow-sm cursor-pointer md:hover:shadow-lg md:hover:-translate-y-1 transition-all group ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
                             >
                               <div className={`h-20 md:h-24 ${isUrgent ? 'bg-gradient-to-r from-red-600 to-orange-500' : 'bg-gradient-to-r from-emerald-600 to-teal-500'} relative flex items-center justify-center`}>
                                 <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-black text-white shadow-sm border border-white/20 ${isUrgent ? 'bg-red-800' : 'bg-emerald-800'}`}>
@@ -1863,7 +1863,7 @@ export default function HomePortal() {
                     </table>
                   </div>
 
-                  {/* Mobile FoxAlba Style List View */}
+                  {/* Mobile FoxAlba Style List View (Synced with JobClient.tsx) */}
                   <div className="md:hidden">
                     <div className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-100'} `}>
                       {filteredShops.length > 0 ? (
