@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home, Star, ChevronRight, X, MessageCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { CheckCircle2, ShieldCheck, MapPin, Phone, MessageSquare, TrendingUp, Sparkles, Home, Star, ChevronRight, X, MessageCircle, Search } from 'lucide-react';
+import { REGIONS_MAP, REGION_LIST } from '@/constants/regions';
+import { JOB_CATEGORY_MAP, JOB_CATEGORIES } from '@/constants/jobs';
 
 interface Shop {
     name: string;
@@ -18,7 +21,7 @@ interface Shop {
     is_placeholder: boolean;
     is_premium?: boolean;
     is_verified?: boolean;
-    tier?: 'grand' | 'preferential' | 'premium' | 'special' | 'urgent' | 'recommended' | 'common';
+    tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common';
 }
 
 interface RegionClientProps {
@@ -28,9 +31,20 @@ interface RegionClientProps {
 }
 
 export default function RegionClient({ regionName, shops, brand }: RegionClientProps) {
+    const router = useRouter();
     const [visibleCount, setVisibleCount] = useState(10);
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
     const [favorites, setFavorites] = useState<string[]>([]);
+
+    // Filters
+    const [selectedCategory, setSelectedCategory] = useState('전체'); // Added Category State
+    const [selectedJobType, setSelectedJobType] = useState('전체');
+    const [searchKeyword, setSearchKeyword] = useState('');
+    // Region Selectors for Navigation
+    const [navRegion, setNavRegion] = useState('전체');
+    const [navSubRegion, setNavSubRegion] = useState('전체');
+
+    const JOB_TYPES = ['룸알바', '노래주점', '텐프로/쩜오', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
 
     // Load favorites from localStorage
     React.useEffect(() => {
@@ -46,14 +60,38 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
         setFavorites(newFavorites);
         localStorage.setItem('coco-favorites', JSON.stringify(newFavorites));
     };
-    const sortedShops = [...shops].sort((a, b) => {
+
+    // Filter Logic
+    const filteredShops = shops.filter(shop => {
+        // 1. Job Type Filter (2-tier)
+        if (selectedJobType !== '전체') {
+            if (shop.workType !== selectedJobType) return false;
+        } else if (selectedCategory !== '전체') {
+            const validTypes = JOB_CATEGORY_MAP[selectedCategory] || [];
+            if (!validTypes.includes(shop.workType)) return false;
+        }
+
+        // 2. Search Keyword
+        if (searchKeyword) {
+            const keyword = searchKeyword.toLowerCase();
+            return (
+                shop.name.toLowerCase().includes(keyword) ||
+                shop.region.toLowerCase().includes(keyword) ||
+                (shop.workType && shop.workType.toLowerCase().includes(keyword))
+            );
+        }
+        return true;
+    });
+
+    const sortedShops = [...filteredShops].sort((a, b) => {
         const tierOrder = {
-            'grand': 7,
-            'preferential': 6,
-            'premium': 5,
-            'special': 4,
-            'urgent': 3,
-            'recommended': 2,
+            'grand': 8,
+            'premium': 7,
+            'deluxe': 6,
+            'special': 5,
+            'urgent': 4,
+            'recommended': 3,
+            'native': 2,
             'common': 1
         };
         const tierA = tierOrder[a.tier as keyof typeof tierOrder] || 0;
@@ -94,6 +132,108 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                     </p>
                 </section>
 
+                {/* Navigation Tabs */}
+                <div className="flex border-b-2 border-gray-100 mb-6">
+                    {['업종별채용', '지역별 채용', '오늘본광고'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => {
+                                if (tab === '업종별채용') router.push('/jobs');
+                                else if (tab === '오늘본광고') router.push('/');
+                            }}
+                            className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${tab === '지역별 채용'
+                                ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5'
+                                : 'text-gray-400 hover:text-gray-600'
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search Form Section (Region First as requested for this page, or default main style) */}
+                {/* User said "검색탭 모습은 지역별채용과 조금 다르게 직종선택을 먼저 나오도록해줘" implying Region page has Region first */}
+                <div className={`mb-8 p-3.5 md:p-6 rounded-[20px] md:rounded-[32px] border shadow-sm space-y-2 md:space-y-0 md:flex md:items-center md:gap-3 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+
+                    {/* Region Selectors (For Navigation) */}
+                    <div className="flex-[2] grid grid-cols-2 gap-2">
+                        <select
+                            className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                            value={navRegion}
+                            onChange={(e) => {
+                                setNavRegion(e.target.value);
+                                setNavSubRegion('전체');
+                                if (e.target.value !== '전체') {
+                                    router.push(`/coco/${e.target.value}`);
+                                }
+                            }}
+                        >
+                            <option value="전체">지역선택</option>
+                            {REGION_LIST.map(reg => (
+                                <option key={reg} value={reg}>{reg}</option>
+                            ))}
+                        </select>
+                        <select
+                            disabled={navRegion === '전체'}
+                            className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white'} disabled:opacity-50`}
+                            value={navSubRegion}
+                            onChange={(e) => {
+                                setNavSubRegion(e.target.value);
+                                if (e.target.value !== '전체') {
+                                    router.push(`/coco/${navRegion}-${e.target.value}`);
+                                }
+                            }}
+                        >
+                            <option value="전체">세부지역</option>
+                            {navRegion !== '전체' && (REGIONS_MAP[navRegion] as string[])?.map((sub: string) => (
+                                <option key={sub} value={sub}>{sub}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Job Type Select (Filter) 2-tier */}
+                    <div className="flex-[2] grid grid-cols-2 gap-2">
+                        <select
+                            className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                            value={selectedCategory}
+                            onChange={(e) => {
+                                setSelectedCategory(e.target.value);
+                                setSelectedJobType('전체');
+                            }}
+                        >
+                            <option value="전체">직종선택</option>
+                            {JOB_CATEGORIES.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <select
+                            disabled={selectedCategory === '전체'}
+                            className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-bold text-xs md:text-sm border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'} disabled:opacity-50`}
+                            value={selectedJobType}
+                            onChange={(e) => setSelectedJobType(e.target.value)}
+                        >
+                            <option value="전체">상세직종</option>
+                            {selectedCategory !== '전체' && JOB_CATEGORY_MAP[selectedCategory]?.map(type => (
+                                <option key={type} value={type}>{type}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Keyword Search (Filter) */}
+                    <div className="flex-[2] flex gap-2">
+                        <input
+                            type="text"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            placeholder="키워드 검색"
+                            className={`flex-1 p-2.5 md:p-3 rounded-lg md:rounded-xl font-medium text-xs md:text-sm border md:border-2 transition-all ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:bg-white'}`}
+                        />
+                        <button className="p-2.5 md:p-3 bg-gray-900 text-white rounded-lg md:rounded-xl shadow-md hover:bg-black transition-all flex items-center justify-center">
+                            <Search size={20} />
+                        </button>
+                    </div>
+                </div>
+
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 mb-10">
                     <div className={`p-4 rounded-2xl shadow-sm border flex items-center gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
@@ -111,7 +251,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                         </div>
                         <div>
                             <p className="text-[10px] text-gray-500 font-bold">진행 중인 공고</p>
-                            <p className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shops.length}개</p>
+                            <p className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{filteredShops.length}개</p>
                         </div>
                     </div>
                 </div>
@@ -167,7 +307,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                         <div className="flex items-center gap-1.5 overflow-hidden min-w-0">
                                                             {shop.tier && shop.tier !== 'common' && (
                                                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${shop.tier === 'grand' ? 'bg-amber-100 text-amber-600 border border-amber-200' : shop.tier === 'special' ? 'bg-purple-100 text-purple-600 border border-purple-200' : shop.tier === 'premium' ? 'bg-blue-100 text-blue-600 border border-blue-200' : shop.tier === 'urgent' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-gray-100 text-gray-600'}`}>
-                                                                    {shop.tier === 'grand' ? '그랜드' : shop.tier === 'special' ? '스페셜' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'urgent' ? '급구' : shop.tier === 'preferential' ? '우대' : shop.tier === 'recommended' ? '추천' : '일반'}
+                                                                    {shop.tier === 'grand' ? '그랜드' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'deluxe' ? '디럭스' : shop.tier === 'special' ? '스페셜' : shop.tier === 'urgent' ? '급구' : shop.tier === 'recommended' ? '추천' : shop.tier === 'native' ? '네이티브' : '일반'}
                                                                 </span>
                                                             )}
                                                             <div className={`font-black w-full truncate group-hover:text-rose-600 transition-colors ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
@@ -279,7 +419,7 @@ export default function RegionClient({ regionName, shops, brand }: RegionClientP
                                                     <div className="flex items-center gap-1.5 text-[12px] flex-wrap">
                                                         {shop.tier && shop.tier !== 'common' && (
                                                             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${shop.tier === 'grand' ? 'bg-amber-100 text-amber-600' : shop.tier === 'special' ? 'bg-purple-100 text-purple-600' : shop.tier === 'premium' ? 'bg-blue-100 text-blue-600' : shop.tier === 'urgent' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                                                                {shop.tier === 'grand' ? '그랜드' : shop.tier === 'special' ? '스페셜' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'urgent' ? '급구' : shop.tier === 'preferential' ? '우대' : shop.tier === 'recommended' ? '추천' : '일반'}
+                                                                {shop.tier === 'grand' ? '그랜드' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'deluxe' ? '디럭스' : shop.tier === 'special' ? '스페셜' : shop.tier === 'urgent' ? '급구' : shop.tier === 'recommended' ? '추천' : shop.tier === 'native' ? '네이티브' : '일반'}
                                                             </span>
                                                         )}
                                                         <span className="text-blue-500 font-extrabold truncate max-w-[120px] flex items-center gap-0.5">

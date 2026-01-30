@@ -55,22 +55,29 @@ const FAQS = [
 const AD_TIERS = [
     {
         id: 'grand',
-        name: (<span>Grand Premium <span className="font-normal">(Tier 1)</span></span>),
+        name: (<span>그랜드 <span className="font-normal">(Tier 1)</span></span>),
         icon: <Crown className="text-amber-600" />,
         price: '350,000원 / 30일',
         benefits: ['PC+모바일 통합 노출 패키지', '메인 최상단 0순위 고정 (Glow)', '전 지역 검색 결과 압도적 선점', '인재열람권 + 강조옵션 풀패키지']
     },
     {
-        id: 'preferential',
-        name: (<span>Preferential <span className="font-normal">(Tier 2)</span></span>),
-        icon: <Zap className="text-pink-400" />,
+        id: 'premium',
+        name: (<span>프리미엄 <span className="font-normal">(Tier 2)</span></span>),
+        icon: <Star className="text-purple-500" />,
         price: '200,000원 / 30일',
-        benefits: ['PC+모바일 통합 노출 패키지', '메인 상단 전략적 노출', '실버/연금색 강조 보더', '제목 강조/아이콘 효과 기본']
+        benefits: ['PC+모바일 통합 노출 패키지', '메인 상단 전략적 노출', '보라색 강조 보더', '제목 강조/아이콘 효과 기본']
+    },
+    {
+        id: 'deluxe',
+        name: (<span>디럭스 <span className="font-normal">(Tier 3)</span></span>),
+        icon: <Zap className="text-blue-500" />,
+        price: '180,000원 / 30일',
+        benefits: ['PC+모바일 통합 노출 패키지', '블루 보더 / 메인 중앙 노출', '자동 점프 30회 지원']
     },
     {
         id: 'basic',
-        name: (<span>Basic Line<br className="hidden md:block" /> <span className="font-normal">(Tier 7)</span></span>),
-        icon: <Star className="text-gray-400" />,
+        name: (<span>베이직(줄광고) <span className="font-normal">(Tier 7)</span></span>),
+        icon: <FileText className="text-gray-400" />,
         price: '60,000원 / 30일',
         benefits: ['PC+모바일 통합 노출 패키지', '일반 리스트 기본 노출', '업소 기본 정보 제공', '자동 점프 10회 지원']
     },
@@ -78,12 +85,12 @@ const AD_TIERS = [
 
 const DETAILED_PRICING = [
     { type: '메인 독점', name: '1번 - 그랜드 (Grand)', d30: 350000, d60: 630000, d90: 840000, benefit: (<span>PC+모바일 통합 노출<br />Glow 효과<br />전 지역 검색 결과<br />압도적 선점</span>) },
-    { type: '메인 상단', name: '2번 - 우대 (Prefer)', d30: 200000, d60: 360000, d90: 480000, benefit: (<span>PC+모바일 통합 노출<br />실버 보더 / 상단 고정</span>) },
-    { type: '메인 일반', name: '3번 - 프리미엄 (Prem)', d30: 150000, d60: 270000, d90: 360000, benefit: (<span>PC+모바일 통합 노출<br />블루 보더 / 메인 중앙</span>) },
-    { type: '리스트 상단', name: '4번 - 스페셜 (Spec)', d30: 120000, d60: 216000, d90: 288000, benefit: (<span>PC+모바일 통합 노출<br />핑크 보더 / 목록 상단</span>) },
-    { type: '리스트 강조', name: '5번 - 급구 및 추천 (Urgent/Rec)', d30: 100000, d60: 180000, d90: 240000, benefit: (<span>PC+모바일 통합 노출<br />빨간 제목 / 가독성 강화</span>) },
-    { type: '리스트 네이티브', name: '6번 - 리스트 네이티브 (Native)', d30: 80000, d60: 144000, d90: 192000, benefit: (<span>PC+모바일 통합노출<br />네이티브 스타일</span>) },
-    { type: '리스트 기본', name: '7번 - 줄광고 (Basic)', d30: 60000, d60: 100000, d90: 140000, benefit: (<span>PC+모바일 통합 노출<br />일반 리스트</span>) },
+    { type: '메인 상단', name: '2번 - 프리미엄 (Premium)', d30: 200000, d60: 360000, d90: 480000, benefit: (<span>PC+모바일 통합 노출<br />보라색 보더 / 상단 고정</span>) },
+    { type: '메인 일반', name: '3번 - 디럭스 (Deluxe)', d30: 180000, d60: 324000, d90: 432000, benefit: (<span>PC+모바일 통합 노출<br />블루 보더 / 메인 중앙</span>) },
+    { type: '리스트 상단', name: '4번 - 스페셜 (Special)', d30: 150000, d60: 270000, d90: 360000, benefit: (<span>PC+모바일 통합 노출<br />핑크 보더 / 목록 상단</span>) },
+    { type: '리스트 강조', name: '5번 - 급구/추천 (Urgent/Rec)', d30: 120000, d60: 216000, d90: 288000, benefit: (<span>PC+모바일 통합 노출<br />빨간 제목 / 가독성 강화</span>) },
+    { type: '리스트 네이티브', name: '6번 - 네이티브 (Native)', d30: 100000, d60: 180000, d90: 240000, benefit: (<span>PC+모바일 통합노출<br />네이티브 스타일</span>) },
+    { type: '리스트 기본', name: '7번 - 베이직/줄광고 (Basic)', d30: 60000, d60: 100000, d90: 140000, benefit: (<span>PC+모바일 통합 노출<br />일반 리스트</span>) },
     { type: '리스트 옵션', name: '8번 - 강조옵션 (Icon/Highlight)', d30: 30000, d60: 55000, d90: 70000, benefit: (<span>아이콘(10종) / 형광펜(8색)<br />선택 가능</span>) },
 ];
 
@@ -707,11 +714,18 @@ function CustomerCenterContent() {
                                                 feature: (<span>시선 집중<br />높은 가성비 전략<br />PC+모바일 통합</span>)
                                             },
                                             {
-                                                pos: '리스트 네이티브',
-                                                type: '리스트 중간 흐름 삽입형 광고',
-                                                size: '980 x 120 (PC / Mobile)',
+                                                pos: (<>디럭스<br />사이드 배너</>),
+                                                type: '지역별/업종별 채용페이지 사이드바 고객지원센터 영역 하단 노출',
+                                                size: '250 x 250 (PC) / 720 x 150 (M)',
                                                 price: '180,000원',
-                                                feature: (<span>거부감없는<br />자연스러운 노출<br />PC+모바일 통합</span>)
+                                                feature: (<span>타겟 지역 집중<br />전략적 배너 노출<br />PC+모바일 통합</span>)
+                                            },
+                                            {
+                                                pos: (<>스페셜<br />사이드 배너</>),
+                                                type: '지역별/업종별 채용페이지 사이드바 고객지원센터 영역 하단 노출',
+                                                size: '250 x 250 (PC) / 720 x 150 (M)',
+                                                price: '150,000원',
+                                                feature: (<span>가성비 최우선<br />실속형 배너 노출<br />PC+모바일 통합</span>)
                                             },
                                         ].map((row, i) => (
                                             <div key={i} className={`p-4 md:p-8 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>

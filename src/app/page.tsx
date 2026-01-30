@@ -2,14 +2,16 @@
 
 import { useBrand } from '@/components/BrandProvider';
 import { useLocation } from '@/hooks/useLocation';
-import { REGIONS_MAP } from '../constants/regions';
+import { REGIONS_MAP, REGION_LIST } from '../constants/regions';
 import { Crown, Flame, Home, MessageCircle, MessageSquare, Pencil, PlusCircle, ShoppingBag, User, Siren, AlertTriangle, Lock, ThumbsUp, Apple, Sparkles, Moon, ArrowRight, CheckCircle2, ShieldCheck, X, Phone, AlertCircle, Briefcase, Scale, Gift, Trophy, PlusSquare, FileText, Megaphone, Users, ChevronLeft, ChevronRight, MapPin, Star, Zap, Search } from 'lucide-react';
+import { JOB_CATEGORY_MAP, JOB_CATEGORIES } from '@/constants/jobs';
 import Link from 'next/link';
 import { MOCK_POSTS } from '@/constants/community';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import EventPopup from '@/components/EventPopup';
 import RightSidebar from '@/components/RightSidebar';
+import LeftSidebar from '@/components/LeftSidebar';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
 
@@ -29,7 +31,7 @@ interface Shop {
   is_premium?: boolean;
   is_verified?: boolean;
   recommended?: boolean;
-  tier?: 'grand' | 'preferential' | 'premium' | 'special' | 'urgent' | 'recommended' | 'common' | 'basic';
+  tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic';
   updatedAt?: string;
   options?: {
     blink?: boolean;
@@ -48,7 +50,7 @@ const REGION_BANNERS = [
   { id: 5, title: '주말 특별 모집', desc: '주말 근무자 특별 보너스 지급', brand: '청담 루이', color: 'bg-slate-800', text: 'text-blue-300' },
 ];
 
-const JOB_TYPES = ['룸', '퍼블릭', '가라오케', '바(Bar)', '카페/서빙', '카운터/데스크', '기타'];
+const JOB_TYPES = ['룸알바', '노래주점', '텐프로/쩜오', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
 
 export default function HomePortal() {
   const router = useRouter();
@@ -56,6 +58,16 @@ export default function HomePortal() {
   const brand = useBrand();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [currentPage, _setCurrentPage] = useState('home');
+
+  // Stable random number generator
+  const getStableNumber = useCallback((seed: string, min: number, max: number) => {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const range = max - min;
+    return Math.abs(hash % range) + min;
+  }, []);
 
   // History Management
   const setCurrentPage = useCallback((page: string) => {
@@ -87,8 +99,12 @@ export default function HomePortal() {
     if (page === 'signup') {
       _setCurrentPage('signup');
       setSignupStep(1);
+    } else if (page === 'region') {
+      _setCurrentPage('region');
     } else if (page === 'login') {
       _setCurrentPage('login');
+    } else if (page === 'payment') {
+      _setCurrentPage('payment');
     }
   }, [searchParams]);
 
@@ -104,7 +120,9 @@ export default function HomePortal() {
 
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [selectedSubRegion, setSelectedSubRegion] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedJobType, setSelectedJobType] = useState('전체');
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -141,19 +159,21 @@ export default function HomePortal() {
   // [핵심] 원본 데이터(shops.json)를 7단계 등급 체계로 변환 및 매핑
   const processedShopsWithTiers = useMemo(() => {
     return (shopsData as Shop[]).map((shop, index) => {
-      // 이미 tier가 정의되어 있다면 유지하되, basic은 common으로 변환
-      let tier = shop.tier || 'common';
+      // 이미 tier가 정의되어 있다면 유지하되, 구 체계는 새 체계로 변환
+      let tier: Shop['tier'] = shop.tier || 'common';
       if (tier === 'basic') tier = 'common';
 
       // 섹션이 비어 보이는 것을 방지하기 위해 데이터 인덱스 기반으로 강제 분배 (샘플링)
       if (tier === 'common') {
-        if (index % 100 === 10) tier = 'special';
-        else if (index % 100 === 20) tier = 'urgent';
-        else if (index % 100 === 30) tier = 'recommended';
+        if (index % 100 === 5) tier = 'deluxe';
+        else if (index % 100 === 10) tier = 'special';
+        else if (index % 100 === 15) tier = 'urgent';
+        else if (index % 100 === 20) tier = 'recommended';
+        else if (index % 100 === 25) tier = 'native';
       }
 
-      // grand 중 일부를 2번(preferential)으로 배분
-      if (tier === 'grand' && index % 3 === 1) tier = 'preferential';
+      // grand 중 일부를 premium으로 배분
+      if (tier === 'grand' && index % 3 === 1) tier = 'premium';
 
       return { ...shop, tier };
     });
@@ -166,6 +186,14 @@ export default function HomePortal() {
   // 지역 기반 필터링 및 정렬 로직 (국내 최초 핵심 엔진)
   const filteredShops = useMemo(() => {
     let list = [...shops];
+
+    // 0. 직종 필터링
+    if (selectedJobType !== '전체') {
+      list = list.filter(shop => shop.workType === selectedJobType);
+    } else if (selectedCategory !== '전체') {
+      const validTypes = JOB_CATEGORY_MAP[selectedCategory] || [];
+      list = list.filter(shop => validTypes.includes(shop.workType) || shop.workType === selectedCategory);
+    }
 
     // 1. 지역 필터링
     if (selectedRegion !== '전체') {
@@ -224,7 +252,7 @@ export default function HomePortal() {
       {/* ... skipping to footer ... */}
 
       {/* Footer */}
-      <main className="max-w-[450px] mx-auto md:max-w-none">
+      <main className="w-full">
         {currentPage === 'home' && (
           <div className="page-home">
             {/* Event Popup */}
@@ -253,7 +281,7 @@ export default function HomePortal() {
               <div className="grid grid-cols-3 md:grid-cols-9 gap-3 md:gap-4 mb-10">
                 {[
                   { label: '업종별채용', icon: <Briefcase />, bg: 'bg-purple-100', color: 'text-purple-600', link: 'home' },
-                  { label: '지역별채용', icon: <Home />, bg: 'bg-blue-100', color: 'text-blue-600', link: 'home' },
+                  { label: '지역별 채용', icon: <Home />, bg: 'bg-blue-100', color: 'text-blue-600', link: 'home' },
                   { label: '인재정보', icon: <User />, bg: 'bg-teal-100', color: 'text-teal-600', link: 'login' },
                   { label: '프리미엄 라운지', icon: <Moon />, bg: 'bg-indigo-100', color: 'text-indigo-600', link: 'community' },
                   { label: '같이일할단짝', icon: <Users />, bg: 'bg-pink-100', color: 'text-pink-600', link: 'community' },
@@ -265,8 +293,10 @@ export default function HomePortal() {
                   <div
                     key={i}
                     onClick={() => {
-                      if (item.label === '지역별채용') {
+                      if (item.label === '지역별 채용') {
                         setCurrentPage('region');
+                      } else if (item.label === '업종별채용') {
+                        router.push('/jobs');
                       } else if (item.label === '무료법률자문') {
                         router.push('/community?category=무료법률상담');
                       } else if (item.label === '같이일할단짝') {
@@ -341,11 +371,11 @@ export default function HomePortal() {
                 </div>
               </div>
 
-              {/* 광고 영역 (1번 그랜드 / 2번 우대) */}
+              {/* 광고 영역 (그랜드 / 프리미엄) */}
               <div className="flex items-center justify-between mb-4">
                 <h3 className="flex items-center gap-2 text-xl font-bold">
                   <Crown size={20} className="text-amber-500" fill="currentColor" />
-                  <span>1번 그랜드 프리미엄</span>
+                  <span>그랜드 / 프리미엄</span>
                 </h3>
                 <button
                   onClick={() => router.push('/customer-center?tab=ad')}
@@ -356,77 +386,114 @@ export default function HomePortal() {
                 </button>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                {shops.filter(s => s.tier === 'grand' || s.tier === 'preferential').slice(0, 8).map((shop, i) => (
-                  <div
-                    key={shop.id || i}
-                    onClick={() => setSelectedShop(shop)}
-                    className={`group relative border rounded-[22px] overflow-hidden shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer aspect-square ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-100'}`}
-                  >
-                    <div className={`w-full h-full flex items-center justify-center text-gray-500 text-[10px] font-black break-keep text-center px-4 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                      {shop.name.split(' ').slice(0, 2).join(' ')}<br />매장 이미지
-                      {shop.options?.blink && (
-                        <div className="absolute top-2 left-2 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-bounce shadow-sm">급구</div>
-                      )}
-
-                      {/* 카드 하단 정보 오버레이 (정사각형 유지를 위해 내부 배치) */}
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-left">
-                        <h4 className="text-white font-black text-[13px] sm:text-[14px] truncate mb-0.5">{shop.name}</h4>
-                        <div className="flex justify-between items-end">
-                          <p className="text-amber-400 font-extrabold text-[11px] sm:text-[12px]">{shop.pay}</p>
-                          <p className="text-gray-300 text-[9px] font-bold">{shop.region.split(' ').slice(0, 2).join(' ')}</p>
-                        </div>
+                {shops.filter(s => s.tier === 'grand' || s.tier === 'premium').slice(0, 8).map((shop, i) => {
+                  const tierConfig: Record<string, { bg: string; label: string }> = {
+                    grand: { bg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-yellow-400', label: '그랜드' },
+                    premium: { bg: 'bg-gradient-to-br from-purple-600 via-pink-500 to-rose-400', label: '프리미엄' },
+                  };
+                  const tier = tierConfig[shop.tier || 'grand'] || tierConfig.grand;
+                  const views = getStableNumber(shop.id || i.toString(), 50, 450);
+                  const rank = i + 1;
+                  return (
+                    <div
+                      key={`grand-${shop.id || i}`}
+                      onClick={() => setSelectedShop(shop)}
+                      className={`group relative rounded-2xl overflow-hidden shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl cursor-pointer ${tier.bg}`}
+                    >
+                      {/* 상단 등급 배지 */}
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black text-white ${shop.tier === 'grand' ? 'bg-amber-600' : 'bg-purple-600'} shadow-sm`}>
+                          {tier.label}
+                        </span>
+                      </div>
+                      {/* 중앙 아이콘 영역 */}
+                      <div className="h-24 md:h-28 flex items-center justify-center relative">
+                        <Crown className="text-white/40" size={40} />
+                        {/* 순위/조회수 배지 */}
+                        <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[9px] px-2 py-1 rounded-full font-bold backdrop-blur-sm">
+                          {rank}위 | {views}회
+                        </span>
+                      </div>
+                      {/* 하단 정보 영역 */}
+                      <div className={`p-3 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                        <h4 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                          {shop.name}
+                        </h4>
+                        <p className="text-[10px] text-gray-500 truncate mb-1">
+                          {shop.region.split(' ').slice(0, 2).join(' ')}
+                        </p>
+                        <p className="text-[12px] font-bold text-pink-600 truncate">
+                          {shop.pay || '급여 협의'}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
 
-
-
-              {/* [QUEEN STYLE] 4번 스페셜 채용정보 */}
+              {/* 디럭스 채용정보 섹션 */}
               <div className="mb-14">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>
-                    <span className="text-2xl">|</span>
-                    <span>스페셜 채용 정보</span>
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
+                    <Zap size={20} className="text-blue-500" />
+                    <span>디럭스 채용 정보</span>
                   </h3>
                   <button
                     onClick={() => router.push('/customer-center?tab=ad')}
                     className={`text-[10px] sm:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-md hover:shadow-lg transition-all flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black'}`}
                   >
-                    <PlusCircle size={12} className="text-purple-500" />
+                    <PlusCircle size={12} className="text-blue-500" />
                     광고신청 +
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                  {shops.filter(s => s.tier === 'special').slice(0, 12).map((shop, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setSelectedShop(shop)}
-                      className={`group border rounded-xl p-1 shadow-sm hover:border-purple-400 transition-all cursor-pointer overflow-hidden aspect-square ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
-                    >
-                      <div className={`relative w-full h-full rounded-lg flex items-center justify-center text-[10px] font-black overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-600' : 'bg-gray-50 text-gray-400'}`}>
-                        {shop.name.substring(0, 1)}
-                        <div className="absolute top-1 right-1 bg-red-600 text-white text-[7px] px-1 py-0.5 rounded-sm font-black italic shadow-sm">HOT</div>
-
-                        {/* 스페셜 오버레이 */}
-                        <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-black/60 text-left">
-                          <h5 className="text-white text-[10px] font-black truncate">{shop.name}</h5>
-                          <p className="text-red-400 text-[9px] font-black">{shop.pay.split(' ')[1] || shop.pay}</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {shops.filter(s => s.tier === 'deluxe').slice(0, 8).map((shop, i) => {
+                    const views = getStableNumber(shop.id || i.toString(), 50, 400);
+                    const rank = i + 1;
+                    return (
+                      <div
+                        key={`deluxe-${shop.id || i}`}
+                        onClick={() => setSelectedShop(shop)}
+                        className="group relative rounded-2xl overflow-hidden shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl cursor-pointer bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400"
+                      >
+                        {/* 상단 등급 배지 */}
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className="px-2 py-0.5 rounded text-[9px] font-black text-white bg-blue-700 shadow-sm">
+                            디럭스
+                          </span>
+                        </div>
+                        {/* 중앙 아이콘 영역 */}
+                        <div className="h-24 md:h-28 flex items-center justify-center relative">
+                          <Zap className="text-white/40" size={40} />
+                          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[9px] px-2 py-1 rounded-full font-bold backdrop-blur-sm">
+                            {rank}위 | {views}회
+                          </span>
+                        </div>
+                        {/* 하단 정보 영역 */}
+                        <div className={`p-3 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                          <h4 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                            {shop.name}
+                          </h4>
+                          <p className="text-[10px] text-gray-500 truncate mb-1">
+                            {shop.region.split(' ').slice(0, 2).join(' ')}
+                          </p>
+                          <p className="text-[12px] font-bold text-blue-600 truncate">
+                            {shop.pay || '급여 협의'}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* 5번 급구 및 추천채용 통합 섹션 */}
-              <div className="mb-16">
-                <div className="flex items-center justify-between mb-5">
-                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-purple-400' : 'text-black'}`}>
-                    <span className="text-2xl text-purple-600">|</span>
-                    <span>급구 및 추천채용</span>
+              {/* 스페셜 채용정보 섹션 */}
+              <div className="mb-14">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-pink-400' : 'text-pink-700'}`}>
+                    <Sparkles size={20} className="text-pink-500" />
+                    <span>스페셜 채용 정보</span>
                   </h3>
                   <button
                     onClick={() => router.push('/customer-center?tab=ad')}
@@ -436,28 +503,101 @@ export default function HomePortal() {
                     광고신청 +
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {shops.filter(s => s.tier === 'urgent' || s.tier === 'recommended' || s.recommended).slice(0, 6).map((shop, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setSelectedShop(shop)}
-                      className={`border rounded-2xl p-4 sm:p-5 hover:border-rose-400 transition-all cursor-pointer group flex gap-4 ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100 shadow-inner'}`}
-                    >
-                      <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-700 text-blue-400' : 'bg-white border border-gray-100 text-blue-400'}`}>
-                        {shop.name.substring(0, 1)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <h5 className={`font-black text-[14px] truncate group-hover:text-rose-500 transition-colors ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{shop.name}</h5>
-                          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${shop.tier === 'urgent' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
-                            {shop.tier === 'urgent' ? '급구' : '추천'}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {shops.filter(s => s.tier === 'special').slice(0, 8).map((shop, i) => {
+                    const views = getStableNumber(shop.id || i.toString(), 50, 350);
+                    const rank = i + 1;
+                    return (
+                      <div
+                        key={`special-${shop.id || i}`}
+                        onClick={() => setSelectedShop(shop)}
+                        className="group relative rounded-2xl overflow-hidden shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl cursor-pointer bg-gradient-to-br from-pink-500 via-rose-500 to-red-400"
+                      >
+                        {/* 상단 등급 배지 */}
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className="px-2 py-0.5 rounded text-[9px] font-black text-white bg-pink-700 shadow-sm">
+                            스페셜
                           </span>
                         </div>
-                        <p className={`text-[11px] font-bold text-gray-500 mb-1`}>{shop.region.split(' ').slice(0, 2).join(' ')} | {shop.workType}</p>
-                        <p className="text-xs font-black text-red-600 tracking-tight">{shop.pay}</p>
+                        {/* 중앙 아이콘 영역 */}
+                        <div className="h-24 md:h-28 flex items-center justify-center relative">
+                          <Sparkles className="text-white/40" size={40} />
+                          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[9px] px-2 py-1 rounded-full font-bold backdrop-blur-sm">
+                            {rank}위 | {views}회
+                          </span>
+                        </div>
+                        {/* 하단 정보 영역 */}
+                        <div className={`p-3 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                          <h4 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                            {shop.name}
+                          </h4>
+                          <p className="text-[10px] text-gray-500 truncate mb-1">
+                            {shop.region.split(' ').slice(0, 2).join(' ')}
+                          </p>
+                          <p className="text-[12px] font-bold text-pink-600 truncate">
+                            {shop.pay || '급여 협의'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 급구 및 추천채용 통합 섹션 */}
+              <div className="mb-16">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className={`flex items-center gap-2 text-xl font-black ${brand.theme === 'dark' ? 'text-red-400' : 'text-red-700'}`}>
+                    <Flame size={20} className="text-red-500" />
+                    <span>급구 / 추천 채용</span>
+                  </h3>
+                  <button
+                    onClick={() => router.push('/customer-center?tab=ad')}
+                    className={`text-[10px] sm:text-[11px] font-black border px-3 py-1.5 rounded-md shadow-md hover:shadow-lg transition-all flex items-center gap-1 active:scale-95 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black'}`}
+                  >
+                    <PlusCircle size={12} className="text-red-500" />
+                    광고신청 +
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {shops.filter(s => s.tier === 'urgent' || s.tier === 'recommended' || s.recommended).slice(0, 8).map((shop, i) => {
+                    const isUrgent = shop.tier === 'urgent';
+                    const views = getStableNumber(shop.id || i.toString(), 50, 300);
+                    const rank = i + 1;
+                    return (
+                      <div
+                        key={`urgent-${shop.id || i}`}
+                        onClick={() => setSelectedShop(shop)}
+                        className={`group relative rounded-2xl overflow-hidden shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl cursor-pointer ${isUrgent ? 'bg-gradient-to-br from-red-500 via-orange-500 to-amber-400' : 'bg-gradient-to-br from-emerald-500 via-green-500 to-teal-400'}`}
+                      >
+                        {/* 상단 등급 배지 */}
+                        <div className="absolute top-2 left-2 z-10">
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-black text-white shadow-sm ${isUrgent ? 'bg-red-700' : 'bg-emerald-700'}`}>
+                            {isUrgent ? '급구' : '추천'}
+                          </span>
+                        </div>
+                        {/* 중앙 아이콘 영역 */}
+                        <div className="h-24 md:h-28 flex items-center justify-center relative">
+                          {isUrgent ? <Flame className="text-white/40" size={40} /> : <Gift className="text-white/40" size={40} />}
+                          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[9px] px-2 py-1 rounded-full font-bold backdrop-blur-sm">
+                            {rank}위 | {views}회
+                          </span>
+                        </div>
+                        {/* 하단 정보 영역 */}
+                        <div className={`p-3 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                          <h4 className={`text-[13px] font-black truncate mb-0.5 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                            {shop.name}
+                          </h4>
+                          <p className="text-[10px] text-gray-500 truncate mb-1">
+                            {shop.region.split(' ').slice(0, 2).join(' ')}
+                          </p>
+                          <p className={`text-[12px] font-bold truncate ${isUrgent ? 'text-red-600' : 'text-emerald-600'}`}>
+                            {shop.pay || '급여 협의'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               {/* 줄광고 리스트 */}
@@ -512,7 +652,7 @@ export default function HomePortal() {
                                     <div className="flex items-center gap-1.5 overflow-hidden">
                                       {shop.tier && shop.tier !== 'common' && (
                                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${shop.tier === 'grand' ? 'bg-amber-100 text-amber-600 border border-amber-200' : shop.tier === 'special' ? 'bg-purple-100 text-purple-600 border border-purple-200' : shop.tier === 'premium' ? 'bg-blue-100 text-blue-600 border border-blue-200' : shop.tier === 'urgent' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-gray-100 text-gray-600'}`}>
-                                          {shop.tier === 'grand' ? '그랜드' : shop.tier === 'special' ? '스페셜' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'urgent' ? '급구' : shop.tier === 'preferential' ? '우대' : shop.tier === 'recommended' ? '추천' : '일반'}
+                                          {shop.tier === 'grand' ? '그랜드' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'deluxe' ? '디럭스' : shop.tier === 'special' ? '스페셜' : shop.tier === 'urgent' ? '급구' : shop.tier === 'recommended' ? '추천' : shop.tier === 'native' ? '네이티브' : '일반'}
                                         </span>
                                       )}
                                       <div className={`font-black w-full truncate group-hover:text-rose-600 transition-colors ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
@@ -626,7 +766,7 @@ export default function HomePortal() {
                                   <div className="flex items-center gap-1.5 text-[12px] flex-wrap">
                                     {shop.tier && shop.tier !== 'common' && (
                                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${shop.tier === 'grand' ? 'bg-amber-100 text-amber-600' : shop.tier === 'special' ? 'bg-purple-100 text-purple-600' : shop.tier === 'premium' ? 'bg-blue-100 text-blue-600' : shop.tier === 'urgent' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                                        {shop.tier === 'grand' ? '그랜드' : shop.tier === 'special' ? '스페셜' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'urgent' ? '급구' : shop.tier === 'preferential' ? '우대' : shop.tier === 'recommended' ? '추천' : '일반'}
+                                        {shop.tier === 'grand' ? '그랜드' : shop.tier === 'premium' ? '프리미엄' : shop.tier === 'deluxe' ? '디럭스' : shop.tier === 'special' ? '스페셜' : shop.tier === 'urgent' ? '급구' : shop.tier === 'recommended' ? '추천' : shop.tier === 'native' ? '네이티브' : '일반'}
                                       </span>
                                     )}
                                     <span className="text-blue-500 font-extrabold truncate max-w-[120px] flex items-center gap-0.5">
@@ -837,12 +977,12 @@ export default function HomePortal() {
                 <div className="space-y-3 mb-8">
                   {[
                     { id: 1, name: '1번 - 그랜드 (Grand)', desc: '메인/지역 최상단 0순위 독점 노출 (Glow 효과)', price: '350,000원' },
-                    { id: 2, name: '2번 - 우대 (Preferential)', desc: '메인 상단 전략적 고정 (실버 보더 적용)', price: '200,000원' },
-                    { id: 3, name: '3번 - 프리미엄 (Premium)', desc: '메인 중앙 집중 노출 (블루 보더 적용)', price: '150,000원' },
+                    { id: 2, name: '2번 - 프리미엄 (Premium)', desc: '메인 상단 전략적 고정 (보라색 보더 적용)', price: '200,000원' },
+                    { id: 3, name: '3번 - 디럭스 (Deluxe)', desc: '메인 중앙 집중 노출 (블루 보더 적용)', price: '150,000원' },
                     { id: 4, name: '4번 - 스페셜 (Special)', desc: '리스트 상단 핑크 보더 노출 (관심 집중)', price: '120,000원' },
-                    { id: 5, name: '5번 - 급구 및 추천 (Urgent/Rec)', desc: '빨간 제목 + 추천 배지로 가독성 극대화', price: '100,000원' },
-                    { id: 6, name: '6번 - 리스트 네이티브 (Native)', desc: '일반 리스트 노출 (네이티브 스타일)', price: '80,000원' },
-                    { id: 7, name: '7번 - 줄광고 (Basic)', desc: '일반 리스트 노출 (실속형 구인 상품)', price: '60,000원' },
+                    { id: 5, name: '5번 - 급구/추천 (Urgent/Rec)', desc: '빨간 제목 + 추천 배지로 가독성 극대화', price: '100,000원' },
+                    { id: 6, name: '6번 - 네이티브 (Native)', desc: '일반 리스트 노출 (네이티브 스타일)', price: '80,000원' },
+                    { id: 7, name: '7번 - 베이직/줄광고 (Basic)', desc: '일반 리스트 노출 (실속형 구인 상품)', price: '60,000원' },
                     { id: 8, name: '8번 - 강조옵션 (Emphasis)', desc: '아이콘/형광펜 효과 (주목도 200% 상승)', price: '30,000원' },
                   ].map((pkg) => (
                     <label key={pkg.id} className={`block p-4 border rounded-xl cursor-pointer relative overflow-hidden transition-all hover:border-red-500 hover:bg-red-50/30 ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : pkg.id === 1 ? 'border-red-500 bg-red-50/50' : 'border-gray-200 bg-white shadow-sm'}`}>
@@ -1027,68 +1167,120 @@ export default function HomePortal() {
               </div>
             </div>
 
-            <div className="px-4 py-6 md:px-0">
-              {/* 2. Page Title Area */}
-              {/* 2. Page Title Area & Notice Bar */}
-              <div className="flex flex-col gap-4 mb-6">
-                <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                  <span className="text-pink-600">|</span> 지역별채용
-                </h3>
+            {/* 3열 레이아웃: 좌측 사이드바 | 중앙 콘텐츠 */}
+            <div className="flex gap-6">
+              {/* 좌측 사이드바 (PC에서만 표시) */}
+              <LeftSidebar
+                selectedRegion={selectedRegion}
+                setSelectedRegion={setSelectedRegion}
+                setSelectedSubRegion={setSelectedSubRegion}
+                selectedJobType={selectedJobType}
+                setSelectedJobType={setSelectedJobType}
+                selectedKeywords={selectedKeywords}
+                setSelectedKeywords={setSelectedKeywords}
+                onLoginClick={() => setCurrentPage('login')}
+                onSignupClick={() => setCurrentPage('signup')}
+                onPaymentClick={() => setCurrentPage('payment')}
+              />
 
-                {/* Notice Bar (Separated) */}
-                <div
-                  onClick={() => router.push('/customer-center?tab=notice')}
-                  className={`cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:bg-opacity-50 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                >
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <span className="bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md whitespace-nowrap">공지사항</span>
-                    <span className={`text-[12px] md:text-sm font-black truncate ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
-                      [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
-                    </span>
+              {/* 중앙 콘텐츠 영역 */}
+              <div className="flex-1 px-4 py-6 md:px-0">
+                {/* 2. Page Title Area */}
+                {/* 2. Page Title Area & Notice Bar */}
+                <div className="flex flex-col gap-4 mb-6">
+                  <h3 className={`text-2xl md:text-3xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                    <span className="text-pink-600">|</span> 지역별 채용
+                  </h3>
+
+                  {/* Notice Bar (Separated) */}
+                  <div
+                    onClick={() => router.push('/customer-center?tab=notice')}
+                    className={`cursor-pointer flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:bg-opacity-50 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span className="bg-pink-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md whitespace-nowrap">공지사항</span>
+                      <span className={`text-[12px] md:text-sm font-black truncate ${brand.theme === 'dark' ? 'text-gray-100' : 'text-black'}`}>
+                        [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
+                      </span>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-400 shrink-0" />
                   </div>
-                  <ChevronRight size={16} className="text-gray-400 shrink-0" />
+
+                  {/* 3. Navigation Tabs */}
+                  <div className="flex border-b-2 border-gray-100 mt-2">
+                    {['업종별채용', '지역별 채용', '오늘본광고'].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => {
+                          if (tab === '업종별채용') {
+                            router.push('/jobs');
+                          } else {
+                            setActiveRegionTab(tab === '지역별 채용' ? 'region' : 'other');
+                          }
+                        }}
+                        className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${(tab === '지역별 채용')
+                          ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5'
+                          : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* 3. Navigation Tabs */}
-                <div className="flex border-b-2 border-gray-100 mt-2">
-                  {['업종별채용', '지역별채용', '오늘본광고'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveRegionTab(tab === '지역별채용' ? 'region' : 'other')}
-                      className={`flex-1 py-3 text-[13px] md:text-sm font-black text-center relative transition-colors ${(tab === '지역별채용')
-                        ? 'text-pink-600 border-b-2 border-pink-600 -mb-0.5'
-                        : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                {/* 4. Search Form Section (Ultra-Compact) */}
+                <div className={`p-3.5 md:p-6 rounded-[20px] md:rounded-[32px] border shadow-sm space-y-2 md:space-y-0 md:flex md:items-center md:gap-3 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
 
-              {/* 4. Search Form Section (Ultra-Compact) */}
-              <div className={`p-3.5 md:p-6 rounded-[20px] md:rounded-[32px] border shadow-sm space-y-2 md:space-y-0 md:flex md:items-center md:gap-3 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                  {/* Mobile: Labels (Hidden on Desktop) */}
+                  <div className="md:hidden grid grid-cols-1 gap-1">
+                    <label className="text-[10px] font-black text-gray-500 pl-1">지역</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                        value={selectedRegion}
+                        onChange={(e) => {
+                          setSelectedRegion(e.target.value);
+                          setSelectedSubRegion('전체');
+                        }}
+                      >
+                        <option value="전체">지역선택</option>
+                        {REGION_LIST.map(reg => (
+                          <option key={reg} value={reg}>{reg}</option>
+                        ))}
+                      </select>
+                      <select
+                        disabled={selectedRegion === '전체'}
+                        className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 focus:border-blue-500 focus:bg-white'} disabled:opacity-50`}
+                        value={selectedSubRegion}
+                        onChange={(e) => setSelectedSubRegion(e.target.value)}
+                      >
+                        <option value="전체">세부지역</option>
+                        {selectedRegion !== '전체' && (REGIONS_MAP[selectedRegion] as string[])?.map((sub: string) => (
+                          <option key={sub} value={sub}>{sub}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-                {/* Mobile: Labels (Hidden on Desktop) */}
-                <div className="md:hidden grid grid-cols-1 gap-1">
-                  <label className="text-[10px] font-black text-gray-500 pl-1">지역</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Desktop: Region Selects */}
+                  <div className="hidden md:flex items-center gap-2 flex-[2]">
                     <select
-                      className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white'}`}
+                      className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-pink-200'}`}
                       value={selectedRegion}
                       onChange={(e) => {
                         setSelectedRegion(e.target.value);
                         setSelectedSubRegion('전체');
                       }}
                     >
-                      <option value="전체">지역선택</option>
-                      {Object.keys(REGIONS_MAP).map(reg => (
+                      <option value="전체">지역전체</option>
+                      {REGION_LIST.map(reg => (
                         <option key={reg} value={reg}>{reg}</option>
                       ))}
                     </select>
                     <select
                       disabled={selectedRegion === '전체'}
-                      className={`w-full p-2.5 rounded-lg text-xs font-bold border appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 focus:border-blue-500 focus:bg-white'} disabled:opacity-50`}
+                      className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer disabled:opacity-50 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-200'}`}
                       value={selectedSubRegion}
                       onChange={(e) => setSelectedSubRegion(e.target.value)}
                     >
@@ -1098,81 +1290,160 @@ export default function HomePortal() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Job Select */}
+                  <div className="grid grid-cols-1 gap-1 md:gap-0 flex-[2] md:flex md:items-center md:gap-2">
+                    <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">직종</label>
+                    <div className="grid grid-cols-2 gap-2 md:w-full">
+                      <select
+                        className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white md:hover:border-purple-200'}`}
+                        value={selectedCategory}
+                        onChange={(e) => {
+                          setSelectedCategory(e.target.value);
+                          setSelectedJobType('전체');
+                        }}
+                      >
+                        <option value="전체">직종선택</option>
+                        {JOB_CATEGORIES.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                      <select
+                        disabled={selectedCategory === '전체'}
+                        className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold border md:border-2 appearance-none transition-all cursor-pointer disabled:opacity-50 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white md:hover:border-purple-200'}`}
+                        value={selectedJobType}
+                        onChange={(e) => setSelectedJobType(e.target.value)}
+                      >
+                        <option value="전체">상세직종</option>
+                        {selectedCategory !== '전체' && JOB_CATEGORY_MAP[selectedCategory]?.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Keyword Input */}
+                  <div className="grid grid-cols-1 gap-1 md:gap-0 flex-[2]">
+                    <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">검색어</label>
+                    <input
+                      type="text"
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
+                      placeholder="키워드 검색 (예: 강남)"
+                      className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-medium text-xs md:text-sm border md:border-2 transition-all ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:bg-white md:hover:border-gray-200'}`}
+                    />
+                  </div>
+
+                  {/* Search Button */}
+                  <div className="pt-1 md:pt-0 w-full md:w-auto">
+                    <button
+                      onClick={() => {
+                        setCurrentPage('home');
+                        setTimeout(() => {
+                          document.getElementById('job-list-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                      }}
+                      className="w-full md:w-auto md:px-6 py-3 md:py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl font-black text-[13px] md:text-sm shadow-md hover:from-black hover:to-black active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                      <Search size={16} />
+                      <span className="md:hidden">검색하기</span>
+                      <span className="hidden md:inline">검색</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Desktop: Region Selects */}
-                <div className="hidden md:flex items-center gap-2 flex-[2]">
-                  <select
-                    className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-pink-200'}`}
-                    value={selectedRegion}
-                    onChange={(e) => {
-                      setSelectedRegion(e.target.value);
-                      setSelectedSubRegion('전체');
-                    }}
-                  >
-                    <option value="전체">지역전체</option>
-                    {Object.keys(REGIONS_MAP).map(reg => (
-                      <option key={reg} value={reg}>{reg}</option>
-                    ))}
-                  </select>
-                  <select
-                    disabled={selectedRegion === '전체'}
-                    className={`w-full p-3 rounded-xl font-bold text-sm border-2 appearance-none cursor-pointer disabled:opacity-50 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 hover:border-blue-200'}`}
-                    value={selectedSubRegion}
-                    onChange={(e) => setSelectedSubRegion(e.target.value)}
-                  >
-                    <option value="전체">세부지역</option>
-                    {selectedRegion !== '전체' && (REGIONS_MAP[selectedRegion] as string[])?.map((sub: string) => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))}
-                  </select>
+
+                {/* 7. 그랜드 프리미엄 헤더 + 더보기/광고신청 버튼 */}
+                <div className="flex items-center justify-between mb-4 mt-8">
+                  <h3 className={`text-lg md:text-xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                    <Star className="text-amber-500" size={20} />
+                    그랜드 프리미엄
+                  </h3>
+                  <div className="flex gap-2">
+                    <button className={`px-3 py-1.5 rounded-lg text-[11px] font-bold border transition ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-300' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                      더보기
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage('payment')}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-pink-600 text-white hover:bg-pink-700 transition"
+                    >
+                      광고신청
+                    </button>
+                  </div>
                 </div>
 
-                {/* Job Select */}
-                <div className="grid grid-cols-1 gap-1 md:gap-0 flex-1">
-                  <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">직종</label>
-                  <select
-                    className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl text-xs md:text-sm font-bold border md:border-2 appearance-none transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-pink-500 focus:bg-white md:hover:border-purple-200'}`}
-                    value={selectedJobType}
-                    onChange={(e) => setSelectedJobType(e.target.value)}
-                  >
-                    <option value="전체">직종선택</option>
-                    {JOB_TYPES.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                {/* 8. 구인정보 카드 그리드 */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  {shops
+                    .filter(shop => shop.tier && shop.tier !== 'common')
+                    .slice(0, 12)
+                    .map((shop, idx) => {
+                      const tierConfig: Record<string, { bg: string; text: string; label: string }> = {
+                        grand: { bg: 'bg-gradient-to-r from-amber-500 to-yellow-400', text: 'text-white', label: '그랜드' },
+                        premium: { bg: 'bg-gradient-to-r from-purple-600 to-pink-500', text: 'text-white', label: '프리미엄' },
+                        deluxe: { bg: 'bg-gradient-to-r from-blue-600 to-cyan-500', text: 'text-white', label: '디럭스' },
+                        special: { bg: 'bg-pink-600', text: 'text-white', label: '스페셜' },
+                        urgent: { bg: 'bg-red-600', text: 'text-white', label: '급구' },
+                        recommended: { bg: 'bg-emerald-600', text: 'text-white', label: '추천' },
+                        native: { bg: 'bg-cyan-600', text: 'text-white', label: '네이티브' },
+                        basic: { bg: 'bg-gray-500', text: 'text-white', label: '베이직' },
+                      };
+                      const tier = tierConfig[shop.tier || 'special'] || tierConfig.special;
+                      const views = getStableNumber(shop.id || idx.toString(), 50, 500);
+                      const rank = idx + 1;
+
+                      return (
+                        <div
+                          key={shop.id}
+                          onClick={() => setSelectedShop(shop)}
+                          className={`rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
+                        >
+                          {/* 썸네일 영역 */}
+                          <div className={`h-20 md:h-24 ${tier.bg} relative flex items-center justify-center`}>
+                            <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-black ${tier.bg} ${tier.text} shadow-sm`}>
+                              {tier.label}
+                            </span>
+                            <Crown className="text-white/50" size={32} />
+                            <span className="absolute bottom-2 right-2 bg-black/50 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">
+                              {rank}위 | {views}회
+                            </span>
+                          </div>
+                          {/* 정보 영역 */}
+                          <div className="p-3">
+                            <h4 className={`text-[13px] font-black truncate mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                              {shop.realName || shop.name}
+                            </h4>
+                            <p className="text-[11px] text-gray-500 truncate mb-1.5">
+                              {shop.region}
+                            </p>
+                            <p className="text-[12px] font-bold text-pink-600 truncate">
+                              {shop.pay || '급여 협의'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
 
-                {/* Keyword Input */}
-                <div className="grid grid-cols-1 gap-1 md:gap-0 flex-[2]">
-                  <label className="md:hidden text-[10px] font-black text-gray-500 pl-1">검색어</label>
-                  <input
-                    type="text"
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder="키워드 검색 (예: 강남)"
-                    className={`w-full p-2.5 md:p-3 rounded-lg md:rounded-xl font-medium text-xs md:text-sm border md:border-2 transition-all ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-100 text-gray-900 placeholder-gray-400 focus:border-pink-500 focus:bg-white md:hover:border-gray-200'}`}
-                  />
-                </div>
-
-                {/* Search Button */}
-                <div className="pt-1 md:pt-0 w-full md:w-auto">
+                {/* 광고 카드 - 사장님 한칸 */}
+                <div className="mt-6 p-4 rounded-2xl border-2 border-dashed border-pink-300 bg-pink-50/50 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-[15px] font-black text-black mb-0.5">사장님, 광고 한칸 어떠세요?</h4>
+                    <p className="text-[11px] text-gray-500">최고의 노출 효과로 매출을 UP 시켜보세요!</p>
+                  </div>
                   <button
-                    onClick={() => {
-                      setCurrentPage('home');
-                      setTimeout(() => {
-                        document.getElementById('job-list-section')?.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
-                    }}
-                    className="w-full md:w-auto md:px-6 py-3 md:py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-xl font-black text-[13px] md:text-sm shadow-md hover:from-black hover:to-black active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                    onClick={() => setCurrentPage('payment')}
+                    className="px-4 py-2 bg-pink-600 text-white rounded-xl text-xs font-bold hover:bg-pink-700 transition flex items-center gap-1"
                   >
-                    <Search size={16} />
-                    <span className="md:hidden">검색하기</span>
-                    <span className="hidden md:inline">검색</span>
+                    <PlusCircle size={14} />
+                    광고등록
                   </button>
                 </div>
+
               </div>
+              {/* 중앙 콘텐츠 영역 끝 */}
             </div>
+            {/* 3열 레이아웃 끝 */}
           </div>
         )}
 
