@@ -225,8 +225,9 @@ export default function MyShopPage() {
     const [totalAmount, setTotalAmount] = useState(0);
 
     // --- Prevent Leave Logic ---
-    // 에디터 내용 추출 (태그 제외 순수 텍스트)
-    const isEditorDirty = editorRef.current ? editorRef.current.innerText.trim() !== '' : false;
+    // --- Prevent Leave Logic ---
+    // 에디터 내용 변경 감지 상태
+    const [isEditorDirty, setIsEditorDirty] = useState(false);
 
     const isDirty = view === 'form' && (
         (shopName !== '' && shopName !== '코코 라운지') ||
@@ -594,15 +595,15 @@ export default function MyShopPage() {
                 <div className={`text-left text-[13px] p-6 rounded-2xl space-y-3 leading-relaxed border font-bold ${brand.theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border-gray-700' : 'bg-gray-50/80 text-gray-700 border-gray-100'}`}>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">1.</span>
-                        <span>한 달 수정한도는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>무제한</strong>이나, 과도한 도배는 금지됩니다.</span>
+                        <span>월 수정횟수는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>30회</strong> 입니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">2.</span>
-                        <span>7단계 등급 시스템에 따라 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>노출 위치</strong>가 결정됩니다.</span>
+                        <span>금칙어 사용 시 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>통보 없이 삭제</strong>될 수 있습니다.</span>
                     </p>
                     <p className="flex gap-3">
                         <span className="text-pink-500 font-black shrink-0">3.</span>
-                        <span>최적의 홍보 효과를 위해 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>제목에 특수문자</strong> 사용을 권장합니다.</span>
+                        <span>본문 내용은 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>1000자 이내</strong>로 작성해주세요.</span>
                     </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-2">
@@ -736,7 +737,10 @@ export default function MyShopPage() {
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
                 <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => router.back()} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-800'}`}>
+                        <button onClick={() => {
+                            if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
+                            router.back();
+                        }} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-800'}`}>
                             <ArrowLeft size={20} />
                         </button>
                         <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
@@ -1076,6 +1080,9 @@ export default function MyShopPage() {
                                     suppressContentEditableWarning={true}
                                     onMouseUp={handleEditorInteract}
                                     onKeyUp={handleEditorInteract}
+                                    onInput={() => {
+                                        if (!isEditorDirty) setIsEditorDirty(true);
+                                    }}
                                     onBlur={saveSelection}
                                 />
                             </div>
@@ -1224,7 +1231,11 @@ export default function MyShopPage() {
                             <button onClick={handlePreview} className="flex-[2] py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-sm md:text-base">
                                 <Eye size={18} /> 미리보기
                             </button>
-                            <button onClick={() => setView('dashboard')} className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition text-sm md:text-base">취소</button>
+                            <button onClick={() => {
+                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 취소하시겠습니까?')) return;
+                                setView('dashboard');
+                                window.scrollTo(0, 0);
+                            }} className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition text-sm md:text-base">취소</button>
                             <button onClick={handleSave} className="flex-[3] py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-200 transition flex items-center justify-center gap-2 text-sm md:text-base">
                                 <Save size={18} /> 저장 및 심사 요청
                             </button>

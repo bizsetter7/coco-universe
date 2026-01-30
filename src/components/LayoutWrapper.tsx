@@ -21,7 +21,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </aside>
 
                 {/* 중앙 메인 */}
-                <main className={`w-full max-w-[1020px] flex-1 min-w-0 shadow-none xl:shadow-none min-h-screen overflow-x-hidden ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-950'}`}>
+                <main className={`w-full max-w-[1020px] flex-1 min-w-0 shadow-none xl:shadow-none min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-950'}`}>
                     {children}
                 </main>
 

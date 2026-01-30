@@ -132,7 +132,8 @@ function CustomerCenterContent() {
     const [inquiryTitle, setInquiryTitle] = useState('');
     const [inquiryContent, setInquiryContent] = useState('');
 
-    usePreventLeave(activeTab === '1:1문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== ''));
+    const isDirty = activeTab === '1:1문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
+    usePreventLeave(isDirty);
 
     // 탭 변경 시 URL 강제 동기화
     const handleTabChange = (tabName: string) => {
@@ -185,18 +186,27 @@ function CustomerCenterContent() {
             <header className={`fixed top-0 left-0 right-0 z-[60] border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'} h-14`}>
                 <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors">
+                        <button onClick={() => {
+                            if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
+                            router.back();
+                        }} className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors">
                             <ArrowLeft size={24} />
                         </button>
                         <h1
-                            onClick={() => router.push('/')}
+                            onClick={() => {
+                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
+                                router.push('/');
+                            }}
                             className={`text-[17px] md:text-xl font-black flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}
                         >
                             <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
                             고객지원센터
                         </h1>
                     </div>
-                    <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
+                    <button onClick={() => {
+                        if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
+                        router.push('/');
+                    }} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
                         <Home size={24} />
                     </button>
                 </div>
