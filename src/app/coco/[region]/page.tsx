@@ -4,22 +4,8 @@ import shopsData from '@/lib/data/shops.json';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 import RegionClient from './RegionClient';
 
-interface Shop {
-    name: string;
-    region: string;
-    phone: string;
-    kakao: string;
-    telegram: string;
-    pay: string;
-    workType: string;
-    url: string;
-    site: string;
-    id: string;
-    is_placeholder: boolean;
-    is_premium?: boolean;
-    is_verified?: boolean;
-    tier?: 'grand' | 'preferential' | 'premium' | 'special' | 'urgent' | 'recommended' | 'common';
-}
+import { Shop } from '@/types/shop';
+
 
 type Params = Promise<{ region: string }>;
 

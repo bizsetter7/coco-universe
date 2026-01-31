@@ -15,31 +15,8 @@ import LeftSidebar from '@/components/LeftSidebar';
 import shopsData from '@/lib/data/shops.json';
 import regionsData from '@/lib/data/regions.json';
 
-interface Shop {
-  name: string;
-  realName?: string;
-  region: string;
-  phone: string;
-  kakao: string;
-  telegram: string;
-  pay: string;
-  workType: string;
-  url: string;
-  site: string;
-  id: string;
-  is_placeholder: boolean;
-  is_premium?: boolean;
-  is_verified?: boolean;
-  recommended?: boolean;
-  tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic';
-  updatedAt?: string;
-  options?: {
-    blink?: boolean;
-    bold?: boolean;
-    color?: string;
-    icons?: string[];
-  }
-}
+import { Shop } from '@/types/shop';
+
 
 
 const REGION_BANNERS = [
@@ -1479,7 +1456,7 @@ export default function HomePortal() {
 
                   {/* 8. 그랜드/프리미엄 카드 그리드 */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
-                    {grandPremiumShops.slice(0, grandLimit).map((shop, idx) => {
+                    {grandPremiumShops.slice(0, grandLimit).map((shop: Shop, idx) => {
                       const tierConfig: Record<string, { bg: string; text: string; label: string }> = {
                         grand: { bg: 'bg-gradient-to-r from-amber-500 to-yellow-400', text: 'text-white', label: '그랜드' },
                         premium: { bg: 'bg-gradient-to-r from-purple-600 to-pink-500', text: 'text-white', label: '프리미엄' },

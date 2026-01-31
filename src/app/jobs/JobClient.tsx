@@ -11,29 +11,14 @@ import LeftSidebar from '@/components/LeftSidebar';
 import { useBrand } from '@/components/BrandProvider';
 import Link from 'next/link';
 
-interface Shop {
-    name: string;
-    realName?: string;
-    region: string;
-    phone: string;
-    kakao: string;
-    telegram: string;
-    pay: string;
-    workType: string;
-    url: string;
-    site: string;
-    id: string;
-    is_placeholder: boolean;
-    is_verified?: boolean;
-    tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic';
-    recommended?: boolean;
-    options?: {
-        blink?: boolean;
-    }
-}
+import { Shop } from '@/types/shop';
+
 
 interface JobClientProps {
     shops: Shop[];
+    jobTypes?: string[];
+    regionName?: string;
+    brand?: { theme: string };
 }
 
 const REGION_BANNERS = [
