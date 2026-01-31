@@ -1755,7 +1755,7 @@ export default function HomePortal() {
                 <div className="flex items-center justify-between mb-5 px-4 md:px-0">
                   <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
                     <MapPin size={22} className="text-pink-500" />
-                    <span>최신 구인정보(수정됨)</span>
+                    <span>최신 구인정보</span>
                     <span className="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">LIVE</span>
                   </h2>
                   <div className="flex items-center gap-4">
