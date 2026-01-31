@@ -80,6 +80,66 @@ export default function HomePortal() {
   const [businessLicense, setBusinessLicense] = useState<File | null>(null); // 사업자등록증 파일
   const [businessLicenseNumber, setBusinessLicenseNumber] = useState(''); // 사업자등록번호
 
+  const [signupForm, setSignupForm] = useState({
+    id: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    phone: '',
+    email: '',
+    businessName: '',
+    businessNumber: '',
+    marketingConsent: true
+  });
+
+  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setSignupForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSignup = async () => {
+    // Validation
+    if (!signupForm.id || !signupForm.password || !signupForm.name || !signupForm.phone) {
+      return alert('필수 항목(*)을 모두 입력해주세요.');
+    }
+    if (signupForm.password !== signupForm.confirmPassword) {
+      return alert('비밀번호가 일치하지 않습니다.');
+    }
+    if (signupType === 'corporate') {
+      if (!signupForm.businessName || !signupForm.businessNumber) {
+        return alert('업소명과 사업자번호를 입력해주세요.');
+      }
+      if (!businessLicense) {
+        return alert('사업자등록증을 첨부해주세요.');
+      }
+    }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...signupForm,
+          type: signupType,
+          registeredAt: new Date().toISOString()
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setSignupStep(3);
+      } else {
+        alert(result.error || '회원가입 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('서버와 통신 중 오류가 발생했습니다.');
+    }
+  };
+
   // Simulation: Registered business numbers
   const REGISTERED_BUSINESS_NUMBERS = ['123-45-67890', '226-13-91078'];
 
@@ -1691,28 +1751,23 @@ export default function HomePortal() {
               </div> {/* 2열(사이드바+콘텐츠) 레이아웃 끝 */}
 
               {/* 12. 최신 구인정보 리스트 (Standardized Style) - Standard Home Alignment */}
-              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-4 md:px-0">
-                <div className="flex items-center justify-between mb-5 w-full">
-                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
+              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-0 md:px-0">
+                <div className="flex items-center justify-between mb-5 px-4 md:px-0">
+                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
                     <MapPin size={22} className="text-pink-500" />
-                    <span>최신 구인정보</span>
-                    <span className="bg-rose-100 text-rose-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-bounce uppercase">Live</span>
+                    <span>최신 구인정보(수정됨)</span>
+                    <span className="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">LIVE</span>
                   </h2>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4">
                     <Link href="/favorites" className="flex items-center gap-1.5 text-xs font-bold text-amber-500 hover:underline">
                       <Star size={14} fill="currentColor" />
                       내 보관함
                     </Link>
-                    <button
-                      onClick={() => setCurrentPage('payment')}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-pink-600 text-white hover:bg-pink-700 transition"
-                    >
-                      광고신청
-                    </button>
+                    <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-pink-400' : 'text-pink-600'} `}>실시간순</span>
                   </div>
                 </div>
 
-                <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}>
+                <div className={`rounded-none md:rounded-2xl border-x-0 md:border border-y md:shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}>
                   {/* Desktop Table View */}
                   <div className="hidden md:block overflow-x-hidden min-w-0">
                     <table className="w-full text-left text-sm border-collapse table-fixed">
@@ -2094,21 +2149,42 @@ export default function HomePortal() {
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">아이디 <span className="text-red-500">*</span></label>
                       <div className="col-span-3 w-full">
-                        <input type="text" placeholder="4~15자 영문/숫자" className="w-full p-3 border rounded-lg text-sm" />
+                        <input
+                          type="text"
+                          name="id"
+                          value={signupForm.id}
+                          onChange={handleSignupChange}
+                          placeholder="4~15자 영문/숫자"
+                          className="w-full p-3 border rounded-lg text-sm"
+                        />
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">비밀번호 <span className="text-red-500">*</span></label>
                       <div className="col-span-3 w-full">
-                        <input type="password" placeholder="4~12자 이상" className="w-full p-3 border rounded-lg text-sm" />
+                        <input
+                          type="password"
+                          name="password"
+                          value={signupForm.password}
+                          onChange={handleSignupChange}
+                          placeholder="4~12자 이상"
+                          className="w-full p-3 border rounded-lg text-sm"
+                        />
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">비번확인 <span className="text-red-500">*</span></label>
                       <div className="col-span-3 w-full">
-                        <input type="password" placeholder="비밀번호 재입력" className="w-full p-3 border rounded-lg text-sm" />
+                        <input
+                          type="password"
+                          name="confirmPassword"
+                          value={signupForm.confirmPassword}
+                          onChange={handleSignupChange}
+                          placeholder="비밀번호 재입력"
+                          className="w-full p-3 border rounded-lg text-sm"
+                        />
                       </div>
                     </div>
 
@@ -2117,7 +2193,14 @@ export default function HomePortal() {
                         <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                           <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">업소명 <span className="text-red-500">*</span></label>
                           <div className="col-span-3 w-full">
-                            <input type="text" placeholder="사업자등록증 상 상호명" className="w-full p-3 border rounded-lg text-sm" />
+                            <input
+                              type="text"
+                              name="businessName"
+                              value={signupForm.businessName}
+                              onChange={handleSignupChange}
+                              placeholder="사업자등록증 상 상호명"
+                              className="w-full p-3 border rounded-lg text-sm"
+                            />
                           </div>
                         </div>
 
@@ -2126,9 +2209,10 @@ export default function HomePortal() {
                           <div className="col-span-3 w-full">
                             <input
                               type="text"
+                              name="businessNumber"
                               placeholder="000-00-00000"
-                              value={businessLicenseNumber}
-                              onChange={(e) => setBusinessLicenseNumber(e.target.value)}
+                              value={signupForm.businessNumber}
+                              onChange={handleSignupChange}
                               className="w-full p-3 border rounded-lg text-sm"
                             />
                           </div>
@@ -2172,7 +2256,14 @@ export default function HomePortal() {
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">이름 <span className="text-red-500">*</span></label>
                       <div className="col-span-3 flex gap-2 w-full">
-                        <input type="text" placeholder="실명 입력 (본인인증)" className="flex-1 p-3 border rounded-lg text-sm min-w-0" />
+                        <input
+                          type="text"
+                          name="name"
+                          value={signupForm.name}
+                          onChange={handleSignupChange}
+                          placeholder="실명 입력 (본인인증)"
+                          className="flex-1 p-3 border rounded-lg text-sm min-w-0"
+                        />
                         <button className="bg-gray-200 text-gray-600 px-3 py-2 rounded text-xs font-bold whitespace-nowrap shrink-0 hover:bg-gray-300 transition">본인인증 하기</button>
                       </div>
                     </div>
@@ -2180,14 +2271,28 @@ export default function HomePortal() {
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">휴대폰 <span className="text-red-500">*</span></label>
                       <div className="col-span-3 w-full">
-                        <input type="tel" placeholder="휴대폰 번호 (- 제외)" className="w-full p-3 border rounded-lg text-sm" />
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={signupForm.phone}
+                          onChange={handleSignupChange}
+                          placeholder="휴대폰 번호 (- 제외)"
+                          className="w-full p-3 border rounded-lg text-sm"
+                        />
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:grid sm:grid-cols-4 gap-2 sm:gap-4 items-start sm:items-center">
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto">이메일</label>
                       <div className="col-span-3 w-full">
-                        <input type="email" placeholder="example@email.com" className="w-full p-3 border rounded-lg text-sm" />
+                        <input
+                          type="email"
+                          name="email"
+                          value={signupForm.email}
+                          onChange={handleSignupChange}
+                          placeholder="example@email.com"
+                          className="w-full p-3 border rounded-lg text-sm"
+                        />
                       </div>
                     </div>
 
@@ -2195,7 +2300,13 @@ export default function HomePortal() {
                       <label className="text-left sm:text-right text-sm font-bold text-gray-600 w-full sm:w-auto sm:pt-2">수신동의</label>
                       <div className="col-span-3 pt-0 sm:pt-2">
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" className="w-4 h-4" defaultChecked />
+                          <input
+                            type="checkbox"
+                            name="marketingConsent"
+                            checked={signupForm.marketingConsent}
+                            onChange={handleSignupChange}
+                            className="w-4 h-4"
+                          />
                           <span className="text-xs sm:text-sm text-gray-600 break-keep">SMS 수신 동의 (채용/지원 알림을 받을 수 있습니다)</span>
                         </label>
                       </div>
@@ -2204,20 +2315,7 @@ export default function HomePortal() {
                     <div className="flex justify-center gap-4 pt-8">
                       <button onClick={() => setSignupStep(1)} className="px-8 py-4 rounded-xl border border-gray-300 text-gray-500 font-bold hover:bg-gray-50">이전단계</button>
                       <button
-                        onClick={() => {
-                          if (signupType === 'corporate') {
-                            if (!businessLicenseNumber) {
-                              return alert('사업자등록번호를 입력해주세요.');
-                            }
-                            if (REGISTERED_BUSINESS_NUMBERS.includes(businessLicenseNumber)) {
-                              return alert('이미 등록된 사업자번호입니다.\n고객센터로 문의해주시기 바랍니다.');
-                            }
-                            if (!businessLicense) {
-                              return alert('사업자등록증을 첨부해주세요.');
-                            }
-                          }
-                          setSignupStep(3);
-                        }}
+                        onClick={handleSignup}
                         style={primaryBgStyle}
                         className="px-12 py-4 rounded-xl text-white font-bold shadow-lg hover:opacity-90 transition-all"
                       >
