@@ -78,7 +78,6 @@ export default function HomePortal() {
   const [signupType, setSignupType] = useState<'individual' | 'corporate'>('individual'); // individual: 구직자, corporate: 구인자
   const [agreements, setAgreements] = useState({ terms: false, privacy: false });
   const [businessLicense, setBusinessLicense] = useState<File | null>(null); // 사업자등록증 파일
-  const [businessLicenseNumber, setBusinessLicenseNumber] = useState(''); // 사업자등록번호
 
   const [signupForm, setSignupForm] = useState({
     id: '',
@@ -140,8 +139,6 @@ export default function HomePortal() {
     }
   };
 
-  // Simulation: Registered business numbers
-  const REGISTERED_BUSINESS_NUMBERS = ['123-45-67890', '226-13-91078'];
 
   // URL Parameter Handling
   useEffect(() => {
@@ -1751,8 +1748,8 @@ export default function HomePortal() {
               </div> {/* 2열(사이드바+콘텐츠) 레이아웃 끝 */}
 
               {/* 12. 최신 구인정보 리스트 (Standardized Style) - Standard Home Alignment */}
-              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-0 md:px-0">
-                <div className="flex items-center justify-between mb-5 px-4 md:px-0">
+              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-3 md:px-0">
+                <div className="flex items-center justify-between mb-5 px-1 md:px-0">
                   <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
                     <MapPin size={22} className="text-pink-500" />
                     <span>최신 구인정보</span>
@@ -1767,7 +1764,7 @@ export default function HomePortal() {
                   </div>
                 </div>
 
-                <div className={`rounded-none md:rounded-2xl border-x-0 md:border border-y md:shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}>
+                <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} `}>
                   {/* Desktop Table View */}
                   <div className="hidden md:block overflow-x-hidden min-w-0">
                     <table className="w-full text-left text-sm border-collapse table-fixed">
@@ -2233,16 +2230,15 @@ export default function HomePortal() {
                                     }
                                   }}
                                 />
-                                {businessLicense ? (<>
-                                  <>
-                                    <span className="text-xs font-bold truncate flex items-center gap-1" style={{ color: brand.primaryColor }}>
-                                      <CheckCircle2 size={14} /> {businessLicense.name}
-                                    </span>
-                                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                                      <PlusSquare size={14} /> 사업자등록증 첨부 (필수)
-                                    </span>
-                                  </>
-                                </>) : null}
+                                {businessLicense ? (
+                                  <span className="text-xs font-bold truncate flex items-center gap-1" style={{ color: brand.primaryColor }}>
+                                    <CheckCircle2 size={14} /> {businessLicense.name}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <PlusSquare size={14} /> 사업자등록증 첨부 (필수)
+                                  </span>
+                                )}
                               </label>
                               <span className="text-[10px] text-gray-400 break-keep shrink-0">
                                 * 관리자 승인 후 가입이 완료됩니다.
