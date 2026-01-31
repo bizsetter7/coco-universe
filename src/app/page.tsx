@@ -1748,7 +1748,7 @@ export default function HomePortal() {
               </div> {/* 2열(사이드바+콘텐츠) 레이아웃 끝 */}
 
               {/* 12. 최신 구인정보 리스트 (Standardized Style) - Standard Home Alignment */}
-              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-3 md:px-0">
+              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-4 md:px-0">
                 <div className="flex items-center justify-between mb-5 px-1 md:px-0">
                   <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
                     <MapPin size={22} className="text-pink-500" />
