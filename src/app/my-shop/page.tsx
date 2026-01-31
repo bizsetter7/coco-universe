@@ -1111,34 +1111,36 @@ export default function MyShopPage() {
 
                             <div className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-100'}`}>
                                 {DETAILED_PRICING.filter(p => p.isMain).map((product: any, idx) => (
-                                    <div key={product.id} className={`flex items-center p-2 gap-3 transition-colors ${brand.theme === 'dark' ? 'hover:bg-pink-900/10' : 'hover:bg-pink-50/10'} ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                                        <div className={`w-16 h-20 rounded border flex-shrink-0 flex flex-col items-center justify-center text-[10px] font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-700' : 'bg-gray-50 border-gray-100 text-gray-300'}`}>
-                                            IMG
-                                        </div>
-                                        <div className="flex-1 min-w-0 py-1">
-                                            <div className="flex items-center gap-1.5 mb-0.5">
-                                                <span className={`text-base font-black leading-tight ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{idx + 1}. {product.name}</span>
-                                                {product.id === 'p6' && <span className="text-[10px] bg-red-500 text-white px-1.5 font-black rounded uppercase shrink-0">Best</span>}
+                                    <div key={product.id} className={`flex flex-col sm:flex-row sm:items-center p-3 gap-3 transition-colors ${brand.theme === 'dark' ? 'hover:bg-pink-900/10' : 'hover:bg-pink-50/10'} ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
+                                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                                            <div className={`w-14 h-14 sm:w-16 sm:h-20 rounded border flex-shrink-0 flex flex-col items-center justify-center text-[8px] sm:text-[10px] font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-700' : 'bg-gray-50 border-gray-100 text-gray-300'}`}>
+                                                IMG
                                             </div>
-                                            <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed">
-                                                {(() => {
-                                                    if (!product.desc.includes('. (')) return product.desc;
-                                                    const [main, sub] = product.desc.split('. (');
-                                                    return (
-                                                        <>
-                                                            <span className="block mb-0.5 md:mb-0">{main}.</span>
-                                                            <span className="flex items-start gap-1 text-pink-500/90 md:text-gray-400 text-[10px] md:text-xs font-black">
-                                                                <span className="md:hidden shrink-0 mt-0.5 text-[8px]">✨</span>
-                                                                <span>({sub}</span>
-                                                            </span>
-                                                        </>
-                                                    );
-                                                })()}
-                                            </p>
+                                            <div className="flex-1 min-w-0 py-0.5 sm:py-1">
+                                                <div className="flex items-center gap-1.5 mb-1 sm:mb-0.5">
+                                                    <span className={`text-sm sm:text-base font-black leading-tight ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{idx + 1}. {product.name}</span>
+                                                    {product.id === 'p6' && <span className="text-[9px] sm:text-[10px] bg-red-500 text-white px-1.5 font-black rounded uppercase shrink-0">Best</span>}
+                                                </div>
+                                                <p className="text-[11px] sm:text-xs text-gray-400 leading-relaxed line-clamp-2 sm:line-clamp-none">
+                                                    {(() => {
+                                                        if (!product.desc.includes('. (')) return product.desc;
+                                                        const [main, sub] = product.desc.split('. (');
+                                                        return (
+                                                            <>
+                                                                <span className="block mb-0.5 sm:mb-0">{main}.</span>
+                                                                <span className="flex items-start gap-1 text-pink-500/90 sm:text-gray-400 text-[10px] sm:text-xs font-black">
+                                                                    <span className="sm:hidden shrink-0 mt-0.5 text-[8px]">✨</span>
+                                                                    <span>({sub}</span>
+                                                                </span>
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="flex gap-2 shrink-0">
+                                        <div className="grid grid-cols-3 sm:flex gap-1.5 sm:gap-2 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
                                             {[30, 60, 90].map((days) => (
-                                                <label key={days} className={`flex flex-col items-center justify-center w-[85px] h-[48px] rounded-xl cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'bg-pink-50 border-pink-500 text-pink-600 shadow-md ring-2 ring-pink-100' : (brand.theme === 'dark' ? 'border-gray-800 bg-gray-900 text-gray-500 hover:border-pink-900' : 'border-gray-100 bg-white text-gray-400 hover:border-pink-200')}`}>
+                                                <label key={days} className={`flex flex-col items-center justify-center flex-1 sm:w-[85px] h-[44px] sm:h-[48px] rounded-xl cursor-pointer border-2 transition-all relative overflow-hidden ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'bg-pink-50 border-pink-500 text-pink-600 shadow-md ring-2 ring-pink-100' : (brand.theme === 'dark' ? 'border-gray-800 bg-gray-900 text-gray-500 hover:border-pink-900' : 'border-gray-100 bg-white text-gray-400 hover:border-pink-200')}`}>
                                                     <input
                                                         type="radio"
                                                         className="hidden"
@@ -1150,11 +1152,11 @@ export default function MyShopPage() {
                                                     />
                                                     {selectedAdProduct === product.id && selectedAdPeriod === days && (
                                                         <div className="absolute top-0 right-0 bg-pink-500 text-white p-0.5 rounded-bl-lg">
-                                                            <Check size={10} strokeWidth={4} />
+                                                            <Check size={9} strokeWidth={4} />
                                                         </div>
                                                     )}
-                                                    <span className="text-[10px] font-bold uppercase leading-none mb-1">{days}일</span>
-                                                    <span className={`text-xs font-black tracking-tighter ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`}>{(product as any)[`d${days}`].toLocaleString()}원</span>
+                                                    <span className="text-[9px] sm:text-[10px] font-bold uppercase leading-none mb-0.5 sm:mb-1">{days}일</span>
+                                                    <span className={`text-[11px] sm:text-xs font-black tracking-tighter ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`}>{(product as any)[`d${days}`].toLocaleString()}원</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -1214,30 +1216,30 @@ export default function MyShopPage() {
                             </section>
                         </div>
 
-                        <div className="bg-[#e6007e] p-5 text-white flex flex-col md:flex-row justify-between items-center rounded-2xl shadow-xl border-2 border-white/20 gap-4 md:gap-0">
-                            <div className="flex flex-col gap-1 text-center md:text-left">
-                                <p className="text-[13px] md:text-sm font-black opacity-90 leading-tight">결제는 PC와 모바일 모두 가능합니다.</p>
-                                <p className="text-[10px] md:text-[11px] font-bold opacity-70">모든 광고 상품은 결제 및 심사 후 즉시 최신 기술(Region Filter)이 적용되어 노출됩니다.</p>
+                        <div className="bg-[#e6007e] p-4 sm:p-5 text-white flex flex-col md:flex-row justify-between items-center rounded-2xl shadow-xl border-2 border-white/20 gap-3 md:gap-0">
+                            <div className="flex flex-col gap-0.5 text-center md:text-left">
+                                <p className="text-xs sm:text-sm font-black opacity-90 leading-tight">결제는 PC와 모바일 모두 가능합니다.</p>
+                                <p className="text-[10px] font-bold opacity-70">모든 광고 상품은 결제 및 심사 후 즉시 자동 적용되어 노출됩니다.</p>
                             </div>
-                            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 w-full md:w-auto">
-                                <span className="text-sm md:text-base font-black opacity-80">총 신청 금액</span>
-                                <span className="text-3xl md:text-4xl font-black bg-white/20 px-6 py-2 rounded-xl border border-white/30 text-center w-full md:w-auto shadow-inner">{totalAmount.toLocaleString()}원</span>
+                            <div className="flex flex-col md:flex-row items-center gap-1.5 md:gap-6 w-full md:w-auto">
+                                <span className="text-xs sm:text-base font-black opacity-80">총 신청 금액</span>
+                                <span className="text-2xl sm:text-4xl font-black bg-white/20 px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl border border-white/30 text-center w-full md:w-auto shadow-inner">{totalAmount.toLocaleString()}원</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className={`fixed bottom-0 left-0 right-0 border-t p-4 z-20 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
-                        <div className="max-w-5xl mx-auto flex gap-3">
-                            <button onClick={handlePreview} className="flex-[2] py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-sm md:text-base">
-                                <Eye size={18} /> 미리보기
+                    <div className={`fixed bottom-0 left-0 right-0 border-t p-3 sm:p-4 z-20 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+                        <div className="max-w-5xl mx-auto flex gap-2 sm:gap-3">
+                            <button onClick={handlePreview} className="flex-1 sm:flex-[2] py-3.5 sm:py-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl transition flex items-center justify-center gap-1.5 text-xs sm:text-base">
+                                <Eye size={16} className="sm:w-[18px]" /> <span className="hidden xs:inline">미리보기</span><span className="xs:hidden">보기</span>
                             </button>
                             <button onClick={() => {
                                 if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 취소하시겠습니까?')) return;
                                 setView('dashboard');
                                 window.scrollTo(0, 0);
-                            }} className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition text-sm md:text-base">취소</button>
-                            <button onClick={handleSave} className="flex-[3] py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-200 transition flex items-center justify-center gap-2 text-sm md:text-base">
-                                <Save size={18} /> 저장 및 심사 요청
+                            }} className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition text-xs sm:text-base">취소</button>
+                            <button onClick={handleSave} className="flex-[2] sm:flex-[3] py-3.5 sm:py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-200 transition flex items-center justify-center gap-1.5 text-xs sm:text-base">
+                                <Save size={16} className="sm:w-[18px]" /> <span className="xs:inline">저장 및 심사</span><span className="xs:hidden">저장</span>
                             </button>
                         </div>
                     </div>

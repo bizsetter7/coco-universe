@@ -1748,19 +1748,24 @@ export default function HomePortal() {
               </div> {/* 2열(사이드바+콘텐츠) 레이아웃 끝 */}
 
               {/* 12. 최신 구인정보 리스트 (Standardized Style) - Standard Home Alignment */}
-              <div id="latest-job-info-region" className="w-full clear-both mt-1 px-4 md:px-0">
+              <div id="latest-job-info-region" className="w-full clear-both mt-0 px-4 md:px-0">
                 <div className="flex items-center justify-between mb-5 px-1 md:px-0">
-                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-red-600'} `}>
+                  <h2 className={`text-xl font-bold flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
                     <MapPin size={22} className="text-pink-500" />
                     <span>최신 구인정보</span>
-                    <span className="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">LIVE</span>
+                    <span className="bg-rose-100 text-rose-600 text-[9px] px-2 py-0.5 rounded-full font-black animate-bounce uppercase">Live</span>
                   </h2>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <Link href="/favorites" className="flex items-center gap-1.5 text-xs font-bold text-amber-500 hover:underline">
                       <Star size={14} fill="currentColor" />
                       내 보관함
                     </Link>
-                    <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-pink-400' : 'text-pink-600'} `}>실시간순</span>
+                    <button
+                      onClick={() => router.push('/?page=payment')}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-pink-600 text-white hover:bg-pink-700 transition"
+                    >
+                      광고신청
+                    </button>
                   </div>
                 </div>
 
