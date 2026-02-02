@@ -110,7 +110,7 @@ const JobAdSection = ({
                                 <div className="flex flex-col h-full">
                                     <div
                                         className="relative w-full overflow-hidden bg-[#f1f5f9]"
-                                        style={{ height: 0, paddingBottom: '100%' }}
+                                        style={{ height: 0, paddingBottom: '100%', position: 'relative' }}
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
@@ -118,6 +118,7 @@ const JobAdSection = ({
                                                     src={shop.options.mediaUrl}
                                                     alt={shop.name}
                                                     className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500"
+                                                    style={{ display: 'block' }}
                                                     loading="lazy"
                                                     decoding="async"
                                                     onError={(e) => {
