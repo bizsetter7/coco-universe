@@ -22,13 +22,13 @@ export const MobileBottomNav = () => {
     const isDark = brand.theme === 'dark';
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden flex flex-col items-center pointer-events-none">
+        <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden flex flex-col items-center pointer-events-none bottom-nav">
             {/* Toggle Handle */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-10 flex items-center gap-1.5 text-xs font-bold transition-colors ${isDark
-                        ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200'
-                        : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'
+                    ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200'
+                    : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'
                     }`}
             >
                 {isExpanded ? (

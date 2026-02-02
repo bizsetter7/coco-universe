@@ -239,7 +239,7 @@ const JobListView: React.FC<JobListViewProps> = ({
                                     <React.Fragment key={shop.id || i}>
                                         <div
                                             onClick={() => setSelectedShop(shop)}
-                                            className={`p-4 active:bg-gray-50 transition-colors flex justify-between items-start gap-3 ${brand.theme === 'dark' ? 'bg-gray-900 active:bg-gray-800' : 'bg-white'}`}
+                                            className={`p-4 active:bg-gray-50 transition-colors flex justify-between items-start gap-3 card-item ${brand.theme === 'dark' ? 'bg-gray-900 active:bg-gray-800' : 'bg-white'}`}
                                         >
                                             <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                                                 {/* Line 1: Title (광고내용) */}

@@ -17,7 +17,7 @@ interface JobAdSectionProps {
     shops: Job[];
     limit: number;
     onMore?: () => void;
-    tier: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'auto';
+    tier: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'auto' | 'native' | 'common' | 'basic';
     brand: Brand;
     setSelectedShop: (shop: Job) => void;
     showAdButton?: boolean;
@@ -158,12 +158,12 @@ const JobAdSection: React.FC<JobAdSectionProps> = ({
                             className={`
                                 cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden transition-all duration-300
                                 border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
-                                shadow-sm hover:shadow-md
+                                shadow-sm hover:shadow-md card-item
                             `}
                         >
                             <div className="flex flex-col h-full">
                                 {/* 상단: 이미지 또는 배너 영역 */}
-                                <div className="relative aspect-[16/9] w-full bg-slate-100 overflow-hidden">
+                                <div className="relative aspect-[16/9] w-full bg-slate-100 overflow-hidden card-image">
                                     {shop.options?.mediaUrl ? (
                                         <>
                                             <img

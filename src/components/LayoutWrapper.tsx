@@ -29,7 +29,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </aside>
 
                 {/* 중앙 메인 */}
-                <main className={`w-full ${isWidePage ? 'max-w-[1280px]' : 'max-w-[1020px]'} flex-1 min-w-0 shadow-none xl:shadow-none min-h-screen ${brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
+                <main className={`w-full ${isWidePage ? 'max-w-[1280px]' : 'max-w-[1020px]'} flex-1 min-w-0 shadow-none xl:shadow-none min-h-screen main-content-area ${brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
                     {children}
                 </main>
 

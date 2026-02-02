@@ -10,6 +10,7 @@ html {
 
   /* 모바일 세로 스크롤 떨림(Jitter) 방지 최적화 */
   scroll-behavior: auto;
+  overscroll-behavior-y: none;
 }
 
 /* Tailwind v4 Selector Strategy */
@@ -45,6 +46,8 @@ body {
   min-height: 100%;
   /* 스티키 정합성을 위해 body 레벨의 overflow-x 제거 */
   -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .no-transition {
@@ -59,9 +62,29 @@ body {
 /* GPU 가속 강제 (모바일 떨림 방지) */
 header.sticky,
 nav.sticky,
-.sticky {
+.sticky,
+.card-item,
+.main-content-area,
+.bottom-nav {
   will-change: transform;
   transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* 하단 내비게이션/플로팅 버튼 떨림 방지 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  transform: translate3d(0, 0, 0);
+  z-index: 100;
+}
+
+/* 이미지 레이아웃 시프트 방지 */
+.card-image {
+  aspect-ratio: 1 / 1;
+  background-color: #f0f0f0;
 }
 
 @keyframes bounce-horizontal {
