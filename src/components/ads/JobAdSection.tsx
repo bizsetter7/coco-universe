@@ -105,7 +105,13 @@ const JobAdSection = ({
                                 `}
                             >
                                 <div className="flex flex-col h-full">
-                                    <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
+                                    <div
+                                        className="relative w-full aspect-square overflow-hidden bg-slate-100"
+                                        style={{
+                                            containIntrinsicSize: '200px 200px',
+                                            contentVisibility: 'auto'
+                                        }}
+                                    >
                                         {shop.options?.mediaUrl ? (
                                             <>
                                                 <img

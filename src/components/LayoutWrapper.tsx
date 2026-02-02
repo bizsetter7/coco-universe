@@ -1,22 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { BannerSidebar } from './BannerSidebar';
 import { useBrand } from './BrandProvider';
+import { BannerSidebar } from './BannerSidebar';
 import { MobileBottomNav } from './ui/MobileBottomNav';
 
-export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
-    const pathname = usePathname();
-    const isMyShop = pathname?.startsWith('/my-shop');
+interface LayoutWrapperProps {
+    children: React.ReactNode;
+}
 
-    const isJobsPage = pathname?.startsWith('/jobs');
-    const isRegionPage = pathname?.startsWith('/region');
-    const isCommunityPage = pathname?.startsWith('/community');
-    const isCustomerPage = pathname?.startsWith('/customer-center');
-    const isHomePage = pathname === '/';
-    const isWidePage = isJobsPage || isRegionPage || isHomePage || isCommunityPage || isCustomerPage;
-
+export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
     const brand = useBrand();
     const [mounted, setMounted] = useState(false);
 
@@ -24,17 +17,21 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         setMounted(true);
     }, []);
 
+    // 특정 탭(공지사항 등)에서 본문이 넓어야 하는 경우를 위한 로직 (필요 시 확장)
+    const isWidePage = false;
+
     return (
-        <div className={`min-h-[100dvh] w-full flex justify-center overflow-visible ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ overflow: 'visible' }}>
+        <div className={`min-h-[100dvh] flex flex-col ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <div
                 className={`grid xl:grid-cols-[160px_1fr_160px] gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative min-h-[100dvh] items-stretch`}
                 style={{
                     overflow: 'visible',
+                    position: 'relative'
                 }}
             >
 
                 {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] h-full self-stretch relative">
+                <aside className="hidden xl:block w-[160px] h-full self-stretch relative" style={{ contain: 'none !important' }}>
                     <BannerSidebar side="left" />
                 </aside>
 
@@ -44,7 +41,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </main>
 
                 {/* 오른쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] h-full self-stretch relative">
+                <aside className="hidden xl:block w-[160px] h-full self-stretch relative" style={{ contain: 'none !important' }}>
                     <BannerSidebar side="right" />
                 </aside>
 

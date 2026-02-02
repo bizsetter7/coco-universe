@@ -76,6 +76,8 @@ aside {
 main {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  /* 지시사항: 브라우저에게 메인 영역 스크롤 최적화 명령 */
 }
 
 .force-flex-stretch {
