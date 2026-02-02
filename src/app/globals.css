@@ -23,7 +23,6 @@ html {
   /* touch-action: manipulation; 제거 (스크롤 간섭 가능성) */
   scroll-behavior: auto;
   min-height: 100dvh;
-  /* !important 제거 */
 }
 
 /* 모바일에서는 gutter를 제거하여 풀스크린 가용성 확보 */
@@ -40,12 +39,6 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-/* [시스템 다크모드 연결 해제] 
-   브랜드 설정(brand.theme)에 의해서만 테마가 결정되도록 prefers-color-scheme 배제 */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
 body {
   background: var(--background);
