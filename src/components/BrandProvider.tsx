@@ -36,6 +36,18 @@ export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [searchParams]);
 
+    // 3. Sync Dark Mode Class to HTML/Body
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            const root = document.documentElement;
+            if (brand.theme === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+        }
+    }, [brand.theme]);
+
     return (
         <BrandContext.Provider value={brand}>
             <style dangerouslySetInnerHTML={{

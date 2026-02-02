@@ -644,17 +644,6 @@ export default function RegionClient({ regionName, shops: initialShops }: Region
                 </div>
             )}
 
-            {/* Mobile Nav */}
-            <nav className={`md:hidden fixed bottom-0 left-0 right-0 w-full border-t flex justify-around py-3 z-40 text-[10px] text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]'}`}>
-                <button onClick={() => router.push('/')} className="flex flex-col items-center gap-1 hover:text-pink-600 transition-colors"><Home size={20} /> <span>홈</span></button>
-                <button onClick={() => router.push('/community')} className="flex flex-col items-center gap-1 hover:text-pink-600 transition-colors"><MessageCircle size={20} /> <span>커뮤니티</span></button>
-                <button onClick={() => router.push('/?page=payment')} className="flex flex-col items-center gap-1 font-bold group" style={{ color: brand.primaryColor }}>
-                    <PlusCircle size={36} className="-mt-6 bg-white rounded-full shadow-lg border-4 border-white group-active:scale-95 transition-transform" />
-                    <span className="mt-1 font-bold">광고등록</span>
-                </button>
-                <Link href="/lounge" className="flex flex-col items-center gap-1 hover:text-pink-600 transition-colors"><Sparkles size={20} /> <span>라운지</span></Link>
-                <button onClick={() => router.push('/?page=login')} className="flex flex-col items-center gap-1 hover:text-pink-600 transition-colors"><User size={20} /> <span>MY</span></button>
-            </nav>
         </div>
     );
 }

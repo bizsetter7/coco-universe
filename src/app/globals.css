@@ -8,12 +8,16 @@ html {
   }
 }
 
+/* Tailwind v4 Selector Strategy */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
   -webkit-text-size-adjust: 100%;
-  touch-action: manipulation;
-  scroll-behavior: auto !important;
+  /* touch-action: manipulation; 제거 (스크롤 간섭 가능성) */
+  scroll-behavior: auto;
+  /* !important 제거 */
 }
 
 /* 모바일에서는 gutter를 제거하여 풀스크린 가용성 확보 */
@@ -44,8 +48,8 @@ body {
   min-height: 100dvh;
   /* 가로 스크롤 차단 */
   overflow-x: hidden;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+  /* overscroll-behavior-y: contain; 제거됨 (스크롤 떨림 방지) */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .no-transition {
