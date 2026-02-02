@@ -2,101 +2,56 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* --- 1. 터치 및 스크롤 근본 안정화 (iOS 및 리플로우 방지) --- */
+/* --- 1. 기본 스타일 복구 --- */
 html,
 body {
-  overflow-x: visible !important;
-  overflow-y: auto !important;
-  height: auto !important;
-  min-height: 100% !important;
-  position: relative !important;
   -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: none !important;
-  /* 지시사항: 폰트 크기 자동 조절 방지 */
-  text-size-adjust: none !important;
-  -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
+  -webkit-text-size-adjust: none;
+  /* 폰트 크기 자동 조절 방지만 유지 */
+  text-size-adjust: none;
 }
 
-/* --- 2. 사이드바 Sticky 활동 영역 및 공간 확보 --- */
+/* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
-  position: relative !important;
-  overflow: visible !important;
-  contain: none !important;
-  min-height: 100vh !important;
-  height: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
+  position: relative;
+  height: fit-content !important;
+  /* 지시사항: 부모 높이를 내용물에 맞춤 */
 }
 
-/* 부모 컨테이너(LayoutWrapper 내부)에서 aside가 main과 동일한 높이를 갖도록 함 */
-.self-stretch {
-  align-self: stretch !important;
-}
-
-/* --- 3. 광고 카드 레이아웃 및 렌더링 격리 (지시사항 반영) --- */
-.ad-card-container {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  /* 모바일 강제 2열 */
-  gap: 12px !important;
-  padding: 0 16px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-@media (min-width: 1024px) {
-  .ad-card-container {
-    grid-template-columns: repeat(4, 1fr) !important;
-    padding: 0 !important;
-    gap: 16px !important;
-  }
-}
-
+/* --- 3. 광고 카드 레이아웃 초기화 --- */
+/* 강제 CSS 제거 및 기존 구조 존중 */
 .ad-card {
-  width: 100% !important;
-  max-width: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-width: 0 !important;
-  height: auto !important;
-  background-color: white;
+  width: 100%;
   border-radius: 20px;
   overflow: hidden;
-  contain: layout !important;
-  -webkit-backface-visibility: hidden !important;
-  backface-visibility: hidden !important;
-  /* 지시사항: 개별 가속 적용 */
-  will-change: transform !important;
+  background-color: white;
+  transition: all 0.3s ease;
 }
 
-/* --- 4. 모달(팝업) 최상단 유지 --- */
+/* 지시사항: 이미지에만 1:1 비율 부여 */
+.ad-card img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  width: 100% !important;
+}
+
+/* --- 4. 모달(팝업) --- */
 .modal-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 99999 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  background: rgba(0, 0, 0, 0.75) !important;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(4px);
 }
 
 body.modal-open {
-  overflow: hidden !important;
+  overflow: hidden;
 }
 
-/* --- 5. [중요] 최하단 강제 주입: 사용자 지시 CSS (우선순위 확보) --- */
-.ad-card div:first-child,
-.ad-card img {
-  aspect-ratio: 1 / 1 !important;
-  width: 100% !important;
-  height: auto !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-
-/* --- 6. 기타 UI --- */
+/* --- 5. 기타 UI --- */
 .bottom-nav {
   position: fixed;
   bottom: 0;

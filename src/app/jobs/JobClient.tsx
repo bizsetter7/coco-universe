@@ -134,12 +134,12 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
     const filteredShops = useMemo(() => {
         return shops.filter(shop => {
             // Region Filter
-            if (selectedRegion !== '전체' && !shop.region.includes(selectedRegion)) return false;
-            if (selectedSubRegion !== '전체' && !shop.region.includes(selectedSubRegion)) return false;
+            if (selectedRegion !== '전체' && !(shop.region?.includes(selectedRegion))) return false;
+            if (selectedSubRegion !== '전체' && !(shop.region?.includes(selectedSubRegion))) return false;
 
             // Job Type Filter
-            if (selectedJobType !== '전체' && !shop.workType.includes(selectedJobType)) return false;
-            if (selectedSubJobType !== '전체' && !shop.workType.includes(selectedSubJobType)) return false;
+            if (selectedJobType !== '전체' && !(shop.workType?.includes(selectedJobType))) return false;
+            if (selectedSubJobType !== '전체' && !(shop.workType?.includes(selectedSubJobType))) return false;
 
             // Search Query Filter
             if (activeSearchQuery) {
