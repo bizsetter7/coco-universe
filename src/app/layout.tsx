@@ -37,6 +37,14 @@ export default function RootLayout({
             </LayoutWrapper>
           </BrandProvider>
         </Suspense>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('touchstart', function() {}, {passive: true});
+              document.addEventListener('touchmove', function() {}, {passive: true});
+            `,
+          }}
+        />
       </body>
     </html>
   );

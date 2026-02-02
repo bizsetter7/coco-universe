@@ -158,12 +158,12 @@ const JobAdSection: React.FC<JobAdSectionProps> = ({
                             className={`
                                 cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden transition-all duration-300
                                 border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
-                                shadow-sm hover:shadow-md card-item
+                                shadow-sm hover:shadow-md ad-card
                             `}
                         >
                             <div className="flex flex-col h-full">
                                 {/* 상단: 이미지 또는 배너 영역 */}
-                                <div className="relative aspect-[16/9] w-full bg-slate-100 overflow-hidden card-image">
+                                <div className="relative h-[150px] w-full bg-slate-100 overflow-hidden">
                                     {shop.options?.mediaUrl ? (
                                         <>
                                             <img

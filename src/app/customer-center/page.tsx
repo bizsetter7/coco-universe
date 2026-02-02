@@ -227,6 +227,15 @@ function CustomerCenterContent() {
     const isDirty = activeTab === '1:1문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
     usePreventLeave(isDirty);
 
+    useEffect(() => {
+        if (selectedImage || isPaymentPopupOpen) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+        return () => document.body.classList.remove('modal-open');
+    }, [selectedImage, isPaymentPopupOpen]);
+
     // 탭 변경 시 URL만 변경 (상태는 useEffect가 searchParams를 감지하여 변경함)
     const handleTabChange = (tabName: string) => {
         setIsMobileMenuOpen(false);
@@ -1214,7 +1223,7 @@ function CustomerCenterContent() {
                 {/* Image Zoom Modal */}
                 {
                     selectedImage && (
-                        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={() => setSelectedImage(null)}>
+                        <div className="modal-overlay" onClick={() => setSelectedImage(null)}>
                             <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
                                 {/* Centered Header for Image Modal as requested */}
                                 <div className="mb-6 text-center">

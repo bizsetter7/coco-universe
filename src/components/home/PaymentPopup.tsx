@@ -33,6 +33,15 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
         }
     }, [isOpen, initialTier]);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+        return () => document.body.classList.remove('modal-open');
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const handleApply = () => {
@@ -56,7 +65,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
     return (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+        <div className="modal-overlay" onClick={onClose}>
             <div className={`w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh] ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
 
                 {/* Header - Centered as per user request */}

@@ -54,55 +54,76 @@ body {
   transition: none !important;
 }
 
-/* 스티키 헤더의 가시성을 위한 미세 상단 패딩 보정 */
-.sticky-header-active {
-  scroll-padding-top: 80px;
+/* --- 가이드 제공 긴급 처방 코드 --- */
+
+/* 1. 광고 카드 컨테이너 크기 강제 고정 */
+.ad-card {
+  width: 100% !important;
+  max-width: 280px;
+  /* 데스크톱 기준 */
+  flex-shrink: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* GPU 가속 강제 (모바일 떨림 방지) */
-header.sticky,
-nav.sticky,
+@media (max-width: 768px) {
+  .ad-card {
+    max-width: 190px;
+    /* 모바일 기준 (캡처 가이드 반영) */
+  }
+}
+
+.ad-card img {
+  width: 100%;
+  height: 150px;
+  /* 가이드 추천: 고정 높이 적용 */
+  object-fit: cover;
+  display: block;
+}
+
+/* 2. 모달(팝업) 출력 및 스크롤 고정 문제 해결 */
+.modal-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999 !important;
+  /* 최상단으로 올림 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* 3. GPU 가속 및 성능 최적화 (유지 및 보완) */
 .sticky,
-.card-item,
-.main-content-area,
-.bottom-nav {
+.bottom-nav,
+.ad-card {
   will-change: transform;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-/* 하단 내비게이션/플로팅 버튼 떨림 방지 */
+/* 하단 내비게이션 안정화 */
 .bottom-nav {
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
   padding-bottom: env(safe-area-inset-bottom);
   transform: translate3d(0, 0, 0);
-  z-index: 100;
-}
-
-/* 이미지 레이아웃 시프트 방지 */
-.card-image {
-  aspect-ratio: 1 / 1;
-  background-color: #f0f0f0;
-}
-
-@keyframes bounce-horizontal {
-
-  0%,
-  100% {
-    transform: translateX(-25%);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-
-  50% {
-    transform: translateX(0);
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
-}
-
-.animate-bounce-horizontal {
-  animation: bounce-horizontal 1s infinite;
+  z-index: 50;
+  /* 헤더보다 낮게, 모달보다는 훨씬 낮게 */
 }
 
 @keyframes blink-border {

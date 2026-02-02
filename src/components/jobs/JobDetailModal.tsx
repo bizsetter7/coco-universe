@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, MessageSquare, Phone } from 'lucide-react';
 import { Shop } from '@/types/shop';
 
@@ -19,10 +19,19 @@ const TIER_GRADIENTS: Record<string, string> = {
 };
 
 const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose }) => {
+    useEffect(() => {
+        if (shop) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+        return () => document.body.classList.remove('modal-open');
+    }, [shop]);
+
     if (!shop) return null;
 
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+        <div className="modal-overlay" onClick={onClose}>
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg md:max-w-2xl overflow-hidden relative flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
 
                 {/* Modal Header */}
