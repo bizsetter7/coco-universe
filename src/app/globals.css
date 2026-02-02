@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* --- 1. 터치 및 스크롤 안정화 (배너 Sticky 및 iOS 대응) --- */
+/* --- 1. 터치 및 스크롤 근본 안정화 (iOS 및 리플로우 방지) --- */
 html,
 body {
   overflow-x: visible !important;
@@ -11,36 +11,30 @@ body {
   min-height: 100% !important;
   position: relative !important;
   -webkit-font-smoothing: antialiased;
-  -webkit-overflow-scrolling: touch;
-  /* iOS Safari 부드러운 스크롤 */
-  touch-action: pan-y;
+  -webkit-text-size-adjust: none !important;
+  /* 지시사항: 폰트 크기 자동 조절 방지 */
+  text-size-adjust: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
 }
 
-/* --- 2. 개별 요소 타겟 GPU 가속 및 렌더링 격리 (떨림 방지) --- */
-.ad-card {
-  contain: layout;
-  /* 개별 요소 렌더링 격리로 리플로우 방지 */
-  width: 100% !important;
-  max-width: none !important;
+/* --- 2. 사이드바 Sticky 활동 영역 및 공간 확보 --- */
+aside {
+  position: relative !important;
+  overflow: visible !important;
+  contain: none !important;
+  min-height: 100vh !important;
+  height: auto !important;
   display: flex !important;
   flex-direction: column !important;
-  min-width: 0 !important;
-  height: auto !important;
-  min-height: 220px !important;
-  background-color: white;
-  border-radius: 20px;
-  overflow: hidden;
-  will-change: transform;
 }
 
-.ad-card img {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
+/* 부모 컨테이너(LayoutWrapper 내부)에서 aside가 main과 동일한 높이를 갖도록 함 */
+.self-stretch {
+  align-self: stretch !important;
 }
 
-/* --- 3. 광고 카드 컨테이너 및 1:1 비율 교정 --- */
+/* --- 3. 광고 카드 레이아웃 및 렌더링 격리 (지시사항 반영) --- */
 .ad-card-container {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -59,23 +53,27 @@ body {
   }
 }
 
-/* 이미지 비율을 1:1로 교정 (가이드 반영) */
-.ad-card img {
+.ad-card {
   width: 100% !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
   height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  /* 원하시는 비율 1:1 적용 */
-  object-fit: cover !important;
-  display: block !important;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  contain: layout !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  /* 지시사항: 개별 가속 적용 */
+  will-change: transform !important;
 }
 
-/* --- 4. 모달(팝업) 최상단 고정 --- */
+/* --- 4. 모달(팝업) 최상단 유지 --- */
 .modal-overlay {
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+  inset: 0 !important;
   z-index: 99999 !important;
   display: flex !important;
   justify-content: center !important;
@@ -88,13 +86,14 @@ body.modal-open {
   overflow: hidden !important;
 }
 
-/* --- 5. 사이드바 Sticky 활동 영역(높이) 확보 --- */
-aside {
-  overflow: visible !important;
-  contain: none !important;
-  min-height: 1200px !important;
-  /* 배너가 따라올 충분한 높이 확보 */
-  height: 100% !important;
+/* --- 5. [중요] 최하단 강제 주입: 사용자 지시 CSS (우선순위 확보) --- */
+.ad-card div:first-child,
+.ad-card img {
+  aspect-ratio: 1 / 1 !important;
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+  display: block !important;
 }
 
 /* --- 6. 기타 UI --- */
