@@ -7,15 +7,19 @@ html,
 body {
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: none;
-  /* 폰트 크기 자동 조절 방지만 유지 */
   text-size-adjust: none;
+  height: -webkit-fill-available;
 }
 
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
   height: fit-content !important;
-  /* 지시사항: 부모 높이를 내용물에 맞춤 */
+  overflow: visible !important;
+}
+
+main {
+  overscroll-behavior-y: contain;
 }
 
 /* --- 3. 광고 카드 레이아웃 초기화 --- */
@@ -31,8 +35,9 @@ aside {
 /* 지시사항: 이미지에만 1:1 비율 부여 */
 .ad-card img {
   aspect-ratio: 1 / 1 !important;
-  object-fit: cover !important;
   width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 /* --- 4. 모달(팝업) --- */

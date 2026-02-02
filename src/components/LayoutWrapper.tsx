@@ -29,7 +29,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
             <div className={`flex gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative`}>
 
                 {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] relative h-fit self-stretch">
+                <aside className="hidden xl:block w-[160px] relative h-fit self-start">
                     <BannerSidebar side="left" />
                 </aside>
 
@@ -39,7 +39,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </main>
 
                 {/* 오른쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] relative h-fit self-stretch">
+                <aside className="hidden xl:block w-[160px] relative h-fit self-start">
                     <BannerSidebar side="right" />
                 </aside>
 
