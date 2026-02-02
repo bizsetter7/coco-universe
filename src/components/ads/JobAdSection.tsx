@@ -103,9 +103,6 @@ const JobAdSection = ({
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                                     shadow-sm hover:shadow-md ad-card w-[calc(50%-16px)] md:w-[calc(25%-16px)] m-2
                                 `}
-                                style={{
-                                    contain: 'size layout'
-                                }}
                             >
                                 <div className="flex flex-col h-full">
                                     <div
