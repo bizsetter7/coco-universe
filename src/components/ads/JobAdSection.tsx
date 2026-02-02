@@ -74,8 +74,10 @@ const JobAdSection = ({
             </div>
 
             <div className="px-4 md:px-0">
+                {console.log(`[JobAdSection Debug - ${title}] total shops:`, shops.length, "limit:", limit)}
                 <div className="flex flex-wrap -m-2">
                     {shops.slice(0, limit).map((shop, idx) => {
+                        console.log(`  -> Mapping [${idx}] shop:`, shop.name || shop.realName);
                         const rank = idx + 1;
                         const isFav = favorites?.includes(shop.id) ?? false;
 
