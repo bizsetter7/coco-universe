@@ -114,7 +114,10 @@ const JobAdSection = ({
                                         style={{
                                             display: 'block',
                                             overflow: 'hidden',
-                                            minHeight: 'var(--job-image-min-height, 140px)'
+                                            aspectRatio: '1/1',
+                                            minHeight: 'var(--job-image-min-height, 140px)',
+                                            backfaceVisibility: 'hidden',
+                                            WebkitBackfaceVisibility: 'hidden'
                                         }}
                                     >
                                         {shop.options?.mediaUrl ? (

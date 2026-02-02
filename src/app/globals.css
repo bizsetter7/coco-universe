@@ -56,6 +56,10 @@ img {
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
+  height: 100% !important;
+  /* 지시사항: 배너 레일 높이 본문과 동일하게 통일 */
+  display: block !important;
+  /* 지시사항: 물리 구조 강제 */
   overflow: visible !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
@@ -70,6 +74,7 @@ main {
 .force-flex-stretch {
   display: flex !important;
   align-items: stretch !important;
+  /* 지시사항: aside가 main 높이를 그대로 상속받도록 강제 */
 }
 
 /* --- 3. 광고 카드 레이아웃 초기화 --- */

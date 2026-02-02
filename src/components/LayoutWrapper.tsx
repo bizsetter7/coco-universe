@@ -36,7 +36,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
             >
 
                 {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] self-start relative">
+                <aside className="hidden xl:block w-[160px] self-stretch relative">
                     <BannerSidebar side="left" />
                 </aside>
 
@@ -46,7 +46,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </main>
 
                 {/* 오른쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] self-start relative">
+                <aside className="hidden xl:block w-[160px] self-stretch relative">
                     <BannerSidebar side="right" />
                 </aside>
 
