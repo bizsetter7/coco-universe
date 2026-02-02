@@ -6,6 +6,11 @@ html {
   @media (min-width: 1280px) {
     scrollbar-gutter: stable both-edges;
   }
+
+  /* 모바일 세로 스크롤 떨림(Jitter) 방지 최적화 */
+  scroll-behavior: auto;
+  /* smooth 제거 (관성 스크롤 충돌 방지) */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Tailwind v4 Selector Strategy */
@@ -17,6 +22,7 @@ html {
   -webkit-text-size-adjust: 100%;
   /* touch-action: manipulation; 제거 (스크롤 간섭 가능성) */
   scroll-behavior: auto;
+  min-height: 100dvh;
   /* !important 제거 */
 }
 
@@ -50,6 +56,7 @@ body {
   overflow-x: hidden;
   /* overscroll-behavior-y: contain; 제거됨 (스크롤 떨림 방지) */
   -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .no-transition {

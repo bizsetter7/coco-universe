@@ -174,10 +174,10 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
     const primaryStyle = { color: brand.primaryColor };
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className={`min-h-dvh ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
             {/* 1. Header (Sticky) */}
-            <header className={`sticky top-0 z-50 border-b backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'} transition-all`}>
+            <header className={`sticky top-0 z-50 border-b backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'}`}>
                 <div className="max-w-[1920px] mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/" className="text-xl md:text-2xl font-black tracking-tighter flex items-center gap-1">
@@ -231,7 +231,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
 
                 {/* Left Sidebar */}
                 <aside className="hidden lg:block w-[220px] shrink-0 space-y-6">
-                    <div ref={sidebarRef} style={stickyStyle} className="sticky transition-[top] duration-200">
+                    <div ref={sidebarRef} style={stickyStyle} className="sticky">
                         <LeftSidebar
                             selectedRegion={selectedRegion}
                             setSelectedRegion={setSelectedRegion}

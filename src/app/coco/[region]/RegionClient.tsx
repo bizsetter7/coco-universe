@@ -155,9 +155,9 @@ export default function RegionClient({ regionName, shops: initialShops }: Region
     };
 
     return (
-        <div className={`w-full max-w-full min-h-screen overflow-x-hidden ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 md:bg-white text-black'}`}>
+        <div className={`w-full max-w-full min-h-dvh overflow-x-hidden ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 md:bg-white text-black'}`}>
             {/* Standard Header */}
-            <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm transition-all border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+            <header className={`sticky top-0 z-50 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-md shadow-sm border-b ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                 <div className="max-w-[1280px] mx-auto px-3 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => router.push('/')}>
                         <ChevronLeft className="md:hidden mr-1" size={24} />
