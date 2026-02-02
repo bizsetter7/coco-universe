@@ -271,7 +271,7 @@ function CustomerCenterContent() {
     return (
         <>
             {/* [Fixed Mastery] Integrated Sticky Header */}
-            <div className="sticky top-0 z-[60]">
+            <div className="sticky top-0 z-[60] [will-change:transform] transform-gpu">
                 <div className={`w-full max-w-[1280px] mx-auto h-14 flex items-center justify-between px-4 border-b border-x shadow-sm pointer-events-auto md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 md:bg-gray-800/95' : 'bg-white border-gray-100 md:bg-white/95'}`}>
                     <div className="flex items-center gap-4">
                         <button onClick={() => {

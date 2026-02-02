@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 html {
+  height: 100%;
 
   /* [궁극의 울렁증 방지] 스크롤바 유무와 상관없이 화면 너비 고정 (데스크탑 이상) */
   @media (min-width: 1280px) {
@@ -41,9 +42,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  /* 가로 스크롤 차단 */
-  overflow-x: hidden;
-  /* overscroll-behavior-y: contain; 제거됨 (스크롤 떨림 방지) */
+  min-height: 100%;
+  /* 스티키 정합성을 위해 body 레벨의 overflow-x 제거 */
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -54,6 +54,14 @@ body {
 /* 스티키 헤더의 가시성을 위한 미세 상단 패딩 보정 */
 .sticky-header-active {
   scroll-padding-top: 80px;
+}
+
+/* GPU 가속 강제 (모바일 떨림 방지) */
+header.sticky,
+nav.sticky,
+.sticky {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes bounce-horizontal {
