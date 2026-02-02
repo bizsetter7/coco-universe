@@ -21,7 +21,7 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
     const isWidePage = false;
 
     return (
-        <div className={`min-h-[100dvh] flex flex-col ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <div className={`min-h-[100dvh] flex flex-col ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ isolation: 'isolate' }}>
             <div
                 className="grid xl:grid-cols-[160px_1fr_160px] gap-0 xl:gap-8 w-full max-w-[1440px] mx-auto justify-center relative min-h-[100dvh] items-stretch"
                 style={{

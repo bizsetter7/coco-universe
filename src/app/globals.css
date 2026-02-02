@@ -48,6 +48,8 @@ body {
   min-height: 100dvh;
   background-color: #f9fafb;
   /* bg-gray-50 기본값 */
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
 }
 
 .dark body {

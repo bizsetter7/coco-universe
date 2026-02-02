@@ -74,7 +74,7 @@ const JobAdSection = ({
             </div>
 
             <div className="px-4 md:px-0">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div className="flex flex-wrap -m-2">
                     {shops.slice(0, limit).map((shop, idx) => {
                         const rank = idx + 1;
                         const isFav = favorites?.includes(shop.id) ?? false;
@@ -101,8 +101,11 @@ const JobAdSection = ({
                                 className={`
                                     cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden transition-all duration-300
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
-                                    shadow-sm hover:shadow-md ad-card
+                                    shadow-sm hover:shadow-md ad-card w-[calc(50%-16px)] md:w-[calc(25%-16px)] m-2
                                 `}
+                                style={{
+                                    contain: 'size layout'
+                                }}
                             >
                                 <div className="flex flex-col h-full">
                                     <div
