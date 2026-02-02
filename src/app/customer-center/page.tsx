@@ -280,7 +280,7 @@ function CustomerCenterContent() {
     return (
         <>
             {/* [Fixed Mastery] Integrated Sticky Header */}
-            <div className="fixed top-0 left-0 right-0 z-[9999] w-full border-b bg-white dark:bg-gray-800" style={{ opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex', justifyContent: 'center' }}>
+            <div className="fixed top-0 z-[10000] w-full border-b bg-white dark:bg-gray-800" style={{ left: '50%', transform: 'translateX(-50%)', opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex', justifyContent: 'center' }}>
                 <div className="w-full max-w-[1440px] mx-auto flex items-center justify-center relative">
                     <div className={`w-full max-w-[1280px] h-[56px] flex items-center justify-between px-4 md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 md:bg-gray-800/95' : 'bg-white border-gray-100 md:bg-white/95'}`} style={{ zIndex: 9999, opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex' }}>
                         <div className="flex items-center gap-4">

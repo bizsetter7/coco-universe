@@ -86,7 +86,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
     return (
         <div className={`w-full ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} pb-24 md:pb-0 transition-colors duration-300`}>
             {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-[9999] w-full h-[56px] border-b bg-white dark:bg-gray-900" style={{ zIndex: 9999, opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex', justifyContent: 'center' }}>
+            <header className="fixed top-0 z-[10000] w-full h-[56px] border-b bg-white dark:bg-gray-900" style={{ left: '50%', transform: 'translateX(-50%)', zIndex: 10000, opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex', justifyContent: 'center' }}>
                 <div className="w-full max-w-[1440px] px-4 h-full flex items-center justify-between" style={{ display: 'flex', margin: '0 auto' }}>
                     {/* Logo */}
                     <div

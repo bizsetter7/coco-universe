@@ -26,7 +26,8 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
                 className="grid xl:grid-cols-[160px_1fr_160px] gap-0 xl:gap-8 w-full max-w-[1440px] mx-auto justify-center relative min-h-[100dvh] items-stretch"
                 style={{
                     overflow: 'visible',
-                    position: 'relative'
+                    position: 'relative',
+                    paddingTop: '56px'
                 }}
             >
 
