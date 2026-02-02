@@ -33,13 +33,19 @@ html {
 
 html,
 body {
+  margin: 0;
+  padding: 0;
   -webkit-text-size-adjust: 100%;
   /* 지시사항: 폰트 크기 고정 */
   text-size-adjust: 100%;
   min-height: 100dvh;
-  overflow: visible !important;
-  text-rendering: optimizeLegibility;
-  /* 지시사항: 텍스트 리플로우 방지 */
+  background-color: #f9fafb;
+  /* bg-gray-50 기본값 */
+}
+
+.dark body {
+  background-color: #030712;
+  /* bg-gray-950 기본값 */
 }
 
 img {
@@ -53,8 +59,8 @@ aside {
   height: inherit !important;
   /* 지시사항: 부모 높이 강제 상속 */
   overflow: visible !important;
-  top: 120px !important;
-  /* 지시사항: 윙 배너 위치 전격 조정 */
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 main {

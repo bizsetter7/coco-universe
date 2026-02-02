@@ -32,9 +32,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+            <div className="flex flex-col min-h-[100dvh]">
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </div>
           </BrandProvider>
         </Suspense>
         <script
