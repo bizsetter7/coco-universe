@@ -2,71 +2,81 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* --- 1. 스크롤 프리징 급히 해결 --- */
+/* --- 1. 터치 및 스크롤 근본 안정화 --- */
 html,
 body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  /* 세로 스크롤 강제 활성화 */
   height: auto !important;
   position: relative !important;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: auto;
-  /* 기본 스크롤 동작 복구 */
+  touch-action: pan-y;
+  /* 가로 흔들림 방지, 세로 스크롤에만 집중 */
 }
 
-/* --- 2. 광고 카드 레이아웃 복구 (유연한 고정) --- */
+/* 모든 요소에 하드웨어 가속 및 떨림 방지 */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* --- 2. 광고 카드 레이아웃 최적화 (2열 정렬 고정) --- */
 .ad-card {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;
-  /* 고정값이 아닌 최소/최대값으로 유연성 확보 */
+  flex: 1 1 45% !important;
+  /* 가이드 기반: 기기 너비에 맞춰 유연하게 반응 */
+  max-width: 48.5% !important;
+  /* 모바일 2열 정렬 유지 */
   min-width: 140px !important;
-  max-width: 100% !important;
   height: auto !important;
   min-height: 220px !important;
   background-color: white;
   border-radius: 20px;
   overflow: hidden;
+  will-change: transform;
+  /* 위치 재계산 지연 방지 */
 }
 
-/* 이미지 높이 안정화 (덜컥거림 방지) */
+/* 데스크톱에서는 4열 정렬을 위해 max-width 조정 */
+@media (min-width: 1024px) {
+  .ad-card {
+    max-width: 300px !important;
+    flex: 0 1 24% !important;
+  }
+}
+
+/* 이미지 로딩 시 화면 튀는 현상 (Jitter) 방지 */
 .ad-card img {
   height: 150px !important;
   min-height: 150px !important;
+  aspect-ratio: 16 / 9 !important;
+  /* 영역 미리 점유 */
   object-fit: cover !important;
   width: 100% !important;
   display: block !important;
 }
 
-/* --- 3. 모달(팝업) 간섭 문제 해결 --- */
-/* 광범위한 [class*="modal"] 선택자를 제거하고 실제 오버레이만 타겟팅 */
+/* --- 3. 모달 및 팝업 최상단 유지 --- */
 .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
   z-index: 99999 !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   background: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: blur(4px);
-  pointer-events: auto !important;
 }
 
-/* 모달이 떴을 때만 본문 스크롤 잠금 */
 body.modal-open {
   overflow: hidden !important;
-  /* position: fixed; 를 제거하여 PC 스크롤 튐 방지 */
 }
 
-/* --- 4. 성능 및 GPU 가속 --- */
-* {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
+/* --- 4. 기타 UI 안정화 --- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -74,7 +84,7 @@ body.modal-open {
   right: 0;
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 50;
-  transform: translateZ(0);
+  will-change: transform;
 }
 
 @theme {
@@ -82,13 +92,6 @@ body.modal-open {
   --color-primary-600: #e11d48;
 }
 
-@layer base {
-  body {
-    @apply antialiased text-gray-900 bg-white dark:bg-gray-950 dark:text-white;
-  }
-}
-
-/* 애니메이션 */
 @keyframes blink-border {
 
   0%,
