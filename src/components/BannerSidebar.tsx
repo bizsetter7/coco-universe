@@ -93,7 +93,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     return (
         <>
             <div
-                className="relative w-[160px] flex flex-col gap-2 z-[40] self-start"
+                className="sticky top-[120px] w-[160px] flex flex-col gap-2 z-[40] self-start"
             >
                 {/* 내부 모든 요소는 클릭 가능하도록 설정 */}
                 <div className="flex flex-col gap-2">
