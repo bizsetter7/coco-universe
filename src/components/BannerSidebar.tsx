@@ -30,105 +30,74 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
     const router = useRouter();
     const brand = useBrand();
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
-    const sidebarRef = useRef<HTMLDivElement>(null);
 
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';
 
-    // 1. 데이터 샘플링 (사용자 요청 수량: Grand 1, Premium 2)
+    // 1. 데이터 샘플링 (Grand 2개, Premium 2개)
     const allShops = shopsData as Shop[];
 
     const grandAds = useMemo(() => {
         const gr = allShops.filter(s => s.tier === 'grand');
-        return gr.slice(isLeft ? 0 : 1, isLeft ? 1 : 2);
+        if (isLeft) return [gr[0], gr[2]].filter(Boolean);
+        return [gr[1], gr[3]].filter(Boolean);
     }, [allShops, isLeft]);
 
     const premiumAds = useMemo(() => {
         const pr = allShops.filter(s => s.tier === 'premium' || s.is_premium);
-        return pr.slice(isLeft ? 0 : 2, isLeft ? 2 : 4);
+        if (isLeft) return pr.slice(0, 2);
+        return pr.slice(2, 4);
     }, [allShops, isLeft]);
 
-    // 🚀 [Ultimate Engine] translate3d 기반 하드웨어 가속 추적
-    useEffect(() => {
-        const updatePosition = () => {
-            if (!sidebarRef.current) return;
-            const scrollY = window.scrollY;
-            // 16px 마스터링: 스크롤 시에도 viewport 상단에서 16px 유지
-            sidebarRef.current.style.transform = `translate3d(0, ${scrollY}px, 0)`;
-        };
+    const renderAdCard = (ad: Shop, isGrand: boolean) => {
+        const gradientClass = isGrand
+            ? "bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600"
+            : "bg-gradient-to-br from-pink-400 via-rose-100 to-pink-600";
 
-        const handleWarp = () => {
-            if (sidebarRef.current) {
-                sidebarRef.current.classList.add('no-transition');
-                sidebarRef.current.style.transform = `translate3d(0, 0, 0)`;
-                setTimeout(() => {
-                    sidebarRef.current?.classList.remove('no-transition');
-                }, 10);
-            }
-        };
-
-        window.addEventListener('scroll', updatePosition, { passive: true });
-        window.addEventListener('sidebar-warp', handleWarp);
-
-        // 초기 위치 즉시 보정
-        updatePosition();
-
-        return () => {
-            window.removeEventListener('scroll', updatePosition);
-            window.removeEventListener('sidebar-warp', handleWarp);
-        };
-    }, []);
-
-    const renderAdCard = (ad: Shop, isGrand: boolean) => (
-        <div
-            key={ad.id}
-            onClick={() => setSelectedAd(ad)}
-            className={`group border overflow-hidden cursor-pointer hover:shadow-md transition-all active:scale-95 shadow-sm
-                ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}
-                ${isGrand ?
-                    `rounded-[18px] border-2 shadow-[0_0_15px_rgba(251,191,36,0.15)] ${brand.theme === 'dark' ? 'border-amber-600 ring-1 ring-amber-900/40' : 'border-amber-400 ring-1 ring-amber-100'}` :
-                    `rounded-[14px] ${brand.theme === 'dark' ? 'border-gray-800' : 'border-gray-100'}`
-                }
-            `}
-        >
-            <div className="p-1.5 flex flex-col gap-1">
-                <div className="flex items-center gap-1.5">
-                    <div className={`relative w-5 h-5 rounded-md overflow-hidden flex-shrink-0 border 
+        return (
+            <div
+                key={ad.id}
+                onClick={() => setSelectedAd(ad)}
+                className={`group p-[1.5px] rounded-[18px] overflow-hidden cursor-pointer hover:shadow-md transition-all active:scale-95 shadow-sm ${gradientClass}`}
+            >
+                <div className={`p-1.5 flex flex-col gap-1 rounded-[16px] h-full ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                    <div className="flex items-center gap-1.5">
+                        <div className={`relative w-5 h-5 rounded-md overflow-hidden flex-shrink-0 border 
+                            ${isGrand ?
+                                (brand.theme === 'dark' ? 'bg-amber-900/20 border-amber-900/30' : 'bg-amber-50 border-amber-100') :
+                                (brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/20' : 'bg-pink-50 border-pink-50')
+                            }
+                        `}>
+                            <div className={`w-full h-full flex items-center justify-center text-[8px] font-bold text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                                {ad.name.substring(0, 1)}
+                            </div>
+                        </div>
+                        <span className={`text-[10px] font-black truncate tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{ad.name}</span>
+                    </div>
+                    <div className={`relative w-full aspect-[4/3] rounded-lg overflow-hidden border 
+                        ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}
                         ${isGrand ?
-                            (brand.theme === 'dark' ? 'bg-amber-900/20 border-amber-900/30' : 'bg-amber-50 border-amber-100') :
-                            (brand.theme === 'dark' ? 'bg-pink-900/20 border-pink-900/30' : 'bg-pink-50 border-pink-50')
+                            (brand.theme === 'dark' ? 'border-amber-900/10' : 'border-amber-50') :
+                            (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')
                         }
                     `}>
-                        <div className={`w-full h-full flex items-center justify-center text-[8px] font-bold text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                            {ad.name.substring(0, 1)}
+                        <div className={`w-full h-full flex items-center justify-center text-[7px] font-bold uppercase italic ${brand.theme === 'dark' ? 'bg-gray-900 text-gray-700' : 'bg-gray-100 text-gray-300'}`}>
+                            AD
                         </div>
-                    </div>
-                    <span className={`text-[10px] font-black truncate tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{ad.name}</span>
-                </div>
-                <div className={`relative w-full aspect-[4/3] rounded-lg overflow-hidden border 
-                    ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}
-                    ${isGrand ?
-                        (brand.theme === 'dark' ? 'border-amber-900/10' : 'border-amber-50') :
-                        (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')
-                    }
-                `}>
-                    <div className={`w-full h-full flex items-center justify-center text-[7px] font-bold uppercase italic ${brand.theme === 'dark' ? 'bg-gray-900 text-gray-700' : 'bg-gray-100 text-gray-300'}`}>
-                        AD
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <>
             <div
-                ref={sidebarRef}
-                className="absolute top-[16px] w-[160px] flex flex-col gap-2 z-[100] will-change-transform pointer-events-none"
+                className="sticky top-[16px] w-[160px] flex flex-col gap-2 z-[100]"
             >
                 {/* 내부 모든 요소는 클릭 가능하도록 설정 */}
-                <div className="flex flex-col gap-2 pointer-events-auto">
-                    {/* 1. GRAND SIDE SECTION (1개) */}
+                <div className="flex flex-col gap-2">
+                    {/* 통합 사이드 섹션 (GRAND 헤더 하나만 사용) */}
                     <div className="flex flex-col gap-1.5">
                         <div
                             onClick={() => router.push('/customer-center?tab=ad')}
@@ -143,33 +112,18 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1 px-1">
-                            {grandAds.map((ad) => renderAdCard(ad, true))}
+                            {/* 그랜드 광고 슬롯 (2개) */}
+                            {grandAds.map((ad, idx) => renderAdCard(ad, true))}
+
+                            {/* 프리미엄 광고 슬롯 (2개 - 헤더 없이 통합) */}
+                            {premiumAds.map((ad, idx) => renderAdCard(ad, false))}
                         </div>
                     </div>
 
-                    {/* 2. PREMIUM SIDE SECTION (2개) */}
-                    <div className="flex flex-col gap-1.5">
-                        <div
-                            onClick={() => router.push('/customer-center?tab=ad')}
-                            className="group bg-gradient-to-br from-pink-400 via-rose-100 to-pink-600 p-0.5 rounded-[16px] shadow-sm cursor-pointer hover:scale-[1.02] transition-all"
-                        >
-                            <div className={`rounded-[14px] py-1 text-center ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-                                <Zap size={12} className="mx-auto mb-0.5 text-pink-500 animate-bounce" fill="currentColor" />
-                                <p className="text-[9px] font-black text-pink-600 uppercase tracking-tighter">
-                                    PREMIUM {sideChar}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1 px-1">
-                            {premiumAds.map((ad) => renderAdCard(ad, false))}
-                        </div>
-                    </div>
-
-                    {/* 광고문의 섹션 (사용자 요청 위치) */}
+                    {/* 광고문의 섹션 */}
                     <div
                         onClick={() => router.push('/customer-center?tab=ad')}
-                        className={`p-2 backdrop-blur-md border rounded-[18px] shadow-md text-center mx-1 border-b-2 border-b-pink-500/20 active:scale-95 transition-transform cursor-pointer mt-1 ${brand.theme === 'dark' ? 'bg-gray-800/95 border-gray-800' : 'bg-white/95 border-gray-100'}`}
+                        className={`p-2 backdrop-blur-md border rounded-[18px] shadow-md text-center mx-1 border-b-2 border-b-pink-500/20 active:scale-95 transition-transform cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800/95 border-gray-800' : 'bg-white/95 border-gray-100'}`}
                     >
                         <p className="text-[8px] text-gray-400 font-black uppercase tracking-[0.2em] mb-0.5">광고문의</p>
                         <p className={`text-[12px] font-black italic tracking-tighter ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>1544-5568</p>
@@ -202,3 +156,4 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         </>
     );
 };
+

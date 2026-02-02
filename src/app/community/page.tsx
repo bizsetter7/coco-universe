@@ -22,6 +22,8 @@ import {
 import { CATEGORIES, MOCK_POSTS } from '@/constants/community';
 import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
+import { Footer } from '@/components/layout/Footer';
 
 // --- Types ---
 type UserType = 'individual' | 'corporate' | 'admin';
@@ -49,7 +51,7 @@ function CommunityContent() {
     }, [searchParams]);
 
     const [userType, setUserType] = useState<UserType>('individual');
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulate login state
+    const { isLoggedIn, toggle } = useAuth(); // Shared Auth State
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
     const brand = useBrand();
@@ -103,7 +105,7 @@ function CommunityContent() {
 
             {/* 1단 상단바 (Sticky z-60) - 보더 제거로 개방감 확보 */}
             <div className={`sticky top-0 left-0 right-0 z-[60] shadow-sm h-14 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-                <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
+                <div className="max-w-[1200px] mx-auto px-4 h-full flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.push('/')} className={`p-2 -ml-2 transition-colors ${brand.theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>
                             <ArrowLeft size={24} />
@@ -129,12 +131,12 @@ function CommunityContent() {
 
             {/* 2단 카테고리 탭 (Sticky z-50, top-14) - 보더 제거로 일체감 조성 */}
             <div className={`sticky top-14 left-0 right-0 z-50 backdrop-blur-md min-h-[48px] py-1 ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
-                <div className="max-w-[1020px] mx-auto flex flex-wrap justify-start px-4 h-full gap-y-1">
+                <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center px-4 h-full gap-2 py-1">
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => handleTabChange(cat)}
-                            className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center ${activeTab === cat
+                            className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center whitespace-nowrap ${activeTab === cat
                                 ? 'border-pink-500 text-pink-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-900'
                                 }`}
@@ -148,12 +150,12 @@ function CommunityContent() {
             {/* Content Body: Sticky 헤더 사용으로 패딩 제거 (자연스러운 흐름) */}
             <div className="pt-0 pb-20">
                 {/* Admin/Mock Controls */}
-                <div className="max-w-[1020px] mx-auto mb-4 px-4">
+                <div className="max-w-[1200px] mx-auto mb-4 px-4">
                     <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between text-[11px] text-indigo-700">
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-indigo-900">🔑 상태 테스트:</span>
                             <button
-                                onClick={() => setIsLoggedIn(!isLoggedIn)}
+                                onClick={toggle}
                                 className={`px-2 py-1 rounded font-black transition ${isLoggedIn ? 'bg-indigo-600 text-white' : 'bg-white border border-indigo-200 text-indigo-600 shadow-sm'}`}
                             >
                                 {isLoggedIn ? '로그인 됨' : '로그인 안 됨'}
@@ -169,7 +171,7 @@ function CommunityContent() {
                     </div>
                 </div>
 
-                <main className="max-w-[1020px] mx-auto px-0 sm:px-4 space-y-4">
+                <main className="max-w-[1200px] mx-auto px-0 sm:px-4 space-y-4">
                     {/* 커뮤니티 상단 브랜드 광고 (Brand Slider 대용) */}
                     <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 sm:rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden group mb-6 cursor-pointer">
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
@@ -313,9 +315,9 @@ function CommunityContent() {
                 </main>
             </div>
 
-            {/* Login Required Modal (z-100) */}
+            {/* Login Required Modal (z-200) */}
             {loginModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                     <div className={`rounded-[45px] w-full max-w-sm p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                         <div className="flex flex-col items-center text-center">
@@ -348,9 +350,9 @@ function CommunityContent() {
                 </div>
             )}
 
-            {/* Corporate Access Denied Modal (z-100) */}
+            {/* Corporate Access Denied Modal (z-200) */}
             {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setIsCorporateModalOpen(false)}></div>
                     <div className={`rounded-[40px] w-full max-w-xs p-10 relative z-10 shadow-2xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                         <div className="flex flex-col items-center text-center">
@@ -382,6 +384,8 @@ function CommunityContent() {
                     <PenLine size={28} />
                 </button>
             )}
+            {/* Footer added as per request */}
+            <Footer />
         </div>
     );
 }

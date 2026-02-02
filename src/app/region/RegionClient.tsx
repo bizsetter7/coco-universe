@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,12 +21,11 @@ import { Footer } from '@/components/layout/Footer';
 import { REGIONS_MAP, REGION_LIST } from '@/constants/regions';
 import { JOB_CATEGORY_MAP, JOB_CATEGORIES } from '@/constants/jobs';
 
-interface JobClientProps {
+interface RegionClientProps {
     shops: Shop[];
-    jobTypes: string[];
 }
 
-export default function JobClient({ shops, jobTypes }: JobClientProps) {
+export default function RegionClient({ shops }: RegionClientProps) {
     const brand = useBrand();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -147,30 +146,6 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
     const urgentShops = filteredShops.filter(s => s.tier === 'urgent' || s.tier === 'recommended'); // Group urgent/rec
     const generalShops = filteredShops; // All shops for the list view
 
-    // Interleave Deluxe and Special (2 by 2)
-    const mixedDeluxeSpecial = useMemo(() => {
-        const result: Shop[] = [];
-        const maxLen = Math.max(deluxeShops.length, specialShops.length);
-        let dIdx = 0;
-        let sIdx = 0;
-
-        while (dIdx < deluxeShops.length || sIdx < specialShops.length) {
-            // Take up to 2 Deluxe
-            for (let i = 0; i < 2; i++) {
-                if (dIdx < deluxeShops.length) {
-                    result.push(deluxeShops[dIdx++]);
-                }
-            }
-            // Take up to 2 Special
-            for (let i = 0; i < 2; i++) {
-                if (sIdx < specialShops.length) {
-                    result.push(specialShops[sIdx++]);
-                }
-            }
-        }
-        return result;
-    }, [deluxeShops, specialShops]);
-
     const primaryStyle = { color: brand.primaryColor };
 
     return (
@@ -199,7 +174,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
             </header>
 
             {/* 2. Hero Section (Slider Banner) */}
-            <div className="max-w-[1200px] mx-auto px-4 mt-6">
+            <div className="max-w-[1280px] mx-auto px-4 mt-6">
                 <div className="relative h-32 md:h-40 bg-gray-900 rounded-[24px] overflow-hidden group">
                     {/* Banner Content (5 items mock) */}
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-pink-900 flex items-center justify-center text-white">
@@ -254,7 +229,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         <div className="flex flex-col gap-6">
                             <h1 className="text-3xl font-black flex items-center gap-2">
                                 <span className="w-1.5 h-8 bg-pink-500 rounded-full"></span>
-                                업종별 채용
+                                지역별 채용
                             </h1>
 
                             {/* Center Tabs (Full Width like Notice Box) */}
@@ -267,7 +242,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                                                 if (tab === '업종별 채용') router.push('/jobs');
                                                 else if (tab === '지역별 채용') router.push('/region');
                                             }}
-                                            className={`flex-1 py-2.5 text-sm font-black rounded-xl transition-all ${tab === '업종별 채용' ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
+                                            className={`flex-1 py-2.5 text-sm font-black rounded-xl transition-all ${tab === '지역별 채용' ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
                                         >
                                             {tab}
                                         </button>
@@ -288,55 +263,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         {/* Search Filter Box with Dropdowns */}
                         <div className="space-y-3">
                             <div className={`p-6 rounded-[32px] border shadow-xl ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 relative z-20`}>
-                                {/* Item 1: Job Type */}
-                                <div className="relative">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'job' ? null : 'job'); }}
-                                        className={`w-full h-12 bg-gray-50 dark:bg-gray-900 border ${openDropdown === 'job' ? 'border-pink-500' : 'border-gray-100 dark:border-gray-700'} rounded-2xl text-sm font-black flex items-center justify-between px-4 hover:border-pink-300 transition-all group`}
-                                    >
-                                        <span className="truncate">{selectedJobType === '전체' ? '직종선택' : selectedJobType}</span>
-                                        <ChevronLeft size={16} className={`text-gray-400 transition-transform ${openDropdown === 'job' ? 'rotate-90' : '-rotate-90'}`} />
-                                    </button>
-                                    {openDropdown === 'job' && (
-                                        <div onClick={(e) => e.stopPropagation()} className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                                            {['전체', ...JOB_CATEGORIES].map(job => (
-                                                <button
-                                                    key={job}
-                                                    onClick={() => { setSelectedJobType(job); setSelectedSubJobType('전체'); setOpenDropdown(null); }}
-                                                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 rounded-xl transition-colors"
-                                                >
-                                                    {job}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
 
-                                {/* Item 2: Sub Job Type (lighter text) */}
-                                <div className="relative">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'subJob' ? null : 'subJob'); }}
-                                        className={`w-full h-12 bg-gray-50 dark:bg-gray-900 border ${openDropdown === 'subJob' ? 'border-pink-500' : 'border-gray-100 dark:border-gray-700'} rounded-2xl text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center justify-between px-4 hover:border-pink-300 transition-all group`}
-                                    >
-                                        <span className="truncate">{selectedSubJobType === '전체' ? '상세직종' : selectedSubJobType}</span>
-                                        <ChevronLeft size={16} className={`text-gray-400 transition-transform ${openDropdown === 'subJob' ? 'rotate-90' : '-rotate-90'}`} />
-                                    </button>
-                                    {openDropdown === 'subJob' && (
-                                        <div onClick={(e) => e.stopPropagation()} className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                                            {['전체', ...(selectedJobType !== '전체' ? JOB_CATEGORY_MAP[selectedJobType] : [])].map(item => (
-                                                <button
-                                                    key={item}
-                                                    onClick={() => { setSelectedSubJobType(item); setOpenDropdown(null); }}
-                                                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 rounded-xl transition-colors"
-                                                >
-                                                    {item}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Item 3: Region */}
+                                {/* Item 1: Region (First) */}
                                 <div className="relative">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'region' ? null : 'region'); }}
@@ -360,7 +288,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                                     )}
                                 </div>
 
-                                {/* Item 4: Sub Region (lighter text) */}
+                                {/* Item 2: Sub Region (Second) */}
                                 <div className="relative">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'subRegion' ? null : 'subRegion'); }}
@@ -378,6 +306,54 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                                                     className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 rounded-xl transition-colors"
                                                 >
                                                     {sub}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Item 3: Job Type (Third) */}
+                                <div className="relative">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'job' ? null : 'job'); }}
+                                        className={`w-full h-12 bg-gray-50 dark:bg-gray-900 border ${openDropdown === 'job' ? 'border-pink-500' : 'border-gray-100 dark:border-gray-700'} rounded-2xl text-sm font-black flex items-center justify-between px-4 hover:border-pink-300 transition-all group`}
+                                    >
+                                        <span className="truncate">{selectedJobType === '전체' ? '직종선택' : selectedJobType}</span>
+                                        <ChevronLeft size={16} className={`text-gray-400 transition-transform ${openDropdown === 'job' ? 'rotate-90' : '-rotate-90'}`} />
+                                    </button>
+                                    {openDropdown === 'job' && (
+                                        <div onClick={(e) => e.stopPropagation()} className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                                            {['전체', ...JOB_CATEGORIES].map(job => (
+                                                <button
+                                                    key={job}
+                                                    onClick={() => { setSelectedJobType(job); setSelectedSubJobType('전체'); setOpenDropdown(null); }}
+                                                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 rounded-xl transition-colors"
+                                                >
+                                                    {job}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Item 4: Sub Job Type (Fourth) */}
+                                <div className="relative">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'subJob' ? null : 'subJob'); }}
+                                        className={`w-full h-12 bg-gray-50 dark:bg-gray-900 border ${openDropdown === 'subJob' ? 'border-pink-500' : 'border-gray-100 dark:border-gray-700'} rounded-2xl text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center justify-between px-4 hover:border-pink-300 transition-all group`}
+                                    >
+                                        <span className="truncate">{selectedSubJobType === '전체' ? '상세직종' : selectedSubJobType}</span>
+                                        <ChevronLeft size={16} className={`text-gray-400 transition-transform ${openDropdown === 'subJob' ? 'rotate-90' : '-rotate-90'}`} />
+                                    </button>
+                                    {openDropdown === 'subJob' && (
+                                        <div onClick={(e) => e.stopPropagation()} className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                                            {['전체', ...(selectedJobType !== '전체' ? JOB_CATEGORY_MAP[selectedJobType] : [])].map(item => (
+                                                <button
+                                                    key={item}
+                                                    onClick={() => { setSelectedSubJobType(item); setOpenDropdown(null); }}
+                                                    className="w-full text-left px-4 py-2 text-sm font-bold hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 rounded-xl transition-colors"
+                                                >
+                                                    {item}
                                                 </button>
                                             ))}
                                         </div>
@@ -460,8 +436,6 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('special')}
                     />
-
-                    {/* 3.5 Urgent / Recommended (8 items) */}
 
                     {/* 3.5 Urgent / Recommended (8 items) */}
                     <JobAdSection

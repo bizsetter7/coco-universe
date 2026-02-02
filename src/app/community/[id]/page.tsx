@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     ArrowLeft,
@@ -14,9 +14,10 @@ import {
 } from 'lucide-react';
 import { MOCK_POSTS, MOCK_COMMENTS } from '@/constants/community';
 
-export default function CommunityDetailPage({ params }: { params: { id: string } }) {
+export default function CommunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
-    const postId = parseInt(params.id);
+    const { id } = use(params);
+    const postId = parseInt(id);
     const post = MOCK_POSTS.find(p => p.id === postId);
     const comments = MOCK_COMMENTS.filter(c => c.postId === postId);
 
@@ -32,10 +33,10 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
     return (
         <div className="min-h-screen bg-white pb-20 font-sans">
             {/* Header */}
-            <header className="fixed top-0 w-full bg-white border-b z-40 bg-white/80 backdrop-blur-md">
-                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between pt-2">
+            <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-800">
+                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors">
                             <ArrowLeft size={24} />
                         </button>
                         <span className="font-black text-lg text-gray-900 truncate max-w-[150px]">{post.category}</span>
@@ -51,7 +52,7 @@ export default function CommunityDetailPage({ params }: { params: { id: string }
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto pt-20 px-4">
+            <main className="max-w-4xl mx-auto pt-6 px-4">
                 {/* Post Content */}
                 <article className="py-6 border-b border-gray-100">
                     <div className="flex items-center justify-between mb-6">

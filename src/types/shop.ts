@@ -1,11 +1,14 @@
 export interface Shop {
     name: string;
+    nickname?: string;
     realName?: string;
+    title?: string;
     region: string;
     phone: string;
     kakao: string;
     telegram: string;
     pay: string;
+    payType?: string;
     workType: string;
     url: string;
     site: string;
@@ -21,5 +24,9 @@ export interface Shop {
         bold?: boolean;
         color?: string;
         icons?: string[];
+        mediaUrl?: string;
+        paySuffixes?: string[];
+        border?: 'none' | 'color' | 'glow';
+        effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
     }
 }

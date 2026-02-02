@@ -15,7 +15,7 @@ interface LeftSidebarProps {
     setSelectedKeywords: (keywords: string[]) => void;
     onLoginClick: () => void;
     onSignupClick: () => void;
-    onPaymentClick: () => void;
+    onPaymentClick: (tier: string) => void;
     isLoggedIn?: boolean;
     userName?: string;
     userType?: 'corporate' | 'individual';
@@ -39,14 +39,14 @@ const KEYWORD_OPTIONS = [
 ];
 
 const CATEGORY_LINKS = [
-    { icon: Crown, label: '그랜드', color: 'text-amber-500' },
-    { icon: Star, label: '프리미엄', color: 'text-purple-500' },
-    { icon: Zap, label: '디럭스', color: 'text-blue-500' },
-    { icon: Sparkles, label: '스페셜', color: 'text-pink-500' },
-    { icon: Flame, label: '급구', color: 'text-red-500' },
-    { icon: Gift, label: '추천', color: 'text-emerald-500' },
-    { icon: List, label: '리스트네이티브', color: 'text-cyan-500' },
-    { icon: FileText, label: '베이직(줄광고)', color: 'text-gray-500' },
+    { icon: Crown, label: '그랜드', color: 'text-amber-500', tier: 'grand' },
+    { icon: Star, label: '프리미엄', color: 'text-purple-500', tier: 'premium' },
+    { icon: Zap, label: '디럭스', color: 'text-blue-500', tier: 'deluxe' },
+    { icon: Sparkles, label: '스페셜', color: 'text-pink-500', tier: 'special' },
+    { icon: Flame, label: '급구', color: 'text-red-500', tier: 'urgent' },
+    { icon: Gift, label: '추천', color: 'text-emerald-500', tier: 'urgent' },
+    { icon: List, label: '리스트네이티브', color: 'text-cyan-500', tier: 'native' },
+    { icon: FileText, label: '베이직(줄광고)', color: 'text-gray-500', tier: 'basic' },
 ];
 
 export default function LeftSidebar({
@@ -226,7 +226,7 @@ export default function LeftSidebar({
                             <span className={`text-[11px] font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-black'}`}>{cat.label}</span>
                         </div>
                         <button
-                            onClick={onPaymentClick}
+                            onClick={() => onPaymentClick(cat.tier)}
                             className="px-2 py-1 bg-gray-100 hover:bg-pink-100 text-gray-500 hover:text-pink-600 rounded text-[9px] font-bold transition"
                         >
                             광고신청

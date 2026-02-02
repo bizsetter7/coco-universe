@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useBrand } from '@/components/BrandProvider';
+import { Footer } from '@/components/layout/Footer';
 import {
     Headphones,
     ChevronDown,
@@ -30,11 +33,13 @@ import {
     Menu,
     ShoppingCart,
     Check,
-    MapPin
+    MapPin,
+    Smartphone,
+    Tablet,
+    Monitor
 } from 'lucide-react';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useBrand } from '@/components/BrandProvider';
+import { PaymentPopup } from '@/components/home/PaymentPopup';
 
 // --- Mock Data ---
 const NOTICES = [
@@ -102,6 +107,73 @@ export default function CustomerCenterPage() {
     );
 }
 
+// Simplified Ad Type Description Component
+const ExposureItem = ({ rank, desc, onArrowClick }: { rank: string, desc: string, onArrowClick?: () => void }) => {
+    const brand = useBrand();
+
+    // 등급별 테마 설정
+    const getTheme = (rank: string) => {
+        const isDark = brand.theme === 'dark';
+        switch (rank) {
+            case 'GRAND': return {
+                badge: 'bg-amber-500 text-white shadow-amber-200',
+                box: isDark ? 'bg-amber-900/10 border-amber-900/30' : 'bg-amber-50 border-amber-100',
+                text: isDark ? 'text-amber-200' : 'text-amber-900'
+            };
+            case 'PREMIUM': return {
+                badge: 'bg-purple-600 text-white shadow-purple-200',
+                box: isDark ? 'bg-purple-900/10 border-purple-900/30' : 'bg-purple-50 border-purple-100',
+                text: isDark ? 'text-purple-200' : 'text-purple-900'
+            };
+            case 'DELUXE': return {
+                badge: 'bg-blue-600 text-white shadow-blue-200',
+                box: isDark ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50 border-blue-100',
+                text: isDark ? 'text-blue-200' : 'text-blue-900'
+            };
+            case 'SPECIAL': return {
+                badge: 'bg-pink-600 text-white shadow-pink-200',
+                box: isDark ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50 border-pink-100',
+                text: isDark ? 'text-pink-200' : 'text-pink-900'
+            };
+            case 'NATIVE': return {
+                badge: 'bg-emerald-600 text-white shadow-emerald-200',
+                box: isDark ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100',
+                text: isDark ? 'text-emerald-200' : 'text-emerald-900'
+            };
+            default: return {
+                badge: 'bg-gray-600 text-white shadow-gray-200',
+                box: isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100',
+                text: isDark ? 'text-gray-300' : 'text-gray-900'
+            };
+        }
+    };
+
+    const theme = getTheme(rank);
+
+    return (
+        <div
+            onClick={() => onArrowClick && onArrowClick()}
+            className={`px-3 py-2 md:px-5 md:py-2.5 border-b lg:border-b last:border-b-0 ${theme.box} transition-all duration-300 hover:brightness-95 group min-h-[65px] flex items-center justify-center lg:justify-start lg:min-h-[55px] cursor-pointer`}
+        >
+            <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 w-full text-center lg:text-left">
+                <div className="shrink-0 w-full lg:w-[80px] flex justify-center">
+                    <span className={`inline-block px-2 py-0.5 lg:px-2.5 lg:py-1 ${theme.badge} text-[8px] lg:text-[9px] font-black rounded-lg uppercase tracking-widest shadow-sm group-hover:scale-105 lg:group-hover:scale-110 transition-transform w-auto lg:w-full text-center`}>
+                        {rank}
+                    </span>
+                </div>
+                <div className="flex-1">
+                    <p className={`text-[10px] md:text-[11px] lg:text-[11px] font-bold lg:font-medium leading-tight break-keep ${theme.text}`}>
+                        {desc}
+                    </p>
+                </div>
+                <div className="hidden lg:block">
+                    <ArrowRight size={16} className={`transition-transform group-hover:translate-x-1 ${theme.text} opacity-50 group-hover:opacity-100`} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 function CustomerCenterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -115,17 +187,37 @@ function CustomerCenterContent() {
 
     useEffect(() => {
         setIsMounted(true);
-        const params = new URLSearchParams(window.location.search);
-        const tab = params.get('tab');
-        if (tab === 'notice') setActiveTab('공지사항');
-        else if (tab === 'ad') setActiveTab('광고안내');
-        else if (tab === 'guide') setActiveTab('이용방법');
-        else if (tab === 'faq') setActiveTab('자주묻는질문');
-        else if (tab === 'inquiry') setActiveTab('1:1문의');
     }, []);
+
+    // 쿼리 스트링 변경 감지하여 탭 전환 및 스크롤 제어
+    useEffect(() => {
+        if (!isMounted) return;
+
+        const tab = searchParams.get('tab');
+        if (tab) {
+            let targetTab = '공지사항';
+            if (tab === 'notice') targetTab = '공지사항';
+            else if (tab === 'ad') targetTab = '광고안내';
+            else if (tab === 'guide') targetTab = '이용방법';
+            else if (tab === 'faq') targetTab = '자주묻는질문';
+            else if (tab === 'inquiry') targetTab = '1:1문의';
+            else if (tab === 'policy') targetTab = '약관및정책';
+
+            if (activeTab !== targetTab) {
+                setActiveTab(targetTab);
+            }
+            // 탭 변경 시 혹은 URL 이동 시 항상 최상단으로 이동 (떨림 방지)
+            window.scrollTo(0, 0);
+        }
+    }, [searchParams, isMounted]);
 
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
+
+    // 사장님 전용 상품 안내 팝업 상태 (PaymentPopup 연동)
+    const [isPaymentPopupOpen, setIsPaymentPopupOpen] = useState(false);
+    const [paymentInitialTier, setPaymentInitialTier] = useState('grand');
 
     // Inquiry states
     const [inquiryContact, setInquiryContact] = useState('');
@@ -135,25 +227,20 @@ function CustomerCenterContent() {
     const isDirty = activeTab === '1:1문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
     usePreventLeave(isDirty);
 
-    // 탭 변경 시 URL 강제 동기화
+    // 탭 변경 시 URL만 변경 (상태는 useEffect가 searchParams를 감지하여 변경함)
     const handleTabChange = (tabName: string) => {
-        setActiveTab(tabName);
-        setIsMobileMenuOpen(false); // Close mobile menu on selection
-        const params = new URLSearchParams(window.location.search);
+        setIsMobileMenuOpen(false);
+        const params = new URLSearchParams(searchParams.toString());
         let tabParam = 'notice';
         if (tabName === '공지사항') tabParam = 'notice';
         else if (tabName === '광고안내') tabParam = 'ad';
         else if (tabName === '이용방법') tabParam = 'guide';
         else if (tabName === '자주묻는질문') tabParam = 'faq';
         else if (tabName === '1:1문의') tabParam = 'inquiry';
+        else if (tabName === '약관및정책') tabParam = 'policy';
 
         params.set('tab', tabParam);
-        window.history.pushState({}, '', `${pathname}?${params.toString()}`);
-
-        requestAnimationFrame(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            window.dispatchEvent(new CustomEvent('sidebar-warp'));
-        });
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     const primaryBgStyle = { backgroundColor: brand.primaryColor };
@@ -164,6 +251,7 @@ function CustomerCenterContent() {
         { id: '이용방법', icon: <Info size={16} /> },
         { id: '자주묻는질문', icon: <HelpCircle size={16} /> },
         { id: '1:1문의', icon: <MessageSquare size={16} /> },
+        { id: '약관및정책', icon: <FileText size={16} /> },
     ];
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -181,15 +269,15 @@ function CustomerCenterContent() {
     };
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} pb-20`}>
-            {/* [Fixed Mastery] Header */}
-            <header className={`fixed top-0 left-0 right-0 z-[60] border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'} h-14`}>
-                <div className="max-w-[1020px] mx-auto px-4 h-full flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+        <>
+            {/* [Fixed Mastery] Integrated Sticky Header */}
+            <div className="sticky top-0 z-[60] -mt-1">
+                <div className={`w-full max-w-[1280px] mx-auto h-14 flex items-center justify-between px-4 border-b border-x backdrop-blur-md shadow-sm pointer-events-auto ${brand.theme === 'dark' ? 'bg-gray-800/95 border-gray-700' : 'bg-white/95 border-gray-100'}`}>
+                    <div className="flex items-center gap-4">
                         <button onClick={() => {
                             if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
                             router.back();
-                        }} className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors">
+                        }} className="py-2 pr-2 text-gray-800 hover:text-black transition-colors">
                             <ArrowLeft size={24} />
                         </button>
                         <h1
@@ -206,16 +294,16 @@ function CustomerCenterContent() {
                     <button onClick={() => {
                         if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
                         router.push('/');
-                    }} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
+                    }} className="py-2 pl-2 text-gray-400 hover:text-gray-900 transition-colors">
                         <Home size={24} />
                     </button>
                 </div>
-            </header>
+            </div>
 
-            <main className="max-w-[1020px] mx-auto px-4 pt-[80px] md:pt-[100px]">
+            <div className="px-4 pt-6">
                 <div className="flex flex-col md:flex-row gap-8 md:items-start">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
-                    <aside className="w-full md:w-64 shrink-0 h-fit sticky top-[60px] md:top-[100px] self-start z-50">
+                    <aside className="w-full md:w-64 shrink-0 h-fit sticky top-[76px] self-start z-50">
                         <div className={`rounded-2xl md:rounded-3xl shadow-sm md:border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
                             {/* PC Title / Mobile Toggle Header */}
                             <div className={`p-4 md:p-5 border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
@@ -249,7 +337,7 @@ function CustomerCenterContent() {
                         </div>
 
                         {/* Customer Service Box (Desktop Only - Mobile version could be added if requested, but for now kept desktop only as per existing logic, but made sure it's inside the sticky aside) */}
-                        <div className={`hidden md:block mt-6 p-7 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'} shadow-xl`}>
+                        <div className={`hidden md:block mt-1 p-5 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'} shadow-xl`}>
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
                                     <PhoneCall size={20} />
@@ -273,7 +361,7 @@ function CustomerCenterContent() {
                         {/* 1. Notice Board */}
                         {activeTab === '공지사항' && (
                             <div className="space-y-5">
-                                <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center justify-between mb-4 pl-6 pr-6">
                                     <h2 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>공지사항</h2>
                                     <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {NOTICES.length}건</span>
                                 </div>
@@ -343,8 +431,11 @@ function CustomerCenterContent() {
                                                     ))}
                                                 </div>
 
-                                                <button className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}>
-                                                    상담 후 신청하기
+                                                <button
+                                                    onClick={() => { setIsPaymentPopupOpen(true); setPaymentInitialTier(tier.id); }}
+                                                    className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}
+                                                >
+                                                    신청하기
                                                 </button>
                                             </div>
                                         ))}
@@ -352,7 +443,7 @@ function CustomerCenterContent() {
                                 </div>
 
                                 {/* Detailed Pricing Table Section */}
-                                <div className={`rounded-[32px] md:rounded-[40px] border p-6 md:p-10 shadow-sm space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                <div className={`rounded-[32px] md:rounded-[40px] border p-5 md:p-8 shadow-sm space-y-6 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-800' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
                                         <div className="flex flex-col gap-1">
@@ -378,8 +469,8 @@ function CustomerCenterContent() {
                                             <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-700' : 'divide-gray-50'}`}>
                                                 {DETAILED_PRICING.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-pink-50/20 transition-colors group">
-                                                        <td className="py-5 text-[12px] font-black text-gray-400 group-hover:text-pink-500 transition-colors">{item.type}</td>
-                                                        <td className="py-5 pl-4">
+                                                        <td className="py-3 text-[12px] font-black text-gray-400 group-hover:text-pink-500 transition-colors">{item.type}</td>
+                                                        <td className="py-3 pl-4">
                                                             <div className="flex flex-col">
                                                                 <span className={`text-[15px] font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</span>
                                                                 <span className={`text-[11px] text-gray-400 font-bold self-start mt-0.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -387,9 +478,9 @@ function CustomerCenterContent() {
                                                                 </span>
                                                             </div>
                                                         </td>
-                                                        <td className="py-5 text-right text-[15px] font-black text-pink-600 pr-8 pl-8 tabular-nums whitespace-nowrap">{item.d30.toLocaleString()}원</td>
-                                                        <td className={`py-5 text-right text-[15px] font-black pr-4 tabular-nums whitespace-nowrap ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d60.toLocaleString()}원</td>
-                                                        <td className={`py-5 text-right text-[15px] font-black pr-4 tabular-nums whitespace-nowrap ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d90.toLocaleString()}원</td>
+                                                        <td className="py-3 text-right text-[15px] font-black text-pink-600 pr-8 pl-8 tabular-nums whitespace-nowrap">{item.d30.toLocaleString()}원</td>
+                                                        <td className={`py-3 text-right text-[15px] font-black pr-4 tabular-nums whitespace-nowrap ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d60.toLocaleString()}원</td>
+                                                        <td className={`py-3 text-right text-[15px] font-black pr-4 tabular-nums whitespace-nowrap ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.d90.toLocaleString()}원</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -399,24 +490,24 @@ function CustomerCenterContent() {
                                     {/* Mobile View Cards (Remove Scroll) - 2 Columns Grid (Optimized Spacing) */}
                                     <div className="md:hidden grid grid-cols-2 gap-2">
                                         {DETAILED_PRICING.map((item, idx) => (
-                                            <div key={idx} className={`p-3 rounded-[24px] border flex flex-col justify-between shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
-                                                <div className="space-y-3">
+                                            <div key={idx} className={`p-2.5 rounded-[24px] border flex flex-col justify-between shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                                <div className="space-y-2">
                                                     <div className="flex flex-col">
-                                                        <div className="flex items-center justify-between mb-1">
+                                                        <div className="flex items-center justify-between mb-0.5">
                                                             <span className="text-[9px] font-black text-pink-600 uppercase">{item.type}</span>
                                                             <div className="w-1.5 h-1.5 rounded-full bg-pink-200"></div>
                                                         </div>
                                                         <h4 className={`text-[13px] font-black leading-tight break-keep ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</h4>
                                                     </div>
 
-                                                    <div className={`p-2 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                                                    <div className={`p-1.5 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                                                         <p className={`text-[10px] font-bold leading-[1.4] break-keep ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             {item.benefit}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className={`mt-4 pt-3 border-t space-y-1.5 font-mono ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                <div className={`mt-3 pt-2.5 border-t space-y-1 font-mono ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                                                     <div className={`flex justify-between items-center px-2 py-1.5 rounded-lg ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                                                         <span className="text-[8px] font-black text-pink-400 uppercase">30일</span>
                                                         <span className="text-[11px] font-black text-pink-600 tabular-nums">{item.d30.toLocaleString()}원</span>
@@ -434,62 +525,119 @@ function CustomerCenterContent() {
                                         ))}
                                     </div>
 
-                                    <div className={`p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
+                                    <div className={`p-3 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
                                         <p className="text-[11px] md:text-[13px] text-gray-400 font-black">※ 모든 가격 부가세 별도 (VAT 별도)</p>
                                         <p className="text-[11px] md:text-[13px] text-gray-500 font-black">연간 패키지 결제 시 <span className="text-pink-600 font-black">25% 할인 혜택</span></p>
                                     </div>
 
-                                    {/* [VIRTUAL PREVIEW] 실시간 광고 노출 예시 */}
-                                    <div className={`mt-12 pt-12 border-t ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
-                                        <div className="flex items-center gap-3 mb-8">
-                                            <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                            <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                                실시간 노출 폼 레퍼런스 <span className="text-gray-400 text-sm font-bold align-middle ml-2">(개발중)</span>
-                                            </h3>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {/* 메인/지역 최상단 (Grand) */}
-                                            <div className="group space-y-3">
-                                                <p className="text-[11px] font-black text-amber-600 uppercase tracking-widest ml-1">Grand / Region Top</p>
-                                                <div className="bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 rounded-3xl shadow-lg group-hover:scale-[1.02] transition-transform">
-                                                    <div className={`p-5 rounded-[22px] text-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl mx-auto mb-3 shadow-inner ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-amber-50'}`}>🏆</div>
-                                                        <h4 className={`font-black text-sm mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>우리 업소 무조건 1위</h4>
-                                                        <p className="text-[10px] text-gray-400 font-bold">골드 보더 + 상단 고정 효과</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {/* 커뮤니티/리스트 중간 (Native) */}
-                                            <div className="group space-y-3">
-                                                <p className="text-[11px] font-black text-rose-600 uppercase tracking-widest ml-1">Community / List Native</p>
-                                                <div className={`border-2 border-dashed p-5 rounded-3xl group-hover:scale-[1.02] transition-transform ${brand.theme === 'dark' ? 'from-gray-800 to-gray-900 border-gray-700 bg-gradient-to-br' : 'from-rose-50 to-pink-50 border-rose-200 bg-gradient-to-br'}`}>
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shrink-0">✨</div>
-                                                        <div className="text-left">
-                                                            <h4 className={`font-black text-[13px] leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사장님, 광고 한 칸<br />어떠세요?</h4>
-                                                            <p className="text-[9px] text-rose-500 font-bold mt-1 uppercase">Recommended Ad</p>
+                                </div>
+
+                                {/* Ad Placement Guide Section - Precise Accordion Implementation */}
+                                <section className="space-y-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>노출 상세 및 영역 안내</h3>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6 items-start">
+                                        {/* Left Side: Accordion Guide */}
+                                        <div className="space-y-4">
+                                            {[
+                                                { id: 'pc_1', title: 'PC 가이드 (1) - 메인/사이드/전체', img: '/images/guide/pc_1.png' },
+                                                { id: 'pc_2', title: 'PC 가이드 (2) - 업종별/지역별', img: '/images/guide/pc_2.png' },
+                                                { id: 'pc_3', title: 'PC 가이드 (3) - 디럭스/스페셜', img: '/images/guide/pc_3.png' },
+                                                { id: 'pc_4', title: 'PC 가이드 (4) - 베이직/네이티브', img: '/images/guide/pc_4.png' },
+                                                { id: 'mobile', title: '모바일 가이드 - 통합 레이아웃', img: '/images/guide/모바일.png', isMobile: true }
+                                            ].map((item) => (
+                                                <div key={item.id} className={`overflow-hidden rounded-2xl border ${brand.theme === 'dark' ? 'bg-gray-800/30 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                                                    <button
+                                                        onClick={() => setActiveAccordion(activeAccordion === item.id ? null : item.id)}
+                                                        className={`w-full p-4 md:p-5 flex items-center justify-between transition-colors ${activeAccordion === item.id ? (brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50') : ''}`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${brand.theme === 'dark' ? 'bg-gray-800 text-pink-500' : 'bg-pink-50 text-pink-600'}`}>
+                                                                {item.isMobile ? <Smartphone size={16} /> : <Monitor size={16} />}
+                                                            </div>
+                                                            <h4 className={`text-[13px] md:text-[14px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h4>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {/* 라운지/스타 (Premium) */}
-                                            <div className="group space-y-3">
-                                                <p className="text-[11px] font-black text-indigo-600 uppercase tracking-widest ml-1">Lounge / Star Membership</p>
-                                                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-5 rounded-[32px] text-white shadow-lg group-hover:scale-[1.02] transition-transform">
-                                                    <div className="flex justify-between items-center">
-                                                        <div>
-                                                            <h4 className="font-black text-[13px] leading-tight">그녀들의 워너비,<br />스타 회원이 되세요!</h4>
+                                                        {activeAccordion === item.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+                                                    </button>
+
+                                                    {activeAccordion === item.id && (
+                                                        <div className="p-4 animate-in slide-in-from-top-4 duration-300">
+                                                            <div
+                                                                className={`relative cursor-pointer overflow-hidden rounded-xl border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'} ${item.isMobile ? 'max-w-[180px] mx-auto aspect-[9/16]' : 'aspect-[16/10]'}`}
+                                                                onClick={() => setSelectedImage(item.img)}
+                                                            >
+                                                                <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                    <span className="text-white font-black flex items-center gap-1.5 bg-pink-600 px-3 py-1.5 rounded-full text-[10px] shadow-xl">
+                                                                        <Search size={12} /> 확대
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="mt-3 flex items-center justify-center gap-1.5 text-gray-400 text-[10px] font-bold">
+                                                                <Info size={12} /> 클릭 시 확대
+                                                            </div>
                                                         </div>
-                                                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">⭐</div>
-                                                    </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Right Side: Product Exposure Item List */}
+                                        <div className="lg:sticky lg:top-24 space-y-4">
+                                            <div className={`rounded-3xl border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800/30 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+                                                <div className={`p-4 border-b ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                                    <h4 className={`text-[13px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상품별 상세 노출 요약</h4>
+                                                </div>
+                                                <div className="grid grid-cols-2 lg:grid-cols-1 gap-px bg-gray-100 dark:bg-gray-800">
+                                                    <ExposureItem
+                                                        rank="GRAND"
+                                                        desc="메인 최상단 특수배너 및 사이드 고정 전 영역 노출"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_1.png')}
+                                                    />
+                                                    <ExposureItem
+                                                        rank="PREMIUM"
+                                                        desc="업종/지역별 상단 전략적 노출 및 보라색 효과"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_1.png')}
+                                                    />
+                                                    <ExposureItem
+                                                        rank="DELUXE"
+                                                        desc="메인 중앙 및 리스트 상단 블루 색상 강조"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_3.png')}
+                                                    />
+                                                    <ExposureItem
+                                                        rank="SPECIAL"
+                                                        desc="리스트 상단 핑크 테두리 강조 가독성 확보"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_3.png')}
+                                                    />
+                                                    <ExposureItem
+                                                        rank="BASIC"
+                                                        desc="일반 리스트 기본 노출 및 업소 정보 안내"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_4.png')}
+                                                    />
+                                                    <ExposureItem
+                                                        rank="NATIVE"
+                                                        desc="리스트 중간 삽입형 네이티브 광고 스타일"
+                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_4.png')}
+                                                    />
                                                 </div>
                                             </div>
+                                            <p className="text-[11px] text-gray-400 font-bold px-2">
+                                                ※ 상세 디자인은 가이드라인에 따라 제공됩니다.
+                                            </p>
                                         </div>
-                                        <p className="mt-8 text-center text-[12px] text-gray-400 font-bold">
-                                            ※ 상세한 노출 방식과 디자인은 상품별 가이드라인에 따라 제공됩니다.
+                                    </div>
+
+                                    <div className={`p-6 rounded-3xl border ${brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50/50 border-pink-100'}`}>
+                                        <p className={`text-[13px] leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            <strong className="text-pink-600">※ 통합 노출 정책:</strong> 모든 광고 상품은 PC와 모바일 버전에 최적화된 형태로 동시 노출됩니다. 사이드 배너의 경우 PC에서는 스크롤 고정형으로, 모바일에서는 메인 상단 롤링 배너 형태로 전략적 변환 노출됩니다.
                                         </p>
                                     </div>
-                                </div>
+                                </section>
+
+
 
                                 {/* Design Guide Section */}
                                 <section className="space-y-6">
@@ -541,14 +689,20 @@ function CustomerCenterContent() {
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="p-6 bg-pink-600 rounded-3xl text-white shadow-lg shadow-pink-200 flex items-center justify-between group cursor-pointer hover:bg-pink-700 transition">
+                                            <div
+                                                onClick={() => handleTabChange('inquiry')}
+                                                className="p-6 bg-pink-600 rounded-3xl text-white shadow-lg shadow-pink-200 flex items-center justify-between group cursor-pointer hover:bg-pink-700 transition"
+                                            >
                                                 <div>
                                                     <p className="text-[11px] font-bold opacity-80">디자인이 필요하신가요?</p>
                                                     <p className="text-[17px] font-black">기본 페이지 디자인 <span className="text-[13px] opacity-90 pl-1">5만원</span></p>
                                                 </div>
                                                 <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
                                             </div>
-                                            <div className="p-6 bg-gray-900 rounded-3xl text-white shadow-lg shadow-gray-200 flex items-center justify-between group cursor-pointer hover:bg-black transition">
+                                            <div
+                                                onClick={() => handleTabChange('inquiry')}
+                                                className="p-6 bg-gray-900 rounded-3xl text-white shadow-lg shadow-gray-200 flex items-center justify-between group cursor-pointer hover:bg-black transition"
+                                            >
                                                 <div>
                                                     <p className="text-[11px] font-bold opacity-80">더 특별한 홍보를 위해!</p>
                                                     <p className="text-[17px] font-black">프리미엄 GIF 구성 <span className="text-[13px] opacity-90 pl-1">10만원</span></p>
@@ -559,52 +713,7 @@ function CustomerCenterContent() {
                                     </div>
                                 </section>
 
-                                {/* Ad Placement Visualization Section */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>노출 영역 안내</h3>
-                                    </div>
-                                    <div className={`p-6 md:p-10 rounded-[32px] md:rounded-[45px] border shadow-xl space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'}`}>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                            <div className="space-y-4">
-                                                <div className="flex items-center justify-between">
-                                                    <h4 className={`text-[16px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>PC 레이아웃 노출 영역</h4>
-                                                    <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>PC 화면</span>
-                                                </div>
-                                                <div
-                                                    className={`aspect-[4/3] rounded-3xl overflow-hidden border relative group cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}
-                                                    onClick={() => setSelectedImage('/banners/pc_placement.png')}
-                                                >
-                                                    <img src="/banners/pc_placement.png" alt="PC Ad Placement" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <span className="bg-black/50 text-white px-4 py-2 rounded-full text-xs font-bold backdrop-blur-sm">확대 보기</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-4">
-                                                <div className="flex items-center justify-between">
-                                                    <h4 className={`text-[16px] font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>모바일 레이아웃 노출 영역</h4>
-                                                    <span className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase ${brand.theme === 'dark' ? 'bg-pink-900/20 text-pink-400' : 'bg-pink-50 text-pink-600'}`}>모바일 화면</span>
-                                                </div>
-                                                <div
-                                                    className={`aspect-[4/3] rounded-3xl overflow-hidden border relative group cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-100'}`}
-                                                    onClick={() => setSelectedImage('/banners/mobile_placement.png')}
-                                                >
-                                                    <img src="/banners/mobile_placement.png" alt="Mobile Ad Placement" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <span className="bg-black/50 text-white px-4 py-2 rounded-full text-xs font-bold backdrop-blur-sm">확대 보기</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className={`p-6 rounded-3xl border ${brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50/50 border-pink-100'}`}>
-                                            <p className={`text-[13px] leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                                                <strong className="text-pink-600">※ 통합 노출 정책:</strong> 모든 광고 상품은 PC와 모바일 버전에 최적화된 형태로 동시 노출됩니다. 사이드 배너의 경우 PC에서는 스크롤 고정형으로, 모바일에서는 메인 상단 롤링 배너 형태로 전략적 변환 노출됩니다.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </section>
+
 
                                 {/* AI Geo-Targeting Section */}
                                 <section className="space-y-6">
@@ -710,6 +819,7 @@ function CustomerCenterContent() {
                                     <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-5">
                                         {[
                                             {
+                                                tier: 'grand',
                                                 pos: (<>그랜드<br />사이드 배너</>),
                                                 type: 'PC 스크롤 좌우측 동시 고정 노출',
                                                 size: '120 x 600 (PC) / 720 x 150 (M)',
@@ -717,6 +827,7 @@ function CustomerCenterContent() {
                                                 feature: (<span>최상위 고정<br />압도적 구인 효과<br />PC+모바일 통합</span>)
                                             },
                                             {
+                                                tier: 'premium',
                                                 pos: (<>프리미엄<br />사이드 배너</>),
                                                 type: (<>PC스크롤 좌/우 택1<br />고정노출</>),
                                                 size: '120 x 600 (PC) / 720 x 150 (M)',
@@ -724,6 +835,7 @@ function CustomerCenterContent() {
                                                 feature: (<span>시선 집중<br />높은 가성비 전략<br />PC+모바일 통합</span>)
                                             },
                                             {
+                                                tier: 'deluxe',
                                                 pos: (<>디럭스<br />사이드 배너</>),
                                                 type: '지역별/업종별 채용페이지 사이드바 고객지원센터 영역 하단 노출',
                                                 size: '250 x 250 (PC) / 720 x 150 (M)',
@@ -731,6 +843,7 @@ function CustomerCenterContent() {
                                                 feature: (<span>타겟 지역 집중<br />전략적 배너 노출<br />PC+모바일 통합</span>)
                                             },
                                             {
+                                                tier: 'special',
                                                 pos: (<>스페셜<br />사이드 배너</>),
                                                 type: '지역별/업종별 채용페이지 사이드바 고객지원센터 영역 하단 노출',
                                                 size: '250 x 250 (PC) / 720 x 150 (M)',
@@ -738,8 +851,12 @@ function CustomerCenterContent() {
                                                 feature: (<span>가성비 최우선<br />실속형 배너 노출<br />PC+모바일 통합</span>)
                                             },
                                         ].map((row, i) => (
-                                            <div key={i} className={`p-4 md:p-8 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
-                                                <div className="space-y-4">
+                                            <div
+                                                key={i}
+                                                onClick={() => { setIsPaymentPopupOpen(true); setPaymentInitialTier(row.tier); }}
+                                                className={`p-3 md:p-6 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}
+                                            >
+                                                <div className="space-y-2.5">
                                                     <div className="flex justify-between items-start">
                                                         <div className="space-y-0.5">
                                                             <span className={`text-[13px] md:text-xl font-black block leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{row.pos}</span>
@@ -749,7 +866,7 @@ function CustomerCenterContent() {
                                                     </div>
                                                     <p className={`text-[11px] md:text-[13px] font-bold leading-tight md:leading-relaxed ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{row.type}</p>
                                                 </div>
-                                                <div className={`mt-4 md:mt-8 pt-4 md:pt-6 border-t flex items-center justify-between ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                <div className={`mt-3 md:mt-5 pt-3 md:pt-4 border-t flex items-center justify-between ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                                                     <div className="flex-1 text-left">
                                                         <p className="text-[8px] md:text-[9px] text-gray-400 font-black mb-0.5 uppercase tracking-widest leading-none">30일 기준</p>
                                                         <p className="text-sm md:text-2xl font-black text-pink-600 leading-none tabular-nums">{row.price}</p>
@@ -783,6 +900,67 @@ function CustomerCenterContent() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Real-time Exposure Form Reference Section (New) */}
+                                <section className="space-y-6 py-6 border-t border-gray-100 dark:border-gray-800">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <div className="flex items-baseline gap-2">
+                                            <h3 className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>실시간 노출 폼 레퍼런스</h3>
+                                            <span className="text-gray-400 text-sm font-bold">(개발중)</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                                        {/* 카드 1: GRAND / REGION TOP */}
+                                        <div className="space-y-2">
+                                            <p className="text-[11px] font-black text-amber-600 uppercase tracking-widest pl-2 font-sans">GRAND / REGION TOP</p>
+                                            <div className="relative group rounded-[30px] border-[2px] border-amber-400 bg-white shadow-lg shadow-amber-100/10 flex items-center justify-start p-5 transition-transform hover:scale-[1.02] gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0">
+                                                    <span className="text-2xl">🏆</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <h4 className="text-[15px] font-black text-gray-900 leading-tight mb-0.5">우리 업소 무조건 1위</h4>
+                                                    <p className="text-[10px] font-bold text-gray-400 leading-tight">골드 보더 + 상단 고정 효과</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* 카드 2: COMMUNITY / LIST NATIVE */}
+                                        <div className="space-y-2">
+                                            <p className="text-[11px] font-black text-pink-500 uppercase tracking-widest pl-2 font-sans">COMMUNITY / LIST NATIVE</p>
+                                            <div className="relative rounded-[30px] border-[1.5px] border-dashed border-pink-300 bg-pink-100/60 flex items-center justify-start p-5 transition-transform hover:scale-[1.02] gap-4">
+                                                <div className="w-10 h-10 rounded-[18px] bg-pink-500 flex items-center justify-center shadow-md shadow-pink-200 shrink-0">
+                                                    <span className="text-xl text-white">✨</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <h4 className="text-[14px] font-black text-gray-900 leading-tight">사장님, 광고 한 칸<br />어떠세요?</h4>
+                                                    <p className="text-[9px] font-black text-pink-500 uppercase mt-1 tracking-widest font-sans">RECOMMENDED AD</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* 카드 3: LOUNGE / STAR MEMBERSHIP */}
+                                        <div className="space-y-2">
+                                            <p className="text-[11px] font-black text-purple-600 uppercase tracking-widest pl-2 font-sans">LOUNGE / STAR MEMBERSHIP</p>
+                                            <div className="relative rounded-[30px] bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-purple-200/30 flex items-center justify-start p-5 transition-transform hover:scale-[1.02] gap-4">
+                                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-inner shrink-0">
+                                                    <span className="text-2xl text-amber-300 drop-shadow-lg">⭐</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <h4 className="text-[14px] font-black text-white leading-tight">그녀들의 워너비,<br />스타 회원이 되세요!</h4>
+                                                    <p className="text-[9px] font-black text-purple-300 uppercase mt-1 tracking-widest font-sans">STAR MEMBER VIP</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-1 md:pt-4 flex justify-center">
+                                        <p className="text-[11px] md:text-[13px] text-gray-400 font-bold flex items-center gap-2 text-center break-keep">
+                                            ※ 상세한 노출 방식과 디자인은 상품별 가이드라인에 따라 제공됩니다.
+                                        </p>
+                                    </div>
+                                </section>
                             </div>
                         )}
 
@@ -860,7 +1038,7 @@ function CustomerCenterContent() {
                         {/* 4. FAQ */}
                         {activeTab === '자주묻는질문' && (
                             <div className="space-y-6">
-                                <h2 className={`text-2xl font-black tracking-tight mb-8 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h2>
+                                <h2 className={`text-2xl font-black tracking-tight mb-8 pl-7 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h2>
                                 <div className="space-y-4">
                                     {FAQS.map(faq => (
                                         <div key={faq.id} className={`rounded-[28px] shadow-sm border overflow-hidden transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -952,41 +1130,113 @@ function CustomerCenterContent() {
                             </div>
                         )}
 
-                        {/* Customer Service Box (Mobile Lower Position) */}
-                        <div className={`md:hidden mt-10 p-8 rounded-[40px] border shadow-xl shadow-pink-100/20 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-white to-pink-50/30 border-pink-100'}`}>
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
-                                    <PhoneCall size={24} />
-                                </div>
-                                <span className={`font-black text-xl ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
+                        {/* 6. 약관 및 정책 */}
+                        {activeTab === '약관및정책' && (
+                            <div className="space-y-10">
+                                <section id="terms" className="scroll-mt-32">
+                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>서비스 이용약관</h3>
+                                    </div>
+                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 1조 (목적)</p>
+                                        <p className="mb-6 ml-2 text-gray-500">본 약관은 코코알바(이하 "회사")가 제공하는 온라인 구인구직 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 2조 (서비스의 내용)</p>
+                                        <p className="mb-6 ml-2 text-gray-500">1. 회사가 제공하는 서비스는 구인공고 등록, 이력서 등록, 광고 대행, 인재 매칭 지원 서비스 등이 포함됩니다.<br />2. 회사는 서비스의 품질 향상을 위해 필요한 경우 서비스의 내용을 변경하거나 중단할 수 있습니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 3조 (이용자의 의무)</p>
+                                        <p className="ml-2 text-gray-500">회원은 관계 법령, 본 약관의 규정, 이용 가이드 및 서비스와 관련하여 공지한 주의사항을 준수하여야 하며, 기타 회사의 업무에 방해되는 행위를 해서는 안 됩니다.</p>
+                                    </div>
+                                </section>
+
+                                <section id="privacy" className="scroll-mt-32">
+                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
+                                    </div>
+                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                        <p className="mb-6 text-gray-500 italic">"코코알바"는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">1. 개인정보의 수집 및 이용 목적</p>
+                                        <p className="mb-6 ml-2 text-gray-500">회사는 회원가입, 원활한 고객 상담, 각종 서비스 제공을 위해 최소한의 개인정보를 수집하며, 수집된 정보는 회원 식별 및 공고 관리 목적으로만 사용됩니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">2. 보유 및 이용 기간</p>
+                                        <p className="ml-2 text-gray-500">회원의 개인정보는 원칙적으로 회원 탈퇴 시 즉시 파기되나, 관계 법령에 의해 보존할 필요가 있는 경우 법정 기간 동안 안전하게 보관됩니다.</p>
+                                    </div>
+                                </section>
+
+                                <section id="youth" className="scroll-mt-32">
+                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>청소년 보호정책</h3>
+                                    </div>
+                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                        <p className="mb-6 text-gray-500">회사는 청소년이 건전한 인격체로 성장할 수 있도록 정보통신망 이용촉진 및 정보보호 등에 관한 법률 및 청소년 보호법에 근거하여 청소년 보호정책을 시행하고 있습니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">1. 청소년 유해정보에 대한 금지행위</p>
+                                        <p className="mb-6 ml-2 text-gray-500">청소년에게 유해한 영향을 미칠 수 있는 게시물이나 광고는 엄격히 금지되며, 상시 모니터링을 통해 즉각적인 조치를 취하고 있습니다.</p>
+
+                                        <p className="mb-4 font-black text-gray-900 dark:text-white">2. 유해환경으로부터의 차단</p>
+                                        <p className="ml-2 text-gray-500">성인 인증 시스템과 필터링 기능을 통해 청소년이 의도치 않게 유해 정보에 노출되지 않도록 최선의 기술적 조치를 다하고 있습니다.</p>
+                                    </div>
+                                </section>
                             </div>
-                            <p className={`text-4xl font-black mb-3 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
-                            <p className={`text-[14px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
+                        )}
+
+                        {/* Customer Service Box (Mobile Lower Position) */}
+                        <div className={`md:hidden mt-6 p-5 rounded-[30px] border shadow-xl shadow-pink-100/10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-white to-pink-50/30 border-pink-100'}`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
+                                    <PhoneCall size={20} />
+                                </div>
+                                <span className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
+                            </div>
+                            <p className={`text-3xl font-black mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
+                            <p className={`text-[12px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
                                 평일 09:30 ~ 19:00 / 점심 12:00 ~ 13:30<br />
-                                <span className="text-pink-600 font-black mt-2 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
+                                <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-pink-600 text-white rounded-[24px] text-base font-black hover:bg-pink-700 transition shadow-xl shadow-pink-100">
-                                <MessageCircle size={20} /> 텔레그렘 실시간 상담
+                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-3 w-full py-4 bg-pink-600 text-white rounded-[20px] text-sm font-black hover:bg-pink-700 transition shadow-xl shadow-pink-100">
+                                <MessageCircle size={18} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
                     </div>
-                </div >
-            </main >
-
-            {/* Image Zoom Modal */}
-            {selectedImage && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={() => setSelectedImage(null)}>
-                    <div className="relative max-w-5xl w-full h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
-                        <img src={selectedImage} alt="Ad Placement Guide Full" className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl border border-white/10" />
-                        <button
-                            onClick={() => setSelectedImage(null)}
-                            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
-                        >
-                            <X size={24} />
-                        </button>
-                    </div>
                 </div>
-            )}
-        </div >
+
+                {/* [Modal] 사장님 전용 상품 안내 (PaymentPopup) */}
+                <PaymentPopup
+                    isOpen={isPaymentPopupOpen}
+                    onClose={() => setIsPaymentPopupOpen(false)}
+                    initialTier={paymentInitialTier}
+                />
+
+                {/* Image Zoom Modal */}
+                {
+                    selectedImage && (
+                        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={() => setSelectedImage(null)}>
+                            <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
+                                {/* Centered Header for Image Modal as requested */}
+                                <div className="mb-6 text-center">
+                                    <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
+                                    <div className="w-12 h-1 bg-pink-600 mx-auto rounded-full"></div>
+                                </div>
+
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                    <img src={selectedImage} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
+                                    <button
+                                        onClick={() => setSelectedImage(null)}
+                                        className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
+                                    >
+                                        <X size={24} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                <Footer />
+            </div>
+        </>
     );
 }
