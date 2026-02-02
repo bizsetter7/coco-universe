@@ -120,7 +120,7 @@ const JobAdSection: React.FC<JobAdSectionProps> = ({
                 </div>
             </div>
 
-            <div className={`grid ${gridColsClass} gap-3 md:gap-4`}>
+            <div className="ad-card-container">
                 {shops.slice(0, limit).map((shop, idx) => {
                     // Calculate a consistent random view count based on name
                     const views = (shop.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 451) + 50;

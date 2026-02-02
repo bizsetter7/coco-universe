@@ -133,7 +133,7 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
 
             {/* AD Detail Modal (Z-INDEX 110으로 독립) */}
             {selectedAd && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl" onClick={() => setSelectedAd(null)}>
+                <div className="modal-overlay" onClick={() => setSelectedAd(null)}>
                     <div className={`rounded-[30px] shadow-2xl w-full max-w-sm overflow-hidden animate-zoomIn ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
                         <div className={`relative aspect-video flex items-center justify-center font-black text-2xl uppercase italic ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-700' : 'bg-gray-100 text-gray-300'}`}>
                             Official AD
