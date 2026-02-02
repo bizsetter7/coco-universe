@@ -27,11 +27,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className={`min-h-[100dvh] w-full flex justify-center overflow-visible ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ overflow: 'visible' }}>
             <div
-                className={`flex items-stretch gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} min-h-[100dvh] force-flex-stretch`}
+                className={`grid xl:grid-cols-[160px_1fr_160px] gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative min-h-[100dvh] items-stretch`}
                 style={{
                     overflow: 'visible',
-                    display: 'flex',
-                    alignItems: 'stretch'
                 }}
             >
 

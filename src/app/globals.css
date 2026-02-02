@@ -56,14 +56,21 @@ img {
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
-  height: 100% !important;
-  /* 지시사항: 배너 레일 높이 본문과 동일하게 통일 */
-  display: block !important;
-  /* 지시사항: 물리 구조 강제 */
+  display: none !important;
+  /* 지시사항: 모바일에서 강제 숨김 */
   overflow: visible !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
   z-index: 40;
+}
+
+@media (min-width: 1280px) {
+  aside {
+    display: block !important;
+    /* 지시사항: XL 데스크톱에서만 노출 */
+    height: 100% !important;
+    /* 지시사항: 배너 레일 높이 본문과 동일하게 통일 */
+  }
 }
 
 main {

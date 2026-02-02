@@ -108,123 +108,94 @@ const JobAdSection = ({
                                 }}
                             >
                                 <div className="flex flex-col h-full">
-                                    {/* 상단: 이미지 영역 (지시사항: Hydration 오류 방지를 위한 CSS 변수 기반 물리적 px 고정) */}
-                                    <div
-                                        className="relative w-full overflow-hidden bg-slate-100"
-                                        style={{
-                                            display: 'block',
-                                            overflow: 'hidden',
-                                            aspectRatio: '1/1',
-                                            minHeight: 'var(--job-image-min-height, 140px)',
-                                            backfaceVisibility: 'hidden',
-                                            WebkitBackfaceVisibility: 'hidden'
-                                        }}
-                                    >
-                                        {shop.options?.mediaUrl ? (
-                                            <>
-                                                <img
-                                                    src={shop.options.mediaUrl}
-                                                    alt={shop.name}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    style={{ aspectRatio: '1/1' }}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    onError={(e) => {
-                                                        const target = e.currentTarget;
-                                                        const fallback = target.nextElementSibling;
-                                                        if (fallback) {
-                                                            target.style.display = 'none';
-                                                            fallback.classList.remove('hidden');
-                                                            fallback.classList.add('flex');
-                                                        }
                                                     }}
                                                 />
-                                                <div className="hidden absolute inset-0 w-full h-full aspect-square">
-                                                    {renderFallback()}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            renderFallback()
+                                    <div className="hidden absolute inset-0 w-full h-full aspect-square">
+                                        {renderFallback()}
+                                    </div>
+                                </>
+                                ) : (
+                                renderFallback()
                                         )}
 
-                                        {shop.tier && shop.tier !== 'common' && (
-                                            <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/50 backdrop-blur-md rounded text-[10px] text-white font-bold tracking-tight">
-                                                {tierConfig[shop.tier]?.label || shop.tier.toUpperCase()}
-                                            </div>
-                                        )}
+                                {shop.tier && shop.tier !== 'common' && (
+                                    <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/50 backdrop-blur-md rounded text-[10px] text-white font-bold tracking-tight">
+                                        {tierConfig[shop.tier]?.label || shop.tier.toUpperCase()}
                                     </div>
-
-                                    {/* BOTTOM: Info Section */}
-                                    <div className="p-3">
-                                        <div className="h-[44px] mb-2 flex flex-col justify-between">
-                                            <div className="flex justify-between items-start mb-0">
-                                                <h4 className={`text-[14px] font-black truncate leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[80%]`}>
-                                                    {shop.realName || shop.name}
-                                                </h4>
-                                                <span className="text-[10px] text-gray-400 font-medium shrink-0 ml-1">
-                                                    {rank}위
-                                                </span>
-                                            </div>
-                                            <p className="text-[11px] text-gray-500 truncate flex items-center gap-1">
-                                                <span className="w-1 h-1 rounded-full bg-gray-400 shrink-0"></span>
-                                                {shop.region}
-                                            </p>
-                                        </div>
-
-                                        {(() => {
-                                            const payStr = shop.pay || '';
-                                            let badgeLabel = '협';
-                                            let badgeColor = 'bg-gray-400';
-                                            let amount = payStr;
-                                            const typeToCheck = shop.payType || payStr;
-
-                                            if (typeToCheck.includes('TC')) { badgeLabel = 'T'; badgeColor = 'bg-indigo-600'; }
-                                            else if (typeToCheck.includes('시급')) { badgeLabel = '시'; badgeColor = 'bg-cyan-500'; }
-                                            else if (typeToCheck.includes('일급') || typeToCheck.includes('일')) { badgeLabel = '일'; badgeColor = 'bg-blue-500'; }
-                                            else if (typeToCheck.includes('주급')) { badgeLabel = '주'; badgeColor = 'bg-pink-500'; }
-                                            else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) { badgeLabel = '월'; badgeColor = 'bg-purple-500'; }
-                                            else if (typeToCheck.includes('연봉')) { badgeLabel = '연'; badgeColor = 'bg-green-600'; }
-
-                                            if (!isNaN(Number(amount))) amount = Number(amount).toLocaleString();
-
-                                            return (
-                                                <div className="flex flex-col gap-1 h-[46px] justify-start">
-                                                    <div className="flex items-center gap-1.5 font-bold">
-                                                        <span className={`${badgeColor} text-white text-[10px] w-[16px] h-[16px] flex items-center justify-center rounded-[4px] font-bold shadow-sm shrink-0`}>
-                                                            {badgeLabel}
-                                                        </span>
-                                                        <span className={`text-[14px] font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                                            {amount}{!isNaN(Number(shop.pay)) ? <span className="text-[11px] font-normal ml-0.5 text-gray-500">원</span> : ''}
-                                                        </span>
-                                                    </div>
-                                                    {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1 mt-0.5 overflow-hidden h-[20px]">
-                                                            {shop.options.paySuffixes.slice(0, 3).map((suffix: string, i: number) => (
-                                                                <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
-                                                                    {suffix}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })()}
-                                        <div className="flex items-center justify-end mt-1">
-                                            <button
-                                                onClick={(e) => toggleFavorite(e, shop.id)}
-                                                className={`transition-colors ${isFav ? 'text-pink-500' : 'text-gray-300 hover:text-pink-400'}`}
-                                            >
-                                                <Crown size={14} fill={isFav ? "currentColor" : "none"} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                )}
                             </div>
-                        );
-                    })}
-                </div>
+
+                                    {/* BOTTOM: Info Section */ }
+                        <div className="p-3">
+                            <div className="h-[44px] mb-2 flex flex-col justify-between">
+                                <div className="flex justify-between items-start mb-0">
+                                    <h4 className={`text-[14px] font-black truncate leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[80%]`}>
+                                        {shop.realName || shop.name}
+                                    </h4>
+                                    <span className="text-[10px] text-gray-400 font-medium shrink-0 ml-1">
+                                        {rank}위
+                                    </span>
+                                </div>
+                                <p className="text-[11px] text-gray-500 truncate flex items-center gap-1">
+                                    <span className="w-1 h-1 rounded-full bg-gray-400 shrink-0"></span>
+                                    {shop.region}
+                                </p>
+                            </div>
+
+                            {(() => {
+                                const payStr = shop.pay || '';
+                                let badgeLabel = '협';
+                                let badgeColor = 'bg-gray-400';
+                                let amount = payStr;
+                                const typeToCheck = shop.payType || payStr;
+
+                                if (typeToCheck.includes('TC')) { badgeLabel = 'T'; badgeColor = 'bg-indigo-600'; }
+                                else if (typeToCheck.includes('시급')) { badgeLabel = '시'; badgeColor = 'bg-cyan-500'; }
+                                else if (typeToCheck.includes('일급') || typeToCheck.includes('일')) { badgeLabel = '일'; badgeColor = 'bg-blue-500'; }
+                                else if (typeToCheck.includes('주급')) { badgeLabel = '주'; badgeColor = 'bg-pink-500'; }
+                                else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) { badgeLabel = '월'; badgeColor = 'bg-purple-500'; }
+                                else if (typeToCheck.includes('연봉')) { badgeLabel = '연'; badgeColor = 'bg-green-600'; }
+
+                                if (!isNaN(Number(amount))) amount = Number(amount).toLocaleString();
+
+                                return (
+                                    <div className="flex flex-col gap-1 h-[46px] justify-start">
+                                        <div className="flex items-center gap-1.5 font-bold">
+                                            <span className={`${badgeColor} text-white text-[10px] w-[16px] h-[16px] flex items-center justify-center rounded-[4px] font-bold shadow-sm shrink-0`}>
+                                                {badgeLabel}
+                                            </span>
+                                            <span className={`text-[14px] font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                {amount}{!isNaN(Number(shop.pay)) ? <span className="text-[11px] font-normal ml-0.5 text-gray-500">원</span> : ''}
+                                            </span>
+                                        </div>
+                                        {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-0.5 overflow-hidden h-[20px]">
+                                                {shop.options.paySuffixes.slice(0, 3).map((suffix: string, i: number) => (
+                                                    <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
+                                                        {suffix}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+                            <div className="flex items-center justify-end mt-1">
+                                <button
+                                    onClick={(e) => toggleFavorite(e, shop.id)}
+                                    className={`transition-colors ${isFav ? 'text-pink-500' : 'text-gray-300 hover:text-pink-400'}`}
+                                >
+                                    <Crown size={14} fill={isFav ? "currentColor" : "none"} />
+                                </button>
+                            </div>
+                        </div>
+                                </div>
             </div>
+            );
+                    })}
         </div>
+            </div >
+        </div >
     );
 };
 
