@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 @import "tailwindcss";
 
 @layer base {
@@ -23,8 +27,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   /* 지시사항: 텍스트 렌더링 단순화 */
-  scroll-behavior: smooth;
-  /* 지시사항: 스크롤 동작 최적화 */
+  scroll-behavior: auto !important;
+  /* 지시사항: 미세 떨림 방지를 위한 기본 스크롤 회귀 */
 }
 
 html,
@@ -51,6 +55,11 @@ aside {
 main {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+.force-flex-stretch {
+  display: flex !important;
+  align-items: stretch !important;
 }
 
 /* --- 3. 광고 카드 레이아웃 초기화 --- */

@@ -26,7 +26,14 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <div className={`min-h-screen w-full flex justify-center overflow-visible ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ overflow: 'visible' }}>
-            <div className={`flex items-stretch gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative min-h-screen`} style={{ overflow: 'visible' }}>
+            <div
+                className={`flex items-stretch gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative min-h-screen force-flex-stretch`}
+                style={{
+                    overflow: 'visible',
+                    display: 'flex',
+                    alignItems: 'stretch'
+                }}
+            >
 
                 {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}
                 <aside className="hidden xl:block w-[160px] h-full self-stretch relative">

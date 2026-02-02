@@ -110,8 +110,6 @@ const JobAdSection = ({
                                         className="relative w-full overflow-hidden bg-slate-100"
                                         style={{
                                             display: 'block',
-                                            contentVisibility: 'auto',
-                                            containIntrinsicSize: '200px 200px',
                                             overflow: 'hidden',
                                             minHeight: 'var(--job-image-min-height, 140px)'
                                         }}
