@@ -111,7 +111,8 @@ const JobAdSection = ({
                                         style={{
                                             display: 'block',
                                             contentVisibility: 'auto',
-                                            containIntrinsicSize: '200px 200px'
+                                            containIntrinsicSize: '200px 200px',
+                                            overflow: 'hidden'
                                         }}
                                     >
                                         {shop.options?.mediaUrl ? (

@@ -10,9 +10,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* --- 1. 기본 스타일 복구 --- */
+html {
+  -webkit-font-smoothing: antialiased;
+  /* 지시사항: 텍스트 렌더링 단순화 */
+}
+
 html,
 body {
-  -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   /* 지시사항: 폰트 크기 고정 */
   text-size-adjust: 100%;
