@@ -13,6 +13,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   /* 지시사항: 텍스트 렌더링 단순화 */
+  scroll-behavior: smooth;
+  /* 지시사항: 스크롤 동작 최적화 */
 }
 
 html,
@@ -47,8 +49,6 @@ main {
   overflow: hidden;
   background-color: white;
   transition: all 0.3s ease;
-  will-change: transform;
-  /* 지시사항: 떨림 방지를 위한 한정적 가속 */
 }
 
 /* 지시사항: 이미지 비율 강제 및 GPU 가속 최적화 */

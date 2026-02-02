@@ -194,7 +194,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
         <div className={`w-full ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
             {/* 1. Header (Sticky) */}
-            <header className={`sticky top-0 z-50 border-b md:backdrop-blur-md [will-change:transform] transform-gpu ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 md:bg-gray-900/95' : 'bg-white border-gray-200 md:bg-white/95'}`}>
+            <header className={`sticky top-0 z-50 border-b md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 md:bg-gray-900/95' : 'bg-white border-gray-200 md:bg-white/95'}`}>
                 <div className="max-w-[1920px] mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/" className="text-xl md:text-2xl font-black tracking-tighter flex items-center gap-1">
