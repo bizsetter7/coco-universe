@@ -105,7 +105,7 @@ const JobAdSection = ({
                                 `}
                             >
                                 <div className="flex flex-col h-full">
-                                    {/* 상단: 이미지 영역 (지시사항: 물리적 px 직접 박제) */}
+                                    {/* 상단: 이미지 영역 (지시사항: Hydration 오류 방지를 위한 CSS 변수 기반 물리적 px 고정) */}
                                     <div
                                         className="relative w-full overflow-hidden bg-slate-100"
                                         style={{
@@ -113,7 +113,7 @@ const JobAdSection = ({
                                             contentVisibility: 'auto',
                                             containIntrinsicSize: '200px 200px',
                                             overflow: 'hidden',
-                                            minHeight: typeof window !== 'undefined' && window.innerWidth >= 768 ? '200px' : '140px'
+                                            minHeight: 'var(--job-image-min-height, 140px)'
                                         }}
                                     >
                                         {shop.options?.mediaUrl ? (

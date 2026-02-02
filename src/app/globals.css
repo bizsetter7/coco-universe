@@ -9,6 +9,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --job-image-min-height: 140px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --job-image-min-height: 200px;
+  }
+}
+
 /* --- 1. 기본 스타일 복구 --- */
 html {
   -webkit-font-smoothing: antialiased;
@@ -31,6 +41,8 @@ body {
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
+  height: inherit !important;
+  /* 지시사항: 부모 높이 강제 상속 */
   overflow: visible !important;
   top: 120px !important;
   /* 지시사항: 윙 배너 위치 전격 조정 */
