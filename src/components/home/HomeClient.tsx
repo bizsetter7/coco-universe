@@ -84,9 +84,9 @@ export default function HomeClient({ shops }: HomeClientProps) {
     const generalShops = filteredShops;
 
     return (
-        <div className={`min-h-dvh ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} pb-24 md:pb-0 overflow-x-hidden transition-colors duration-300`}>
+        <div className={`w-full ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} pb-24 md:pb-0 overflow-x-hidden transition-colors duration-300`}>
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md dark:bg-gray-900/80 dark:border-gray-800">
+            <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white dark:bg-gray-900 dark:border-gray-800 md:bg-white/80 md:backdrop-blur-md md:dark:bg-gray-900/80">
                 <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
                     {/* Logo */}
                     <div
