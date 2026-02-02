@@ -1,120 +1,103 @@
 @import "tailwindcss";
 
-html {
-  height: 100%;
-
-  /* [궁극의 울렁증 방지] 스크롤바 유무와 상관없이 화면 너비 고정 (데스크탑 이상) */
-  @media (min-width: 1280px) {
-    scrollbar-gutter: stable both-edges;
-  }
-
-  /* 모바일 세로 스크롤 떨림(Jitter) 방지 최적화 */
-  scroll-behavior: auto;
-  overscroll-behavior-y: none;
-}
-
-/* Tailwind v4 Selector Strategy */
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  -webkit-text-size-adjust: 100%;
-  /* touch-action: manipulation; 제거 (스크롤 간섭 가능성) */
-  scroll-behavior: auto;
+/* --- 가이드 제공 최종 긴급 처방 코드 (100% 반영) --- */
+
+/* 1. 광고 카드 크기 및 레이아웃 고정 (크기 문제 해결) */
+.ad-card,
+[class*="card"] {
+  flex: 0 0 auto !important;
+  /* 크기가 변하지 않게 고정 */
+  width: 160px !important;
+  /* 영상 기준 적정 너비 */
+  height: 220px !important;
+  /* 높이도 함께 고정하여 덜컥거림 방지 */
+  max-width: 45% !important;
+  /* 화면의 절반을 넘지 않게 설정 */
+  overflow: hidden;
+  background-color: white;
+  /* 서버 렌더링 시 배경 고정 */
 }
 
-/* 모바일에서는 gutter를 제거하여 풀스크린 가용성 확보 */
-@media (max-width: 1279px) {
-  html {
-    scrollbar-gutter: auto;
-  }
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100%;
-  /* 스티키 정합성을 위해 body 레벨의 overflow-x 제거 */
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.no-transition {
-  transition: none !important;
-}
-
-/* --- 가이드 제공 긴급 처방 코드 --- */
-
-/* 1. 광고 카드 컨테이너 크기 강제 고정 */
-.ad-card {
+/* 이미지 높이를 미리 확보해서 스크롤 떨림 방지 */
+.ad-card img,
+[class*="card"] img {
+  height: 150px !important;
+  object-fit: cover !important;
   width: 100% !important;
-  max-width: 280px;
-  /* 데스크톱 기준 */
-  flex-shrink: 0 !important;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  display: block !important;
 }
 
-@media (max-width: 768px) {
-  .ad-card {
-    max-width: 190px;
-    /* 모바일 기준 (캡처 가이드 반영) */
-  }
-}
-
-.ad-card img {
-  width: 100%;
-  height: 150px;
-  /* 가이드 추천: 고정 높이 적용 */
-  object-fit: cover;
-  display: block;
-}
-
-/* 2. 모달(팝업) 출력 및 스크롤 고정 문제 해결 */
-.modal-overlay {
+/* 2. 모달(팝업) 정상화 및 최상단 배치 */
+.modal-overlay,
+[class*="modal"],
+[class*="popup"] {
   position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999 !important;
-  /* 최상단으로 올림 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  /* 숫자가 클수록 위로 올라옴 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: rgba(0, 0, 0, 0.6) !important;
 }
 
+/* 모달 오픈 시 본문 고정 */
 body.modal-open {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
 }
 
-/* 3. GPU 가속 및 성능 최적화 (유지 및 보완) */
-.sticky,
-.bottom-nav,
-.ad-card {
-  will-change: transform;
-  transform: translateZ(0);
+/* 3. 스크롤 떨림 최종 해결 (성능 최적화) */
+html,
+body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  /* 모든 요소에 미세한 떨림 방지 적용 */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-/* 하단 내비게이션 안정화 */
+/* --- 추가 스타일 및 테마 정의 --- */
+
+@theme {
+  --font-sans: var(--font-inter);
+  --color-primary-50: #fff1f2;
+  --color-primary-100: #ffe4e6;
+  --color-primary-200: #fecdd3;
+  --color-primary-300: #fda4af;
+  --color-primary-400: #fb7185;
+  --color-primary-500: #f43f5e;
+  --color-primary-600: #e11d48;
+  --color-primary-700: #be123c;
+  --color-primary-800: #9f1239;
+  --color-primary-900: #881337;
+  --color-primary-950: #4c0519;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-white dark:bg-gray-950 dark:text-white;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 하단 내비게이션 안정화 (유지) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -123,357 +106,40 @@ body.modal-open {
   padding-bottom: env(safe-area-inset-bottom);
   transform: translate3d(0, 0, 0);
   z-index: 50;
-  /* 헤더보다 낮게, 모달보다는 훨씬 낮게 */
 }
 
 @keyframes blink-border {
 
   0%,
   100% {
-    border-color: #ef4444;
-    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
-  }
-
-  25% {
-    border-color: #3b82f6;
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    border-color: rgba(225, 29, 72, 0.3);
+    box-shadow: 0 0 0 rgba(225, 29, 72, 0);
   }
 
   50% {
-    border-color: #eab308;
-    box-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
-  }
-
-  75% {
-    border-color: #22c55e;
-    box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+    border-color: rgba(225, 29, 72, 1);
+    box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
   }
 }
 
 .animate-blink-border {
-  animation: blink-border 1.5s infinite;
+  animation: blink-border 2s infinite;
 }
 
-@keyframes rainbow-text {
-  0% {
-    color: #ef4444;
-  }
-
-  20% {
-    color: #f97316;
-  }
-
-  40% {
-    color: #eab308;
-  }
-
-  60% {
-    color: #22c55e;
-  }
-
-  80% {
-    color: #3b82f6;
-  }
-
-  100% {
-    color: #ef4444;
-  }
-}
-
-.animate-rainbow-text {
-  animation: rainbow-text 2s infinite linear;
-}
-
-@keyframes shimmer-banner {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-shimmer-banner {
-  position: relative;
-  overflow: hidden;
-}
-
-.animate-shimmer-banner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(to right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 255, 255, 0) 100%);
-  animation: shimmer-banner 3s infinite;
-}
-
-.text-stroke-3 {
-  -webkit-text-stroke: 1.5px black;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-}
-
-.text-stroke-white {
-  -webkit-text-stroke: 1px white;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-}
-
-.bg-diagonal-stripes {
-  background-image: repeating-linear-gradient(45deg,
-      rgba(0, 0, 0, 0.05) 0px,
-      rgba(0, 0, 0, 0.05) 10px,
-      transparent 10px,
-      transparent 20px);
-}
-
-@keyframes bounce-slight {
+@keyframes bounce-horizontal {
 
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateX(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
 
   50% {
-    transform: translateY(-3px);
+    transform: translateX(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
-.animate-bounce-slight {
-  animation: bounce-slight 1s infinite;
-}
-
-@keyframes disco-border {
-  0% {
-    border-color: #ef4444;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-  }
-
-  25% {
-    border-color: #3b82f6;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
-  }
-
-  50% {
-    border-color: #eab308;
-    box-shadow: 0 0 8px rgba(234, 179, 8, 0.8);
-  }
-
-  75% {
-    border-color: #22c55e;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
-  }
-
-  100% {
-    border-color: #ef4444;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
-  }
-}
-
-.animate-disco-border {
-  animation: disco-border 0.5s infinite linear;
-}
-
-@keyframes rainbow-bg {
-  0% {
-    background-color: #ef4444;
-  }
-
-  20% {
-    background-color: #f97316;
-  }
-
-  40% {
-    background-color: #eab308;
-  }
-
-  60% {
-    background-color: #22c55e;
-  }
-
-  80% {
-    background-color: #3b82f6;
-  }
-
-  100% {
-    background-color: #ef4444;
-  }
-}
-
-.animate-rainbow-bg {
-  animation: rainbow-bg 3s infinite linear;
-  background-size: 200% 200%;
-}
-
-@keyframes disco-bg {
-  0% {
-    background-color: #ef4444;
-  }
-
-  25% {
-    background-color: #3b82f6;
-  }
-
-  50% {
-    background-color: #eab308;
-  }
-
-  75% {
-    background-color: #22c55e;
-  }
-
-  100% {
-    background-color: #ef4444;
-  }
-}
-
-.animate-disco-bg {
-  animation: disco-bg 0.5s infinite steps(4);
-}
-
-@keyframes rainbow-border {
-  0% {
-    border-color: #ef4444;
-  }
-
-  20% {
-    border-color: #f97316;
-  }
-
-  40% {
-    border-color: #eab308;
-  }
-
-  60% {
-    border-color: #22c55e;
-  }
-
-  80% {
-    border-color: #3b82f6;
-  }
-
-  100% {
-    border-color: #ef4444;
-  }
-}
-
-.animate-rainbow-border {
-  animation: rainbow-border 2s infinite linear;
-}
-
-@keyframes flash-bg {
-
-  0%,
-  100% {
-    background-color: transparent;
-  }
-
-  50% {
-    background-color: rgba(255, 255, 0, 0.15);
-  }
-}
-
-.animate-flash-bg {
-  animation: flash-bg 0.8s infinite;
-}
-
-@keyframes neon-border {
-
-  0%,
-  100% {
-    border-color: #f472b6;
-    box-shadow: 0 0 5px #f472b6, 0 0 10px #f472b6;
-  }
-
-  33% {
-    border-color: #60a5fa;
-    box-shadow: 0 0 5px #60a5fa, 0 0 10px #60a5fa;
-  }
-
-  66% {
-    border-color: #34d399;
-    box-shadow: 0 0 5px #34d399, 0 0 10px #34d399;
-  }
-}
-
-.animate-neon-border {
-  animation: neon-border 1.5s infinite alternate;
-}
-
-/* --- Premium Banner Styles --- */
-
-.banner-glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
-}
-
-.banner-pattern {
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(45deg, rgba(255, 255, 255, 0.03) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.03) 75%, transparent 75%, transparent);
-  background-size: 20px 20px, 40px 40px;
-}
-
-.text-premium {
-  background: linear-gradient(to bottom, #ffffff 30%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-  font-family: var(--font-sans);
-  letter-spacing: -0.05em;
-}
-
-@keyframes float-banner {
-
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-
-  50% {
-    transform: translateY(-3px) scale(1.02);
-  }
-}
-
-.animate-float-premium {
-  animation: float-banner 3s ease-in-out infinite;
-}
-
-.text-stroke-premium {
-  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3);
-}
-
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(200, 200, 200, 0.5);
-  border-radius: 20px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(160, 160, 160, 0.8);
-}
-
-/* Hide Scrollbar */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.animate-bounce-horizontal {
+  animation: bounce-horizontal 1s infinite;
 }

@@ -170,6 +170,7 @@ const JobAdSection: React.FC<JobAdSectionProps> = ({
                                                 src={shop.options.mediaUrl}
                                                 alt={shop.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                loading="eager"
                                                 onError={(e) => {
                                                     const target = e.currentTarget;
                                                     const fallback = target.nextElementSibling;
