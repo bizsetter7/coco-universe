@@ -48,6 +48,20 @@ main {
   object-fit: cover !important;
 }
 
+/* 이미지 컨테이너 레이아웃 시프트 방지 보강 */
+.ad-card .aspect-square {
+  aspect-ratio: 1 / 1 !important;
+  min-height: 140px;
+  /* 모바일 최소 사양 */
+}
+
+@media (min-width: 768px) {
+  .ad-card .aspect-square {
+    min-height: 200px;
+    /* 데스크톱 최소 사양 */
+  }
+}
+
 /* 헤더 가속 최적화 (사용자 지시에 따라 전역 가속 삭제 후 main에 집중) */
 header {
   transform: translateZ(0);

@@ -89,7 +89,7 @@ const JobAdSection = ({
                         const tileConfig = tierConfig[displayTier] || tierConfig.grand;
 
                         const renderFallback = () => (
-                            <div className={`w-full h-full ${tileConfig.bg} flex items-center justify-center p-4 text-center overflow-hidden relative aspect-square`}>
+                            <div className={`w-full aspect-square ${tileConfig.bg} flex items-center justify-center p-4 text-center overflow-hidden relative min-h-[140px] md:min-h-[200px]`}>
                                 <div>{tileConfig.icon}</div>
                             </div>
                         );
@@ -106,7 +106,7 @@ const JobAdSection = ({
                             >
                                 <div className="flex flex-col h-full">
                                     {/* 상단: 이미지 영역 (지시사항: 이미지에 직접 aspect-ratio 부여) */}
-                                    <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
+                                    <div className="relative w-full aspect-square overflow-hidden bg-slate-100 min-h-[140px] md:min-h-[200px]">
                                         {shop.options?.mediaUrl ? (
                                             <>
                                                 <img
