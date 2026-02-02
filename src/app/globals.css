@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    font-size: 16px;
+    /* 지시사항: 폰트 크기 강제 박제 */
+  }
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* --- 1. 기본 스타일 복구 --- */
@@ -20,6 +27,8 @@ aside {
   position: relative;
   height: fit-content !important;
   overflow: visible !important;
+  top: 120px !important;
+  /* 지시사항: 윙 배너 위치 전격 조정 */
 }
 
 main {

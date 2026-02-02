@@ -105,8 +105,15 @@ const JobAdSection = ({
                                 `}
                             >
                                 <div className="flex flex-col h-full">
-                                    {/* 상단: 이미지 영역 (지시사항: 이미지에 직접 aspect-ratio 부여) */}
-                                    <div className="relative w-full aspect-square overflow-hidden bg-slate-100 min-h-[140px] md:min-h-[200px]">
+                                    {/* 상단: 이미지 영역 (지시사항: 이미지 물리적 예약 및 async 디코딩) */}
+                                    <div
+                                        className="relative w-full aspect-square overflow-hidden bg-slate-100 min-h-[140px] md:min-h-[200px]"
+                                        style={{
+                                            display: 'block',
+                                            contentVisibility: 'auto',
+                                            containIntrinsicSize: '200px 200px'
+                                        }}
+                                    >
                                         {shop.options?.mediaUrl ? (
                                             <>
                                                 <img
@@ -115,6 +122,7 @@ const JobAdSection = ({
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     style={{ aspectRatio: '1/1' }}
                                                     loading="eager"
+                                                    decoding="async"
                                                     onError={(e) => {
                                                         const target = e.currentTarget;
                                                         const fallback = target.nextElementSibling;
