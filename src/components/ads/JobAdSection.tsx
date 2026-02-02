@@ -116,15 +116,15 @@ const JobAdSection = ({
                                                     decoding="async"
                                                     onError={(e) => {
                                                         const target = e.currentTarget;
-                                                        const fallback = target.nextElementSibling;
-                                                        if (fallback) {
+                                                        const nextEl = target.nextElementSibling;
+                                                        if (nextEl) {
                                                             target.style.display = 'none';
-                                                            fallback.classList.remove('hidden');
-                                                            fallback.classList.add('flex');
+                                                            nextEl.classList.remove('hidden');
+                                                            nextEl.classList.add('flex');
                                                         }
                                                     }}
                                                 />
-                                                <div className="hidden absolute inset-0 w-full h-full aspect-square">
+                                                <div className="hidden absolute inset-0 w-full h-full">
                                                     {renderFallback()}
                                                 </div>
                                             </>
