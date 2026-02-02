@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Crown, Zap, Flame, Sparkles, Siren, Megaphone } from 'lucide-react';
+import { Crown, Zap, Flame, Sparkles } from 'lucide-react';
 import { Shop } from '@/types/shop';
-import { Brand } from '@/types/brand';
+import { BrandConfig } from '@/lib/brand-config';
 
 interface JobAdSectionProps {
     title: string;
@@ -12,13 +12,13 @@ interface JobAdSectionProps {
     shops: Shop[];
     limit: number;
     onMore?: () => void;
-    tier: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'auto';
-    brand: Brand;
+    tier: string; // 타입을 string으로 완화하여 타입 불일치 해결
+    brand: BrandConfig;
     setSelectedShop: (shop: Shop) => void;
     showAdButton?: boolean;
     onAdRegister?: () => void;
-    favorites: string[];
-    toggleFavorite: (e: React.MouseEvent, id: string) => void;
+    favorites?: string[]; // 선택적 속성으로 변경 (런타임 오류 방지)
+    toggleFavorite?: (e: React.MouseEvent, id: string) => void;
 }
 
 const tierConfig: Record<string, any> = {
@@ -41,11 +41,10 @@ const JobAdSection = ({
     setSelectedShop,
     showAdButton = true,
     onAdRegister,
-    favorites,
-    toggleFavorite
+    favorites = [], // 기본값 빈 배열로 설정
+    toggleFavorite = () => { } // 기본값 빈 함수로 설정
 }: JobAdSectionProps) => {
     const router = useRouter();
-    const gridColsClass = brand.isMobile ? 'grid-cols-2' : 'grid-cols-4';
 
     return (
         <div className="mb-0">
@@ -105,7 +104,7 @@ const JobAdSection = ({
                                 shadow-sm hover:shadow-md ad-card
                             `}
                         >
-                            {/* 상단: 이미지 또는 배너 영역 (직접 첫 번째 자식으로 배치) */}
+                            {/* 상단: 이미지 또는 배너 영역 */}
                             <div className="relative w-full bg-slate-100 overflow-hidden">
                                 {shop.options?.mediaUrl ? (
                                     <>

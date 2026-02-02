@@ -52,6 +52,23 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+    // Favorites State
+    const [favorites, setFavorites] = useState<string[]>([]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('favorites');
+        if (saved) setFavorites(JSON.parse(saved));
+    }, []);
+
+    const toggleFavorite = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        const newFavs = favorites.includes(id)
+            ? favorites.filter(fid => fid !== id)
+            : [...favorites, id];
+        setFavorites(newFavs);
+        localStorage.setItem('favorites', JSON.stringify(newFavs));
+    };
+
     // Payment Popup State
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [targetTier, setTargetTier] = useState('grand');
@@ -420,6 +437,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         setSelectedShop={setSelectedShop}
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('grand')}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
                     />
 
                     {/* 3.2 프리미엄 채용정보 */}
@@ -433,6 +452,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         setSelectedShop={setSelectedShop}
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('premium')}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
                     />
 
                     {/* 3.3 디럭스 채용정보 */}
@@ -446,6 +467,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         setSelectedShop={setSelectedShop}
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('deluxe')}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
                     />
 
                     {/* 3.4 스페셜 채용정보 */}
@@ -459,9 +482,9 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         setSelectedShop={setSelectedShop}
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('special')}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
                     />
-
-                    {/* 3.5 Urgent / Recommended (8 items) */}
 
                     {/* 3.5 Urgent / Recommended (8 items) */}
                     <JobAdSection
@@ -474,6 +497,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         setSelectedShop={setSelectedShop}
                         showAdButton={true}
                         onAdRegister={() => openPaymentPopup('urgent')}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
                     />
 
                     {/* 4. General List View */}
@@ -481,8 +506,8 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         <JobListView
                             shops={generalShops}
                             brand={brand}
-                            favorites={[]}
-                            toggleFavorite={() => { }}
+                            favorites={favorites}
+                            toggleFavorite={toggleFavorite}
                             setSelectedShop={setSelectedShop}
                             visibleCount={visibleCount}
                             setVisibleCount={setVisibleCount}
