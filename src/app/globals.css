@@ -2,6 +2,11 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: auto !important;
+  /* 지시사항: 스크롤 파기 억제 */
+}
+
 @import "tailwindcss";
 
 @layer base {
