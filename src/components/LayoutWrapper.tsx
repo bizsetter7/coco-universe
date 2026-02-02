@@ -25,9 +25,9 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     return (
-        <div className={`min-h-screen w-full flex justify-center overflow-visible ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ overflow: 'visible' }}>
+        <div className={`min-h-[100dvh] w-full flex justify-center overflow-visible ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ overflow: 'visible' }}>
             <div
-                className={`flex items-stretch gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} relative min-h-screen force-flex-stretch`}
+                className={`flex items-stretch gap-0 xl:gap-8 w-full ${isWidePage ? 'max-w-[1700px] justify-center px-0 xl:px-4' : 'max-w-[1400px] justify-center px-0 xl:px-4'} min-h-[100dvh] force-flex-stretch`}
                 style={{
                     overflow: 'visible',
                     display: 'flex',
@@ -41,7 +41,7 @@ export const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 </aside>
 
                 {/* 중앙 메인 */}
-                <main className={`w-full ${isWidePage ? 'max-w-[1280px]' : 'max-w-[1020px]'} flex-1 min-w-0 shadow-none xl:shadow-none min-h-screen main-content-area ${mounted && brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
+                <main className={`w-full ${isWidePage ? 'max-w-[1280px]' : 'max-w-[1020px]'} flex-1 min-w-0 shadow-none xl:shadow-none min-h-full main-content-area ${mounted && brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
                     {children}
                 </main>
 

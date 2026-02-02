@@ -36,10 +36,15 @@ body {
   -webkit-text-size-adjust: 100%;
   /* 지시사항: 폰트 크기 고정 */
   text-size-adjust: 100%;
-  height: -webkit-fill-available;
+  min-height: 100dvh;
   overflow: visible !important;
   text-rendering: optimizeLegibility;
   /* 지시사항: 텍스트 리플로우 방지 */
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
