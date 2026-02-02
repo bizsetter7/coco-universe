@@ -109,7 +109,8 @@ const JobAdSection = ({
                             >
                                 <div className="flex flex-col h-full">
                                     <div
-                                        className="relative w-full aspect-square overflow-hidden bg-slate-100"
+                                        className="relative w-full overflow-hidden bg-[#f1f5f9]"
+                                        style={{ aspectRatio: '1 / 1' }}
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
