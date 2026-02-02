@@ -6,11 +6,13 @@
 html,
 body {
   -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: none;
-  text-size-adjust: none;
+  -webkit-text-size-adjust: 100%;
+  /* 지시사항: 폰트 크기 고정 */
+  text-size-adjust: 100%;
   height: -webkit-fill-available;
   overflow: visible !important;
-  /* Sticky 보증을 위해 전역 overflow visible 강제 */
+  text-rendering: optimizeLegibility;
+  /* 지시사항: 텍스트 리플로우 방지 */
 }
 
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
@@ -22,6 +24,10 @@ aside {
 
 main {
   overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  /* 지시사항: 스크롤 가속 */
+  will-change: scroll-position;
+  /* 지시사항: 스크롤 가속 전용 */
 }
 
 /* --- 3. 광고 카드 레이아웃 초기화 --- */
@@ -40,13 +46,10 @@ main {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  will-change: transform;
-  transform: translateZ(0);
 }
 
-/* 헤더 가속 최적화 */
+/* 헤더 가속 최적화 (사용자 지시에 따라 전역 가속 삭제 후 main에 집중) */
 header {
-  will-change: transform;
   transform: translateZ(0);
 }
 

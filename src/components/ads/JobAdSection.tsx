@@ -106,7 +106,7 @@ const JobAdSection = ({
                             >
                                 <div className="flex flex-col h-full">
                                     {/* 상단: 이미지 영역 (지시사항: 이미지에 직접 aspect-ratio 부여) */}
-                                    <div className="relative w-full overflow-hidden bg-slate-100">
+                                    <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
                                         {shop.options?.mediaUrl ? (
                                             <>
                                                 <img
