@@ -280,8 +280,8 @@ function CustomerCenterContent() {
     return (
         <>
             {/* [Fixed Mastery] Integrated Sticky Header */}
-            <div className="sticky top-0 z-[999]">
-                <div className={`w-full max-w-[1280px] mx-auto h-14 flex items-center justify-between px-4 border-b border-x shadow-sm pointer-events-auto md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 md:bg-gray-800/95' : 'bg-white border-gray-100 md:bg-white/95'}`} style={{ zIndex: 999 }}>
+            <div className="sticky top-0 z-[999]" style={{ opacity: 1, visibility: 'visible' }}>
+                <div className={`w-full max-w-[1280px] mx-auto h-14 flex items-center justify-between px-4 border-b border-x shadow-sm pointer-events-auto md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 md:bg-gray-800/95' : 'bg-white border-gray-100 md:bg-white/95'}`} style={{ zIndex: 999, opacity: 1, visibility: 'visible' }}>
                     <div className="flex items-center gap-4">
                         <button onClick={() => {
                             if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
