@@ -105,14 +105,15 @@ const JobAdSection = ({
                                 `}
                             >
                                 <div className="flex flex-col h-full">
-                                    {/* 상단: 이미지 영역 (지시사항: 이미지 물리적 예약 및 async 디코딩) */}
+                                    {/* 상단: 이미지 영역 (지시사항: 물리적 px 직접 박제) */}
                                     <div
-                                        className="relative w-full aspect-square overflow-hidden bg-slate-100 min-h-[140px] md:min-h-[200px]"
+                                        className="relative w-full overflow-hidden bg-slate-100"
                                         style={{
                                             display: 'block',
                                             contentVisibility: 'auto',
                                             containIntrinsicSize: '200px 200px',
-                                            overflow: 'hidden'
+                                            overflow: 'hidden',
+                                            minHeight: typeof window !== 'undefined' && window.innerWidth >= 768 ? '200px' : '140px'
                                         }}
                                     >
                                         {shop.options?.mediaUrl ? (

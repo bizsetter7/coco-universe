@@ -29,7 +29,6 @@ body {
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
-  height: fit-content !important;
   overflow: visible !important;
   top: 120px !important;
   /* 지시사항: 윙 배너 위치 전격 조정 */
@@ -38,9 +37,6 @@ aside {
 main {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  /* 지시사항: 스크롤 가속 */
-  will-change: scroll-position;
-  /* 지시사항: 스크롤 가속 전용 */
 }
 
 /* --- 3. 광고 카드 레이아웃 초기화 --- */
@@ -77,9 +73,9 @@ main {
   }
 }
 
-/* 헤더 가속 최적화 (사용자 지시에 따라 전역 가속 삭제 후 main에 집중) */
+/* 헤더 가속 최적화 (가속 전면 제거) */
 header {
-  transform: translateZ(0);
+  position: relative;
 }
 
 /* --- 4. 모달(팝업) --- */
