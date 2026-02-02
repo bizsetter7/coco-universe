@@ -56,11 +56,10 @@ img {
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
 aside {
   position: relative;
-  height: inherit !important;
-  /* 지시사항: 부모 높이 강제 상속 */
   overflow: visible !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
+  z-index: 40;
 }
 
 main {

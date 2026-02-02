@@ -103,6 +103,9 @@ const JobAdSection = ({
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                                     shadow-sm hover:shadow-md ad-card
                                 `}
+                                style={{
+                                    contain: 'paint'
+                                }}
                             >
                                 <div className="flex flex-col h-full">
                                     {/* 상단: 이미지 영역 (지시사항: Hydration 오류 방지를 위한 CSS 변수 기반 물리적 px 고정) */}
@@ -121,7 +124,7 @@ const JobAdSection = ({
                                                     alt={shop.name}
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     style={{ aspectRatio: '1/1' }}
-                                                    loading="eager"
+                                                    loading="lazy"
                                                     decoding="async"
                                                     onError={(e) => {
                                                         const target = e.currentTarget;
