@@ -127,7 +127,7 @@ main {
 
 /* 헤더 가속 최적화 (가속 전면 제거) */
 header {
-  position: relative;
+  margin: 0 !important;
 }
 
 /* --- 4. 모달(팝업) --- */
