@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Home, MessageSquare, User, Sparkles, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -10,6 +10,11 @@ export const MobileBottomNav = () => {
     const pathname = usePathname();
     const brand = useBrand();
     const [isExpanded, setIsExpanded] = useState(true);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const navItems = [
         { label: '홈', icon: <Home size={24} />, href: '/' },
@@ -26,7 +31,7 @@ export const MobileBottomNav = () => {
             {/* Toggle Handle */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-10 flex items-center gap-1.5 text-xs font-bold transition-colors ${isDark
+                className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-10 flex items-center gap-1.5 text-xs font-bold transition-colors ${mounted && isDark
                     ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200'
                     : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'
                     }`}
@@ -48,7 +53,7 @@ export const MobileBottomNav = () => {
             <div
                 className={`
                     w-full border-t shadow-xl pb-safe transition-all duration-300 ease-in-out pointer-events-auto
-                    ${isDark ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}
+                    ${mounted && isDark ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}
                     ${isExpanded ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
                 `}
             >
