@@ -9,6 +9,8 @@ body {
   -webkit-text-size-adjust: none;
   text-size-adjust: none;
   height: -webkit-fill-available;
+  overflow: visible !important;
+  /* Sticky 보증을 위해 전역 overflow visible 강제 */
 }
 
 /* --- 2. 사이드바 Sticky 활동 영역 --- */
@@ -32,12 +34,20 @@ main {
   transition: all 0.3s ease;
 }
 
-/* 지시사항: 이미지에만 1:1 비율 부여 */
+/* 지시사항: 이미지 비율 강제 및 GPU 가속 최적화 */
 .ad-card img {
   aspect-ratio: 1 / 1 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 헤더 가속 최적화 */
+header {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* --- 4. 모달(팝업) --- */
