@@ -114,12 +114,24 @@ const JobAdSection = ({
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                                     shadow-sm hover:shadow-md ad-card max-width-full
                                 `}
-                                style={{ contain: 'content' }}
+                                style={{
+                                    contain: 'content',
+                                    transform: 'translate3d(0, 0, 0)',
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden'
+                                }}
                             >
                                 <div className="flex flex-col h-full">
                                     <div
-                                        className="relative w-full aspect-square md:h-[400px] overflow-hidden bg-[#f1f5f9]"
-                                        style={{ position: 'relative', willChange: 'auto !important' as React.CSSProperties['willChange'] }}
+                                        className="relative w-full aspect-square overflow-hidden bg-[#f1f5f9]"
+                                        style={{
+                                            position: 'relative',
+                                            width: '100%',
+                                            aspectRatio: '1 / 1',
+                                            overflow: 'hidden',
+                                            backgroundColor: '#f1f5f9',
+                                            willChange: 'transform'
+                                        }}
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
@@ -131,6 +143,7 @@ const JobAdSection = ({
                                                     className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500"
                                                     style={{ display: 'block' }}
                                                     priority={idx < 4}
+                                                    loading={idx < 4 ? undefined : "lazy"}
                                                 />
                                                 <div className="hidden absolute inset-0 w-full h-full">
                                                     {renderFallback()}
