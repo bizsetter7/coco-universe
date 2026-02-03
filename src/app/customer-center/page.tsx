@@ -1,4 +1,4 @@
-'use client'; // Force re-deploy to verify mobile scroll jitter fix
+'use client'; // Re-triggering deployment after limit reset
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
