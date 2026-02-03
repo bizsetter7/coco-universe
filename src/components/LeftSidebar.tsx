@@ -11,8 +11,6 @@ interface LeftSidebarProps {
     setSelectedSubRegion: (subRegion: string) => void;
     selectedJobType: string;
     setSelectedJobType: (jobType: string) => void;
-    selectedKeywords: string[];
-    setSelectedKeywords: (keywords: string[]) => void;
     onLoginClick: () => void;
     onSignupClick: () => void;
     onPaymentClick: (tier: string) => void;
@@ -55,8 +53,6 @@ export default function LeftSidebar({
     setSelectedSubRegion,
     selectedJobType,
     setSelectedJobType,
-    selectedKeywords,
-    setSelectedKeywords,
     onLoginClick,
     onSignupClick,
     onPaymentClick,
@@ -67,14 +63,6 @@ export default function LeftSidebar({
 }: LeftSidebarProps) {
     const brand = useBrand();
 
-    // 키워드 토글 (최대 5개)
-    const toggleKeyword = (keyword: string) => {
-        if (selectedKeywords.includes(keyword)) {
-            setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
-        } else if (selectedKeywords.length < 5) {
-            setSelectedKeywords([...selectedKeywords, keyword]);
-        }
-    };
 
     return (
         <div className="hidden lg:block w-[220px] flex-shrink-0 space-y-4">
@@ -192,21 +180,15 @@ export default function LeftSidebar({
                         <span className="text-purple-600">편의사항</span> 키워드
                     </h4>
                     <span className="text-[10px] text-gray-500">
-                        {selectedKeywords.length}/5
+                        필터
                     </span>
                 </div>
                 <div className="flex flex-wrap gap-1 max-h-[200px] overflow-y-auto">
                     {KEYWORD_OPTIONS.map((kw) => (
                         <button
                             key={kw}
-                            onClick={() => toggleKeyword(kw)}
-                            className={`px-2 py-1 rounded text-[9px] font-bold transition ${selectedKeywords.includes(kw)
-                                ? 'bg-pink-600 text-white'
-                                : selectedKeywords.length >= 5
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            disabled={selectedKeywords.length >= 5 && !selectedKeywords.includes(kw)}
+                            onClick={() => { }}
+                            className={`px-2 py-1 rounded text-[9px] font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                         >
                             {kw}
                         </button>
@@ -284,6 +266,6 @@ export default function LeftSidebar({
                     <p className="text-xs mt-2 opacity-90">지원금 지원<br />당일지급<br />뮤초진행</p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

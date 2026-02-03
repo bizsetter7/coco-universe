@@ -36,7 +36,6 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
     const [selectedSubRegion, setSelectedSubRegion] = useState('전체');
     const [selectedJobType, setSelectedJobType] = useState('전체');
     const [selectedSubJobType, setSelectedSubJobType] = useState('전체');
-    const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeSearchQuery, setActiveSearchQuery] = useState('');
 
@@ -255,8 +254,6 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                             setSelectedSubRegion={setSelectedSubRegion}
                             selectedJobType={selectedJobType}
                             setSelectedJobType={setSelectedJobType}
-                            selectedKeywords={selectedKeywords}
-                            setSelectedKeywords={setSelectedKeywords}
                             onLoginClick={() => router.push('/?page=login')}
                             onSignupClick={() => router.push('/?page=signup')}
                             onPaymentClick={openPaymentPopup}

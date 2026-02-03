@@ -43,7 +43,7 @@ export default function AdminPage() {
     useEffect(() => {
         const initialData = (shopsData as Shop[]).map(s => ({
             ...s,
-            tier: s.tier || ((s as any).is_premium ? 'grand' : 'basic'),
+            tier: s.tier || ((s as { is_premium?: boolean }).is_premium ? 'grand' : 'basic'),
             is_verified: s.is_verified || false,
             expiryDate: s.expiryDate || '',
             updatedAt: s.updatedAt || new Date().toISOString(),

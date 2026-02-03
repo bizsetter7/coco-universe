@@ -1108,8 +1108,6 @@ export default function HomePortal() {
                   setSelectedSubRegion={setSelectedSubRegion}
                   selectedJobType={selectedJobType}
                   setSelectedJobType={setSelectedJobType}
-                  selectedKeywords={selectedKeywords}
-                  setSelectedKeywords={setSelectedKeywords}
                   onLoginClick={() => setCurrentPage('login')}
                   onSignupClick={() => setCurrentPage('signup')}
                   onPaymentClick={() => setCurrentPage('payment')}

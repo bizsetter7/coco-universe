@@ -47,7 +47,7 @@ const NOTICES = [
     { id: 6, title: '[중요] 서비스 전면 개편 및 광고 상품 단가 확정 안내', date: '2026-01-27', isNew: true, category: '공지' },
     { id: 5, title: '[안내] PC버전 사이드배너 광고 노출 시스템 도입 안내', date: '2026-01-25', isNew: true, category: '공지' },
     { id: 4, title: '[공지] 여성 전용 1:1 실시간 채팅 상담 상담원 증설 안내', date: '2026-01-15', isNew: true, category: '공지' },
-    { id: 3, title: '[안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내', date: '2026-01-10', isNew: false, category: '점검' },
+    { id: 3, title: '[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내', date: '2026-01-10', isNew: false, category: '점검' },
 ];
 
 const FAQS = [

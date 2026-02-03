@@ -1486,7 +1486,7 @@ export default function MyShopPage() {
                                                                     onChange={() => {
                                                                         if (product.id !== 'p8') {
                                                                             setSelectedAdProduct(product.id);
-                                                                            setSelectedAdPeriod(days as any);
+                                                                            setSelectedAdPeriod(days as 30 | 60 | 90);
                                                                         }
                                                                     }}
                                                                 />
@@ -1496,7 +1496,7 @@ export default function MyShopPage() {
                                                                     </div>
                                                                 )}
                                                                 <span className="text-[9px] sm:text-[10px] font-bold uppercase leading-none mb-0.5 sm:mb-1">{days}일</span>
-                                                                <span className={`text-[11px] sm:text-xs font-black tracking-tighter ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`}>{(product as any)[`d${days}`].toLocaleString()}원</span>
+                                                                <span className={`text-[11px] sm:text-xs font-black tracking-tighter ${selectedAdProduct === product.id && selectedAdPeriod === days ? 'text-pink-600' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}`}>{(product as Record<string, any>)[`d${days}`].toLocaleString()}원</span>
                                                             </label>
                                                         ))
                                                     )}
@@ -1522,7 +1522,7 @@ export default function MyShopPage() {
                                                             }
                                                         }}
                                                     >
-                                                        <input type="radio" checked={iconPeriod === d} onChange={() => { if (selectedAdProduct) setIconPeriod(d as any); }} className="hidden" />
+                                                        <input type="radio" checked={iconPeriod === d} onChange={() => { if (selectedAdProduct) setIconPeriod(d as 30 | 60 | 90); }} className="hidden" />
                                                         <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${iconPeriod === d ? 'border-pink-500' : 'border-gray-300'}`}>
                                                             {iconPeriod === d && <div className="w-2 h-2 rounded-full bg-pink-500" />}
                                                         </div>
@@ -1582,7 +1582,7 @@ export default function MyShopPage() {
                                                             }
                                                         }}
                                                     >
-                                                        <input type="radio" checked={highlighterPeriod === d} onChange={() => { if (selectedAdProduct) setHighlighterPeriod(d as any); }} className="hidden" />
+                                                        <input type="radio" checked={highlighterPeriod === d} onChange={() => { if (selectedAdProduct) setHighlighterPeriod(d as 30 | 60 | 90); }} className="hidden" />
                                                         <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${highlighterPeriod === d ? 'border-pink-500' : 'border-gray-300'}`}>
                                                             {highlighterPeriod === d && <div className="w-2 h-2 rounded-full bg-pink-500" />}
                                                         </div>
@@ -1637,7 +1637,7 @@ export default function MyShopPage() {
                                                 {['none', 'color', 'glow'].map((opt) => (
                                                     <button
                                                         key={opt}
-                                                        onClick={() => setBorderOption(opt as any)}
+                                                        onClick={() => setBorderOption(opt as 'none' | 'color' | 'glow')}
                                                         className={`flex-1 py-2 rounded-lg text-xs font-bold border transition capitalize ${borderOption === opt ? 'bg-purple-100 border-purple-500 text-purple-700 ring-2 ring-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:ring-purple-900/50' : (brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-500')}`}
                                                     >
                                                         {opt === 'none' ? '없음' : opt === 'color' ? '컬러 테두리' : 'Glow 효과'}

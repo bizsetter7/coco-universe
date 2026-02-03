@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import shopsData from '@/lib/data/shops.json';
 import JobClient from './JobClient';
+import { Shop } from '@/types/shop';
 
 // Constant from page.tsx
 const JOB_TYPES = ['룸알바', '노래주점', '텐프로/쩜오', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function JobPage() {
     // Pass raw shops data to client for filtering
-    const shops = shopsData as any[];
+    const shops = shopsData as Shop[];
 
     return <JobClient shops={shops} jobTypes={JOB_TYPES} />;
 }

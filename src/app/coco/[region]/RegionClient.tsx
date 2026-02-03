@@ -221,8 +221,6 @@ export default function RegionClient({ regionName, shops: initialShops }: Region
                         setSelectedSubRegion={setSelectedSubRegion}
                         selectedJobType={selectedJobType}
                         setSelectedJobType={setSelectedJobType}
-                        selectedKeywords={[]}
-                        setSelectedKeywords={() => { }}
                         onLoginClick={() => router.push('/?page=login')}
                         onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={() => router.push('/?page=payment')}
