@@ -46,7 +46,7 @@ const JobAdSection = ({
 }: JobAdSectionProps) => {
     const router = useRouter();
 
-    console.log(`[JobAdSection Debug - ${title}] total shops:`, shops.length, "limit:", limit);
+    console.log(`%c[JobAdSection Debug - ${title}]`, "color: #ff0080; font-weight: bold", "Data reached UI! total shops:", shops.length, "limit:", limit);
 
     return (
         <div className="mb-0">
@@ -106,7 +106,7 @@ const JobAdSection = ({
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                                     shadow-sm hover:shadow-md ad-card max-width-full
                                 `}
-                                style={{ contain: 'strict' }}
+                                style={{ contain: 'content' }}
                             >
                                 <div className="flex flex-col h-full">
                                     <div
