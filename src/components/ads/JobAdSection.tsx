@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Crown, Zap, Flame, Sparkles } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { BrandConfig } from '@/lib/brand-config';
@@ -21,7 +22,14 @@ interface JobAdSectionProps {
     toggleFavorite?: (e: React.MouseEvent, id: string) => void;
 }
 
-const tierConfig: Record<string, any> = {
+interface TierStyle {
+    bg: string;
+    text: string;
+    label: string;
+    icon: React.ReactNode;
+}
+
+const tierConfig: Record<string, TierStyle> = {
     grand: { bg: 'bg-amber-50', text: 'text-amber-600', label: 'GRAND', icon: <Crown size={18} className="text-amber-500" /> },
     premium: { bg: 'bg-purple-50', text: 'text-purple-600', label: 'PREMIUM', icon: <Crown size={18} className="text-purple-500" /> },
     deluxe: { bg: 'bg-blue-50', text: 'text-blue-600', label: 'DELUXE', icon: <Zap size={18} className="text-blue-500" /> },

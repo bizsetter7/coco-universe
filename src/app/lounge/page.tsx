@@ -1,9 +1,11 @@
 'use client';
 
 import { useBrand } from '@/components/BrandProvider';
+import { BrandConfig } from '@/lib/brand-config';
 import { Apple, Sparkles, Moon, ArrowLeft, Home, MessageCircle, User, ThumbsUp, ChevronRight, Calculator, Heart, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoungePage() {
     const brand = useBrand();
@@ -52,10 +54,11 @@ export default function LoungePage() {
                         <div className="relative overflow-hidden rounded-3xl bg-gray-900 aspect-[16/7] flex items-center px-8 text-white shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10"></div>
                             <div className="absolute inset-0 z-0">
-                                <img
+                                <Image
                                     src="/lounge_hero_premium.png"
                                     alt="Premium Lounge"
-                                    className="w-full h-full object-cover opacity-70"
+                                    fill
+                                    className="object-cover opacity-70"
                                 />
                             </div>
                             <div className="relative z-20 space-y-2">
@@ -270,7 +273,7 @@ export default function LoungePage() {
                                     <div className="text-5xl mb-6">💰</div>
                                     <h3 className="text-2xl font-black mb-4">오늘의 재물운: <span className="text-amber-500">최상(★★★★★)</span></h3>
                                     <div className={`p-6 rounded-3xl text-left border ${brand.theme === 'dark' ? 'bg-amber-900/10 border-amber-900/40' : 'bg-amber-50 border-amber-100'}`}>
-                                        <p className="font-bold text-amber-700 mb-2 italic">"동쪽에서 귀인이 나타나 큰 재물을 가져다줄 기운입니다."</p>
+                                        <p className="font-bold text-amber-700 mb-2 italic">&quot;동쪽에서 귀인이 나타나 큰 재물을 가져다줄 기운입니다.&quot;</p>
                                         <p className={`text-sm leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>오늘은 새로운 인연보다는 기존의 인연에서 큰 득이 있을 날입니다. 오후 3시에서 5시 사이가 가장 길한 시간대이니 참고하세요.</p>
                                     </div>
                                     <button onClick={() => setShowResult(false)} className="mt-8 text-sm text-gray-400 underline">다른 생일로 확인하기</button>
@@ -286,7 +289,18 @@ export default function LoungePage() {
     );
 }
 
-function LoungeServiceCard({ title, desc, icon, color, bgColor, darkBg, onClick, brand }: any) {
+interface LoungeServiceCardProps {
+    title: string;
+    desc: string;
+    icon: React.ReactNode;
+    color: string;
+    bgColor: string;
+    darkBg: string;
+    onClick: () => void;
+    brand: BrandConfig;
+}
+
+function LoungeServiceCard({ title, desc, icon, color, bgColor, darkBg, onClick, brand }: LoungeServiceCardProps) {
     return (
         <div
             onClick={onClick}

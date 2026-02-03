@@ -1106,7 +1106,13 @@ export default function MyShopPage() {
                                     </div>
                                     {mediaUrl && (
                                         <div className="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 relative group border">
-                                            <img src={mediaUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => (e.target as HTMLImageElement).style.opacity = '0.5'} />
+                                            <Image
+                                                src={mediaUrl}
+                                                alt="Preview"
+                                                width={800}
+                                                height={450}
+                                                className="w-full h-full object-cover"
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -1428,7 +1434,7 @@ export default function MyShopPage() {
                                     </div>
 
                                     <div className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-800' : 'divide-gray-100'}`}>
-                                        {DETAILED_PRICING.filter(p => p.isMain).map((product: any, idx) => (
+                                        {DETAILED_PRICING.filter(p => p.isMain).map((product, idx) => (
                                             <div key={product.id} className={`flex ${product.id === 'p8' ? 'flex-row items-center' : 'flex-col sm:flex-row sm:items-center'} p-3 gap-3 transition-colors ${brand.theme === 'dark' ? 'hover:bg-pink-900/10' : 'hover:bg-pink-50/10'} ${product.disabled ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
                                                 <div className="flex items-start gap-3 flex-1 min-w-0">
                                                     <div className={`w-14 h-14 sm:w-16 sm:h-20 rounded border flex-shrink-0 flex flex-col items-center justify-center text-[8px] sm:text-[10px] font-black ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-700' : 'bg-gray-50 border-gray-100 text-gray-300'}`}>

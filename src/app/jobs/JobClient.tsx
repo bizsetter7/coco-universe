@@ -297,7 +297,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         <div className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800' : 'bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5'}`}>
                             <div className="flex items-center gap-3 overflow-hidden">
                                 <span className="bg-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm">공지사항</span>
-                                <p className="text-[13px] font-bold text-gray-700 dark:text-gray-200 truncate">[안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내</p>
+                                <p className="text-[13px] font-bold text-gray-700 dark:text-gray-200 truncate">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
                             </div>
                             <ChevronRight size={16} className="text-gray-300 shrink-0" />
                         </div>

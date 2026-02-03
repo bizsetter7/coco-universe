@@ -586,7 +586,13 @@ function CustomerCenterContent() {
                                                                 className={`relative cursor-pointer overflow-hidden rounded-xl border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'} ${item.isMobile ? 'max-w-[180px] mx-auto aspect-[9/16]' : 'aspect-[16/10]'}`}
                                                                 onClick={() => setSelectedImage(item.img)}
                                                             >
-                                                                <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                                                                <Image
+                                                                    src={item.img}
+                                                                    alt={item.title}
+                                                                    width={item.isMobile ? 180 : 800}
+                                                                    height={item.isMobile ? 320 : 500}
+                                                                    className="w-full h-full object-cover"
+                                                                />
                                                                 <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                                                                     <span className="text-white font-black flex items-center gap-1.5 bg-pink-600 px-3 py-1.5 rounded-full text-[10px] shadow-xl">
                                                                         <Search size={12} /> 확대
@@ -778,7 +784,7 @@ function CustomerCenterContent() {
                                             <Zap size={120} className="text-pink-500" />
                                         </div>
                                         <div className="relative z-10">
-                                            <h4 className="text-xl md:text-2xl font-black mb-2">구인 효과를 극대화하는 '점프' ⚡</h4>
+                                            <h4 className="text-xl md:text-2xl font-black mb-2">구인 효과를 극대화하는 &apos;점프&apos; ⚡</h4>
                                             <p className="text-gray-400 text-[13px] md:text-sm font-bold mb-8">내 업소를 리스트 최상단으로 끌어올려 보세요.</p>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1157,7 +1163,7 @@ function CustomerCenterContent() {
                                     </div>
                                     <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
                                         <p className="mb-4 font-black text-gray-900 dark:text-white">제 1조 (목적)</p>
-                                        <p className="mb-6 ml-2 text-gray-500">본 약관은 코코알바(이하 "회사")가 제공하는 온라인 구인구직 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.</p>
+                                        <p className="mb-6 ml-2 text-gray-500">본 약관은 코코알바(이하 &quot;회사&quot;)가 제공하는 온라인 구인구직 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.</p>
 
                                         <p className="mb-4 font-black text-gray-900 dark:text-white">제 2조 (서비스의 내용)</p>
                                         <p className="mb-6 ml-2 text-gray-500">1. 회사가 제공하는 서비스는 구인공고 등록, 이력서 등록, 광고 대행, 인재 매칭 지원 서비스 등이 포함됩니다.<br />2. 회사는 서비스의 품질 향상을 위해 필요한 경우 서비스의 내용을 변경하거나 중단할 수 있습니다.</p>
@@ -1173,7 +1179,7 @@ function CustomerCenterContent() {
                                         <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
                                     </div>
                                     <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
-                                        <p className="mb-6 text-gray-500 italic">"코코알바"는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
+                                        <p className="mb-6 text-gray-500 italic">&quot;코코알바&quot;는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
 
                                         <p className="mb-4 font-black text-gray-900 dark:text-white">1. 개인정보의 수집 및 이용 목적</p>
                                         <p className="mb-6 ml-2 text-gray-500">회사는 회원가입, 원활한 고객 상담, 각종 서비스 제공을 위해 최소한의 개인정보를 수집하며, 수집된 정보는 회원 식별 및 공고 관리 목적으로만 사용됩니다.</p>
@@ -1238,7 +1244,13 @@ function CustomerCenterContent() {
                             </div>
 
                             <div className="relative w-full h-full flex items-center justify-center">
-                                <img src={selectedImage || undefined} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
+                                <Image
+                                    src={selectedImage || ''}
+                                    alt="Ad Placement Guide Full"
+                                    width={1000}
+                                    height={1500}
+                                    className="max-width-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+                                />
                                 <button
                                     onClick={() => setSelectedImage(null)}
                                     className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
