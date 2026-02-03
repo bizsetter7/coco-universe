@@ -1229,29 +1229,26 @@ function CustomerCenterContent() {
                 />
 
                 {/* Image Zoom Modal */}
-                {
-                    selectedImage && (
-                        <div className="modal-overlay" onClick={() => setSelectedImage(null)}>
-                            <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
-                                {/* Centered Header for Image Modal as requested */}
-                                <div className="mb-6 text-center">
-                                    <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
-                                    <div className="w-12 h-1 bg-pink-600 mx-auto rounded-full"></div>
-                                </div>
+                {selectedImage && (
+                    <div className="modal-overlay" onClick={() => setSelectedImage(null)}>
+                        <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
+                            <div className="mb-6 text-center">
+                                <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
+                                <div className="w-12 h-1 bg-pink-600 mx-auto rounded-full"></div>
+                            </div>
 
-                                <div className="relative w-full h-full flex items-center justify-center">
-                                    <img src={selectedImage || undefined} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
-                                    <button
-                                        onClick={() => setSelectedImage(null)}
-                                        className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
-                                    >
-                                        <X size={24} />
-                                    </button>
-                                </div>
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <img src={selectedImage || undefined} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
+                                <button
+                                    onClick={() => setSelectedImage(null)}
+                                    className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
+                                >
+                                    <X size={24} />
+                                </button>
                             </div>
                         </div>
-                    )
-                }
+                    </div>
+                )}
                 <Footer />
             </div>
 
