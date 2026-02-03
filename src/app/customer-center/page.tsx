@@ -301,12 +301,21 @@ function CustomerCenterContent() {
                                 고객지원센터
                             </h1>
                         </div>
-                        <button onClick={() => {
-                            if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
-                            router.push('/');
-                        }} className="py-2 pl-2 text-gray-400 hover:text-gray-900 transition-colors">
-                            <Home size={24} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            {/* Mobile Hamburger Menu Button */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 order-2"
+                            >
+                                {isMobileMenuOpen ? <X size={20} className="text-pink-600" /> : <Menu size={20} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-700'} />}
+                            </button>
+                            <button onClick={() => {
+                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
+                                router.push('/');
+                            }} className="py-2 pl-2 text-gray-400 hover:text-gray-900 transition-colors">
+                                <Home size={24} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,21 +328,14 @@ function CustomerCenterContent() {
                             {/* PC Title / Mobile Toggle Header */}
                             <div className={`p-4 md:p-5 border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                                 <p className={`text-[13px] font-black uppercase tracking-widest hidden md:block ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-400'}`}>Customer Support</p>
-                                {/* Mobile View: Active Tab & Toggle */}
+                                {/* Mobile View: Active Tab Display Only */}
                                 <div className="md:hidden flex items-center gap-2 text-sm font-black w-full justify-between">
                                     <span className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeTab}</span>
-                                    <button
-                                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                        className="flex items-center justify-center border rounded-lg bg-white"
-                                        style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
-                                    >
-                                        {isMobileMenuOpen ? <X size={20} style={{ color: '#000' }} /> : <Menu size={20} style={{ color: '#000' }} />}
-                                    </button>
                                 </div>
                             </div>
 
-                            {/* Nav List: Hidden on mobile unless open, always visible on desktop */}
-                            <nav className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col p-2 md:p-0 gap-1 md:gap-0`}>
+                            {/* Desktop Nav List (Hidden on mobile) */}
+                            <nav className="hidden md:flex flex-col p-2 md:p-0 gap-1 md:gap-0">
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
@@ -1251,6 +1253,60 @@ function CustomerCenterContent() {
                     )
                 }
                 <Footer />
+            </div>
+
+            {/* Mobile Drawer UI */}
+            <div
+                className={`fixed inset-0 z-[11000] md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}
+                style={{ isolation: 'isolate' }}
+            >
+                {/* Backdrop */}
+                <div
+                    className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+
+                {/* Drawer Content */}
+                <div
+                    className={`absolute right-0 top-0 h-full w-[280px] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                >
+                    <div className="p-6 border-b flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
+                            <span className={`font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객지원센터</span>
+                        </div>
+                        <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 -mr-2 text-gray-400">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="space-y-2">
+                            {TABS.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id)}
+                                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-black transition-all ${activeTab === tab.id
+                                        ? 'bg-pink-600 text-white shadow-lg shadow-pink-200 dark:shadow-pink-900/20'
+                                        : `${brand.theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}`}
+                                >
+                                    <div className={activeTab === tab.id ? 'text-white' : 'text-gray-400'}>
+                                        {tab.icon}
+                                    </div>
+                                    {tab.id}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-gray-50 dark:bg-gray-800/50">
+                        <div className="flex items-center gap-3 mb-2">
+                            <PhoneCall size={18} className="text-pink-600" />
+                            <span className={`font-black text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>24시간 상담 가능</span>
+                        </div>
+                        <p className="text-[12px] text-gray-500 font-medium">관리자에게 문의하시면 신속하게 답변해 드립니다.</p>
+                    </div>
+                </div>
             </div>
         </>
     );
