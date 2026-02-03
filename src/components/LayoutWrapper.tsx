@@ -27,7 +27,8 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
                 style={{
                     overflow: 'visible',
                     position: 'relative',
-                    paddingTop: '56px'
+                    paddingTop: '56px',
+                    transform: 'translateZ(0)'
                 }}
             >
 

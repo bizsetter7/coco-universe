@@ -106,11 +106,12 @@ const JobAdSection = ({
                                     border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                                     shadow-sm hover:shadow-md ad-card max-width-full
                                 `}
+                                style={{ contain: 'strict' }}
                             >
                                 <div className="flex flex-col h-full">
                                     <div
                                         className="relative w-full overflow-hidden bg-[#f1f5f9]"
-                                        style={{ height: 0, paddingBottom: '100%', position: 'relative' }}
+                                        style={{ height: 0, paddingBottom: '100%', position: 'relative', willChange: 'auto !important' as any }}
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
