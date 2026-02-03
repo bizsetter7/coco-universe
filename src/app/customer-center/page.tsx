@@ -1240,7 +1240,7 @@ function CustomerCenterContent() {
                                 </div>
 
                                 <div className="relative w-full h-full flex items-center justify-center">
-                                    <img src={selectedImage} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
+                                    <img src={selectedImage || undefined} alt="Ad Placement Guide Full" className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
                                     <button
                                         onClick={() => setSelectedImage(null)}
                                         className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
