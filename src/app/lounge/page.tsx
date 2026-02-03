@@ -51,7 +51,7 @@ export default function LoungePage() {
                 {activeTab === 'main' && (
                     <div className="space-y-8">
                         {/* 상단 배너 */}
-                        <div className="relative overflow-hidden rounded-3xl bg-gray-900 aspect-[16/7] flex items-center px-8 text-white shadow-xl">
+                        <div className="relative overflow-hidden rounded-3xl bg-gray-900 h-[300px] flex items-center px-8 text-white shadow-xl">
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10"></div>
                             <div className="absolute inset-0 z-0">
                                 <Image

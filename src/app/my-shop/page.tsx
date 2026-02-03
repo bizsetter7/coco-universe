@@ -1106,7 +1106,7 @@ export default function MyShopPage() {
                                         </p>
                                     </div>
                                     {mediaUrl && (
-                                        <div className="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 relative group border">
+                                        <div className="w-full h-[450px] rounded-xl overflow-hidden bg-gray-100 relative group border">
                                             <Image
                                                 src={mediaUrl}
                                                 alt="Preview"
