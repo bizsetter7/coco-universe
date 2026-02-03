@@ -11,6 +11,7 @@ import {
     RefreshCw, Calendar, Eye, Highlighter, Smile, Menu, MousePointerClick,
     Zap, Star, Crown
 } from 'lucide-react';
+import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBrand } from '@/components/BrandProvider';
 
@@ -118,15 +119,15 @@ const AD_TIERS = [
 ];
 
 const DETAILED_PRICING = [
-    { id: 'p1', name: '그랜드 (Grand)', desc: '메인 독점! 최상단 0순위에 배치됩니다. (전 지역 검색 결과 압도적 선점 / Glow 효과)', d30: 350000, d60: 630000, d90: 840000, isMain: true },
-    { id: 'p2', name: '프리미엄 (Premium)', desc: '메인 중단의 가장 눈에 띄는 위치에 배치됩니다. (실버 보더 적용 / 자동점프 일 30회)', d30: 200000, d60: 360000, d90: 480000, isMain: true },
-    { id: 'p3', name: '디럭스 (Deluxe)', desc: '메인페이지 프리미엄 하단의 위치에 배치됩니다. (블루 보더 적용 / 자동점프 일 30회)', d30: 180000, d60: 324000, d90: 432000, isMain: true },
-    { id: 'p4', name: '스페셜 (Special)', desc: '리스트 중간 상단에 배치됩니다. (핑크 보더 적용 / 자동점프 일 20회)', d30: 150000, d60: 270000, d90: 360000, isMain: true },
-    { id: 'p5', name: '급구/추천 (Urgent/Rec)', desc: '강렬한 빨간 제목과 추천 배지로 주목도를 높입니다. (목록 강조 노출 / 자동점프 일 20회)', d30: 120000, d60: 216000, d90: 288000, isMain: true },
-    { id: 'p6', name: '네이티브 (Native)', desc: '리스트 하단에 배치됩니다. (지역 1개 노출/네이티브 스타일/자동점프 일 10회 설정 제공)', d30: 100000, d60: 180000, d90: 240000, isMain: true },
-    { id: 'p7', name: '베이직/줄광고 (Basic)', desc: '일반 리스트 노출 (실속형 구인 상품 / 자동점프 일 5회 설정 제공)', d30: 60000, d60: 100000, d90: 140000, isMain: true },
-    { id: 'p8', name: '강조옵션 (Icon/Highlighter)', desc: '아이콘 및 형광펜 효과로 시선을 사로잡으세요. (목록 옵션 노출)', d30: 30000, d60: 55000, d90: 70000, isMain: true },
-    { id: 'bold', name: '굵은글씨 적용', desc: '채용정보의 제목을 굵게 표시되어 어디든 눈에 띌 수 있도록 표시', d30: 30000, d60: 55000, d90: 70000, isMain: false },
+    { id: 'p1', name: '그랜드 (Grand)', desc: '메인 독점! 최상단 0순위에 배치됩니다. (전 지역 검색 결과 압도적 선점 / Glow 효과)', d30: 350000, d60: 630000, d90: 840000, isMain: true, disabled: false },
+    { id: 'p2', name: '프리미엄 (Premium)', desc: '메인 중단의 가장 눈에 띄는 위치에 배치됩니다. (실버 보더 적용 / 자동점프 일 30회)', d30: 200000, d60: 360000, d90: 480000, isMain: true, disabled: false },
+    { id: 'p3', name: '디럭스 (Deluxe)', desc: '메인페이지 프리미엄 하단의 위치에 배치됩니다. (블루 보더 적용 / 자동점프 일 30회)', d30: 180000, d60: 324000, d90: 432000, isMain: true, disabled: false },
+    { id: 'p4', name: '스페셜 (Special)', desc: '리스트 중간 상단에 배치됩니다. (핑크 보더 적용 / 자동점프 일 20회)', d30: 150000, d60: 270000, d90: 360000, isMain: true, disabled: false },
+    { id: 'p5', name: '급구/추천 (Urgent/Rec)', desc: '강렬한 빨간 제목과 추천 배지로 주목도를 높입니다. (목록 강조 노출 / 자동점프 일 20회)', d30: 120000, d60: 216000, d90: 288000, isMain: true, disabled: false },
+    { id: 'p6', name: '네이티브 (Native)', desc: '리스트 하단에 배치됩니다. (지역 1개 노출/네이티브 스타일/자동점프 일 10회 설정 제공)', d30: 100000, d60: 180000, d90: 240000, isMain: true, disabled: false },
+    { id: 'p7', name: '베이직/줄광고 (Basic)', desc: '일반 리스트 노출 (실속형 구인 상품 / 자동점프 일 5회 설정 제공)', d30: 60000, d60: 100000, d90: 140000, isMain: true, disabled: false },
+    { id: 'p8', name: '강조옵션 (Icon/Highlighter)', desc: '아이콘 및 형광펜 효과로 시선을 사로잡으세요. (목록 옵션 노출)', d30: 30000, d60: 55000, d90: 70000, isMain: true, disabled: false },
+    { id: 'bold', name: '굵은글씨 적용', desc: '채용정보의 제목을 굵게 표시되어 어디든 눈에 띌 수 있도록 표시', d30: 30000, d60: 55000, d90: 70000, isMain: false, disabled: false },
 ];
 
 const AD_ICONS = [

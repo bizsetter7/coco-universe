@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { useBrand } from '@/components/BrandProvider';
 import { Footer } from '@/components/layout/Footer';
 import {
