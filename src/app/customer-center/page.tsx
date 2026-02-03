@@ -102,9 +102,13 @@ const DETAILED_PRICING = [
 
 export default function CustomerCenterPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">로딩 중...</div>}>
-            <CustomerCenterContent />
-        </Suspense>
+        <>
+            {/* Deployment Verification Tag for SSR Visibility */}
+            <div data-deploy-version="2026-02-04-03:00" style={{ display: 'none' }}></div>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">로딩 중...</div>}>
+                <CustomerCenterContent />
+            </Suspense>
+        </>
     );
 }
 
