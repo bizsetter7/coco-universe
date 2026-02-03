@@ -1262,6 +1262,8 @@ function CustomerCenterContent() {
                         </div>
                     </div>
                 )}
+                {/* Deployment Verification Tag */}
+                <div data-deploy-version="2026-02-04-02:40" style={{ display: 'none' }}></div>
                 <Footer />
             </div>
 
