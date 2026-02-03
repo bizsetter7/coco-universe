@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig: any = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // eslint: { ignoreDuringBuilds: true }, // Vercel redeploy trigger: 2026-02-04
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

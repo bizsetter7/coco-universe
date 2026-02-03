@@ -1,4 +1,4 @@
-﻿'use client'; // Deploy Version: 2026-02-04-02-35 (Forced Redeploy)
+'use client'; // Deploy Version: 2026-02-04-02-35 (Forced Redeploy)
 
 import React, { useMemo } from 'react';
 import HomeClient from '@/components/home/HomeClient';
