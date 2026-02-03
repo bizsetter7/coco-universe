@@ -85,7 +85,7 @@ export default function AdminPage() {
         }
     };
 
-    const updateShop = (id: string, field: keyof Shop | string, value: any) => {
+    const updateShop = (id: string, field: keyof Shop | string, value: string | boolean | string[]) => {
         setShops(prev => prev.map(shop => {
             if (shop.id !== id) return shop;
 

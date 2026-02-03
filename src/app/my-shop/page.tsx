@@ -601,7 +601,7 @@ export default function MyShopPage() {
         try {
             const selection = window.getSelection();
             let fontName = '';
-            let fontSize = '';
+            const fontSize = '';
             let foreColor = '#000000';
             let hiliteColor = 'transparent';
             let boldState = false;
@@ -610,7 +610,7 @@ export default function MyShopPage() {
 
             if (selection && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
-                let node = range.startContainer.nodeType === 1 ? (range.startContainer as HTMLElement) : range.startContainer.parentElement;
+                const node = range.startContainer.nodeType === 1 ? (range.startContainer as HTMLElement) : range.startContainer.parentElement;
 
                 if (node && editorRef.current?.contains(node)) {
                     const style = window.getComputedStyle(node);

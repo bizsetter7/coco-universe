@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         }
 
         // 3. Check for Duplicate ID
-        const existingUser = users.find((user: any) => user.id === id);
+        const existingUser = users.find((user: { id: string }) => user.id === id);
         if (existingUser) {
             return NextResponse.json({ success: false, message: '이미 존재하는 아이디입니다.' }, { status: 409 });
         }

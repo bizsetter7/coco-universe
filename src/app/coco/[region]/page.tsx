@@ -46,5 +46,5 @@ export default async function RegionPage(props: { params: Params }) {
     // Since useBrand() is a hook, we pass the necessary brand info or keep it in the client component
     // For now, we'll assume RegionClient can handle its own brand context or receive it as props
 
-    return <RegionClient regionName={regionName} shops={shops} brand={{ theme: 'light' }} />;
+    return <RegionClient regionName={regionName} shops={shops} />;
 }

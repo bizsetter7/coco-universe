@@ -3,18 +3,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, PhoneCall, Crown, Zap } from 'lucide-react';
+import { Shop } from '@/types/shop';
 import { useBrand } from './BrandProvider';
 import shopsData from '@/lib/data/shops.json';
-
-interface Shop {
-    id: string;
-    name: string;
-    region: string;
-    pay: string;
-    tier?: string;
-    workType?: string;
-    [key: string]: any;
-}
 
 interface BannerSidebarProps {
     side: 'left' | 'right';

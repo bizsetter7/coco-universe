@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { BrandConfig } from '@/lib/brand-config';
 
-export default function EventPopup({ brand }: { brand: any }) {
+export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 

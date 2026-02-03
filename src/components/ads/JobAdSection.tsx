@@ -123,22 +123,14 @@ const JobAdSection = ({
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
-                                                <img
+                                                <Image
                                                     src={shop.options.mediaUrl}
                                                     alt={shop.name}
+                                                    width={400}
+                                                    height={400}
                                                     className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500"
                                                     style={{ display: 'block' }}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    onError={(e) => {
-                                                        const target = e.currentTarget;
-                                                        const nextEl = target.nextElementSibling;
-                                                        if (nextEl) {
-                                                            target.style.display = 'none';
-                                                            nextEl.classList.remove('hidden');
-                                                            nextEl.classList.add('flex');
-                                                        }
-                                                    }}
+                                                    priority={idx < 4}
                                                 />
                                                 <div className="hidden absolute inset-0 w-full h-full">
                                                     {renderFallback()}

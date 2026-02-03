@@ -9,6 +9,7 @@ import {
     Home
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 
 const CATEGORIES = [
@@ -124,7 +125,14 @@ export default function WritePostPage() {
 
                         {images.map((img, idx) => (
                             <div key={idx} className="w-20 h-20 rounded-lg border border-gray-100 overflow-hidden relative shrink-0">
-                                <img src={img} alt="preview" className="w-full h-full object-cover" />
+                                <Image
+                                    src={img}
+                                    alt="preview"
+                                    width={80}
+                                    height={80}
+                                    className="w-full h-full object-cover"
+                                    unoptimized // Since it's a blob URL
+                                />
                                 <button
                                     onClick={() => removeImage(idx)}
                                     className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white"
