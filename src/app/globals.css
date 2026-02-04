@@ -3,8 +3,8 @@
 }
 
 html {
-  scroll-behavior: auto !important;
-  /* 지시사항: 스크롤 파기 억제 */
+  scroll-behavior: smooth !important;
+  /* 지시사항: PC 고해상도 끊김 방지 */
 }
 
 @import "tailwindcss";
@@ -34,8 +34,8 @@ html {
 html {
   -webkit-font-smoothing: antialiased;
   /* 지시사항: 텍스트 렌더링 단순화 */
-  scroll-behavior: auto !important;
-  /* 지시사항: 미세 떨림 방지를 위한 기본 스크롤 회귀 */
+  scroll-behavior: smooth !important;
+  /* 지시사항: PC 스크롤 보간 강제 */
 }
 
 html,

@@ -1,6 +1,6 @@
 'use client'; // Physical Surgical Update: 2026-02-04-14:40 (Pure FPS Engine Turn)
 
-import React, { useState } from 'react';
+import React, { useState, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Crown, Zap, Flame, Sparkles } from 'lucide-react';
@@ -95,11 +95,12 @@ const JobCard = React.memo(({
 
     return (
         <div
-            onClick={() => setSelectedShop(shop)}
+            onClick={() => startTransition(() => setSelectedShop(shop))}
             className={`
-                cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden duration-300
+                cursor-pointer group block relative bg-white rounded-xl overflow-hidden duration-300
                 border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
-                shadow-sm hover:shadow-md ad-card max-width-full
+                border-b-2 hover:border-b-4 active:border-b-2
+                ad-card max-width-full
             `}
             style={{
                 contain: 'content',

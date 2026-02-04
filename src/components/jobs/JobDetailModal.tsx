@@ -31,8 +31,17 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose }) => {
     if (!shop) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg md:max-w-2xl overflow-hidden relative flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+            {/* Modal Container: Mobile 90-100%, Tablet 600px, PC 800px */}
+            <div
+                className="
+                    bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden relative flex flex-col 
+                    w-full md:w-[600px] lg:w-[800px] 
+                    max-h-[90vh] lg:max-h-[80vh]
+                    animate-in fade-in zoom-in duration-200
+                "
+                onClick={e => e.stopPropagation()}
+            >
 
                 {/* Modal Header */}
                 <div className={`p-6 md:p-8 text-center relative shrink-0 ${shop.tier && TIER_GRADIENTS[shop.tier]
