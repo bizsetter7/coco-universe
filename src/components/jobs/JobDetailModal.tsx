@@ -31,14 +31,15 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose }) => {
     if (!shop) return null;
 
     return (
-        <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-            {/* Modal Container: Mobile 90-100%, Tablet 600px, PC 800px */}
+        <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 md:p-0" onClick={onClose}>
+            {/* Modal Container: Mobile 90-100% (Bottom Sheet), Tablet 600px, PC 800px */}
             <div
                 className="
-                    bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden relative flex flex-col 
-                    w-full md:w-[600px] lg:w-[800px] 
-                    max-h-[90vh] lg:max-h-[80vh]
-                    animate-in fade-in zoom-in duration-200
+                    bg-white dark:bg-gray-900 shadow-xl overflow-hidden flex flex-col
+                    fixed bottom-0 inset-x-0 w-full h-[90vh] rounded-t-2xl rounded-b-none
+                    md:static md:w-[600px] lg:w-[800px] md:h-auto md:max-h-[85vh] md:rounded-2xl
+                    animate-in slide-in-from-bottom duration-300 
+                    md:animate-in md:fade-in md:zoom-in md:duration-200
                 "
                 onClick={e => e.stopPropagation()}
             >
