@@ -1,4 +1,4 @@
-'use client'; // Physical Surgical Update: 2026-02-04-14:00 (Gray Brick & Zero-Jitter Fix)
+'use client'; // Physical Surgical Update: 2026-02-04-14:40 (Pure FPS Engine Turn)
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -48,6 +48,7 @@ const JobCardImage = ({ src, alt, priority }: { src: string, alt: string, priori
             width={400}
             height={400}
             sizes="(max-width: 768px) 50vw, 33vw"
+            quality={75}
             className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             style={{ display: 'block' }}
             priority={priority}
@@ -96,7 +97,7 @@ const JobCard = React.memo(({
         <div
             onClick={() => setSelectedShop(shop)}
             className={`
-                cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden transition-all duration-300
+                cursor-pointer group block relative bg-white rounded-[24px] overflow-hidden duration-300
                 border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
                 shadow-sm hover:shadow-md ad-card max-width-full
             `}
@@ -114,8 +115,7 @@ const JobCard = React.memo(({
                         aspectRatio: '1 / 1',
                         overflow: 'hidden',
                         backgroundColor: '#f8f9fa',
-                        // Reduced to standard transform for cleaner comp, removed explicit will-change if it causes memory pressure, 
-                        // but keeping simple transform can be okay. For now, removing to test "poison" theory.
+                        willChange: 'transform' // Localized hardware acceleration for smooth image appearing
                     }}
                 >
                     {shop.options?.mediaUrl ? (
