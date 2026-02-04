@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Physical Surgical Update: 2026-02-04-13:40 (CLS & Jitter Fix)
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -121,7 +121,7 @@ const JobAdSection = ({
                                     WebkitBackfaceVisibility: 'hidden'
                                 }}
                             >
-                                <div className="flex flex-col h-full">
+                                <div className="flex flex-col">
                                     <div
                                         className="relative w-full aspect-square overflow-hidden bg-[#f1f5f9]"
                                         style={{
@@ -130,6 +130,7 @@ const JobAdSection = ({
                                             aspectRatio: '1 / 1',
                                             overflow: 'hidden',
                                             backgroundColor: '#f1f5f9',
+                                            minHeight: '200px',
                                             willChange: 'transform'
                                         }}
                                     >
