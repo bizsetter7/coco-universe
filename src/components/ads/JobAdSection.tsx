@@ -1,6 +1,6 @@
 'use client'; // Physical Surgical Update: 2026-02-04-14:00 (Gray Brick & Zero-Jitter Fix)
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Crown, Zap, Flame, Sparkles } from 'lucide-react';
@@ -36,6 +36,25 @@ const tierConfig: Record<string, TierStyle> = {
     special: { bg: 'bg-teal-50', text: 'text-teal-600', label: 'SPECIAL', icon: <Sparkles size={18} className="text-teal-500" /> },
     urgent: { bg: 'bg-rose-50', text: 'text-rose-600', label: '급구', icon: <Flame size={18} className="text-rose-500" /> },
     recommended: { bg: 'bg-indigo-50', text: 'text-indigo-600', label: '추천', icon: <Sparkles size={18} className="text-indigo-500" /> },
+};
+
+const JobCardImage = ({ src, alt, priority }: { src: string, alt: string, priority: boolean }) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    return (
+        <Image
+            src={src}
+            alt={alt}
+            width={400}
+            height={400}
+            sizes="(max-width: 768px) 50vw, 33vw"
+            className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+            style={{ display: 'block' }}
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
+            onLoad={() => setIsLoaded(true)}
+        />
+    );
 };
 
 const JobAdSection = ({
@@ -84,7 +103,13 @@ const JobAdSection = ({
             </div>
 
             <div className="px-4 md:px-0">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div
+                    className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
+                    style={{
+                        contentVisibility: 'auto',
+                        containIntrinsicSize: '300px'
+                    }}
+                >
                     {shops.slice(0, limit).map((shop, idx) => {
                         console.log(`  -> Mapping [${idx}] shop:`, shop.name || shop.realName);
                         const rank = idx + 1;
@@ -135,15 +160,10 @@ const JobAdSection = ({
                                     >
                                         {shop.options?.mediaUrl ? (
                                             <>
-                                                <Image
+                                                <JobCardImage
                                                     src={shop.options.mediaUrl}
                                                     alt={shop.name}
-                                                    width={400}
-                                                    height={400}
-                                                    className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500"
-                                                    style={{ display: 'block' }}
                                                     priority={idx < 4}
-                                                    loading={idx < 4 ? undefined : "lazy"}
                                                 />
                                                 <div className="hidden absolute inset-0 w-full h-full">
                                                     {renderFallback()}
