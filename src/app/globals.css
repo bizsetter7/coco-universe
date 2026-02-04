@@ -85,6 +85,11 @@ aside {
 main {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  /* 지시사항: 모바일 가속 강제 */
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
 }
 
 .force-flex-stretch {

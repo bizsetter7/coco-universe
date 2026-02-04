@@ -1,4 +1,4 @@
-'use client'; // Physical Surgical Update: 2026-02-04-13:40 (CLS & Jitter Fix)
+'use client'; // Physical Surgical Update: 2026-02-04-14:00 (Gray Brick & Zero-Jitter Fix)
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -129,8 +129,7 @@ const JobAdSection = ({
                                             width: '100%',
                                             aspectRatio: '1 / 1',
                                             overflow: 'hidden',
-                                            backgroundColor: '#f1f5f9',
-                                            minHeight: '200px',
+                                            backgroundColor: '#f8f9fa',
                                             willChange: 'transform'
                                         }}
                                     >
@@ -162,8 +161,8 @@ const JobAdSection = ({
                                     </div>
 
                                     {/* BOTTOM: Info Section */}
-                                    <div className="p-3">
-                                        <div className="h-[44px] mb-2 flex flex-col justify-between">
+                                    <div className="p-3 mt-3">
+                                        <div className="mb-2 flex flex-col justify-between">
                                             <div className="flex justify-between items-start mb-0">
                                                 <h4 className={`text-[14px] font-black truncate leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[80%]`}>
                                                     {shop.realName || shop.name}
