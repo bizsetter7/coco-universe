@@ -2,19 +2,22 @@
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useBrand } from '@/components/BrandProvider';
-import { Footer } from '@/components/layout/Footer';
+
 import {
     Headphones,
     ChevronDown,
     ChevronUp,
+
     ChevronLeft,
     ChevronRight,
     PhoneCall,
     MessageSquare,
     ArrowLeft,
     Home,
+
     Megaphone,
     Search,
     ShoppingBag,
@@ -31,23 +34,61 @@ import {
     Zap,
     Crown,
     X,
-    Menu,
-    ShoppingCart,
-    Check,
     MapPin,
     Smartphone,
-    Tablet,
-    Monitor
+    Monitor,
+    AlertTriangle
 } from 'lucide-react';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
 
 // --- Mock Data ---
 const NOTICES = [
-    { id: 6, title: '[중요] 서비스 전면 개편 및 광고 상품 단가 확정 안내', date: '2026-01-27', isNew: true, category: '공지' },
-    { id: 5, title: '[안내] PC버전 사이드배너 광고 노출 시스템 도입 안내', date: '2026-01-25', isNew: true, category: '공지' },
-    { id: 4, title: '[공지] 여성 전용 1:1 실시간 채팅 상담 상담원 증설 안내', date: '2026-01-15', isNew: true, category: '공지' },
-    { id: 3, title: '[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내', date: '2026-01-10', isNew: false, category: '점검' },
+    {
+        id: 7,
+        title: '[필독] 이력서 등록 시 주의사항 (허위사실 기재 금지 등)',
+        date: '2026-02-07',
+        isNew: true,
+        category: '필독',
+        type: 'rich-resume'
+    },
+    {
+        id: 6,
+        title: '[중요] 서비스 전면 개편 및 광고 상품 단가 확정 안내',
+        date: '2026-01-27',
+        isNew: true,
+        category: '공지',
+        content: `브랜드 통합 시스템 오픈과 함께 광고 상품의 단가가 확정되었습니다. 
+더욱 효율적인 구인 환경을 제공하기 위해 시스템이 전면 개편되었으니 이용에 참고하시기 바랍니다. 
+상세한 단가는 고객센터 > 광고안내 탭에서 확인하실 수 있습니다.`
+    },
+    {
+        id: 5,
+        title: '[안내] PC버전 사이드배너 광고 노출 시스템 도입 안내',
+        date: '2026-01-25',
+        isNew: true,
+        category: '공지',
+        content: `PC 버전 사용자를 위한 사이드 고정 배너 노출 시스템이 도입되었습니다. 
+스크롤을 내려도 사라지지 않는 고정형 배너로 더욱 높은 노출 효과를 경험해 보세요.`
+    },
+    {
+        id: 4,
+        title: '[공지] 여성 전용 1:1 실시간 채팅 상담 상담원 증설 안내',
+        date: '2026-01-15',
+        isNew: true,
+        category: '공지',
+        content: `여성 회원님들의 안전하고 전문적인 상담을 위해 실시간 채팅 상담원을 대폭 증설하였습니다. 
+궁금하신 점은 언제든 1:1 상담을 통해 문의해 주세요.`
+    },
+    {
+        id: 3,
+        title: '[안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내',
+        date: '2026-01-10',
+        isNew: false,
+        category: '점검',
+        content: `최상위 광고 등급인 그랜드 티어(Grand Tier)의 혜택이 더욱 강화되었습니다. 
+메인 최상단 노출뿐만 아니라 전국 검색 결과 우선순위 적용 등 압도적인 혜택을 누려보세요.`
+    },
 ];
 
 const FAQS = [
@@ -113,6 +154,221 @@ export default function CustomerCenterPage() {
 }
 
 // Simplified Ad Type Description Component
+// --- Rich Components ---
+const ResumeNoticeDetail = () => {
+    const brand = useBrand();
+
+    return (
+        <div className="flex flex-col items-center py-6 md:py-10 px-1 md:px-0 max-w-4xl mx-auto space-y-10 md:space-y-12">
+            {/* Main Header */}
+            <div className="text-center space-y-2">
+                <p className="text-gray-900 font-black text-xl md:text-2xl tracking-tighter">이력서 등록 시</p>
+                <h4 className="text-4xl md:text-5xl font-black text-[#E14D2A] tracking-tighter break-keep">구직자 주의사항!</h4>
+            </div>
+
+            {/* Warning Box */}
+            <div className="w-full bg-[#E14D2A] rounded-[30px] md:rounded-[40px] p-6 md:p-12 text-center text-white relative shadow-xl shadow-red-100/50">
+                <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl md:rounded-3xl rotate-12 flex items-center justify-center shadow-lg border-4 border-[#E14D2A]">
+                    <div className="animate-pulse">
+                        <Zap size={32} className="md:size-[40px] text-[#E14D2A] fill-current" />
+                    </div>
+                </div>
+                <div className="pt-6 space-y-4">
+                    <h5 className="text-2xl md:text-3xl font-black leading-tight break-keep">
+                        구직자분들의 피해 방지를 위해<br />
+                        이력서 등록 시 반드시 주의하세요.
+                    </h5>
+                    <div className="h-px bg-white/20 w-full"></div>
+                    <div className="space-y-2 text-sm md:text-base font-bold text-red-50 leading-relaxed opacity-90 break-keep">
+                        <p>최근 불법 성매매 업소 및 보이스 피싱 등으로 인한</p>
+                        <p>피해 사례가 발생하고 있습니다.</p>
+                        <p className="mt-4 pt-4 border-t border-white/10">회원님들의 피해 방지와 투명한 구인 활동을 위해</p>
+                        <p>이력서 등록 시 주의 사항 및 대처 방법을 안내 드립니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Subsection 1 */}
+            <div className="w-full space-y-8">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
+                        <AlertTriangle size={24} />
+                    </div>
+                    <h6 className="text-xl md:text-2xl font-black text-gray-900 bg-red-50 px-6 py-3 rounded-full border border-red-100 shadow-sm">
+                        면접 시 주의 사항 및 대처 방법
+                    </h6>
+                </div>
+
+                <div className="text-center space-y-4 px-4 py-8 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+                    <p className="text-lg md:text-xl font-black text-gray-900 break-keep">
+                        구직자분들께서는 기업에서 먼저 연락이 올 시<br />
+                        <span className="text-red-600 underline decoration-red-200 underline-offset-4">진행중인 채용공고를 요청하시어</span><br />
+                        정보와 공고의 기업정보를 반드시 확인해 주세요.
+                    </p>
+                    <p className="text-sm font-bold text-gray-500">대면과 유선 상담에 대해서는 신중히 주의를 기울여 주시기 바랍니다.</p>
+                </div>
+            </div>
+
+            {/* Number List */}
+            <div className="w-full space-y-4">
+                {[
+                    "기업의 구체적인 정보를 알려주지 않고, 선물을 먼저 보내려고 하는 경우",
+                    "상호명이 아닌 별도의 개인이나 연락처 등은 곳에서 면접을 보자고 하는 경우",
+                    "통장, 원본, 인감 등 개인정보를 요구하는 경우 (보이스 피싱, 대출 등 사기 주의)",
+                    "취업을 조건으로 보증금, 선입금 등 금전을 요구하는 경우",
+                    "유흥비 대출 기만을 제의하는 경우 (보이스 피싱 및 성매매 등 불법 유입 주의)",
+                    "그 외 채용공고의 내용과 다른 직무를 제안하거나 유도하는 경우"
+                ].map((item, i) => (
+                    <div key={i} className="group relative flex items-center bg-[#E14D2A] text-white p-5 md:p-6 rounded-full shadow-md transition-transform hover:-translate-y-1">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-[#E14D2A] rounded-full flex items-center justify-center text-lg md:text-xl font-black shrink-0 shadow-sm">
+                            {i + 1}
+                        </div>
+                        <p className="flex-1 ml-4 md:ml-6 text-sm md:text-[17px] font-black leading-tight break-keep">
+                            {item}
+                        </p>
+                    </div>
+                ))}
+            </div>
+
+            {/* Important Warning Boxes */}
+            <div className="w-full space-y-4 md:space-y-6">
+                <div className="bg-[#E14D2A]/90 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-sm">
+                        <X size={24} className="md:size-[32px]" />
+                    </div>
+                    <p className="text-[15px] md:text-lg font-black leading-normal pt-0.5 md:pt-1 break-keep">
+                        통장, 체크카드, 계좌 비밀번호, 개인정보 요구는<br />
+                        취업을 빙자한 보이스 피싱 사기 행위일 수 있습니다.
+                    </p>
+                </div>
+
+                <div className="bg-[#E14D2A]/80 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-sm">
+                        <Zap size={24} className="md:size-[32px]" />
+                    </div>
+                    <p className="text-[15px] md:text-lg font-black leading-normal pt-0.5 md:pt-1 break-keep">
+                        고수익이 가능하다고 현혹하는 업제의 광고는<br />
+                        불법 성매매 광고일 가능성이 높으니 각별히 주의해 주세요.
+                    </p>
+                </div>
+            </div>
+
+            {/* Call Center Text */}
+            <div className="w-full text-center space-y-2 py-6 border-y border-red-50">
+                <p className="text-[#E14D2A] text-sm md:text-base font-black break-keep">
+                    저희 브랜드 통합 시스템은 불법 행위 예방을 위해 최선을 다하고 있으며,<br />
+                    회원분들의 안전하고 건강한 구인활동을 위해 지속적인 상시모니터링을 진행하고 있습니다.
+                </p>
+            </div>
+
+            {/* Guide Section */}
+            <div className="w-full space-y-10">
+                <h6 className="text-center text-2xl font-black text-gray-900">내 연락처 노출 설정 가이드</h6>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    {/* PC Guide */}
+                    <div className="space-y-6 text-center">
+                        <span className="inline-block px-4 py-1.5 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-widest">Guide (PC버전)</span>
+                        <div className="relative group overflow-hidden rounded-[30px] md:rounded-[40px] border-4 border-slate-100 shadow-xl bg-white p-8 md:p-10 space-y-6">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-pink-500 transition-colors">
+                                    <Monitor size={28} className="md:size-[32px]" />
+                                </div>
+                                <ArrowRight size={20} className="text-slate-200 md:size-[24px]" />
+                                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-pink-600 text-white flex items-center justify-center shadow-lg shadow-pink-100 scale-110">
+                                    <UserCheck size={28} className="md:size-[32px]" />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <p className="text-[15px] md:text-base font-black text-gray-900 leading-snug">
+                                    상단메뉴 {'>'} 마이페이지<br />
+                                    {'>'} 연락처 노출 설정 OFF
+                                </p>
+                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p className="text-[11px] md:text-xs font-bold text-gray-400 leading-relaxed">
+                                        연락처를 비공개로 설정하면 제안 메시지로만<br />
+                                        매칭이 이루어져 더욱 안전합니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Guide */}
+                    <div className="space-y-6 text-center">
+                        <span className="inline-block px-4 py-1.5 bg-pink-600 text-white rounded-full text-xs font-black uppercase tracking-widest">Guide (모바일버전)</span>
+                        <div className="relative group overflow-hidden rounded-[30px] md:rounded-[40px] border-4 border-pink-50 shadow-xl bg-white p-8 md:p-10 space-y-6">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-pink-50 border border-pink-100 flex items-center justify-center text-pink-300 group-hover:text-pink-500 transition-colors">
+                                    <Smartphone size={28} className="md:size-[32px]" />
+                                </div>
+                                <ArrowRight size={20} className="text-pink-100 md:size-[24px]" />
+                                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-200 scale-110">
+                                    <Info size={28} className="md:size-[32px]" />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <p className="text-[15px] md:text-base font-black text-gray-900 leading-snug">
+                                    하단 바 메뉴 {'>'} MY<br />
+                                    {'>'} 개인정보 관리 {'>'} 수동 노출
+                                </p>
+                                <div className="p-4 bg-pink-50/30 rounded-2xl border border-pink-50">
+                                    <p className="text-[11px] md:text-xs font-bold text-pink-600/60 leading-relaxed">
+                                        모바일에서도 간편하게 실시간으로<br />
+                                        내 연락처 노출 여부를 제어하세요.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Info */}
+            <div className="w-full bg-slate-900 rounded-[40px] md:rounded-[50px] p-8 md:p-14 text-white text-center space-y-10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-10 opacity-10">
+                    <Info size={150} className="hidden md:block" />
+                </div>
+                <div className="relative z-10 space-y-8">
+                    <div className="space-y-2">
+                        <p className="text-[10px] md:text-sm font-bold text-pink-400 tracking-widest uppercase">Safe Recruitment Policy</p>
+                        <h5 className="text-xl md:text-3xl font-black leading-tight break-keep">
+                            건강한 구인·구직 서비스,<br />
+                            우리가 함께 만들어 갑니다.
+                        </h5>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div className="p-5 md:p-6 bg-white/5 rounded-2xl md:rounded-3xl border border-white/10">
+                            <h6 className="text-[#E14D2A] font-black mb-1 md:mb-2 text-base md:text-lg">기업 확인 필수</h6>
+                            <p className="text-[12px] md:text-sm font-medium text-gray-400 leading-relaxed">기업정보 본인인증, 사업자 등록 여부 확인을 완료한 업체와의 구인을 권장합니다.</p>
+                        </div>
+                        <div className="p-5 md:p-6 bg-white/5 rounded-2xl md:rounded-3xl border border-white/10">
+                            <h6 className="text-[#E14D2A] font-black mb-1 md:mb-2 text-base md:text-lg">피해 신고 안내</h6>
+                            <p className="text-[12px] md:text-sm font-medium text-gray-400 leading-relaxed">피해 발생 시 즉시 고객센터에 제보주시면 확인 후 즉각적인 조치를 취하겠습니다.</p>
+                        </div>
+                    </div>
+                    <p className="text-[11px] md:text-sm font-bold text-gray-400 leading-relaxed opacity-60 break-keep max-w-2xl mx-auto border-t border-white/5 pt-6 md:pt-8 line-clamp-2 md:line-clamp-none">
+                        회원분들의 안전하고 투명한 구인 서비스를 위해<br />
+                        항상 최선의 노력을 다하겠습니다.
+                    </p>
+                </div>
+            </div>
+
+            {/* Sticky Call Center Info (Reproduction of screenshot bottom) */}
+            <div className="w-full pt-10 border-t border-red-100 flex flex-col items-center gap-2">
+                <p className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-3">
+                    고객센터 <span className="text-[#E14D2A]">1544-5568</span>
+                </p>
+                <div className="text-center">
+                    <p className="text-sm font-black text-red-600 mb-1">고객센터 운영시간</p>
+                    <p className="text-xs font-bold text-gray-500">(평일 09:30~19:00 / 점심시간 12:00~13:30)</p>
+                    <p className="text-[10px] font-bold text-gray-400 mt-1">* 주말 및 공휴일은 고객센터 휴무입니다.</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const ExposureItem = ({ rank, desc, onArrowClick }: { rank: string, desc: string, onArrowClick?: () => void }) => {
     const brand = useBrand();
 
@@ -188,7 +444,7 @@ function CustomerCenterContent() {
     // SSR 안전한 탭 상태 관리
     const [activeTab, setActiveTab] = useState('공지사항');
     const [isMounted, setIsMounted] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
     useEffect(() => {
         setIsMounted(true);
@@ -206,16 +462,17 @@ function CustomerCenterContent() {
             else if (tab === 'guide') targetTab = '이용방법';
             else if (tab === 'faq') targetTab = '자주묻는질문';
             else if (tab === 'inquiry') targetTab = '1:1문의';
-            else if (tab === 'policy') targetTab = '약관및정책';
+            else if (tab === 'policy') targetTab = '약관 및 정책';
 
             if (activeTab !== targetTab) {
                 setActiveTab(targetTab);
+                // 탭이 '진짜로' 변경될 때만 최상단으로 이동 (불필요한 떨림 방지)
+                window.scrollTo({ top: 0, behavior: 'instant' });
             }
-            // 탭 변경 시 혹은 URL 이동 시 항상 최상단으로 이동 (떨림 방지)
-            window.scrollTo(0, 0);
         }
-    }, [searchParams, isMounted]);
+    }, [searchParams, isMounted, activeTab]);
 
+    const [expandedNotice, setExpandedNotice] = useState<number | null>(null);
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
@@ -243,7 +500,7 @@ function CustomerCenterContent() {
 
     // 탭 변경 시 URL만 변경 (상태는 useEffect가 searchParams를 감지하여 변경함)
     const handleTabChange = (tabName: string) => {
-        setIsMobileMenuOpen(false);
+
         const params = new URLSearchParams(searchParams.toString());
         let tabParam = 'notice';
         if (tabName === '공지사항') tabParam = 'notice';
@@ -251,7 +508,7 @@ function CustomerCenterContent() {
         else if (tabName === '이용방법') tabParam = 'guide';
         else if (tabName === '자주묻는질문') tabParam = 'faq';
         else if (tabName === '1:1문의') tabParam = 'inquiry';
-        else if (tabName === '약관및정책') tabParam = 'policy';
+        else if (tabName === '약관 및 정책') tabParam = 'policy';
 
         params.set('tab', tabParam);
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
@@ -265,7 +522,7 @@ function CustomerCenterContent() {
         { id: '이용방법', icon: <Info size={16} /> },
         { id: '자주묻는질문', icon: <HelpCircle size={16} /> },
         { id: '1:1문의', icon: <MessageSquare size={16} /> },
-        { id: '약관및정책', icon: <FileText size={16} /> },
+        { id: '약관 및 정책', icon: <FileText size={16} /> },
     ];
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -307,13 +564,7 @@ function CustomerCenterContent() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-2">
-                            {/* Mobile Hamburger Menu Button */}
-                            <button
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700 order-2"
-                            >
-                                {isMobileMenuOpen ? <X size={20} className="text-pink-600" /> : <Menu size={20} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-700'} />}
-                            </button>
+
                             <button onClick={() => {
                                 if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
                                 router.push('/');
@@ -383,31 +634,50 @@ function CustomerCenterContent() {
                         {/* 1. Notice Board */}
                         {activeTab === '공지사항' && (
                             <div className="space-y-5">
-                                <div className="flex items-center justify-between mb-4 pl-6 pr-6">
-                                    <h2 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>공지사항</h2>
-                                    <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {NOTICES.length}건</span>
+                                <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                    <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                    <div className="flex items-center justify-between flex-1">
+                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>공지사항</h3>
+                                        <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {NOTICES.length}건</span>
+                                    </div>
                                 </div>
-                                <div className={`rounded-3xl border overflow-hidden shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                    {NOTICES.map((notice, idx) => (
+                                {NOTICES.map((notice, idx) => (
+                                    <div key={notice.id} className={`${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
                                         <div
-                                            key={notice.id}
-                                            className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}
+                                            onClick={() => setExpandedNotice(expandedNotice === notice.id ? null : notice.id)}
+                                            className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <span className={`px-2.5 py-1 rounded text-[11px] font-black ${notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-pink-600 text-white'}`}>
+                                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                <span className={`w-12 h-6 flex items-center justify-center shrink-0 rounded text-[10px] font-black ${notice.category === '필독' ? 'bg-red-600 text-white' : notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-pink-600 text-white'}`}>
                                                     {notice.category}
                                                 </span>
-                                                <span className={`text-[15px] font-black truncate max-w-[220px] sm:max-w-md ${notice.isNew ? (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900') : (brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}`}>
-                                                    {notice.title}
-                                                </span>
-                                                {notice.isNew && <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>}
+                                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                    <span className={`text-[15px] font-black truncate ${notice.isNew ? (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900') : (brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}`}>
+                                                        {notice.title}
+                                                    </span>
+                                                    {notice.isNew && <span className="w-1.5 h-1.5 bg-red-600 rounded-full shrink-0 animate-pulse"></span>}
+                                                </div>
                                             </div>
-                                            <span className="text-xs text-gray-600 font-bold flex items-center gap-1.5">
-                                                <Clock size={16} /> {notice.date}
-                                            </span>
+                                            <div className="flex items-center justify-between sm:justify-end gap-4">
+                                                <span className="text-xs text-gray-600 font-bold flex items-center gap-1.5">
+                                                    <Clock size={16} /> {notice.date}
+                                                </span>
+                                                <div className={`transition-transform duration-300 ${expandedNotice === notice.id ? 'rotate-180 text-pink-600' : 'text-gray-300'}`}>
+                                                    <ChevronDown size={20} />
+                                                </div>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
+                                        {expandedNotice === notice.id && (
+                                            <div className={`p-4 md:p-8 pt-2 border-t text-[14px] md:text-[15px] leading-loose font-bold whitespace-pre-wrap animate-in slide-in-from-top-2 duration-300 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-800'}`}>
+                                                {notice.type === 'rich-resume' ? (
+                                                    <ResumeNoticeDetail />
+                                                ) : (
+                                                    notice.content
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         )}
 
@@ -467,9 +737,9 @@ function CustomerCenterContent() {
                                 {/* Detailed Pricing Table Section */}
                                 <div className={`rounded-[32px] md:rounded-[40px] border p-5 md:p-8 shadow-sm space-y-6 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-800' : 'bg-white border-gray-100'}`}>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
                                         <div className="flex flex-col gap-1">
-                                            <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세 단가표</h3>
+                                            <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세 단가표</h3>
                                             <p className="text-[12px] md:text-[13px] text-gray-500 font-bold leading-relaxed">
                                                 모든 상품은 <span className="text-pink-600">PC+모바일 통합 노출</span>되며, 리전 필터 등 최신 기술이 적용된 전략적 구좌를 제공합니다.
                                             </p>
@@ -557,8 +827,8 @@ function CustomerCenterContent() {
                                 {/* Ad Placement Guide Section - Precise Accordion Implementation */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>노출 상세 및 영역 안내</h3>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>노출 상세 및 영역 안내</h3>
                                     </div>
 
                                     <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6 items-start">
@@ -670,9 +940,9 @@ function CustomerCenterContent() {
                                 {/* Design Guide Section */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
                                         <div className="flex items-center gap-2">
-                                            <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>이미지 제작 가이드</h3>
+                                            <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>이미지 제작 가이드</h3>
                                         </div>
                                     </div>
                                     <div className={`p-8 md:p-10 rounded-[32px] md:rounded-[45px] border shadow-xl space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'}`}>
@@ -746,8 +1016,8 @@ function CustomerCenterContent() {
                                 {/* AI Geo-Targeting Section */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full shadow-[0_0_15px_rgba(219,39,119,0.3)]"></div>
-                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>지역 기반 스마트 매칭</h3>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full shadow-[0_0_15px_rgba(219,39,119,0.3)]"></div>
+                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>지역 기반 스마트 매칭</h3>
                                     </div>
                                     <div className="bg-gradient-to-br from-pink-600 to-pink-500 p-8 md:p-10 rounded-[32px] md:rounded-[45px] text-white shadow-2xl shadow-pink-200 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-10 opacity-20 transform translate-x-1/4 -translate-y-1/4">
@@ -781,8 +1051,8 @@ function CustomerCenterContent() {
                                 {/* Jump Service Guide Section */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>점프 서비스</h3>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>점프 서비스</h3>
                                     </div>
                                     <div className="bg-gradient-to-br from-gray-900 to-black p-8 md:p-10 rounded-[32px] md:rounded-[45px] text-white shadow-2xl space-y-8 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-10 opacity-10">
@@ -932,9 +1202,9 @@ function CustomerCenterContent() {
                                 {/* Real-time Exposure Form Reference Section (New) */}
                                 <section className="space-y-6 py-6 border-t border-gray-100 dark:border-gray-800">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
                                         <div className="flex items-baseline gap-2">
-                                            <h3 className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>실시간 노출 폼 레퍼런스</h3>
+                                            <h3 className={`text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>실시간 노출 폼 레퍼런스</h3>
                                             <span className="text-gray-400 text-sm font-bold">(개발중)</span>
                                         </div>
                                     </div>
@@ -996,8 +1266,8 @@ function CustomerCenterContent() {
                         {activeTab === '이용방법' && (
                             <div className="space-y-12">
                                 <section>
-                                    <div className="flex items-center gap-3 mb-8">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full shadow-lg shadow-pink-200"></div>
+                                    <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
                                         <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구직자 이용가이드</h3>
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -1020,8 +1290,8 @@ function CustomerCenterContent() {
                                 </section>
 
                                 <section>
-                                    <div className="flex items-center gap-3 mb-8">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full shadow-lg shadow-pink-200"></div>
+                                    <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
                                         <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구인자(사장님) 가이드</h3>
                                     </div>
                                     <div className={`p-8 md:p-10 rounded-[45px] border shadow-xl shadow-pink-100/10 space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
@@ -1066,7 +1336,10 @@ function CustomerCenterContent() {
                         {/* 4. FAQ */}
                         {activeTab === '자주묻는질문' && (
                             <div className="space-y-6">
-                                <h2 className={`text-2xl font-black tracking-tight mb-8 pl-7 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h2>
+                                <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                    <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                    <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h3>
+                                </div>
                                 <div className="space-y-4">
                                     {FAQS.map(faq => (
                                         <div key={faq.id} className={`rounded-[28px] shadow-sm border overflow-hidden transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -1159,12 +1432,12 @@ function CustomerCenterContent() {
                         )}
 
                         {/* 6. 약관 및 정책 */}
-                        {activeTab === '약관및정책' && (
+                        {activeTab === '약관 및 정책' && (
                             <div className="space-y-10">
                                 <section id="terms" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>서비스 이용약관</h3>
+                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>서비스 이용약관</h3>
                                     </div>
                                     <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
                                         <p className="mb-4 font-black text-gray-900 dark:text-white">제 1조 (목적)</p>
@@ -1179,9 +1452,9 @@ function CustomerCenterContent() {
                                 </section>
 
                                 <section id="privacy" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
+                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
                                     </div>
                                     <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
                                         <p className="mb-6 text-gray-500 italic">&quot;코코알바&quot;는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
@@ -1195,9 +1468,9 @@ function CustomerCenterContent() {
                                 </section>
 
                                 <section id="youth" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700">
-                                        <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>청소년 보호정책</h3>
+                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>청소년 보호정책</h3>
                                     </div>
                                     <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
                                         <p className="mb-6 text-gray-500">회사는 청소년이 건전한 인격체로 성장할 수 있도록 정보통신망 이용촉진 및 정보보호 등에 관한 법률 및 청소년 보호법에 근거하여 청소년 보호정책을 시행하고 있습니다.</p>
@@ -1239,9 +1512,8 @@ function CustomerCenterContent() {
                     initialTier={paymentInitialTier}
                 />
 
-                {/* Image Zoom Modal */}
-                {selectedImage && (
-                    <div className="modal-overlay" onClick={() => setSelectedImage(null)}>
+                {selectedImage && createPortal(
+                    <div className="fixed inset-0 z-[20000] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
                         <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
                             <div className="mb-6 text-center">
                                 <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
@@ -1264,66 +1536,15 @@ function CustomerCenterContent() {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
                 {/* Deployment Verification Tag */}
                 <div data-deploy-version="2026-02-04-02:40" style={{ display: 'none' }}></div>
-                <Footer />
+
             </div>
 
-            {/* Mobile Drawer UI */}
-            <div
-                className={`fixed inset-0 z-[11000] md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}
-                style={{ isolation: 'isolate' }}
-            >
-                {/* Backdrop */}
-                <div
-                    className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
 
-                {/* Drawer Content */}
-                <div
-                    className={`absolute right-0 top-0 h-full w-[280px] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
-                >
-                    <div className="p-6 border-b flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
-                            <span className={`font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객지원센터</span>
-                        </div>
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 -mr-2 text-gray-400">
-                            <X size={24} />
-                        </button>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <div className="space-y-2">
-                            {TABS.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => handleTabChange(tab.id)}
-                                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[15px] font-black transition-all ${activeTab === tab.id
-                                        ? 'bg-pink-600 text-white shadow-lg shadow-pink-200 dark:shadow-pink-900/20'
-                                        : `${brand.theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}`}
-                                >
-                                    <div className={activeTab === tab.id ? 'text-white' : 'text-gray-400'}>
-                                        {tab.icon}
-                                    </div>
-                                    {tab.id}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="p-6 border-t bg-gray-50 dark:bg-gray-800/50">
-                        <div className="flex items-center gap-3 mb-2">
-                            <PhoneCall size={18} className="text-pink-600" />
-                            <span className={`font-black text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>24시간 상담 가능</span>
-                        </div>
-                        <p className="text-[12px] text-gray-500 font-medium">관리자에게 문의하시면 신속하게 답변해 드립니다.</p>
-                    </div>
-                </div>
-            </div>
         </>
     );
 }

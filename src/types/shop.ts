@@ -2,6 +2,7 @@ export interface Shop {
     name: string;
     nickname?: string;
     realName?: string;
+    managerName?: string; // Business Owner Name
     title?: string;
     region: string;
     phone: string;
@@ -13,12 +14,16 @@ export interface Shop {
     url: string;
     site: string;
     id: string;
+    adNo?: number; // Unique Ad Number for easy identification
     is_placeholder: boolean;
     is_premium?: boolean;
     is_verified?: boolean;
     recommended?: boolean;
     tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic';
+    color?: string;
     updatedAt?: string;
+    date?: string;
+    description?: string;
     options?: {
         blink?: boolean;
         bold?: boolean;
@@ -26,6 +31,7 @@ export interface Shop {
         icons?: string[];
         mediaUrl?: string;
         paySuffixes?: string[];
+        keywords?: string[];
         border?: 'none' | 'color' | 'glow';
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
     }

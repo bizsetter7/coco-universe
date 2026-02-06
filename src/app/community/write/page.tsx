@@ -50,7 +50,7 @@ export default function WritePostPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-0 bg-white">
             {/* Header */}
             <header className="sticky top-0 bg-white border-b z-10 flex items-center justify-between px-4 h-14">
                 <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 pt-2">

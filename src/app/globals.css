@@ -1,183 +1,22 @@
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth !important;
-  /* 지시사항: PC 고해상도 끊김 방지 */
-}
-
 @import "tailwindcss";
 
-@layer base {
-  html {
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    /* 지시사항: 폰트 크기 강제 박제 */
-  }
-}
-
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
-  --job-image-min-height: 140px;
+    color-scheme: light;
 }
 
-@media (min-width: 768px) {
-  :root {
-    --job-image-min-height: 200px;
-  }
-}
-
-/* --- 1. 기본 스타일 복구 --- */
-html {
-  -webkit-font-smoothing: antialiased;
-  /* 지시사항: 텍스트 렌더링 단순화 */
-  scroll-behavior: smooth !important;
-  /* 지시사항: PC 스크롤 보간 강제 */
-}
-
+/* 기본 스크롤 동작 최적화 */
 html,
 body {
-  margin: 0;
-  padding: 0;
-  -webkit-text-size-adjust: 100%;
-  /* 지시사항: 폰트 크기 고정 */
-  text-size-adjust: 100%;
-  min-height: 100dvh;
-  background-color: #f9fafb;
-  /* bg-gray-50 기본값 */
-  line-height: 1.5 !important;
-  letter-spacing: 0 !important;
+    height: auto;
+    min-height: 100%;
+    overscroll-behavior-y: none;
 }
 
-.dark body {
-  background-color: #030712;
-  /* bg-gray-950 기본값 */
-}
-
-img {
-  display: block;
-  max-width: 100%;
-}
-
-/* --- 2. 사이드바 Sticky 활동 영역 --- */
-aside {
-  position: relative;
-  display: none !important;
-  /* 지시사항: 모바일에서 강제 숨김 */
-  overflow: visible !important;
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-  z-index: 40;
-}
-
-@media (min-width: 1280px) {
-  aside {
-    display: block !important;
-    /* 지시사항: XL 데스크톱에서만 노출 */
-    height: 100% !important;
-    /* 지시사항: 배너 레일 높이 본문과 동일하게 통일 */
-  }
-}
-
-main {
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-  /* 지시사항: 모바일 가속 강제 */
-}
-
-body {
-  -webkit-overflow-scrolling: touch;
-}
-
-.force-flex-stretch {
-  display: flex !important;
-  align-items: stretch !important;
-  /* 지시사항: aside가 main 높이를 그대로 상속받도록 강제 */
-}
-
-/* --- 3. 광고 카드 레이아웃 초기화 --- */
-/* 강제 CSS 제거 및 기존 구조 존중 */
-.ad-card {
-  width: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  background-color: white;
-  transition: all 0.3s ease;
-}
-
-/* 지시사항: 이미지 비율 강제 및 GPU 가속 최적화 */
-.ad-card img {
-  aspect-ratio: 1 / 1 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-
-/* 이미지 컨테이너 레이아웃 시프트 방지 보강 */
-.ad-card .aspect-square {
-  aspect-ratio: 1 / 1 !important;
-  min-height: 140px;
-  /* 모바일 최소 사양 */
-}
-
-@media (min-width: 768px) {
-  .ad-card .aspect-square {
-    min-height: 200px;
-    /* 데스크톱 최소 사양 */
-  }
-}
-
-/* 헤더 가속 최적화 (가속 전면 제거) */
-header {
-  margin: 0 !important;
-}
-
-/* --- 4. 모달(팝업) --- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-}
-
-body.modal-open {
-  overflow: hidden;
-}
-
-/* --- 5. 기타 UI --- */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 50;
-}
-
-@theme {
-  --font-sans: var(--font-inter);
-  --color-primary-600: #e11d48;
-}
-
-@keyframes blink-border {
-
-  0%,
-  100% {
-    border-color: rgba(225, 29, 72, 0.3);
-  }
-
-  50% {
-    border-color: rgba(225, 29, 72, 1);
-  }
-}
-
-.animate-blink-border {
-  animation: blink-border 2s infinite;
+/* 모달 활성화 시 배경 스크롤 방지 */
+body.modal-active {
+    overflow: hidden !important;
+    height: 100vh !important;
+    position: relative;
+    touch-action: none;
+    /* 모바일 터치 스크롤 방지 */
 }

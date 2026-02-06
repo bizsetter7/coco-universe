@@ -1,32 +1,94 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, PhoneCall, Crown, Zap } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { useBrand } from './BrandProvider';
-import shopsData from '@/lib/data/shops.json';
+import { useMobile } from '@/hooks/useMobile';
+import { formatKoreanMoney } from '@/utils/formatMoney';
+import { getPayColor } from '@/utils/payColors';
+import JobDetailModal from './jobs/JobDetailModal';
+
+// [Optimization] Memoized Sub-component to prevent unnecessary re-renders
+const SideAdCard = React.memo(({ ad, isGrand, onSelect }: { ad: Shop, isGrand: boolean, onSelect: (shop: Shop) => void }) => {
+    // 1. Image handling
+    const hasMedia = !!ad.options?.mediaUrl;
+    const [imgError, setImgError] = useState(false);
+
+    // 2. Badge handling
+    const getBadgeChar = () => {
+        if (ad.payType) return ad.payType.substring(0, 1);
+        if (ad.pay === '면접후결정') return '면';
+        return '시';
+    };
+
+    const badgeChar = getBadgeChar();
+
+    return (
+        <div
+            onClick={() => onSelect(ad)}
+            className="group relative w-full h-[140px] bg-white rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all border border-gray-100 flex flex-col"
+        >
+            {/* 1. Image Area */}
+            <div className="relative w-full h-[85px] bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+                {hasMedia && !imgError ? (
+                    <img
+                        src={ad.options?.mediaUrl}
+                        alt={ad.name}
+                        loading="lazy" // [Optimization] Lazy load images
+                        onError={() => setImgError(true)}
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 z-10 relative"
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-0">
+                        <Crown size={20} className="text-gray-200" />
+                    </div>
+                )}
+            </div>
+
+            {/* 2. Content Area */}
+            <div className="px-3 py-2 flex flex-col justify-center flex-1 bg-white gap-1.5">
+                <h4 className="text-[11px] font-bold text-gray-800 leading-tight truncate tracking-tight">
+                    {ad.title || ad.name}
+                </h4>
+
+                <div className="flex items-center justify-end gap-1.5">
+                    <div className={`shrink-0 w-[14px] h-[14px] flex items-center justify-center rounded-[3px] shadow-sm relative overflow-hidden ${getPayColor(ad.payType || (badgeChar === '면' ? '협의' : ''))} `} style={{ backgroundColor: badgeChar === '면' ? '#6b7280' : undefined }}>
+                        <span className="text-[9px] font-bold text-white leading-none absolute inset-0 flex items-center justify-center z-20 pt-[1px]">
+                            {badgeChar}
+                        </span>
+                    </div>
+                    <span className="text-[12px] font-black text-gray-900 tracking-tighter">
+                        {formatKoreanMoney(ad.pay)}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+});
+SideAdCard.displayName = 'SideAdCard';
 
 interface BannerSidebarProps {
     side: 'left' | 'right';
+    shops: Shop[];
 }
 
-/**
- * 🚀 BannerSidebar - 'Ultimate Follow-Scroll' Edition v8
- * - 전설의 translate3d 기반 0ms 반응성 엔진 탑재
- * - 16px 시작점 (top-[16px]) 절대 고정
- * - JSX 구문 오류 및 태그 불균형 완벽 수리 완료
- */
-export const BannerSidebar = ({ side }: BannerSidebarProps) => {
+import { useBannerControl } from '@/hooks/useBannerControl';
+
+// [Optimization] Main Component Memoization
+export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) => {
     const router = useRouter();
     const brand = useBrand();
+    const isMobile = useMobile();
+    const isVisible = useBannerControl(); // Global + Manual Control
+
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
 
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';
 
-    // 1. 데이터 샘플링 (Grand 2개, Premium 2개)
-    const allShops = shopsData as Shop[];
+    const allShops = shops || [];
 
     const grandAds = useMemo(() => {
         const gr = allShops.filter(s => s.tier === 'grand');
@@ -40,59 +102,23 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
         return pr.slice(2, 4);
     }, [allShops, isLeft]);
 
-    const renderAdCard = (ad: Shop, isGrand: boolean) => {
-        const gradientClass = isGrand
-            ? "bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600"
-            : "bg-gradient-to-br from-pink-400 via-rose-100 to-pink-600";
+    // [Optimization] Valid Return for Mobile to prevent mounting - MUST BE AFTER HOOKS
+    if (isMobile) return null;
+    if (!isVisible && !selectedAd) return null;
 
-        return (
-            <div
-                key={ad.id}
-                onClick={() => setSelectedAd(ad)}
-                className={`group p-[1.5px] rounded-[18px] overflow-hidden cursor-pointer hover:shadow-md transition-all active:scale-95 shadow-sm ${gradientClass}`}
-            >
-                <div className={`p-1.5 flex flex-col gap-1 rounded-[16px] h-full ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-                    <div className="flex items-center gap-1.5">
-                        <div className={`relative w-5 h-5 rounded-md overflow-hidden flex-shrink-0 border 
-                            ${isGrand ?
-                                (brand.theme === 'dark' ? 'bg-amber-900/20 border-amber-900/30' : 'bg-amber-50 border-amber-100') :
-                                (brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/20' : 'bg-pink-50 border-pink-50')
-                            }
-                        `}>
-                            <div className={`w-full h-full flex items-center justify-center text-[8px] font-bold text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                                {ad.name.substring(0, 1)}
-                            </div>
-                        </div>
-                        <span className={`text-[10px] font-black truncate tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{ad.name}</span>
-                    </div>
-                    <div className={`relative w-full aspect-[4/3] rounded-lg overflow-hidden border 
-                        ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}
-                        ${isGrand ?
-                            (brand.theme === 'dark' ? 'border-amber-900/10' : 'border-amber-50') :
-                            (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')
-                        }
-                    `}>
-                        <div className={`w-full h-full flex items-center justify-center text-[7px] font-bold uppercase italic ${brand.theme === 'dark' ? 'bg-gray-900 text-gray-700' : 'bg-gray-100 text-gray-300'}`}>
-                            AD
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
+    // [Optimization] Removed backdrop-blur-md, replaced with solid bg/opacity to reduce paint cost
+    const contactBoxClass = brand.theme === 'dark'
+        ? 'bg-gray-800/95 border-gray-800'
+        : 'bg-white/95 border-gray-100';
 
     return (
         <>
-            <div
-                className="sticky top-[120px] w-[160px] flex flex-col gap-2 z-[40] m-0 p-0"
-            >
-                {/* 내부 모든 요소는 클릭 가능하도록 설정 */}
-                <div className="flex flex-col gap-2">
-                    {/* 통합 사이드 섹션 (GRAND 헤더 하나만 사용) */}
+            <div className={`flex flex-col gap-2 w-full pt-0`}>
+                <div className="flex flex-col gap-2 pb-4">
                     <div className="flex flex-col gap-1.5">
                         <div
                             onClick={() => router.push('/customer-center?tab=ad')}
-                            className="group bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600 p-0.5 rounded-[16px] shadow-sm cursor-pointer hover:scale-[1.02] transition-all"
+                            className="group bg-gradient-to-br from-amber-400 via-yellow-100 to-amber-600 p-0.5 rounded-[16px] shadow-sm cursor-pointer hover:scale-[1.02] transition-all will-change-transform"
                         >
                             <div className={`rounded-[14px] py-1 text-center ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                                 <Crown size={12} className="mx-auto mb-0.5 text-amber-500 animate-pulse" fill="currentColor" />
@@ -103,18 +129,18 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                         </div>
 
                         <div className="flex flex-col gap-1 px-1">
-                            {/* 그랜드 광고 슬롯 (2개) */}
-                            {grandAds.map((ad, idx) => renderAdCard(ad, true))}
-
-                            {/* 프리미엄 광고 슬롯 (2개 - 헤더 없이 통합) */}
-                            {premiumAds.map((ad, idx) => renderAdCard(ad, false))}
+                            {grandAds.map((ad) => (
+                                <SideAdCard key={ad.id} ad={ad} isGrand={true} onSelect={setSelectedAd} />
+                            ))}
+                            {premiumAds.map((ad) => (
+                                <SideAdCard key={ad.id} ad={ad} isGrand={false} onSelect={setSelectedAd} />
+                            ))}
                         </div>
                     </div>
 
-                    {/* 광고문의 섹션 */}
                     <div
                         onClick={() => router.push('/customer-center?tab=ad')}
-                        className={`p-2 backdrop-blur-md border rounded-[18px] shadow-md text-center mx-1 border-b-2 border-b-pink-500/20 active:scale-95 transition-transform cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-800/95 border-gray-800' : 'bg-white/95 border-gray-100'}`}
+                        className={`p-2 border rounded-[18px] shadow-md text-center mx-1 border-b-2 border-b-pink-500/20 active:scale-95 transition-transform cursor-pointer ${contactBoxClass}`}
                     >
                         <p className="text-[8px] text-gray-400 font-black uppercase tracking-[0.2em] mb-0.5">광고문의</p>
                         <p className={`text-[12px] font-black italic tracking-tighter ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>1544-5568</p>
@@ -122,29 +148,13 @@ export const BannerSidebar = ({ side }: BannerSidebarProps) => {
                 </div>
             </div>
 
-            {/* AD Detail Modal (Z-INDEX 110으로 독립) */}
             {selectedAd && (
-                <div className="modal-overlay" onClick={() => setSelectedAd(null)}>
-                    <div className={`rounded-[30px] shadow-2xl w-full max-w-sm overflow-hidden animate-zoomIn ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
-                        <div className={`relative aspect-video flex items-center justify-center font-black text-2xl uppercase italic ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-700' : 'bg-gray-100 text-gray-300'}`}>
-                            Official AD
-                            <button onClick={() => setSelectedAd(null)} className="absolute top-5 right-5 bg-black/20 hover:bg-black/40 backdrop-blur-md text-white p-2.5 rounded-full transition-all">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="p-8">
-                            <h2 className={`text-2xl font-black mb-4 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{selectedAd.name}</h2>
-                            <p className={`text-[14px] leading-relaxed break-keep mb-8 font-medium ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {selectedAd.region} | {selectedAd.pay} | {selectedAd.workType || '상세 정보 문의'}
-                            </p>
-                            <a href={`tel:1544-5568`} className={`flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black rounded-2xl transition-all shadow-xl active:scale-[0.98] text-lg`}>
-                                <PhoneCall size={22} /> 실시간 문의하기
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <JobDetailModal
+                    shop={selectedAd}
+                    onClose={() => setSelectedAd(null)}
+                />
             )}
         </>
     );
-};
-
+});
+BannerSidebar.displayName = 'BannerSidebar';

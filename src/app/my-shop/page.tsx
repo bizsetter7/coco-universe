@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     ArrowLeft, Home, Store, MapPin, Phone, MessageCircle, Camera, Check,
@@ -9,115 +10,24 @@ import {
     FileText, User, CreditCard, LogOut, Settings, Bell,
     LayoutDashboard, List, PlusSquare, ChevronDown, HelpCircle, Laptop,
     RefreshCw, Calendar, Eye, Highlighter, Smile, Menu, MousePointerClick,
-    Zap, Star, Crown
+    Zap, Star, Crown, ChevronRight
 } from 'lucide-react';
 import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBrand } from '@/components/BrandProvider';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 import { JOB_CATEGORY_MAP as INDUSTRY_DATA } from '@/constants/jobs';
+import { REGIONS_MAP as REGION_DATA } from '@/constants/regions';
 
-const REGION_DATA: Record<string, string[]> = {
-    '서울': ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'],
-    '경기': ['가평군', '고양시', '과천시', '광명시', '광주시', '구리시', '군포시', '김포시', '남양주시', '동두천시', '부천시', '성남시', '수원시', '시흥시', '안산시', '안성시', '안양시', '양주시', '양평군', '여주시', '연천군', '오산시', '용인시', '의왕시', '의정부시', '이천시', '파주시', '평택시', '포천시', '하남시', '화성시'],
-    '인천': ['강화군', '계양구', '남동구', '동구', '미추홀구', '부평구', '서구', '연수구', '옹진군', '중구'],
-    '부산': ['강서구', '금정구', '기장군', '남구', '동구', '동래구', '부산진구', '북구', '사상구', '사하구', '서구', '수영구', '연제구', '영도구', '중구', '해운대구'],
-    '대구': ['남구', '달서구', '달성군', '동구', '북구', '서구', '수성구', '중구'],
-    '광주': ['광산구', '남구', '동구', '북구', '서구'],
-    '대전': ['대덕구', '동구', '서구', '유성구', '중구'],
-    '울산': ['남구', '동구', '북구', '울주군', '중구'],
-    '세종': ['세종시'],
-    '강원': ['강릉시', '고성군', '동해시', '삼척시', '속초시', '양구군', '양양군', '영월군', '원주시', '인제군', '정선군', '철원군', '춘천시', '태백시', '평창군', '홍천군', '화천군', '횡성군'],
-    '충북': ['괴산군', '단양군', '보은군', '영동군', '옥천군', '음성군', '제천시', '증평군', '진천군', '청주시', '충주시'],
-    '충남': ['계룡시', '공주시', '금산군', '논산시', '당진시', '보령시', '부여군', '서산시', '서천군', '아산시', '예산군', '천안시', '청양군', '태안군', '홍성군'],
-    '전북': ['고창군', '군산시', '김제시', '남원시', '무주군', '부안군', '순창군', '완주군', '익산시', '임실군', '장수군', '전주시', '정읍시', '진안군'],
-    '전남': ['강진군', '고흥군', '곡성군', '광양시', '구례군', '나주시', '담양군', '목포시', '무안군', '보성군', '순천시', '신안군', '여수시', '영광군', '영암군', '완도군', '장성군', '장흥군', '진도군', '함평군', '해남군', '화순군'],
-    '경북': ['경산시', '경주시', '고령군', '구미시', '군위군', '김천시', '문경시', '봉화군', '상주시', '성주군', '안동시', '영덕군', '영양군', '영주시', '영천시', '예천군', '울릉군', '울진군', '의성군', '청도군', '청송군', '칠곡군', '포항시'],
-    '경남': ['거제시', '거창군', '고성군', '김해시', '남해군', '밀양시', '사천시', '산청군', '양산시', '의령군', '진주시', '창녕군', '창원시', '통영시', '하동군', '함안군', '함양군', '합천군'],
-    '제주': ['서귀포시', '제주시']
-};
 
-const PAY_TYPES = ['종류선택', 'TC', '시급', '일급', '주급', '월급', '연봉', '건별', '협의'];
 
-const CONVENIENCE_ITEMS = [
-    '출퇴근지원', '순번확실', '원룸제공', '만근비지원', '출퇴근자유',
-    '식사제공', '팁별도', '인센티브', '홀복지원', '갯수보장',
-    '지명우대', '초이스없음', '해외여행지원', '뒷방없음', '따당가능',
-    '푸쉬가능', '밀방없음', '칼퇴보장', '텃세없음', '지명비있음'
-];
-
-const KEYWORDS = [
-    '선불가능', '성형지원', '숙식제공', '경력우대', '당일지급',
-    '초보가능', '파트타임', '주말알바', '당일알바', '주간알바',
-    '투잡알바', '평일알바', '야간알바', '단기알바', '고수익'
-];
-
-const AGES = Array.from({ length: 41 }, (_, i) => 20 + i);
-
-const TEXT_COLORS = [
-    { name: '검정', value: '#000000' },
-    { name: '흰색', value: '#FFFFFF' },
-    { name: '빨강', value: '#FF0000' },
-    { name: '파랑', value: '#0000FF' },
-    { name: '초록', value: '#008000' },
-    { name: '보라', value: '#800080' },
-    { name: '분홍', value: '#FF00FF' },
-    { name: '주황', value: '#FFA500' },
-    { name: '회색', value: '#808080' },
-];
-
-const BG_COLORS = [
-    { name: '없음', value: 'transparent' },
-    { name: '노랑', value: '#FFFF00' },
-    { name: '연두', value: '#90EE90' },
-    { name: '하늘', value: '#ADD8E6' },
-    { name: '분홍', value: '#FFC0CB' },
-];
-
-// Merged Fonts: Old (Korean Generic) + New (Web Generic)
-const FONTS = [
-    { name: '기본서체', value: 'sans-serif' },
-    { name: '돋움', value: 'Dotum' },
-    { name: '굴림', value: 'Gulim' },
-    { name: '궁서', value: 'Gungsuh' },
-    { name: '바탕', value: 'Batang' },
-    { name: '명조체', value: 'serif' },
-    { name: '필기체', value: 'cursive' },
-];
-
-const FONT_SIZES = [
-    { name: '크기', value: '' },
-    { name: '1', value: '1' },
-    { name: '2', value: '2' },
-    { name: '3', value: '3' },
-    { name: '4', value: '4' },
-    { name: '5', value: '5' },
-    { name: '6', value: '6' },
-    { name: '7', value: '7' },
-];
-
-const EMOJIS = ['❤️', '⭐', '✨', '🔥', '💰', '👍', '✔️', '👑', '💎', '📢', '🎵', '👀', '🎁', '🚀', '✅', '🎶', '🎀'];
-
-const PAY_SUFFIX_OPTIONS = [
-    '+α', '보너스', '팁', '보장', '이상', '당일지급', '숙식제공', '교통비'
-];
+import {
+    PAY_SUFFIX_OPTIONS, CONVENIENCE_KEYWORDS,
+    AGES, FONTS, FONT_SIZES, TEXT_COLORS, BG_COLORS, PAY_TYPES
+} from '@/constants/job-options';
 
 // shared Pricing Data
-const AD_TIERS = [
-    {
-        id: 'grand',
-        name: 'Grand (Tier 1)',
-        price: '350,000원 / 30일',
-        benefits: ['메인 최상단 0순위 고정', '검색 리스트 최상단 노출', '블링블링 Glow/굵은폰트', '인재열람권 무제한 제공']
-    },
-    {
-        id: 'premium',
-        name: 'Premium (Tier 2)',
-        price: '200,000원 / 30일',
-        benefits: ['메인 상단 전략적 노출', '실버/연금색 강조 보더', '제목 강조/아이콘 효과 기본', '실시간 채팅 지원']
-    },
-];
-
 const DETAILED_PRICING = [
     { id: 'p1', name: '그랜드 (Grand)', desc: '메인 독점! 최상단 0순위에 배치됩니다. (전 지역 검색 결과 압도적 선점 / Glow 효과)', d30: 350000, d60: 630000, d90: 840000, isMain: true, disabled: false },
     { id: 'p2', name: '프리미엄 (Premium)', desc: '메인 중단의 가장 눈에 띄는 위치에 배치됩니다. (실버 보더 적용 / 자동점프 일 30회)', d30: 200000, d60: 360000, d90: 480000, isMain: true, disabled: false },
@@ -165,11 +75,29 @@ export default function MyShopPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const brand = useBrand();
-    const [view, setView] = useState<'dashboard' | 'form' | 'member-info'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showDesignModal, setShowDesignModal] = useState(false);
     const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+    // Body Scroll Lock for Modals
+    useBodyScrollLock(showWarningModal || showDesignModal || showPreviewModal || showMobileMenu);
+
+    // [Event] Listen for Hamburger Click from MainHeader
+    useEffect(() => {
+        const handleToggle = () => setShowMobileMenu(true);
+        window.addEventListener('toggle-mobile-menu', handleToggle);
+        return () => window.removeEventListener('toggle-mobile-menu', handleToggle);
+    }, []);
+
+    // [View Sync] URL Parameter to State
+    useEffect(() => {
+        const viewParam = searchParams.get('view');
+        if (viewParam) {
+            setView(viewParam as any);
+        }
+    }, [searchParams]);
 
     // Reset Form Logic
     const resetForm = () => {
@@ -192,7 +120,6 @@ export default function MyShopPage() {
         setWorkTime('');
         setSelectedConvenience([]);
         setSelectedKeywords([]);
-        setContent('');
         if (editorRef.current) editorRef.current.innerHTML = '';
         setSeoTags([]);
         setSelectedAdProduct(null);
@@ -211,6 +138,21 @@ export default function MyShopPage() {
         setBorderOption('none');
         // Reset steps if any custom step logic existed
     };
+
+    // [Auth] Check User Role and Set Layout
+    const [userTypeForLayout, setUserTypeForLayout] = useState<string | null>(null);
+
+    useEffect(() => {
+        const userType = localStorage.getItem('user_type');
+        if (userType === 'personal') {
+            setUserTypeForLayout('personal');
+            setView('member-info'); // Default to Member Info
+        } else {
+            setUserTypeForLayout('business');
+        }
+    }, []);
+
+    // Loading check moved to bottom to prevent Hook violation
 
     // --- Form States ---
     const [shopName, setShopName] = useState('코코 라운지');
@@ -250,7 +192,7 @@ export default function MyShopPage() {
     const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
     // Editor State
-    const [content, setContent] = useState('');
+    // Editor State
     const editorRef = useRef<HTMLDivElement>(null);
     const selectionRange = useRef<Range | null>(null);
 
@@ -306,6 +248,16 @@ export default function MyShopPage() {
 
     usePreventLeave(isDirty);
 
+    // --- Auth Guard (My Page Restricted Access) ---
+    useEffect(() => {
+        // Simple Mock Auth Check
+        const isLoggedIn = localStorage.getItem('user_session') || localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+            alert('로그인이 필요한 서비스입니다.');
+            router.replace('/?page=login');
+        }
+    }, [router]);
+
     // --- Effects & Logic ---
 
     // Manage body class for layout focus (hiding scroll/dimming)
@@ -314,9 +266,9 @@ export default function MyShopPage() {
         const isFormView = view === 'form';
 
         if (isAnyModalOpen) {
-            document.body.classList.add('modal-active');
+            // modal-active is now handled by useBodyScrollLock hook
         } else {
-            document.body.classList.remove('modal-active');
+            // modal-active is now handled by useBodyScrollLock hook
         }
 
         if (isFormView) {
@@ -325,9 +277,25 @@ export default function MyShopPage() {
             document.body.classList.remove('form-mode');
         }
 
+        // User requested Banners to be VISIBLE in Form View.
+        // Only hide if a Modal is open (to prevent Z-index overlap).
+        if (isAnyModalOpen) {
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('toggle-side-banner', { detail: { visible: false } }));
+            }
+        } else {
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('toggle-side-banner', { detail: { visible: true } }));
+            }
+        }
+
         return () => {
             document.body.classList.remove('modal-active');
             document.body.classList.remove('form-mode');
+            // Reset Banners on Unmount
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('toggle-side-banner', { detail: { visible: true } }));
+            }
         };
     }, [showWarningModal, showDesignModal, showPreviewModal, view]);
     useEffect(() => {
@@ -438,20 +406,25 @@ export default function MyShopPage() {
 
 
     // --- Handlers ---
-    const toggleConvenience = (item: string) => {
-        if (selectedConvenience.includes(item)) {
-            setSelectedConvenience(selectedConvenience.filter(t => t !== item));
+    // 급여 추가 옵션 (Pay Suffixes) - 1 Free + 5 Paid
+    const togglePaySuffix = (item: string) => {
+        if (paySuffixes.includes(item)) {
+            setPaySuffixes(paySuffixes.filter(t => t !== item));
         } else {
-            if (selectedConvenience.length + selectedKeywords.length >= 10) return alert('키워드는 총 10개까지만 선택 가능합니다.');
-            setSelectedConvenience([...selectedConvenience, item]);
+            // Logic: 1 free, rest paid. Warn if over limit? System says "Default 1 provided, add up to 5 (paid)".
+            // For now, let's just limit total to 6 (1+5) and warn if needed, or just allow selection and calculate price later.
+            // Simplified: Just limit to 6 for now.
+            if (paySuffixes.length >= 6) return alert('급여 추가옵션은 최대 6개(기본1 + 추가5)까지 선택 가능합니다.');
+            setPaySuffixes([...paySuffixes, item]);
         }
     };
 
+    // 편의사항 키워드 (Keywords) - Max 10
     const toggleKeyword = (item: string) => {
         if (selectedKeywords.includes(item)) {
             setSelectedKeywords(selectedKeywords.filter(t => t !== item));
         } else {
-            if (selectedConvenience.length + selectedKeywords.length >= 10) return alert('키워드는 총 10개까지만 선택 가능합니다.');
+            if (selectedKeywords.length >= 10) return alert('키워드는 총 10개까지만 선택 가능합니다.');
             setSelectedKeywords([...selectedKeywords, item]);
         }
     };
@@ -535,7 +508,7 @@ export default function MyShopPage() {
     const handleSave = () => {
         // Forbidden Words Check
         const badWordsTitle = validateContent(title);
-        const badWordsContent = validateContent(content);
+        const badWordsContent = validateContent(editorRef.current?.innerText || '');
 
         if (badWordsTitle.length > 0 || badWordsContent.length > 0) {
             const allBadWords = Array.from(new Set([...badWordsTitle, ...badWordsContent]));
@@ -596,91 +569,82 @@ export default function MyShopPage() {
 
     // --- Editor State Sync ---
     const updateToolbarState = () => {
-        if (!document.queryCommandSupported('bold')) return;
+        if (typeof document === 'undefined') return;
 
         try {
             const selection = window.getSelection();
-            let fontName = '';
-            const fontSize = '';
-            let foreColor = '#000000';
-            let hiliteColor = 'transparent';
-            let boldState = false;
-            let italicState = false;
-            let underlineState = false;
+            if (!selection || selection.rangeCount === 0) return;
 
-            if (selection && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const node = range.startContainer.nodeType === 1 ? (range.startContainer as HTMLElement) : range.startContainer.parentElement;
+            const range = selection.getRangeAt(0);
+            let node = range.startContainer;
+            if (node.nodeType === 3) { // Text node
+                node = node.parentElement as Node;
+            }
 
-                if (node && editorRef.current?.contains(node)) {
-                    const style = window.getComputedStyle(node);
+            // Ensure we are inside the editor
+            if (node && editorRef.current && editorRef.current.contains(node)) {
+                const element = node as HTMLElement;
+                const style = window.getComputedStyle(element);
 
-                    // 1. Bold Detection (Numeric weight is more reliable)
-                    const weight = style.fontWeight;
-                    boldState = weight === 'bold' || weight === 'bolder' || parseInt(weight) >= 600;
+                // 1. Bold
+                const fontWeight = style.fontWeight;
+                const isBold = fontWeight === 'bold' || fontWeight === 'bolder' || parseInt(fontWeight) >= 700;
+                setIsBold(isBold);
 
-                    // 2. Italic/Underline
-                    italicState = style.fontStyle === 'italic';
-                    underlineState = style.textDecoration.includes('underline');
+                // 2. Italic
+                setIsItalic(style.fontStyle === 'italic');
 
-                    // 3. Font Family (Clean first font)
-                    fontName = style.fontFamily.replace(/['"]/g, '').split(',')[0].trim();
+                // 3. Underline
+                setIsUnderline(style.textDecorationLine.includes('underline'));
 
-                    // 4. Fore Color
-                    foreColor = style.color;
+                // 4. Font Family
+                let fontName = style.fontFamily.replace(/['"]/g, '').split(',')[0].trim();
+                const normalizedFont = fontName.toLowerCase();
+                const fontExists = FONTS.find(f => f.toLowerCase() === normalizedFont);
+                setCurrentFont(fontExists || fontName);
 
-                    // 5. Hilite Color (Walk up ONLY until editor boundary)
-                    let bgNode: HTMLElement | null = node;
-                    while (bgNode && editorRef.current?.contains(bgNode) && bgNode !== editorRef.current) {
-                        const bgStyle = window.getComputedStyle(bgNode);
-                        const bg = bgStyle.backgroundColor;
-                        // Avoid transparent/inherited backgrounds
-                        if (bg && bg !== 'transparent' && !bg.includes('rgba(0, 0, 0, 0)') && !bg.includes('rgba(255, 255, 255, 0)')) {
-                            hiliteColor = bg;
-                            break;
-                        }
-                        bgNode = bgNode.parentElement;
-                    }
+                // 5. Font Size (Handle px)
+                const fontSize = style.fontSize; // e.g., "16px"
+                if (fontSize) {
+                    // Check if it matches our options
+                    const sizeExists = FONT_SIZES.find(s => s === fontSize);
+                    setCurrentFontSize(sizeExists || fontSize);
+                } else {
+                    // Fallback
+                    setCurrentFontSize('');
                 }
-            } else {
-                // No selection -> Use document commands as fallback or defaults
-                boldState = document.queryCommandState('bold');
-                italicState = document.queryCommandState('italic');
-                underlineState = document.queryCommandState('underline');
+
+                // 6. Fore Color
+                const foreColor = style.color; // rgb(...)
+                const hexFore = rgbToHex(foreColor).toUpperCase();
+                const foreExists = TEXT_COLORS.find(c => c.value.toUpperCase() === hexFore);
+                setCurrentForeColor(foreExists ? foreExists.value : hexFore);
+
+                // 7. Hilite Color (Walk up recursively)
+                let hiliteColor = 'transparent';
+                let bgNode: HTMLElement | null = element;
+
+                while (bgNode && editorRef.current.contains(bgNode) && bgNode !== editorRef.current) {
+                    const bgStyle = window.getComputedStyle(bgNode);
+                    const bg = bgStyle.backgroundColor;
+
+                    if (bg && bg !== 'transparent' && !bg.includes('rgba(0, 0, 0, 0)')) {
+                        hiliteColor = bg;
+                        break;
+                    }
+                    bgNode = bgNode.parentElement;
+                }
+
+                if (hiliteColor !== 'transparent') {
+                    const hexHilite = rgbToHex(hiliteColor).toUpperCase();
+                    const hiliteExists = BG_COLORS.find(c => c.value.toUpperCase() === hexHilite);
+                    setCurrentHiliteColor(hiliteExists ? hiliteExists.value : hexHilite);
+                } else {
+                    setCurrentHiliteColor('transparent');
+                }
             }
-
-            // Apply synced states to UI
-            setIsBold(boldState);
-            setIsItalic(italicState);
-            setIsUnderline(underlineState);
-
-            // Font Mapping
-            if (!fontName) fontName = document.queryCommandValue('fontName').replace(/['"]/g, '');
-            if (fontName) {
-                const normalized = fontName.toLowerCase();
-                const exists = FONTS.find(f => f.value.toLowerCase() === normalized || f.name.toLowerCase() === normalized);
-                setCurrentFont(exists ? exists.value : fontName);
-            }
-
-            // FontSize Mapping (Keep 1-7 command value for consistency)
-            const fSizeCmd = document.queryCommandValue('fontSize');
-            setCurrentFontSize(fSizeCmd || '');
-
-            // Color Normalization
-            const finalFore = rgbToHex(foreColor).toUpperCase();
-            const foreExists = TEXT_COLORS.find(c => c.value.toUpperCase() === finalFore);
-            setCurrentForeColor(foreExists ? foreExists.value : finalFore);
-
-            if (hiliteColor && hiliteColor !== 'transparent') {
-                const finalHilite = rgbToHex(hiliteColor).toUpperCase();
-                const hiliteExists = BG_COLORS.find(c => c.value.toUpperCase() === finalHilite);
-                setCurrentHiliteColor(hiliteExists ? hiliteExists.value : finalHilite);
-            } else {
-                setCurrentHiliteColor('transparent');
-            }
-
         } catch (e) {
-            console.log("Editor sync error:", e);
+            console.error("Editor sync error:", e);
         }
     };
 
@@ -691,7 +655,29 @@ export default function MyShopPage() {
         }
         restoreSelection(); // Put the cursor/selection back where it was
 
-        document.execCommand(command, false, value);
+        // Use CSS styling for better support of pixels and colors
+        if (document.queryCommandSupported('styleWithCSS')) {
+            document.execCommand('styleWithCSS', false, 'true');
+        }
+
+        if (command === 'fontSize' && value) {
+            // Special handling for legacy fontSize command to support pixels
+            // 1. Apply size 7 (largest standard size) as a temporary marker
+            document.execCommand('fontSize', false, '7');
+
+            // 2. Find the newly applied styles and force the pixel value
+            if (editorRef.current) {
+                // Selectors for various browser implementations of "Size 7"
+                const elements = editorRef.current.querySelectorAll('font[size="7"], span[style*="font-size: -webkit-xxx-large"], span[style*="font-size: xxx-large"], span[style*="font-size: 3rem"]');
+                elements.forEach((el) => {
+                    const htmlEl = el as HTMLElement;
+                    htmlEl.removeAttribute('size');
+                    htmlEl.style.fontSize = value;
+                });
+            }
+        } else {
+            document.execCommand(command, false, value);
+        }
 
         if (editorRef.current) {
             editorRef.current.focus();
@@ -710,154 +696,189 @@ export default function MyShopPage() {
         execCmd('fontName', font);
     }
 
-    // Capture selection & Sync Toolbar
-    const handleEditorInteract = () => {
+    // Capture selection & Sync Toolbar (Optimized)
+    const handleEditorInteract = (e?: React.KeyboardEvent | React.MouseEvent) => {
+        // Filter KeyUp: Only sync on navigation or modifying keys
+        if (e && e.type === 'keyup') {
+            const key = (e as React.KeyboardEvent).key;
+            const ignoreKeys = ['Process', 'Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Tab']; // And common typing?
+            // Actually, we SHOULD sync if user typed something that inherits style.
+            // But reflow on every char is heavy.
+            // Navigation keys are most important for "clicking away and back".
+            // If I type 'a', it inherits previous.
+            // If I backspace, I might land in new style.
+            const allowedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'Enter', 'Home', 'End', 'PageUp', 'PageDown'];
+            if (!allowedKeys.includes(key)) return;
+        }
+
         saveSelection();
         updateToolbarState();
     }
 
     // --- Components ---
 
-    const WarningModal = () => (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-pink-50 border-white'}`}>
-                    <AlertTriangle size={40} className="text-pink-500" />
-                </div>
-                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>게시글 작성 전 필독! 📢</h3>
-                <div className={`text-left text-[13px] p-6 rounded-2xl space-y-3 leading-relaxed border font-bold ${brand.theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border-gray-700' : 'bg-gray-50/80 text-gray-700 border-gray-100'}`}>
-                    <p className="flex gap-3">
-                        <span className="text-pink-500 font-black shrink-0">1.</span>
-                        <span>월 수정횟수는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>30회</strong> 입니다.</span>
-                    </p>
-                    <p className="flex gap-3">
-                        <span className="text-pink-500 font-black shrink-0">2.</span>
-                        <span>금칙어 사용 시 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>통보 없이 삭제</strong>될 수 있습니다.</span>
-                    </p>
-                    <p className="flex gap-3">
-                        <span className="text-pink-500 font-black shrink-0">3.</span>
-                        <span>본문 내용은 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>1000자 이내</strong>로 작성해주세요.</span>
-                    </p>
-                </div>
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button onClick={() => setShowWarningModal(false)} className={`py-4 rounded-xl border-2 font-bold transition-colors ${brand.theme === 'dark' ? 'border-gray-800 text-gray-500 hover:bg-gray-800' : 'border-gray-100 text-gray-500 hover:bg-gray-50'}`}>취소</button>
-                    <button onClick={proceedToForm} className="py-4 rounded-xl bg-[#ff3399] text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-pink-100/10">확인 후 작성</button>
-                </div>
-            </div>
-        </div>
-    );
-
-    const DesignRequestModal = () => (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-blue-900/30 border-gray-800' : 'bg-blue-50 border-white'}`}>
-                    <Laptop size={40} className="text-blue-500" />
-                </div>
-                <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세페이지 디자인 의뢰</h3>
-                <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} text-sm leading-relaxed`}>
-                    전문 디자이너가 사장님만의 <br />
-                    <strong className="text-pink-500 font-black text-lg">고퀄리티 상세페이지</strong>를 제작해드립니다.
-                </p>
-                <div className={`p-6 rounded-2xl text-left space-y-3 text-xs md:text-sm border font-bold ${brand.theme === 'dark' ? 'bg-blue-900/10 text-blue-200 border-blue-900/30' : 'bg-blue-50/50 text-gray-700 border-blue-100'}`}>
-                    <p className="flex items-center gap-2">• 브랜드 전용 1:1 맞춤형 고해상도 디자인</p>
-                    <p className="flex items-center gap-2">• 7단계 노출 등급에 최적화된 레이아웃 제공</p>
-                    <p className="flex items-center gap-2">• 움직이는 GIF 및 프리미엄 움짤 무료 제작</p>
-                    <p className="flex items-center gap-2">• 제작 기간: 영업일 기준 평균 1~2일</p>
-                </div>
-                <div className="grid grid-cols-1 gap-3 pt-2">
-                    <button onClick={() => alert('고객센터로 디자인 제작 문의가 접수되었습니다.')} className="py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-100/10 transition-all flex items-center justify-center gap-2">
-                        실시간 1:1 문의 / 고객센터 연결
-                    </button>
-                    <button onClick={() => setShowDesignModal(false)} className="py-3 text-gray-400 font-bold hover:text-gray-600">
-                        닫기
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-
-    const PreviewModal = () => (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className={`rounded-[32px] shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] transform animate-in fade-in fill-mode-both duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
-                <div className={`p-6 border-b flex justify-between items-center rounded-t-[32px] ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50/50'}`}>
-                    <h3 className={`font-black text-xl flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}><Eye size={24} className="text-pink-500" /> 채용공고 최종 미리보기</h3>
-                    <button onClick={() => setShowPreviewModal(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={24} /></button>
-                </div>
-                <div className="p-6 overflow-y-auto space-y-6">
-                    <div>
-                        <span className="inline-block px-2 py-1 bg-pink-100 text-pink-600 text-xs font-bold rounded mb-2">{industrySub}</span>
-                        <h2 className={`text-2xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h2>
-                        <p className="text-sm text-gray-500 mt-1">{shopName} | {regionCity} {regionGu}</p>
+    const WarningModal = () => {
+        if (typeof document === 'undefined') return null; return createPortal(
+            <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+                <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-pink-50 border-white'}`}>
+                        <AlertTriangle size={40} className="text-pink-500" />
                     </div>
+                    <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>게시글 작성 전 필독! 📢</h3>
+                    <div className={`text-left text-[13px] p-6 rounded-2xl space-y-3 leading-relaxed border font-bold ${brand.theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border-gray-700' : 'bg-gray-50/80 text-gray-700 border-gray-100'}`}>
+                        <p className="flex gap-3">
+                            <span className="text-pink-500 font-black shrink-0">1.</span>
+                            <span>월 수정횟수는 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>30회</strong> 입니다.</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-pink-500 font-black shrink-0">2.</span>
+                            <span>금칙어 사용 시 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>통보 없이 삭제</strong>될 수 있습니다.</span>
+                        </p>
+                        <p className="flex gap-3">
+                            <span className="text-pink-500 font-black shrink-0">3.</span>
+                            <span>본문 내용은 <strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-black'} font-black`}>1000자 이내</strong>로 작성해주세요.</span>
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                        <button onClick={() => setShowWarningModal(false)} className={`py-4 rounded-xl border-2 font-bold transition-colors ${brand.theme === 'dark' ? 'border-gray-800 text-gray-500 hover:bg-gray-800' : 'border-gray-100 text-gray-500 hover:bg-gray-50'}`}>취소</button>
+                        <button onClick={proceedToForm} className="py-4 rounded-xl bg-[#ff3399] text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-pink-100/10">확인 후 작성</button>
+                    </div>
+                </div>
+            </div>
+            , document.body);
+    };
 
-                    <div className={`grid grid-cols-2 gap-4 p-4 rounded-xl text-sm ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-50 text-gray-800'}`}>
-                        <div><span className="text-gray-500 block text-xs">급여</span><strong className="text-blue-600 text-lg">{payType} {payAmount}</strong></div>
-                        <div><span className="text-gray-500 block text-xs">나이</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{ageMin}세 ~ {ageMax}세</strong></div>
-                        <div><span className="text-gray-500 block text-xs">담당자 / 연락처</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{managerName} / {managerPhone}</strong></div>
+    const DesignRequestModal = () => {
+        if (typeof document === 'undefined') return null; return createPortal(
+            <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+                <div className={`rounded-[32px] shadow-2xl max-w-sm w-full p-8 text-center space-y-6 transform animate-in fade-in zoom-in duration-200 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 shadow-sm ${brand.theme === 'dark' ? 'bg-blue-900/30 border-gray-800' : 'bg-blue-50 border-white'}`}>
+                        <Laptop size={40} className="text-blue-500" />
+                    </div>
+                    <h3 className={`text-2xl font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세페이지 디자인 의뢰</h3>
+                    <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} text-sm leading-relaxed`}>
+                        전문 디자이너가 사장님만의 <br />
+                        <strong className="text-pink-500 font-black text-lg">고퀄리티 상세페이지</strong>를 제작해드립니다.
+                    </p>
+                    <div className={`p-6 rounded-2xl text-left space-y-3 text-xs md:text-sm border font-bold ${brand.theme === 'dark' ? 'bg-blue-900/10 text-blue-200 border-blue-900/30' : 'bg-blue-50/50 text-gray-700 border-blue-100'}`}>
+                        <p className="flex items-center gap-2">• 브랜드 전용 1:1 맞춤형 고해상도 디자인</p>
+                        <p className="flex items-center gap-2">• 7단계 노출 등급에 최적화된 레이아웃 제공</p>
+                        <p className="flex items-center gap-2">• 움직이는 GIF 및 프리미엄 움짤 무료 제작</p>
+                        <p className="flex items-center gap-2">• 제작 기간: 영업일 기준 평균 1~2일</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 pt-2">
+                        <button onClick={() => alert('고객센터로 디자인 제작 문의가 접수되었습니다.')} className="py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-100/10 transition-all flex items-center justify-center gap-2">
+                            실시간 1:1 문의 / 고객센터 연결
+                        </button>
+                        <button onClick={() => setShowDesignModal(false)} className="py-3 text-gray-400 font-bold hover:text-gray-600">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            </div>
+            , document.body);
+    };
+
+    const PreviewModal = () => {
+        if (typeof document === 'undefined') return null;
+
+        return createPortal(
+            <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+                <div className={`rounded-[32px] shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] transform animate-in fade-in fill-mode-both duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white'}`}>
+                    <div className={`p-6 border-b flex justify-between items-center rounded-t-[32px] ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50/50'}`}>
+                        <h3 className={`font-black text-xl flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}><Eye size={24} className="text-pink-500" /> 채용공고 최종 미리보기</h3>
+                        <button onClick={() => setShowPreviewModal(false)} className="p-2 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={24} /></button>
+                    </div>
+                    <div className="p-6 overflow-y-auto space-y-6">
                         <div>
-                            <span className="text-gray-500 block text-xs">메신저</span>
-                            <div className="flex flex-col gap-1 mt-1">
-                                {messengers.kakao && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-yellow-100 text-[10px] text-yellow-800 rounded font-bold">카카오</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.kakao}</span></div>}
-                                {messengers.line && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-green-100 text-[10px] text-green-800 rounded font-bold">라인</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.line}</span></div>}
-                                {messengers.telegram && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-blue-100 text-[10px] text-blue-800 rounded font-bold">텔레그램</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.telegram}</span></div>}
-                                {!messengers.kakao && !messengers.line && !messengers.telegram && <span className="text-gray-500 text-xs">-</span>}
+                            <span className="inline-block px-2 py-1 bg-pink-100 text-pink-600 text-xs font-bold rounded mb-2">{industrySub}</span>
+                            <h2 className={`text-2xl font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h2>
+                            <p className="text-sm text-gray-500 mt-1">{shopName} | {regionCity} {regionGu}</p>
+                        </div>
+
+                        <div className={`grid grid-cols-2 gap-4 p-4 rounded-xl text-sm ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-50 text-gray-800'}`}>
+                            <div><span className="text-gray-500 block text-xs">급여</span><strong className="text-blue-600 text-lg">{payType} {payAmount}</strong></div>
+                            <div><span className="text-gray-500 block text-xs">나이</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{ageMin}세 ~ {ageMax}세</strong></div>
+                            <div><span className="text-gray-500 block text-xs">담당자 / 연락처</span><strong className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{managerName} / {managerPhone}</strong></div>
+                            <div>
+                                <span className="text-gray-500 block text-xs">메신저</span>
+                                <div className="flex flex-col gap-1 mt-1">
+                                    {messengers.kakao && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-yellow-100 text-[10px] text-yellow-800 rounded font-bold">카카오</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.kakao}</span></div>}
+                                    {messengers.line && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-green-100 text-[10px] text-green-800 rounded font-bold">라인</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.line}</span></div>}
+                                    {messengers.telegram && <div className="flex items-center gap-2"><span className="px-1.5 py-0.5 bg-blue-100 text-[10px] text-blue-800 rounded font-bold">텔레그램</span><span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{messengers.telegram}</span></div>}
+                                    {!messengers.kakao && !messengers.line && !messengers.telegram && <span className="text-gray-500 text-xs">-</span>}
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Pay Suffixes Preview */}
+                        {paySuffixes.length > 0 && (
+                            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                <p className="text-[10px] text-gray-500 font-bold mb-2 uppercase">급여 추가 옵션</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {paySuffixes.map((suffix, i) => (
+                                        <span key={i} className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-lg">{suffix}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="border-t pt-6 text-left">
+                            <h4 className="font-bold text-gray-900 mb-4">상세내용</h4>
+                            <div
+                                className="prose prose-sm max-w-none text-gray-900 leading-relaxed whitespace-pre-wrap text-left"
+                                style={{ fontFamily: 'inherit' }}
+                                dangerouslySetInnerHTML={{ __html: editorRef.current?.innerHTML || '' }}
+                            />
                         </div>
                     </div>
 
-                    <div className="border-t pt-6 text-left">
-                        <h4 className="font-bold text-gray-900 mb-4">상세내용</h4>
-                        <div
-                            className="prose prose-sm max-w-none text-gray-900 leading-relaxed whitespace-pre-wrap text-left"
-                            style={{ fontFamily: 'inherit' }}
-                            dangerouslySetInnerHTML={{ __html: editorRef.current?.innerHTML || '' }}
-                        />
+                    <div className={`p-4 border-t text-left ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <p className="text-[10px] text-gray-500 font-bold mb-2 uppercase">Keyword & Info</p>
+                        <div className="flex flex-wrap gap-1 text-[10px] text-gray-500">
+                            {selectedKeywords.map(k => <span key={k} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded mr-1">#{k}</span>)}
+                        </div>
+                    </div>
+
+                    <div className={`p-4 border-t rounded-b-2xl text-right ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <button onClick={() => setShowPreviewModal(false)} className={`px-6 py-3 font-bold rounded-xl transition ${brand.theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-800 text-white hover:bg-gray-900'}`}>닫기</button>
                     </div>
                 </div>
+            </div>,
+            document.body
+        );
+    };
 
-                <div className={`p-4 border-t text-left ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <p className="text-[10px] text-gray-500 font-bold mb-2 uppercase">Keyword & Info</p>
-                    <div className="flex flex-wrap gap-1 text-[10px] text-gray-500">
-                        {selectedConvenience.map(c => <span key={c}>#{c}</span>)}
-                        {selectedKeywords.map(k => <span key={k}>#{k}</span>)}
-                    </div>
-                </div>
-
-                <div className={`p-4 border-t rounded-b-2xl text-right ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <button onClick={() => setShowPreviewModal(false)} className={`px-6 py-3 font-bold rounded-xl transition ${brand.theme === 'dark' ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-800 text-white hover:bg-gray-900'}`}>닫기</button>
-                </div>
-            </div>
-        </div>
-    );
-
-    const MobileMenu = () => (
-        <div className="fixed inset-0 z-[60] flex justify-end">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileMenu(false)} />
-            <div className={`relative w-72 h-full shadow-2xl p-6 transform animate-in slide-in-from-right duration-300 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-                <button onClick={() => setShowMobileMenu(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <X size={24} />
-                </button>
-
-                <div className="mt-8 text-center">
-                    <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 flex items-center justify-center text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'}`}>
-                        <Store size={32} />
-                    </div>
-                    <h2 className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
-                    <p className="text-sm text-gray-500 mb-6">프리미엄 회원</p>
-                    <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                        사진 등록/수정
+    const MobileMenu = () => {
+        if (typeof document === 'undefined') return null; return createPortal(
+            <div className="fixed inset-0 z-[20000] flex justify-end">
+                <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileMenu(false)} />
+                <div className={`relative w-72 h-full shadow-2xl p-6 transform animate-in slide-in-from-right duration-300 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+                    <button onClick={() => setShowMobileMenu(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <X size={24} />
                     </button>
-                </div>
 
-                <nav className={`mt-8 space-y-2 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <div onClick={() => { setView('dashboard'); setShowMobileMenu(false); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><List size={18} /> 진행중인 공고</div>
-                    <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
-                    <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
-                    <div onClick={() => { setView('member-info'); setShowMobileMenu(false); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><User size={18} /> 회원 정보 수정</div>
-                </nav>
+                    <div className="mt-8 text-center">
+                        <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 flex items-center justify-center text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'}`}>
+                            <Store size={32} />
+                        </div>
+                        <h2 className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName}</h2>
+                        <p className="text-sm text-gray-500 mb-6">프리미엄 회원</p>
+                        <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                            사진 등록/수정
+                        </button>
+                    </div>
+
+                    <nav className={`mt-8 space-y-2 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <div onClick={() => { setView('dashboard'); setShowMobileMenu(false); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><List size={18} /> 진행중인 공고</div>
+                        <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
+                        <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
+                        <div onClick={() => { setView('member-info'); setShowMobileMenu(false); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><User size={18} /> 회원 정보 수정</div>
+                    </nav>
+                </div>
             </div>
-        </div>
-    );
+            , document.body);
+    };
 
     const MemberInfoForm = () => (
         <div className={`max-w-4xl mx-auto p-6 md:p-10 rounded-[32px] shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
@@ -972,40 +993,111 @@ export default function MyShopPage() {
         </div>
     );
 
+    // Personal Mobile Menu Component
+    function PersonalMobileMenu({ onClose, setView }: { onClose: () => void, setView: (v: 'member-info' | 'member-edit' | 'resume-form' | 'dashboard' | 'form') => void }) {
+        const menuItems = [
+            { id: 'resume-list', label: '이력서 리스트', icon: <List size={16} /> },
+            { id: 'scrap', label: '채용정보 스크랩', icon: <Star size={16} /> },
+            { id: 'payment', label: '유료결제 내역', icon: <CreditCard size={16} /> },
+            { id: 'excluded', label: '열람불가 업소설정', icon: <AlertTriangle size={16} /> },
+            { id: 'custom-job', label: '맞춤구인정보', icon: <Briefcase size={16} /> },
+            { id: 'my-posts', label: '내가 작성한 게시글', icon: <FileText size={16} /> },
+            { id: 'block', label: '회원 차단 설정', icon: <User size={16} /> },
+            { id: 'bookmark', label: '즐겨찾기한 게시글', icon: <Star size={16} /> },
+        ];
+
+        return (
+            createPortal(
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+                    <div className={`absolute top-0 right-0 w-[80%] max-w-[300px] h-full shadow-2xl animate-in slide-in-from-right duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border-l border-gray-800' : 'bg-white'}`}>
+                        <div className="p-4 flex justify-between items-center border-b dark:border-gray-800">
+                            <h2 className={`font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>마이페이지 메뉴</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+                                <X size={20} className={brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} />
+                            </button>
+                        </div>
+                        <div className="p-4 space-y-1">
+                            {menuItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        if (item.id === 'resume-list') setView('member-info');
+                                        else alert('준비 중인 기능입니다.');
+                                        onClose();
+                                    }}
+                                    className={`w-full text-left px-4 py-3 text-sm font-bold rounded-xl flex items-center gap-3 transition ${brand.theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                >
+                                    {item.icon}
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                        {/* Global Links for Mobile */}
+                        <div className="p-4 border-t dark:border-gray-800 space-y-1">
+                            <button onClick={() => router.push('/')} className="w-full text-left px-4 py-3 text-sm font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl flex items-center gap-3">
+                                <Home size={16} /> 홈으로
+                            </button>
+                            <button onClick={() => router.push('/community')} className="w-full text-left px-4 py-3 text-sm font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl flex items-center gap-3">
+                                <MessageCircle size={16} /> 커뮤니티
+                            </button>
+                            <button onClick={() => {
+                                if (confirm('로그아웃 하시겠습니까?')) {
+                                    localStorage.clear();
+                                    window.location.href = '/';
+                                }
+                            }} className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-gray-800 rounded-xl flex items-center gap-3">
+                                <LogOut size={16} /> 로그아웃
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )
+        );
+    }
+
+    if (userTypeForLayout === null) {
+        return <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} />;
+    }
+
+    if (userTypeForLayout === 'personal') {
+        return (
+            <div className={`h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24`}>
+                {showMobileMenu && <PersonalMobileMenu onClose={() => setShowMobileMenu(false)} setView={setView} />}
+
+                {/* Header is Global now */}
+
+                <div className="max-w-6xl mx-auto p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <PersonalSidebar view={view} setView={setView} />
+                    <main className="col-span-1 md:col-span-3">
+                        {(view === 'member-info' || view === 'dashboard') && <PersonalDashboardHome setView={setView} />}
+                        {view === 'member-edit' && <PersonalMemberEdit setView={setView} />}
+                        {view === 'resume-form' && <ResumeForm setView={setView} />}
+
+                        {/* New View Placeholders */}
+                        {view === 'resume-list' && <PersonalDashboardHome setView={setView} />} {/* Placeholder reusing dashboard */}
+                        {view === 'scrap-jobs' && <ComingSoonView title="채용정보 스크랩" />}
+                        {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}
+                        {view === 'excluded-shops' && <ComingSoonView title="열람불가 업소설정" />}
+                        {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}
+                        {view === 'my-posts' && <ComingSoonView title="내가 작성한 게시글" />}
+                        {view === 'block-settings' && <ComingSoonView title="회원 차단 설정" />}
+                        {view === 'post-bookmarks' && <ComingSoonView title="즐겨찾기한 게시글" />}
+                    </main>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24`}>
+        <div className={`h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24`}>
             {showWarningModal && <WarningModal />}
             {showDesignModal && <DesignRequestModal />}
             {showPreviewModal && <PreviewModal />}
             {showMobileMenu && <MobileMenu />}
 
-            {/* Header */}
-            <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
-                <div className="max-w-[1020px] mx-auto px-3 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        {view === 'dashboard' ? (
-                            <button onClick={() => router.push('/')} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-800'}`}>
-                                <Home size={24} />
-                            </button>
-                        ) : (
-                            <button onClick={() => {
-                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
-                                setView('dashboard');
-                            }} className={`p-2 rounded-full transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-stone-50 text-gray-800'}`}>
-                                <ArrowLeft size={20} />
-                            </button>
-                        )}
-                        <h1 className="text-xl font-black tracking-tight flex items-center gap-2">
-                            마이페이지 <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-black uppercase">Admin</span>
-                        </h1>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => setShowMobileMenu(true)} className="text-gray-600 md:hidden">
-                            <Menu size={24} />
-                        </button>
-                    </div>
-                </div>
-            </header>
+
 
             {view === 'dashboard' ? (
                 <div className="max-w-6xl mx-auto p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -1080,44 +1172,9 @@ export default function MyShopPage() {
                             채용공고 등록하기
                         </button>
 
+                        {/* Media URL Section Removed - Moved to Editor Toolbar */}
+
                         <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-
-
-                            {/* 0. Media URL (New) */}
-                            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className={`p-3 rounded-2xl ${brand.theme === 'dark' ? 'bg-gray-700 text-pink-400' : 'bg-pink-50 text-pink-500'}`}>
-                                        <Camera size={24} />
-                                    </div>
-                                    <h3 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>미디어 설정 <span className="text-sm font-normal text-gray-500 ml-2">(선택)</span></h3>
-                                </div>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-500 mb-2">이미지/영상 URL</label>
-                                        <input
-                                            type="text"
-                                            value={mediaUrl}
-                                            onChange={(e) => setMediaUrl(e.target.value)}
-                                            placeholder="https://example.com/image.jpg (이미지 또는 영상 URL을 입력하세요)"
-                                            className={`w-full h-14 px-4 rounded-xl border-2 transition-all font-bold ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700 text-white focus:border-pink-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-pink-500'}`}
-                                        />
-                                        <p className="text-xs text-gray-400 mt-2 ml-1">
-                                            * 입력하지 않으면 기본 아이콘이 표시됩니다. (권장 비율 16:9)
-                                        </p>
-                                    </div>
-                                    {mediaUrl && (
-                                        <div className="w-full h-[450px] rounded-xl overflow-hidden bg-gray-100 relative group border">
-                                            <Image
-                                                src={mediaUrl}
-                                                alt="Preview"
-                                                width={800}
-                                                height={450}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
 
                             {/* 1. Recruitment Info */}
                             <div className={`p-4 border-b transition ${brand.theme === 'dark' ? 'border-gray-800 hover:bg-gray-800/30' : 'border-gray-100 hover:bg-gray-50'}`}>
@@ -1164,11 +1221,10 @@ export default function MyShopPage() {
                                     <p className={`text-sm ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                         <strong className="text-pink-500">*</strong> 표시는 필수 입력 항목입니다. 정확한 정보를 입력해주세요.
                                     </p>
+                                    {/* Form Content */}
                                 </div>
-                                {/* Form Content */}
-                            </div>
-                            {/* Start of existing Form Content */}
-                            <div className="space-y-3">
+                                {/* Start of existing Form Content */}
+                                {/* Start of existing Form Content */}
                                 <section className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
                                     <h2 className="font-black text-gray-800 mb-2.5 flex items-center gap-2 text-sm">
                                         <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
@@ -1245,123 +1301,129 @@ export default function MyShopPage() {
                                         </div>
                                     </div>
                                 </section>
-                            </div>
 
-                            <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                                <h2 className={`font-black mb-2.5 flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
-                                    <span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>
-                                    채용 공고 정보
-                                </h2>
-                                <div className="space-y-2.5">
-                                    <div>
-                                        <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                                        <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-2 text-base font-black placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-pink-900/50' : 'bg-white border-gray-200 text-black focus:ring-pink-500'}`} />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2.5">
+                                <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                                    <h2 className={`font-black mb-2.5 flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                                        <span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>
+                                        채용 공고 정보
+                                    </h2>
+                                    <div className="space-y-2.5">
                                         <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>직종</label>
-                                            <div className="flex gap-1.5">
-                                                <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    <option value="">1차</option>
-                                                    {Object.keys(INDUSTRY_DATA).map(i => <option key={i} value={i}>{i}</option>)}
-                                                </select>
-                                                <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    <option value="">2차</option>
-                                                    {INDUSTRY_DATA[industryMain]?.map(j => <option key={j} value={j}>{j}</option>)}
-                                                </select>
+                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>공고 제목</label>
+                                            <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-2 text-base font-black placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-pink-900/50' : 'bg-white border-gray-200 text-black focus:ring-pink-500'}`} />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>직종</label>
+                                                <div className="flex gap-1.5">
+                                                    <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        <option value="">1차</option>
+                                                        {Object.keys(INDUSTRY_DATA).map(i => <option key={i} value={i}>{i}</option>)}
+                                                    </select>
+                                                    <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        <option value="">2차</option>
+                                                        {INDUSTRY_DATA[industryMain]?.map(j => <option key={j} value={j}>{j}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>연령</label>
+                                                <div className="flex items-center gap-1.5">
+                                                    <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                                    </select>
+                                                    <span className="text-gray-300 text-[10px]">-</span>
+                                                    <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>연령</label>
-                                            <div className="flex items-center gap-1.5">
-                                                <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
-                                                </select>
-                                                <span className="text-gray-300 text-[10px]">-</span>
-                                                <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
-                                                </select>
+
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>근무 지역</label>
+                                                <div className="flex gap-1.5">
+                                                    <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        <option value="">시/도</option>
+                                                        {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
+                                                    </select>
+                                                    <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                        <option value="">구/군</option>
+                                                        {REGION_DATA[regionCity]?.map(g => <option key={g} value={g}>{g}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}>근무시간</label>
+                                                <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-2 gap-2.5">
-                                        <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>근무 지역</label>
-                                            <div className="flex gap-1.5">
-                                                <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    <option value="">시/도</option>
-                                                    {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
-                                                </select>
-                                                <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className={`w-full border rounded-lg p-2 text-sm outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                    <option value="">구/군</option>
-                                                    {REGION_DATA[regionCity]?.map(g => <option key={g} value={g}>{g}</option>)}
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여 방식</label>
+                                                <select value={payType} onChange={handlePayTypeChange} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                                                    {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                                 </select>
                                             </div>
+                                            <div>
+                                                <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여액</label>
+                                                <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} disabled={payType === '협의'} className={`w-full border rounded-lg p-2 text-base font-black text-right outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'} ${payType === '협의' ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-900' : ''}`} />
+                                            </div>
+                                            <div className="col-span-2 mt-1">
+                                                <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>급여 추가 옵션</label>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {PAY_SUFFIX_OPTIONS.map(suffix => (
+                                                        <button
+                                                            key={suffix}
+                                                            onClick={() => {
+                                                                if (paySuffixes.includes(suffix)) {
+                                                                    setPaySuffixes(paySuffixes.filter(s => s !== suffix));
+                                                                } else {
+                                                                    setPaySuffixes([...paySuffixes, suffix]);
+                                                                }
+                                                            }}
+                                                            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${paySuffixes.includes(suffix) ? 'bg-pink-500 text-white border-pink-500 shadow-md shadow-pink-200' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50')}`}
+                                                        >
+                                                            {suffix}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}>근무시간</label>
-                                            <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className={`w-full border rounded-lg p-2 text-base placeholder-gray-400 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
-                                        </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-2 gap-2.5">
-                                        <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여 방식</label>
-                                            <select value={payType} onChange={handlePayTypeChange} className={`w-full border rounded-lg p-2 text-base outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                                                {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className={`block text-sm font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>급여액</label>
-                                            <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} disabled={payType === '협의'} className={`w-full border rounded-lg p-2 text-base font-black text-right outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'} ${payType === '협의' ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-900' : ''}`} />
-                                        </div>
-                                        <div className="col-span-2 mt-1">
-                                            <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>급여 추가 옵션</label>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {PAY_SUFFIX_OPTIONS.map(suffix => (
+                                        <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                            <div className="flex justify-between items-center">
+                                                <label className="block text-sm font-black text-gray-500 uppercase tracking-tighter">편의사항 및 키워드 (최대 10개)</label>
+                                                <span className={`text-xs font-bold ${selectedKeywords.length >= 10 ? 'text-red-500' : 'text-pink-500'}`}>
+                                                    {selectedKeywords.length}/10
+                                                </span>
+                                            </div>
+                                            <div className={`p-4 rounded-xl border border-dashed flex flex-wrap gap-2 max-h-[150px] overflow-y-auto custom-scrollbar ${brand.theme === 'dark' ? 'bg-gray-800/30 border-gray-700' : 'bg-gray-50/50 border-gray-200'}`}>
+                                                {CONVENIENCE_KEYWORDS.map(item => (
                                                     <button
-                                                        key={suffix}
-                                                        onClick={() => {
-                                                            if (paySuffixes.includes(suffix)) {
-                                                                setPaySuffixes(paySuffixes.filter(s => s !== suffix));
-                                                            } else {
-                                                                setPaySuffixes([...paySuffixes, suffix]);
-                                                            }
-                                                        }}
-                                                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${paySuffixes.includes(suffix) ? 'bg-pink-500 text-white border-pink-500 shadow-md shadow-pink-200' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50')}`}
+                                                        key={item}
+                                                        onClick={() => toggleKeyword(item)}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${selectedKeywords.includes(item)
+                                                            ? 'bg-purple-500 text-white border-purple-500 shadow-md shadow-purple-200 dark:shadow-none'
+                                                            : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700 hover:text-gray-200' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700')
+                                                            }`}
                                                     >
-                                                        {suffix}
+                                                        {item}
                                                     </button>
                                                 ))}
                                             </div>
+                                            <p className="text-[10px] text-gray-400 text-center">
+                                                * 선택하신 키워드는 검색 필터와 매칭되어 노출 효율을 높여줍니다.
+                                            </p>
                                         </div>
                                     </div>
+                                </section>
 
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center mb-1.5">
-                                            <label className="block text-sm font-black text-gray-500 uppercase tracking-tighter">편의사항 및 키워드</label>
-                                            <span className="text-xs text-pink-500 font-bold">{selectedConvenience.length + selectedKeywords.length}/10</span>
-                                        </div>
-                                        <div className={`flex flex-wrap gap-1.5 p-2 rounded-lg border max-h-[100px] overflow-y-auto ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
-                                            {CONVENIENCE_ITEMS.map(item => (
-                                                <button key={item} onClick={() => toggleConvenience(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedConvenience.includes(item) ? 'bg-blue-500 text-white border-blue-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-white text-gray-400 border-gray-200')}`}>
-                                                    {item}
-                                                </button>
-                                            ))}
-                                            {KEYWORDS.map(item => (
-                                                <button key={item} onClick={() => toggleKeyword(item)} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${selectedKeywords.includes(item) ? 'bg-pink-500 text-white border-pink-500' : (brand.theme === 'dark' ? 'bg-gray-800 text-gray-500 border-gray-700' : 'bg-white text-gray-400 border-gray-200')}`}>
-                                                    {item}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* 에디터와 상세 정보 미리보기는 전체 너비로 배치하여 수직 공간 효율 극대화 */}
-                            <div className="space-y-4">
+                                {/* 에디터와 상세 정보 미리보기는 전체 너비로 배치하여 수직 공간 효율 극대화 */}
+                                {/* 에디터와 상세 정보 미리보기는 전체 너비로 배치하여 수직 공간 효율 극대화 */}
                                 <section className={`p-3 md:p-4 rounded-xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                                     <div className="flex justify-between items-center mb-2">
                                         <h2 className={`font-black flex items-center gap-2 text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
@@ -1375,10 +1437,10 @@ export default function MyShopPage() {
                                     <div className="border rounded-xl overflow-hidden">
                                         <div className={`border-b p-1.5 flex gap-1 flex-wrap items-center ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
                                             <select onChange={handleFontChange} value={currentFont} className={`h-6 text-[10px] border rounded px-1 outline-none w-16 ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
-                                                {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                                                {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
                                             </select>
                                             <select onChange={(e) => execCmd('fontSize', e.target.value)} value={currentFontSize} className={`h-6 text-[10px] border rounded px-1 outline-none w-12 ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
-                                                {FONT_SIZES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                                                {FONT_SIZES.map(f => <option key={f} value={f}>{f}</option>)}
                                             </select>
                                             <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
                                             <button onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }} className={`p-1 rounded ${isBold ? 'bg-gray-300' : (brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100')}`}><Bold size={14} /></button>
@@ -1387,16 +1449,30 @@ export default function MyShopPage() {
                                             <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
                                             <select value={currentForeColor} onChange={(e) => execCmd('foreColor', e.target.value)} className={`h-6 text-[10px] outline-none w-16 border rounded ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                                 <option value="black">글자색</option>
-                                                {TEXT_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
+                                                {TEXT_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                             </select>
-                                            <select onChange={(e) => execCmd('hiliteColor', e.target.value)} className={`h-6 text-[10px] outline-none w-16 border rounded ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
+                                            <select value={currentHiliteColor} onChange={(e) => execCmd('hiliteColor', e.target.value)} className={`h-6 text-[10px] outline-none w-16 border rounded ${brand.theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}>
                                                 <option value="transparent">배경색</option>
-                                                {BG_COLORS.map(c => <option key={c.value} value={c.value}>{c.name}</option>)}
+                                                {BG_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                             </select>
                                             <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
                                             <button onClick={() => execCmd('justifyLeft')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignLeft size={14} /></button>
                                             <button onClick={() => execCmd('justifyCenter')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignCenter size={14} /></button>
                                             <button onClick={() => execCmd('justifyRight')} className={`p-1 rounded ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100'}`}><AlignRight size={14} /></button>
+                                            <div className={`w-px h-3 mx-0.5 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
+                                            <button
+                                                onClick={() => {
+                                                    const url = window.prompt('이미지 또는 영상 URL을 입력하세요', mediaUrl);
+                                                    if (url !== null) {
+                                                        setMediaUrl(url);
+                                                    }
+                                                }}
+                                                className={`p-1 rounded flex items-center gap-1 ${brand.theme === 'dark' ? 'hover:bg-gray-700 text-pink-400' : 'hover:bg-pink-50 text-pink-500'}`}
+                                                title="대표 미디어 설정"
+                                            >
+                                                <Camera size={14} />
+                                                <span className="text-[10px] font-bold">미디어</span>
+                                            </button>
                                         </div>
                                         <div
                                             ref={editorRef}
@@ -1686,6 +1762,625 @@ export default function MyShopPage() {
                     )}
                 </div>
             )}
+        </div>
+    );
+}
+
+// --- Personal Member Components ---
+
+function PersonalSidebar({ view, setView }: { view: string, setView: (v: any) => void }) {
+    const brand = useBrand();
+    const router = useRouter(); // Added router hook
+    const [userName, setUserName] = useState('회원님');
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        if (storedName) setUserName(storedName);
+    }, []);
+
+    const menuItems = [
+        { id: 'resume-list', label: '이력서 리스트', icon: <List size={16} /> },
+        { id: 'scrap-jobs', label: '채용정보 스크랩', icon: <Star size={16} /> },
+        { id: 'payment-history', label: '유료결제 내역', icon: <CreditCard size={16} /> },
+        { id: 'excluded-shops', label: '열람불가 업소설정', icon: <AlertTriangle size={16} /> },
+        { id: 'custom-jobs', label: '맞춤구인정보', icon: <Briefcase size={16} /> },
+        { id: 'my-posts', label: '내가 작성한 게시글', icon: <FileText size={16} /> },
+        { id: 'block-settings', label: '회원 차단 설정', icon: <User size={16} /> },
+        { id: 'post-bookmarks', label: '즐겨찾기한 게시글', icon: <Star size={16} /> },
+    ];
+
+    return (
+        <aside className="col-span-1 space-y-4">
+            {/* Profile Box */}
+            <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className={`w-20 h-20 rounded-lg mx-auto mb-4 overflow-hidden border-2 flex items-center justify-center ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <User size={40} className="opacity-50" />
+                    </div>
+                </div>
+                <div>
+                    <p className={`text-sm font-bold mb-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>일반 회원님</p>
+                    <h2 className={`font-black text-xl tracking-tight mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userName}</h2>
+                </div>
+                <div className="flex gap-1 w-full">
+                    <button className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                        <Camera size={12} /> 사진등록/수정
+                    </button>
+                    <button
+                        onClick={() => setView('member-edit')}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                    >
+                        <Settings size={12} /> 회원정보 수정
+                    </button>
+                </div>
+            </div>
+
+            {/* Menu - Hidden on Mobile, accessible via Hamburger */}
+            <div className={`hidden md:block rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                {menuItems.map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => router.push(`/my-shop?view=${item.id}`)}
+                        className={`w-full text-left px-5 py-3.5 text-sm font-bold border-b last:border-0 flex items-center gap-3 transition ${brand.theme === 'dark' ? 'border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-white' : 'border-gray-50 text-gray-600 hover:bg-gray-50 hover:text-gray-900'} ${view === item.id ? 'bg-pink-50 text-pink-600 dark:bg-gray-800 dark:text-pink-400' : ''}`}
+                    >
+                        {item.icon}
+                        {item.label}
+                    </button>
+                ))}
+            </div>
+
+
+        </aside>
+    );
+}
+
+function PersonalDashboardHome({ setView }: { setView: (v: 'member-info' | 'member-edit' | 'resume-form' | 'dashboard' | 'form') => void }) {
+    const brand = useBrand();
+    const router = useRouter();
+    const [userName, setUserName] = useState('회원님');
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        if (storedName) setUserName(storedName);
+    }, []);
+
+    const handleLogout = () => {
+        if (confirm('로그아웃 하시겠습니까?')) {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+    };
+
+    const menuItems = [
+        { label: '이력서 관리', icon: <FileText size={24} />, action: () => setView('resume-form'), color: 'text-blue-500' },
+        { label: '스크랩 공고', icon: <Star size={24} />, action: () => alert('준비중입니다'), color: 'text-amber-500' },
+        { label: '결제/이용권', icon: <CreditCard size={24} />, action: () => alert('준비중입니다'), color: 'text-purple-500' },
+        { label: '차단 상점', icon: <AlertTriangle size={24} />, action: () => alert('준비중입니다'), color: 'text-red-500' },
+        { label: '맞춤알바', icon: <Briefcase size={24} />, action: () => alert('준비중입니다'), color: 'text-emerald-500' },
+        { label: '내가 쓴 글', icon: <MessageCircle size={24} />, action: () => router.push('/community?my=true'), color: 'text-pink-500' },
+        { label: '회원정보', icon: <Settings size={24} />, action: () => setView('member-info'), color: 'text-gray-500' },
+        // { label: '로그아웃', icon: <LogOut size={24} />, action: handleLogout, color: 'text-gray-400' },
+    ];
+
+    return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+            {/* Resume Status */}
+            <div className={`p-5 rounded-2xl border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <FileText size={18} className="text-gray-400" />
+                    <h2 className={`text-base font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{userName} 회원님의 구직활동</h2>
+                </div>
+                <div className="flex divide-x dark:divide-gray-800">
+                    <div className="flex-1 flex flex-col items-center justify-center p-4">
+                        <div className="text-xs font-bold text-gray-500 mb-2">이력서 등록수</div>
+                        <div className="text-3xl font-black text-red-500">0<span className="text-sm text-gray-400 ml-1">개</span></div>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center justify-center p-4">
+                        <div className="text-xs font-bold text-gray-500 mb-2">공개중인 이력서</div>
+                        <div className="text-3xl font-black text-red-500">0<span className="text-sm text-gray-400 ml-1">개</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Dashboard Status Summary - Original */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                    <span className="text-[11px] text-gray-400 font-bold">이력서 열람</span>
+                    <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>0</span>
+                </div>
+                <div className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                    <span className="text-[11px] text-gray-400 font-bold">면접 제의</span>
+                    <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>0</span>
+                </div>
+                <div className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                    <span className="text-[11px] text-gray-400 font-bold">스크랩</span>
+                    <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>0</span>
+                </div>
+            </div>
+
+            {/* Resume List Placeholder (Visible if view matches) */}
+            <div className="space-y-4">
+                <div className={`p-8 rounded-2xl border border-dashed flex flex-col items-center justify-center text-center gap-3 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300 bg-gray-50'}`}>
+                    <FileText className="text-gray-300" size={48} />
+                    <div>
+                        <p className="text-gray-500 font-bold">등록된 이력서가 없습니다.</p>
+                        <button
+                            onClick={() => setView('resume-form')}
+                            className="mt-4 px-8 py-3 bg-pink-500 hover:bg-pink-600 text-white font-black rounded-2xl shadow-lg shadow-pink-200 transition-all active:scale-95"
+                        >
+                            + 이력서 등록하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {/* Mobile Logout Button */}
+            <div className="md:hidden">
+                <button
+                    onClick={handleLogout}
+                    className="w-full py-4 text-gray-400 font-bold text-sm underline hover:text-red-500 transition-colors"
+                >
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function PersonalMemberEdit({ setView }: { setView: (v: 'member-info' | 'member-edit' | 'resume-form' | 'dashboard' | 'form') => void }) {
+    const brand = useBrand();
+    const [userName, setUserName] = useState('회원님');
+
+    // Form Data
+    const [formData, setFormData] = useState({
+        id: 'admin_user',
+        password: '',
+        passwordConfirm: '',
+        realName: '김여우',
+        nickname: '회원님',
+        birthdate: '1998-08-13',
+        gender: '여성', // Default
+        email: 'user@example.com',
+        phone: '010-0000-0000',
+        smsConsent: true
+    });
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        if (storedName) {
+            setUserName(storedName);
+            setFormData(prev => ({ ...prev, nickname: storedName }));
+        }
+    }, []);
+
+    const handleChange = (field: string, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSave = () => {
+        if (formData.password && formData.password !== formData.passwordConfirm) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        localStorage.setItem('user_name', formData.nickname);
+        alert('회원정보가 수정되었습니다.');
+        setView('member-info');
+    };
+
+    return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+                    <Settings size={20} className="text-gray-400" />
+                    <h2 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>회원정보 수정</h2>
+                </div>
+
+                <div className="space-y-5">
+                    {/* ID (Read Only) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">아이디</label>
+                        <div className="md:col-span-9">
+                            <input type="text" value={formData.id} readOnly className="w-full bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
+                        </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">비밀번호</label>
+                        <div className="md:col-span-9">
+                            <input
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) => handleChange('password', e.target.value)}
+                                placeholder="변경할 비밀번호를 입력하세요"
+                                className="w-full bg-white border border-gray-300 rounded p-2 text-sm font-bold outline-none focus:border-purple-500"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Password Confirm */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">비밀번호 확인</label>
+                        <div className="md:col-span-9">
+                            <input
+                                type="password"
+                                value={formData.passwordConfirm}
+                                onChange={(e) => handleChange('passwordConfirm', e.target.value)}
+                                placeholder="비밀번호를 다시 입력하세요"
+                                className="w-full bg-white border border-gray-300 rounded p-2 text-sm font-bold outline-none focus:border-purple-500"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Real Name (Read Only) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">이름</label>
+                        <div className="md:col-span-9">
+                            <input type="text" value={formData.realName} readOnly className="w-full bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
+                        </div>
+                    </div>
+
+                    {/* Nickname (Editable) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">닉네임</label>
+                        <div className="md:col-span-9">
+                            <input
+                                type="text"
+                                value={formData.nickname}
+                                onChange={(e) => handleChange('nickname', e.target.value)}
+                                className="w-full bg-white border border-gray-300 rounded p-2 text-sm font-bold outline-none focus:border-purple-500"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Birthdate (Read Only) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">생년월일</label>
+                        <div className="md:col-span-9">
+                            <input type="text" value={formData.birthdate} readOnly className="w-full bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
+                        </div>
+                    </div>
+
+                    {/* Gender (Read Only) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">성별</label>
+                        <div className="md:col-span-9">
+                            <input type="text" value={formData.gender} readOnly className="w-full bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
+                        </div>
+                    </div>
+
+                    {/* Email (Editable) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">이메일</label>
+                        <div className="md:col-span-9">
+                            <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => handleChange('email', e.target.value)}
+                                className="w-full bg-white border border-gray-300 rounded p-2 text-sm font-bold outline-none focus:border-purple-500"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Phone (Read Only + Certify) */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-start">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500 mt-2.5">휴대폰</label>
+                        <div className="md:col-span-9 space-y-2">
+                            <div className="flex gap-2">
+                                <input type="text" value={formData.phone} readOnly className="flex-1 bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
+                                <button className="px-3 text-xs font-bold bg-gray-800 text-white rounded hover:bg-gray-900 transition flex-shrink-0">휴대폰 인증</button>
+                            </div>
+                            <p className="text-[11px] text-blue-500 font-bold">* 연락처 변경은 '휴대폰인증'이 필요합니다.</p>
+                        </div>
+                    </div>
+
+                    {/* SMS Consent */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-y-0 items-center">
+                        <label className="md:col-span-3 text-xs font-bold text-gray-500">SMS 수신동의</label>
+                        <div className="md:col-span-9 flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={formData.smsConsent}
+                                onChange={(e) => handleChange('smsConsent', e.target.checked)}
+                                id="smsConsent"
+                                className="w-4 h-4 accent-purple-500"
+                            />
+                            <label htmlFor="smsConsent" className="text-sm font-bold text-gray-700 cursor-pointer">동의합니다</label>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-center gap-2 mt-8 pt-6 border-t border-gray-100">
+                        <button onClick={() => setView('member-info')} className="px-6 py-2.5 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
+                        <button onClick={handleSave} className="px-8 py-2.5 rounded-xl bg-gray-900 text-white font-bold hover:bg-black transition shadow-lg">정보 수정완료</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ResumeForm({ setView }: { setView: (v: 'member-info' | 'resume-form' | 'dashboard' | 'form') => void }) {
+    const brand = useBrand();
+    const router = useRouter();
+
+    // User Info State
+    const [userName, setUserName] = useState('회원님');
+    const [userId, setUserId] = useState('admin_user');
+
+    // Form States
+    const [selectedIndustryMain, setSelectedIndustryMain] = useState('');
+    const [selectedIndustrySub, setSelectedIndustrySub] = useState('');
+    const [selectedRegionMain, setSelectedRegionMain] = useState('');
+    const [selectedRegionSub, setSelectedRegionSub] = useState('');
+    const [payType, setPayType] = useState('급여협의'); // Default match corporate
+
+    // Contact State
+    const [contactMethod, setContactMethod] = useState('');
+    const [contactValue, setContactValue] = useState('');
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        const storedId = localStorage.getItem('user_id');
+        if (storedName) setUserName(storedName);
+        if (storedId) setUserId(storedId);
+    }, []);
+
+    const handleContactMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const method = e.target.value;
+        setContactMethod(method);
+        if (method === 'phone') {
+            setContactValue('010-0000-0000'); // Mock verified phone
+        } else if (method === 'site_msg') {
+            setContactValue('site_msg');
+        } else {
+            setContactValue(''); // Clear for ID input
+        }
+    };
+
+    // PAY_TYPES is assumed to be imported or defined globally/in a parent scope.
+    // const PAY_TYPES = ['급여협의', '시급', '일당', '월급', '건별']; // Removed as per instruction
+
+    return (
+        <div className={`space-y-6 animate-in fade-in slide-in-from-right-4 duration-500`}>
+
+            {/* Warning Banner */}
+            <div
+                onClick={() => router.push('/customer-center?tab=notice')}
+                className="w-full bg-red-50 border border-red-100 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:bg-red-100/50 transition group"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-red-500 border border-red-100">
+                        <AlertTriangle size={24} fill="currentColor" strokeWidth={0} />
+                    </div>
+                    <div>
+                        <div className="text-xs font-bold text-gray-500 mb-0.5">이력서 등록 시</div>
+                        <div className="text-xl font-black text-red-500 tracking-tight">구직자 주의사항!</div>
+                    </div>
+                </div>
+                <div className="text-sm font-bold text-gray-500 flex items-center gap-1 group-hover:text-red-500 transition">
+                    자세히 보기 <ChevronRight size={16} />
+                </div>
+            </div>
+
+            <div className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100 dark:border-gray-800">
+                    <h2 className={`text-xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        <span className="text-pink-500">{userName}</span> 회원 이력서 등록
+                    </h2>
+                    <div className="text-xs font-bold text-gray-400">MY PERSONAL HISTORY</div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
+                    {/* Photo Area */}
+                    <div className="md:col-span-3 flex flex-col items-center sm:items-stretch gap-2">
+                        <div className="w-28 sm:w-full aspect-[3/4] rounded-lg border-2 border-dashed flex items-center justify-center bg-gray-50 text-gray-300">
+                            <User size={32} className="sm:w-[48px] sm:h-[48px]" />
+                        </div>
+                    </div>
+
+                    {/* Basic Info Fields */}
+                    <div className="md:col-span-9 space-y-4">
+                        {/* ID - ReadOnly */}
+                        <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
+                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">아이디</label>
+                            <div className="sm:col-span-9 text-sm font-bold truncate w-full">{userId}</div>
+                        </div>
+                        {/* Nickname - Editable */}
+                        <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
+                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">이름(닉네임) <span className="text-red-500">*</span></label>
+                            <div className="sm:col-span-9 flex gap-2 w-full">
+                                <input
+                                    type="text"
+                                    value={userName}
+                                    maxLength={10}
+                                    onChange={(e) => setUserName(e.target.value)}
+                                    placeholder="10자 이내 입력"
+                                    className={`flex-1 border rounded p-1.5 text-xs font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:border-pink-500 min-w-0`}
+                                />
+                            </div>
+                        </div>
+                        {/* Birthdate/Sex */}
+                        <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
+                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">성별/생년월일 <span className="text-red-500">*</span></label>
+                            <div className="sm:col-span-9 flex flex-wrap gap-2 items-center w-full">
+                                <select className="border border-gray-300 rounded p-1.5 text-xs font-bold bg-white text-gray-700 outline-none flex-shrink-0">
+                                    <option>여성</option>
+                                    <option>남성</option>
+                                </select>
+                                <div className="flex items-center gap-1 flex-1 min-w-[200px]">
+                                    <input type="number" defaultValue="2000" className="w-[60px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">년</span>
+                                    <input type="number" defaultValue="1" className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">월</span>
+                                    <input type="number" defaultValue="1" className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">일</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Contact Method - Dynamic Input */}
+                        <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
+                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">연락방법 <span className="text-red-500">*</span></label>
+                            <div className="sm:col-span-9 space-y-2 w-full">
+                                <select
+                                    value={contactMethod}
+                                    onChange={handleContactMethodChange}
+                                    className="w-full border border-gray-300 rounded p-1.5 text-xs font-bold bg-white text-gray-700 outline-none"
+                                >
+                                    <option value="">연락방법 선택</option>
+                                    <option value="phone">휴대폰 (안심번호)</option>
+                                    <option value="kakao">카카오톡</option>
+                                    <option value="line">라인</option>
+                                    <option value="telegram">텔레그램</option>
+                                    <option value="site_msg">사이트 메세지</option>
+                                </select>
+
+                                {contactMethod === 'phone' && (
+                                    <>
+                                        <input type="text" value={contactValue} readOnly className="w-full bg-gray-100 border border-gray-300 rounded p-1.5 text-[11px] text-gray-500 font-bold outline-none" />
+                                        <p className="text-[10px] text-blue-500 leading-tight">* 안심번호를 선택하면 입력하신 전화번호는 노출되지 않습니다.</p>
+                                    </>
+                                )}
+
+                                {['kakao', 'line', 'telegram'].includes(contactMethod) && (
+                                    <input
+                                        type="text"
+                                        value={contactValue}
+                                        onChange={(e) => setContactValue(e.target.value)}
+                                        placeholder={`${contactMethod === 'kakao' ? '카카오톡' : contactMethod === 'line' ? '라인' : '텔레그램'} ID를 입력해주세요`}
+                                        className={`w-full border rounded p-1.5 text-[11px] font-bold outline-none focus:border-pink-500 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                    />
+                                )}
+
+                                {contactMethod === 'site_msg' && (
+                                    <div className="w-full bg-gray-50 border border-gray-200 rounded p-2 text-[10px] text-gray-500 text-center font-bold">
+                                        구직자에게 사이트 내 쪽지로 연락을 받습니다. (연락처 비공개)
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section Divider */}
+                <div className="border-t border-dashed border-gray-200 my-6"></div>
+
+                {/* Resume Content */}
+                <div className="space-y-6">
+                    {/* Title */}
+                    <div>
+                        <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-red-400 rounded-full"></span> 이력서 제목 <span className="text-red-500">*</span></label>
+                        <input type="text" placeholder="제목을 입력하세요" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500" />
+                    </div>
+                    {/* Pay - Corporate Mapping */}
+                    <div>
+                        <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-blue-400 rounded-full"></span> 희망 급여</label>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <select
+                                value={payType}
+                                onChange={(e) => setPayType(e.target.value)}
+                                className="border border-gray-300 rounded-lg p-2.5 text-xs font-bold bg-white text-gray-700 outline-none flex-shrink-0"
+                            >
+                                {/* Assuming PAY_TYPES is available in this scope */}
+                                {PAY_TYPES.map(type => (
+                                    <option key={type} value={type}>{type}</option>
+                                ))}
+                            </select>
+                            <div className="relative flex-1">
+                                <input
+                                    type="text"
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2.5 pr-8 text-sm font-bold outline-none focus:border-pink-500"
+                                    placeholder="금액 입력"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">원</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Industry */}
+                    <div>
+                        <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-purple-400 rounded-full"></span> 희망 분야 <span className="text-red-500">*</span></label>
+                        <div className="flex gap-2">
+                            <select
+                                value={selectedIndustryMain}
+                                onChange={(e) => {
+                                    setSelectedIndustryMain(e.target.value);
+                                    setSelectedIndustrySub('');
+                                }}
+                                className="w-full border border-gray-300 rounded p-2 text-xs font-bold bg-white text-gray-700 outline-none"
+                            >
+                                <option value="">1차 업종 선택</option>
+                                {Object.keys(INDUSTRY_DATA).map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={selectedIndustrySub}
+                                onChange={(e) => setSelectedIndustrySub(e.target.value)}
+                                className="w-full border border-gray-300 rounded p-2 text-xs font-bold bg-white text-gray-700 outline-none"
+                                disabled={!selectedIndustryMain}
+                            >
+                                <option value="">2차 업종 선택</option>
+                                {selectedIndustryMain && INDUSTRY_DATA[selectedIndustryMain]?.map(sub => (
+                                    <option key={sub} value={sub}>{sub}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    {/* Region */}
+                    <div>
+                        <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-green-400 rounded-full"></span> 업무 가능 지역 <span className="text-red-500">*</span></label>
+                        <div className="flex gap-2">
+                            <select
+                                value={selectedRegionMain}
+                                onChange={(e) => {
+                                    setSelectedRegionMain(e.target.value);
+                                    setSelectedRegionSub('');
+                                }}
+                                className="w-full border border-gray-300 rounded p-2 text-xs font-bold bg-white text-gray-700 outline-none"
+                            >
+                                <option value="">지역 선택</option>
+                                {Object.keys(REGION_DATA).map(region => (
+                                    <option key={region} value={region}>{region}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={selectedRegionSub}
+                                onChange={(e) => setSelectedRegionSub(e.target.value)}
+                                className="w-full border border-gray-300 rounded p-2 text-xs font-bold bg-white text-gray-700 outline-none"
+                                disabled={!selectedRegionMain}
+                            >
+                                <option value="">세부 지역 선택</option>
+                                {selectedRegionMain && REGION_DATA[selectedRegionMain]?.map(sub => (
+                                    <option key={sub} value={sub}>{sub}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    {/* Intro */}
+                    <div>
+                        <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-orange-400 rounded-full"></span> 자기소개 <span className="text-red-500">*</span></label>
+                        <textarea className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
+                    </div>
+                </div>
+
+                {/* Form Actions */}
+                <div className="mt-8 flex justify-center gap-3">
+                    <button onClick={() => setView('member-info')} className="px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
+                    <button onClick={() => { alert('이력서가 등록되었습니다.'); setView('member-info'); }} className="px-8 py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition shadow-lg">이력서 등록완료</button>
+                </div>
+            </div>
+        </div>
+    );
+}
+// --- Utility Components ---
+
+function ComingSoonView({ title }: { title: string }) {
+    const brand = useBrand();
+    return (
+        <div className={`p-10 rounded-2xl border text-center flex flex-col items-center justify-center gap-4 min-h-[400px] ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-gray-400 ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                <Settings size={32} />
+            </div>
+            <div>
+                <h2 className={`text-xl font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h2>
+                <p className="text-gray-500 font-bold">서비스 준비 중입니다.</p>
+            </div>
         </div>
     );
 }

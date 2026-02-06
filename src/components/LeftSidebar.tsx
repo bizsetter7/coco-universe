@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { useBrand } from '@/components/BrandProvider';
 import {
     Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText
@@ -26,15 +28,7 @@ const REGION_BUTTONS = ['서울', '경기', '인천', '부산', '대구', '광�
 // 새로운 직종 목록 (10개)
 const JOB_TYPE_BUTTONS = ['룸알바', '노래주점', '텐프로/쩜오', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
 
-// 편의사항/키워드 목록 (36개)
-const KEYWORD_OPTIONS = [
-    '출퇴근지원', '순번확실', '원룸제공', '만근비지원', '출퇴근자유', '식사제공',
-    '팁별도', '인센티브', '홀복지원', '갯수보장', '지명우대', '고수익',
-    '초이스없음', '해외여행지원', '뒷방없음', '따당가능', '푸쉬가능', '밀방없음',
-    '칼퇴보장', '텃세없음', '지명비있음', '선불가능', '성형지원', '숙식제공',
-    '경력우대', '당일지급', '초보가능', '파트타임', '주말알바', '당일알바',
-    '주간알바', '투잡알바', '평일알바', '야간알바', '단기알바', '신입환영'
-];
+import { SIDEBAR_KEYWORDS } from '@/constants/job-options';
 
 const CATEGORY_LINKS = [
     { icon: Crown, label: '그랜드', color: 'text-amber-500', tier: 'grand' },
@@ -62,10 +56,23 @@ export default function LeftSidebar({
     userPoints = 0,
 }: LeftSidebarProps) {
     const brand = useBrand();
+    const [selectedKeywords, setSelectedKeywords] = React.useState<string[]>([]);
+
+    const toggleKeyword = (kw: string) => {
+        if (selectedKeywords.includes(kw)) {
+            setSelectedKeywords(prev => prev.filter(k => k !== kw));
+        } else {
+            if (selectedKeywords.length < 5) {
+                setSelectedKeywords(prev => [...prev, kw]);
+            } else {
+                alert('최대 5개까지만 선택 가능합니다.');
+            }
+        }
+    };
 
 
     return (
-        <div className="hidden lg:block w-[220px] flex-shrink-0 space-y-4">
+        <div className="hidden lg:block w-full flex-shrink-0 space-y-4">
             {/* 1. MEMBER LOGIN / 로그인 상태 박스 */}
             <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 {isLoggedIn ? (
@@ -173,26 +180,36 @@ export default function LeftSidebar({
                 </div>
             </div>
 
-            {/* 5. 편의사항/키워드 (최대 5개 선택) */}
+
+
+            {/* 5. 편의사항/키워드 (최대 5개 선택 -> Expanded List) */}
             <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="flex items-center justify-between mb-3">
                     <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                         <span className="text-purple-600">편의사항</span> 키워드
                     </h4>
                     <span className="text-[10px] text-gray-500">
-                        필터
+                        {selectedKeywords.length}/5
                     </span>
                 </div>
-                <div className="flex flex-wrap gap-1 max-h-[200px] overflow-y-auto">
-                    {KEYWORD_OPTIONS.map((kw) => (
-                        <button
-                            key={kw}
-                            onClick={() => { }}
-                            className={`px-2 py-1 rounded text-[9px] font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                        >
-                            {kw}
-                        </button>
-                    ))}
+                <div className="flex flex-wrap gap-1 max-h-[200px] overflow-y-auto custom-scrollbar">
+                    {SIDEBAR_KEYWORDS.map((kw) => {
+                        const isSelected = selectedKeywords.includes(kw);
+                        return (
+                            <button
+                                key={kw}
+                                onClick={() => toggleKeyword(kw)}
+                                className={`px-2 py-1 rounded text-[9px] font-bold transition ${isSelected
+                                    ? 'bg-pink-500 text-white shadow-md'
+                                    : brand.theme === 'dark'
+                                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                            >
+                                {kw}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 

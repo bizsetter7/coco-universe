@@ -1,54 +1,77 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useBrand } from './BrandProvider';
+import React from 'react';
+
 import { BannerSidebar } from './BannerSidebar';
+import { useMobile } from '@/hooks/useMobile';
 import { MobileBottomNav } from './ui/MobileBottomNav';
+import { useBrand } from './BrandProvider';
+import { Footer } from './layout/Footer';
+import { LAYOUT } from '@/constants/layout';
+import MainHeader from './common/MainHeader';
+import { Shop } from '@/types/shop';
+// ... other imports
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
+    sideAds: Shop[]; // [Optimization]
 }
 
-export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
+export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
+    const isMobile = useMobile();
     const brand = useBrand();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    // 특정 탭(공지사항 등)에서 본문이 넓어야 하는 경우를 위한 로직 (필요 시 확장)
-    const isWidePage = false;
 
     return (
-        <div className={`min-h-[100dvh] flex flex-col ${mounted && brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ isolation: 'isolate' }}>
-            <div
-                className="grid xl:grid-cols-[160px_1fr_160px] gap-0 xl:gap-8 w-full max-w-[1440px] mx-auto justify-center relative min-h-[100dvh] items-stretch"
-                style={{
-                    overflow: 'visible',
-                    position: 'relative',
-                    paddingTop: '56px',
-                    transform: 'translateZ(0)'
-                }}
-            >
+        <React.Fragment>
+            {/* Global Header */}
+            <MainHeader />
 
-                {/* 왼쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] h-full self-stretch relative" style={{ contain: 'none !important' }}>
-                    <BannerSidebar side="left" />
-                </aside>
+            {/* 
+               [Golden Rule - Framework Reconstruction] 
+               1. Outer Wrapper: Max 1432px, Centered, Relative
+               2. Sidebars: Absolute positioned at top-[10px] (Overlapping Header)
+               3. Main Grid: Keeps 160px spacers to prevent content overlap
+            */}
+            <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                {/* 중앙 메인 */}
-                <main className={`w-full ${isWidePage ? 'max-w-[1280px]' : 'max-w-[1020px]'} flex-1 min-w-0 shadow-none xl:shadow-none min-h-full main-content-area ${mounted && brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
-                    {children}
-                </main>
+                {/* Left Sidebar - Absolute Overlay (Desktop Only) */}
+                {!isMobile && (
+                    <div className="hidden xl:block absolute top-0 left-0 w-[160px] h-full z-[10001] pointer-events-none">
+                        <div className="sticky top-[66px] pointer-events-auto">
+                            <BannerSidebar side="left" shops={sideAds} />
+                        </div>
+                    </div>
+                )}
 
-                {/* 오른쪽 사이드바 컨테이너 (Engine Track) */}
-                <aside className="hidden xl:block w-[160px] h-full self-stretch relative" style={{ contain: 'none !important' }}>
-                    <BannerSidebar side="right" />
-                </aside>
+                {/* Right Sidebar - Absolute Overlay (Desktop Only) */}
+                {!isMobile && (
+                    <div className="hidden xl:block absolute top-0 right-0 w-[160px] h-full z-[10001] pointer-events-none">
+                        <div className="sticky top-[66px] pointer-events-auto">
+                            <BannerSidebar side="right" shops={sideAds} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Main Grid - Spacers + Content */}
+                <div className="grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4">
+                    {/* Left Spacer */}
+                    <div className="hidden xl:block w-[160px]" />
+
+                    {/* Main Content */}
+                    <main className={`w-full flex-1 min-w-0 relative z-0`}>
+                        {children}
+                    </main>
+
+                    {/* Right Spacer */}
+                    <div className="hidden xl:block w-[160px]" />
+                </div>
 
             </div>
+
+            {/* Global Footer */}
+            <Footer />
+
             <MobileBottomNav />
-        </div>
+        </React.Fragment>
     );
 };

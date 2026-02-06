@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Crown, Zap, Flame, Sparkles } from 'lucide-react';
 import { Shop } from '@/types/shop';
+import { formatKoreanMoney } from '@/utils/formatMoney';
+import { getPayColor } from '@/utils/payColors';
 import { BrandConfig } from '@/lib/brand-config';
 
 interface JobAdSectionProps {
@@ -49,6 +51,7 @@ const JobCardImage = ({ src, alt, priority }: { src: string, alt: string, priori
             height={400}
             sizes="(max-width: 768px) 50vw, 33vw"
             quality={75}
+            decoding="async" // Explicit async decoding
             className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             style={{ display: 'block' }}
             priority={priority}
@@ -116,7 +119,7 @@ const JobCard = React.memo(({
                         aspectRatio: '1 / 1',
                         overflow: 'hidden',
                         backgroundColor: '#f8f9fa',
-                        willChange: 'transform' // Localized hardware acceleration for smooth image appearing
+                        // willChange: 'transform' // Removed to prevent scroll jitter
                     }}
                 >
                     {shop.options?.mediaUrl ? (
@@ -160,28 +163,16 @@ const JobCard = React.memo(({
 
                     {(() => {
                         const payStr = shop.pay || '';
-                        let badgeLabel = '협';
-                        let badgeColor = 'bg-gray-400';
-                        let amount = payStr;
                         const typeToCheck = shop.payType || payStr;
-
-                        if (typeToCheck.includes('TC')) { badgeLabel = 'T'; badgeColor = 'bg-indigo-600'; }
-                        else if (typeToCheck.includes('시급')) { badgeLabel = '시'; badgeColor = 'bg-cyan-500'; }
-                        else if (typeToCheck.includes('일급') || typeToCheck.includes('일')) { badgeLabel = '일'; badgeColor = 'bg-blue-500'; }
-                        else if (typeToCheck.includes('주급')) { badgeLabel = '주'; badgeColor = 'bg-pink-500'; }
-                        else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) { badgeLabel = '월'; badgeColor = 'bg-purple-500'; }
-                        else if (typeToCheck.includes('연봉')) { badgeLabel = '연'; badgeColor = 'bg-green-600'; }
-
-                        if (!isNaN(Number(amount))) amount = Number(amount).toLocaleString();
 
                         return (
                             <div className="flex flex-col gap-1 h-[46px] justify-start">
                                 <div className="flex items-center gap-1.5 font-bold">
-                                    <span className={`${badgeColor} text-white text-[10px] w-[16px] h-[16px] flex items-center justify-center rounded-[4px] font-bold shadow-sm shrink-0`}>
-                                        {badgeLabel}
+                                    <span className={`${getPayColor(typeToCheck)} text-white text-[10px] w-[18px] h-[18px] flex items-center justify-center rounded-[3px] shadow-sm shrink-0 leading-none`}>
+                                        {typeToCheck.substring(0, 1)}
                                     </span>
                                     <span className={`text-[14px] font-black tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                        {amount}{!isNaN(Number(shop.pay)) ? <span className="text-[11px] font-normal ml-0.5 text-gray-500">원</span> : ''}
+                                        {formatKoreanMoney(shop.pay)}
                                     </span>
                                 </div>
                                 {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
@@ -234,7 +225,6 @@ const JobAdSection = ({
 }: JobAdSectionProps) => {
     const router = useRouter();
 
-    console.log(`%c[JobAdSection Debug - ${title}]`, "color: #ff0080; font-weight: bold", "Data reached UI! total shops:", shops.length, "limit:", limit);
 
     return (
         <div className="mb-0">
@@ -271,19 +261,35 @@ const JobAdSection = ({
                         containIntrinsicSize: '300px'
                     }}
                 >
-                    {shops.slice(0, limit).map((shop, idx) => (
-                        <JobCard
-                            key={shop.id || idx}
-                            shop={shop}
-                            rank={idx + 1}
-                            isFav={favorites?.includes(shop.id) ?? false}
-                            tier={tier}
-                            tierConfig={tierConfig}
-                            brand={brand}
-                            setSelectedShop={setSelectedShop}
-                            toggleFavorite={toggleFavorite}
-                        />
-                    ))}
+                    {shops.length > 0 ? (
+                        shops.slice(0, limit).map((shop, idx) => (
+                            <JobCard
+                                key={shop.id || idx}
+                                shop={shop}
+                                rank={idx + 1}
+                                isFav={favorites?.includes(shop.id) ?? false}
+                                tier={tier}
+                                tierConfig={tierConfig}
+                                brand={brand}
+                                setSelectedShop={setSelectedShop}
+                                toggleFavorite={toggleFavorite}
+                            />
+                        ))
+                    ) : (
+                        // [Golden Rule] CLS Prevention Skeleton
+                        [...Array(Math.min(limit, 4))].map((_, i) => (
+                            <div key={`skel-${i}`} className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm h-full min-h-[250px] animate-pulse">
+                                <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 relative flex items-center justify-center">
+                                    <span className="text-gray-300 font-black text-xs">RESERVED</span>
+                                </div>
+                                <div className="p-3 space-y-2">
+                                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
+                                    <div className="h-3 bg-gray-50 dark:bg-gray-900 rounded w-1/2" />
+                                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-full mt-2" />
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

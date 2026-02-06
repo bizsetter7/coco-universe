@@ -1,10 +1,17 @@
-import React, { useEffect } from 'react';
-import { X, MessageSquare, Phone } from 'lucide-react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Clock, Crown } from 'lucide-react';
 import { Shop } from '@/types/shop';
+import { formatKoreanMoney } from '@/utils/formatMoney';
+import { getPayColor } from '@/utils/payColors';
 
 interface JobDetailModalProps {
     shop: Shop | null;
     onClose: () => void;
+    isFavorite?: boolean;
+    onToggleFavorite?: (e: React.MouseEvent, id: string) => void;
 }
 
 const TIER_GRADIENTS: Record<string, string> = {
@@ -18,7 +25,22 @@ const TIER_GRADIENTS: Record<string, string> = {
     common: 'bg-gray-50'
 };
 
-const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose }) => {
+const PAY_TYPE_BADGES: Record<string, string> = {
+    '시급': 'bg-red-100 text-red-600',
+    '일급': 'bg-blue-100 text-blue-600',
+    '주급': 'bg-green-100 text-green-600',
+    '월급': 'bg-purple-100 text-purple-600',
+    '건별': 'bg-gray-100 text-gray-600',
+};
+
+const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavorite, onToggleFavorite }) => {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
+
     useEffect(() => {
         if (shop) {
             document.body.classList.add('modal-open');
@@ -28,126 +50,215 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose }) => {
         return () => document.body.classList.remove('modal-open');
     }, [shop]);
 
-    if (!shop) return null;
+    if (!shop || !mounted) return null;
 
-    return (
-        <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 md:p-0" onClick={onClose}>
-            {/* Modal Container: Mobile 90-100% (Bottom Sheet), Tablet 600px, PC 800px */}
+    // Theme Helpers
+    const isTiered = shop.tier && ['grand', 'premium', 'deluxe', 'special', 'urgent', 'recommended'].includes(shop.tier);
+    // Header background is now always white/neutral based on user request for cleaner look, or we can keep gradient. 
+    // User request: "상단 : 찜버튼... [지역]상세+업종(상세) 제목 아이콘+닉네임"
+    // We will keep the gradient for tiered shops as it adds "Premium" feel requested in general guidelines.
+    const headerBg = isTiered ? TIER_GRADIENTS[shop.tier!] : 'bg-white';
+    const textColor = isTiered ? 'text-white' : 'text-gray-900';
+    const subTextColor = isTiered ? 'text-white/80' : 'text-gray-500';
+    const iconColor = isTiered ? 'text-white' : 'text-pink-500';
+
+    // Option 8 Simulation (Emphasis Icon)
+    // Logic: If shop has specific option OR random simulation for demo
+    const hasEmphasis = shop.options?.icons?.includes('emphasis') || parseInt(shop.id.replace(/\D/g, '') || '0') % 8 === 0;
+
+    // Keywords Simulation
+    const keywords = shop.options?.keywords || ['초보가능', '경력우대', '당일지급', '숙식제공', '자유복장'];
+
+    // Pay Option Simulation
+    const payOption = shop.options?.paySuffixes?.[0] || '협의가능';
+
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        if (onToggleFavorite && shop.id) {
+            onToggleFavorite(e, shop.id);
+        }
+    };
+
+    return createPortal(
+        <div
+            className="modal-overlay fixed inset-0 z-[20000] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm touch-none overscroll-contain"
+            onClick={onClose}
+        >
             <div
                 className="
-                    bg-white dark:bg-gray-900 shadow-xl overflow-hidden flex flex-col
-                    fixed bottom-0 inset-x-0 w-full h-[90vh] rounded-t-2xl rounded-b-none
-                    md:static md:w-[600px] lg:w-[800px] md:h-auto md:max-h-[85vh] md:rounded-2xl
+                    bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col
+                    fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-2xl rounded-b-none
+                    md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-2xl
+                    transform-gpu will-change-transform backface-hidden
                     animate-in slide-in-from-bottom duration-300 
-                    md:animate-in md:fade-in md:zoom-in md:duration-200
                 "
                 onClick={e => e.stopPropagation()}
             >
+                {/* 1. HEADER SECTION */}
+                <div className={`p-6 relative text-center shrink-0 ${headerBg} transition-colors duration-300`}>
 
-                {/* Modal Header */}
-                <div className={`p-6 md:p-8 text-center relative shrink-0 ${shop.tier && TIER_GRADIENTS[shop.tier]
-                    ? `${TIER_GRADIENTS[shop.tier]} text-white`
-                    : 'bg-white text-gray-900 border-b border-gray-100'
-                    }`}>
-                    <button onClick={onClose} className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-colors ${shop.tier && ['grand', 'premium', 'special'].includes(shop.tier) ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}>
-                        <X size={24} />
-                    </button>
+                    {/* Top Row: Star (Left) & Close (Right) */}
+                    <div className="absolute top-0 left-0 w-full flex justify-between items-start p-4 z-10">
+                        {/* Left: Star Button (찜버튼) */}
+                        <button
+                            onClick={handleFavoriteClick}
+                            className={`p-2 rounded-full transition-all active:scale-95 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:text-amber-400 hover:bg-amber-50'}`}
+                        >
+                            <Star size={20} className={isFavorite ? "fill-amber-400 text-amber-400" : "hover:fill-current"} />
+                        </button>
 
-                    <div className="mb-2">
-                        <span className={`inline-block px-2 py-1 rounded text-[11px] font-bold mb-3 ${shop.tier && ['grand', 'premium', 'special'].includes(shop.tier) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                            {shop.workType}
-                        </span>
-                    </div>
-                    <h2 className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${shop.tier && ['grand', 'premium', 'special'].includes(shop.tier) ? 'text-white' : 'text-gray-900'}`}>
-                        {shop.realName || shop.name}
-                    </h2>
-                    <p className={`font-medium ${shop.tier && ['grand', 'premium', 'special'].includes(shop.tier) ? 'text-white/80' : 'text-gray-500'}`}>
-                        {shop.region}
-                    </p>
-                </div>
-
-                {/* Modal Content - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-white dark:bg-gray-900">
-
-                    {/* Key Info Cards */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-red-50 dark:bg-red-900/10 p-5 rounded-2xl text-center border border-red-100 dark:border-red-900/30 flex flex-col justify-center gap-1.5">
-                            <p className="text-xs text-red-500 font-bold mb-0.5">급여</p>
-                            <p className="text-red-600 dark:text-red-400 font-black text-xl truncate leading-tight">
-                                {(() => {
-                                    const payVal = shop.pay || '';
-                                    if (!isNaN(Number(payVal))) {
-                                        return `${Number(payVal).toLocaleString()}원`;
-                                    }
-                                    return payVal;
-                                })()}
-                            </p>
-                            {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
-                                <div className="flex flex-wrap gap-1 justify-center mt-0.5">
-                                    {shop.options.paySuffixes.map((suffix, i) => (
-                                        <span key={i} className="px-1.5 py-0.5 bg-red-100/50 text-red-600 text-[9px] rounded font-bold border border-red-200/50 leading-none">
-                                            {suffix}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <div className="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-2xl text-center border border-gray-100 dark:border-gray-700">
-                            <p className="text-xs text-gray-500 font-bold mb-1">근무시간</p>
-                            <p className="text-gray-900 dark:text-gray-100 font-black text-lg truncate">시간협의</p>
-                        </div>
-                    </div>
-
-                    {/* Detailed Recruitment Content */}
-                    <div className="space-y-3">
-                        <h3 className="text-lg font-black flex items-center gap-2 text-gray-900 dark:text-white">
-                            <MessageSquare size={20} className="text-gray-400" />
-                            상세 모집내용
-                        </h3>
-                        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 text-sm md:text-base leading-relaxed text-gray-700 dark:text-gray-300 font-medium whitespace-pre-wrap border border-gray-100 dark:border-gray-700">
-                            {shop.title || '등록된 상세 모집 내용이 없습니다.'}
-                            {'\n\n'}
-                            {/* Mocking long text for better visualization if content is short */}
-                            {(!shop.title || shop.title.length < 50) &&
-                                `가족같이 편안한 분위기에서 함께 일하실 분 모십니다!\n\n[자격요건]\n- 성별 무관\n- 초보 가능 (친절하게 알려드립니다)\n- 경력자 우대\n\n[근무조건]\n- 근무기간: 3개월 이상\n- 근무요일: 요일협의\n- 근무시간: 시간협의\n\n저희와 함께 즐겁게 일하실 분들의 많은 지원 부탁드립니다. 궁금한 점은 언제든지 문의주세요!`}
-                        </div>
-                    </div>
-
-                    {/* Contact Info (Kakao) */}
-                    {shop.kakao && (
-                        <div className="flex items-center justify-between p-5 bg-yellow-50 dark:bg-yellow-900/10 rounded-2xl border border-yellow-100 dark:border-yellow-900/30">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900">
-                                    <MessageSquare size={20} fill="currentColor" />
-                                </div>
-                                <div>
-                                    <p className="text-xs text-yellow-600 dark:text-yellow-400 font-bold">카카오톡 아이디</p>
-                                    <p className="text-lg font-black text-gray-900 dark:text-white">{shop.kakao}</p>
-                                </div>
-                            </div>
+                        {/* Right: Ad No + Close Button */}
+                        <div className="flex items-center gap-2">
+                            <span className={`text-[10px] font-mono font-bold opacity-60 ${isTiered ? 'text-white/70' : 'text-gray-400'}`}>
+                                No.{shop.adNo || '0000'}
+                            </span>
                             <button
-                                onClick={() => { navigator.clipboard.writeText(shop.kakao || ''); alert('복사되었습니다!'); }}
-                                className="px-4 py-2 bg-white dark:bg-gray-800 text-xs font-bold border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                onClick={onClose}
+                                className={`p-2 rounded-full transition-all active:scale-95 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                             >
-                                복사하기
+                                <X size={20} />
                             </button>
                         </div>
-                    )}
+                    </div>
+
+                    {/* Content: [Region] Detail + Sector */}
+                    <div className={`mt-8 mb-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black tracking-tight ${isTiered ? 'bg-black/20 text-white border border-white/10' : 'bg-gray-100/80 text-gray-600 border border-gray-200'}`}>
+                        <span className="flex items-center gap-0.5"><MapPin size={10} /> {shop.region}</span>
+                        <span className="opacity-30 mx-0.5">|</span>
+                        <span className="flex items-center gap-0.5"><Briefcase size={10} /> {shop.workType}</span>
+                    </div>
+
+                    {/* Content: Title */}
+                    <h2 className={`text-xl md:text-2xl font-black mb-3 leading-snug break-keep px-4 ${textColor}`}>
+                        {shop.title || shop.name}
+                    </h2>
+
+                    {/* Content: Icon + Nickname + Option 8 Icon */}
+                    <div className={`flex items-center justify-center gap-2 ${subTextColor}`}>
+                        {/* Main Shop Icon (User/Crown/etc based on tier logic inside Shop logic usually, here hardcoded for UI) */}
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isTiered ? 'bg-white/20' : 'bg-pink-50 text-pink-500'}`}>
+                            <User size={14} className="fill-current" />
+                        </div>
+
+                        <span className="text-sm font-bold">{shop.nickname || shop.name}</span>
+
+                        {/* Option 8 Icon (Emphasis) */}
+                        {hasEmphasis && (
+                            <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white ml-0.5 animate-pulse shadow-sm" title="강조 업소">
+                                <Crown size={10} fill="currentColor" />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Modal Footer (Sticky) */}
-                <div className="p-4 md:p-6 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
-                    <a
-                        href={`tel:${shop.phone}`}
-                        className="flex items-center justify-center w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black rounded-xl text-xl shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 transition-all"
-                    >
-                        <Phone size={24} className="mr-2" />
-                        전화로 문의하기
-                    </a>
+                {/* 2. BODY SECTION */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white dark:bg-gray-900">
+
+                    {/* Pay & Option Section */}
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
+                        <div className="flex items-center gap-3">
+                            <span className={`px-2 py-1 rounded text-xs font-black whitespace-nowrap ${PAY_TYPE_BADGES[shop.payType?.substring(0, 2) || '시급'] || 'bg-gray-100 text-gray-600'}`}>
+                                {shop.payType || '시급'}
+                            </span>
+                            <span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">
+                                {formatKoreanMoney(shop.pay)}
+                            </span>
+                        </div>
+                        <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-bold whitespace-nowrap">
+                            <Clock size={14} className="text-pink-500" />
+                            {payOption}
+                        </div>
+                    </div>
+
+                    {/* 상세 모집내용 */}
+                    <div className="space-y-3">
+                        <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                            <span className="w-1 h-4 bg-pink-500 rounded-full"></span>
+                            상세 모집내용
+                        </h3>
+                        <div className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 break-words whitespace-pre-wrap bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 min-h-[120px]">
+                            {shop.description || `${shop.name}에서 열정적인 분을 모십니다.\n가족같은 분위기에서 함께 성장할 수 있습니다.\n\n[근무조건]\n- 근무기간: 1년이상\n- 근무요일: 요일협의\n- 근무시간: 시간협의\n\n초보자도 환영합니다!`}
+                        </div>
+                    </div>
+
+                    {/* 위치 정보 (지도 RESTORED) */}
+                    <div className="space-y-3">
+                        <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                            <span className="w-1 h-4 bg-green-500 rounded-full"></span>
+                            위치 정보
+                        </h3>
+                        <div className="aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50 dark:border-gray-700">
+                            <MapPin size={32} className="opacity-50" />
+                            <span className="text-xs font-bold">{shop.region}</span>
+                            <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
+                        </div>
+                    </div>
+
+                    {/* Keyword & Info (Subtle for SEO) */}
+                    <div className="space-y-2 pt-2">
+                        <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1.5 opacity-80">
+                            <Info size={12} />
+                            Keyword & Info
+                        </h3>
+                        <div className="bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-lg border border-gray-100 dark:border-gray-800/50">
+                            <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
+                                {keywords.map((keyword, idx) => (
+                                    <span key={idx} className="px-2 py-1 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 text-[10px] font-medium">
+                                        #{keyword}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. FOOTER SECTION (Contact) */}
+                <div className="p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0 safe-area-bottom">
+                    <div className="flex gap-3">
+                        {/* Message Button */}
+                        <button
+                            onClick={() => {
+                                // Dispatch Custom Event to Open Message Modal
+                                const event = new CustomEvent('open-note-modal', {
+                                    detail: { receiver: shop.managerName || shop.nickname || `${shop.name} 사장님` }
+                                });
+                                window.dispatchEvent(event);
+                            }}
+                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
+                        >
+                            <MessageSquare size={20} className="stroke-current" />
+                            <span className="text-xs font-black">쪽지문의</span>
+                        </button>
+
+                        {/* Kakao/Tele Button */}
+                        {(shop.kakao || shop.telegram) && (
+                            <button
+                                onClick={() => {
+                                    const id = shop.kakao || shop.telegram;
+                                    navigator.clipboard.writeText(id);
+                                    alert(`${shop.kakao ? '카카오톡' : '텔레그램'} ID가 복사되었습니다: ${id}`);
+                                }}
+                                className="flex-1 flex flex-col items-center justify-center gap-1 bg-yellow-400 text-yellow-900 py-3 rounded-xl hover:bg-yellow-500 transition active:scale-[0.98]"
+                            >
+                                <MessageSquare size={20} className="fill-yellow-900/20 stroke-current" />
+                                <span className="text-xs font-black">{shop.kakao ? '카톡문의' : '텔레문의'}</span>
+                            </button>
+                        )}
+
+                        {/* Phone Button */}
+                        <a
+                            href={`tel:${shop.phone}`}
+                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200 dark:shadow-none"
+                        >
+                            <Phone size={20} className="fill-white/20 stroke-current" />
+                            <span className="text-xs font-black">전화/문자 지원하기</span>
+                        </a>
+                    </div>
                 </div>
 
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BrandConfig } from '@/lib/brand-config';
@@ -8,8 +9,10 @@ import { BrandConfig } from '@/lib/brand-config';
 export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         // Check if popup should be hidden for today
         const hideDate = localStorage.getItem('hideEventPopupdate');
         const today = new Date().toDateString();
@@ -17,7 +20,25 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
         if (hideDate !== today) {
             setIsOpen(true);
         }
+        return () => setMounted(false);
     }, []);
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.classList.add('modal-open');
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            if (scrollbarWidth > 0) {
+                document.body.style.paddingRight = `${scrollbarWidth}px`;
+            }
+        } else {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+        }
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+        };
+    }, [isOpen]);
 
     const closePopup = (hideForToday: boolean) => {
         setIsOpen(false);
@@ -26,11 +47,17 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
-    return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-            <div className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl">
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 touch-none overscroll-contain"
+            onClick={() => closePopup(false)}
+        >
+            <div
+                className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300"
+                onClick={e => e.stopPropagation()}
+            >
                 {/* Top Bar for Brand Color */}
                 <div className="h-2 w-full" style={{ backgroundColor: brand.primaryColor }}></div>
 
@@ -86,6 +113,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

@@ -22,31 +22,36 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import shopsData from "@/lib/data/shops.json"; // Optimized Loading
+
+// ... imports
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // [Optimization] Server-side data prep for sidebars
+  // We only need Grand/Premium ads for sidebars. 
+  // Passing only this small subset prevents sending the entire DB to client bundle via LayoutWrapper.
+  const grandAds = (shopsData as any[]).filter(s => s.tier === 'grand');
+  const premiumAds = (shopsData as any[]).filter(s => s.tier === 'premium' || s.is_premium);
+  const sideAds = [...grandAds, ...premiumAds];
+
   return (
     <html lang="ko">
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
           <BrandProvider>
-            <div className="flex flex-col min-h-[100dvh]">
-              <LayoutWrapper>
+            <div className="flex flex-col h-auto">
+              <LayoutWrapper sideAds={sideAds}>
                 {children}
               </LayoutWrapper>
             </div>
           </BrandProvider>
         </Suspense>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              document.addEventListener('touchstart', function() {}, {passive: true});
-              document.addEventListener('touchmove', function() {}, {passive: true});
-            `,
-          }}
-        />
+    // ...
+
       </body>
     </html>
   );

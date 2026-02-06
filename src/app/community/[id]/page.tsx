@@ -23,7 +23,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
 
     if (!post) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <div className="min-h-0 flex flex-col items-center justify-center p-4">
                 <p className="text-gray-500 font-bold mb-4">존재하지 않는 게시글입니다.</p>
                 <button onClick={() => router.back()} className="text-pink-500 font-bold underline">뒤로 가기</button>
             </div>
@@ -31,7 +31,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
     }
 
     return (
-        <div className="min-h-screen bg-white pb-20 font-sans">
+        <div className="min-h-0 bg-white pb-20 font-sans">
             {/* Header */}
             <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
                 <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">

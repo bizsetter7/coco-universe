@@ -3,8 +3,9 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Footer } from '@/components/layout/Footer';
+
 import { useBrand } from '@/components/BrandProvider';
-import { ArrowLeft, Home, Search, MapPin, Clock, Star, Filter } from 'lucide-react';
+import { ArrowLeft, Home, Search, MapPin, Clock, Star, Filter, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Mock Data for Talent (Reused from HomeClient or similar)
@@ -24,24 +25,8 @@ export default function TalentPage() {
     const brand = useBrand();
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
-            {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md dark:bg-gray-900/80 dark:border-gray-800 transition-all duration-300">
-                <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors">
-                            <ArrowLeft size={24} />
-                        </button>
-                        <span className="text-lg md:text-xl font-black tracking-tight text-gray-900 dark:text-white">
-                            인재정보
-                        </span>
-                    </div>
+        <div className={`h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
-                    <button onClick={() => router.push('/')} className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-                        <Home size={24} />
-                    </button>
-                </div>
-            </header>
 
             <main className="container mx-auto px-4 py-8 pb-20 max-w-[1020px]">
                 {/* Search & Filter */}
@@ -90,12 +75,29 @@ export default function TalentPage() {
                                 {talent.intro}
                             </p>
 
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 mb-4">
                                 {talent.tags.map((tag, i) => (
                                     <span key={i} className={`text-[11px] font-bold px-2.5 py-1 rounded-md ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-500'}`}>
                                         #{tag}
                                     </span>
                                 ))}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const event = new CustomEvent('open-note-modal', {
+                                            detail: { receiver: talent.name }
+                                        });
+                                        window.dispatchEvent(event);
+                                    }}
+                                    className={`flex-1 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors ${brand.theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-pink-50 hover:bg-pink-100 text-pink-600'}`}
+                                >
+                                    <MessageSquare size={16} />
+                                    면접 제안 / 쪽지
+                                </button>
                             </div>
                         </div>
                     ))}
@@ -109,7 +111,7 @@ export default function TalentPage() {
                 </div>
             </main>
 
-            <Footer />
+
         </div>
     );
 }

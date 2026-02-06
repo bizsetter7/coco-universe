@@ -1,0 +1,280 @@
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import JobListView from '@/components/jobs/JobListView';
+import { JOB_CATEGORIES, JOB_CATEGORY_MAP } from '@/constants/jobs';
+import { REGION_LIST, REGIONS_MAP } from '@/constants/regions';
+import { Shop } from '@/types/shop';
+import { useBrand } from '@/components/BrandProvider';
+
+export type FilterType = 'job' | 'subJob' | 'region' | 'subRegion';
+
+interface UnifiedJobListingProps {
+    title: string;
+    shops: Shop[];
+    favorites: string[];
+    toggleFavorite: (e: React.MouseEvent, id: string) => void;
+    setSelectedShop: (shop: Shop) => void;
+    visibleCount: number;
+    setVisibleCount: React.Dispatch<React.SetStateAction<number>>;
+    onAdRegister: () => void;
+    onNativeAdRegister: () => void;
+
+    // Filter State
+    selectedRegion: string;
+    setSelectedRegion: (v: string) => void;
+    selectedSubRegion: string;
+    setSelectedSubRegion: (v: string) => void;
+    selectedJobType: string;
+    setSelectedJobType: (v: string) => void;
+    selectedSubJobType: string;
+    setSelectedSubJobType: (v: string) => void;
+
+    searchQuery: string;
+    setSearchQuery: (v: string) => void;
+    setActiveSearchQuery: (v: string) => void;
+
+    // Configuration
+    filterOrder?: FilterType[];
+    adGrid?: React.ReactNode;
+}
+
+export const UnifiedJobListing = ({
+    title,
+    shops,
+    favorites,
+    toggleFavorite,
+    setSelectedShop,
+    visibleCount,
+    setVisibleCount,
+    onAdRegister,
+    onNativeAdRegister,
+    selectedRegion,
+    setSelectedRegion,
+    selectedSubRegion,
+    setSelectedSubRegion,
+    selectedJobType,
+    setSelectedJobType,
+    selectedSubJobType,
+    setSelectedSubJobType,
+    searchQuery,
+    setSearchQuery,
+    setActiveSearchQuery,
+    filterOrder = ['job', 'subJob', 'region', 'subRegion'], // Default Order
+    adGrid
+}: UnifiedJobListingProps) => {
+    const brand = useBrand();
+    const router = useRouter();
+
+    // Filter Components Map
+    const renderFilter = (type: FilterType) => {
+        switch (type) {
+            case 'job':
+                return (
+                    <div className="relative" key="job">
+                        <select
+                            value={selectedJobType}
+                            onChange={(e) => { setSelectedJobType(e.target.value); setSelectedSubJobType('전체'); }}
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer"
+                        >
+                            <option value="전체">직종선택</option>
+                            {JOB_CATEGORIES.map(job => (
+                                <option key={job} value={job}>{job}</option>
+                            ))}
+                        </select>
+                        <ChevronLeft size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
+                    </div>
+                );
+            case 'subJob':
+                return (
+                    <div className="relative" key="subJob">
+                        <select
+                            value={selectedSubJobType}
+                            onChange={(e) => setSelectedSubJobType(e.target.value)}
+                            disabled={selectedJobType === '전체'}
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                        >
+                            <option value="전체">상세직종</option>
+                            {selectedJobType !== '전체' && JOB_CATEGORY_MAP[selectedJobType]?.map(item => (
+                                <option key={item} value={item}>{item}</option>
+                            ))}
+                        </select>
+                        <ChevronLeft size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
+                    </div>
+                );
+            case 'region':
+                return (
+                    <div className="relative" key="region">
+                        <select
+                            value={selectedRegion}
+                            onChange={(e) => { setSelectedRegion(e.target.value); setSelectedSubRegion('전체'); }}
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer"
+                        >
+                            <option value="전체">지역선택</option>
+                            {REGION_LIST.map(reg => (
+                                <option key={reg} value={reg}>{reg}</option>
+                            ))}
+                        </select>
+                        <ChevronLeft size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
+                    </div>
+                );
+            case 'subRegion':
+                return (
+                    <div className="relative" key="subRegion">
+                        <select
+                            value={selectedSubRegion}
+                            onChange={(e) => setSelectedSubRegion(e.target.value)}
+                            disabled={selectedRegion === '전체'}
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                        >
+                            <option value="전체">세부지역</option>
+                            {selectedRegion !== '전체' && REGIONS_MAP[selectedRegion]?.map(sub => (
+                                <option key={sub} value={sub}>{sub}</option>
+                            ))}
+                        </select>
+                        <ChevronLeft size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-[-90deg] pointer-events-none" />
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="space-y-4 md:space-y-8">
+            {/* Hero Section */}
+            <div className="relative h-32 md:h-40 bg-gray-900 rounded-[24px] overflow-hidden group mx-4 md:mx-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-pink-900 flex items-center justify-center text-white">
+                    <div className="text-center">
+                        <h2 className="text-xl md:text-2xl font-black mb-1">코코알바만의 특별한 혜택</h2>
+                        <p className="text-sm opacity-80">지금 가입하고 무료 광고 혜택을 누리세요</p>
+                    </div>
+                </div>
+                {/* Navigation Arrows */}
+                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ChevronLeft size={24} />
+                </button>
+                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ChevronRight size={24} />
+                </button>
+                {/* Dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-y-1/2 flex gap-1.5">
+                    {[1, 2, 3, 4, 5].map((_, i) => (
+                        <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/40'}`} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Main Content Flow */}
+            <div className="space-y-3 md:space-y-6">
+                <h1 className="text-3xl font-black flex items-center gap-2 mx-4 md:mx-0">
+                    <span className="w-1.5 h-8 bg-pink-500 rounded-full"></span>
+                    {title}
+                </h1>
+
+                {/* Center Tabs */}
+                <div className="flex justify-center mx-4 md:mx-0">
+                    <div className="flex gap-1 !bg-white !text-black p-1.5 rounded-2xl shadow-sm border border-gray-100 w-full">
+                        {['업종별 채용', '지역별 채용', '오늘본공고'].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => {
+                                    if (tab === '업종별 채용') router.push('/jobs');
+                                    else if (tab === '지역별 채용') router.push('/region');
+                                }}
+                                className={`flex-1 py-2.5 text-sm font-black rounded-xl transition-all ${title === tab ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Announcement Bar */}
+                <div className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5 mx-4 md:mx-0`}>
+                    <div className="flex items-center gap-3 overflow-hidden">
+                        <span className="bg-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm">공지사항</span>
+                        <p className="text-[13px] font-bold text-gray-700 truncate">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-300 shrink-0" />
+                </div>
+
+                {/* Search Filter Box with Dropdowns */}
+                <div className="space-y-3 mx-4 md:mx-0">
+                    <div className={`p-6 rounded-[32px] border shadow-xl !bg-white !text-black border-gray-100 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 relative z-20`}>
+                        {/* Dynamic Filter Order */}
+                        {filterOrder.map((filterType) => renderFilter(filterType))}
+
+                        {/* Keyword Input */}
+                        <div className="relative lg:col-span-1">
+                            <input
+                                type="text"
+                                placeholder="키워드 검색"
+                                className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-pink-300 transition-all font-black text-black"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        setActiveSearchQuery(searchQuery);
+                                    }
+                                }}
+                            />
+                        </div>
+                        <button
+                            onClick={() => setActiveSearchQuery(searchQuery)}
+                            className="h-12 bg-pink-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-pink-700 hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all"
+                        >
+                            <Search size={18} />
+                            검색
+                        </button>
+                    </div>
+                </div>
+
+                {/* Ad Grid Section (Injected) */}
+                {adGrid && (
+                    <div className="mt-6 md:mt-8">
+                        {adGrid}
+                    </div>
+                )}
+
+                {/* Skeleton Loader (Always present to prevent CLS) */}
+
+                {shops.length === 0 && (
+                    <div className="space-y-4 pt-8 mx-4 md:mx-0">
+                        <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="aspect-square bg-gray-100 rounded-[20px] animate-pulse relative overflow-hidden">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="w-12 h-12 rounded-full bg-gray-200" />
+                                            <span className="text-gray-300 font-black text-xs">RESERVED</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 space-y-3 absolute bottom-0 w-full bg-white/50 backdrop-blur-sm">
+                                        <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                        <div className="h-4 bg-gray-200 rounded w-1/2" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* List View */}
+
+                <JobListView
+                    shops={shops}
+                    brand={brand}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
+                    setSelectedShop={setSelectedShop}
+                    visibleCount={visibleCount}
+                    setVisibleCount={setVisibleCount}
+                    onAdRegister={onAdRegister}
+                    onNativeAdRegister={onNativeAdRegister}
+                />
+            </div>
+        </div>
+    );
+};

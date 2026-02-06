@@ -46,7 +46,7 @@ export default function FavoritesPage() {
     const favoriteShops = (shopsData as Shop[]).filter(shop => favorites.includes(shop.id));
 
     return (
-        <div className={`min-h-screen pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className={`min-h-0 pb-20 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
             <header className={`sticky top-0 z-50 border-b ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="max-w-4xl mx-auto px-3 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-3">

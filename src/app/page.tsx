@@ -1,11 +1,16 @@
 'use client'; // Deploy Version: 2026-02-04-02-35 (Forced Redeploy)
 
-import React, { useMemo } from 'react';
+import React, { useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import HomeClient from '@/components/home/HomeClient';
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
+import { LoginPage } from '@/components/auth/LoginPage';
 
-export default function HomePortal() {
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const page = searchParams.get('page');
+
   // [Logic Preserved] - Distribute tiers based on index to simulate a rich DB
   const processedShops = useMemo(() => {
     return (shopsData as Shop[]).map((shop, index) => {
@@ -28,5 +33,17 @@ export default function HomePortal() {
     });
   }, []);
 
+  if (page === 'login') {
+    return <LoginPage />;
+  }
+
   return <HomeClient shops={processedShops} />;
+}
+
+export default function HomePortal() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
 }

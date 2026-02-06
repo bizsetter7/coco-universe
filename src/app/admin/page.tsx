@@ -131,7 +131,7 @@ export default function AdminPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="min-h-0 bg-gray-50 p-4 md:p-8">
             <div className="max-w-[1800px] mx-auto">
                 <header className="flex justify-between items-center mb-8">
                     <div>
