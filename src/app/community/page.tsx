@@ -279,11 +279,11 @@ function CommunityContent() {
                 </div>
             )}
 
-            {/* Corporate Access Denied Modal (z-200) */}
+            {/* Corporate Access Denied Modal (z-[20000]) */}
             {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setIsCorporateModalOpen(false)}></div>
-                    <div className={`rounded-[32px] md:rounded-[40px] w-[85%] md:w-full max-w-xs p-8 md:p-10 relative z-10 shadow-2xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                    <div className={`rounded-[32px] md:rounded-[40px] w-[85%] md:w-full max-w-xs p-8 md:p-10 relative z-10 shadow-2xl border animate-in fade-in zoom-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
                         <div className="flex flex-col items-center text-center">
                             <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-full flex items-center justify-center mb-5 md:mb-6 text-blue-600 shadow-inner">
                                 <AlertCircle size={28} className="md:w-8 md:h-8" />
