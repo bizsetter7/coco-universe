@@ -56,7 +56,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
                 {/* Left Sidebar - Absolute Overlay (Desktop Only) */}
                 {!isMobile && (
-                    <div className="hidden xl:block absolute top-0 left-0 w-[160px] h-full z-[10001] pointer-events-none">
+                    <div className="hidden xl:block absolute top-0 left-0 w-[160px] h-full z-[10002] pointer-events-none">
                         <div className="sticky top-[66px] pointer-events-auto">
                             <BannerSidebar side="left" shops={sideAds} />
                         </div>
@@ -65,7 +65,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
                 {/* Right Sidebar - Absolute Overlay (Desktop Only) */}
                 {!isMobile && (
-                    <div className="hidden xl:block absolute top-0 right-0 w-[160px] h-full z-[10001] pointer-events-none">
+                    <div className="hidden xl:block absolute top-0 right-0 w-[160px] h-full z-[10002] pointer-events-none">
                         <div className="sticky top-[66px] pointer-events-auto">
                             <BannerSidebar side="right" shops={sideAds} />
                         </div>
@@ -78,7 +78,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                     <div className="hidden xl:block w-[160px]" />
 
                     {/* Main Content */}
-                    <main className={`w-full flex-1 min-w-0 relative z-0`}>
+                    <main className={`w-full flex-1 min-w-0 relative`}>
                         {children}
                     </main>
 
