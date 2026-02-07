@@ -23,24 +23,17 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const brand = useBrand();
     const pathname = usePathname();
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
-    const [userType, setUserType] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         const verified = localStorage.getItem('adult_verified') === 'true';
         const session = localStorage.getItem('user_session');
-        const type = localStorage.getItem('user_type');
         setIsVerified(verified || !!session);
-        setUserType(type);
     }, []);
 
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
         setIsVerified(true);
     };
-
-    // Ensure sidebars are hidden for corporate users on community path
-    const isCommunityPath = pathname?.startsWith('/community');
-    const hideBanners = userType === 'shop' && isCommunityPath;
 
     if (isVerified === null) return null; // Prevent flicker
 
@@ -62,7 +55,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
                 {/* Left Sidebar - Absolute Overlay (Desktop Only) */}
-                {!isMobile && !hideBanners && (
+                {!isMobile && (
                     <div className="hidden xl:block absolute top-0 left-0 w-[160px] h-full z-[10001] pointer-events-none">
                         <div className="sticky top-[66px] pointer-events-auto">
                             <BannerSidebar side="left" shops={sideAds} />
@@ -71,7 +64,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                 )}
 
                 {/* Right Sidebar - Absolute Overlay (Desktop Only) */}
-                {!isMobile && !hideBanners && (
+                {!isMobile && (
                     <div className="hidden xl:block absolute top-0 right-0 w-[160px] h-full z-[10001] pointer-events-none">
                         <div className="sticky top-[66px] pointer-events-auto">
                             <BannerSidebar side="right" shops={sideAds} />
