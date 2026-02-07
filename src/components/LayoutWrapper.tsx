@@ -10,7 +10,7 @@ import { Footer } from './layout/Footer';
 import { LAYOUT } from '@/constants/layout';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
-// ... other imports
+import { AdultVerificationGate } from './common/AdultVerificationGate';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -20,6 +20,24 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const brand = useBrand();
+    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+
+    React.useEffect(() => {
+        const verified = localStorage.getItem('adult_verified') === 'true';
+        const session = localStorage.getItem('user_session');
+        setIsVerified(verified || !!session);
+    }, []);
+
+    const handleVerify = () => {
+        localStorage.setItem('adult_verified', 'true');
+        setIsVerified(true);
+    };
+
+    if (isVerified === null) return null; // Prevent flicker
+
+    if (!isVerified) {
+        return <AdultVerificationGate onVerify={handleVerify} />;
+    }
 
     return (
         <React.Fragment>
