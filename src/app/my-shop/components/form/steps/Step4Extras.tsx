@@ -143,20 +143,18 @@ export const Step4Extras: React.FC<Step4Props> = ({
                 {/* 1. 급여 추가 옵션 (4열 그리드) */}
                 <div>
                     <div className="flex items-center justify-between mb-3">
-                        <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <div className="flex flex-wrap items-end md:items-center gap-1.5 md:gap-3">
                             <h3 className="text-[13px] md:text-[16px] font-black text-gray-700 flex items-center gap-2">
                                 <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600"><Zap size={14} fill="currentColor" /></div>
                                 급여 추가 옵션
                             </h3>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] md:text-[12px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded-full">기본 1개 제공(무료), 추가 5개까지 선택가능(유료)</span>
-                                <span className="text-[10px] md:text-[11px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">+5,000원</span>
-                            </div>
+                            <span className="text-[10px] md:text-[11px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">+5,000원</span>
+                            <span className="text-[9px] md:text-[12px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded-full w-full md:w-auto">기본 1개 제공(무료), 추가 5개까지 선택가능(유료)</span>
                         </div>
                         <button
                             type="button"
                             onClick={() => openExample('step4_pay')}
-                            className="px-2.5 py-1 text-[10px] font-black bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm text-gray-600"
+                            className="px-2.5 py-1 text-[10px] font-black bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm text-gray-600 shrink-0"
                         >
                             예시보기
                         </button>
@@ -230,7 +228,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             </div>
                             <button
                                 type="button"
-                                onClick={() => openExample('step4_icon')}
+                                onClick={() => openExample('step4_pay')}
                                 className="px-2.5 py-1 text-[10px] font-black bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition backdrop-blur-sm"
                             >
                                 예시보기
@@ -269,7 +267,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             </div>
                             <button
                                 type="button"
-                                onClick={() => openExample('step4_hl')}
+                                onClick={() => openExample('step2_list')}
                                 className="px-2.5 py-1 text-[10px] font-black bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition backdrop-blur-sm"
                             >
                                 예시보기
@@ -306,19 +304,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                     <div className="rounded-2xl border-2 overflow-hidden border-gray-200 bg-white shadow-sm">
                         <div className="bg-gray-600 text-white p-2.5 md:p-3 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Radio size={18} className="animate-pulse" /></div>
+                                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Radio size={18} /></div>
                                 <div>
                                     <h3 className="text-[13px] md:text-[16px] font-black leading-none">추가 강조 효과</h3>
                                     <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">테두리/특수효과로 나만의 광고를 돋보이세요!</p>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => openExample('step4_effect')}
-                                className="px-2.5 py-1 text-[10px] font-black bg-white/10 border border-white/20 rounded-lg hover:bg-white/20 transition backdrop-blur-sm"
-                            >
-                                예시보기
-                            </button>
                         </div>
                         <div className="p-4 md:p-6 space-y-6">
                             {/* 기간 선택 (상단 배치) */}
@@ -356,9 +347,9 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             {/* 미리보기 영역 (최하단 배치, 아이콘 섹션 박스 스타일 적용) */}
                             <div className="pt-4 border-t border-gray-100">
                                 <h4 className="text-[12px] md:text-[14px] font-black text-gray-500 font-black mb-3">프리미엄 미리보기</h4>
-                                <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color' ? 'border-pink-500 border-4 shadow-sm' : borderOption === 'glow' ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]' : borderOption === 'sparkle' ? 'border-yellow-400 border-4 shadow-[0_0_15px_rgba(250,204,21,0.5)]' : 'border-gray-200 border-dashed'}`}>
+                                <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color' ? 'border-pink-500 border-4 shadow-sm' : borderOption === 'glow' ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]' : borderOption === 'sparkle' ? 'border-yellow-400 border-4 shadow-[0_0_20px_rgba(250,204,21,0.4)]' : 'border-gray-200 border-dashed'}`}>
                                     <div className="text-center group">
-                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? 'text-pink-500' : 'text-gray-300'}`} />
+                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : 'text-pink-500') : 'text-gray-300'}`} />
                                         <span className={`text-[11px] md:text-[13px] font-black transition-colors ${borderOption !== 'none' ? 'text-gray-900' : 'text-gray-400'}`}>실제 노출 효과 예시</span>
                                     </div>
                                 </div>
