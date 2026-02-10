@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, Store, MapPin, Check, PlusSquare, RefreshCw, Calendar } from 'lucide-react';
+import { ChevronLeft, Store, MapPin, Check, PlusSquare, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings } from 'lucide-react';
 
 interface BusinessDashboardProps {
     brand: any;
@@ -13,18 +13,29 @@ interface BusinessDashboardProps {
     router: any;
 }
 
+interface BusinessDashboardProps {
+    brand: any;
+    shopName: string;
+    nickname: string;
+    isVerified: boolean;
+    handleAdClick: (isNew: boolean) => void;
+    setShowDesignModal: (v: boolean) => void;
+    setView: (v: any) => void;
+    router: any;
+}
+
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, router
+    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router
 }) => {
     return (
         <div className="w-full p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Sidebar (PC Only) - Strictly hidden on mobile via CSS for now, but ensured no heavy logic here */}
-            <aside className="hidden md:block col-span-1 space-y-2">
+            {/* Sidebar (PC Only) */}
+            <aside className="hidden md:block col-span-1 space-y-4">
                 <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}>
                         <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
                     </div>
-                    <div>
+                    <div className="mb-4">
                         <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>{shopName || '내 상점'}</h2>
                         {nickname && <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>{nickname}</p>}
                         <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} `}>프리미엄 인증 업소</p>
@@ -33,6 +44,24 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                         사진 등록/수정
                     </button>
                 </div>
+
+                <nav className={`p-4 rounded-2xl border shadow-sm space-y-1 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-100 text-gray-600'} `}>
+                    <div onClick={() => setView('dashboard')} className="flex items-center gap-3 p-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer font-bold text-sm">
+                        <List size={18} /> 진행중인 채용정보
+                    </div>
+                    <div onClick={() => setView('closed-ads')} className="flex items-center gap-3 p-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer font-bold text-sm">
+                        <LogOut size={18} /> 마감된 채용정보
+                    </div>
+                    <div onClick={() => setView('applicants')} className="flex items-center gap-3 p-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer font-bold text-sm">
+                        <User size={18} /> 지원자 관리
+                    </div>
+                    <div onClick={() => setView('payments')} className="flex items-center gap-3 p-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer font-bold text-sm">
+                        <CreditCard size={18} /> 결제 내역
+                    </div>
+                    <div onClick={() => setView('member-info')} className="flex items-center gap-3 p-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer font-bold text-sm border-t mt-2">
+                        <Settings size={18} /> 회원정보 수정
+                    </div>
+                </nav>
             </aside>
 
             {/* Main Content (Dashboard) */}
@@ -66,28 +95,15 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                     </div>
                 </header>
 
-                <div className="grid grid-cols-3 gap-2 md:gap-4 h-24 md:h-auto">
-                    <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                        <div className="text-[11px] md:text-sm font-black mb-1 text-black">채용공고 등록수</div>
-                        <div className="text-lg md:text-3xl font-black text-pink-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
-                    </div>
-                    <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                        <div className="text-[11px] md:text-sm font-black mb-1 text-black">진행중인 공고</div>
-                        <div className="text-lg md:text-3xl font-black text-blue-500">1<span className="text-xs text-gray-400 ml-1">개</span></div>
-                    </div>
-                    <div className={`p-2 md:p-4 rounded-2xl border shadow-sm text-center opacity-60 flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                        <div className="text-[11px] md:text-sm font-black mb-1 text-black">마감된 공고</div>
-                        <div className="text-lg md:text-3xl font-black text-gray-500">0<span className="text-xs text-gray-400 ml-1">개</span></div>
-                    </div>
+                {/* Progress Tabs (Capture 4 style simulation) */}
+                <div className="flex gap-0 overflow-hidden rounded-xl border border-gray-200 font-black text-sm">
+                    <button onClick={() => setView('dashboard')} className="flex-1 py-4 bg-gray-600 text-white flex items-center justify-center gap-2 border-r border-gray-100/10">
+                        진행중인 채용정보 <span className="bg-white/20 px-2 py-0.5 rounded text-xs">1</span>
+                    </button>
+                    <button onClick={() => setView('closed-ads')} className="flex-1 py-4 bg-gray-200 text-gray-500 flex items-center justify-center gap-2">
+                        마감된 채용정보 <span className="bg-gray-300 text-gray-600 px-2 py-0.5 rounded text-xs">0</span>
+                    </button>
                 </div>
-
-                <button
-                    onClick={() => handleAdClick(true)}
-                    className="w-full py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-lg font-black rounded-xl shadow-lg shadow-blue-200 hover:opacity-90 transition flex items-center justify-center gap-2"
-                >
-                    <PlusSquare size={24} />
-                    채용공고 등록하기
-                </button>
 
                 <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     {/* 1. Recruitment Info Placeholder for now */}
