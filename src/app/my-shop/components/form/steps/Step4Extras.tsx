@@ -1,0 +1,274 @@
+'use client';
+
+import React from 'react';
+import { PlusCircle, Sparkles, Box, ChevronDown, Check, MousePointer2, Highlighter, Palette, Play, Zap, Radio } from 'lucide-react';
+import { ICONS, HIGHLIGHTERS, PAY_SUFFIX_OPTIONS, STEP4_CONVENIENCE_KEYWORDS } from '../../../constants';
+
+interface Step4Props {
+    brand: any;
+    paySuffixes: string[];
+    togglePaySuffix: (v: string) => void;
+    borderOption: string;
+    setBorderOption: (v: any) => void;
+    borderPeriod: number;
+    setBorderPeriod: (v: number) => void;
+    selectedIcon: number | null;
+    setSelectedIcon: (v: number | null) => void;
+    iconPeriod: number;
+    setIconPeriod: (v: number) => void;
+    selectedHighlighter: number | null;
+    setSelectedHighlighter: (v: number | null) => void;
+    highlighterPeriod: number;
+    setHighlighterPeriod: (v: number) => void;
+    selectedKeywords: string[];
+    setSelectedKeywords: (v: string[]) => void;
+}
+
+export const Step4Extras: React.FC<Step4Props> = ({
+    brand, paySuffixes, togglePaySuffix, borderOption, setBorderOption, borderPeriod, setBorderPeriod,
+    selectedIcon, setSelectedIcon, iconPeriod, setIconPeriod,
+    selectedHighlighter, setSelectedHighlighter, highlighterPeriod, setHighlighterPeriod,
+    selectedKeywords, setSelectedKeywords
+}) => {
+
+    const toggleKeyword = (kw: string) => {
+        if (selectedKeywords.includes(kw)) {
+            setSelectedKeywords(selectedKeywords.filter(k => k !== kw));
+        } else {
+            if (selectedKeywords.length < 10) {
+                setSelectedKeywords([...selectedKeywords, kw]);
+            }
+        }
+    };
+
+    const renderPeriodSelector = (current: number, setter: (v: number) => void, noneLabel: string = "안함") => (
+        <div className="grid grid-cols-4 gap-1 w-full">
+            {[0, 30, 60, 90].map(p => (
+                <button
+                    key={p}
+                    type="button"
+                    onClick={() => setter(p)}
+                    className={`flex flex-col items-center justify-center py-1.5 md:py-2 rounded-lg border transition-all ${current === p
+                        ? 'bg-pink-50 text-pink-600 border-pink-400 ring-1 ring-pink-400'
+                        : 'bg-white border-gray-100 text-gray-400 hover:border-pink-200'
+                        }`}
+                >
+                    {p === 0 ? (
+                        <div className="flex flex-col items-center">
+                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === 0 ? 'border-pink-500 bg-pink-500' : 'border-gray-200'}`}>
+                                {current === 0 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </div>
+                            <span className="text-[10px] md:text-[12px] font-black">{noneLabel}</span>
+                        </div>
+                    ) : (
+                        <>
+                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === p ? 'border-pink-500 bg-pink-500' : 'border-gray-200'}`}>
+                                {current === p && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </div>
+                            <span className="text-[10px] md:text-[12px] font-black">{p}일</span>
+                            <div className="text-[8px] md:text-[10px] opacity-70 font-bold">+{p === 30 ? '3' : p === 60 ? '5.5' : '7'}만원</div>
+                        </>
+                    )}
+                </button>
+            ))}
+        </div>
+    );
+
+    return (
+        <section className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-amber-950 via-gray-900 to-gray-950 border-amber-900/50' : 'bg-gradient-to-br from-amber-50 via-white to-orange-50 border-amber-200'}`}>
+            <div className="bg-gradient-to-r from-[#9333ea] via-[#a855f7] to-[#ec4899] text-white p-5 md:p-7 rounded-[24px] mb-6 md:mb-8 shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30 shadow-inner">
+                            <Sparkles size={28} className="text-white animate-pulse" />
+                        </div>
+                        <div>
+                            <h2 className="font-black text-xl md:text-2xl tracking-tight flex items-center gap-2">
+                                STEP 4 : 추가 노출 강조 옵션
+                            </h2>
+                            <div className="flex items-center gap-4 mt-1">
+                                <span className="text-yellow-300 font-black text-sm md:text-base animate-bounce">노출 효과의 압도적 극대화!!</span>
+                                <div className="hidden md:block w-px h-4 bg-white/30"></div>
+                                <span className="text-white/80 font-bold text-xs md:text-sm">다양한 옵션으로 시선을 사로 잡으세요!</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mx-auto md:mx-0 flex items-center justify-center w-fit">
+                        <span className="text-[10px] md:text-xs font-black tracking-widest text-[#e9d5ff]">SELECTION OPTIONS</span>
+                        <span className="text-white font-black text-xs md:text-sm ml-2">선택 시 추가 비용 발생</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-6 md:space-y-10">
+                {/* 1. 급여 추가 옵션 (4열 그리드) */}
+                <div>
+                    <h3 className="text-[13px] md:text-[16px] font-black mb-3 text-gray-700 flex items-center gap-2">
+                        <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600"><Zap size={14} fill="currentColor" /></div>
+                        급여 추가 옵션
+                    </h3>
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-1.5 md:gap-2">
+                        {PAY_SUFFIX_OPTIONS.map(s => (
+                            <button
+                                key={s}
+                                type="button"
+                                onClick={() => togglePaySuffix(s)}
+                                className={`flex items-center justify-center h-9 md:h-11 rounded-lg text-[10.5px] md:text-[13px] font-bold transition border-2 ${paySuffixes.includes(s) ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white border-gray-100 text-gray-500 hover:border-amber-200'}`}
+                            >
+                                {s}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 2. 편의사항 및 키워드 (4열 그리드) */}
+                <div>
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-[13px] md:text-[16px] font-black text-gray-700 flex items-center gap-2">
+                            <div className="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600"><Sparkles size={14} fill="currentColor" /></div>
+                            편의사항 및 키워드 (최대 10개)
+                        </h3>
+                        <span className="text-[12px] md:text-[14px] font-black text-pink-500">{selectedKeywords.length}/10</span>
+                    </div>
+                    <div className={`p-2 md:p-5 rounded-2xl border-2 border-dashed ${brand.theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-white/40 border-gray-100 shadow-inner'}`}>
+                        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-1.5 md:gap-2">
+                            {STEP4_CONVENIENCE_KEYWORDS.map(kw => (
+                                <button
+                                    key={kw}
+                                    type="button"
+                                    onClick={() => toggleKeyword(kw)}
+                                    className={`flex items-center justify-center h-9 md:h-11 rounded-lg text-[10.5px] md:text-[13px] font-bold transition border-2 ${selectedKeywords.includes(kw) ? 'bg-indigo-500 text-white border-indigo-500 shadow-sm' : 'bg-white border-gray-100 text-gray-400 hover:border-indigo-200'}`}
+                                >
+                                    {kw}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-[9.5px] md:text-[12px] text-gray-400 font-bold mt-4 text-center">
+                            * 선택하신 키워드는 검색 필터와 매칭되어 노출 효율을 높여줍니다.
+                        </p>
+                    </div>
+                </div>
+
+                {/* 3 & 4. 아이콘 & 형광펜 (2열 배치) */}
+                <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                    {/* 아이콘 선택 */}
+                    <div className="rounded-2xl border-2 overflow-hidden border-gray-200 bg-white shadow-sm flex flex-col">
+                        <div className="bg-gray-600 text-white p-2.5 md:p-3 flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><MousePointer2 size={18} fill="currentColor" className="rotate-90" /></div>
+                            <div>
+                                <h3 className="text-[13px] md:text-[16px] font-black leading-none">10종 아이콘</h3>
+                                <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">제목앞에 아이콘을 노출하여 주목도를 높이세요!</p>
+                            </div>
+                        </div>
+                        <div className="p-3 md:p-5 space-y-4 flex-1">
+                            {renderPeriodSelector(iconPeriod, setIconPeriod as any, "안함")}
+                            <div className="grid grid-cols-5 gap-2 md:gap-3">
+                                {ICONS.map(item => (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => setSelectedIcon(selectedIcon === item.id ? null : item.id)}
+                                        className={`flex flex-col items-center justify-center py-2 md:py-3 rounded-lg transition-all border-2 ${selectedIcon === item.id ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
+                                    >
+                                        <span className="text-lg md:text-2xl mb-1">{item.icon}</span>
+                                        <span className={`text-[8px] md:text-[11px] font-black ${selectedIcon === item.id ? 'text-pink-600' : 'text-gray-400'}`}>{item.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 형광펜 선택 */}
+                    <div className="rounded-2xl border-2 overflow-hidden border-gray-200 bg-white shadow-sm flex flex-col">
+                        <div className="bg-gray-600 text-white p-2.5 md:p-3 flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Highlighter size={18} fill="currentColor" /></div>
+                            <div>
+                                <h3 className="text-[13px] md:text-[16px] font-black leading-none">8종 형광펜</h3>
+                                <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">제목에 시각적인 광고효과를 입혀보세요!</p>
+                            </div>
+                        </div>
+                        <div className="p-3 md:p-5 space-y-4 flex-1">
+                            {renderPeriodSelector(highlighterPeriod, setHighlighterPeriod as any, "안함")}
+                            <div className="grid grid-cols-4 gap-2 md:gap-2.5">
+                                {HIGHLIGHTERS.map(item => (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => setSelectedHighlighter(selectedHighlighter === item.id ? null : item.id)}
+                                        className={`py-1.5 md:py-2 px-1 rounded-lg transition-all border-2 flex items-center justify-center ${selectedHighlighter === item.id ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
+                                    >
+                                        <span
+                                            className="w-full py-1 rounded text-[9px] md:text-[12px] font-black"
+                                            style={{ backgroundColor: item.color, color: '#333' }}
+                                        >
+                                            {item.name}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 5. 추가 강조 효과 (테두리/특수효과) */}
+                <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="rounded-2xl border-2 overflow-hidden border-gray-200 bg-white shadow-sm">
+                        <div className="bg-gray-600 text-white p-2.5 md:p-3 flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Radio size={18} className="animate-pulse" /></div>
+                            <div>
+                                <h3 className="text-[13px] md:text-[16px] font-black leading-none">추가 강조 효과</h3>
+                                <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">테두리/특수효과로 나만의 광고를 돋보이세요!</p>
+                            </div>
+                        </div>
+                        <div className="p-4 md:p-6 space-y-6">
+                            {/* 기간 선택 (상단 배치) */}
+                            <div>
+                                {renderPeriodSelector(borderPeriod, setBorderPeriod as any, "안함")}
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-[13px] md:text-[16px] font-black mb-3 text-gray-700">
+                                        테두리/특수효과 선택
+                                    </h3>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'none', label: '없음' },
+                                            { id: 'color', label: '컬러 테두리' },
+                                            { id: 'glow', label: 'Glow 효과' }
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.id}
+                                                type="button"
+                                                onClick={() => setBorderOption(opt.id as any)}
+                                                className={`py-3 md:py-3.5 px-2 rounded-xl border-2 transition-all font-black text-[10px] md:text-[13px] ${borderOption === opt.id ? 'bg-purple-100 text-purple-700 border-purple-400' : 'bg-white border-gray-100 text-gray-400 hover:border-purple-200'}`}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 미리보기 영역 (최하단 배치, 아이콘 섹션 박스 스타일 적용) */}
+                            <div className="pt-4 border-t border-gray-100">
+                                <h4 className="text-[12px] md:text-[14px] font-black text-gray-500 font-black mb-3">프리미엄 미리보기</h4>
+                                <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color' ? 'border-pink-500 border-4 shadow-sm' : borderOption === 'glow' ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]' : 'border-gray-200 border-dashed'}`}>
+                                    <div className="text-center group">
+                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? 'text-pink-500' : 'text-gray-300'}`} />
+                                        <span className={`text-[11px] md:text-[13px] font-black transition-colors ${borderOption !== 'none' ? 'text-gray-900' : 'text-gray-400'}`}>실제 노출 효과 예시</span>
+                                    </div>
+                                </div>
+                                <p className="text-[9px] md:text-[11px] text-gray-400 font-bold mt-3 text-center">
+                                    ※ 위의 이미지는 적용된 효과의 예시이며, 실제 공고 노출 시 디자인 및 위치가 다를 수 있습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+

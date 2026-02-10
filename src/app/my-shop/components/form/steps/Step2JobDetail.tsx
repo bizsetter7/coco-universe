@@ -1,0 +1,398 @@
+'use client';
+
+import React, { useEffect, useRef, useCallback } from 'react';
+import { Edit3, Laptop, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Smile, ChevronDown, Image as ImageIcon } from 'lucide-react';
+import { INDUSTRY_DATA, REGION_DATA, AGES, PAY_TYPES, FONT_DISPLAY_NAMES, FONT_SIZES, TEXT_COLORS, BG_COLORS } from '../../../constants';
+
+interface Step2Props {
+    brand: any;
+    title: string;
+    setTitle: (v: string) => void;
+    industryMain: string;
+    setIndustryMain: (v: string) => void;
+    industrySub: string;
+    setIndustrySub: (v: string) => void;
+    ageMin: number;
+    setAgeMin: (v: number) => void;
+    ageMax: number;
+    setAgeMax: (v: number) => void;
+    regionCity: string;
+    setRegionCity: (v: string) => void;
+    regionGu: string;
+    setRegionGu: (v: string) => void;
+    workTime: string;
+    setWorkTime: (v: string) => void;
+    payType: string;
+    handlePayTypeChange: (e: any) => void;
+    payAmount: string;
+    handlePayAmountChange: (e: any) => void;
+    setShowDesignModal: (v: boolean) => void;
+    editorRef: React.RefObject<HTMLDivElement | null>;
+    handleEditorInteract: () => void;
+    setIsEditorDirty: (v: boolean) => void;
+    saveSelection: () => void;
+    restoreSelection: () => void;
+    syncEditorHtml: () => void;
+    editorHtml: string;
+    toolbarStatus: any;
+    execCmd: (cmd: string, val?: string) => void;
+    updateToolbarStatus: () => void;
+    showFontMenu: boolean;
+    setShowFontMenu: (v: boolean) => void;
+    showFontSizeMenu: boolean;
+    setShowFontSizeMenu: (v: boolean) => void;
+    showForeColorMenu: boolean;
+    setShowForeColorMenu: (v: boolean) => void;
+    showHiliteColorMenu: boolean;
+    setShowHiliteColorMenu: (v: boolean) => void;
+    showEmojiMenu: boolean;
+    setShowEmojiMenu: (v: boolean) => void;
+    insertEmoji: (emoji: string) => void;
+    setExampleType: (v: any) => void;
+    setShowExampleModal: (v: boolean) => void;
+}
+
+export const Step2JobDetail: React.FC<Step2Props> = ({
+    brand, title, setTitle, industryMain, setIndustryMain, industrySub, setIndustrySub,
+    ageMin, setAgeMin, ageMax, setAgeMax, regionCity, setRegionCity, regionGu, setRegionGu,
+    workTime, setWorkTime, payType, handlePayTypeChange, payAmount, handlePayAmountChange,
+    setShowDesignModal, editorRef, handleEditorInteract, setIsEditorDirty, saveSelection,
+    restoreSelection, syncEditorHtml, editorHtml,
+    toolbarStatus, execCmd, updateToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,
+    showForeColorMenu, setShowForeColorMenu, showHiliteColorMenu, setShowHiliteColorMenu,
+    showEmojiMenu, setShowEmojiMenu, insertEmoji, setExampleType, setShowExampleModal
+}) => {
+    // --- Toolbar Menus Logic ---
+    const toggleMenu = useCallback((menuName: string) => {
+        setShowFontMenu(menuName === 'font' ? !showFontMenu : false);
+        setShowFontSizeMenu(menuName === 'fontSize' ? !showFontSizeMenu : false);
+        setShowForeColorMenu(menuName === 'foreColor' ? !showForeColorMenu : false);
+        setShowHiliteColorMenu(menuName === 'hiliteColor' ? !showHiliteColorMenu : false);
+        setShowEmojiMenu(menuName === 'emoji' ? !showEmojiMenu : false);
+    }, [showFontMenu, showFontSizeMenu, showForeColorMenu, showHiliteColorMenu, showEmojiMenu, setShowFontMenu, setShowFontSizeMenu, setShowForeColorMenu, setShowHiliteColorMenu, setShowEmojiMenu]);
+
+    const insertImage = (file: File) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const url = e.target?.result;
+            if (url) {
+                restoreSelection();
+                const img = `<img src="${url}" style="max-width: 100%; height: auto; border-radius: 12px; margin: 8px 0;" />`;
+                document.execCommand('insertHTML', false, img);
+                syncEditorHtml();
+                editorRef.current?.focus();
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const applyPxFontSize = useCallback((size: string) => {
+        let sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) {
+            restoreSelection(); // 유실된 경우 복원 시도
+            sel = window.getSelection();
+        }
+
+        if (!sel || sel.rangeCount === 0) return;
+
+        const range = sel.getRangeAt(0);
+        if (range.collapsed) return;
+
+        // 기존의 execCommand("fontSize")는 1-7 레벨로 변환되어버림
+        // 대신 선택 영역을 span으로 감싸고 직접 스타일을 주입 (동기화 이슈 방지)
+        const span = document.createElement('span');
+        span.style.fontSize = size;
+        span.style.lineHeight = '1.4';
+
+        try {
+            // 선택 영역의 콘텐츠를 추출하여 span에 넣고 다시 삽입
+            const content = range.extractContents();
+            span.appendChild(content);
+            range.insertNode(span);
+
+            // 삽입 후 선택 영역을 다시 span으로 잡아서 연속 작업 가능하게 함
+            const newRange = document.createRange();
+            newRange.selectNodeContents(span);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+            saveSelection(); // 상태 업데이트
+        } catch (err) {
+            console.error('Font size apply error:', err);
+        }
+
+        setShowFontSizeMenu(false);
+        syncEditorHtml();
+        updateToolbarStatus();
+        editorRef.current?.focus();
+    }, [editorRef, setShowFontSizeMenu, syncEditorHtml, updateToolbarStatus, restoreSelection, saveSelection]);
+
+    useEffect(() => {
+        // 에디터 초기 내용 로드 (page 전환 시 유실 방지)
+        if (editorRef.current && editorHtml && !editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = editorHtml;
+        }
+    }, [editorRef, editorHtml]);
+
+    useEffect(() => {
+        const handleDocMouseDown = (e: MouseEvent) => {
+            // 에디터나 툴바가 아닌 다른 곳을 클릭했을 때 선택 영역을 저장
+            // 단, 다른 텍스트를 드래그하려는 의도(input, textarea 등)가 아닐 때만 유지
+            const target = e.target as HTMLElement;
+            const isToolbar = target.closest('.editor-toolbar');
+            const isEditor = target.closest('.editor-content');
+
+            if (!isToolbar && !isEditor) {
+                // 클릭한 곳이 에디터나 툴바가 아니면 현재 선택 영역을 백업
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                    saveSelection();
+                }
+            }
+        };
+
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.font-menu')) setShowFontMenu(false);
+            if (!target.closest('.size-menu')) setShowFontSizeMenu(false);
+            if (!target.closest('.color-menu')) setShowForeColorMenu(false);
+            if (!target.closest('.highlight-menu')) setShowHiliteColorMenu(false);
+            if (!target.closest('.emoji-menu')) setShowEmojiMenu(false);
+        };
+
+        document.addEventListener('mousedown', handleDocMouseDown, true);
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleDocMouseDown, true);
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [saveSelection, setShowFontMenu, setShowFontSizeMenu, setShowForeColorMenu, setShowHiliteColorMenu, setShowEmojiMenu]);
+    return (
+        <section className={`p-2 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-green-950 via-gray-900 to-gray-950 border-green-900/50' : 'bg-gradient-to-br from-green-50 via-white to-emerald-50 border-green-200'}`}>
+            <div className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 text-white p-4 rounded-2xl mb-3 md:mb-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-center md:text-left">
+                    <h2 className="font-black text-lg md:text-xl flex items-center justify-center md:justify-start gap-2">
+                        <Edit3 size={24} className="text-white" />
+                        STEP 2: 상세 내용 작성
+                    </h2>
+                    <p className="text-[13px] font-bold opacity-90 mt-1">공고의 제목과 내용을 상세하게 작성/표현해주세요!</p>
+                </div>
+                <div className="flex gap-2 w-full md:w-auto">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExampleType('step2_card'); setShowExampleModal(true); }} className="flex-1 md:w-28 px-2 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-[10px] font-black border border-white/30 transition">광고카드 예시</button>
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExampleType('step2_list'); setShowExampleModal(true); }} className="flex-1 md:w-28 px-2 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-[10px] font-black border border-white/30 transition">리스트 예시</button>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                {/* Basic Info Section */}
+                <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white/80 backdrop-blur-sm border-gray-100'}`}>
+                    <h2 className="font-black text-gray-800 mb-2 md:mb-4 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>채용 공고 정보</h2>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>공고 제목</label>
+                            <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-3 text-base font-black outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black shadow-inner'}`} />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>직종</label>
+                                    <div className="flex gap-1.5">
+                                        <select value={industryMain} onChange={e => setIndustryMain(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white">
+                                            <option value="">1차</option>
+                                            {Object.keys(INDUSTRY_DATA).map(i => <option key={i} value={i}>{i}</option>)}
+                                        </select>
+                                        <select value={industrySub} onChange={e => setIndustrySub(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white" disabled={!industryMain}>
+                                            <option value="">2차</option>
+                                            {INDUSTRY_DATA[industryMain as keyof typeof INDUSTRY_DATA]?.map((j: string) => <option key={j} value={j}>{j}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>연령</label>
+                                    <div className="flex items-center gap-1.5">
+                                        <select value={ageMin} onChange={e => setAgeMin(Number(e.target.value))} className="w-full border rounded-lg p-2 text-sm outline-none bg-white">
+                                            {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                        </select>
+                                        <span className="text-gray-300">-</span>
+                                        <select value={ageMax} onChange={e => setAgeMax(Number(e.target.value))} className="w-full border rounded-lg p-2 text-sm outline-none bg-white">
+                                            {AGES.map(a => <option key={a} value={a}>{a}세</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
+                                    <div className="flex gap-1.5 relative">
+                                        <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8" style={{ WebkitAppearance: 'none' }}>
+                                            <option value="">시/도</option>
+                                            {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
+                                        </select>
+                                        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                        <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8 disabled:bg-gray-50 disabled:cursor-not-allowed" disabled={!regionCity} style={{ WebkitAppearance: 'none' }}>
+                                            <option value="">구/군</option>
+                                            {REGION_DATA[regionCity as keyof typeof REGION_DATA]?.map((g: string) => <option key={g} value={g}>{g}</option>)}
+                                        </select>
+                                        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-black mb-1.5">근무시간</label>
+                                    <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none bg-white" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여 방식</label>
+                                <select value={payType} onChange={handlePayTypeChange} className="w-full border rounded-lg p-2.5 text-sm outline-none bg-white h-[42px]">
+                                    {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
+                                <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} disabled={payType === '협의'} className="w-full border rounded-lg p-2.5 text-base font-black text-right outline-none bg-white disabled:bg-gray-50 h-[42px]" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Editor & Preview Split View for PC */}
+                <div className="lg:grid lg:grid-cols-2 lg:gap-6 items-start">
+                    {/* Editor Side */}
+                    <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>상세내용 작성 (에디터)</h2>
+                            <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인이 필요한가요?</button>
+                        </div>
+
+                        {/* Sticky Toolbar */}
+                        <div id="editor-toolbar" className="sticky top-0 z-[60] p-0.5 md:p-1 border-2 border-b-0 rounded-t-2xl flex flex-col gap-1 bg-white border-gray-200 text-gray-900 shadow-sm">
+                            <div className="flex items-center flex-wrap gap-1 md:gap-1.5 p-1 pb-0">
+                                <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('bold'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('italic'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('underline'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
+                                </div>
+                                <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyLeft'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyCenter'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyRight'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
+                                </div>
+
+                                {/* Media Upload Moved Here */}
+                                <label className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0 h-[34px] md:h-[38px] w-[34px] md:w-[38px]" title="기존 업로드 위치에서 이동됨">
+                                    <ImageIcon size={18} />
+                                    <input
+                                        type="file"
+                                        accept="image/*,image/gif"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            if (e.target.files?.[0]) {
+                                                insertImage(e.target.files[0]);
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
+
+                            <div className="flex items-center flex-wrap gap-1 md:gap-1.5">
+                                <div className="relative font-menu">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('font'); }} className="h-8 min-w-[110px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-pink-300">
+                                        <span className="truncate">{FONT_DISPLAY_NAMES[toolbarStatus.currentFont] || toolbarStatus.currentFont}</span>
+                                        <ChevronDown size={14} className="shrink-0 text-gray-400" />
+                                    </button>
+                                    {showFontMenu && (
+                                        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[180px] py-1 overflow-hidden animate-in fade-in zoom-in duration-150">
+                                            {Object.entries(FONT_DISPLAY_NAMES).map(([id, name]) => (
+                                                <button key={id} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('fontName', id); editorRef.current?.focus(); setShowFontMenu(false); }} className="w-full px-3 py-2 text-left hover:bg-gray-100 text-[13px] font-bold" style={{ fontFamily: id }}>{name}</button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative size-menu">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('fontSize'); }} className="h-8 min-w-[55px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-pink-300">
+                                        {toolbarStatus.currentFontSize.replace('px', '').replace('pt', '') || '16'}pt
+                                        <ChevronDown size={14} className="shrink-0 text-gray-400" />
+                                    </button>
+                                    {showFontSizeMenu && (
+                                        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[80px] py-1 animate-in fade-in zoom-in duration-150">
+                                            {FONT_SIZES.map(s => <button key={s} onMouseDown={(e) => { e.preventDefault(); applyPxFontSize(s); }} className="w-full px-3 py-2 text-left text-[12px] font-black hover:bg-gray-100">{s.replace('px', '')}</button>)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative color-menu">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('foreColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Text Color"><Type size={16} style={{ color: toolbarStatus.currentForeColor }} /></button>
+                                    {showForeColorMenu && (
+                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
+                                            {TEXT_COLORS.map(c => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('foreColor', c.value); editorRef.current?.focus(); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative highlight-menu">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('hiliteColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Highlight Color"><Palette size={16} style={{ backgroundColor: toolbarStatus.currentHiliteColor === 'transparent' ? 'transparent' : toolbarStatus.currentHiliteColor }} /></button>
+                                    {showHiliteColorMenu && (
+                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
+                                            {BG_COLORS.map(c => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('hiliteColor', c.value); editorRef.current?.focus(); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative emoji-menu">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('emoji'); }} className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm"><Smile size={18} /></button>
+                                    {showEmojiMenu && (
+                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-6 gap-2 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[210px] max-h-48 overflow-y-auto animate-in fade-in zoom-in duration-150">
+                                            {['😊', '😂', '😍', '👍', '🔥', '✨', '💖', '⭐', '🎈', '🍺', '🎁', '🍭', '🤣', '😉', '😜', '🤩', '🥳', '😭', '😱', '😡', '✅', '🌈', '💎', '💰', '👑'].map(emoji => (
+                                                <button key={emoji} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); insertEmoji(emoji); editorRef.current?.focus(); setShowEmojiMenu(false); }} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-xl transition active:scale-90">{emoji}</button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div
+                            ref={editorRef}
+                            contentEditable
+                            onKeyUp={() => { handleEditorInteract(); syncEditorHtml(); }}
+                            onMouseUp={() => { handleEditorInteract(); saveSelection(); }}
+                            onSelect={() => { handleEditorInteract(); saveSelection(); }}
+                            onBlur={() => { saveSelection(); }}
+                            onInput={() => { setIsEditorDirty(true); syncEditorHtml(); }}
+                            className={`w-full min-h-[400px] lg:min-h-[500px] p-4 md:p-6 border-2 rounded-b-2xl outline-none overflow-y-auto ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-100 text-gray-900'}`}
+                            style={{ lineHeight: '1.6' }}
+                        ></div>
+                        <p className="text-[11px] mt-2 font-bold text-gray-400 px-1">* 팁: 에디터 높이가 충분히 확보되었습니다. PC와 모바일 모두 실시간 미리보기가 지원됩니다.</p>
+                    </div>
+
+                    {/* Preview Side (Desktop Only) */}
+                    <div className="hidden lg:flex flex-col h-full">
+                        <div className="flex items-center gap-2 mb-3">
+                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>실시간 미리보기</h2>
+                            <span className="px-2 py-0.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100">PREVIEW</span>
+                        </div>
+                        <div className={`flex-1 p-6 border-2 rounded-[24px] overflow-y-auto max-h-[600px] bg-white border-gray-100 shadow-inner relative ${brand.theme === 'dark' ? 'bg-gray-950/50 border-gray-800' : ''}`}>
+                            <div className="mb-4 pb-4 border-b border-gray-100">
+                                <h3 className="text-xl font-black text-gray-900 break-all">{title || "공고 제목이 여기에 표시됩니다."}</h3>
+                            </div>
+                            <div
+                                className="description-preview text-gray-800 prose prose-sm max-w-none"
+                                dangerouslySetInnerHTML={{ __html: editorHtml || '<p class="text-gray-300">상세 내용이 아직 입력되지 않았습니다.</p>' }}
+                            />
+                            {!editorHtml && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                    <Edit3 size={64} className="text-gray-400" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style jsx global>{`
+                .description-preview p { margin-bottom: 0.5rem; }
+                .description-preview strong { font-weight: 900; }
+                .description-preview img { max-width: 100%; border-radius: 8px; }
+            `}</style>
+        </section>
+    );
+};
