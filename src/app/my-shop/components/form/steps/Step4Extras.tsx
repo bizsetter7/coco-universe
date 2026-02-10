@@ -347,9 +347,16 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             {/* 미리보기 영역 (최하단 배치, 아이콘 섹션 박스 스타일 적용) */}
                             <div className="pt-4 border-t border-gray-100">
                                 <h4 className="text-[12px] md:text-[14px] font-black text-gray-500 font-black mb-3">프리미엄 미리보기</h4>
-                                <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color' ? 'border-pink-500 border-4 shadow-sm' : borderOption === 'glow' ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]' : borderOption === 'sparkle' ? 'border-yellow-400 border-4 shadow-[0_0_20px_rgba(250,204,21,0.4)]' : 'border-gray-200 border-dashed'}`}>
+                                <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color'
+                                        ? 'border-pink-500 border-4 shadow-sm'
+                                        : borderOption === 'glow'
+                                            ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+                                            : borderOption === 'sparkle'
+                                                ? 'border-yellow-400 border-4 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse'
+                                                : 'border-gray-200 border-dashed'
+                                    }`}>
                                     <div className="text-center group">
-                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : 'text-pink-500') : 'text-gray-300'}`} />
+                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : 'text-pink-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />
                                         <span className={`text-[11px] md:text-[13px] font-black transition-colors ${borderOption !== 'none' ? 'text-gray-900' : 'text-gray-400'}`}>실제 노출 효과 예시</span>
                                     </div>
                                 </div>
