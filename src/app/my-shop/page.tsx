@@ -105,6 +105,7 @@ function MyShopContent() {
     // Handlers
     const handleSave = () => {
         alert('저장 및 심사 요청이 완료되었습니다!');
+        formState.resetAdStates(); // Reset state after successful save
         setView('dashboard');
         window.scrollTo({ top: 0, behavior: 'auto' });
     };
@@ -112,10 +113,12 @@ function MyShopContent() {
     const handleBack = () => {
         if (formState.isDirty) {
             if (confirm('작성 중인 내용이 있습니다. 저장하지 않고 나가시겠습니까?')) {
+                formState.resetAdStates(); // Reset state on cancel
                 setView('dashboard');
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
         } else {
+            formState.resetAdStates(); // Reset state even if not dirty to ensure clean exit
             setView('dashboard');
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
@@ -169,7 +172,11 @@ function MyShopContent() {
                 <WarningModal
                     brand={brand}
                     onClose={() => setShowWarningModal(false)}
-                    onConfirm={() => { setView('form'); setShowWarningModal(false); }}
+                    onConfirm={() => {
+                        formState.resetAdStates(); // Reset for NEW ad
+                        setView('form');
+                        setShowWarningModal(false);
+                    }}
                 />
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
