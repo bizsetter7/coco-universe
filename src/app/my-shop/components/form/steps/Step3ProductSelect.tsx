@@ -29,7 +29,7 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                     <span className="text-[12px] md:text-lg opacity-80 font-bold">(7개 타입중 택1)</span>
                 </h2>
                 <p className="text-[11px] md:text-[13px] font-bold opacity-90 mt-2 break-keep leading-tight">
-                    기본부터 그랜드까지 광고 등급을 선택해주세요. 높은 타입일수록 더 많은 노출 혜택을 받습니다.
+                    기본부터 그랜드까지 광고 등급을 선택해주세요.<br className="md:hidden" /> 높은 타입일수록 더 많은 노출 혜택을 받습니다.
                 </p>
             </div>
 

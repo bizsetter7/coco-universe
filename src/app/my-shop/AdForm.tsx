@@ -63,7 +63,7 @@ export default function AdForm(props: AdFormProps) {
     const { brand } = props;
 
     return (
-        <div className="w-full max-w-[1080px] mx-auto space-y-5 pb-48 pt-[10px] px-3 xl:px-0 relative mb-20">
+        <div className="w-full max-w-[1080px] mx-auto space-y-5 pb-16 pt-[10px] px-3 xl:px-0 relative mb-6">
             {/* Recruitment Registration Header (Capture 3) */}
             <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-4 mb-2">
@@ -86,6 +86,9 @@ export default function AdForm(props: AdFormProps) {
                 {...props}
                 selectedKeywords={props.selectedKeywords}
                 setSelectedKeywords={props.setSelectedKeywords}
+                selectedAdProduct={props.selectedAdProduct}
+                setExampleType={props.setExampleType}
+                setShowExampleModal={props.setShowExampleModal}
             />
 
             {/* Total Amount Display (Redesigned matching Capture 1/2) */}

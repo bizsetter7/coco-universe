@@ -137,7 +137,7 @@ export function useAdFormState() {
     const [highlighterPeriod, setHighlighterPeriod] = useState<30 | 60 | 90 | 0>(0);
     const [mediaUrl, setMediaUrl] = useState('');
     const [paySuffixes, setPaySuffixes] = useState<string[]>([]);
-    const [borderOption, setBorderOption] = useState<'none' | 'color' | 'glow'>('none');
+    const [borderOption, setBorderOption] = useState<'none' | 'color' | 'glow' | 'sparkle'>('none');
     const [borderPeriod, setBorderPeriod] = useState<30 | 60 | 90 | 0>(0);
     const [totalAmount, setTotalAmount] = useState(0);
 
