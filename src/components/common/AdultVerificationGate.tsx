@@ -44,17 +44,21 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
         }
 
         // Mock Login Logic
-        localStorage.setItem('user_session', 'active_' + Date.now());
-        localStorage.setItem('user_type', loginType);
-        localStorage.setItem('user_name', loginType === 'business' ? '사장님' : '홍길동');
-        localStorage.setItem('isLoggedIn', 'true');
+        const sessionData = {
+            type: loginType === 'business' ? 'shop' : 'personal',
+            name: loginType === 'business' ? '사장님' : '홍길동',
+            id: 'mock_user_' + Date.now(),
+            points: 50000
+        };
+        localStorage.setItem('user_session', JSON.stringify(sessionData));
+        localStorage.setItem('user_type', loginType === 'business' ? 'shop' : 'personal');
 
         onVerify();
     };
 
     return (
-        <div className={`fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto p-4 md:p-6 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
-            <div className="w-full max-w-4xl animate-in fade-in zoom-in duration-500">
+        <div className={`fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto p-4 md:p-6 animate-in fade-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+            <div className="w-full max-w-4xl">
                 {/* Header: 19 Symbol & Legal Text */}
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-10 text-center md:text-left">
                     <div className="relative group">

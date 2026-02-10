@@ -16,7 +16,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Links */}
-                <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-6 font-medium">
+                <div className="flex justify-center gap-2 md:gap-4 mb-6 font-medium text-[10px] md:text-sm whitespace-nowrap overflow-x-auto no-scrollbar">
                     <Link href="/customer-center?tab=policy" className="hover:text-gray-900 dark:hover:text-white transition-colors">이용약관</Link>
                     <span className="text-gray-300">|</span>
                     <Link href="/customer-center?tab=policy" className="hover:text-gray-900 dark:hover:text-white transition-colors font-bold">개인정보처리방침</Link>
@@ -27,10 +27,12 @@ export const Footer = () => {
                 </div>
 
                 {/* Company Info */}
-                <div className="space-y-1 mb-6 text-gray-400 text-[11px] md:text-xs">
+                <div className="space-y-1 mb-6 text-gray-400 text-[11px] md:text-xs text-center">
                     <p>COCO 코코알바 | 대표: 김코코 | 사업자등록번호: 226-13-91078</p>
-                    <p>주소: 서울특별시 강남구 테헤란로 123, 4층 | 직업정보제공사업 신고번호: 2024-서울강남-1234</p>
-                    <p>고객센터: 1544-0000 (평일 09:00 ~ 18:00) | 이메일: bizsetter7@gmail.com</p>
+                    <p>주소: 서울특별시 강남구 테헤란로 123, 4층</p>
+                    <p>직업정보제공사업 신고번호: 2024-서울강남-1234</p>
+                    <p>고객센터: 1544-0000 (평일 09:00 ~ 18:00)</p>
+                    <p>이메일: bizsetter7@gmail.com</p>
                 </div>
 
                 {/* Copyright */}

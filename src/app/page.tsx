@@ -6,6 +6,7 @@ import HomeClient from '@/components/home/HomeClient';
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
 import { LoginPage } from '@/components/auth/LoginPage';
+import { CustomerCenterContent } from '@/app/customer-center/page';
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -35,6 +36,10 @@ function HomeContent() {
 
   if (page === 'login') {
     return <LoginPage />;
+  }
+
+  if (page === 'support' || page === 'faq' || page === 'inquiry') {
+    return <CustomerCenterContent />;
   }
 
   return <HomeClient shops={processedShops} />;

@@ -6,10 +6,9 @@ import { useSearchParams, usePathname } from 'next/navigation';
 
 const BrandContext = createContext<BrandConfig>(DEFAULT_BRAND);
 
-export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
-    const [brand, setBrand] = useState<BrandConfig>(DEFAULT_BRAND);
-    const pathname = usePathname();
+const BrandSync = ({ setBrand }: { setBrand: (b: BrandConfig) => void }) => {
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     // 0. Global Scroll to Top on Route Change
     useEffect(() => {
@@ -34,7 +33,13 @@ export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
                 setBrand(foundBrand);
             }
         }
-    }, [searchParams]);
+    }, [searchParams, setBrand]);
+
+    return null;
+};
+
+export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
+    const [brand, setBrand] = useState<BrandConfig>(DEFAULT_BRAND);
 
     // 3. Sync Dark Mode Class to HTML/Body
     useEffect(() => {
@@ -50,6 +55,9 @@ export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <BrandContext.Provider value={brand}>
+            <React.Suspense fallback={null}>
+                <BrandSync setBrand={setBrand} />
+            </React.Suspense>
             <style dangerouslySetInnerHTML={{
                 __html: `
                 :root {

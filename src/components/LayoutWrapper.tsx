@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 
 import { BannerSidebar } from './BannerSidebar';
+import { StickyWrapper } from './ui/StickyWrapper';
 import { useMobile } from '@/hooks/useMobile';
 import { MobileBottomNav } from './ui/MobileBottomNav';
 import { useBrand } from './BrandProvider';
@@ -11,7 +13,6 @@ import { LAYOUT } from '@/constants/layout';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
 import { AdultVerificationGate } from './common/AdultVerificationGate';
-import { usePathname } from 'next/navigation';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -21,23 +22,31 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const brand = useBrand();
-    const pathname = usePathname();
-    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+    const [isVerified, setIsVerified] = React.useState<boolean | null>(() => {
+        if (typeof window !== 'undefined') {
+            const verified = localStorage.getItem('adult_verified') === 'true';
+            const session = localStorage.getItem('user_session');
+            return verified || !!session;
+        }
+        return null;
+    });
 
     React.useEffect(() => {
-        const verified = localStorage.getItem('adult_verified') === 'true';
-        const session = localStorage.getItem('user_session');
-        setIsVerified(verified || !!session);
-    }, []);
+        if (isVerified === null) {
+            const verified = localStorage.getItem('adult_verified') === 'true';
+            const session = localStorage.getItem('user_session');
+            setIsVerified(verified || !!session);
+        }
+    }, [isVerified]);
 
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
         setIsVerified(true);
     };
 
-    if (isVerified === null) return null; // Prevent flicker
+    const showGate = isVerified === false;
 
-    if (!isVerified) {
+    if (showGate) {
         return <AdultVerificationGate onVerify={handleVerify} />;
     }
 
@@ -47,43 +56,36 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             <MainHeader />
 
             {/* 
-               [Golden Rule - Framework Reconstruction] 
+               [Golden Rule - Framework Reconstruction v2] 
                1. Outer Wrapper: Max 1432px, Centered, Relative
-               2. Sidebars: Absolute positioned at top-[10px] (Overlapping Header)
-               3. Main Grid: Keeps 160px spacers to prevent content overlap
+               2. Main Grid: 160px Spacers + 1fr Content
+               3. Sidebars: Now nested INSIDE spacers to contribute to height and ensure alignment
             */}
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                {/* Left Sidebar - Absolute Overlay (Desktop Only) */}
-                {!isMobile && (
-                    <div className="hidden xl:block absolute top-0 left-0 w-[160px] h-full z-[10002] pointer-events-none">
-                        <div className="sticky top-[66px] pointer-events-auto">
-                            <BannerSidebar side="left" shops={sideAds} />
-                        </div>
-                    </div>
-                )}
-
-                {/* Right Sidebar - Absolute Overlay (Desktop Only) */}
-                {!isMobile && (
-                    <div className="hidden xl:block absolute top-0 right-0 w-[160px] h-full z-[10002] pointer-events-none">
-                        <div className="sticky top-[66px] pointer-events-auto">
-                            <BannerSidebar side="right" shops={sideAds} />
-                        </div>
-                    </div>
-                )}
-
-                {/* Main Grid - Spacers + Content */}
-                <div className="grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4">
-                    {/* Left Spacer */}
-                    <div className="hidden xl:block w-[160px]" />
+                <div className="grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4 xl:px-0 min-h-full">
+                    {/* Left Sidebar Spacer + Component */}
+                    {!isMobile && (
+                        <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
+                            <StickyWrapper offsetTop={66}>
+                                <BannerSidebar side="left" shops={sideAds} />
+                            </StickyWrapper>
+                        </aside>
+                    )}
 
                     {/* Main Content */}
-                    <main className={`w-full flex-1 min-w-0 relative`}>
+                    <main className={`w-full flex-1 min-w-0 relative z-[10]`}>
                         {children}
                     </main>
 
-                    {/* Right Spacer */}
-                    <div className="hidden xl:block w-[160px]" />
+                    {/* Right Sidebar Spacer + Component */}
+                    {!isMobile && (
+                        <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
+                            <StickyWrapper offsetTop={66}>
+                                <BannerSidebar side="right" shops={sideAds} />
+                            </StickyWrapper>
+                        </aside>
+                    )}
                 </div>
 
             </div>

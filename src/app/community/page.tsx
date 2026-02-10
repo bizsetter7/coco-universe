@@ -11,7 +11,6 @@ import {
     Lock,
     Search,
     PenLine,
-    Home,
     ArrowLeft,
     User,
     ShieldAlert,
@@ -29,6 +28,7 @@ import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { Footer } from '@/components/layout/Footer';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 // --- Types ---
 type UserType = 'individual' | 'corporate' | 'admin';
@@ -56,6 +56,9 @@ function CommunityContent() {
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
     const brand = useBrand();
     const primaryStyle = { color: brand.primaryColor };
+
+    // [Optimization] Prevent background scroll when modal is open (Fixes jitter)
+    useBodyScrollLock(loginModalOpen || isCorporateModalOpen);
 
     useEffect(() => {
         setMounted(true);
@@ -109,7 +112,11 @@ function CommunityContent() {
     };
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'}`}>
+        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'} ${isCorporateModalOpen ? 'overflow-hidden h-screen' : ''}`}>
+            {/* Security Blur Layer for Corporate Users */}
+            {isCorporateModalOpen && (
+                <div className="fixed inset-0 z-[19000] backdrop-blur-xl bg-white/50 dark:bg-black/50" />
+            )}
             {/* 모바일 전용: 현재 카테고리 타이틀 표시 (서브페이지일 때 누르면 라운지 메인으로) */}
             <div className="flex md:hidden items-center px-4 py-5">
                 <h2

@@ -113,12 +113,6 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     }, []);
 
     useEffect(() => {
-        if (isOpen && initialTier) {
-            setSelectedTier(initialTier);
-        }
-    }, [isOpen, initialTier]);
-
-    useEffect(() => {
         if (isOpen) {
             document.body.classList.add('modal-open');
             // Prevent scroll chain and layout shift
@@ -129,18 +123,21 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
         } else {
             document.body.classList.remove('modal-open');
             document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
         }
         return () => {
             document.body.classList.remove('modal-open');
             document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
         };
     }, [isOpen]);
 
-    if (!isOpen || !mounted) return null;
+    // SSR 환경에서 document.body 접근 에러 방지 및 컴포넌트 마운트 확인
+    if (!mounted || !isOpen) return null;
 
     const handleApply = () => {
         // Mock Login Check
-        const isLoggedIn = localStorage.getItem('user_session') || localStorage.getItem('isLoggedIn');
+        const isLoggedIn = !!localStorage.getItem('user_session');
 
         if (!isLoggedIn) {
             if (confirm('광고를 신청하려면 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?')) {
@@ -166,8 +163,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                     fixed bottom-0 md:static
                     max-h-[85dvh] md:max-h-[90vh]
                     ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}
-                    transform-gpu will-change-transform backface-hidden
-                    animate-in slide-in-from-bottom duration-300 md:animate-in md:fade-in md:zoom-in
+                    transform-gpu animate-in slide-in-from-bottom duration-300
                 `}
                 onClick={e => e.stopPropagation()}
             >
@@ -175,8 +171,8 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                 {/* Header - Centered as per user request */}
                 <div className={`p-6 border-b text-center relative shrink-0 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                     <div>
-                        <h2 className={`text-xl md:text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사장님 전용 상품 안내</h2>
-                        <p className="text-xs md:text-sm text-gray-500 mt-2">원하시는 광고 상품을 선택해주세요.</p>
+                        <h2 className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사장님 전용 상품 안내</h2>
+                        <p className="text-xs md:text-sm text-gray-400 mt-2 font-bold">원하시는 광고 상품을 선택해주세요.</p>
                     </div>
                     <button onClick={onClose} className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-black/5 rounded-full transition-colors">
                         <X size={24} className={brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} />

@@ -20,8 +20,7 @@ export const LoginPage = () => {
                 shopId: 'shop_123' // Mock shop ID for testing
             };
             localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('demo_isLoggedIn', 'true'); // Fix for useAuth hook
+            localStorage.setItem('user_session', JSON.stringify(sessionData));
             localStorage.setItem('user_type', 'shop');
 
             alert('업주 관리자로 로그인되었습니다.');
@@ -34,8 +33,7 @@ export const LoginPage = () => {
                 id: 'admin_user'
             };
             localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('demo_isLoggedIn', 'true'); // Fix for useAuth hook
+            localStorage.setItem('user_session', JSON.stringify(sessionData));
             localStorage.setItem('user_type', 'personal');
 
             alert('일반 회원으로 로그인되었습니다.');

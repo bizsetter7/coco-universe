@@ -4,6 +4,7 @@ import "./globals.css";
 import { BrandProvider } from "@/components/BrandProvider";
 import { Suspense } from "react";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +23,7 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-import shopsData from "@/lib/data/shops.json"; // Optimized Loading
-
-// ... imports
+import shopsData from "@/lib/data/shops.json";
 
 export default function RootLayout({
   children,
@@ -32,8 +31,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // [Optimization] Server-side data prep for sidebars
-  // We only need Grand/Premium ads for sidebars. 
-  // Passing only this small subset prevents sending the entire DB to client bundle via LayoutWrapper.
   const grandAds = (shopsData as any[]).filter(s => s.tier === 'grand');
   const premiumAds = (shopsData as any[]).filter(s => s.tier === 'premium' || s.is_premium);
   const sideAds = [...grandAds, ...premiumAds];
@@ -41,17 +38,16 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <BrandProvider>
-            <div className="flex flex-col h-auto">
-              <LayoutWrapper sideAds={sideAds}>
+        <BrandProvider>
+          <ScrollToTop />
+          <div className="flex flex-col h-auto">
+            <LayoutWrapper sideAds={sideAds}>
+              <Suspense fallback={null}>
                 {children}
-              </LayoutWrapper>
-            </div>
-          </BrandProvider>
-        </Suspense>
-    // ...
-
+              </Suspense>
+            </LayoutWrapper>
+          </div>
+        </BrandProvider>
       </body>
     </html>
   );

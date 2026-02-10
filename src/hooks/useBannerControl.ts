@@ -23,9 +23,11 @@ export const useBannerControl = () => {
         // 1. Initial Check
         checkModalState();
 
-        // 2. Mutation Observer to watch for class changes
-        const observer = new MutationObserver((mutations) => {
-            checkModalState();
+        // 2. Mutation Observer with requestAnimationFrame throttling
+        let rafId: number | null = null;
+        const observer = new MutationObserver(() => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(checkModalState);
         });
 
         observer.observe(document.body, {

@@ -55,7 +55,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
             onClick={() => closePopup(false)}
         >
             <div
-                className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300"
+                className="relative w-[90%] max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl transition-transform"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Top Bar for Brand Color */}

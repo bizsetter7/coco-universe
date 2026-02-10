@@ -3,18 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Home, MessageSquare, User, Sparkles, Plus, ChevronDown, ChevronUp } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '../BrandProvider';
 
 // ... imports
 import { PaymentPopup } from '@/components/home/PaymentPopup';
 import { useRouter } from 'next/navigation';
 import { NoteService } from '@/lib/noteService';
+import { useAuth } from '@/hooks/useAuth';
 
 export const MobileBottomNav = () => {
     const pathname = usePathname();
     const brand = useBrand();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -63,12 +65,18 @@ export const MobileBottomNav = () => {
         }
     };
 
+    const { logout } = useAuth();
+
     const handleLogout = () => {
         if (confirm('로그아웃 하시겠습니까?')) {
-            localStorage.clear();
+            logout();
             window.location.href = '/';
         }
     };
+
+    const isRegForm = pathname === '/my-shop' && searchParams.get('view') === 'form';
+
+    if (isRegForm) return null;
 
     return (
         <>
@@ -149,6 +157,7 @@ export const MobileBottomNav = () => {
                                 )
                             }
 
+
                             return (
                                 <Link
                                     key={index}
@@ -170,7 +179,9 @@ export const MobileBottomNav = () => {
                 </div>
             </div>
 
-            <PaymentPopup isOpen={showPaymentPopup} onClose={() => setShowPaymentPopup(false)} />
+            {showPaymentPopup && (
+                <PaymentPopup isOpen={showPaymentPopup} onClose={() => setShowPaymentPopup(false)} />
+            )}
         </>
     );
 };

@@ -86,11 +86,13 @@ export default function HomeClient({ shops }: HomeClientProps) {
             />
 
             {/* Payment Modal */}
-            <PaymentPopup
-                isOpen={showPaymentPopup}
-                onClose={() => setShowPaymentPopup(false)}
-                initialTier={selectedTier}
-            />
+            {showPaymentPopup && (
+                <PaymentPopup
+                    isOpen={showPaymentPopup}
+                    onClose={() => setShowPaymentPopup(false)}
+                    initialTier={selectedTier}
+                />
+            )}
 
             {/* Job Detail Modal */}
             {selectedShop && (

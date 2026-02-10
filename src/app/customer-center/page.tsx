@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useBrand } from '@/components/BrandProvider';
+import { StickyWrapper } from '@/components/ui/StickyWrapper';
 
 import {
     Headphones,
@@ -435,7 +436,7 @@ const ExposureItem = ({ rank, desc, onArrowClick }: { rank: string, desc: string
     );
 };
 
-function CustomerCenterContent() {
+export function CustomerCenterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -454,10 +455,10 @@ function CustomerCenterContent() {
     useEffect(() => {
         if (!isMounted) return;
 
-        const tab = searchParams.get('tab');
+        const tab = searchParams.get('tab') || searchParams.get('page');
         if (tab) {
             let targetTab = '공지사항';
-            if (tab === 'notice') targetTab = '공지사항';
+            if (tab === 'notice' || tab === 'support') targetTab = '공지사항';
             else if (tab === 'ad') targetTab = '광고안내';
             else if (tab === 'guide') targetTab = '이용방법';
             else if (tab === 'faq') targetTab = '자주묻는질문';
@@ -490,13 +491,14 @@ function CustomerCenterContent() {
     usePreventLeave(isDirty);
 
     useEffect(() => {
-        if (selectedImage || isPaymentPopupOpen) {
+        if (selectedImage) {
             document.body.classList.add('modal-open');
         } else {
+            // isPaymentPopupOpen은 PaymentPopup 컴포넌트 내에서 자체적으로 제어하므로 여기서는 무시
             document.body.classList.remove('modal-open');
         }
         return () => document.body.classList.remove('modal-open');
-    }, [selectedImage, isPaymentPopupOpen]);
+    }, [selectedImage]); // isPaymentPopupOpen 의존성 제거
 
     // 탭 변경 시 URL만 변경 (상태는 useEffect가 searchParams를 감지하여 변경함)
     const handleTabChange = (tabName: string) => {
@@ -541,92 +543,60 @@ function CustomerCenterContent() {
 
     return (
         <>
-            {/* [Fixed Mastery] Integrated Sticky Header */}
-            <div className="fixed top-0 z-[10000] w-full border-b bg-white dark:bg-gray-800" style={{ left: '50%', transform: 'translateX(-50%)', opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex', justifyContent: 'center' }}>
-                <div className="w-full max-w-[1440px] mx-auto flex items-center justify-center relative">
-                    <div className={`w-full max-w-[1280px] h-[56px] flex items-center justify-between px-4 md:backdrop-blur-md ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 md:bg-gray-800/95' : 'bg-white border-gray-100 md:bg-white/95'}`} style={{ zIndex: 9999, opacity: 1, visibility: 'visible', overflow: 'visible', display: 'flex' }}>
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => {
-                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
-                                router.back();
-                            }} className="py-2 pr-2 text-gray-800 hover:text-black transition-colors">
-                                <ArrowLeft size={24} />
-                            </button>
-                            <h1
-                                onClick={() => {
-                                    if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
-                                    router.push('/');
-                                }}
-                                className={`text-[17px] md:text-xl font-black flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}
-                            >
-                                <span className="w-5 h-5 bg-pink-600 rounded-md flex items-center justify-center text-[10px] text-white shrink-0">CS</span>
-                                고객지원센터
-                            </h1>
-                        </div>
-                        <div className="flex items-center gap-2">
-
-                            <button onClick={() => {
-                                if (isDirty && !window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) return;
-                                router.push('/');
-                            }} className="py-2 pl-2 text-gray-400 hover:text-gray-900 transition-colors">
-                                <Home size={24} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div className="px-4 pt-6">
-                <div className="flex flex-col md:flex-row gap-8 md:items-start">
+                <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
-                    <aside className="w-full md:w-64 shrink-0 h-fit sticky top-[76px] self-start z-50">
-                        <div className={`rounded-2xl md:rounded-3xl shadow-sm md:border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
-                            {/* PC Title / Mobile Toggle Header */}
-                            <div className={`p-4 md:p-5 border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
-                                <p className={`text-[13px] font-black uppercase tracking-widest hidden md:block ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-400'}`}>Customer Support</p>
-                                {/* Mobile View: Active Tab Display Only */}
-                                <div className="md:hidden flex items-center gap-2 text-sm font-black w-full justify-between">
-                                    <span className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeTab}</span>
+                    <aside className="w-full md:w-64 shrink-0 z-50">
+                        <StickyWrapper offsetTop={80}>
+                            <div className={`rounded-2xl md:rounded-3xl md:border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+                                {/* PC Title / Mobile Toggle Header */}
+                                <div className={`p-4 md:p-5 border-b flex items-center justify-between rounded-t-2xl md:rounded-t-3xl ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
+                                    <p className={`text-[13px] font-black uppercase tracking-widest hidden md:block ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-400'}`}>Customer Support</p>
+                                    {/* Mobile View: Active Tab Display Only */}
+                                    <div className="md:hidden flex items-center gap-2 text-sm font-black w-full justify-between">
+                                        <span className={`${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeTab}</span>
+                                    </div>
                                 </div>
+
+                                {/* Desktop Nav List (Hidden on mobile) */}
+                                <nav className="hidden md:flex flex-col p-2 md:p-0 gap-1 md:gap-0">
+                                    {TABS.map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => handleTabChange(tab.id)}
+                                            className={`w-full flex items-center justify-start gap-3 md:gap-4 px-4 py-3 md:px-6 md:py-5 text-[13px] md:text-sm font-black whitespace-nowrap rounded-lg md:rounded-none md:border-l-4 ${activeTab === tab.id
+                                                ? `bg-pink-50 md:bg-gradient-to-br md:border-pink-500 shadow-sm md:shadow-none ${brand.theme === 'dark' ? 'from-pink-900/20 to-gray-800 text-pink-400 bg-gray-700' : 'from-pink-50 to-white text-pink-600'}`
+                                                : `${brand.theme === 'dark' ? 'bg-transparent text-gray-400 hover:text-white' : 'bg-transparent text-gray-500 hover:text-gray-900'} border-transparent`}`}
+                                        >
+                                            <div className={` ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-300'}`}>
+                                                {tab.icon}
+                                            </div>
+                                            <span>{tab.id}</span>
+                                        </button>
+                                    ))}
+                                </nav>
                             </div>
 
-                            {/* Desktop Nav List (Hidden on mobile) */}
-                            <nav className="hidden md:flex flex-col p-2 md:p-0 gap-1 md:gap-0">
-                                {TABS.map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => handleTabChange(tab.id)}
-                                        className={`w-full flex items-center justify-start gap-3 md:gap-4 px-4 py-3 md:px-6 md:py-5 text-[13px] md:text-sm font-black whitespace-nowrap rounded-lg md:rounded-none md:border-l-4 ${activeTab === tab.id
-                                            ? `bg-pink-50 md:bg-gradient-to-br md:border-pink-500 shadow-sm md:shadow-none ${brand.theme === 'dark' ? 'from-pink-900/20 to-gray-800 text-pink-400 bg-gray-700' : 'from-pink-50 to-white text-pink-600'}`
-                                            : `${brand.theme === 'dark' ? 'bg-transparent text-gray-400 hover:text-white' : 'bg-transparent text-gray-500 hover:text-gray-900'} border-transparent`}`}
-                                    >
-                                        <div className={` ${activeTab === tab.id ? 'text-pink-600' : 'text-gray-300'}`}>
-                                            {tab.icon}
-                                        </div>
-                                        <span>{tab.id}</span>
-                                    </button>
-                                ))}
-                            </nav>
-                        </div>
-
-                        {/* Customer Service Box (Desktop Only - Mobile version could be added if requested, but for now kept desktop only as per existing logic, but made sure it's inside the sticky aside) */}
-                        <div className={`hidden md:block mt-1 p-5 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'} shadow-xl`}>
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
-                                    <PhoneCall size={20} />
+                            {/* Customer Service Box (Desktop Only - Mobile version could be added if requested, but for now kept desktop only as per existing logic, but made sure it's inside the sticky aside) */}
+                            <div className={`hidden md:block mt-1 p-5 rounded-[32px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 shadow-pink-900/10' : 'bg-white border-gray-100 shadow-pink-100/10'} shadow-xl`}>
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg bg-pink-600">
+                                        <PhoneCall size={20} />
+                                    </div>
+                                    <span className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
                                 </div>
-                                <span className={`font-black text-lg ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>고객센터</span>
+                                <p className={`text-3xl font-black mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
+                                <p className={`text-[13px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
+                                    평일 09:30 ~ 19:00<br />
+                                    점심 12:00 ~ 13:30<br />
+                                    <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무</span>
+                                </p>
+                                <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg">
+                                    <MessageCircle size={18} /> 텔레그렘 실시간 상담
+                                </a>
                             </div>
-                            <p className={`text-3xl font-black mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1544-5568</p>
-                            <p className={`text-[13px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
-                                평일 09:30 ~ 19:00<br />
-                                점심 12:00 ~ 13:30<br />
-                                <span className="text-pink-600 font-black mt-1 block">공휴일 / 주말 휴무</span>
-                            </p>
-                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg">
-                                <MessageCircle size={18} /> 텔레그렘 실시간 상담
-                            </a>
-                        </div>
+                        </StickyWrapper>
                     </aside>
 
                     {/* Content Area */}
@@ -704,7 +674,14 @@ function CustomerCenterContent() {
 
                                     <div ref={scrollContainerRef} className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-hidden -mx-5 px-5 md:mx-0 md:px-0 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide scroll-smooth">
                                         {AD_TIERS.map((tier) => (
-                                            <div key={tier.id} className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}>
+                                            <div
+                                                key={tier.id}
+                                                onClick={() => {
+                                                    setPaymentInitialTier(tier.id);
+                                                    setIsPaymentPopupOpen(true);
+                                                }}
+                                                className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 cursor-pointer snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}
+                                            >
                                                 <div className="flex items-center justify-between mb-5 md:mb-6">
                                                     <div className={`p-4 md:p-4 rounded-2xl shadow-inner text-pink-600 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-pink-50'}`}>
                                                         {React.cloneElement(tier.icon as React.ReactElement<{ size?: number }>, { size: 24 })}
@@ -724,7 +701,6 @@ function CustomerCenterContent() {
                                                 </div>
 
                                                 <button
-                                                    onClick={() => { setIsPaymentPopupOpen(true); setPaymentInitialTier(tier.id); }}
                                                     className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}
                                                 >
                                                     신청하기
@@ -856,7 +832,7 @@ function CustomerCenterContent() {
                                                     </button>
 
                                                     {activeAccordion === item.id && (
-                                                        <div className="p-4 animate-in slide-in-from-top-4 duration-300">
+                                                        <div className="p-4">
                                                             <div
                                                                 className={`relative cursor-pointer overflow-hidden rounded-xl border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'} ${item.isMobile ? 'max-w-[180px] mx-auto aspect-[9/16]' : 'aspect-[16/10]'}`}
                                                                 onClick={() => setSelectedImage(item.img)}
@@ -1151,7 +1127,10 @@ function CustomerCenterContent() {
                                         ].map((row, i) => (
                                             <div
                                                 key={i}
-                                                onClick={() => { setIsPaymentPopupOpen(true); setPaymentInitialTier(row.tier); }}
+                                                onClick={() => {
+                                                    setPaymentInitialTier(row.tier);
+                                                    setIsPaymentPopupOpen(true);
+                                                }}
                                                 className={`p-3 md:p-6 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}
                                             >
                                                 <div className="space-y-2.5">
@@ -1506,11 +1485,13 @@ function CustomerCenterContent() {
                 </div>
 
                 {/* [Modal] 사장님 전용 상품 안내 (PaymentPopup) */}
-                <PaymentPopup
-                    isOpen={isPaymentPopupOpen}
-                    onClose={() => setIsPaymentPopupOpen(false)}
-                    initialTier={paymentInitialTier}
-                />
+                {isPaymentPopupOpen && (
+                    <PaymentPopup
+                        isOpen={isPaymentPopupOpen}
+                        onClose={() => setIsPaymentPopupOpen(false)}
+                        initialTier={paymentInitialTier}
+                    />
+                )}
 
                 {selectedImage && createPortal(
                     <div className="fixed inset-0 z-[20000] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
@@ -1542,7 +1523,7 @@ function CustomerCenterContent() {
                 {/* Deployment Verification Tag */}
                 <div data-deploy-version="2026-02-04-02:40" style={{ display: 'none' }}></div>
 
-            </div>
+            </div >
 
 
         </>

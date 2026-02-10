@@ -12,6 +12,7 @@ import { PaymentPopup } from '@/components/home/PaymentPopup';
 // Types & Data
 import { Shop } from '@/types/shop';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
@@ -23,6 +24,7 @@ interface RegionClientProps {
 export default function RegionClient({ shops }: RegionClientProps) {
     const brand = useBrand();
     const router = useRouter();
+    const { isLoggedIn, userType, userName, userPoints } = useAuth();
 
     // -- State --
     const [selectedRegion, setSelectedRegion] = useState('전체');
@@ -94,6 +96,10 @@ export default function RegionClient({ shops }: RegionClientProps) {
                         onLoginClick={() => router.push('/?page=login')}
                         onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={openPaymentPopup}
+                        isLoggedIn={isLoggedIn}
+                        userType={userType}
+                        userName={userName}
+                        userPoints={userPoints}
                     />
                 }>
                     {/* Unified Listing Content with Ad Grid Injected */}
@@ -145,11 +151,13 @@ export default function RegionClient({ shops }: RegionClientProps) {
                 />
             )}
 
-            <PaymentPopup
-                isOpen={showPaymentPopup}
-                onClose={() => setShowPaymentPopup(false)}
-                initialTier={selectedTier}
-            />
+            {showPaymentPopup && (
+                <PaymentPopup
+                    isOpen={showPaymentPopup}
+                    onClose={() => setShowPaymentPopup(false)}
+                    initialTier={selectedTier}
+                />
+            )}
         </div>
     );
 }

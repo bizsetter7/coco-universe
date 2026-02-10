@@ -126,7 +126,7 @@ export default function MessageModal({ isOpen, onClose, userRole, initialReceive
     return createPortal(
         <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
             {/* Main Container */}
-            <div className="w-full sm:w-[95%] max-w-[850px] h-full sm:h-[650px] bg-white rounded-none sm:rounded-lg shadow-xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 relative">
+            <div className="w-full sm:w-[95%] max-w-[850px] h-full sm:h-[650px] bg-white rounded-none sm:rounded-lg shadow-xl flex flex-col overflow-hidden relative transition-transform">
 
                 {/* Header (Gray bg, with Close Button inside) */}
                 <div className="h-[45px] sm:h-[50px] bg-gray-50 flex items-center justify-between px-0 border-b border-gray-200 shrink-0 relative">

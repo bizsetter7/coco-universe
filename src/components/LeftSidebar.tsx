@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useBrand } from '@/components/BrandProvider';
 import {
-    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText
+    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText, ChevronDown
 } from 'lucide-react';
 
 interface LeftSidebarProps {
@@ -41,6 +42,8 @@ const CATEGORY_LINKS = [
     { icon: FileText, label: '베이직(줄광고)', color: 'text-gray-500', tier: 'basic' },
 ];
 
+import { useAuth } from '@/hooks/useAuth';
+
 export default function LeftSidebar({
     selectedRegion,
     setSelectedRegion,
@@ -50,13 +53,49 @@ export default function LeftSidebar({
     onLoginClick,
     onSignupClick,
     onPaymentClick,
-    isLoggedIn = false,
-    userName = '케이(K)',
-    userType = 'corporate',
-    userPoints = 0,
+    isLoggedIn: propIsLoggedIn,
+    userName: propUserName,
+    userType: propUserType,
+    userPoints: propUserPoints,
 }: LeftSidebarProps) {
     const brand = useBrand();
+    const router = useRouter();
+    const { isLoggedIn: authIsLoggedIn, userName: authUserName, userType: authUserType, userPoints: authUserPoints, logout, login: authLogin } = useAuth();
     const [selectedKeywords, setSelectedKeywords] = React.useState<string[]>([]);
+    const [isLoginOpen, setIsLoginOpen] = React.useState(false);
+    const [isRegionOpen, setIsRegionOpen] = React.useState(false);
+    const [isJobTypeOpen, setIsJobTypeOpen] = React.useState(false);
+    const [isKeywordOpen, setIsKeywordOpen] = React.useState(false);
+    const [isAdProductOpen, setIsAdProductOpen] = React.useState(false);
+
+    // Login Form State
+    const [loginId, setLoginId] = React.useState('');
+    const [loginPw, setLoginPw] = React.useState('');
+
+    // Use auth hook values for better sync across pages if props are not explicitly updated
+    const isLoggedIn = propIsLoggedIn ?? authIsLoggedIn;
+    const userName = propUserName ?? authUserName;
+    const userType = propUserType ?? authUserType;
+    const userPoints = propUserPoints ?? authUserPoints;
+
+    const handleLogin = () => {
+        if (!loginId || !loginPw) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+        // Demo login logic: if ID includes 'shop', login as corporate
+        const type = loginId.includes('shop') ? 'shop' : 'personal';
+        authLogin(type);
+        setIsLoginOpen(false);
+        setLoginId('');
+        setLoginPw('');
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
+    };
 
     const toggleKeyword = (kw: string) => {
         if (selectedKeywords.includes(kw)) {
@@ -72,62 +111,91 @@ export default function LeftSidebar({
 
 
     return (
-        <div className="hidden lg:block w-full flex-shrink-0 space-y-4">
+        <div className="hidden lg:block w-full flex-shrink-0 space-y-2">
             {/* 1. MEMBER LOGIN / 로그인 상태 박스 */}
-            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                {isLoggedIn ? (
-                    <>
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
-                                <User size={16} className="text-gray-500" />
+            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div
+                    className="flex items-center justify-between cursor-pointer group"
+                    onClick={() => setIsLoginOpen(!isLoginOpen)}
+                >
+                    <h4 className={`text-xs font-black uppercase tracking-wider ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {isLoggedIn ? 'MEMBER INFO' : 'MEMBER LOGIN'}
+                    </h4>
+                    <ChevronDown
+                        size={14}
+                        className={`text-gray-400 group-hover:text-purple-500 transition-transform duration-300 ${isLoginOpen ? 'rotate-0' : '-rotate-90'}`}
+                    />
+                </div>
+
+                <div className={`transition-all duration-300 overflow-hidden ${isLoginOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    {isLoggedIn ? (
+                        <>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
+                                    <User size={16} className="text-gray-500" />
+                                </div>
+                                <div>
+                                    <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                                        {userName} 님 <span className="text-gray-400">☆</span>
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                                    {userName} 님 <span className="text-gray-400">☆</span> [1]
-                                </p>
+                            <p className="text-[11px] text-gray-500 mb-2 text-center">
+                                회원님은 <span className="text-purple-600 font-bold">{userType === 'corporate' ? '기업회원' : '일반회원'}</span> 입니다.
+                            </p>
+                            <div className={`flex items-center gap-1 mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <span className="text-[11px] text-gray-500">P</span>
+                                <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userPoints.toLocaleString()}</span>
                             </div>
-                        </div>
-                        <p className="text-[11px] text-gray-500 mb-2 text-center">
-                            회원님은 <span className="text-purple-600 font-bold">{userType === 'corporate' ? '기업회원' : '일반회원'}</span> 입니다.
-                        </p>
-                        <div className={`flex items-center gap-1 mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                            <span className="text-[11px] text-gray-500">P</span>
-                            <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userPoints.toLocaleString()}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-1">
-                            <button className="py-2 bg-purple-100 text-purple-600 rounded text-[10px] font-bold hover:bg-purple-200 transition">마이페이지</button>
-                            <button className={`py-2 rounded text-[10px] font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>회원수정</button>
-                            <button className={`py-2 rounded text-[10px] font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>로그아웃</button>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <h4 className={`text-xs font-black mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>MEMBER LOGIN</h4>
-                        <div className="space-y-2">
-                            <input
-                                type="text"
-                                placeholder="ID"
-                                className={`w-full px-3 py-2 rounded-lg text-xs border ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-gray-50 border-gray-200 text-black placeholder-gray-400'}`}
-                            />
-                            <input
-                                type="password"
-                                placeholder="PASSWORD"
-                                className={`w-full px-3 py-2 rounded-lg text-xs border ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-gray-50 border-gray-200 text-black placeholder-gray-400'}`}
-                            />
-                            <button
-                                onClick={onLoginClick}
-                                className="w-full py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 transition"
-                            >
-                                로그인
-                            </button>
-                        </div>
-                        <div className="flex justify-center gap-2 mt-3 text-[10px] text-gray-500">
-                            <button onClick={onSignupClick} className="hover:text-pink-600 transition">회원가입</button>
-                            <span>|</span>
-                            <button className="hover:text-pink-600 transition">아이디/패스워드 찾기</button>
-                        </div>
-                    </>
-                )}
+                            <div className="grid grid-cols-2 gap-1">
+                                <button
+                                    onClick={() => { setIsLoginOpen(false); router.push('/my-shop'); }}
+                                    className="py-2 bg-purple-100 text-purple-600 rounded text-[10px] font-bold hover:bg-purple-200 transition"
+                                >
+                                    마이페이지
+                                </button>
+                                <button
+                                    onClick={() => { setIsLoginOpen(false); logout(); }}
+                                    className={`py-2 rounded text-[10px] font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                >
+                                    로그아웃
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="space-y-2">
+                                <input
+                                    type="text"
+                                    placeholder="ID"
+                                    value={loginId}
+                                    onChange={(e) => setLoginId(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    className={`w-full px-3 py-2 rounded-lg text-xs border ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-gray-50 border-gray-200 text-black placeholder-gray-400'}`}
+                                />
+                                <input
+                                    type="password"
+                                    placeholder="PASSWORD"
+                                    value={loginPw}
+                                    onChange={(e) => setLoginPw(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    className={`w-full px-3 py-2 rounded-lg text-xs border ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-gray-50 border-gray-200 text-black placeholder-gray-400'}`}
+                                />
+                                <button
+                                    onClick={handleLogin}
+                                    className="w-full py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 transition"
+                                >
+                                    로그인
+                                </button>
+                            </div>
+                            <div className="flex justify-center gap-2 mt-3 text-[10px] text-gray-500">
+                                <button onClick={() => { setIsLoginOpen(false); router.push('/?page=signup'); }} className="hover:text-pink-600 transition">회원가입</button>
+                                <span>|</span>
+                                <button onClick={() => setIsLoginOpen(false)} className="hover:text-pink-600 transition">아이디/패스워드 찾기</button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* 2. 광고 배너 슬롯 */}
@@ -139,15 +207,29 @@ export default function LeftSidebar({
             </div>
 
             {/* 3. 지역별 채용정보 */}
-            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <h4 className={`text-sm font-black mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                    <span className="text-purple-600">지역별</span> 채용정보
-                </h4>
-                <div className="grid grid-cols-4 gap-1">
+            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div
+                    className="flex items-center justify-between cursor-pointer group mb-1"
+                    onClick={() => setIsRegionOpen(!isRegionOpen)}
+                >
+                    <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                        <span className="text-purple-600">지역별</span> 채용정보
+                    </h4>
+                    <ChevronDown
+                        size={14}
+                        className={`text-gray-400 group-hover:text-purple-500 transition-transform duration-300 ${isRegionOpen ? 'rotate-0' : '-rotate-90'}`}
+                    />
+                </div>
+
+                <div className={`grid grid-cols-5 gap-1 transition-all duration-300 overflow-hidden ${isRegionOpen ? 'max-h-[500px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {REGION_BUTTONS.map((reg) => (
                         <button
                             key={reg}
-                            onClick={() => { setSelectedRegion(reg); setSelectedSubRegion('전체'); }}
+                            onClick={() => {
+                                setSelectedRegion(reg);
+                                setSelectedSubRegion('전체');
+                                setIsRegionOpen(false); // Auto-close after selection
+                            }}
                             className={`px-1 py-1.5 rounded text-[10px] font-bold transition ${selectedRegion === reg
                                 ? 'bg-purple-600 text-white'
                                 : brand.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
@@ -160,15 +242,28 @@ export default function LeftSidebar({
             </div>
 
             {/* 4. 업직종별 채용정보 */}
-            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <h4 className={`text-sm font-black mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                    <span className="text-purple-600">업직종별</span> 채용정보
-                </h4>
-                <div className="grid grid-cols-2 gap-1.5">
+            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div
+                    className="flex items-center justify-between cursor-pointer group mb-1"
+                    onClick={() => setIsJobTypeOpen(!isJobTypeOpen)}
+                >
+                    <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                        <span className="text-purple-600">업직종별</span> 채용정보
+                    </h4>
+                    <ChevronDown
+                        size={14}
+                        className={`text-gray-400 group-hover:text-purple-500 transition-transform duration-300 ${isJobTypeOpen ? 'rotate-0' : '-rotate-90'}`}
+                    />
+                </div>
+
+                <div className={`grid grid-cols-2 gap-1.5 transition-all duration-300 overflow-hidden ${isJobTypeOpen ? 'max-h-[500px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {JOB_TYPE_BUTTONS.map((job) => (
                         <button
                             key={job}
-                            onClick={() => setSelectedJobType(job)}
+                            onClick={() => {
+                                setSelectedJobType(job);
+                                setIsJobTypeOpen(false); // Auto-close after selection
+                            }}
                             className={`px-2 py-1.5 rounded text-[10px] font-bold transition ${selectedJobType === job
                                 ? 'bg-purple-600 text-white'
                                 : brand.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
@@ -183,16 +278,26 @@ export default function LeftSidebar({
 
 
             {/* 5. 편의사항/키워드 (최대 5개 선택 -> Expanded List) */}
-            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <div className="flex items-center justify-between mb-3">
+            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div
+                    className="flex items-center justify-between cursor-pointer group mb-1"
+                    onClick={() => setIsKeywordOpen(!isKeywordOpen)}
+                >
                     <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                         <span className="text-purple-600">편의사항</span> 키워드
                     </h4>
-                    <span className="text-[10px] text-gray-500">
-                        {selectedKeywords.length}/5
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-500">
+                            {selectedKeywords.length}/5
+                        </span>
+                        <ChevronDown
+                            size={14}
+                            className={`text-gray-400 group-hover:text-purple-500 transition-transform duration-300 ${isKeywordOpen ? 'rotate-0' : '-rotate-90'}`}
+                        />
+                    </div>
                 </div>
-                <div className="flex flex-wrap gap-1 max-h-[200px] overflow-y-auto custom-scrollbar">
+
+                <div className={`flex flex-wrap gap-1 transition-all duration-300 overflow-hidden ${isKeywordOpen ? 'max-h-[300px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {SIDEBAR_KEYWORDS.map((kw) => {
                         const isSelected = selectedKeywords.includes(kw);
                         return (
@@ -215,51 +320,43 @@ export default function LeftSidebar({
 
             {/* 6. 카테고리 링크 + 광고신청 */}
             <div className={`rounded-xl border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                {CATEGORY_LINKS.map((cat, idx) => (
-                    <div
-                        key={idx}
-                        className={`flex items-center justify-between px-3 py-2.5 border-b last:border-b-0 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}
-                    >
-                        <div className="flex items-center gap-2">
-                            <cat.icon size={14} className={cat.color} />
-                            <span className={`text-[11px] font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-black'}`}>{cat.label}</span>
-                        </div>
-                        <button
-                            onClick={() => onPaymentClick(cat.tier)}
-                            className="px-2 py-1 bg-gray-100 hover:bg-pink-100 text-gray-500 hover:text-pink-600 rounded text-[9px] font-bold transition"
+                <div
+                    className="flex items-center justify-between px-4 py-2.5 cursor-pointer group"
+                    onClick={() => setIsAdProductOpen(!isAdProductOpen)}
+                >
+                    <h4 className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                        <span className="text-purple-600">광고상품</span> 바로가기
+                    </h4>
+                    <ChevronDown
+                        size={14}
+                        className={`text-gray-400 group-hover:text-purple-500 transition-transform duration-300 ${isAdProductOpen ? 'rotate-0' : '-rotate-90'}`}
+                    />
+                </div>
+
+                <div className={`transition-all duration-300 overflow-hidden ${isAdProductOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                    {CATEGORY_LINKS.map((cat, idx) => (
+                        <div
+                            key={idx}
+                            className={`flex items-center justify-between px-3 py-2.5 border-t ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}
                         >
-                            광고신청
-                        </button>
-                    </div>
-                ))}
+                            <div className="flex items-center gap-2">
+                                <cat.icon size={14} className={cat.color} />
+                                <span className={`text-[11px] font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-black'}`}>{cat.label}</span>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setIsAdProductOpen(false); // Can auto-close on click
+                                    onPaymentClick(cat.tier);
+                                }}
+                                className="px-2 py-1 bg-gray-100 hover:bg-pink-100 text-gray-500 hover:text-pink-600 rounded text-[9px] font-bold transition"
+                            >
+                                광고신청
+                            </button>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* 7. 고객지원센터 */}
-            <div className={`p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                <div className="flex items-center justify-between mb-3">
-                    <h4 className={`text-xs font-black flex items-center gap-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
-                        <Phone size={12} />
-                        고객지원센터
-                    </h4>
-                    <button className="text-[10px] text-gray-400 hover:text-pink-600 flex items-center gap-0.5 transition">
-                        MORE <ChevronRight size={10} />
-                    </button>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-xs font-black text-black">
-                        TALK
-                    </div>
-                    <div>
-                        <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>CocoAlba</p>
-                        <p className="text-lg font-black text-purple-600">1544-5568</p>
-                    </div>
-                </div>
-                <p className="text-[9px] text-gray-500 mb-2">평일 09:30~19:00 점심 12:00~13:30<br />*공휴일 토,일은 근무하지 않습니다.</p>
-                <div className="flex gap-2 text-[10px]">
-                    <button className={`hover:text-pink-600 transition ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>➤ FAQ 도움말</button>
-                    <button className={`hover:text-pink-600 transition ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>➤ 광고문의 & 일반문의</button>
-                </div>
-            </div>
 
             {/* 8. 광고 슬롯 1 */}
             <div className="h-[200px] rounded-xl bg-gradient-to-b from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg overflow-hidden">
@@ -281,6 +378,46 @@ export default function LeftSidebar({
                     <p className="text-lg font-bold mt-1">순수테이블</p>
                     <p className="text-sm font-bold">2시간 40만원</p>
                     <p className="text-xs mt-2 opacity-90">지원금 지원<br />당일지급<br />뮤초진행</p>
+                </div>
+            </div>
+
+            {/* 7. 고객지원센터 (최하단 이동) */}
+            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className="flex items-center justify-between mb-3">
+                    <h4 className={`text-xs font-black flex items-center gap-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                        <Phone size={12} />
+                        고객지원센터
+                    </h4>
+                    <button
+                        onClick={() => router.push('/?page=support')}
+                        className="text-[10px] text-gray-400 hover:text-purple-600 flex items-center gap-0.5 transition"
+                    >
+                        MORE <ChevronRight size={10} />
+                    </button>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-xs font-black text-black">
+                        TALK
+                    </div>
+                    <div>
+                        <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>CocoAlba</p>
+                        <p className="text-lg font-black text-purple-600">1544-5568</p>
+                    </div>
+                </div>
+                <p className="text-[9px] text-gray-500 mb-2">평일 09:30~19:00 점심 12:00~13:30<br />*공휴일 토,일은 근무하지 않습니다.</p>
+                <div className="flex gap-2 text-[10px]">
+                    <button
+                        onClick={() => router.push('/?page=faq')}
+                        className={`hover:text-purple-600 transition ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-50'}`}
+                    >
+                        ➤ FAQ 도움말
+                    </button>
+                    <button
+                        onClick={() => router.push('/?page=inquiry')}
+                        className={`hover:text-purple-600 transition ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-50'}`}
+                    >
+                        ➤ 광고문의 & 일반문의
+                    </button>
                 </div>
             </div>
         </div >

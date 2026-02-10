@@ -5,20 +5,20 @@ export const PAY_SUFFIX_OPTIONS = [
     '대학생알바', '지명우대', '친구동반우대', '가족같은분위기',
     '밀방없음', '뒷방없음', '칼퇴보장', '텃세없음', '당일지급', '면접비지원',
     '회식활발', '출퇴근자유', '홀복지원', '해외여행지원', 'BJ알바',
-    '숙식제공', '식사제공', '교통비지원', '인센티브', '남자실장', '여자실장'
+    '숙식제공', '식사제공', '교통비지원', '인센티브', '인플루언서', '남자실장', '여자실장'
 ];
 
 export const CONVENIENCE_KEYWORDS = [
     '초보가능', '당일지급', '당일알바', '평일알바', '주말알바', '주간알바', '초이스없음', '20대알바', '30대알바', '40대알바',
     '밤알바', '유흥알바', '투잡알바', '야간알바', '단기알바', '경력우대', '파트타임', '여성알바', '여자알바',
-    '모델알바', '인플루언서', '룸알바', '보도알바', '고수익', '고액알바'
+    '모델알바', '룸알바', '보도알바', '고수익', '고액알바'
 ];
 
 export const SIDEBAR_KEYWORDS = Array.from(new Set([...PAY_SUFFIX_OPTIONS, ...CONVENIENCE_KEYWORDS]));
 
 export const AGES = Array.from({ length: 50 }, (_, i) => i + 20); // 20세~69세
 
-export const FONTS = ['Pretendard', 'GmarketSans', 'ChosunB', 'ChosunKg', 'PyeongChangPeace'];
+export const FONTS = ['Pretendard', 'Nanum Gothic', 'Nanum Myeongjo', 'Hahmlet', 'Gowun Batang', 'Arial', 'system-ui'];
 export const FONT_SIZES = ['12px', '14px', '16px', '18px', '20px', '24px', '30px'];
 
 export const TEXT_COLORS = [
