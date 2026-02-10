@@ -870,7 +870,7 @@ export const ResumeForm = ({ setView }: { setView: (v: any) => void }) => {
 
 // --- Business Sub-Views ---
 
-export const OngoingAdsView = ({ setView, ads = [] }: { setView: (v: any) => void, ads?: any[] }) => {
+export const OngoingAdsView = ({ setView, ads = [], userName = '' }: { setView: (v: any) => void, ads?: any[], userName?: string }) => {
     const brand = useBrand();
     return (
         <div className="space-y-6">
@@ -881,44 +881,56 @@ export const OngoingAdsView = ({ setView, ads = [] }: { setView: (v: any) => voi
                 <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
                     <User size={20} />
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">김대순 <span className="text-gray-400 not-italic font-sans">회원 님의 진행중인 채용정보</span></h2>
+                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원 님의 진행중인 채용정보</span></h2>
             </div>
 
-            {ads.length === 0 ? (
-                <div className="min-h-[400px] flex flex-col items-center justify-center border-t border-gray-900 pt-20">
-                    <p className="text-gray-900 font-bold text-lg">등록중인 구인정보가 없습니다.</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {/* Map through ads later */}
-                </div>
-            )}
+            <div className="border-t border-gray-900 pt-10">
+                {ads.length === 0 ? (
+                    <div className="min-h-[300px] flex flex-col items-center justify-center">
+                        <p className="text-gray-900 font-bold text-lg">등록중인 구인정보가 없습니다.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {ads.map((ad: any) => (
+                            <div key={ad.id} className="bg-white border border-gray-200 rounded-sm overflow-hidden relative shadow-sm">
+                                <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex gap-4 text-[13px] font-bold text-gray-500">
+                                        <span>등록일 <span className="ml-2 font-mono text-pink-500">{ad.updateDate || '-'}</span></span>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">수정</button>
+                                        <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">마감</button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 space-y-3">
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 제목</span>
+                                        <h3 className="text-gray-900 font-bold text-[15px] underline underline-offset-4 cursor-pointer">{ad.title}</h3>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 직종</span>
+                                        <span className="text-gray-600 font-bold text-[13px]">{ad.category || '-'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 p-2 flex items-center gap-3 border-t border-gray-100 px-4">
+                                    <button className="bg-gray-800 text-white px-3 py-1 text-[11px] font-bold rounded-sm shadow-inner">온라인 인재관리</button>
+                                    <div className="flex gap-4 text-[12px] font-bold text-gray-600">
+                                        <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 총지원자 [ {ad.applicantCount || 0}명 ]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
 
-export const ClosedAdsView = ({ setView, ads = [] }: { setView: (v: any) => void, ads?: any[] }) => {
+export const ClosedAdsView = ({ setView, ads = [], userName = '' }: { setView: (v: any) => void, ads?: any[], userName?: string }) => {
     const brand = useBrand();
-    const mockAds = ads.length > 0 ? ads : [
-        {
-            id: 27639,
-            title: '▶돈? 꾸준히 출근만해줘, 돈은 오빠가 보장할게!◀',
-            nickname: '케이(K)',
-            category: '노래주점 / 아가씨',
-            keywords: ['주말알바', '경력우대', '당일지급', '초보가능', '투잡알바'],
-            updateDate: '2022-07-15',
-            closeDate: '2022-08-16',
-        },
-        {
-            id: 28374,
-            title: '돈? 꾸준히 출근만해줘, 돈은 오빠가 보장할게!!!',
-            nickname: '케이(K)',
-            category: '노래주점 / 아가씨',
-            keywords: ['주말알바', '경력우대', '당일지급', '초보가능', '투잡알바'],
-            updateDate: '2022-05-28',
-            closeDate: '2022-05-28',
-        }
-    ];
 
     return (
         <div className="space-y-6">
@@ -929,73 +941,76 @@ export const ClosedAdsView = ({ setView, ads = [] }: { setView: (v: any) => void
                 <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
                     <User size={20} />
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">김대순 <span className="text-gray-400 not-italic font-sans">회원 님의 마감된 채용정보</span></h2>
+                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원 님의 마감된 채용정보</span></h2>
             </div>
 
-            <div className="space-y-8 border-t border-gray-200">
-                {mockAds.map(ad => (
-                    <div key={ad.id} className="bg-[#f8f8f8] border border-gray-200 rounded-sm overflow-hidden relative mt-8">
-                        <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
-                            <div className="absolute top-2 right-[-20px] w-20 h-6 bg-gray-500 text-white text-[10px] font-bold flex items-center justify-center transform rotate-45 uppercase">End</div>
-                        </div>
-
-                        <div className="p-4 md:p-6 bg-white border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div className="flex gap-4 text-[13px] font-bold text-gray-500">
-                                <span>최종 수정일 <span className="ml-2 font-mono">{ad.updateDate}</span></span>
-                                <span>마감일 <span className="ml-2 font-mono">{ad.closeDate}</span></span>
-                            </div>
-                            <div className="flex gap-1">
-                                <button className="px-5 py-1.5 bg-[#00d1b2] text-white text-[13px] font-bold rounded flex items-center gap-1 shadow-sm">
-                                    <span className="bg-yellow-300 text-black px-1 rounded-sm text-[10px]">!</span> 광고연장
-                                </button>
-                                <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">수정</button>
-                                <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">마감</button>
-                                <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">삭제</button>
-                            </div>
-                        </div>
-
-                        <div className="p-6 space-y-3">
-                            <div className="flex items-start gap-4">
-                                <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 제목</span>
-                                <h3 className="text-gray-800 font-bold text-[15px] underline underline-offset-4 cursor-pointer">{ad.title}</h3>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 닉네임</span>
-                                <span className="text-gray-600 font-bold text-[13px]">{ad.nickname}</span>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 직종</span>
-                                <span className="text-gray-600 font-bold text-[13px]">1차 직종 : {ad.category}</span>
-                            </div>
-                            <div className="flex items-start gap-4">
-                                <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 키워드</span>
-                                <span className="text-gray-400 font-bold text-[13px]">{ad.keywords.join(', ')}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-[#eee] p-2 flex items-center gap-3 border-t border-gray-200 px-4">
-                            <button className="bg-gray-700 text-white px-3 py-1 text-[11px] font-bold rounded-sm border border-black shadow-inner">온라인 인재관리</button>
-                            <div className="flex gap-4 text-[12px] font-bold text-gray-600">
-                                <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 총지원자 [ 0명 ]</span>
-                                <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 미열람 [ 0명 ]</span>
-                                <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 인재스크랩 [ 0명 ]</span>
-                                <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 예비합격자 [ 0명 ]</span>
-                            </div>
-                        </div>
+            <div className="border-t border-gray-900 pt-10">
+                {ads.length === 0 ? (
+                    <div className="min-h-[300px] flex flex-col items-center justify-center">
+                        <p className="text-gray-900 font-bold text-lg">마감된 구인정보가 없습니다.</p>
                     </div>
-                ))}
+                ) : (
+                    <div className="space-y-8">
+                        {ads.map((ad: any) => (
+                            <div key={ad.id} className="bg-[#f8f8f8] border border-gray-200 rounded-sm overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden pointer-events-none">
+                                    <div className="absolute top-2 right-[-20px] w-20 h-6 bg-gray-500 text-white text-[10px] font-bold flex items-center justify-center transform rotate-45 uppercase">End</div>
+                                </div>
+
+                                <div className="p-4 md:p-6 bg-white border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex gap-4 text-[13px] font-bold text-gray-500">
+                                        <span>최종 수정일 <span className="ml-2 font-mono">{ad.updateDate || '-'}</span></span>
+                                        <span>마감일 <span className="ml-2 font-mono">{ad.closeDate || '-'}</span></span>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button className="px-5 py-1.5 bg-[#00d1b2] text-white text-[13px] font-bold rounded flex items-center gap-1 shadow-sm">
+                                            <span className="bg-yellow-300 text-black px-1 rounded-sm text-[10px]">!</span> 광고연장
+                                        </button>
+                                        <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">수정</button>
+                                        <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">마감</button>
+                                        <button className="px-5 py-1.5 bg-gray-100 border border-gray-200 text-gray-700 text-[13px] font-bold rounded hover:bg-gray-200 transition">삭제</button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 space-y-3">
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 제목</span>
+                                        <h3 className="text-gray-800 font-bold text-[15px] underline underline-offset-4 cursor-pointer">{ad.title}</h3>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 닉네임</span>
+                                        <span className="text-gray-600 font-bold text-[13px]">{ad.nickname || userName}</span>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 직종</span>
+                                        <span className="text-gray-600 font-bold text-[13px]">1차 직종 : {ad.category || '-'}</span>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <span className="w-16 shrink-0 text-sm font-black text-gray-400 flex items-center gap-1 uppercase tracking-tighter">◆ 키워드</span>
+                                        <span className="text-gray-400 font-bold text-[13px]">{ad.keywords?.join(', ') || '-'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-[#eee] p-2 flex items-center gap-3 border-t border-gray-200 px-4">
+                                    <button className="bg-gray-700 text-white px-3 py-1 text-[11px] font-bold rounded-sm border border-black shadow-inner">온라인 인재관리</button>
+                                    <div className="flex gap-4 text-[12px] font-bold text-gray-600">
+                                        <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 총지원자 [ {ad.applicantCount || 0}명 ]</span>
+                                        <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 미열람 [ {ad.unreadCount || 0}명 ]</span>
+                                        <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 인재스크랩 [ {ad.scrapCount || 0}명 ]</span>
+                                        <span className="flex items-center gap-1"><User size={12} className="text-gray-400" /> 예비합격자 [ {ad.prePassCount || 0}명 ]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-export const PaymentsView = ({ setView, payments = [] }: { setView: (v: any) => void, payments?: any[] }) => {
+export const PaymentsView = ({ setView, payments = [], userName = '' }: { setView: (v: any) => void, payments?: any[], userName?: string }) => {
     const brand = useBrand();
-    const mockPayments = payments.length > 0 ? payments : [
-        { id: 75699, type: '줄광고', desc: '90일(기간별) 170,000원', price: '170,000원', method: '무통장입금\n중소기업은행\n13700016197512', nickname: '케이(K)', date: '2022-05-18 03:23:34', status: '입금확인됨' },
-        { id: 73920, type: '줄광고', desc: '30일(기간별) 70,000원', price: '70,000원', method: '무통장입금\n국민은행\n87039012536988', nickname: '케이(K)', date: '2022-04-01 17:09:50', status: '입금확인됨' },
-        { id: 73266, type: '줄광고', desc: '30일(기간별) 70,000원', price: '70,000원', method: '무통장입금\n중소기업은행\n13700017797638', nickname: '케이(K)', date: '2022-03-05 01:57:17', status: '입금확인됨' },
-    ];
 
     return (
         <div className="space-y-6">
@@ -1006,7 +1021,7 @@ export const PaymentsView = ({ setView, payments = [] }: { setView: (v: any) => 
                 <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
                     <User size={20} />
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">김대순 <span className="text-gray-400 not-italic font-sans">회원님의 채용활동</span></h2>
+                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원님의 채용활동</span></h2>
             </div>
 
             <div className="overflow-x-auto border-t border-gray-900 pt-10">
@@ -1014,63 +1029,85 @@ export const PaymentsView = ({ setView, payments = [] }: { setView: (v: any) => 
                     <ArrowRight size={14} className="text-gray-400 shrink-0" />
                     <span className="font-black text-sm text-gray-800">유료결제내역</span>
                 </div>
-                <table className="w-full text-center border-collapse text-[11px] md:text-[13px]">
-                    <thead className="bg-gray-50 border-y border-gray-200 text-gray-400 font-bold">
-                        <tr>
-                            <th className="py-2.5 px-2">번호</th>
-                            <th className="py-2.5 px-2">구매내역</th>
-                            <th className="py-2.5 px-2">결제금액</th>
-                            <th className="py-2.5 px-2">결제방식</th>
-                            <th className="py-2.5 px-2 text-pink-500">닉네임</th>
-                            <th className="py-2.5 px-2">보기</th>
-                            <th className="py-2.5 px-2">결제일</th>
-                            <th className="py-2.5 px-2 text-green-600">확인</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-gray-600">
-                        {mockPayments.map(p => (
-                            <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition">
-                                <td className="py-4 px-2 font-mono text-gray-400">{p.id}</td>
-                                <td className="py-4 px-2 text-left">
-                                    <span className="bg-orange-400 text-white text-[10px] px-1 rounded-sm mr-1.5 font-black uppercase">줄광고</span>
-                                    <span className="font-bold underline cursor-pointer">{p.desc}</span>
-                                </td>
-                                <td className="py-4 px-2 font-black text-gray-800">{p.price}</td>
-                                <td className="py-4 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-medium">{p.method}</td>
-                                <td className="py-4 px-2 font-bold">{p.nickname}</td>
-                                <td className="py-4 px-2">
-                                    <button className="text-blue-500 underline text-[11px] font-bold">채용정보보기</button>
-                                </td>
-                                <td className="py-4 px-2 font-mono text-gray-400 leading-tight">
-                                    {p.date.split(' ')[0]}<br />{p.date.split(' ')[1]}
-                                </td>
-                                <td className="py-4 px-2">
-                                    <span className="px-2 py-1 bg-green-500 text-white text-[10px] font-black rounded-sm border border-green-700 shadow-inner">입금확확인됨</span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="flex justify-center items-center gap-1 mt-10 text-[13px] font-black">
-                    <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">&lt; Prev</button>
-                    <span className="px-3 py-1 text-red-500 border border-gray-100">1</span>
-                    <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">Next &gt;</button>
-                </div>
+                {payments.length === 0 ? (
+                    <div className="min-h-[200px] flex items-center justify-center border border-gray-100 rounded-xl bg-gray-50/30">
+                        <p className="text-gray-400 font-bold">결제 내역이 없습니다.</p>
+                    </div>
+                ) : (
+                    <>
+                        <table className="w-full text-center border-collapse text-[11px] md:text-[13px]">
+                            <thead className="bg-gray-50 border-y border-gray-200 text-gray-400 font-bold">
+                                <tr>
+                                    <th className="py-2.5 px-2">번호</th>
+                                    <th className="py-2.5 px-2">구매내역</th>
+                                    <th className="py-2.5 px-2">결제금액</th>
+                                    <th className="py-2.5 px-2">결제방식</th>
+                                    <th className="py-2.5 px-2 text-pink-500">닉네임</th>
+                                    <th className="py-2.5 px-2">보기</th>
+                                    <th className="py-2.5 px-2">결제일</th>
+                                    <th className="py-2.5 px-2 text-green-600">확인</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-gray-600">
+                                {payments.map((p: any) => (
+                                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                                        <td className="py-4 px-2 font-mono text-gray-400">{p.id}</td>
+                                        <td className="py-4 px-2 text-left">
+                                            <span className="bg-orange-400 text-white text-[10px] px-1 rounded-sm mr-1.5 font-black uppercase">{p.type || '신청'}</span>
+                                            <span className="font-bold underline cursor-pointer">{p.desc}</span>
+                                        </td>
+                                        <td className="py-4 px-2 font-black text-gray-800">{p.price}</td>
+                                        <td className="py-4 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-medium">{p.method}</td>
+                                        <td className="py-4 px-2 font-bold">{p.nickname || userName}</td>
+                                        <td className="py-4 px-2">
+                                            <button className="text-blue-500 underline text-[11px] font-bold">채용정보보기</button>
+                                        </td>
+                                        <td className="py-4 px-2 font-mono text-gray-400 leading-tight">
+                                            {p.date?.split(' ')[0]}<br />{p.date?.split(' ')[1]}
+                                        </td>
+                                        <td className="py-4 px-2">
+                                            <span className={`px-2 py-1 text-white text-[10px] font-black rounded-sm border shadow-inner ${p.isConfirmed ? 'bg-green-500 border-green-700' : 'bg-gray-400 border-gray-500'}`}>
+                                                {p.status || '대기'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className="flex justify-center items-center gap-1 mt-10 text-[13px] font-black">
+                            <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">&lt; Prev</button>
+                            <span className="px-3 py-1 text-red-500 border border-gray-100">1</span>
+                            <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">Next &gt;</button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
 };
 
-export const ApplicantsView = ({ setView }: { setView: (v: any) => void }) => {
+export const ApplicantsView = ({ setView, userName = '' }: { setView: (v: any) => void, userName?: string }) => {
     const brand = useBrand();
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
                 <Home size={12} /> 메인 &gt; 마이페이지 &gt; <span className="text-gray-900 font-bold">지원자 관리</span>
             </div>
-            {/* Same header... */}
+            <div className="flex items-center gap-3 mb-6 p-2">
+                <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
+                    <User size={20} />
+                </div>
+                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원님의 지원자 관리</span></h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* ... existing stats ... */}
+                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <div className="text-4xl font-black text-pink-500 mb-2">0</div>
+                    <p className="text-xs font-bold text-gray-500">진행 중인 공고 지원자</p>
+                </div>
+                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <div className="text-4xl font-black text-gray-300 mb-2">0</div>
+                    <p className="text-xs font-bold text-gray-500">새로운 메시지</p>
+                </div>
             </div>
             <div className={`p-12 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <p className="text-gray-400 font-bold">지원 현황이 없습니다.</p>

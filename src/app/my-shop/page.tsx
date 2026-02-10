@@ -49,6 +49,10 @@ function MyShopContent() {
     const [userType, setUserType] = useState<'business' | 'personal' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
 
+    // Business Data States
+    const [registeredAds, setRegisteredAds] = useState<any[]>([]);
+    const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
+
     const setView = (newView: any) => {
         if (newView === view) return;
         if (newView === 'dashboard') {
@@ -107,9 +111,43 @@ function MyShopContent() {
 
     // Handlers
     const handleSave = () => {
-        alert('저장 및 심사 요청이 완료되었습니다!');
-        formState.resetAdStates();
-        setView('dashboard');
+        if (isNewEntry) {
+            if (confirm('공고를 등록하시겠습니까?')) {
+                // Simulate saving to state
+                const newId = Math.floor(Math.random() * 90000) + 10000;
+                const newAd = {
+                    id: newId,
+                    title: formState.title,
+                    nickname: formState.nickname,
+                    category: formState.category1,
+                    keywords: formState.keywords,
+                    updateDate: new Date().toISOString().split('T')[0],
+                    applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0
+                };
+                setRegisteredAds(prev => [newAd, ...prev]);
+
+                // Simulate payment history entry
+                const newPayment = {
+                    id: newId + 500,
+                    type: '일반등록',
+                    desc: `${formState.title} 등록 비용`,
+                    price: '0원', // Mock price
+                    method: '포인트 결제',
+                    nickname: formState.nickname,
+                    date: new Date().toLocaleString(),
+                    status: '결제완료',
+                    isConfirmed: true
+                };
+                setPaymentHistory(prev => [newPayment, ...prev]);
+
+                alert('공고가 성공적으로 등록 되었습니다!');
+                setView('dashboard');
+                formState.resetAdStates();
+            }
+        } else {
+            formState.resetAdStates();
+            setView('dashboard');
+        }
     };
 
     const handleBack = () => {
@@ -202,10 +240,10 @@ function MyShopContent() {
                         setView={setView}
                     />
                 )}
-                {view === 'ongoing-ads' && <OngoingAdsView setView={setView} />}
-                {view === 'closed-ads' && <ClosedAdsView setView={setView} />}
-                {view === 'payments' && <PaymentsView setView={setView} />}
-                {view === 'applicants' && <ApplicantsView setView={setView} />}
+                {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} />}
+                {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
+                {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory} />}
+                {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
             </div>
 
             {view === 'form' && (
