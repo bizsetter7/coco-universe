@@ -241,9 +241,10 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
 
                 <nav className={`mt-8 space-y-2 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><List size={18} /> 진행중인 공고</div>
-                    <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
-                    <div className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
-                    <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><User size={18} /> 회원 정보 수정</div>
+                    <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><LogOut size={18} /> 마감된 공고</div>
+                    <div onClick={() => { setView('payments'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><CreditCard size={18} /> 유료 결제 내역</div>
+                    <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><User size={18} /> 지원자 관리</div>
+                    <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer flex items-center gap-3"><Settings size={18} /> 회원 정보 수정</div>
                 </nav>
             </div>
         </div>,
@@ -252,23 +253,23 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
 };
 
 export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmail, smsConsent, setSmsConsent, brand, setView }: any) => (
-    <div className={`max-w-4xl mx-auto p-6 md:p-10 rounded-[32px] shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-        <h2 className={`text-2xl font-black mb-8 pb-4 border-b ${brand.theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-900 border-gray-100'}`}>
+    <div className={`max-w-4xl mx-auto p-4 md:p-10 rounded-[24px] md:rounded-[32px] shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+        <h2 className={`text-xl md:text-2xl font-black mb-6 md:mb-8 pb-4 border-b ${brand.theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-900 border-gray-100'}`}>
             회원 정보 수정
         </h2>
 
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
             {/* ID / Password */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className={`block text-sm font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>아이디</label>
-                    <input type="text" value="bizsetter" disabled className={`w-full p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`} />
+                    <label className={`block text-xs font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>아이디</label>
+                    <input type="text" value="bizsetter" disabled className={`w-full p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`} />
                 </div>
                 <div>
-                    <label className={`block text-sm font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>비밀번호 변경</label>
-                    <div className="flex gap-2">
-                        <input type="password" placeholder="변경할 비밀번호 입력" className={`flex-1 p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`} />
-                        <button className={`px-4 rounded-xl font-bold whitespace-nowrap ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}>변경</button>
+                    <label className={`block text-xs font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>비밀번호 변경</label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <input type="password" placeholder="변경할 비밀번호 입력" className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`} />
+                        <button className={`w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700' : 'bg-gray-950 text-white border border-gray-950 hover:bg-black transition'}`}>변경</button>
                     </div>
                 </div>
             </div>
@@ -276,7 +277,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
             {/* Nickname & Business Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className={`block text-sm font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <label className={`block text-xs font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                         닉네임 <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -284,24 +285,24 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
                         value={nickname}
                         maxLength={10}
                         onChange={(e) => setNickname(e.target.value)}
-                        className={`w-full p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
                     />
-                    <p className="text-[11px] text-pink-500 mt-1.5 font-bold flex items-center gap-1">
+                    <p className="text-[10px] text-pink-500 mt-1.5 font-bold flex items-center gap-1">
                         <span className="w-1 h-1 bg-pink-500 rounded-full"></span>
                         최대 10자 (공백 포함) / 구인 리스트에 노출됩니다.
                     </p>
                 </div>
                 <div>
-                    <label className={`block text-sm font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <label className={`block text-xs font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                         상호명 (고정) <Check size={14} className="text-green-500" />
                     </label>
                     <input
                         type="text"
                         value={shopName}
                         disabled
-                        className={`w-full p-4 rounded-xl font-bold border opacity-70 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border opacity-70 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}
                     />
-                    <p className="text-[11px] text-green-600 mt-1.5 font-bold">
+                    <p className="text-[10px] text-green-600 mt-1.5 font-bold">
                         * 사업자등록증 기반으로 인증된 상호명입니다.
                     </p>
                 </div>
@@ -310,28 +311,28 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
             {/* Email & Phone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className={`block text-sm font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <label className={`block text-xs font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                         이메일
                     </label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
                     />
                 </div>
                 <div>
-                    <label className={`block text-sm font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <label className={`block text-xs font-bold mb-2 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                         휴대폰 번호 <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <input
                             type="text"
                             value="010-3838-4335"
                             readOnly
-                            className={`flex-1 p-4 rounded-xl font-bold border outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-white border-gray-200 text-gray-900'}`}
+                            className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
                         />
-                        <button className={`px-4 rounded-xl font-bold whitespace-nowrap bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/30 transition`}>
+                        <button className={`w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/30 transition`}>
                             재인증
                         </button>
                     </div>
@@ -861,6 +862,79 @@ export const ResumeForm = ({ setView }: { setView: (v: any) => void }) => {
                     <button onClick={() => setView('member-info')} className="px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
                     <button onClick={() => { alert('이력서가 등록되었습니다.'); setView('member-info'); }} className="px-8 py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition shadow-lg">이력서 등록완료</button>
                 </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Business Sub-Views ---
+
+export const ClosedAdsView = ({ setView }: { setView: (v: any) => void }) => {
+    const brand = useBrand();
+    const mockAds = [
+        { id: 1, title: '코코라운지 주말 야간 구인', date: '2025-12-01', status: '기간만료' },
+        { id: 2, title: '평일 오후 서빙 알바 급구', date: '2025-11-15', status: '기간만료' },
+    ];
+
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>마감된 공고</h2>
+                <button onClick={() => setView('dashboard')} className="text-sm font-bold text-gray-400 hover:text-gray-600">돌아가기</button>
+            </div>
+            <div className="space-y-3">
+                {mockAds.map(ad => (
+                    <div key={ad.id} className={`p-5 rounded-2xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} flex items-center justify-between`}>
+                        <div>
+                            <h3 className={`font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{ad.title}</h3>
+                            <p className="text-xs text-gray-400 font-bold">마감일: {ad.date}</p>
+                        </div>
+                        <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-[10px] font-black">{ad.status}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export const PaymentsView = ({ setView }: { setView: (v: any) => void }) => {
+    const brand = useBrand();
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>유료 결제 내역</h2>
+                <button onClick={() => setView('dashboard')} className="text-sm font-bold text-gray-400 hover:text-gray-600">돌아가기</button>
+            </div>
+            <div className={`p-10 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                    <CreditCard size={32} />
+                </div>
+                <p className="text-gray-500 font-bold">최근 3개월간 결제 내역이 없습니다.</p>
+            </div>
+        </div>
+    );
+};
+
+export const ApplicantsView = ({ setView }: { setView: (v: any) => void }) => {
+    const brand = useBrand();
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>지원자 관리</h2>
+                <button onClick={() => setView('dashboard')} className="text-sm font-bold text-gray-400 hover:text-gray-600">돌아가기</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <div className="text-4xl font-black text-pink-500 mb-2">0</div>
+                    <p className="text-xs font-bold text-gray-500">진행 중인 공고 지원자</p>
+                </div>
+                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <div className="text-4xl font-black text-gray-300 mb-2">0</div>
+                    <p className="text-xs font-bold text-gray-500">새로운 메시지</p>
+                </div>
+            </div>
+            <div className={`p-12 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <p className="text-gray-400 font-bold">지원 현황이 없습니다.</p>
             </div>
         </div>
     );

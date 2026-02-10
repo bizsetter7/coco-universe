@@ -18,7 +18,8 @@ import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import {
     WarningModal, DesignRequestModal, PreviewModal, ExampleModal,
-    BusinessMobileMenu, MemberInfoForm
+    BusinessMobileMenu, MemberInfoForm,
+    ClosedAdsView, PaymentsView, ApplicantsView
 } from './page_sub_components';
 
 // --- Constants (Exported for sub-components) ---
@@ -44,7 +45,7 @@ function MyShopContent() {
     const brand = useBrand();
 
     // View States
-    const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
+    const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'closed-ads' | 'payments' | 'applicants' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
     const [userType, setUserType] = useState<'business' | 'personal' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
 
@@ -193,13 +194,19 @@ function MyShopContent() {
             )}
 
             {/* Content View */}
-            {view === 'member-info' && (
-                <MemberInfoForm
-                    {...formState}
-                    brand={brand}
-                    setView={setView}
-                />
-            )}
+            <div className="max-w-4xl mx-auto px-4 md:px-0">
+                {view === 'member-info' && (
+                    <MemberInfoForm
+                        {...formState}
+                        brand={brand}
+                        setView={setView}
+                    />
+                )}
+                {view === 'closed-ads' && <ClosedAdsView setView={setView} />}
+                {view === 'payments' && <PaymentsView setView={setView} />}
+                {view === 'applicants' && <ApplicantsView setView={setView} />}
+            </div>
+
             {view === 'form' && (
                 <AdForm
                     {...formState}

@@ -57,26 +57,27 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
     };
 
     return (
-        <div className={`fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto p-4 md:p-6 animate-in fade-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
-            <div className="w-full max-w-4xl">
+        <div className={`fixed inset-0 z-[99999] flex items-center justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300`}>
+            <div className={`w-full max-w-4xl mx-auto my-auto ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 {/* Header: 19 Symbol & Legal Text */}
-                <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-10 text-center md:text-left">
-                    <div className="relative group">
-                        <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-[8px] border-red-600 flex items-center justify-center shadow-2xl shadow-red-500/20 bg-white">
-                            <span className="text-6xl md:text-7xl font-black text-gray-900 italic tracking-tighter">19</span>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-8 md:mb-12 text-center md:text-left mt-8 md:mt-0">
+                    <div className="relative group shrink-0">
+                        <div className="w-24 h-24 md:w-40 md:h-40 rounded-full border-[6px] md:border-[8px] border-red-600 flex items-center justify-center shadow-2xl shadow-red-500/20 bg-white">
+                            <span className="text-4xl md:text-7xl font-black text-gray-900 italic tracking-tighter">19</span>
                         </div>
-                        <div className="absolute -top-2 -right-2 w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white animate-bounce">
-                            <AlertTriangle size={20} />
+                        <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-8 h-8 md:w-10 md:h-10 bg-red-600 rounded-full flex items-center justify-center text-white animate-bounce shadow-lg">
+                            <AlertTriangle size={16} className="md:w-5 md:h-5" />
                         </div>
                     </div>
 
-                    <div className="space-y-3 max-w-xl">
-                        <h2 className={`text-xl md:text-2xl font-black leading-tight break-keep ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
-                            본 정보 내용은 청소년 유해 매체물로서<br />
-                            정보통신망 이용촉진 및 정보보호 등에 관한 법률 및<br />
-                            <span className="text-red-600">청소년보호법의 규정에 의하여</span><br />
+                    <div className="space-y-3 max-w-xl px-2">
+                        <h2 className={`text-lg md:text-2xl font-black leading-tight ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
+                            본 정보 내용은 청소년 유해 매체물로서<br className="hidden md:block" />
+                            정보통신망 이용촉진 및 정보보호 등에 관한 법률 및<br className="hidden md:block" />
+                            <span className="text-red-600">청소년보호법의 규정에 의하여</span><br className="hidden md:block" />
                             만 19세 미만의 청소년이 이용할 수 없습니다.
                         </h2>
+                        <p className="text-[11px] md:text-xs text-gray-500 font-bold opacity-70">ADULT VERIFICATION REQUIRED</p>
                     </div>
                 </div>
 
