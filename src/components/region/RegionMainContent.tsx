@@ -50,7 +50,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
             <div className={`flex items-center gap-3 p-3 rounded-lg mb-6 text-sm ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
                 <span className="px-2 py-0.5 bg-pink-500 text-white text-[10px] font-bold rounded">공지사항</span>
                 <span className={`flex-1 truncate ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
+                    [안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내
                 </span>
                 <ChevronDown size={14} className="text-gray-400" />
             </div>

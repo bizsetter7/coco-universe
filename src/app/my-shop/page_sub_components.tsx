@@ -570,7 +570,7 @@ export const PersonalMemberEdit = ({ setView }: { setView: (v: any) => void }) =
                                 <input type="text" value={formData.phone} readOnly className="flex-1 bg-gray-100 border border-gray-200 rounded p-2 text-sm font-bold text-gray-500 outline-none" />
                                 <button className="px-3 text-xs font-bold bg-gray-800 text-white rounded hover:bg-gray-900 transition flex-shrink-0">휴대폰 인증</button>
                             </div>
-                            <p className="text-[11px] text-blue-500 font-bold">* 연락처 변경은 '휴대폰인증'이 필요합니다.</p>
+                            <p className="text-[11px] text-blue-500 font-bold">* 연락처 변경은 &apos;휴대폰인증&apos;이 필요합니다.</p>
                         </div>
                     </div>
 
