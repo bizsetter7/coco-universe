@@ -149,7 +149,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                 급여 추가 옵션
                             </h3>
                             <span className="text-[10px] md:text-[11px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">+5,000원</span>
-                            <span className="text-[9px] md:text-[12px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded-full w-full md:w-auto">기본 1개 제공(무료), 추가 5개까지 선택가능(유료)</span>
+                            <span className="text-[9px] md:text-[12px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded-full md:w-auto">기본 1개 제공(무료), 추가 5개까지 선택가능(유료)</span>
                         </div>
                         <button
                             type="button"
@@ -348,12 +348,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             <div className="pt-4 border-t border-gray-100">
                                 <h4 className="text-[12px] md:text-[14px] font-black text-gray-500 font-black mb-3">프리미엄 미리보기</h4>
                                 <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color'
-                                        ? 'border-pink-500 border-4 shadow-sm'
-                                        : borderOption === 'glow'
-                                            ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                                            : borderOption === 'sparkle'
-                                                ? 'border-yellow-400 border-4 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse'
-                                                : 'border-gray-200 border-dashed'
+                                    ? 'border-pink-500 border-4 shadow-sm'
+                                    : borderOption === 'glow'
+                                        ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+                                        : borderOption === 'sparkle'
+                                            ? 'border-yellow-400 border-4 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse'
+                                            : 'border-gray-200 border-dashed'
                                     }`}>
                                     <div className="text-center group">
                                         <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : 'text-pink-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />

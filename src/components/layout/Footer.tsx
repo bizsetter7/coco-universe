@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
+import { House } from 'lucide-react';
 
 export const Footer = () => {
     const brand = useBrand();
@@ -10,9 +11,12 @@ export const Footer = () => {
     return (
         <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
             <div className="container mx-auto px-4 text-center text-xs leading-relaxed">
-                {/* Logo */}
-                <div className="mb-6">
-                    <span className="text-xl font-black text-amber-400">COCO</span> <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>코코알바</span>
+                {/* Branded Logo matching MainHeader */}
+                <div className="mb-6 flex items-center justify-center gap-1.5">
+                    <House size={18} className="text-pink-500" />
+                    <span className="text-lg md:text-xl font-black tracking-tighter text-pink-500">
+                        COCOALBA
+                    </span>
                 </div>
 
                 {/* Links */}
