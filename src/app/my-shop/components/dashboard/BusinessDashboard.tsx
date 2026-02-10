@@ -22,14 +22,23 @@ interface BusinessDashboardProps {
     setShowDesignModal: (v: boolean) => void;
     setView: (v: any) => void;
     router: any;
+    ads?: any[];
 }
 
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router
+    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = []
 }) => {
+    const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
+
+    // Filter ads based on status (assuming closed ads have a status or isClosed property, 
+    // for now we'll simulate sorting or using the prop)
+    const ongoingAds = ads.filter(ad => !ad.isClosed);
+    const closedAds = ads.filter(ad => ad.isClosed);
+    const displayedAds = activeTab === 'ongoing' ? ongoingAds : closedAds;
+
     return (
         <div className="w-full space-y-6">
-            <header className="flex flex-col gap-4 mb-8">
+            <header className="flex flex-col gap-4 mb-4">
                 <div className={`p-6 sm:rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex items-center gap-4">
@@ -58,43 +67,61 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                 </div>
             </header>
 
-            {/* Progress Tabs (Capture 4 style simulation) */}
+            {/* Progress Tabs */}
             <div className="flex gap-0 overflow-hidden rounded-xl border border-gray-200 font-black text-sm">
-                <button onClick={() => setView('dashboard')} className="flex-1 py-4 bg-gray-600 text-white flex items-center justify-center gap-2 border-r border-gray-100/10">
-                    진행중인 채용정보 <span className="bg-white/20 px-2 py-0.5 rounded text-xs">1</span>
+                <button
+                    onClick={() => setActiveTab('ongoing')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 border-r border-gray-200 transition-colors ${activeTab === 'ongoing' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                >
+                    진행중인 채용정보 <span className={`px-2 py-0.5 rounded text-xs ${activeTab === 'ongoing' ? 'bg-white/20' : 'bg-gray-200 text-gray-500'}`}>{ongoingAds.length}</span>
                 </button>
-                <button onClick={() => setView('closed-ads')} className="flex-1 py-4 bg-gray-200 text-gray-500 flex items-center justify-center gap-2">
-                    마감된 채용정보 <span className="bg-gray-300 text-gray-600 px-2 py-0.5 rounded text-xs">0</span>
+                <button
+                    onClick={() => setActiveTab('closed')}
+                    className={`flex-1 py-4 flex items-center justify-center gap-2 transition-colors ${activeTab === 'closed' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                >
+                    마감된 채용정보 <span className={`px-2 py-0.5 rounded text-xs ${activeTab === 'closed' ? 'bg-white/20' : 'bg-gray-200 text-gray-500'}`}>{closedAds.length}</span>
                 </button>
             </div>
 
-            <div className={`rounded-2xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                {/* 1. Recruitment Info Placeholder for now */}
-                <div className={`p-4 border-b transition ${brand.theme === 'dark' ? 'border-gray-800 hover:bg-gray-800/30' : 'border-gray-100 hover:bg-gray-50'} `}>
-                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                        <div className="space-y-2">
-                            <div className="flex gap-2 text-xs items-center">
-                                <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded font-black">진행중</span>
-                                <span className="text-gray-400">마감일: 2026-02-25</span>
-                            </div>
-                            <h4 className={`font-bold line-clamp-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>🔥 [강남 쩜오] 갯수보장 / 팁별도 / 당일지급 확실합니다!</h4>
-                            <div className={`text-xs ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} `}>
-                                {shopName} {nickname && <span className="text-xs text-gray-400 ml-1">({nickname})</span>} | 서울 강남구 | 룸싸롱 | 아가씨
-                            </div>
-                        </div>
-                        <div className="flex gap-2 shrink-0 items-center justify-center md:justify-end">
-                            <button onClick={() => handleAdClick(false)} className={`px-3 py-2 border text-xs font-bold rounded transition ${brand.theme === 'dark' ? 'border-blue-500/50 text-blue-400 hover:bg-blue-900/20' : 'border-blue-500 text-blue-600 hover:bg-blue-50'} `}>수정</button>
-                            <button className={`px-3 py-2 border text-xs font-bold rounded transition ${brand.theme === 'dark' ? 'border-gray-700 text-gray-400 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-50'} `}>마감</button>
-                            <button className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white text-xs font-bold rounded hover:bg-green-600 shadow-sm">
-                                <RefreshCw size={12} /> 점프
-                            </button>
-                            <button className="flex items-center gap-1 px-3 py-2 bg-blue-500 text-white text-xs font-bold rounded hover:bg-blue-600 shadow-sm">
-                                <Calendar size={12} /> 연장
-                            </button>
-                            <button className={`px-3 py-2 border text-xs font-bold rounded transition ${brand.theme === 'dark' ? 'border-red-900/50 text-red-400 hover:bg-red-900/20' : 'border-red-200 text-red-500 hover:bg-red-50'} `}>삭제</button>
-                        </div>
+            <div className="space-y-4">
+                {displayedAds.length === 0 ? (
+                    <div className={`p-12 rounded-2xl border border-dashed text-center flex flex-col items-center justify-center gap-2 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-gray-50/50 border-gray-200'} `}>
+                        <List size={32} className="text-gray-300" />
+                        <p className="text-gray-400 font-bold">{activeTab === 'ongoing' ? '진행중인 공고가 없습니다.' : '마감된 공고가 없습니다.'}</p>
                     </div>
-                </div>
+                ) : (
+                    displayedAds.map((ad: any) => (
+                        <div key={ad.id} className={`p-6 rounded-2xl border transition shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 hover:bg-gray-800/50' : 'bg-white border-gray-100 hover:shadow-md'} `}>
+                            <div className="flex flex-col md:flex-row justify-between gap-4">
+                                <div className="space-y-2">
+                                    <div className="flex gap-2 text-[11px] items-center font-black">
+                                        <span className={`${activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded`}>
+                                            {activeTab === 'ongoing' ? '진행중' : '마감'}
+                                        </span>
+                                        <span className="text-gray-400">마감일: 2026-02-25</span>
+                                    </div>
+                                    <h4 className={`font-bold text-[15px] line-clamp-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
+                                        🔥 {ad.title}
+                                    </h4>
+                                    <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
+                                        {shopName} {nickname && <span className="text-gray-400 ml-1">({nickname})</span>} | 서울 강남구 | {ad.category || '룸싸롱'} | 아가씨
+                                    </div>
+                                </div>
+                                <div className="flex gap-1.5 shrink-0 items-center justify-center md:justify-end">
+                                    <button onClick={() => handleAdClick(false)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">수정</button>
+                                    <button className="px-3 py-2 border border-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-50 transition">마감</button>
+                                    <button className="flex items-center gap-1.2 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
+                                        <RefreshCw size={12} /> 점프
+                                    </button>
+                                    <button className="flex items-center gap-1.2 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition">
+                                        <Calendar size={12} /> 연장
+                                    </button>
+                                    <button className="px-3 py-2 border border-red-100 text-red-400 text-xs font-bold rounded-lg hover:bg-red-50 transition">삭제</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

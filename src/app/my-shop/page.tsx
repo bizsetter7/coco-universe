@@ -271,6 +271,7 @@ function MyShopContent() {
                                 setShowDesignModal={setShowDesignModal}
                                 setView={setView}
                                 router={router}
+                                ads={registeredAds}
                             />
                         )}
                     </div>
