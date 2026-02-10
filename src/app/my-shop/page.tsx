@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     Store, List, User, LogOut, CreditCard, MessageCircle,
@@ -31,6 +31,14 @@ export const REGION_DATA = REGION_DATA_MAP;
 export const PAY_TYPES = PAY_TYPES_CONST;
 
 export default function MyShopPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">로딩 중...</div>}>
+            <MyShopContent />
+        </Suspense>
+    );
+}
+
+function MyShopContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const brand = useBrand();

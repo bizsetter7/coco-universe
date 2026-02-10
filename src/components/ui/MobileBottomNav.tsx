@@ -13,6 +13,14 @@ import { NoteService } from '@/lib/noteService';
 import { useAuth } from '@/hooks/useAuth';
 
 export const MobileBottomNav = () => {
+    return (
+        <React.Suspense fallback={null}>
+            <MobileBottomNavContent />
+        </React.Suspense>
+    );
+};
+
+const MobileBottomNavContent = () => {
     const pathname = usePathname();
     const brand = useBrand();
     const router = useRouter();

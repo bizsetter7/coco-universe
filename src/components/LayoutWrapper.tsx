@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { BannerSidebar } from './BannerSidebar';
@@ -93,7 +93,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             {/* Global Footer */}
             <Footer />
 
-            <MobileBottomNav />
+            <Suspense fallback={null}>
+                <MobileBottomNav />
+            </Suspense>
         </React.Fragment>
     );
 };
