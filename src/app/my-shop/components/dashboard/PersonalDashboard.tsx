@@ -92,13 +92,30 @@ export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }
 
     return (
         <div className="space-y-6">
-            {/* 1. 구직활동 요약 섹션 (캡처 이미지 스타일 반영) */}
+            {/* 1. 기존 통계 그리드 섹션 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                    { label: '스크랩한 공고', val: '12', icon: <Star className="text-yellow-400" /> },
+                    { label: '열람한 기업', val: '45', icon: <Home className="text-blue-400" /> },
+                    { label: '지원한 내역', val: '3', icon: <FileText className="text-pink-400" /> }
+                ].map((item, idx) => (
+                    <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
+                            <span className="text-sm font-black">{item.label}</span>
+                        </div>
+                        <div className="text-3xl font-black">{item.val}<span className="text-sm text-gray-400 ml-1">건</span></div>
+                    </div>
+                ))}
+            </div>
+
+            {/* 2. 구직활동 요약 섹션 (배너 바로 위, 중간 배치) */}
             <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-50 dark:border-gray-800">
                     <div className="w-8 h-8 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400">
                         <FileText size={18} />
                     </div>
-                    <h3 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-[#334155]'}`}>{userName} {userName}의 구직활동</h3>
+                    <h3 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-[#334155]'}`}>{userName} 님의 구직활동</h3>
                 </div>
 
                 <div className="flex items-center justify-around py-4 relative">
@@ -119,23 +136,6 @@ export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* 2. 기존 통계 그리드 섹션 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { label: '스크랩한 공고', val: '12', icon: <Star className="text-yellow-400" /> },
-                    { label: '열람한 기업', val: '45', icon: <Home className="text-blue-400" /> },
-                    { label: '지원한 내역', val: '3', icon: <FileText className="text-pink-400" /> }
-                ].map((item, idx) => (
-                    <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
-                            <span className="text-sm font-black">{item.label}</span>
-                        </div>
-                        <div className="text-3xl font-black">{item.val}<span className="text-sm text-gray-400 ml-1">건</span></div>
-                    </div>
-                ))}
             </div>
 
             {/* 3. 하단 배너 섹션 (기존 상단 섹션 이동 + 버튼 텍스트 수정) */}

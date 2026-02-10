@@ -46,6 +46,7 @@ function MyShopContent() {
     // View States
     const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
     const [userType, setUserType] = useState<'business' | 'personal' | null>(null);
+    const [isNewEntry, setIsNewEntry] = useState(false);
 
     const setView = (newView: any) => {
         if (newView === view) return;
@@ -173,7 +174,7 @@ function MyShopContent() {
                     brand={brand}
                     onClose={() => setShowWarningModal(false)}
                     onConfirm={() => {
-                        formState.resetAdStates(); // Reset for NEW ad
+                        if (isNewEntry) formState.resetAdStates(); // Only reset if NEW
                         setView('form');
                         setShowWarningModal(false);
                     }}
@@ -226,7 +227,10 @@ function MyShopContent() {
                     shopName={formState.shopName}
                     nickname={formState.nickname}
                     isVerified={formState.isVerified}
-                    handleAdClick={(isNew) => isNew ? setShowWarningModal(true) : setView('form')}
+                    handleAdClick={(isNew) => {
+                        setIsNewEntry(isNew);
+                        setShowWarningModal(true); // Always show for both NEW and EDIT
+                    }}
                     setShowDesignModal={setShowDesignModal}
                     router={router}
                 />
