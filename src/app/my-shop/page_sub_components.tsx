@@ -207,7 +207,7 @@ export const ExampleModal = React.memo(({ show, type, onClose, brand }: any) => 
                 <div className="p-4 max-h-[60vh] overflow-y-auto bg-white flex items-center justify-center relative min-h-[200px]">
                     <img src={cur.img} alt={cur.title} className="max-w-full h-auto rounded-xl shadow-lg border border-gray-100" />
                 </div>
-                <div className="p-6 bg-white dark:bg-gray-800 space-y-4">
+                <div className="p-6 bg-white space-y-4">
                     <p className={`text-sm font-bold text-center leading-relaxed whitespace-pre-line ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{cur.desc}</p>
                     <button onClick={onClose} className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-black transition">확인했습니다</button>
                 </div>
