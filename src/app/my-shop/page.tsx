@@ -120,23 +120,49 @@ function MyShopContent() {
                     title: formState.title,
                     nickname: formState.nickname,
                     category: formState.industryMain,
+                    categorySub: formState.industrySub,
+                    regionCity: formState.regionCity,
+                    regionGu: formState.regionGu,
+                    ageMin: formState.ageMin,
+                    ageMax: formState.ageMax,
+                    payType: formState.payType,
+                    payAmount: formState.payAmount,
+                    workTime: formState.workTime,
+                    content: formState.editorRef.current?.innerHTML || '',
                     keywords: formState.selectedKeywords,
                     updateDate: new Date().toISOString().split('T')[0],
-                    applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0
+                    applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0,
+                    status: 'PENDING_REVIEW', // 심사중 
+                    productType: formState.selectedAdProduct,
+                    productPeriod: formState.selectedAdPeriod,
+                    options: {
+                        icon: formState.selectedIcon,
+                        iconPeriod: formState.iconPeriod,
+                        highlighter: formState.selectedHighlighter,
+                        highlighterPeriod: formState.highlighterPeriod,
+                        borderOption: formState.borderOption,
+                        borderPeriod: formState.borderPeriod,
+                        paySuffixes: formState.paySuffixes
+                    }
                 };
                 setRegisteredAds(prev => [newAd, ...prev]);
 
                 // Simulate payment history entry
                 const newPayment = {
-                    id: newId + 500,
-                    type: '일반등록',
-                    desc: `${formState.title} 등록 비용`,
-                    price: '0원', // Mock price
-                    method: '포인트 결제',
-                    nickname: formState.nickname,
-                    date: new Date().toLocaleString(),
-                    status: '결제완료',
-                    isConfirmed: true
+                    id: newId, // Use the same NO.
+                    type: formState.selectedAdProduct || '일반등록',
+                    desc: formState.title, // User wanted ad title itself
+                    price: `${formState.totalAmount.toLocaleString()}원`, // Actual amount
+                    method: '입금', // User specified '입금'
+                    nickname: formState.nickname || '관리자',
+                    date: new Date().toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    status: '심사중', // User requested '심사중'
+                    isConfirmed: false,
+                    options: {
+                        icon: formState.selectedIcon,
+                        highlighter: formState.selectedHighlighter,
+                        border: formState.borderOption !== 'none'
+                    }
                 };
                 setPaymentHistory(prev => [newPayment, ...prev]);
 
@@ -190,7 +216,10 @@ function MyShopContent() {
     };
 
     const handlePayTypeChange = (e: any) => formState.setPayType(e.target.value);
-    const handlePayAmountChange = (e: any) => formState.setPayAmount(e.target.value.replace(/[^0-9]/g, ''));
+    const handlePayAmountChange = (e: any) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        formState.setPayAmount(value);
+    };
     const togglePaySuffix = (s: string) => {
         if (formState.paySuffixes.includes(s)) {
             formState.setPaySuffixes(formState.paySuffixes.filter(x => x !== s));
@@ -264,8 +293,13 @@ function MyShopContent() {
                                 shopName={formState.shopName}
                                 nickname={formState.nickname}
                                 isVerified={formState.isVerified}
-                                handleAdClick={(isNew) => {
+                                handleAdClick={(isNew, ad) => {
                                     setIsNewEntry(isNew);
+                                    if (!isNew && ad) {
+                                        formState.loadAdData(ad);
+                                    } else {
+                                        formState.resetAdStates();
+                                    }
                                     setShowWarningModal(true);
                                 }}
                                 setShowDesignModal={setShowDesignModal}

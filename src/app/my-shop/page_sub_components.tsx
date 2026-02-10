@@ -893,7 +893,10 @@ export const OngoingAdsView = ({ setView, ads = [], userName = '' }: { setView: 
                         {ads.map((ad: any) => (
                             <div key={ad.id} className="bg-white border border-gray-200 rounded-sm overflow-hidden relative shadow-sm">
                                 <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="flex gap-4 text-[13px] font-bold text-gray-500">
+                                    <div className="flex gap-4 text-[13px] font-bold text-gray-500 items-center">
+                                        {ad.status === 'PENDING_REVIEW' && (
+                                            <span className="bg-orange-100 text-orange-500 px-2 py-0.5 rounded text-[11px] font-black border border-orange-200">심사중</span>
+                                        )}
                                         <span>등록일 <span className="ml-2 font-mono text-pink-500">{ad.updateDate || '-'}</span></span>
                                     </div>
                                     <div className="flex gap-1">
@@ -1051,20 +1054,27 @@ export const PaymentsView = ({ setView, payments = [], userName = '' }: { setVie
                                         <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition">
                                             <td className="py-4 px-2 font-mono text-gray-400">{p.id}</td>
                                             <td className="py-4 px-2 text-left">
-                                                <span className="bg-orange-400 text-white text-[10px] px-1 rounded-sm mr-1.5 font-black uppercase">{p.type || '신청'}</span>
-                                                <span className="font-bold underline cursor-pointer">{p.desc}</span>
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        <span className="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black uppercase shadow-sm">{p.type || '신청'}</span>
+                                                        {p.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아이콘</span>}
+                                                        {p.options?.highlighter && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형광펜</span>}
+                                                        {p.options?.border && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테두리</span>}
+                                                    </div>
+                                                    <span className="font-bold underline cursor-pointer text-gray-800 text-[14px]">{p.desc}</span>
+                                                </div>
                                             </td>
                                             <td className="py-4 px-2 font-black text-gray-800">{p.price}</td>
-                                            <td className="py-4 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-medium">{p.method}</td>
+                                            <td className="py-2 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-bold">{p.method}</td>
                                             <td className="py-4 px-2 font-bold">{p.nickname || userName}</td>
                                             <td className="py-4 px-2">
-                                                <button className="text-blue-500 underline text-[11px] font-bold">채용정보보기</button>
+                                                <button onClick={() => setView('ongoing-ads')} className="text-blue-500 underline text-[11px] font-bold hover:text-blue-700 transition">채용정보보기</button>
                                             </td>
-                                            <td className="py-4 px-2 font-mono text-gray-400 leading-tight">
-                                                {p.date?.split(' ')[0]}<br />{p.date?.split(' ')[1]}
+                                            <td className="py-4 px-2 font-mono text-gray-400 leading-tight text-[11px]">
+                                                {p.date}
                                             </td>
                                             <td className="py-4 px-2">
-                                                <span className={`px-2 py-1 text-white text-[10px] font-black rounded-sm border shadow-inner ${p.isConfirmed ? 'bg-green-500 border-green-700' : 'bg-gray-400 border-gray-500'}`}>
+                                                <span className={`px-2 py-1 text-white text-[10px] font-black rounded-sm border shadow-inner ${p.status === '결제완료' ? 'bg-green-500 border-green-700' : 'bg-orange-400 border-orange-500'}`}>
                                                     {p.status || '대기'}
                                                 </span>
                                             </td>

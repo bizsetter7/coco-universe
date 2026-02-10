@@ -251,7 +251,16 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                             </div>
                             <div>
                                 <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
-                                <input type="text" placeholder="0" value={payAmount} onChange={handlePayAmountChange} disabled={payType === '협의'} className="w-full border rounded-lg p-2.5 text-base font-black text-right outline-none bg-white disabled:bg-gray-50 h-[42px]" />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="0"
+                                        value={payAmount ? (Number(payAmount).toLocaleString() + '원') : ''}
+                                        onChange={handlePayAmountChange}
+                                        disabled={payType === '협의'}
+                                        className="w-full border rounded-lg p-2.5 text-base font-black text-right outline-none bg-white disabled:bg-gray-50 h-[42px] pr-4"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

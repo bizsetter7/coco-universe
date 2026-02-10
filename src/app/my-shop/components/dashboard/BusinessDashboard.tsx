@@ -8,17 +8,7 @@ interface BusinessDashboardProps {
     shopName: string;
     nickname: string;
     isVerified: boolean;
-    handleAdClick: (isNew: boolean) => void;
-    setShowDesignModal: (v: boolean) => void;
-    router: any;
-}
-
-interface BusinessDashboardProps {
-    brand: any;
-    shopName: string;
-    nickname: string;
-    isVerified: boolean;
-    handleAdClick: (isNew: boolean) => void;
+    handleAdClick: (isNew: boolean, ad?: any) => void;
     setShowDesignModal: (v: boolean) => void;
     setView: (v: any) => void;
     router: any;
@@ -95,8 +85,8 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                             <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2">
                                     <div className="flex gap-2 text-[11px] items-center font-black">
-                                        <span className={`${activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500'} px-2 py-0.5 rounded`}>
-                                            {activeTab === 'ongoing' ? '진행중' : '마감'}
+                                        <span className={`${ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500')} px-2 py-0.5 rounded`}>
+                                            {ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감')}
                                         </span>
                                         <span className="text-gray-400">마감일: 2026-02-25</span>
                                     </div>
@@ -108,7 +98,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                     </div>
                                 </div>
                                 <div className="flex gap-1.5 shrink-0 items-center justify-center md:justify-end">
-                                    <button onClick={() => handleAdClick(false)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">수정</button>
+                                    <button onClick={() => handleAdClick(false, ad)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">수정</button>
                                     <button className="px-3 py-2 border border-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-50 transition">마감</button>
                                     <button className="flex items-center gap-1.2 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
                                         <RefreshCw size={12} /> 점프

@@ -212,6 +212,37 @@ export function useAdFormState() {
         selectedHighlighter !== null
     );
 
+    const loadAdData = (ad: any) => {
+        if (!ad) return;
+        setTitle(ad.title || '');
+        setNickname(ad.nickname || '');
+        setIndustryMain(ad.category || '');
+        setIndustrySub(ad.categorySub || '');
+        setRegionCity(ad.regionCity || '');
+        setRegionGu(ad.regionGu || '');
+        setAgeMin(ad.ageMin || 20);
+        setAgeMax(ad.ageMax || 35);
+        setPayType(ad.payType || '종류선택');
+        setPayAmount(ad.payAmount || '0');
+        setWorkTime(ad.workTime || '');
+        setSelectedKeywords(ad.keywords || []);
+        setEditorHtml(ad.content || '');
+        if (editorRef.current) {
+            editorRef.current.innerHTML = ad.content || '';
+        }
+
+        // Ad Options
+        setSelectedAdProduct(ad.productType || null);
+        setSelectedAdPeriod(ad.productPeriod || 30);
+        setSelectedIcon(ad.options?.icon || null);
+        setIconPeriod(ad.options?.iconPeriod || 0);
+        setSelectedHighlighter(ad.options?.highlighter || null);
+        setHighlighterPeriod(ad.options?.highlighterPeriod || 0);
+        setBorderOption(ad.options?.borderOption || 'none');
+        setBorderPeriod(ad.options?.borderPeriod || 0);
+        setPaySuffixes(ad.options?.paySuffixes || []);
+    };
+
     return {
         shopName, setShopName, isVerified, setIsVerified, nickname, setNickname,
         managerName, setManagerName,
@@ -227,6 +258,6 @@ export function useAdFormState() {
         selectedAdPeriod, setSelectedAdPeriod, selectedIcon, setSelectedIcon, iconPeriod, setIconPeriod,
         selectedHighlighter, setSelectedHighlighter, highlighterPeriod, setHighlighterPeriod,
         paySuffixes, setPaySuffixes, borderOption, setBorderOption, borderPeriod, setBorderPeriod,
-        totalAmount, setTotalAmount, resetAdStates, isDirty
+        totalAmount, setTotalAmount, resetAdStates, loadAdData, isDirty
     };
 }
