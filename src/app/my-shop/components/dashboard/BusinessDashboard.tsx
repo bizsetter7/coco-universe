@@ -18,14 +18,14 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
 }) => {
     return (
         <div className="w-full p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Sidebar (PC Only) */}
+            {/* Sidebar (PC Only) - Strictly hidden on mobile via CSS for now, but ensured no heavy logic here */}
             <aside className="hidden md:block col-span-1 space-y-2">
                 <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}>
                         <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
                     </div>
                     <div>
-                        <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>{shopName}</h2>
+                        <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>{shopName || '내 상점'}</h2>
                         {nickname && <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>{nickname}</p>}
                         <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} `}>프리미엄 인증 업소</p>
                     </div>

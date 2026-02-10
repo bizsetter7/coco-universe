@@ -8,8 +8,6 @@ export function useAdFormState() {
     const [shopName, setShopName] = useState('코코 라운지');
     const [isVerified, setIsVerified] = useState(true);
     const [nickname, setNickname] = useState('');
-    const [email, setEmail] = useState('');
-    const [smsConsent, setSmsConsent] = useState(false);
 
     // Manager Info
     const [managerName, setManagerName] = useState('');
@@ -125,9 +123,6 @@ export function useAdFormState() {
         }
     };
 
-    // SEO Tags
-    const [seoTags, setSeoTags] = useState<string[]>([]);
-
     // Ad Selection
     const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(null);
     const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(30);
@@ -135,7 +130,6 @@ export function useAdFormState() {
     const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(0);
     const [selectedHighlighter, setSelectedHighlighter] = useState<number | null>(null);
     const [highlighterPeriod, setHighlighterPeriod] = useState<30 | 60 | 90 | 0>(0);
-    const [mediaUrl, setMediaUrl] = useState('');
     const [paySuffixes, setPaySuffixes] = useState<string[]>([]);
     const [borderOption, setBorderOption] = useState<'none' | 'color' | 'glow' | 'sparkle'>('none');
     const [borderPeriod, setBorderPeriod] = useState<30 | 60 | 90 | 0>(0);
@@ -159,19 +153,13 @@ export function useAdFormState() {
         setPayType('종류선택');
         setPayAmount('0');
         setWorkTime('');
-        setSelectedKeywords([]);
-        if (editorRef.current) editorRef.current.innerHTML = '';
-        setSeoTags([]);
+        setIsEditorDirty(false);
         setSelectedAdProduct(null);
         setSelectedAdPeriod(30);
         setSelectedIcon(null);
         setIconPeriod(0);
         setSelectedHighlighter(null);
         setHighlighterPeriod(0);
-        setTotalAmount(0);
-        setIsEditorDirty(false);
-        setPaySuffixes([]);
-        setBorderOption('none');
         setBorderPeriod(0);
     };
 
@@ -221,13 +209,12 @@ export function useAdFormState() {
         paySuffixes.length > 0 ||
         borderOption !== 'none' ||
         selectedIcon !== null ||
-        selectedHighlighter !== null ||
-        mediaUrl !== ''
+        selectedHighlighter !== null
     );
 
     return {
         shopName, setShopName, isVerified, setIsVerified, nickname, setNickname,
-        email, setEmail, smsConsent, setSmsConsent, managerName, setManagerName,
+        managerName, setManagerName,
         managerPhone, setManagerPhone, messengers, setMessengers, title, setTitle,
         regionCity, setRegionCity, regionGu, setRegionGu, addressDetail, setAddressDetail,
         industryMain, setIndustryMain, industrySub, setIndustrySub, ageMin, setAgeMin,
@@ -236,10 +223,9 @@ export function useAdFormState() {
         editorHtml, setEditorHtml, syncEditorHtml, updateToolbarStatus, saveSelection, restoreSelection,
         toolbarStatus, setToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,
         showForeColorMenu, setShowForeColorMenu, showHiliteColorMenu, setShowHiliteColorMenu,
-        showEmojiMenu, setShowEmojiMenu, seoTags, setSeoTags, selectedAdProduct, setSelectedAdProduct,
+        showEmojiMenu, setShowEmojiMenu, selectedAdProduct, setSelectedAdProduct,
         selectedAdPeriod, setSelectedAdPeriod, selectedIcon, setSelectedIcon, iconPeriod, setIconPeriod,
         selectedHighlighter, setSelectedHighlighter, highlighterPeriod, setHighlighterPeriod,
-        mediaUrl, setMediaUrl,
         paySuffixes, setPaySuffixes, borderOption, setBorderOption, borderPeriod, setBorderPeriod,
         totalAmount, setTotalAmount, resetAdStates, isDirty
     };

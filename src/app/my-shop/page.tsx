@@ -88,10 +88,11 @@ function MyShopContent() {
 
     // --- View Sync from URL ---
     useEffect(() => {
-        const viewParam = searchParams.get('view') || 'dashboard';
+        const viewParam = (searchParams.get('view') || 'dashboard') as any;
         if (viewParam !== view) {
-            _setView(viewParam as any);
-            // Only scroll to top on actual view change to prevent jitter
+            _setView(viewParam);
+            // Only scroll to top if not returning to dashboard (dashboard handles its own scroll or prefers natural position)
+            // Using 'auto' for better mobile feeling instead of 'instant' unless necessary
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
     }, [searchParams, view]);
@@ -106,22 +107,19 @@ function MyShopContent() {
     // Handlers
     const handleSave = () => {
         alert('저장 및 심사 요청이 완료되었습니다!');
-        formState.resetAdStates(); // Reset state after successful save
+        formState.resetAdStates();
         setView('dashboard');
-        window.scrollTo({ top: 0, behavior: 'auto' });
     };
 
     const handleBack = () => {
         if (formState.isDirty) {
             if (confirm('작성 중인 내용이 있습니다. 저장하지 않고 나가시겠습니까?')) {
-                formState.resetAdStates(); // Reset state on cancel
+                formState.resetAdStates();
                 setView('dashboard');
-                window.scrollTo({ top: 0, behavior: 'instant' });
             }
         } else {
-            formState.resetAdStates(); // Reset state even if not dirty to ensure clean exit
+            formState.resetAdStates();
             setView('dashboard');
-            window.scrollTo({ top: 0, behavior: 'instant' });
         }
     };
 
