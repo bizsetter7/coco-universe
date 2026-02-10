@@ -83,28 +83,45 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
 
 export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }) {
     const brand = useBrand();
+    const [userName, setUserName] = useState('회원님');
+
+    useEffect(() => {
+        const storedName = localStorage.getItem('user_name');
+        if (storedName) setUserName(storedName);
+    }, []);
 
     return (
         <div className="space-y-6">
-            <header className="flex flex-col gap-4">
-                <div className={`p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div className="flex items-center gap-6">
-                            <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-pink-200">
-                                <User size={40} />
-                            </div>
-                            <div>
-                                <h2 className="text-3xl font-black mb-1">관심 공고를 확인하세요!</h2>
-                                <p className="text-sm text-gray-500 font-bold">회원님만을 위한 맞춤 취업 정보를 제공합니다.</p>
-                            </div>
+            {/* 1. 구직활동 요약 섹션 (캡처 이미지 스타일 반영) */}
+            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-50 dark:border-gray-800">
+                    <div className="w-8 h-8 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400">
+                        <FileText size={18} />
+                    </div>
+                    <h3 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-[#334155]'}`}>{userName} {userName}의 구직활동</h3>
+                </div>
+
+                <div className="flex items-center justify-around py-4 relative">
+                    {/* 세로 구분선 */}
+                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-100 dark:bg-gray-800 hidden md:block"></div>
+
+                    <div className="text-center space-y-2">
+                        <div className="text-xs md:text-sm font-black text-gray-500">이력서 등록수</div>
+                        <div className="text-3xl md:text-5xl font-black text-red-500 flex items-baseline justify-center gap-1">
+                            0<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
-                        <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-8 bg-pink-500 text-white rounded-2xl font-black hover:bg-pink-600 shadow-xl shadow-pink-200 transition-all flex items-center justify-center gap-2">
-                            내 이력서 작성하기
-                        </button>
+                    </div>
+
+                    <div className="text-center space-y-2">
+                        <div className="text-xs md:text-sm font-black text-gray-500">공개중인 이력서</div>
+                        <div className="text-3xl md:text-5xl font-black text-red-500 flex items-baseline justify-center gap-1">
+                            0<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
+                        </div>
                     </div>
                 </div>
-            </header>
+            </div>
 
+            {/* 2. 기존 통계 그리드 섹션 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                     { label: '스크랩한 공고', val: '12', icon: <Star className="text-yellow-400" /> },
@@ -113,12 +130,30 @@ export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }
                 ].map((item, idx) => (
                     <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="p-2 bg-gray-50 rounded-xl">{item.icon}</span>
+                            <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
                             <span className="text-sm font-black">{item.label}</span>
                         </div>
                         <div className="text-3xl font-black">{item.val}<span className="text-sm text-gray-400 ml-1">건</span></div>
                     </div>
                 ))}
+            </div>
+
+            {/* 3. 하단 배너 섹션 (기존 상단 섹션 이동 + 버튼 텍스트 수정) */}
+            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-pink-200">
+                            <User size={32} className="md:w-10 md:h-10" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl md:text-3xl font-black mb-1">관심 공고를 확인하세요!</h2>
+                            <p className="text-sm text-gray-500 font-bold">회원님만을 위한 맞춤 취업 정보를 제공합니다.</p>
+                        </div>
+                    </div>
+                    <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-10 bg-pink-500 text-white rounded-2xl font-black hover:bg-pink-600 shadow-xl shadow-pink-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span className="text-lg">+</span> 이력서 등록하기
+                    </button>
+                </div>
             </div>
         </div>
     );
