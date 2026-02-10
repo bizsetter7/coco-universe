@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   verification: {
     google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
   },
+  other: {
+    google: "notranslate",
+  },
 };
 
 export const viewport: Viewport = {
