@@ -11,10 +11,10 @@ export const Footer = () => {
     return (
         <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
             <div className="container mx-auto px-4 text-center text-xs leading-relaxed">
-                {/* Branded Logo matching MainHeader */}
-                <div className="mb-6 flex items-center justify-center gap-1.5">
-                    <House size={18} className="text-pink-500" />
-                    <span className="text-lg md:text-xl font-black tracking-tighter text-pink-500">
+                {/* Branded Logo matching MainHeader exactly in style */}
+                <div className="mb-6 flex items-center justify-center gap-1.5 mt-1">
+                    <House size={22} strokeWidth={3} className="text-pink-500" />
+                    <span className="text-xl md:text-2xl font-black tracking-tighter text-pink-500">
                         COCOALBA
                     </span>
                 </div>
