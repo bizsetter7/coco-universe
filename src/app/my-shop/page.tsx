@@ -18,7 +18,7 @@ import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import {
     WarningModal, DesignRequestModal, PreviewModal, ExampleModal,
-    BusinessMobileMenu, MemberInfoForm,
+    BusinessMobileMenu, BusinessSidebar, MemberInfoForm,
     OngoingAdsView, ClosedAdsView, PaymentsView, ApplicantsView
 } from './page_sub_components';
 
@@ -119,8 +119,8 @@ function MyShopContent() {
                     id: newId,
                     title: formState.title,
                     nickname: formState.nickname,
-                    category: formState.category1,
-                    keywords: formState.keywords,
+                    category: formState.industryMain,
+                    keywords: formState.selectedKeywords,
                     updateDate: new Date().toISOString().split('T')[0],
                     applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0
                 };
@@ -232,53 +232,71 @@ function MyShopContent() {
             )}
 
             {/* Content View */}
-            <div className="max-w-4xl mx-auto px-4 md:px-0">
-                {view === 'member-info' && (
-                    <MemberInfoForm
-                        {...formState}
-                        brand={brand}
-                        setView={setView}
-                    />
-                )}
-                {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} />}
-                {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
-                {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory} />}
-                {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
+            <div className="max-w-6xl mx-auto px-4 md:px-6">
+                <div className={`grid grid-cols-1 ${(view === 'form' || (userType as string) === 'personal') ? '' : 'md:grid-cols-4'} gap-6 md:py-8`}>
+                    {/* PC Sidebar Persistence for business views (excluding AdForm) */}
+                    {(userType as string) === 'business' && view !== 'form' && (
+                        <BusinessSidebar
+                            brand={brand}
+                            shopName={formState.shopName}
+                            nickname={formState.nickname}
+                            view={view}
+                            setView={setView}
+                        />
+                    )}
+
+                    <div className={`${view === 'form' || (userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3'} space-y-6`}>
+                        {view === 'member-info' && (
+                            <MemberInfoForm
+                                {...formState}
+                                brand={brand}
+                                setView={setView}
+                            />
+                        )}
+                        {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} />}
+                        {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
+                        {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory} />}
+                        {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
+
+                        {view === 'dashboard' && (
+                            <BusinessDashboard
+                                brand={brand}
+                                shopName={formState.shopName}
+                                nickname={formState.nickname}
+                                isVerified={formState.isVerified}
+                                handleAdClick={(isNew) => {
+                                    setIsNewEntry(isNew);
+                                    setShowWarningModal(true);
+                                }}
+                                setShowDesignModal={setShowDesignModal}
+                                setView={setView}
+                                router={router}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
 
             {view === 'form' && (
-                <AdForm
-                    {...formState}
-                    brand={brand}
-                    setShowDesignModal={setShowDesignModal}
-                    handleEditorInteract={formState.updateToolbarStatus}
-                    saveSelection={formState.saveSelection}
-                    execCmd={execCmd}
-                    insertEmoji={insertEmoji}
-                    handlePayTypeChange={handlePayTypeChange}
-                    handlePayAmountChange={handlePayAmountChange}
-                    togglePaySuffix={togglePaySuffix}
-                    setExampleType={setExampleType}
-                    setShowExampleModal={setShowExampleModal}
-                    onSave={handleSave}
-                    onPreview={() => setShowPreviewModal(true)}
-                    onBack={handleBack}
-                />
-            )}
-            {view === 'dashboard' && (
-                <BusinessDashboard
-                    brand={brand}
-                    shopName={formState.shopName}
-                    nickname={formState.nickname}
-                    isVerified={formState.isVerified}
-                    handleAdClick={(isNew) => {
-                        setIsNewEntry(isNew);
-                        setShowWarningModal(true); // Always show for both NEW and EDIT
-                    }}
-                    setShowDesignModal={setShowDesignModal}
-                    setView={setView}
-                    router={router}
-                />
+                <div className="max-w-4xl mx-auto px-4 md:px-0">
+                    <AdForm
+                        {...formState}
+                        brand={brand}
+                        setShowDesignModal={setShowDesignModal}
+                        handleEditorInteract={formState.updateToolbarStatus}
+                        saveSelection={formState.saveSelection}
+                        execCmd={execCmd}
+                        insertEmoji={insertEmoji}
+                        handlePayTypeChange={handlePayTypeChange}
+                        handlePayAmountChange={handlePayAmountChange}
+                        togglePaySuffix={togglePaySuffix}
+                        setExampleType={setExampleType}
+                        setShowExampleModal={setShowExampleModal}
+                        onSave={handleSave}
+                        onPreview={() => setShowPreviewModal(true)}
+                        onBack={handleBack}
+                    />
+                </div>
             )}
         </div>
     );

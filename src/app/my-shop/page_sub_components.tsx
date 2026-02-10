@@ -874,14 +874,13 @@ export const OngoingAdsView = ({ setView, ads = [], userName = '' }: { setView: 
     const brand = useBrand();
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
-                <Home size={12} /> 메인 &gt; 마이페이지 &gt; 채용정보 &gt; <span className="text-gray-900 font-bold">진행중인 채용정보</span>
-            </div>
-            <div className="flex items-center gap-3 mb-6 p-2">
-                <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
-                    <User size={20} />
+            <div className={`p-6 rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-pink-600'} `}>
+                        <List size={24} />
+                    </div>
+                    <h2 className="text-xl font-black text-gray-800">{userName} <span className="text-gray-400 font-bold">회원 님의 진행중인 채용정보</span></h2>
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원 님의 진행중인 채용정보</span></h2>
             </div>
 
             <div className="border-t border-gray-900 pt-10">
@@ -934,14 +933,13 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '' }: { setView: (
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
-                <Home size={12} /> 메인 &gt; 마이페이지 &gt; 채용정보 &gt; <span className="text-gray-900 font-bold">마감된 채용정보</span>
-            </div>
-            <div className="flex items-center gap-3 mb-6 p-2">
-                <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
-                    <User size={20} />
+            <div className={`p-6 rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-600'} `}>
+                        <LogOut size={24} />
+                    </div>
+                    <h2 className="text-xl font-black text-gray-800">{userName} <span className="text-gray-400 font-bold">회원 님의 마감된 채용정보</span></h2>
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원 님의 마감된 채용정보</span></h2>
             </div>
 
             <div className="border-t border-gray-900 pt-10">
@@ -1014,73 +1012,74 @@ export const PaymentsView = ({ setView, payments = [], userName = '' }: { setVie
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
-                <Home size={12} /> 메인 &gt; 마이페이지 &gt; <span className="text-gray-900 font-bold">결제내역</span>
-            </div>
-            <div className="flex items-center gap-3 mb-6 p-2">
-                <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
-                    <User size={20} />
+            <div className={`p-6 rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-green-600'} `}>
+                        <CreditCard size={24} />
+                    </div>
+                    <h2 className="text-xl font-black text-gray-800">{userName} <span className="text-gray-400 font-bold">회원 님의 결제 내역</span></h2>
                 </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원님의 채용활동</span></h2>
             </div>
 
-            <div className="overflow-x-auto border-t border-gray-900 pt-10">
-                <div className="flex items-center gap-2 mb-2">
-                    <ArrowRight size={14} className="text-gray-400 shrink-0" />
-                    <span className="font-black text-sm text-gray-800">유료결제내역</span>
-                </div>
-                {payments.length === 0 ? (
-                    <div className="min-h-[200px] flex items-center justify-center border border-gray-100 rounded-xl bg-gray-50/30">
-                        <p className="text-gray-400 font-bold">결제 내역이 없습니다.</p>
+            <div className="space-y-6">
+                <div className="overflow-x-auto border-t border-gray-900 pt-10">
+                    <div className="flex items-center gap-2 mb-2">
+                        <ArrowRight size={14} className="text-gray-400 shrink-0" />
+                        <span className="font-black text-sm text-gray-800">유료결제내역</span>
                     </div>
-                ) : (
-                    <>
-                        <table className="w-full text-center border-collapse text-[11px] md:text-[13px]">
-                            <thead className="bg-gray-50 border-y border-gray-200 text-gray-400 font-bold">
-                                <tr>
-                                    <th className="py-2.5 px-2">번호</th>
-                                    <th className="py-2.5 px-2">구매내역</th>
-                                    <th className="py-2.5 px-2">결제금액</th>
-                                    <th className="py-2.5 px-2">결제방식</th>
-                                    <th className="py-2.5 px-2 text-pink-500">닉네임</th>
-                                    <th className="py-2.5 px-2">보기</th>
-                                    <th className="py-2.5 px-2">결제일</th>
-                                    <th className="py-2.5 px-2 text-green-600">확인</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-gray-600">
-                                {payments.map((p: any) => (
-                                    <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition">
-                                        <td className="py-4 px-2 font-mono text-gray-400">{p.id}</td>
-                                        <td className="py-4 px-2 text-left">
-                                            <span className="bg-orange-400 text-white text-[10px] px-1 rounded-sm mr-1.5 font-black uppercase">{p.type || '신청'}</span>
-                                            <span className="font-bold underline cursor-pointer">{p.desc}</span>
-                                        </td>
-                                        <td className="py-4 px-2 font-black text-gray-800">{p.price}</td>
-                                        <td className="py-4 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-medium">{p.method}</td>
-                                        <td className="py-4 px-2 font-bold">{p.nickname || userName}</td>
-                                        <td className="py-4 px-2">
-                                            <button className="text-blue-500 underline text-[11px] font-bold">채용정보보기</button>
-                                        </td>
-                                        <td className="py-4 px-2 font-mono text-gray-400 leading-tight">
-                                            {p.date?.split(' ')[0]}<br />{p.date?.split(' ')[1]}
-                                        </td>
-                                        <td className="py-4 px-2">
-                                            <span className={`px-2 py-1 text-white text-[10px] font-black rounded-sm border shadow-inner ${p.isConfirmed ? 'bg-green-500 border-green-700' : 'bg-gray-400 border-gray-500'}`}>
-                                                {p.status || '대기'}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className="flex justify-center items-center gap-1 mt-10 text-[13px] font-black">
-                            <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">&lt; Prev</button>
-                            <span className="px-3 py-1 text-red-500 border border-gray-100">1</span>
-                            <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">Next &gt;</button>
+                    {payments.length === 0 ? (
+                        <div className="min-h-[200px] flex items-center justify-center border border-gray-100 rounded-xl bg-gray-50/30">
+                            <p className="text-gray-400 font-bold">결제 내역이 없습니다.</p>
                         </div>
-                    </>
-                )}
+                    ) : (
+                        <>
+                            <table className="w-full text-center border-collapse text-[11px] md:text-[13px]">
+                                <thead className="bg-gray-50 border-y border-gray-200 text-gray-400 font-bold">
+                                    <tr>
+                                        <th className="py-2.5 px-2">번호</th>
+                                        <th className="py-2.5 px-2">구매내역</th>
+                                        <th className="py-2.5 px-2">결제금액</th>
+                                        <th className="py-2.5 px-2">결제방식</th>
+                                        <th className="py-2.5 px-2 text-pink-500">닉네임</th>
+                                        <th className="py-2.5 px-2">보기</th>
+                                        <th className="py-2.5 px-2">결제일</th>
+                                        <th className="py-2.5 px-2 text-green-600">확인</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-gray-600">
+                                    {payments.map((p: any) => (
+                                        <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                                            <td className="py-4 px-2 font-mono text-gray-400">{p.id}</td>
+                                            <td className="py-4 px-2 text-left">
+                                                <span className="bg-orange-400 text-white text-[10px] px-1 rounded-sm mr-1.5 font-black uppercase">{p.type || '신청'}</span>
+                                                <span className="font-bold underline cursor-pointer">{p.desc}</span>
+                                            </td>
+                                            <td className="py-4 px-2 font-black text-gray-800">{p.price}</td>
+                                            <td className="py-4 px-2 whitespace-pre-line leading-relaxed text-[11px] text-indigo-700 font-medium">{p.method}</td>
+                                            <td className="py-4 px-2 font-bold">{p.nickname || userName}</td>
+                                            <td className="py-4 px-2">
+                                                <button className="text-blue-500 underline text-[11px] font-bold">채용정보보기</button>
+                                            </td>
+                                            <td className="py-4 px-2 font-mono text-gray-400 leading-tight">
+                                                {p.date?.split(' ')[0]}<br />{p.date?.split(' ')[1]}
+                                            </td>
+                                            <td className="py-4 px-2">
+                                                <span className={`px-2 py-1 text-white text-[10px] font-black rounded-sm border shadow-inner ${p.isConfirmed ? 'bg-green-500 border-green-700' : 'bg-gray-400 border-gray-500'}`}>
+                                                    {p.status || '대기'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <div className="flex justify-center items-center gap-1 mt-10 text-[13px] font-black">
+                                <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">&lt; Prev</button>
+                                <span className="px-3 py-1 text-red-500 border border-gray-100">1</span>
+                                <button className="px-2 py-1 border border-gray-200 text-gray-400 hover:bg-gray-50 uppercase text-[10px]">Next &gt;</button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -1090,29 +1089,68 @@ export const ApplicantsView = ({ setView, userName = '' }: { setView: (v: any) =
     const brand = useBrand();
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
-                <Home size={12} /> 메인 &gt; 마이페이지 &gt; <span className="text-gray-900 font-bold">지원자 관리</span>
-            </div>
-            <div className="flex items-center gap-3 mb-6 p-2">
-                <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded flex items-center justify-center text-gray-300">
-                    <User size={20} />
-                </div>
-                <h2 className="text-xl font-black text-gray-800 font-serif lowercase italic">{userName} <span className="text-gray-400 not-italic font-sans">회원님의 지원자 관리</span></h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                    <div className="text-4xl font-black text-pink-500 mb-2">0</div>
-                    <p className="text-xs font-bold text-gray-500">진행 중인 공고 지원자</p>
-                </div>
-                <div className={`p-6 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                    <div className="text-4xl font-black text-gray-300 mb-2">0</div>
-                    <p className="text-xs font-bold text-gray-500">새로운 메시지</p>
+            <div className={`p-6 rounded-[32px] shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-blue-600'} `}>
+                        <User size={24} />
+                    </div>
+                    <h2 className="text-xl font-black text-gray-800">{userName} <span className="text-gray-400 font-bold">회원 님의 온라인 지원자 관리</span></h2>
                 </div>
             </div>
-            <div className={`p-12 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                <p className="text-gray-400 font-bold">지원 현황이 없습니다.</p>
+
+            <div className="space-y-6">
+                <div className={`p-12 rounded-2xl border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <p className="text-gray-400 font-bold">지원 현항이 없습니다.</p>
+                </div>
             </div>
         </div>
+    );
+};
+
+export const BusinessSidebar = ({
+    brand, shopName, nickname, view, setView
+}: {
+    brand: any, shopName: string, nickname?: string, view: string, setView: (v: any) => void
+}) => {
+    const navItems = [
+        { id: 'dashboard', label: '진행중인 채용정보', icon: List },
+        { id: 'closed-ads', label: '마감된 채용정보', icon: LogOut },
+        { id: 'applicants', label: '지원자 관리', icon: User },
+        { id: 'payments', label: '결제 내역', icon: CreditCard },
+        { id: 'member-info', label: '회원정보 수정', icon: Settings, borderTop: true },
+    ];
+
+    const activeItemStyle = "bg-pink-50 text-pink-500 rounded-xl";
+    const inactiveItemStyle = "hover:bg-pink-50 hover:text-pink-500 rounded-xl transition";
+
+    return (
+        <aside className="hidden md:block col-span-1 space-y-4">
+            <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}>
+                    <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
+                </div>
+                <div className="mb-4">
+                    <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>{shopName || '내 상점'}</h2>
+                    {nickname && <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>{nickname}</p>}
+                    <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} `}>프리미엄 인증 업소</p>
+                </div>
+                <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} `}>
+                    사진 등록/수정
+                </button>
+            </div>
+
+            <nav className={`p-4 rounded-2xl border shadow-sm space-y-1 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-100 text-gray-600'} `}>
+                {navItems.map((item) => (
+                    <div
+                        key={item.id}
+                        onClick={() => setView(item.id)}
+                        className={`flex items-center gap-3 p-3 cursor-pointer font-bold text-sm ${item.borderTop ? 'border-t mt-2 pt-4' : ''} ${view === item.id ? activeItemStyle : inactiveItemStyle}`}
+                    >
+                        <item.icon size={18} /> {item.label}
+                    </div>
+                ))}
+            </nav>
+        </aside>
     );
 };
 
