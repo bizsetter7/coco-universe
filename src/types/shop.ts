@@ -31,6 +31,8 @@ export interface Shop {
         icons?: string[];
         mediaUrl?: string;
         paySuffixes?: string[];
+        icon?: number | string;
+        highlighter?: number | string;
         keywords?: string[];
         border?: 'none' | 'color' | 'glow';
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';

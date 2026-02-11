@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { MessageCircle } from 'lucide-react';
 import { Step1BasicInfo } from './components/form/steps/Step1BasicInfo';
 import { Step2JobDetail } from './components/form/steps/Step2JobDetail';
 import { Step3ProductSelect } from './components/form/steps/Step3ProductSelect';
@@ -21,7 +22,6 @@ interface AdFormProps {
     ageMax: number; setAgeMax: (v: number) => void;
     regionCity: string; setRegionCity: (v: string) => void;
     regionGu: string; setRegionGu: (v: string) => void;
-    workTime: string; setWorkTime: (v: string) => void;
     payType: string; handlePayTypeChange: (e: any) => void;
     payAmount: string; handlePayAmountChange: (e: any) => void;
     selectedKeywords: string[]; setSelectedKeywords: (v: string[]) => void;
@@ -57,39 +57,59 @@ interface AdFormProps {
     onSave?: () => void;
     onPreview?: () => void;
     onBack?: () => void;
+    isNewEntry?: boolean;
 }
 
 export default function AdForm(props: AdFormProps) {
     const { brand } = props;
 
     return (
-        <div className="w-full max-w-[1080px] mx-auto space-y-5 pb-8 pt-[10px] px-3 xl:px-0 relative mb-3">
+        <div className="w-full max-w-[1120px] mx-auto space-y-1 pb-8 pt-0 px-2 md:px-3 xl:px-0 relative mb-3">
             {/* Recruitment Registration Header (Capture 3) */}
-            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                <div className="flex items-start gap-4 mb-2">
-                    <div className="w-2 h-8 bg-pink-500 rounded-full shrink-0"></div>
-                    <h1 className={`text-2xl md:text-3xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>채용공고등록</h1>
+            <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+                <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">
+                    <div className="w-1.5 h-6 md:w-2 md:h-8 bg-pink-500 rounded-full shrink-0"></div>
+                    <h1 className={`text-xl md:text-3xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>채용공고등록</h1>
                 </div>
-                <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'} font-bold text-sm md:text-base ml-0 leading-tight md:leading-normal`}>
-                    <span className="mr-1 text-lg font-black text-pink-500">*</span>
-                    <span className="hidden md:inline">표시는 필수 입력 항목입니다. 정확한 정보를 입력해주세요.</span>
-                    <span className="md:hidden">표시는 필수 입력 항목입니다.<br />정확한 정보를 입력해주세요.</span>
+                <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'} font-bold text-[11px] md:text-base ml-0 leading-tight md:leading-normal`}>
+                    <span className="mr-0.5 text-pink-500 font-extrabold">*</span> 표시 항목은 필수 입력입니다. 정확히 입력해주세요.
                 </p>
             </div>
 
-            <div>
-                <Step1BasicInfo {...props} />
-            </div>
+            <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} />
-            <Step3ProductSelect {...props} />
-            <Step4Extras
-                {...props}
-                selectedKeywords={props.selectedKeywords}
-                setSelectedKeywords={props.setSelectedKeywords}
-                selectedAdProduct={props.selectedAdProduct}
-                setExampleType={props.setExampleType}
-                setShowExampleModal={props.setShowExampleModal}
-            />
+            {/* Step 3 & 4: Restricted in Edit Mode */}
+            <div className="relative group">
+                {!props.isNewEntry && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-[32px] pointer-events-none animate-in fade-in duration-500">
+                        <div className="bg-white/90 shadow-xl border border-pink-100 p-6 rounded-3xl text-center max-w-sm">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-pink-600">
+                                <MessageCircle size={20} fill="currentColor" />
+                                <span className="font-black text-sm uppercase tracking-wider">Product Info</span>
+                            </div>
+                            <h3 className="text-lg font-black text-gray-900 mb-1">상품 및 추가 옵션 변경 안내</h3>
+                            <p className="text-[12px] text-gray-500 font-bold leading-relaxed mb-4">
+                                이미 등록된 공고의 상품 등급 및 옵션은 직접 수정이 불가능합니다. <br />
+                                <span className="text-pink-600 font-black underline">관리자 1:1 문의</span>를 통해 요청해주세요.
+                            </p>
+                            <button className="pointer-events-auto px-5 py-2 bg-gray-900 text-white text-xs font-black rounded-xl hover:bg-black transition-all active:scale-95 shadow-lg">
+                                고객센터 문의하기
+                            </button>
+                        </div>
+                    </div>
+                )}
+                <div className={`space-y-5 transition-all duration-300 ${!props.isNewEntry ? 'opacity-40 grayscale-[0.3] pointer-events-none' : ''}`}>
+                    <Step3ProductSelect {...props} />
+                    <Step4Extras
+                        {...props}
+                        selectedKeywords={props.selectedKeywords}
+                        setSelectedKeywords={props.setSelectedKeywords}
+                        selectedAdProduct={props.selectedAdProduct}
+                        setExampleType={props.setExampleType}
+                        setShowExampleModal={props.setShowExampleModal}
+                    />
+                </div>
+            </div>
 
             {/* Total Amount Display (Redesigned matching Capture 1/2) */}
             <div className="max-w-[900px] mx-auto w-full px-4 md:px-0">

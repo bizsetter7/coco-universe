@@ -51,3 +51,27 @@ export const PAY_TYPES = ['시급', '일급', '주급', '월급', '건별', '협
 export const CONVENIENCE_ITEMS = CONVENIENCE_KEYWORDS;
 
 export const KEYWORDS = CONVENIENCE_KEYWORDS;
+
+export const ICONS = [
+    { id: 1, name: '초보환영', icon: '❤️' },
+    { id: 2, name: '원룸제공', icon: '👄' },
+    { id: 3, name: '최고급시설', icon: '💥' },
+    { id: 4, name: '블랙관리', icon: '⬛' },
+    { id: 5, name: '꽁비지급', icon: '😜' },
+    { id: 6, name: '사이즈X', icon: '❌' },
+    { id: 7, name: '셋트환영', icon: '👯' },
+    { id: 8, name: '픽업가능', icon: '🚗' },
+    { id: 9, name: '회원제운영', icon: '❗' },
+    { id: 10, name: '급전가능', icon: '✨' },
+];
+
+export const HIGHLIGHTERS = [
+    { id: 1, name: '연두', color: '#ccff00' },
+    { id: 2, name: '초록', color: '#00ff00' },
+    { id: 3, name: '하늘', color: '#00ffff' },
+    { id: 4, name: '보라', color: '#cc99ff' },
+    { id: 5, name: '오렌지', color: '#ffcc00' },
+    { id: 6, name: '연파랑', color: '#99ccff' },
+    { id: 7, name: '분홍', color: '#ff99ff' },
+    { id: 8, name: '핫핑크', color: '#ff00ff' },
+];

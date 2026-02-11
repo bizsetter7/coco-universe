@@ -8,6 +8,7 @@ import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { BrandConfig } from '@/lib/brand-config';
+import { ICONS, HIGHLIGHTERS } from '@/constants/job-options';
 
 interface JobAdSectionProps {
     title: string;
@@ -146,20 +147,38 @@ const JobCard = React.memo(({
 
                 {/* BOTTOM: Info Section */}
                 <div className="p-3 mt-3">
-                    <div className="mb-2 flex flex-col justify-between">
-                        <div className="flex justify-between items-start mb-0">
-                            <h4 className={`text-[14px] font-black truncate leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} max-w-[80%]`}>
-                                {shop.realName || shop.name}
+                    <div className="flex flex-col gap-1.5 mb-1 min-h-[48px]">
+                        {/* Icon + Name (Step 4 Options) */}
+                        {shop.options?.icon && (() => {
+                            const iconObj = ICONS.find((i: any) => i.id === Number(shop.options?.icon));
+                            return iconObj ? (
+                                <div className="flex items-center gap-1 text-[10px] font-black text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded w-fit border border-pink-100/50">
+                                    <span>{iconObj.icon}</span>
+                                    <span className="truncate">{iconObj.name}</span>
+                                </div>
+                            ) : null;
+                        })()}
+
+                        <div className="flex justify-between items-start">
+                            <h4 className={`text-[13px] md:text-[14px] font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} line-clamp-2`}>
+                                <span style={shop.options?.highlighter ? {
+                                    backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(shop.options?.highlighter))?.color + 'cc',
+                                    color: '#000',
+                                    padding: '0 2px',
+                                    borderRadius: '2px'
+                                } : {}}>
+                                    {shop.title || shop.realName || shop.name}
+                                </span>
                             </h4>
-                            <span className="text-[10px] text-gray-400 font-medium shrink-0 ml-1">
+                            <span className="text-[9px] text-gray-400 font-medium shrink-0 ml-1 mt-0.5">
                                 {rank}위
                             </span>
                         </div>
-                        <p className="text-[11px] text-gray-500 truncate flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-gray-400 shrink-0"></span>
-                            {shop.region}
-                        </p>
                     </div>
+                    <p className="text-[11px] text-gray-500 truncate flex items-center gap-1">
+                        <span className="w-1 h-1 rounded-full bg-gray-400 shrink-0"></span>
+                        {shop.region}
+                    </p>
 
                     {(() => {
                         const payStr = shop.pay || '';

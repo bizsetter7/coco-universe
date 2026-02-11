@@ -20,8 +20,6 @@ interface Step2Props {
     setRegionCity: (v: string) => void;
     regionGu: string;
     setRegionGu: (v: string) => void;
-    workTime: string;
-    setWorkTime: (v: string) => void;
     payType: string;
     handlePayTypeChange: (e: any) => void;
     payAmount: string;
@@ -55,7 +53,7 @@ interface Step2Props {
 export const Step2JobDetail: React.FC<Step2Props> = ({
     brand, title, setTitle, industryMain, setIndustryMain, industrySub, setIndustrySub,
     ageMin, setAgeMin, ageMax, setAgeMax, regionCity, setRegionCity, regionGu, setRegionGu,
-    workTime, setWorkTime, payType, handlePayTypeChange, payAmount, handlePayAmountChange,
+    payType, handlePayTypeChange, payAmount, handlePayAmountChange,
     setShowDesignModal, editorRef, handleEditorInteract, setIsEditorDirty, saveSelection,
     restoreSelection, syncEditorHtml, editorHtml,
     toolbarStatus, execCmd, updateToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,
@@ -189,8 +187,20 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                     <h2 className="font-black text-gray-800 mb-2 md:mb-4 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>채용 공고 정보</h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                            <input type="text" placeholder="EX) 강남 1등 가게! 갯수 보장!" value={title} onChange={(e) => setTitle(e.target.value)} className={`w-full border rounded-lg p-3 text-base font-black outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black shadow-inner'}`} />
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-sm font-black"><span className="text-red-500 mr-1">*</span>공고 제목</label>
+                                <span className={`text-[10px] font-bold ${title.length >= 25 ? 'text-red-500' : 'text-gray-400'}`}>
+                                    {title.length}/25 (텍스트+숫자+특수문자 포함)
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="EX) 강남 1등 가게! 갯수 보장!"
+                                value={title}
+                                maxLength={25}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className={`w-full border rounded-lg p-3 text-base font-black outline-none placeholder:text-gray-200 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black shadow-inner'}`}
+                            />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid grid-cols-2 gap-2.5">
@@ -220,25 +230,19 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2.5">
-                                <div>
-                                    <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
-                                    <div className="flex gap-1.5 relative">
-                                        <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8" style={{ WebkitAppearance: 'none' }}>
-                                            <option value="">시/도</option>
-                                            {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
-                                        </select>
-                                        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                        <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8 disabled:bg-gray-50 disabled:cursor-not-allowed" disabled={!regionCity} style={{ WebkitAppearance: 'none' }}>
-                                            <option value="">구/군</option>
-                                            {REGION_DATA[regionCity as keyof typeof REGION_DATA]?.map((g: string) => <option key={g} value={g}>{g}</option>)}
-                                        </select>
-                                        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-black mb-1.5">근무시간</label>
-                                    <input type="text" placeholder="협의" value={workTime} onChange={(e) => setWorkTime(e.target.value)} className="w-full border rounded-lg p-2 text-base outline-none bg-white" />
+                            <div>
+                                <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>근무 지역</label>
+                                <div className="flex gap-1.5 relative">
+                                    <select value={regionCity} onChange={e => setRegionCity(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8" style={{ WebkitAppearance: 'none' }}>
+                                        <option value="">시/도</option>
+                                        {Object.keys(REGION_DATA).map(r => <option key={r} value={r}>{r}</option>)}
+                                    </select>
+                                    <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                    <select value={regionGu} onChange={e => setRegionGu(e.target.value)} className="w-full border rounded-lg p-2 text-sm outline-none bg-white appearance-none cursor-pointer pr-8 disabled:bg-gray-50 disabled:cursor-not-allowed" disabled={!regionCity} style={{ WebkitAppearance: 'none' }}>
+                                        <option value="">구/군</option>
+                                        {REGION_DATA[regionCity as keyof typeof REGION_DATA]?.map((g: string) => <option key={g} value={g}>{g}</option>)}
+                                    </select>
+                                    <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                                 </div>
                             </div>
                         </div>
@@ -246,20 +250,22 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                             <div>
                                 <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여 방식</label>
                                 <select value={payType} onChange={handlePayTypeChange} className="w-full border rounded-lg p-2.5 text-sm outline-none bg-white h-[42px]">
+                                    <option value="급여방식선택">급여방식선택</option>
                                     {PAY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
-                                <div className="relative">
+                                <div className={`relative flex items-center border rounded-lg overflow-hidden transition-all focus-within:ring-2 focus-within:ring-pink-100 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 shadow-inner'}`}>
                                     <input
                                         type="text"
                                         placeholder="0"
-                                        value={payAmount ? (Number(payAmount).toLocaleString() + '원') : ''}
+                                        value={payAmount ? Number(payAmount).toLocaleString() : ''}
                                         onChange={handlePayAmountChange}
                                         disabled={payType === '협의'}
-                                        className="w-full border rounded-lg p-2.5 text-base font-black text-right outline-none bg-white disabled:bg-gray-50 h-[42px] pr-4"
+                                        className={`flex-1 p-2.5 text-base font-black text-right outline-none bg-transparent disabled:bg-gray-50 h-[42px] pr-1 placeholder:text-gray-200`}
                                     />
+                                    <span className={`pr-3 pl-1 text-sm font-black ${payAmount ? 'text-gray-900' : 'text-gray-300'}`}>원</span>
                                 </div>
                             </div>
                         </div>
@@ -269,7 +275,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                 {/* Editor & Preview Split View for PC */}
                 <div className="lg:grid lg:grid-cols-2 lg:gap-6 items-start">
                     {/* Editor Side */}
-                    <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
+                    <div className={`p-5 md:p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
                         <div className="flex items-center justify-between mb-3">
                             <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>상세내용 작성 (에디터)</h2>
                             <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인이 필요한가요?</button>
@@ -334,7 +340,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('foreColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Text Color"><Type size={16} style={{ color: toolbarStatus.currentForeColor }} /></button>
                                     {showForeColorMenu && (
                                         <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {TEXT_COLORS.map(c => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('foreColor', c.value); editorRef.current?.focus(); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                            {TEXT_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('foreColor', c.value); editorRef.current?.focus(); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
                                         </div>
                                     )}
                                 </div>
@@ -342,7 +348,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('hiliteColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Highlight Color"><Palette size={16} style={{ backgroundColor: toolbarStatus.currentHiliteColor === 'transparent' ? 'transparent' : toolbarStatus.currentHiliteColor }} /></button>
                                     {showHiliteColorMenu && (
                                         <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {BG_COLORS.map(c => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('hiliteColor', c.value); editorRef.current?.focus(); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                            {BG_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('hiliteColor', c.value); editorRef.current?.focus(); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
                                         </div>
                                     )}
                                 </div>

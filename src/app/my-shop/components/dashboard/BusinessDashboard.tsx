@@ -94,7 +94,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         🔥 {ad.title}
                                     </h4>
                                     <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
-                                        {shopName} {nickname && <span className="text-gray-400 ml-1">({nickname})</span>} | 서울 강남구 | {ad.category || '룸싸롱'} | 아가씨
+                                        {shopName} {nickname && <span className="text-gray-400 ml-1">({nickname})</span>} | {ad.regionCity} {ad.regionGu} | {ad.category || '룸싸롱'} | 아가씨
                                     </div>
                                 </div>
                                 <div className="flex gap-1.5 shrink-0 items-center justify-center md:justify-end">

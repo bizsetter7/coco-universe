@@ -31,9 +31,8 @@ export function useAdFormState() {
     const [ageMax, setAgeMax] = useState(35);
 
     // Pay
-    const [payType, setPayType] = useState('종류선택');
+    const [payType, setPayType] = useState('급여방식선택');
     const [payAmount, setPayAmount] = useState('0');
-    const [workTime, setWorkTime] = useState('');
 
     const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
@@ -150,9 +149,8 @@ export function useAdFormState() {
         setIndustrySub('');
         setAgeMin(20);
         setAgeMax(35);
-        setPayType('종류선택');
+        setPayType('급여방식선택');
         setPayAmount('0');
-        setWorkTime('');
         setIsEditorDirty(false);
         setSelectedAdProduct(null);
         setSelectedAdPeriod(30);
@@ -200,7 +198,7 @@ export function useAdFormState() {
         ageMax !== 35 ||
         regionCity !== '' ||
         regionGu !== '' ||
-        payType !== '종류선택' ||
+        payType !== '급여방식선택' ||
         payAmount !== '0' ||
         isEditorDirty ||
         selectedKeywords.length > 0 ||
@@ -214,6 +212,9 @@ export function useAdFormState() {
 
     const loadAdData = (ad: any) => {
         if (!ad) return;
+        setManagerName(ad.managerName || '');
+        setManagerPhone(ad.managerPhone || '');
+        setMessengers(ad.messengers || { kakao: '', line: '', telegram: '' });
         setTitle(ad.title || '');
         setNickname(ad.nickname || '');
         setIndustryMain(ad.category || '');
@@ -222,9 +223,8 @@ export function useAdFormState() {
         setRegionGu(ad.regionGu || '');
         setAgeMin(ad.ageMin || 20);
         setAgeMax(ad.ageMax || 35);
-        setPayType(ad.payType || '종류선택');
+        setPayType(ad.payType || '급여방식선택');
         setPayAmount(ad.payAmount || '0');
-        setWorkTime(ad.workTime || '');
         setSelectedKeywords(ad.keywords || []);
         setEditorHtml(ad.content || '');
         if (editorRef.current) {
@@ -249,7 +249,8 @@ export function useAdFormState() {
         managerPhone, setManagerPhone, messengers, setMessengers, title, setTitle,
         regionCity, setRegionCity, regionGu, setRegionGu, addressDetail, setAddressDetail,
         industryMain, setIndustryMain, industrySub, setIndustrySub, ageMin, setAgeMin,
-        ageMax, setAgeMax, payType, setPayType, payAmount, setPayAmount, workTime, setWorkTime,
+        ageMax, setAgeMax, payType, setPayType,
+        payAmount, setPayAmount,
         selectedKeywords, setSelectedKeywords, editorRef, selectionRange, isEditorDirty, setIsEditorDirty,
         editorHtml, setEditorHtml, syncEditorHtml, updateToolbarStatus, saveSelection, restoreSelection,
         toolbarStatus, setToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,

@@ -17,7 +17,7 @@ import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import {
-    WarningModal, DesignRequestModal, PreviewModal, ExampleModal,
+    WarningModal, DesignRequestModal, PreviewModal, ExampleModal, AdDetailModal,
     BusinessMobileMenu, BusinessSidebar, MemberInfoForm,
     OngoingAdsView, ClosedAdsView, PaymentsView, ApplicantsView
 } from './page_sub_components';
@@ -69,6 +69,7 @@ function MyShopContent() {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showExampleModal, setShowExampleModal] = useState(false);
     const [exampleType, setExampleType] = useState<any>(null);
+    const [selectedAdForModal, setSelectedAdForModal] = useState<any>(null);
 
     // Form State (Hook)
     const formState = useAdFormState();
@@ -111,6 +112,21 @@ function MyShopContent() {
 
     // Handlers
     const handleSave = () => {
+        // --- Validation ---
+        const {
+            title, shopName, managerName, managerPhone, industryMain, industrySub,
+            regionCity, regionGu, payType, payAmount
+        } = formState;
+
+        if (!shopName?.trim()) { alert('상호명을 입력해주세요.'); return; }
+        if (!managerName?.trim()) { alert('담당자 성함을 입력해주세요.'); return; }
+        if (!managerPhone?.trim()) { alert('담당자 연락처를 입력해주세요.'); return; }
+        if (!title?.trim()) { alert('공고 제목을 입력해주세요.'); return; }
+        if (!industryMain || !industrySub) { alert('직종(1차/2차)을 모두 선택해주세요.'); return; }
+        if (!regionCity || !regionGu) { alert('근무 지역(시/구)을 모두 선택해주세요.'); return; }
+        if (payType === '종류선택') { alert('급여 종류를 선택해주세요.'); return; }
+        if (payType !== '협의' && (!payAmount || payAmount === '0')) { alert('급여 금액을 입력해주세요.'); return; }
+
         if (isNewEntry) {
             if (confirm('공고를 등록하시겠습니까?')) {
                 // Simulate saving to state
@@ -119,6 +135,9 @@ function MyShopContent() {
                     id: newId,
                     title: formState.title,
                     nickname: formState.nickname,
+                    managerName: formState.managerName,
+                    managerPhone: formState.managerPhone,
+                    messengers: formState.messengers,
                     category: formState.industryMain,
                     categorySub: formState.industrySub,
                     regionCity: formState.regionCity,
@@ -127,7 +146,6 @@ function MyShopContent() {
                     ageMax: formState.ageMax,
                     payType: formState.payType,
                     payAmount: formState.payAmount,
-                    workTime: formState.workTime,
                     content: formState.editorRef.current?.innerHTML || '',
                     keywords: formState.selectedKeywords,
                     updateDate: new Date().toISOString().split('T')[0],
@@ -171,6 +189,39 @@ function MyShopContent() {
                 formState.resetAdStates();
             }
         } else {
+            // Edit Mode: Update existing ad
+            const targetId = searchParams.get('id');
+            if (targetId) {
+                setRegisteredAds(prev => prev.map(ad => {
+                    if (String(ad.id) === targetId) {
+                        return {
+                            ...ad,
+                            title: formState.title,
+                            nickname: formState.nickname,
+                            managerName: formState.managerName,
+                            managerPhone: formState.managerPhone,
+                            messengers: formState.messengers,
+                            category: formState.industryMain,
+                            categorySub: formState.industrySub,
+                            regionCity: formState.regionCity,
+                            regionGu: formState.regionGu,
+                            ageMin: formState.ageMin,
+                            ageMax: formState.ageMax,
+                            payType: formState.payType,
+                            payAmount: formState.payAmount,
+                            content: formState.editorRef.current?.innerHTML || '',
+                            keywords: formState.selectedKeywords,
+                            updateDate: new Date().toISOString().split('T')[0],
+                            options: {
+                                ...ad.options,
+                                paySuffixes: formState.paySuffixes
+                            }
+                        };
+                    }
+                    return ad;
+                }));
+                alert('공고 수정이 완료되었습니다.');
+            }
             formState.resetAdStates();
             setView('dashboard');
         }
@@ -224,11 +275,6 @@ function MyShopContent() {
         if (formState.paySuffixes.includes(s)) {
             formState.setPaySuffixes(formState.paySuffixes.filter(x => x !== s));
         } else {
-            if (formState.paySuffixes.length >= 6) {
-                alert('급여 옵션은 최대 6개(기본 1개 포함)까지 선택 가능합니다.');
-                return;
-            }
-            formState.setPaySuffixes([...formState.paySuffixes, s]);
         }
     };
 
@@ -249,6 +295,13 @@ function MyShopContent() {
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
             {showPreviewModal && <PreviewModal brand={brand} onClose={() => setShowPreviewModal(false)} formData={currentFormData} />}
             {showExampleModal && <ExampleModal show={showExampleModal} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
+            {selectedAdForModal && (
+                <AdDetailModal
+                    brand={brand}
+                    ad={selectedAdForModal}
+                    onClose={() => setSelectedAdForModal(null)}
+                />
+            )}
             {showMobileMenu && (
                 <BusinessMobileMenu
                     brand={brand}
@@ -282,9 +335,27 @@ function MyShopContent() {
                                 setView={setView}
                             />
                         )}
-                        {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} />}
+                        {view === 'ongoing-ads' && (
+                            <OngoingAdsView
+                                setView={setView}
+                                userName={formState.shopName}
+                                ads={registeredAds}
+                                onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
+                            />
+                        )}
                         {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
-                        {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory} />}
+                        {view === 'payments' && (
+                            <PaymentsView
+                                setView={setView}
+                                userName={formState.shopName}
+                                payments={paymentHistory}
+                                onShowAdDetail={(adId) => {
+                                    const ad = registeredAds.find(a => a.id === adId);
+                                    if (ad) setSelectedAdForModal(ad);
+                                    else alert('해당 공고 상세 정보를 찾을 수 없습니다.');
+                                }}
+                            />
+                        )}
                         {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
 
                         {view === 'dashboard' && (
@@ -312,10 +383,11 @@ function MyShopContent() {
                 </div>
             </div>
 
-            {view === 'form' && (
-                <div className="max-w-4xl mx-auto px-4 md:px-0">
+            {view === 'form' ? (
+                <div className="w-full">
                     <AdForm
                         {...formState}
+                        isNewEntry={isNewEntry}
                         brand={brand}
                         setShowDesignModal={setShowDesignModal}
                         handleEditorInteract={formState.updateToolbarStatus}
@@ -332,7 +404,7 @@ function MyShopContent() {
                         onBack={handleBack}
                     />
                 </div>
-            )}
+            ) : null}
         </div>
     );
 }
