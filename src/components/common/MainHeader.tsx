@@ -417,7 +417,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                                         ) : (
                                                             <div className="flex items-center gap-2">
                                                                 <div
-                                                                    onClick={() => router.push('/my-shop')}
+                                                                    onClick={() => { router.push('/my-shop'); setShowMobileMenu(false); }}
                                                                     className={`flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg cursor-pointer transition-all active:scale-95 border ${brand.theme === 'dark'
                                                                         ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700'
                                                                         : 'bg-gray-50 border-gray-100 text-gray-700 hover:bg-gray-100'
@@ -473,9 +473,8 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
 
                                         {userRole === 'business' && (
                                             <>
-                                                <button onClick={() => { router.push('/my-shop?view=job-list'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">공고 관리</button>
                                                 <button onClick={() => { router.push('/my-shop?view=applicants'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">지원자 관리</button>
-                                                <button onClick={() => { router.push('/my-shop?view=payment-history'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">결제 내역</button>
+                                                <button onClick={() => { router.push('/my-shop?view=payments'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">결제 내역</button>
                                                 <button onClick={() => { router.push('/my-shop?view=member-info'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">회원정보 수정</button>
                                             </>
                                         )}

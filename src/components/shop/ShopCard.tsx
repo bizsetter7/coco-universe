@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, Star } from 'lucide-react';
+import { Crown, Star, Sparkles, Flame } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { useBrand } from '../BrandProvider';
 import { formatKoreanMoney } from '@/utils/formatMoney';
@@ -17,24 +17,26 @@ interface ShopCardProps {
 const ShopBadge = React.memo(({ tierLabel }: { tierLabel?: string }) => {
     if (!tierLabel) return null;
 
-    let info = { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' };
+    let info: { bg: string, text: string, border: string, icon: React.ReactNode } = {
+        bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200', icon: null
+    };
 
-    if (tierLabel === 'GRAND' || tierLabel === '그랜드') {
-        info = { bg: 'bg-amber-900', text: 'text-amber-400', border: 'border-amber-700' };
-    } else if (tierLabel === 'PREMIUM' || tierLabel === '프리미엄') {
-        info = { bg: 'bg-slate-800', text: 'text-slate-200', border: 'border-slate-600' };
-    } else if (tierLabel === 'DELUXE' || tierLabel === '디럭스') {
-        info = { bg: 'bg-pink-900', text: 'text-pink-200', border: 'border-pink-700' };
-    } else if (tierLabel === 'SPECIAL' || tierLabel === '스페셜') {
-        info = { bg: 'bg-purple-900', text: 'text-purple-200', border: 'border-purple-700' };
-    } else if (tierLabel === 'URGENT' || tierLabel === '급구') {
-        info = { bg: 'bg-red-600', text: 'text-white', border: 'border-red-500' };
-    } else if (tierLabel === 'RECOMMENDED' || tierLabel === '추천') {
-        info = { bg: 'bg-emerald-600', text: 'text-white', border: 'border-emerald-500' };
+    const labelUpper = tierLabel.toUpperCase();
+    if (labelUpper === 'GRAND' || labelUpper === '그랜드') {
+        info = { bg: 'bg-amber-500', text: 'text-white', border: 'border-amber-400', icon: <Crown size={10} className="fill-current" /> };
+    } else if (labelUpper === 'PREMIUM' || labelUpper === '프리미엄') {
+        info = { bg: 'bg-purple-600', text: 'text-white', border: 'border-purple-500', icon: <Star size={10} className="fill-current" /> };
+    } else if (labelUpper === 'DELUXE' || labelUpper === '디럭스') {
+        info = { bg: 'bg-pink-600', text: 'text-white', border: 'border-pink-500', icon: <Sparkles size={10} /> };
+    } else if (labelUpper === 'SPECIAL' || labelUpper === '스페셜') {
+        info = { bg: 'bg-indigo-600', text: 'text-white', border: 'border-indigo-500', icon: null };
+    } else if (labelUpper === 'URGENT' || labelUpper === '급구') {
+        info = { bg: 'bg-red-600', text: 'text-white', border: 'border-red-500', icon: <Flame size={10} /> };
     }
 
     return (
-        <span className={`absolute top-3 left-3 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded shadow-sm z-10 ${info.bg} ${info.text} ${info.border} border`}>
+        <span className={`absolute top-2 left-2 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded shadow-lg z-10 ${info.bg} ${info.text} ${info.border} border-b-2 flex items-center gap-1`}>
+            {info.icon}
             {tierLabel}
         </span>
     );
@@ -52,8 +54,10 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, isGrand 
     // [Optimization] We can omit the state if we accept a default "broken image" look or use a simple <object> tag trick.
     // Keeping state for now but ensuring memoization helps.
 
+    const isPremium = tierLabel === 'PREMIUM' || tierLabel === '프리미엄' || tierLabel === 'GRAND' || tierLabel === '그랜드';
+
     return (
-        <div className={`group relative flex flex-col gap-3 p-3 rounded-2xl cursor-pointer ${isDark ? 'bg-gray-800' : 'bg-white border border-gray-100'}`}>
+        <div className={`group relative flex flex-col gap-3 p-3 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] active:scale-95 ${isDark ? 'bg-gray-800' : 'bg-white'} ${isPremium ? 'border-2 border-amber-400 shadow-xl shadow-amber-500/10' : 'border border-gray-100 shadow-sm'}`}>
 
             {/* Image / Thumbnail Area */}
             <div className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 transform-gpu`}>

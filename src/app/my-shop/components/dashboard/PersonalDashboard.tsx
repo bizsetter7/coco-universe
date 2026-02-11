@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
-import { PersonalMemberEdit, ResumeForm } from '../../page_sub_components';
+import { PersonalMemberEdit } from '../PersonalMemberEdit';
+import { ResumeForm } from '../ResumeForm';
+
 
 // Placeholder for missing components from main page
 const ComingSoonView = ({ title }: { title: string }) => {

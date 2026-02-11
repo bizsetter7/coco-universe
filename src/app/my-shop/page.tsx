@@ -16,11 +16,60 @@ import BusinessDashboard from './components/dashboard/BusinessDashboard';
 import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
-import {
-    WarningModal, DesignRequestModal, PreviewModal, ExampleModal, AdDetailModal,
-    BusinessMobileMenu, BusinessSidebar, MemberInfoForm,
-    OngoingAdsView, ClosedAdsView, PaymentsView, ApplicantsView
-} from './page_sub_components';
+
+// --- Components (Refactored) ---
+import { WarningModal } from './components/WarningModal';
+import { DesignRequestModal } from './components/DesignRequestModal';
+import { MobilePreviewModal as PreviewModal } from './components/MobilePreviewModal';
+import { ExampleModal } from './components/ExampleModal';
+import { AdDetailModal } from './components/AdDetailModal';
+import { BusinessMobileMenu } from './components/BusinessMobileMenu';
+import { BusinessSidebar } from './components/BusinessSidebar';
+import { MemberInfoForm } from './components/MemberInfoForm';
+import { OngoingAdsView } from './components/OngoingAdsView';
+import { ClosedAdsView } from './components/ClosedAdsView';
+
+// Simple Error Boundary for debugging
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error: any) {
+        return { hasError: true, error };
+    }
+    componentDidCatch(error: any, errorInfo: any) {
+        console.error("Critical Modal Error:", error, errorInfo);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-red-50 text-red-600 p-10 font-bold overflow-auto bg-opacity-95 backdrop-blur">
+                    <h2 className="text-3xl mb-4">💥 미리보기 중 오류 발생</h2>
+                    <p className="text-xl text-black mb-4">아래 오류 메시지를 개발자에게 캡처해서 전달해주세요.</p>
+                    <pre className="bg-white p-6 rounded-xl border border-red-200 shadow-xl text-left max-w-4xl w-full overflow-auto text-sm text-gray-800">
+                        {this.state.error?.toString()}
+                        <br />
+                        {this.state.error?.stack}
+                    </pre>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-8 px-8 py-4 bg-red-600 text-white rounded-xl font-black hover:bg-red-700 transition"
+                    >
+                        페이지 새로고침
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+import { PaymentsView } from './components/PaymentsView';
+import { ApplicantsView } from './components/ApplicantsView';
+import { PersonalMobileMenu } from './components/PersonalMobileMenu';
+import { PersonalMemberEdit } from './components/PersonalMemberEdit';
+import { ResumeForm } from './components/ResumeForm';
+import { ComingSoonView } from './components/ComingSoonView';
 
 // --- Constants (Exported for sub-components) ---
 import { JOB_CATEGORY_MAP as INDUSTRY_DATA_MAP } from '@/constants/jobs';
@@ -32,6 +81,7 @@ export const REGION_DATA = REGION_DATA_MAP;
 export const PAY_TYPES = PAY_TYPES_CONST;
 
 export default function MyShopPage() {
+    // Force rebuild
     return (
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">로딩 중...</div>}>
             <MyShopContent />
@@ -61,7 +111,11 @@ function MyShopContent() {
         const savedPayments = localStorage.getItem('my_site_payment_history');
         if (savedAds) {
             try {
-                setRegisteredAds(JSON.parse(savedAds));
+                const ads = JSON.parse(savedAds);
+                setRegisteredAds(ads.map((ad: any) => ({
+                    ...ad,
+                    deadline: ad.deadline || '2026-03-25'
+                })));
             } catch (e) {
                 console.error("Failed to parse ads", e);
             }
@@ -146,7 +200,75 @@ function MyShopContent() {
         return () => window.removeEventListener('toggle-mobile-menu', handleToggle);
     }, []);
 
+    // --- Restore Edit State from URL (Fix for Mobile/Refresh) ---
+    useEffect(() => {
+        const adIdParam = searchParams.get('id');
+        if (view === 'form' && adIdParam && isDataLoaded && registeredAds.length > 0) {
+            // If we are in form view with an ID, but editingAdId is lost (e.g. refresh), restore it.
+            // Or if we just navigated here via router.push with ID.
+            const adId = Number(adIdParam);
+            if (editingAdId !== adId) {
+                const ad = registeredAds.find(a => a.id === adId);
+                if (ad) {
+                    setEditingAdId(adId);
+                    setIsNewEntry(false);
+                    // Load data if form is empty (heuristic to avoid overwriting user unsaved input during weird re-renders)
+                    // But typically on first load/refresh it's empty.
+                    if (!formState.title) {
+                        formState.loadAdData(ad);
+                    }
+                }
+            }
+        }
+    }, [searchParams, view, isDataLoaded, registeredAds, editingAdId]);
+
     // Handlers
+    const onPreview = () => {
+        console.log("onPreview Triggered - Parsing Real Data");
+
+        // Map formState to Ad structure
+        const newAd = {
+            id: 'preview',
+            title: formState.title || '제목을 입력해주세요',
+            nickname: formState.nickname || '관리자',
+            managerName: formState.managerName,
+            managerPhone: formState.managerPhone,
+            messengers: formState.messengers || [],
+            category: formState.industryMain || '업종',
+            categorySub: formState.industrySub,
+            regionCity: formState.regionCity || '지역',
+            regionGu: formState.regionGu,
+            ageMin: formState.ageMin,
+            ageMax: formState.ageMax,
+            payType: formState.payType || '시급',
+            payAmount: formState.payAmount || 0,
+            content: formState.editorRef.current?.innerHTML || '<p>내용이 없습니다.</p>',
+            keywords: formState.selectedKeywords || [],
+            updateDate: new Date().toISOString().split('T')[0],
+            deadline: new Date(Date.now() + (Number(formState.selectedAdPeriod) || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0,
+            status: 'PENDING_REVIEW',
+            productType: formState.selectedAdProduct || '그랜드',
+            productPeriod: formState.selectedAdPeriod,
+            options: {
+                icon: formState.selectedIcon,
+                iconPeriod: formState.iconPeriod,
+                highlighter: formState.selectedHighlighter,
+                highlighterPeriod: formState.highlighterPeriod,
+                borderOption: formState.borderOption,
+                borderPeriod: formState.borderPeriod,
+                paySuffixes: formState.paySuffixes
+            }
+        };
+
+        console.log("page.tsx: Setting Preview Ad:", newAd);
+        try {
+            setSelectedAdForModal(newAd);
+        } catch (e) {
+            console.error("Error setting modal state:", e);
+        }
+    };
+
     const handleSave = () => {
         // --- Validation ---
         const {
@@ -167,6 +289,7 @@ function MyShopContent() {
             if (confirm('공고를 등록하시겠습니까?')) {
                 // Simulate saving to state
                 const newId = Math.floor(Math.random() * 90000) + 10000;
+
                 const newAd = {
                     id: newId,
                     title: formState.title,
@@ -185,9 +308,10 @@ function MyShopContent() {
                     content: formState.editorRef.current?.innerHTML || '',
                     keywords: formState.selectedKeywords,
                     updateDate: new Date().toISOString().split('T')[0],
+                    deadline: new Date(Date.now() + (Number(formState.selectedAdPeriod) || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                     applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0,
                     status: 'PENDING_REVIEW', // 심사중 
-                    productType: formState.selectedAdProduct,
+                    productType: formState.selectedAdProduct || '그랜드', // Default for preview
                     productPeriod: formState.selectedAdPeriod,
                     options: {
                         icon: formState.selectedIcon,
@@ -200,8 +324,6 @@ function MyShopContent() {
                     }
                 };
                 setRegisteredAds(prev => [newAd, ...prev]);
-
-                // Simulate payment history entry
                 const newPayment = {
                     id: newId, // Use the same NO.
                     type: formState.selectedAdProduct || '일반등록',
@@ -247,9 +369,14 @@ function MyShopContent() {
                             content: formState.editorRef.current?.innerHTML || '',
                             keywords: formState.selectedKeywords,
                             updateDate: new Date().toISOString().split('T')[0],
+                            // Update deadline if period changed? Usually registration date is fixed, but let's assume update changes it if period changes.
+                            // For now, keep original logic (no deadline update on edit usually unless extended)
                             options: {
                                 ...ad.options,
-                                paySuffixes: formState.paySuffixes
+                                paySuffixes: formState.paySuffixes,
+                                icon: formState.selectedIcon, // Also update options
+                                highlighter: formState.selectedHighlighter,
+                                borderOption: formState.borderOption
                             }
                         };
                     }
@@ -261,22 +388,25 @@ function MyShopContent() {
                     }
                     return p;
                 }));
-                setEditingAdId(null);
                 alert('공고 수정이 완료되었습니다.');
+                setView('dashboard');
+                setEditingAdId(null); // Clear editing state
+                formState.resetAdStates();
+            } else {
+                // Fallback if editingAdId is missing but we are in edit mode (should be caught by useEffect)
+                alert('수정할 공고 정보를 찾을 수 없습니다. 다시 시도해주세요.');
+                setView('dashboard');
             }
-            formState.resetAdStates();
-            setView('dashboard');
         }
     };
 
     const handleBack = () => {
         if (formState.isDirty) {
-            if (confirm('작성 중인 내용이 있습니다. 저장하지 않고 나가시겠습니까?')) {
-                formState.resetAdStates();
+            if (confirm('작성 중인 내용이 있습니다. 정말 나가시겠습니까?')) {
                 setView('dashboard');
+                formState.resetAdStates();
             }
         } else {
-            formState.resetAdStates();
             setView('dashboard');
         }
     };
@@ -333,21 +463,35 @@ function MyShopContent() {
                     brand={brand}
                     onClose={() => setShowWarningModal(false)}
                     onConfirm={() => {
-                        if (isNewEntry) formState.resetAdStates(); // Only reset if NEW
-                        setView('form');
+                        if (isNewEntry) {
+                            formState.resetAdStates(); // Only reset if NEW
+                            setView('form');
+                        } else {
+                            // Edit Mode: Ensure ID is passed in URL
+                            if (editingAdId) {
+                                router.push(`?view=form&id=${editingAdId}`, { scroll: false });
+                            } else {
+                                setView('form');
+                            }
+                        }
                         setShowWarningModal(false);
                     }}
                 />
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
-            {showPreviewModal && <PreviewModal brand={brand} onClose={() => setShowPreviewModal(false)} formData={currentFormData} />}
+
+
+            {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
+            {/* Removed separate PreviewModal to ensure 100% consistency with AdDetailModal */}
             {showExampleModal && <ExampleModal show={showExampleModal} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
             {selectedAdForModal && (
-                <AdDetailModal
-                    brand={brand}
-                    ad={selectedAdForModal}
-                    onClose={() => setSelectedAdForModal(null)}
-                />
+                <ErrorBoundary>
+                    <AdDetailModal
+                        brand={brand}
+                        ad={selectedAdForModal}
+                        onClose={() => setSelectedAdForModal(null)}
+                    />
+                </ErrorBoundary>
             )}
             {showMobileMenu && (
                 <BusinessMobileMenu
@@ -363,7 +507,8 @@ function MyShopContent() {
             {/* Content View */}
             {view !== 'form' && (
                 <div className="max-w-6xl mx-auto px-4 md:px-6">
-                    <div className={`grid grid-cols-1 ${(userType as string) === 'personal' ? '' : 'md:grid-cols-4'} gap-6 md:py-8`}>
+
+                    <div className={`grid grid-cols-1 ${(userType as string) === 'personal' ? '' : 'md:grid-cols-4'} gap-4 md:py-6`}>
                         {/* PC Sidebar Persistence for business views (excluding AdForm) */}
                         {(userType as string) === 'business' && (
                             <BusinessSidebar
@@ -375,12 +520,13 @@ function MyShopContent() {
                             />
                         )}
 
-                        <div className={(userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-6'}>
+                        <div className={(userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-4'}>
                             {view === 'member-info' && (
                                 <MemberInfoForm
                                     {...formState}
                                     brand={brand}
                                     setView={setView}
+                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
                                 />
                             )}
                             {view === 'ongoing-ads' && (
@@ -389,9 +535,24 @@ function MyShopContent() {
                                     userName={formState.shopName}
                                     ads={registeredAds}
                                     onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
+                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
+                                    onEditAd={(ad) => {
+                                        // Reuse handleAdClick logic for editing
+                                        setIsNewEntry(false);
+                                        setEditingAdId(ad.id);
+                                        formState.loadAdData(ad);
+                                        setShowWarningModal(true);
+                                    }}
                                 />
                             )}
-                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
+                            {view === 'closed-ads' && (
+                                <ClosedAdsView
+                                    setView={setView}
+                                    userName={formState.shopName}
+                                    ads={registeredAds.filter(ad => ad.isClosed)}
+                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
+                                />
+                            )}
                             {view === 'payments' && (
                                 <PaymentsView
                                     setView={setView}
@@ -402,9 +563,10 @@ function MyShopContent() {
                                         if (ad) setSelectedAdForModal(ad);
                                         else alert('해당 공고 상세 정보를 찾을 수 없습니다.');
                                     }}
+                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
                                 />
                             )}
-                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
+                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
 
                             {view === 'dashboard' && (
                                 <BusinessDashboard
@@ -427,6 +589,7 @@ function MyShopContent() {
                                     setView={setView}
                                     router={router}
                                     ads={registeredAds}
+                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
                                 />
                             )}
                         </div>
@@ -451,8 +614,8 @@ function MyShopContent() {
                         setExampleType={setExampleType}
                         setShowExampleModal={setShowExampleModal}
                         onSave={handleSave}
-                        onPreview={() => setShowPreviewModal(true)}
                         onBack={handleBack}
+                        onPreview={onPreview}
                     />
                 </div>
             ) : null}

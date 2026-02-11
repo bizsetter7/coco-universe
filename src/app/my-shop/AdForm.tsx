@@ -132,7 +132,11 @@ export default function AdForm(props: AdFormProps) {
             <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-6 bg-gradient-to-t from-white via-white/10 to-transparent dark:from-gray-950 dark:via-gray-950/10 pointer-events-none">
                 <div className="max-w-[1120px] mx-auto flex flex-row gap-2 md:gap-4 pointer-events-auto">
                     <button
-                        onClick={() => props.onPreview?.()}
+                        type="button" // Explicitly set type to button to prevent form submission
+                        onClick={() => {
+                            console.log("AdForm: Button Clicked local");
+                            props.onPreview?.();
+                        }}
                         className="flex-[1.5] md:w-40 py-4 rounded-2xl bg-slate-800 text-white font-black text-xs md:text-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 whitespace-nowrap"
                     >
                         <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>

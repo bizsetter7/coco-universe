@@ -90,7 +90,7 @@ export function useAuth() {
 
     const logout = () => {
         localStorage.removeItem('user_session');
-        localStorage.removeItem('user_session');
+        localStorage.removeItem('adult_verified'); // Clear verification too for full reset
         localStorage.removeItem('user_type');
         window.dispatchEvent(new Event('auth-change'));
     };

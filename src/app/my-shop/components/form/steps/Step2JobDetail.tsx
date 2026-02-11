@@ -263,9 +263,9 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                         value={payAmount ? Number(payAmount).toLocaleString() : ''}
                                         onChange={handlePayAmountChange}
                                         disabled={payType === '협의'}
-                                        className={`flex-1 p-2.5 text-base font-black text-right outline-none bg-transparent disabled:bg-gray-50 h-[42px] pr-1 placeholder:text-gray-200`}
+                                        className={`flex-1 p-2.5 text-base font-black outline-none bg-transparent disabled:bg-gray-50 h-[42px] placeholder:text-gray-200 text-left`}
                                     />
-                                    <span className={`pr-3 pl-1 text-sm font-black ${payAmount ? 'text-gray-900' : 'text-gray-300'}`}>원</span>
+                                    <span className={`pr-3 pl-1 text-sm font-black shrink-0 ${payAmount ? 'text-gray-900' : 'text-gray-300'}`}>원</span>
                                 </div>
                             </div>
                         </div>

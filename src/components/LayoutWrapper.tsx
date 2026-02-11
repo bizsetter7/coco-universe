@@ -22,22 +22,14 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const brand = useBrand();
-    const [isVerified, setIsVerified] = React.useState<boolean | null>(() => {
-        if (typeof window !== 'undefined') {
-            const verified = localStorage.getItem('adult_verified') === 'true';
-            const session = localStorage.getItem('user_session');
-            return verified || !!session;
-        }
-        return null;
-    });
+    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
 
     React.useEffect(() => {
-        if (isVerified === null) {
-            const verified = localStorage.getItem('adult_verified') === 'true';
-            const session = localStorage.getItem('user_session');
-            setIsVerified(verified || !!session);
-        }
-    }, [isVerified]);
+        // Move all client-side checks here to ensure hydration matches
+        const verified = localStorage.getItem('adult_verified') === 'true';
+        const session = localStorage.getItem('user_session');
+        setIsVerified(verified || !!session);
+    }, []); // Run once on mount
 
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
