@@ -64,7 +64,7 @@ export default function AdForm(props: AdFormProps) {
     const { brand } = props;
 
     return (
-        <div className="w-full max-w-[1120px] mx-auto space-y-1 pb-8 pt-0 px-2 md:px-3 xl:px-0 relative mb-3">
+        <div className="w-full max-w-[1120px] mx-auto space-y-1 pb-8 pt-2.5 px-2 md:px-3 xl:px-0 relative mb-3">
             {/* Recruitment Registration Header (Capture 3) */}
             <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">

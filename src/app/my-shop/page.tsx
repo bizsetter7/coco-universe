@@ -314,74 +314,76 @@ function MyShopContent() {
             )}
 
             {/* Content View */}
-            <div className="max-w-6xl mx-auto px-4 md:px-6">
-                <div className={`grid grid-cols-1 ${(view === 'form' || (userType as string) === 'personal') ? '' : 'md:grid-cols-4'} gap-6 md:py-8`}>
-                    {/* PC Sidebar Persistence for business views (excluding AdForm) */}
-                    {(userType as string) === 'business' && view !== 'form' && (
-                        <BusinessSidebar
-                            brand={brand}
-                            shopName={formState.shopName}
-                            nickname={formState.nickname}
-                            view={view}
-                            setView={setView}
-                        />
-                    )}
-
-                    <div className={`${view === 'form' || (userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3'} space-y-6`}>
-                        {view === 'member-info' && (
-                            <MemberInfoForm
-                                {...formState}
-                                brand={brand}
-                                setView={setView}
-                            />
-                        )}
-                        {view === 'ongoing-ads' && (
-                            <OngoingAdsView
-                                setView={setView}
-                                userName={formState.shopName}
-                                ads={registeredAds}
-                                onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
-                            />
-                        )}
-                        {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
-                        {view === 'payments' && (
-                            <PaymentsView
-                                setView={setView}
-                                userName={formState.shopName}
-                                payments={paymentHistory}
-                                onShowAdDetail={(adId) => {
-                                    const ad = registeredAds.find(a => a.id === adId);
-                                    if (ad) setSelectedAdForModal(ad);
-                                    else alert('해당 공고 상세 정보를 찾을 수 없습니다.');
-                                }}
-                            />
-                        )}
-                        {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
-
-                        {view === 'dashboard' && (
-                            <BusinessDashboard
+            {view !== 'form' && (
+                <div className="max-w-6xl mx-auto px-4 md:px-6">
+                    <div className={`grid grid-cols-1 ${(userType as string) === 'personal' ? '' : 'md:grid-cols-4'} gap-6 md:py-8`}>
+                        {/* PC Sidebar Persistence for business views (excluding AdForm) */}
+                        {(userType as string) === 'business' && (
+                            <BusinessSidebar
                                 brand={brand}
                                 shopName={formState.shopName}
                                 nickname={formState.nickname}
-                                isVerified={formState.isVerified}
-                                handleAdClick={(isNew, ad) => {
-                                    setIsNewEntry(isNew);
-                                    if (!isNew && ad) {
-                                        formState.loadAdData(ad);
-                                    } else {
-                                        formState.resetAdStates();
-                                    }
-                                    setShowWarningModal(true);
-                                }}
-                                setShowDesignModal={setShowDesignModal}
+                                view={view}
                                 setView={setView}
-                                router={router}
-                                ads={registeredAds}
                             />
                         )}
+
+                        <div className={(userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-6'}>
+                            {view === 'member-info' && (
+                                <MemberInfoForm
+                                    {...formState}
+                                    brand={brand}
+                                    setView={setView}
+                                />
+                            )}
+                            {view === 'ongoing-ads' && (
+                                <OngoingAdsView
+                                    setView={setView}
+                                    userName={formState.shopName}
+                                    ads={registeredAds}
+                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
+                                />
+                            )}
+                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={[]} />}
+                            {view === 'payments' && (
+                                <PaymentsView
+                                    setView={setView}
+                                    userName={formState.shopName}
+                                    payments={paymentHistory}
+                                    onShowAdDetail={(adId) => {
+                                        const ad = registeredAds.find(a => a.id === adId);
+                                        if (ad) setSelectedAdForModal(ad);
+                                        else alert('해당 공고 상세 정보를 찾을 수 없습니다.');
+                                    }}
+                                />
+                            )}
+                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} />}
+
+                            {view === 'dashboard' && (
+                                <BusinessDashboard
+                                    brand={brand}
+                                    shopName={formState.shopName}
+                                    nickname={formState.nickname}
+                                    isVerified={formState.isVerified}
+                                    handleAdClick={(isNew, ad) => {
+                                        setIsNewEntry(isNew);
+                                        if (!isNew && ad) {
+                                            formState.loadAdData(ad);
+                                        } else {
+                                            formState.resetAdStates();
+                                        }
+                                        setShowWarningModal(true);
+                                    }}
+                                    setShowDesignModal={setShowDesignModal}
+                                    setView={setView}
+                                    router={router}
+                                    ads={registeredAds}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {view === 'form' ? (
                 <div className="w-full">
