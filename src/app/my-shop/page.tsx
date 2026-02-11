@@ -48,6 +48,7 @@ function MyShopContent() {
     const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'ongoing-ads' | 'closed-ads' | 'payments' | 'applicants' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
     const [userType, setUserType] = useState<'business' | 'personal' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
+    const [editingAdId, setEditingAdId] = useState<number | null>(null);
 
     // Business Data States
     const [registeredAds, setRegisteredAds] = useState<any[]>([]);
@@ -190,10 +191,9 @@ function MyShopContent() {
             }
         } else {
             // Edit Mode: Update existing ad
-            const targetId = searchParams.get('id');
-            if (targetId) {
+            if (editingAdId) {
                 setRegisteredAds(prev => prev.map(ad => {
-                    if (String(ad.id) === targetId) {
+                    if (ad.id === editingAdId) {
                         return {
                             ...ad,
                             title: formState.title,
@@ -220,6 +220,7 @@ function MyShopContent() {
                     }
                     return ad;
                 }));
+                setEditingAdId(null);
                 alert('공고 수정이 완료되었습니다.');
             }
             formState.resetAdStates();
@@ -373,8 +374,10 @@ function MyShopContent() {
                                     handleAdClick={(isNew, ad) => {
                                         setIsNewEntry(isNew);
                                         if (!isNew && ad) {
+                                            setEditingAdId(ad.id);
                                             formState.loadAdData(ad);
                                         } else {
+                                            setEditingAdId(null);
                                             formState.resetAdStates();
                                         }
                                         setShowWarningModal(true);

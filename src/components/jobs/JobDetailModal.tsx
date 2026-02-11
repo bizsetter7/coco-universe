@@ -86,8 +86,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
             <div
                 className="
                     bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col
-                    fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-2xl rounded-b-none
-                    md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-2xl
+                    fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
+                    md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
                     transform-gpu will-change-transform backface-hidden
                     animate-in slide-in-from-bottom duration-300 
                 "
