@@ -53,6 +53,41 @@ function MyShopContent() {
     // Business Data States
     const [registeredAds, setRegisteredAds] = useState<any[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    // --- Data Persistence (Load) ---
+    useEffect(() => {
+        const savedAds = localStorage.getItem('my_site_registered_ads');
+        const savedPayments = localStorage.getItem('my_site_payment_history');
+        if (savedAds) {
+            try {
+                setRegisteredAds(JSON.parse(savedAds));
+            } catch (e) {
+                console.error("Failed to parse ads", e);
+            }
+        }
+        if (savedPayments) {
+            try {
+                setPaymentHistory(JSON.parse(savedPayments));
+            } catch (e) {
+                console.error("Failed to parse payments", e);
+            }
+        }
+        setIsDataLoaded(true);
+    }, []);
+
+    // --- Data Persistence (Save) ---
+    useEffect(() => {
+        if (isDataLoaded) {
+            localStorage.setItem('my_site_registered_ads', JSON.stringify(registeredAds));
+        }
+    }, [registeredAds, isDataLoaded]);
+
+    useEffect(() => {
+        if (isDataLoaded) {
+            localStorage.setItem('my_site_payment_history', JSON.stringify(paymentHistory));
+        }
+    }, [paymentHistory, isDataLoaded]);
 
     const setView = (newView: any) => {
         if (newView === view) return;
@@ -219,6 +254,12 @@ function MyShopContent() {
                         };
                     }
                     return ad;
+                }));
+                setPaymentHistory(prev => prev.map(p => {
+                    if (p.id === editingAdId) {
+                        return { ...p, desc: formState.title };
+                    }
+                    return p;
                 }));
                 setEditingAdId(null);
                 alert('공고 수정이 완료되었습니다.');
