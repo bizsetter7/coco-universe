@@ -44,7 +44,6 @@ export const Step4Extras: React.FC<Step4Props> = ({
     };
 
     const handleTogglePaySuffix = (s: string) => {
-        if (!checkStep3()) return;
         togglePaySuffix(s);
     };
 

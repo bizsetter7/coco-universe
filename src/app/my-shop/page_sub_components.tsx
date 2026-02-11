@@ -1286,39 +1286,40 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
         <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
             <div className={`w-full max-w-lg bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]`}>
                 {/* Header (Capture 4 style) */}
-                <div className={`relative px-6 py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-2 shrink-0 shadow-lg`}>
-                    <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-full transition">
+                <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
+                    <button onClick={onClose} className="absolute top-5 right-6 p-2 hover:bg-white/20 rounded-full transition z-50">
                         <X size={24} />
                     </button>
-                    <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1">
+                    <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1 shadow-sm">
                         <MapPin size={10} /> [{ad.regionCity} {ad.regionGu}] | <Store size={10} /> {ad.category || '노래주점'}
                     </div>
-                    {/* Ad Title White Box Layout */}
-                    <div className="mt-4 w-full bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-[32px] shadow-sm border border-white/50 flex flex-col items-center gap-3">
+                    {/* Ad Title White Box Layout (Matched with No.1006 Style) */}
+                    <div className="w-full bg-white/95 backdrop-blur-sm px-4 py-3 md:px-6 md:py-4 rounded-[20px] md:rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 group">
                         {ad.options?.icon && (() => {
                             const iconObj = ICONS.find((i: any) => i.id === Number(ad.options.icon));
                             return iconObj ? (
-                                <div className="flex items-center gap-1.5 px-3 py-1 bg-pink-50 text-pink-600 rounded-full border border-pink-100 shadow-sm animate-bounce-slow">
-                                    <span className="text-xl">{iconObj.icon}</span>
-                                    <span className="text-[11px] font-black uppercase tracking-tighter">{iconObj.name}</span>
+                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-lg border border-pink-100 shadow-sm shrink-0">
+                                    <span className="text-lg md:text-xl">{iconObj.icon}</span>
+                                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">{iconObj.name}</span>
                                 </div>
                             ) : null;
                         })()}
 
-                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 drop-shadow-sm text-center">
+                        <h2 className="text-lg md:text-2xl font-black leading-tight text-gray-900 drop-shadow-sm text-center md:text-left flex-1 truncate">
                             <span style={ad.options?.highlighter ? {
                                 backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(ad.options.highlighter))?.color + 'cc',
                                 color: '#000',
-                                padding: '0 6px',
-                                borderRadius: '6px'
+                                padding: '0 8px',
+                                borderRadius: '6px',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                             } : {}}>
-                                {ad.title?.slice(0, 25)}
+                                {ad.title || ad.jobTitle}
                             </span>
                         </h2>
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-90 font-black text-sm mt-3">
-                        {ad.nickname || '파라다이스'}
+                    <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-3 py-1 rounded-full">
+                        {ad.nickname || ad.shopName || '비즈니스 파트너'}
                     </div>
                 </div>
 
@@ -1353,7 +1354,21 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         </div>
                     </div>
 
-                    {/* Location & Keywords & Info */}
+                    {/* Recruiting Section (Moved Up) */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-1.5 h-6 bg-pink-500 rounded-full" />
+                            <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
+                            <div
+                                className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: ad.content || '등록된 상세 내용이 없습니다.' }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Location & Keywords & Info (Moved Down) */}
                     <div className="grid grid-cols-1 gap-4">
                         <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-4">
                             <div className="flex items-center gap-3">
@@ -1378,20 +1393,6 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                                     )}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Recruiting Section */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="w-1.5 h-6 bg-pink-500 rounded-full" />
-                            <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
-                        </div>
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
-                            <div
-                                className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: ad.content || '등록된 상세 내용이 없습니다.' }}
-                            />
                         </div>
                     </div>
                 </div>

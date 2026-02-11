@@ -102,9 +102,12 @@ const JobCard = React.memo(({
             onClick={() => startTransition(() => setSelectedShop(shop))}
             className={`
                 cursor-pointer group block relative bg-white rounded-xl overflow-hidden duration-300
-                border ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}
-                border-b-2 hover:border-b-4 active:border-b-2
-                ad-card max-width-full
+                border-2 ${brand.theme === 'dark' ? 'border-gray-700' :
+                    shop.tier === 'grand' ? 'border-amber-400' :
+                        shop.tier === 'premium' ? 'border-blue-400' :
+                            shop.tier === 'special' ? 'border-pink-400' : 'border-gray-100'}
+                hover:shadow-lg active:scale-[0.98]
+                ad-card max-width-full min-h-[380px] md:min-h-[420px]
             `}
             style={{
                 contain: 'content',
@@ -146,33 +149,30 @@ const JobCard = React.memo(({
                 </div>
 
                 {/* BOTTOM: Info Section */}
-                <div className="p-3 mt-3">
-                    <div className="flex flex-col gap-1.5 mb-1 min-h-[48px]">
-                        {/* Icon + Name (Step 4 Options) */}
-                        {shop.options?.icon && (() => {
-                            const iconObj = ICONS.find((i: any) => i.id === Number(shop.options?.icon));
-                            return iconObj ? (
-                                <div className="flex items-center gap-1 text-[10px] font-black text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded w-fit border border-pink-100/50">
-                                    <span>{iconObj.icon}</span>
-                                    <span className="truncate">{iconObj.name}</span>
-                                </div>
-                            ) : null;
-                        })()}
+                <div className="p-2.5 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                        {/* Ad Title White Box Layout (Matched with No.1006 Style) */}
+                        <div className={`p-2 rounded-lg border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-50'} shadow-sm flex items-center gap-2 overflow-hidden min-h-[44px] md:min-h-[50px]`}>
+                            {shop.options?.icon && (() => {
+                                const iconObj = ICONS.find((i: any) => i.id === Number(shop.options?.icon));
+                                return iconObj ? (
+                                    <div className="flex flex-col items-center justify-center bg-pink-50 text-pink-600 px-1.5 py-0.5 rounded border border-pink-100/50 shrink-0">
+                                        <span className="text-sm leading-none">{iconObj.icon}</span>
+                                        <span className="text-[7px] font-black uppercase tracking-tighter leading-none mt-0.5">{iconObj.name}</span>
+                                    </div>
+                                ) : null;
+                            })()}
 
-                        <div className="flex justify-between items-start">
-                            <h4 className={`text-[13px] md:text-[14px] font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} line-clamp-2`}>
-                                <span style={shop.options?.highlighter ? {
+                            <h4 className={`text-[12px] md:text-[13px] font-black leading-tight flex-1 truncate ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                <span className="inline-block" style={shop.options?.highlighter ? {
                                     backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(shop.options?.highlighter))?.color + 'cc',
                                     color: '#000',
-                                    padding: '0 2px',
-                                    borderRadius: '2px'
+                                    padding: '0 4px',
+                                    borderRadius: '3px'
                                 } : {}}>
                                     {shop.title || shop.realName || shop.name}
                                 </span>
                             </h4>
-                            <span className="text-[9px] text-gray-400 font-medium shrink-0 ml-1 mt-0.5">
-                                {rank}위
-                            </span>
                         </div>
                     </div>
                     <p className="text-[11px] text-gray-500 truncate flex items-center gap-1">
