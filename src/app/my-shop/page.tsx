@@ -275,6 +275,11 @@ function MyShopContent() {
         if (formState.paySuffixes.includes(s)) {
             formState.setPaySuffixes(formState.paySuffixes.filter(x => x !== s));
         } else {
+            if (formState.paySuffixes.length >= 6) {
+                alert('급여 추가 옵션은 최대 6개(기본 1개 포함)까지만 선택 가능합니다.');
+                return;
+            }
+            formState.setPaySuffixes([...formState.paySuffixes, s]);
         }
     };
 
