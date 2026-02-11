@@ -7,7 +7,8 @@ import {
     X, AlertTriangle, Laptop, Eye, Store, List, LogOut,
     CreditCard, User, Star, Briefcase, MessageCircle, Home,
     ChevronRight, ChevronLeft, Calendar, ArrowRight,
-    Check, Settings, FileText, MapPin, RefreshCw, Phone
+    Check, Settings, FileText, MapPin, RefreshCw, Phone, Info,
+    Sparkles, Zap
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
@@ -1284,41 +1285,41 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
 
     return createPortal(
         <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className={`w-full max-w-lg bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]`}>
-                {/* Header (Capture 4 style) */}
-                <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
+            <div className={`w-full md:w-[500px] lg:w-[600px] bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]`}>
+                {/* Header (Capture 2 style) */}
+                <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-4 shrink-0 shadow-lg`}>
                     <button onClick={onClose} className="absolute top-5 right-6 p-2 hover:bg-white/20 rounded-full transition z-50">
                         <X size={24} />
                     </button>
                     <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1 shadow-sm">
                         <MapPin size={10} /> [{ad.regionCity} {ad.regionGu}] | <Store size={10} /> {ad.category || '노래주점'}
                     </div>
-                    {/* Ad Title White Box Layout (Matched with No.1006 Style) */}
-                    <div className="w-full bg-white/95 backdrop-blur-sm px-4 py-3 md:px-6 md:py-4 rounded-[20px] md:rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 group">
+
+                    {/* Ad Title Single White Box Layout (Capture 2 Style) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-4 rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-3">
                         {ad.options?.icon && (() => {
                             const iconObj = ICONS.find((i: any) => i.id === Number(ad.options.icon));
                             return iconObj ? (
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-lg border border-pink-100 shadow-sm shrink-0">
-                                    <span className="text-lg md:text-xl">{iconObj.icon}</span>
-                                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                    <span className="text-xl">{iconObj.icon}</span>
+                                    <span className="text-[11px] font-black uppercase tracking-tight">{iconObj.name}</span>
                                 </div>
                             ) : null;
                         })()}
 
-                        <h2 className="text-lg md:text-2xl font-black leading-tight text-gray-900 drop-shadow-sm text-center md:text-left flex-1 truncate">
+                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
                             <span style={ad.options?.highlighter ? {
                                 backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(ad.options.highlighter))?.color + 'cc',
                                 color: '#000',
                                 padding: '0 8px',
-                                borderRadius: '6px',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                borderRadius: '6px'
                             } : {}}>
                                 {ad.title || ad.jobTitle}
                             </span>
                         </h2>
                     </div>
 
-                    <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-3 py-1 rounded-full">
+                    <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
                         {ad.nickname || ad.shopName || '비즈니스 파트너'}
                     </div>
                 </div>
@@ -1368,30 +1369,36 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         </div>
                     </div>
 
-                    {/* Location & Keywords & Info (Moved Down) */}
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 shadow-sm"><MapPin size={16} /></div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">위치 정보</span>
-                                    <span className="text-[14px] font-black text-gray-800">{ad.regionCity} {ad.regionGu} {ad.addressDetail || ''}</span>
-                                </div>
-                            </div>
+                    {/* 위치 정보 (위치 정보 섹션 스타일 JobDetailModal과 통일) */}
+                    <div className="space-y-3">
+                        <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
+                            <span className="w-1 h-4 bg-green-500 rounded-full"></span>
+                            위치 정보
+                        </h3>
+                        <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
+                            <MapPin size={32} className="opacity-50" />
+                            <span className="text-xs font-bold">{ad.regionCity} {ad.regionGu}</span>
+                            <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
+                        </div>
+                    </div>
 
-                            <div className="pt-4 border-t border-gray-50">
-                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-2">Keyword & Info</span>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {ad.keywords && ad.keywords.length > 0 ? (
-                                        ad.keywords.map((kw: string, i: number) => (
-                                            <span key={i} className="px-2.5 py-1 bg-gray-50 text-gray-600 text-[11px] font-bold rounded-lg border border-gray-100 transition hover:bg-white hover:shadow-sm">
-                                                #{kw}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>
-                                    )}
-                                </div>
+                    {/* Keyword & Info (Keyword 섹션 스타일 JobDetailModal과 통일) */}
+                    <div className="space-y-2 pt-2">
+                        <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
+                            <Info size={12} />
+                            Keyword & Info
+                        </h3>
+                        <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
+                            <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
+                                {ad.keywords && ad.keywords.length > 0 ? (
+                                    ad.keywords.map((kw: string, i: number) => (
+                                        <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
+                                            #{kw}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>
+                                )}
                             </div>
                         </div>
                     </div>

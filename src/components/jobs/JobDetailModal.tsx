@@ -93,60 +93,53 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                 "
                 onClick={e => e.stopPropagation()}
             >
-                {/* 1. HEADER SECTION */}
-                <div className={`p-6 relative text-center shrink-0 ${headerBg} transition-colors duration-300`}>
+                {/* 1. HEADER SECTION (Capture 2 Style) */}
+                <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
 
-                    {/* Top Row: Star (Left) & Close (Right) */}
-                    <div className="absolute top-0 left-0 w-full flex justify-between items-start p-4 z-10">
-                        {/* Left: Star Button (찜버튼) */}
-                        <button
-                            onClick={handleFavoriteClick}
-                            className={`p-2 rounded-full transition-all active:scale-95 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:text-amber-400 hover:bg-amber-50'}`}
-                        >
-                            <Star size={20} className={isFavorite ? "fill-amber-400 text-amber-400" : "hover:fill-current"} />
+                    {/* Top Row: Ad No & Close Button */}
+                    <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
+                        <span className={`text-[10px] font-mono font-black opacity-60 px-2 py-0.5 rounded-full bg-black/10 ${isTiered ? 'text-white/70' : 'text-gray-400'}`}>
+                            No.{shop.adNo || '0000'}
+                        </span>
+                        <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
+                            <X size={24} className={isTiered ? 'text-white' : 'text-gray-900'} />
                         </button>
-
-                        {/* Right: Ad No + Close Button */}
-                        <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-mono font-bold opacity-60 ${isTiered ? 'text-white/70' : 'text-gray-400'}`}>
-                                No.{shop.adNo || '0000'}
-                            </span>
-                            <button
-                                onClick={onClose}
-                                className={`p-2 rounded-full transition-all active:scale-95 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
                     </div>
 
-                    {/* Content: [Region] Detail + Sector */}
-                    <div className={`mt-8 mb-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black tracking-tight ${isTiered ? 'bg-black/20 text-white border border-white/10' : 'bg-gray-100/80 text-gray-600 border border-gray-200'}`}>
-                        <span className="flex items-center gap-0.5"><MapPin size={10} /> {shop.region}</span>
-                        <span className="opacity-30 mx-0.5">|</span>
-                        <span className="flex items-center gap-0.5"><Briefcase size={10} /> {shop.workType}</span>
+                    {/* Star Button (Left) */}
+                    <button
+                        onClick={handleFavoriteClick}
+                        className={`absolute top-5 left-6 p-2 rounded-full transition-all active:scale-95 z-50 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:text-amber-400 hover:bg-amber-50'}`}
+                    >
+                        <Star size={20} className={isFavorite ? "fill-amber-400 text-amber-400" : "hover:fill-current"} />
+                    </button>
+
+                    {/* Region & WorkType Badge */}
+                    <div className={`bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm ${isTiered ? 'text-white' : 'text-gray-600 bg-gray-100/80 border-gray-200'}`}>
+                        <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.workType}
                     </div>
 
-                    {/* Content: Title */}
-                    <h2 className={`text-xl md:text-2xl font-black mb-3 leading-snug break-keep px-4 ${textColor}`}>
-                        {shop.title || shop.name}
-                    </h2>
-
-                    {/* Content: Icon + Nickname + Option 8 Icon */}
-                    <div className={`flex items-center justify-center gap-2 ${subTextColor}`}>
-                        {/* Main Shop Icon (User/Crown/etc based on tier logic inside Shop logic usually, here hardcoded for UI) */}
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isTiered ? 'bg-white/20' : 'bg-pink-50 text-pink-500'}`}>
-                            <User size={14} className="fill-current" />
-                        </div>
-
-                        <span className="text-sm font-bold">{shop.nickname || shop.name}</span>
-
-                        {/* Option 8 Icon (Emphasis) */}
-                        {hasEmphasis && (
-                            <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white ml-0.5 animate-pulse shadow-sm" title="강조 업소">
-                                <Crown size={10} fill="currentColor" />
+                    {/* Ad Title Single White Box Layout (Capture 2 Style) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-4 rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-3">
+                        {/* Simulation of Icon if tiered or specific options */}
+                        {(isTiered || hasEmphasis) && (
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                <span className="text-xl">{isTiered && shop.tier === 'grand' ? '👑' : '🔥'}</span>
+                                <span className="text-[11px] font-black uppercase tracking-tight">{shop.tier === 'grand' ? 'GRAND' : 'HOT'}</span>
                             </div>
                         )}
+
+                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
+                            {shop.title || shop.name}
+                        </h2>
+                    </div>
+
+                    {/* Nickname Area */}
+                    <div className="flex items-center gap-2.5 opacity-95 font-black text-sm bg-black/10 px-4 py-1.5 rounded-full text-white">
+                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                            <User size={12} className="fill-current" />
+                        </div>
+                        {shop.nickname || shop.name}
                     </div>
                 </div>
 
