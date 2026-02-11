@@ -183,7 +183,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
 
             <div className="space-y-4">
                 {/* Basic Info Section */}
-                <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white/80 backdrop-blur-sm border-gray-100'}`}>
+                <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'}`}>
                     <h2 className="font-black text-gray-800 mb-2 md:mb-4 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>채용 공고 정보</h2>
                     <div className="space-y-4">
                         <div>

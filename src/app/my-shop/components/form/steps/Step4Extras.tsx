@@ -118,7 +118,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30 shadow-inner">
+                        <div className="w-12 h-12 bg-white/30 rounded-2xl flex items-center justify-center border border-white/40 shadow-inner">
                             <Sparkles size={28} className="text-white animate-pulse" />
                         </div>
                         <div>
@@ -132,7 +132,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             </div>
                         </div>
                     </div>
-                    <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mx-auto md:mx-0 flex items-center justify-center w-fit">
+                    <div className="bg-black/30 px-4 py-2 rounded-full border border-white/20 mx-auto md:mx-0 flex items-center justify-center w-fit">
                         <span className="text-[10px] md:text-xs font-black tracking-widest text-[#e9d5ff]">SELECTION OPTIONS</span>
                         <span className="text-white font-black text-xs md:text-sm ml-2">선택 시 추가 비용 발생</span>
                     </div>

@@ -81,7 +81,7 @@ export default function AdForm(props: AdFormProps) {
             {/* Step 3 & 4: Restricted in Edit Mode */}
             <div className="relative group space-y-2 md:space-y-5">
                 {!props.isNewEntry && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-[32px] pointer-events-none animate-in fade-in duration-500">
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 rounded-[32px] pointer-events-none animate-in fade-in duration-500">
                         <div className="bg-white/90 shadow-xl border border-pink-100 p-6 rounded-3xl text-center max-w-sm">
                             <div className="flex items-center justify-center gap-2 mb-2 text-pink-600">
                                 <MessageCircle size={20} fill="currentColor" />
@@ -121,7 +121,7 @@ export default function AdForm(props: AdFormProps) {
                     </div>
                     <div className="flex flex-col md:flex-row items-center gap-2 md:gap-8 w-full md:w-auto z-10">
                         <div className="font-black text-base md:text-lg whitespace-nowrap opacity-90">총 신청 금액</div>
-                        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 md:p-5 rounded-2xl min-w-[180px] md:min-w-[240px] text-center shadow-inner">
+                        <div className="bg-white/20 border border-white/20 p-2 md:p-5 rounded-2xl min-w-[180px] md:min-w-[240px] text-center shadow-inner">
                             <span className="text-2xl md:text-5xl font-black tracking-tighter">{props.totalAmount.toLocaleString()}원</span>
                         </div>
                     </div>
@@ -129,7 +129,7 @@ export default function AdForm(props: AdFormProps) {
             </div>
 
             {/* Sticky Bottom Navigation (Capture 3/4/5 Style) */}
-            <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-6 bg-gradient-to-t from-white via-white/10 to-transparent dark:from-gray-950 dark:via-gray-950/10 pointer-events-none">
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-6 bg-white/90 pointer-events-none">
                 <div className="max-w-[1120px] mx-auto flex flex-row gap-2 md:gap-4 pointer-events-auto">
                     <button
                         type="button" // Explicitly set type to button to prevent form submission

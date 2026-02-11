@@ -12,15 +12,12 @@ interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
-// Mock User Database for Validation
-const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = {
+// Mock User Database for Validation (Local Only)
+const IS_LOCAL = process.env.NODE_ENV === 'development';
+const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = IS_LOCAL ? {
     'admin': { type: 'personal', name: '관리자' },
-    'user123': { type: 'personal', name: '홍길동' },
-    'shop_user': { type: 'business', name: '코코 라운지' },
-    'foxalba': { type: 'business', name: '폭스알바 사장님' },
-    'test': { type: 'business', name: '테스트 계정' },
-    'admin_shop': { type: 'business', name: '샵 관리자' }
-};
+    'test': { type: 'business', name: '테스트 계정' }
+} : {};
 
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
     const brand = useBrand();
