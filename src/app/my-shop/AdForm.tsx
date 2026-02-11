@@ -64,7 +64,7 @@ export default function AdForm(props: AdFormProps) {
     const { brand } = props;
 
     return (
-        <div className="w-full max-w-[1120px] mx-auto space-y-1 pb-8 pt-2.5 px-2 md:px-3 xl:px-0 relative mb-3">
+        <div className="w-full max-w-[1120px] mx-auto space-y-2 md:space-y-5 pb-8 pt-2.5 px-2 md:px-3 xl:px-0 relative mb-3">
             {/* Recruitment Registration Header (Capture 3) */}
             <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">
@@ -79,7 +79,7 @@ export default function AdForm(props: AdFormProps) {
             <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} />
             {/* Step 3 & 4: Restricted in Edit Mode */}
-            <div className="relative group">
+            <div className="relative group space-y-2 md:space-y-5">
                 {!props.isNewEntry && (
                     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-[32px] pointer-events-none animate-in fade-in duration-500">
                         <div className="bg-white/90 shadow-xl border border-pink-100 p-6 rounded-3xl text-center max-w-sm">
@@ -130,7 +130,7 @@ export default function AdForm(props: AdFormProps) {
 
             {/* Sticky Bottom Navigation (Capture 3/4/5 Style) */}
             <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-6 bg-gradient-to-t from-white via-white/10 to-transparent dark:from-gray-950 dark:via-gray-950/10 pointer-events-none">
-                <div className="max-w-[1080px] mx-auto flex flex-row gap-2 md:gap-4 pointer-events-auto">
+                <div className="max-w-[1120px] mx-auto flex flex-row gap-2 md:gap-4 pointer-events-auto">
                     <button
                         onClick={() => props.onPreview?.()}
                         className="flex-[1.5] md:w-40 py-4 rounded-2xl bg-slate-800 text-white font-black text-xs md:text-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 whitespace-nowrap"
