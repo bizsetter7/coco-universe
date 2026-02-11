@@ -311,6 +311,31 @@ function CommunityContent() {
                 </div>
             )}
 
+            {/* Corporate Access Denied Modal (z-[20000]) */}
+            {isCorporateModalOpen && (
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setIsCorporateModalOpen(false)}></div>
+                    <div className={`rounded-[32px] md:rounded-[40px] w-[85%] md:w-full max-w-xs p-8 md:p-10 relative z-10 shadow-2xl border animate-in fade-in zoom-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-full flex items-center justify-center mb-5 md:mb-6 text-blue-600 shadow-inner">
+                                <AlertCircle size={28} className="md:w-8 md:h-8" />
+                            </div>
+                            <h3 className={`text-lg md:text-xl font-black mb-3 underline decoration-blue-200 decoration-4 underline-offset-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>접근 권한 제한</h3>
+                            <p className={`text-xs md:text-sm mb-6 md:mb-8 leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
+                                사장님 회원은 구직자들의 소통 공간을<br />
+                                열람하실 수 없습니다. 🙏
+                            </p>
+                            <button
+                                onClick={() => setIsCorporateModalOpen(false)}
+                                className={`w-full py-4 rounded-2xl font-black transition-all outline-none ${brand.theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
+                            >
+                                확인했습니다
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Floating Action Button (z-40) */}
             {isLoggedIn && userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
                 <button

@@ -99,13 +99,13 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, isGrand 
                 </div>
 
                 <h3 className={`text-[15px] font-bold leading-tight line-clamp-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    {shop.title || shop.name}
+                    {(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                 </h3>
 
                 {/* Pay Info Logic */}
                 <div className={`flex items-center gap-1.5 mt-0.5`}>
                     {/* Badge for Pay Type (Position 2: Fixed Badge, 1 Char) */}
-                    <span className={`text-[10px] font-black px-1.5 py-[2px] rounded ${getPayColor(shop.payType || '시급')} whitespace-nowrap min-w-[24px] text-center`}>
+                    <span className={`text-[10px] font-black w-[20px] h-[20px] flex items-center justify-center rounded ${getPayColor(shop.payType || '시급')} whitespace-nowrap min-w-[20px] text-center`}>
                         {shop.payType?.substring(0, 1) || '시'}
                     </span>
                     {/* Pay Amount */}

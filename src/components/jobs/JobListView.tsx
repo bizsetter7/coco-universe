@@ -108,7 +108,7 @@ const JobRow = React.memo(({
             <td className="py-4 px-2 text-center">
                 <div className="flex items-center justify-center gap-1.5 w-full">
                     <span className={`font-black text-[14px] truncate max-w-full ${brandTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                        {shop.name}
+                        {shop.name.replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                     </span>
                     {shop.tier && shop.tier !== 'common' && (
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
@@ -128,7 +128,7 @@ const JobRow = React.memo(({
                     {shop.tier === 'urgent' && <span className="text-[10px] bg-rose-100 text-rose-600 px-1 py-0.5 rounded font-black whitespace-nowrap shrink-0">급구</span>}
 
                     <p className={`text-[14px] font-bold truncate max-w-[300px] ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {shop.title || `${shop.name}에서 열정적인 가족을 모집합니다. 최고 대우 보장!`}
+                        {(shop.title || `${shop.name}에서 열정적인 가족을 모집합니다. 최고 대우 보장!`).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                     </p>
                 </div>
             </td>
@@ -198,7 +198,7 @@ const MobileJobRow = React.memo(({
                             {shop.options?.blink && <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-black whitespace-nowrap">NEW</span>}
                             {shop.tier === 'urgent' && <span className="text-[9px] bg-rose-100 text-rose-600 px-1 py-0.5 rounded font-black whitespace-nowrap">급구</span>}
                         </span>
-                        <span className="truncate">{shop.title || shop.name}</span>
+                        <span className="truncate">{(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}</span>
                     </span>
                 </h3>
 

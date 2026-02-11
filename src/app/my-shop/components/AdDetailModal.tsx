@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info, Clock, Crown } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
+import { getPayColor } from '@/utils/payColors';
 
 const TIER_GRADIENTS: Record<string, string> = {
     grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
@@ -99,12 +100,12 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
 
                         <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
                             <span className="md:hidden">
-                                {(ad.title || ad.jobTitle || '').length > 15
-                                    ? (ad.title || ad.jobTitle || '').slice(0, 15) + '...'
-                                    : (ad.title || ad.jobTitle)}
+                                {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().length > 15
+                                    ? (ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().slice(0, 15) + '...'
+                                    : (ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                             </span>
                             <span className="hidden md:block">
-                                {ad.title || ad.jobTitle}
+                                {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\]|\{.*?\}/g, '').trim()}
                             </span>
                         </h2>
                     </div>
@@ -114,7 +115,7 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {ad.nickname || ad.shopName || '관리자'}
+                        {(ad.nickname || ad.shopName || '관리자').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                     </div>
                 </div>
 
@@ -124,8 +125,8 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                     {/* Pay & Option Section */}
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 gap-3 md:gap-0">
                         <div className="flex items-center gap-3 w-full md:w-auto">
-                            <span className={`px-2 py-1 rounded text-xs font-black whitespace-nowrap ${PAY_TYPE_BADGES[(ad.payType || '').substring(0, 2)] || 'bg-gray-100 text-gray-600'}`}>
-                                {ad.payType || '시급'}
+                            <span className={`w-[24px] h-[24px] flex items-center justify-center rounded text-[10px] font-black text-white ${getPayColor(ad.payType || (ad.adNo ? '시급' : ''))}`}>
+                                {(ad.payType || '').includes('TC') ? 'T' : (ad.payType || '')?.substring(0, 1) || '협'}
                             </span>
                             <span className="text-lg font-black text-gray-900 tracking-tight">
                                 {formatKoreanMoney(ad.payAmount)}

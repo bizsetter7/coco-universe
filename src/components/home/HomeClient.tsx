@@ -8,7 +8,7 @@ import { PaymentPopup } from './PaymentPopup';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 
 // Restore Imports
-import { MainBanner } from './MainBanner';
+import { HeroSection } from './HeroSection';
 import { CommunityNotice } from './CommunityNotice';
 import { QuickMenu } from './QuickMenu';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
@@ -47,9 +47,9 @@ export default function HomeClient({ shops }: HomeClientProps) {
 
     return (
         <div className="w-full pb-20">
-            {/* 1. Top Section: Banner, Quick Menu, Community */}
+            {/* 1. Top Section: Hero (Carousel), Quick Menu, Community */}
             <section className="mb-4">
-                <MainBanner onAdRegister={() => handleAdRegister('grand')} />
+                <HeroSection />
 
                 {/* Visual Offset: Lift QuickMenu up */}
                 <div className="-mt-4 relative z-10">

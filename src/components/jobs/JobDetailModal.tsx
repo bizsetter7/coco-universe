@@ -139,7 +139,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {shop.nickname || shop.name}
+                        {(shop.nickname || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                     </div>
                 </div>
 
@@ -149,8 +149,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                     {/* Pay & Option Section */}
                     <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
                         <div className="flex items-center gap-3">
-                            <span className={`px-2 py-1 rounded text-xs font-black whitespace-nowrap ${PAY_TYPE_BADGES[shop.payType?.substring(0, 2) || '시급'] || 'bg-gray-100 text-gray-600'}`}>
-                                {shop.payType || '시급'}
+                            <span className={`w-[24px] h-[24px] flex items-center justify-center rounded text-[10px] font-black text-white ${getPayColor(shop.payType || shop.pay)}`}>
+                                {(shop.payType || shop.pay)?.includes('TC') ? 'T' : (shop.payType || shop.pay)?.substring(0, 1) || '시'}
                             </span>
                             <span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">
                                 {formatKoreanMoney(shop.pay)}
