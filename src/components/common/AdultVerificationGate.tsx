@@ -12,12 +12,13 @@ interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
-// Mock User Database for Validation (Local Only)
-const IS_LOCAL = process.env.NODE_ENV === 'development';
-const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = IS_LOCAL ? {
+// Mock User Database for Validation (Always available for admin/test)
+const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = {
+    'admin_shop': { type: 'business', name: '최고관리자' },
+    'admin_user': { type: 'personal', name: '테스트회원' },
     'admin': { type: 'personal', name: '관리자' },
     'test': { type: 'business', name: '테스트 계정' }
-} : {};
+};
 
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
     const brand = useBrand();
@@ -56,14 +57,16 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
         }
 
         // Success: Setup Session
+        const sessionType = foundUser.type === 'business' ? 'shop' : 'personal';
         const sessionData = {
-            type: foundUser.type === 'business' ? 'shop' : 'personal',
+            type: sessionType,
             name: foundUser.name,
-            id: 'mock_user_' + targetId,
-            points: 50000
+            id: targetId === 'admin_shop' ? 'admin_shop' : ('mock_user_' + targetId),
+            points: 50000,
+            shopId: targetId === 'admin_shop' ? 'shop_123' : undefined
         };
         localStorage.setItem('user_session', JSON.stringify(sessionData));
-        localStorage.setItem('user_type', sessionData.type);
+        localStorage.setItem('user_type', sessionType);
 
         onVerify();
     };

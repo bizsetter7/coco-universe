@@ -6,6 +6,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
 import { PaymentPopup } from './PaymentPopup';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 // Restore Imports
 import { HeroSection } from './HeroSection';
@@ -29,6 +30,9 @@ export default function HomeClient({ shops }: HomeClientProps) {
     const [showPaymentPopup, setShowPaymentPopup] = React.useState(false);
     const [selectedTier, setSelectedTier] = React.useState('grand');
     const [favorites, setFavorites] = React.useState<string[]>([]);
+
+    // Body Scroll Lock
+    useBodyScrollLock(!!selectedShop || showPaymentPopup);
 
     // -- Handlers --
     const toggleFavorite = (e: React.MouseEvent, id: string) => {

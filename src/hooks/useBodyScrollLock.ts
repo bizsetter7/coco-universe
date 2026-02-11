@@ -8,13 +8,19 @@ export const useBodyScrollLock = (isOpen: boolean) => {
     useEffect(() => {
         if (isOpen) {
             document.body.classList.add('modal-active');
+            document.body.classList.add('modal-open');
+            // Simplified: Just lock overflow to prevent jump
+            document.body.style.overflow = 'hidden';
         } else {
             document.body.classList.remove('modal-active');
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
         }
 
-        // Cleanup function to ensure scroll is restored if component unmounts while modal is "open"
         return () => {
             document.body.classList.remove('modal-active');
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
         };
     }, [isOpen]);
 };

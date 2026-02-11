@@ -100,7 +100,7 @@ export function useAuth() {
         user,
         login,
         logout,
-        userType: (user.type === 'shop' ? 'corporate' : 'individual') as 'corporate' | 'individual', // Explicit cast for LeftSidebar
+        userType: (user.type === 'shop' || user.id === 'admin_shop' ? 'corporate' : 'individual') as 'corporate' | 'individual', // Explicit cast for LeftSidebar
         userName: user.name,
         userPoints: user.points
     };

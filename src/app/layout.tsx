@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   },
   other: {
     google: "notranslate",
+    "color-scheme": "light",
+    "supported-color-schemes": "light",
   },
 };
 
@@ -24,6 +26,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 import shopsData from "@/lib/data/shops.json";

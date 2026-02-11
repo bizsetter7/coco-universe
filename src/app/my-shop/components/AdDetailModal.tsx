@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom';
 import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info, Clock, Crown } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
+import { ICONS, HIGHLIGHTERS } from '../constants';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 const TIER_GRADIENTS: Record<string, string> = {
     grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
@@ -27,6 +29,8 @@ const PAY_TYPE_BADGES: Record<string, string> = {
 
 export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => void, brand: any }) => {
     const [mounted, setMounted] = useState(false);
+
+    useBodyScrollLock(!!ad);
 
     useEffect(() => {
         console.log("AdDetailModal MOUNTED with ad:", ad);
@@ -90,24 +94,32 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         <MapPin size={10} /> {ad.regionCity} {ad.regionGu} | <Briefcase size={10} /> {ad.category || '업종'}
                     </div>
 
-                    {/* Ad Title Single White Box Layout */}
-                    <div className="w-full bg-white px-4 md:px-6 py-4 rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-3">
-                        {/* Tier Icon */}
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                            <span className="text-xl">{tier === 'grand' ? '👑' : '🔥'}</span>
-                            <span className="text-[11px] font-black uppercase tracking-tight">{tier === 'grand' ? 'GRAND' : 'HOT'}</span>
-                        </div>
+                    {/* Ad Title White Box Layout (CENTERED) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+                            {ad.options?.icon && (() => {
+                                const iconObj = ICONS.find((i: any) => i.id === Number(ad.options.icon));
+                                return iconObj ? (
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                        <span className="text-lg">{iconObj.icon}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                    </div>
+                                ) : null;
+                            })()}
 
-                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
-                            <span className="md:hidden">
-                                {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().length > 15
-                                    ? (ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().slice(0, 15) + '...'
-                                    : (ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
-                            </span>
-                            <span className="hidden md:block">
-                                {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\]|\{.*?\}/g, '').trim()}
-                            </span>
-                        </h2>
+                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
+                                <span
+                                    style={ad.options?.highlighter ? {
+                                        backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(ad.options.highlighter))?.color + 'cc',
+                                        color: '#000',
+                                        padding: '2px 8px',
+                                        borderRadius: '6px'
+                                    } : {}}
+                                >
+                                    {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                                </span>
+                            </h2>
+                        </div>
                     </div>
 
                     {/* Nickname Area */}
@@ -120,30 +132,36 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                 </div>
 
                 {/* 2. BODY SECTION */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate' }}>
+                    {/* Ad Number (Moved to Body) */}
+                    <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
+                        No.{ad.adNo || ad.id?.toString().substring(0, 4) || '1004'}
+                    </div>
 
-                    {/* Pay & Option Section */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 gap-3 md:gap-0">
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                            <span className={`w-[24px] h-[24px] flex items-center justify-center rounded text-[10px] font-black text-white ${getPayColor(ad.payType || (ad.adNo ? '시급' : ''))}`}>
-                                {(ad.payType || '').includes('TC') ? 'T' : (ad.payType || '')?.substring(0, 1) || '협'}
-                            </span>
-                            <span className="text-lg font-black text-gray-900 tracking-tight">
-                                {formatKoreanMoney(ad.payAmount)}
-                            </span>
+                    {/* Pay & Keywords Box (CENTERED/GRID) */}
+                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
+                        {/* Left: Salary Info */}
+                        <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
+                            {/* Stylish Square Box Badge */}
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(ad.payType || (ad.adNo ? '시급' : ''))}`}>
+                                {(ad.payType || '').includes('TC') ? 'T' : (ad.payType || '')?.substring(0, 1) || '급'}
+                            </div>
+                            <div className="flex flex-col gap-0.5 overflow-hidden">
+                                <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
+                                    {formatKoreanMoney(ad.payAmount)}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="hidden md:block h-8 w-px bg-gray-200 mx-2"></div>
-
-                        <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
-                            {(ad.options?.paySuffixes || []).length > 0 ? (
-                                (ad.options.paySuffixes).map((suffix: string, idx: number) => (
-                                    <span key={idx} className="bg-pink-50 text-pink-600 px-2 py-1 rounded text-[10px] font-bold border border-pink-100 whitespace-nowrap">
-                                        {suffix}
-                                    </span>
-                                ))
-                            ) : (
-                                <span className="text-gray-400 text-xs font-bold">옵션 없음</span>
+                        {/* Right: Keywords (Grid 3 cols) */}
+                        <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
+                            {(ad.options?.paySuffixes || []).slice(0, 6).map((kw: string, idx: number) => (
+                                <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                                    {kw}
+                                </span>
+                            ))}
+                            {(ad.options?.paySuffixes || []).length === 0 && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
                             )}
                         </div>
                     </div>
@@ -174,22 +192,27 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         </div>
                     </div>
 
-                    {/* Keyword & Info */}
-                    <div className="space-y-2 pt-2">
-                        <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
-                            <Info size={12} />
+                    {/* [Restored] Keyword & Info */}
+                    <div className="space-y-2 pt-4 border-t border-gray-100">
+                        <h3 className="text-sm font-bold text-gray-300 flex items-center gap-1.5">
+                            <Info size={16} />
                             Keyword & Info
                         </h3>
-                        <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
-                            <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
-                                {keywords.map((keyword: string, idx: number) => (
-                                    <span key={idx} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
-                                        #{keyword}
+
+                        {/* Keywords Grid Only (Subtle Style) */}
+                        {keywords && keywords.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                                {keywords.map((k: string, i: number) => (
+                                    <span key={i} className="text-[10px] font-normal text-gray-400 bg-gray-50/50 px-2 py-1 rounded border border-gray-100">
+                                        #{k}
                                     </span>
                                 ))}
                             </div>
-                        </div>
+                        ) : (
+                            <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30"></div>
+                        )}
                     </div>
+
                 </div>
 
                 {/* 3. FOOTER SECTION (Contact) */}

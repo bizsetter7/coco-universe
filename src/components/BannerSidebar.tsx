@@ -53,15 +53,15 @@ const SideAdCard = React.memo(({ ad, isGrand, onSelect }: { ad: Shop, isGrand: b
                     {ad.title || ad.name}
                 </h4>
 
-                <div className="flex items-center justify-end gap-1.5">
-                    <div className={`shrink-0 w-[14px] h-[14px] flex items-center justify-center rounded-[3px] shadow-sm relative overflow-hidden ${getPayColor(ad.payType || (badgeChar === '면' ? '협의' : ''))} `} style={{ backgroundColor: badgeChar === '면' ? '#6b7280' : undefined }}>
+                <div className="flex items-center gap-1">
+                    <span className={`shrink-0 w-[14px] h-[14px] flex items-center justify-center rounded-[3px] shadow-sm relative overflow-hidden ${getPayColor(ad.payType || (badgeChar === '면' ? '협의' : ''))} `} style={{ backgroundColor: badgeChar === '면' ? '#6b7280' : undefined }}>
                         <span className="text-[9px] font-bold text-white leading-none absolute inset-0 flex items-center justify-center z-20 pt-[1px]">
                             {badgeChar}
                         </span>
-                    </div>
-                    <span className="text-[12px] font-black text-gray-900 tracking-tighter">
-                        {formatKoreanMoney(ad.pay)}
                     </span>
+                    <div className="text-[10px] font-black text-gray-900 tracking-tighter">
+                        {formatKoreanMoney(ad.pay)}
+                    </div>
                 </div>
             </div>
         </div>

@@ -59,28 +59,30 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose, form
                         <MapPin size={10} /> [{formData.regionCity} {formData.regionGu}] | <Store size={10} /> {formData.industryMain || '업종미기재'}
                     </div>
 
-                    {/* Ad Title Single White Box Layout (Capture 2 Style) */}
-                    <div className="w-full bg-white px-4 md:px-6 py-4 rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-3">
-                        {formData.selectedIcon && (() => {
-                            const iconObj = ICONS.find((i: any) => i.id === Number(formData.selectedIcon));
-                            return iconObj ? (
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                                    <span className="text-xl">{iconObj.icon}</span>
-                                    <span className="text-[11px] font-black uppercase tracking-tight">{iconObj.name}</span>
-                                </div>
-                            ) : null;
-                        })()}
+                    {/* Ad Title White Box Layout (CENTERED) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2 w-full">
+                            {formData.selectedIcon && (() => {
+                                const iconObj = ICONS.find((i: any) => i.id === Number(formData.selectedIcon));
+                                return iconObj ? (
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                        <span className="text-lg">{iconObj.icon}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                    </div>
+                                ) : null;
+                            })()}
 
-                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
-                            <span style={formData.selectedHighlighter ? {
-                                backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(formData.selectedHighlighter))?.color + 'cc',
-                                color: '#000',
-                                padding: '0 8px',
-                                borderRadius: '6px'
-                            } : {}}>
-                                {formData.title || '제목을 입력해주세요'}
-                            </span>
-                        </h2>
+                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
+                                <span style={formData.selectedHighlighter ? {
+                                    backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(formData.selectedHighlighter))?.color + 'cc',
+                                    color: '#000',
+                                    padding: '2px 8px',
+                                    borderRadius: '6px'
+                                } : {}}>
+                                    {formData.title || '제목을 입력해주세요'}
+                                </span>
+                            </h2>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
@@ -90,31 +92,30 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose, form
 
                 {/* Content (Scrollable) */}
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gray-50/30">
-                    {/* Salary Info Box (Redesigned with Vertical Line and Options area) */}
-                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-stretch group hover:shadow-md transition-shadow min-h-[100px]">
+                    {/* Pay & Keywords Box (CENTERED/GRID) */}
+                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
                         {/* Left: Salary Info */}
-                        <div className="flex-[4] flex items-center gap-3 pr-4 border-r border-gray-100">
+                        <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
                             {/* Stylish Square Box Badge */}
-                            <div className={`w-8 h-8 ${accentColor} ${badgeBg} rounded-xl border-2 border-current/20 flex items-center justify-center text-md font-black shadow-inner shrink-0`}>
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${accentColor.replace('text-', 'bg-')}`}>
                                 {getPayAbbr(formData.payType)}
                             </div>
                             <div className="flex flex-col gap-0.5 overflow-hidden">
-                                <span className="text-xl md:text-2xl font-black text-gray-800 tracking-tighter truncate leading-tight">
+                                <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
                                     {formatKoreanMoney(formData.payAmount)}
-                                </span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Right: Salary Options (Suffixes) */}
-                        <div className="flex-[6] pl-6 flex items-center flex-wrap gap-1.5 align-content-center">
-                            {formData.paySuffixes?.length > 0 ? (
-                                formData.paySuffixes.slice(0, 6).map((s: string, i: number) => (
-                                    <span key={i} className="px-2.5 py-1 bg-red-50 text-red-500 text-[10px] font-black rounded-lg border border-red-100/50 whitespace-nowrap shadow-sm">
-                                        {s}
-                                    </span>
-                                ))
-                            ) : (
-                                <span className="text-gray-300 text-[11px] font-bold italic">추가 옵션 없음</span>
+                        {/* Right: Keywords (Grid 3 cols) */}
+                        <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
+                            {formData.selectedKeywords?.slice(0, 6).map((kw: string, i: number) => (
+                                <span key={i} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                                    {kw}
+                                </span>
+                            ))}
+                            {(!formData.selectedKeywords || formData.selectedKeywords.length === 0) && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
                             )}
                         </div>
                     </div>

@@ -2,6 +2,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=Hahmlet:wght@100..900&family=Gowun+Batang:wght@400;700&display=swap');
 @import "tailwindcss";
 
+/* Force Light Mode Globally */
+:root,
+html,
+body,
+* {
+    color-scheme: light !important;
+    forced-color-adjust: none !important;
+}
+
 /* 코코알바 프리미엄 디자인 복구 */
 :root {
     color-scheme: light;
@@ -17,9 +26,20 @@ body {
     color: #111827;
 }
 
-body.modal-active {
+body.modal-active,
+body.modal-open {
     overflow: hidden !important;
-    height: 100vh !important;
-    position: relative;
+    width: 100%;
     touch-action: none;
+    -webkit-overflow-scrolling: none;
+}
+
+/* Force White Background Override for Mobile Cards */
+
+.force-dark-text {
+    color: #111827 !important;
+}
+
+.force-dark-text * {
+    color: #111827 !important;
 }

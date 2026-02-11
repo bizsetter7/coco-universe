@@ -39,7 +39,7 @@ export const LoginPage = () => {
             alert('일반 회원으로 로그인되었습니다.');
             window.location.href = '/';
         } else {
-            alert('아이디 또는 비밀번호가 올바르지 않거나 서비스 준비 중입니다.\n(테스트 계정: admin_shop / admin_user)');
+            alert('아이디 또는 비밀번호가 올바르지 않습니다.\n(최고관리자: admin_shop / 비번: password123)');
         }
     };
 

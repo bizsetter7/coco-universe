@@ -164,8 +164,8 @@ function MyShopContent() {
     // Form State (Hook)
     const formState = useAdFormState();
 
-    // Body Scroll Lock
-    useBodyScrollLock(showWarningModal || showDesignModal || showPreviewModal || showMobileMenu || showExampleModal);
+    // Body Scroll Lock (ALL MODALS)
+    useBodyScrollLock(!!selectedAdForModal || showWarningModal || showDesignModal || showPreviewModal || showMobileMenu || showExampleModal);
 
     // Prevent Leave
     usePreventLeave(formState.isDirty && view === 'form');

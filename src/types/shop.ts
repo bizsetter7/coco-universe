@@ -11,6 +11,11 @@ export interface Shop {
     pay: string;
     payType?: string;
     workType: string;
+    // [Added] Missing properties for UI
+    workTime?: string;
+    gender?: string;
+    age?: string;
+    keywords?: string[];
     url: string;
     site: string;
     id: string;

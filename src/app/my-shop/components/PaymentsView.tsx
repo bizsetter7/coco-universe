@@ -63,7 +63,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                         </div>
                                                         <span
                                                             onClick={() => onShowAdDetail?.(p.id)}
-                                                            className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                            className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                                                         >
                                                             {p.desc}
                                                         </span>
@@ -71,15 +71,15 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 </td>
                                                 <td className="py-5 px-2 font-black text-pink-500">{p.price}</td>
                                                 <td className="py-5 px-2 text-[11px] font-bold text-gray-400">{p.method}</td>
-                                                <td className="py-5 px-2 font-black">{p.nickname || userName}</td>
-                                                <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight">
+                                                <td className="py-5 px-2 font-black max-w-[100px] truncate">{p.nickname || userName}</td>
+                                                <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight whitespace-nowrap">
                                                     <div className="flex flex-col">
                                                         <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
                                                         <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
                                                     </div>
                                                 </td>
                                                 <td className="py-5 px-2">
-                                                    <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'} shadow-sm`}>
+                                                    <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'} shadow-sm whitespace-nowrap`}>
                                                         {p.status || '대기'}
                                                     </span>
                                                 </td>
@@ -94,7 +94,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                 {payments.map((p: any) => (
                                     <div key={p.id} className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} border rounded-[24px] p-5 shadow-sm space-y-4`}>
                                         <div className="flex justify-between items-start gap-2">
-                                            <div className="space-y-1">
+                                            <div className="space-y-1 overflow-hidden">
                                                 <div className="flex flex-wrap gap-1">
                                                     <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black uppercase`}>
                                                         {p.type?.includes('p') ? p.type.toUpperCase() : 'AD'}
@@ -103,7 +103,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 </div>
                                                 <h3
                                                     onClick={() => onShowAdDetail?.(p.id)}
-                                                    className={`text-[15px] font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
+                                                    className={`text-[15px] font-black leading-tight line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
                                                 >
                                                     {p.desc}
                                                 </h3>

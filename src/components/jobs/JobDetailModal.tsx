@@ -6,6 +6,8 @@ import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Cl
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
+import { HIGHLIGHTERS, ICONS } from '@/constants/job-options';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface JobDetailModalProps {
     shop: Shop | null;
@@ -41,14 +43,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
         return () => setMounted(false);
     }, []);
 
-    useEffect(() => {
-        if (shop) {
-            document.body.classList.add('modal-open');
-        } else {
-            document.body.classList.remove('modal-open');
-        }
-        return () => document.body.classList.remove('modal-open');
-    }, [shop]);
+    useBodyScrollLock(!!shop);
 
     if (!shop || !mounted) return null;
 
@@ -85,7 +80,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
         >
             <div
                 className="
-                    bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col
+                    bg-white shadow-2xl overflow-hidden flex flex-col
                     fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
                     md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
                     transform-gpu will-change-transform backface-hidden
@@ -96,11 +91,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                 {/* 1. HEADER SECTION (Capture 2 Style) */}
                 <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
 
-                    {/* Top Row: Ad No & Close Button */}
+                    {/* Top Row: Close Button Only */}
                     <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
-                        <span className={`text-[10px] font-mono font-black opacity-60 px-2 py-0.5 rounded-full bg-black/10 ${isTiered ? 'text-white/70' : 'text-gray-400'}`}>
-                            No.{shop.adNo || '0000'}
-                        </span>
                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
                             <X size={24} className={isTiered ? 'text-white' : 'text-gray-900'} />
                         </button>
@@ -111,27 +103,54 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                         onClick={handleFavoriteClick}
                         className={`absolute top-5 left-6 p-2 rounded-full transition-all active:scale-95 z-50 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:text-amber-400 hover:bg-amber-50'}`}
                     >
-                        <Star size={20} className={isFavorite ? "fill-amber-400 text-amber-400" : "hover:fill-current"} />
+                        <Star size={20} className={isFavorite ? "fill-white text-white" : "hover:fill-current"} />
                     </button>
 
                     {/* Region & WorkType Badge */}
-                    <div className={`bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm ${isTiered ? 'text-white' : 'text-gray-600 bg-gray-100/80 border-gray-200'}`}>
+                    <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
                         <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.workType}
                     </div>
 
-                    {/* Ad Title Single White Box Layout (Capture 2 Style) */}
-                    <div className="w-full bg-white px-4 md:px-6 py-4 rounded-[24px] shadow-xl border border-white/50 flex flex-col md:flex-row items-center justify-center gap-3">
-                        {/* Simulation of Icon if tiered or specific options */}
-                        {(isTiered || hasEmphasis) && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                                <span className="text-xl">{isTiered && shop.tier === 'grand' ? '👑' : '🔥'}</span>
-                                <span className="text-[11px] font-black uppercase tracking-tight">{shop.tier === 'grand' ? 'GRAND' : 'HOT'}</span>
-                            </div>
-                        )}
+                    {/* Ad Title White Box Layout (RE-RESTORED & CENTERED) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+                            {shop.options?.icon && (() => {
+                                const iconObj = ICONS.find(i => i.id === Number(shop.options?.icon));
+                                return iconObj ? (
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                        <span className="text-lg">{iconObj.icon}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                    </div>
+                                ) : null;
+                            })()}
 
-                        <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 flex-1 truncate text-center md:text-left">
-                            {shop.title || shop.name}
-                        </h2>
+                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
+                                <span
+                                    style={shop.options?.highlighter ? {
+                                        backgroundColor: HIGHLIGHTERS.find(h => h.id === Number(shop.options?.highlighter))?.color + 'cc',
+                                        color: '#000',
+                                        padding: '2px 8px',
+                                        borderRadius: '6px'
+                                    } : {}}
+                                    className="md:hidden"
+                                >
+                                    {(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().length > 15
+                                        ? (shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().slice(0, 15) + '...'
+                                        : (shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                                </span>
+                                <span
+                                    style={shop.options?.highlighter ? {
+                                        backgroundColor: HIGHLIGHTERS.find(h => h.id === Number(shop.options?.highlighter))?.color + 'cc',
+                                        color: '#000',
+                                        padding: '2px 10px',
+                                        borderRadius: '6px'
+                                    } : {}}
+                                    className="hidden md:inline"
+                                >
+                                    {shop.title || shop.name}
+                                </span>
+                            </h2>
+                        </div>
                     </div>
 
                     {/* Nickname Area */}
@@ -144,69 +163,88 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                 </div>
 
                 {/* 2. BODY SECTION */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white dark:bg-gray-900">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 !bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate', mixBlendMode: 'normal' }}>
+                    {/* Ad Number (Moved to Body for minimal visual impact) */}
+                    <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
+                        No.{shop.adNo || shop.id?.substring(0, 4) || '1004'}
+                    </div>
 
-                    {/* Pay & Option Section */}
-                    <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
-                        <div className="flex items-center gap-3">
-                            <span className={`w-[24px] h-[24px] flex items-center justify-center rounded text-[10px] font-black text-white ${getPayColor(shop.payType || shop.pay)}`}>
-                                {(shop.payType || shop.pay)?.includes('TC') ? 'T' : (shop.payType || shop.pay)?.substring(0, 1) || '시'}
-                            </span>
-                            <span className="text-lg font-black text-gray-900 dark:text-gray-100 tracking-tight">
-                                {formatKoreanMoney(shop.pay)}
-                            </span>
+                    {/* Pay & Keywords Box (Redesigned as per user capture) */}
+                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
+                        {/* Left: Salary Info */}
+                        <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
+                            {/* Stylish Square Box Badge */}
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(shop.payType || shop.pay)}`}>
+                                {(shop.payType || shop.pay)?.substring(0, 1) || '시'}
+                            </div>
+                            <div className="flex flex-col gap-0.5 overflow-hidden">
+                                <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
+                                    {formatKoreanMoney(shop.pay)}
+                                </div>
+                            </div>
                         </div>
-                        <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
-                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs font-bold whitespace-nowrap">
-                            <Clock size={14} className="text-pink-500" />
-                            {payOption}
+
+                        {/* Right: Keywords (Grid 3 cols) */}
+                        <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
+                            {keywords.slice(0, 6).map((kw, idx) => (
+                                <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                                    {kw}
+                                </span>
+                            ))}
+                            {keywords.length === 0 && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
+                            )}
                         </div>
                     </div>
 
                     {/* 상세 모집내용 */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
                             <span className="w-1 h-4 bg-pink-500 rounded-full"></span>
                             상세 모집내용
                         </h3>
-                        <div className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 break-words whitespace-pre-wrap bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 min-h-[120px]">
+                        <div className="text-sm leading-relaxed text-gray-600 break-words whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100 min-h-[120px]">
                             {shop.description || `${shop.name}에서 열정적인 분을 모십니다.\n가족같은 분위기에서 함께 성장할 수 있습니다.\n\n[근무조건]\n- 근무기간: 1년이상\n- 근무요일: 요일협의\n- 근무시간: 시간협의\n\n초보자도 환영합니다!`}
                         </div>
                     </div>
 
-                    {/* 위치 정보 (지도 RESTORED) */}
+                    {/* 위치 정보 */}
                     <div className="space-y-3">
-                        <h3 className="text-sm font-black text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
                             <span className="w-1 h-4 bg-green-500 rounded-full"></span>
                             위치 정보
                         </h3>
-                        <div className="aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50 dark:border-gray-700">
+                        <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
                             <MapPin size={32} className="opacity-50" />
                             <span className="text-xs font-bold">{shop.region}</span>
                             <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
                         </div>
                     </div>
 
-                    {/* Keyword & Info (Subtle for SEO) */}
-                    <div className="space-y-2 pt-2">
-                        <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1.5 opacity-80">
-                            <Info size={12} />
+                    {/* [Added] Keyword & Info (Matches AdDetailModal style) */}
+                    <div className="space-y-2 pt-4 border-t border-gray-100">
+                        <h3 className="text-sm font-bold text-gray-300 flex items-center gap-1.5">
+                            <Info size={16} />
                             Keyword & Info
                         </h3>
-                        <div className="bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-lg border border-gray-100 dark:border-gray-800/50">
-                            <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
-                                {keywords.map((keyword, idx) => (
-                                    <span key={idx} className="px-2 py-1 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 text-[10px] font-medium">
-                                        #{keyword}
+
+                        {/* Keywords Grid Only */}
+                        {keywords && keywords.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                                {keywords.map((k: string, i: number) => (
+                                    <span key={i} className="text-[10px] font-normal text-gray-400 bg-gray-50/50 px-2 py-1 rounded border border-gray-100">
+                                        #{k}
                                     </span>
                                 ))}
                             </div>
-                        </div>
+                        ) : (
+                            <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30"></div>
+                        )}
                     </div>
                 </div>
 
                 {/* 3. FOOTER SECTION (Contact) */}
-                <div className="p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0 safe-area-bottom">
+                <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
                     <div className="flex gap-3">
                         {/* Message Button */}
                         <button
@@ -241,7 +279,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                         {/* Phone Button */}
                         <a
                             href={`tel:${shop.phone}`}
-                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200 dark:shadow-none"
+                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
                         >
                             <Phone size={20} className="fill-white/20 stroke-current" />
                             <span className="text-xs font-black">전화/문자 지원하기</span>
