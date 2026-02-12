@@ -157,7 +157,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
         // Other Sections
         if (pathname?.startsWith('/region') || pathname?.startsWith('/location')) return <span className="text-lg md:text-xl font-black">지역별 채용</span>;
         if (pathname?.startsWith('/jobs') || pathname?.startsWith('/industry')) return <span className="text-lg md:text-xl font-black">업종별 채용</span>;
-        if (pathname?.startsWith('/talent')) return <span className="text-lg md:text-xl font-black">같이일할 단짝</span>;
+        if (pathname?.startsWith('/talent')) return <span className="text-lg md:text-xl font-black">인재정보</span>;
         if (pathname?.startsWith('/theme')) return <span className="text-lg md:text-xl font-black">테마별 채용</span>;
         if (pathname?.startsWith('/premium')) return <span className="text-lg md:text-xl font-black">프리미엄 라운지</span>;
         if (pathname?.startsWith('/night-talk')) return <span className="text-lg md:text-xl font-black">밤문화 톡</span>;

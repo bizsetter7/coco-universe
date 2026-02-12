@@ -113,10 +113,7 @@ function CommunityContent() {
 
     return (
         <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'} ${isCorporateModalOpen ? 'overflow-hidden h-screen' : ''}`}>
-            {/* Security Blur Layer for Corporate Users */}
-            {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[19000] backdrop-blur-xl bg-white/50 dark:bg-black/50" />
-            )}
+            {/* Removed redundant security blur layer to prevent additive blur effect */}
             {/* 모바일 전용: 현재 카테고리 타이틀 표시 (서브페이지일 때 누르면 라운지 메인으로) */}
             <div className="flex md:hidden items-center px-4 py-5">
                 <h2
@@ -154,7 +151,7 @@ function CommunityContent() {
                 </div>
             )}
 
-            {/* PC용 카테고리 탭 */}
+            {/* PC용 카테고리 탭 (Restored to original md) */}
             <div className={`sticky top-[56px] left-0 right-0 z-30 backdrop-blur-md min-h-[48px] py-1 hidden md:block ${brand.theme === 'dark' ? 'bg-gray-800/95' : 'bg-white/95'}`}>
                 <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center px-4 h-full gap-2 py-1">
                     {CATEGORIES.map((cat) => (
@@ -205,7 +202,7 @@ function CommunityContent() {
                                             </h3>
 
                                             <p className={`text-sm line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>
-                                                <span className={(mounted && (userType === 'corporate' || !isLoggedIn)) ? 'blur-[5px] select-none' : ''}>
+                                                <span className={(userType === 'corporate' || !isLoggedIn) ? 'blur-[5px] select-none opacity-50' : ''}>
                                                     {post.content}
                                                 </span>
                                             </p>
@@ -251,10 +248,10 @@ function CommunityContent() {
                 </main>
             </div>
 
-            {/* Login Required Modal (z-200) */}
+            {/* Login Required Modal (z-200) (Restored to original lg) */}
             {loginModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                     <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                         <div className="flex flex-col items-center text-center">
                             <div className="w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-pink-500 ring-8 ring-pink-50 shadow-inner">
@@ -286,48 +283,33 @@ function CommunityContent() {
                 </div>
             )}
 
-            {/* Corporate Access Denied Modal (z-[20000]) */}
+            {/* 🔒 Corporate Access Denied Modal (z-[20000]) */}
             {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setIsCorporateModalOpen(false)}></div>
-                    <div className={`rounded-[32px] md:rounded-[40px] w-[85%] md:w-full max-w-xs p-8 md:p-10 relative z-10 shadow-2xl border animate-in fade-in zoom-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                        <div className="flex flex-col items-center text-center">
-                            <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-full flex items-center justify-center mb-5 md:mb-6 text-blue-600 shadow-inner">
-                                <AlertCircle size={28} className="md:w-8 md:h-8" />
-                            </div>
-                            <h3 className={`text-lg md:text-xl font-black mb-3 underline decoration-blue-200 decoration-4 underline-offset-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>접근 권한 제한</h3>
-                            <p className={`text-xs md:text-sm mb-6 md:mb-8 leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
-                                사장님 회원은 구직자들의 소통 공간을<br />
-                                열람하실 수 없습니다. 🙏
-                            </p>
-                            <button
-                                onClick={() => setIsCorporateModalOpen(false)}
-                                className={`w-full py-4 rounded-2xl font-black transition-all outline-none ${brand.theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
-                            >
-                                확인했습니다
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4 overflow-hidden">
+                    {/* Backdrop: Perfect Match with JobDetailModal (bg-black/75 + md blur for premium feel) */}
+                    <div
+                        className="absolute inset-0 bg-black/75 backdrop-blur-md animate-in fade-in duration-300"
+                        onClick={() => setIsCorporateModalOpen(false)}
+                    ></div>
 
-            {/* Corporate Access Denied Modal (z-[20000]) */}
-            {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/75 backdrop-blur-lg" onClick={() => setIsCorporateModalOpen(false)}></div>
-                    <div className={`rounded-[32px] md:rounded-[40px] w-[85%] md:w-full max-w-xs p-8 md:p-10 relative z-10 shadow-2xl border animate-in fade-in zoom-in duration-300 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                    <div className={`
+                        rounded-[32px] md:rounded-[40px] w-[90%] md:w-full max-w-sm p-8 md:p-12 
+                        relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border 
+                        animate-in slide-in-from-bottom-4 zoom-in-95 duration-300
+                        ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}
+                    `}>
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-50 rounded-full flex items-center justify-center mb-5 md:mb-6 text-blue-600 shadow-inner">
-                                <AlertCircle size={28} className="md:w-8 md:h-8" />
+                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600 shadow-inner ring-4 ring-blue-50/50">
+                                <AlertCircle size={32} />
                             </div>
-                            <h3 className={`text-lg md:text-xl font-black mb-3 underline decoration-blue-200 decoration-4 underline-offset-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>접근 권한 제한</h3>
-                            <p className={`text-xs md:text-sm mb-6 md:mb-8 leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
+                            <h3 className={`text-xl font-black mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>접근 권한 제한</h3>
+                            <p className={`text-sm mb-8 leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                 사장님 회원은 구직자들의 소통 공간을<br />
                                 열람하실 수 없습니다. 🙏
                             </p>
                             <button
                                 onClick={() => setIsCorporateModalOpen(false)}
-                                className={`w-full py-4 rounded-2xl font-black transition-all outline-none ${brand.theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
+                                className={`w-full py-4 rounded-2xl font-black transition-all active:scale-95 shadow-lg shadow-blue-500/20 ${brand.theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
                             >
                                 확인했습니다
                             </button>

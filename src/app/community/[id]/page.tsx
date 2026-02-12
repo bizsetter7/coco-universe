@@ -32,7 +32,7 @@ export default function CommunityDetailPage({ params }: { params: Promise<{ id: 
 
     return (
         <div className="min-h-0 bg-white pb-20 font-sans">
-            {/* Header */}
+            {/* Header (Restored to original md) */}
             <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md">
                 <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2">

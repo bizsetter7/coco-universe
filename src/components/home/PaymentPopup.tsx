@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useBrand } from '@/components/BrandProvider';
-import { X, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface PaymentPopupProps {
@@ -181,6 +181,19 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
 
                 {/* Content - Scrollable */}
                 <div className="p-6 overflow-y-auto flex-1 touch-pan-y overscroll-contain">
+                    {/* [NEW] Card Termination Warning */}
+                    <div className="bg-amber-50 text-amber-700 text-xs md:text-sm p-3 rounded-xl mb-4 border border-amber-200 flex items-start gap-2">
+                        <Info size={16} className="shrink-0 mt-0.5" />
+                        <p className="leading-tight break-keep">
+                            <span className="font-bold">[중요] 카드 결제 서비스 종료 안내</span><br />
+                            2025년 6월 21일부터 카드 결제가 중단되며 무통장 입금으로 전환됩니다.
+                            <button
+                                onClick={() => router.push('/notice/card-payment-termination')}
+                                className="ml-1 underline font-bold"
+                            >자세히 보기</button>
+                        </p>
+                    </div>
+
                     {/* [UPDATE] 2-Line Banner */}
                     <div className="bg-red-50 text-red-600 text-center leading-relaxed p-4 rounded-xl mb-6 font-bold flex flex-col items-center justify-center gap-1 shadow-inner border border-red-100">
                         <div className="flex items-center gap-1.5 text-sm md:text-base">

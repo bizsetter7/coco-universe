@@ -51,10 +51,25 @@ export const CommunityNotice = () => {
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">업데이트</span>
                 </div>
                 <div className={listStyle}>
-                    {['[중요] 서비스 전면 개편 및 광고 상품 단가 확정 안내', 'PC 사이드배너 광고 시스템 정식 도입', '브랜드 통합 시스템 리뉴얼 안내'].map((txt, i) => (
-                        <div key={i} className="flex items-center gap-2 md:gap-3">
-                            <span className={iconBoxStyle('text-blue-500')}>📢</span>
-                            <span className={itemStyle}>{txt}</span>
+                    {[
+                        { title: '[중요] 카드 결제 서비스 종료 및 입금 방식 전환 안내', url: '/notice/card-payment-termination', important: true },
+                        { title: '[공지] 서비스 전면 개편 및 광고 상품 단가 확정 안내', url: '/customer-center?tab=notice' },
+                        { title: 'PC 사이드배너 광고 시스템 정식 도입', url: '/customer-center?tab=notice' }
+                    ].map((item, i) => (
+                        <div
+                            key={i}
+                            className="flex items-center gap-2 md:gap-3 group cursor-pointer"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(item.url);
+                            }}
+                        >
+                            <span className={iconBoxStyle('text-blue-500')}>
+                                {item.important ? '🚨' : '📢'}
+                            </span>
+                            <span className={`${itemStyle} group-hover:underline ${item.important ? 'font-bold text-red-500 dark:text-red-400' : ''}`}>
+                                {item.title}
+                            </span>
                         </div>
                     ))}
                 </div>
