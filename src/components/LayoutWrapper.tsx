@@ -59,7 +59,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                     {/* Left Sidebar Spacer + Component */}
                     {!isMobile && (
                         <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
-                            <StickyWrapper offsetTop={66}>
+                            <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="left" shops={sideAds} />
                             </StickyWrapper>
                         </aside>
@@ -73,7 +73,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                     {/* Right Sidebar Spacer + Component */}
                     {!isMobile && (
                         <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
-                            <StickyWrapper offsetTop={66}>
+                            <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="right" shops={sideAds} />
                             </StickyWrapper>
                         </aside>

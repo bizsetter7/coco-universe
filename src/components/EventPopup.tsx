@@ -5,11 +5,15 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BrandConfig } from '@/lib/brand-config';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    // 전역 스크롤 관리자 연동
+    useBodyScrollLock(isOpen);
 
     useEffect(() => {
         setMounted(true);
@@ -22,23 +26,6 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
         }
         return () => setMounted(false);
     }, []);
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.classList.add('modal-open');
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            if (scrollbarWidth > 0) {
-                document.body.style.paddingRight = `${scrollbarWidth}px`;
-            }
-        } else {
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-        }
-        return () => {
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-        };
-    }, [isOpen]);
 
     const closePopup = (hideForToday: boolean) => {
         setIsOpen(false);
@@ -86,7 +73,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
                     <div className="space-y-3">
                         <button
                             onClick={() => {
-                                router.push('/my-shop'); // 즉각적인 탭 전환
+                                router.push('/my-shop');
                                 closePopup(false);
                             }}
                             style={{ backgroundColor: brand.primaryColor }}

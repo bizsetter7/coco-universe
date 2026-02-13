@@ -29,7 +29,7 @@ export const ListingPageLayout = ({ children, sidebar }: ListingPageLayoutProps)
 
                 {/* Desktop: Dynamic Sticky Left Block */}
                 <aside className="hidden lg:block w-[220px] flex-shrink-0 relative">
-                    <StickyWrapper offsetTop={70}>
+                    <StickyWrapper offsetTop={56} isInternal={true}>
                         {SidebarContent}
                     </StickyWrapper>
                 </aside>

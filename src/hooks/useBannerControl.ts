@@ -1,57 +1,23 @@
-
 import { useEffect, useState } from 'react';
 
 /**
- * Hook to detect if any modal is open (checking body classes)
- * and control banner visibility globally.
+ * Hook to control banner visibility.
+ * Updated: Always returns true to prevent banners from disappearing behind modals.
+ * Manual toggle is still supported via custom events.
  */
 export const useBannerControl = () => {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
-        // Function to check body state
-        const checkModalState = () => {
-            const body = document.body;
-            // Check for common modal classes or specific app classes
-            const isModalOpen = body.classList.contains('modal-open') ||
-                body.classList.contains('modal-active') ||
-                body.style.overflow === 'hidden';
-
-            setIsVisible(!isModalOpen);
-        };
-
-        // 1. Initial Check
-        checkModalState();
-
-        // 2. Mutation Observer with requestAnimationFrame throttling
-        let rafId: number | null = null;
-        const observer = new MutationObserver(() => {
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(checkModalState);
-        });
-
-        observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ['class', 'style']
-        });
-
-        // 3. Listen to Custom Event (backward compatibility with my-shop page logic)
         const handleCustomToggle = (e: Event) => {
             const customEvent = e as CustomEvent;
             if (customEvent.detail && typeof customEvent.detail.visible === 'boolean') {
-                // If custom event says hide, we hide. 
-                // If custom event says show, we still check modal state to be safe.
-                if (customEvent.detail.visible === false) {
-                    setIsVisible(false);
-                } else {
-                    checkModalState();
-                }
+                setIsVisible(customEvent.detail.visible);
             }
         };
         window.addEventListener('toggle-side-banner', handleCustomToggle);
 
         return () => {
-            observer.disconnect();
             window.removeEventListener('toggle-side-banner', handleCustomToggle);
         };
     }, []);

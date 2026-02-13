@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useBrand } from '@/components/BrandProvider';
 import { X, CheckCircle2, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface PaymentPopupProps {
     isOpen: boolean;
@@ -118,30 +119,13 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     const [selectedTier, setSelectedTier] = useState(initialTier);
     const [mounted, setMounted] = useState(false);
 
+    // 전역 스크롤 관리자 연동
+    useBodyScrollLock(isOpen);
+
     useEffect(() => {
         setMounted(true);
         return () => setMounted(false);
     }, []);
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.classList.add('modal-open');
-            // Prevent scroll chain and layout shift
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            if (scrollbarWidth > 0) {
-                document.body.style.paddingRight = `${scrollbarWidth}px`;
-            }
-        } else {
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-            document.body.style.overflow = '';
-        }
-        return () => {
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-            document.body.style.overflow = '';
-        };
-    }, [isOpen]);
 
     // SSR 환경에서 document.body 접근 에러 방지 및 컴포넌트 마운트 확인
     if (!mounted || !isOpen) return null;
@@ -199,7 +183,10 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                             <span className="font-bold">[중요] 카드 결제 서비스 종료 안내</span><br />
                             2025년 6월 21일부터 카드 결제가 중단되며 무통장 입금으로 전환됩니다.
                             <button
-                                onClick={() => router.push('/customer-center?tab=notice')}
+                                onClick={() => {
+                                    router.push('/customer-center?tab=notice');
+                                    onClose();
+                                }}
                                 className="ml-1 underline font-bold"
                             >자세히 보기</button>
                         </p>

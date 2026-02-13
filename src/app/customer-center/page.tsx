@@ -645,7 +645,7 @@ export function CustomerCenterContent() {
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
                     <aside className="w-full md:w-64 shrink-0 z-50">
-                        <StickyWrapper offsetTop={80}>
+                        <StickyWrapper offsetTop={56} isInternal={true}>
                             <div className={`rounded-2xl md:rounded-3xl md:border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
                                 {/* PC Title / Mobile Toggle Header */}
                                 <div className={`p-4 md:p-5 border-b flex items-center justify-between rounded-t-2xl md:rounded-t-3xl ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 border-gray-100'}`}>
