@@ -96,7 +96,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, tierId }
                     <div className="min-w-0 flex items-center gap-1">
                         <IconBadge iconId={shop.options?.icon} className="text-[12px]" />
                         <h3
-                            className="text-[12px] font-black leading-tight truncate transition-all inline-block max-w-full"
+                            className="text-[12px] font-black leading-tight line-clamp-2 transition-all inline-block max-w-full"
                             style={getHighlighterStyle(shop.options?.highlighter)}
                         >
                             {cleanTitle}

@@ -125,15 +125,15 @@ const JobRow = React.memo(({
 
             {/* 5. 모집내용 */}
             <td className="py-4 px-2 text-center">
-                <div className="flex items-center justify-center gap-2 w-full">
+                <div className="flex items-center justify-center gap-2 w-full px-2">
                     <p
-                        className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} line-clamp-1 flex items-center justify-center gap-1.5`}
+                        className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} line-clamp-2 flex items-center justify-center gap-1.5 text-center leading-snug`}
                     >
                         {shop.options?.blink && <span className="text-[10px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shrink-0 mr-0.5 align-middle shadow-sm">NEW</span>}
-                        <IconBadge iconId={shop.options?.icon} className="text-[14px]" />
+                        <IconBadge iconId={shop.options?.icon} className="text-[14px] shrink-0" />
                         <span
                             style={getHighlighterStyle(shop.options?.highlighter)}
-                            className="truncate"
+                            className="inline"
                         >
                             {cleanShopTitle(shop.title, shop.name)}
                         </span>
@@ -203,12 +203,12 @@ const MobileJobRow = React.memo(({
             <div className="w-full bg-white rounded-lg p-3 flex justify-between items-start gap-1 relative shadow-sm border border-gray-100">
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5 pr-2 pt-1">
                     {/* Line 1: Title (광고내용) */}
-                    <h3 className={`text-[15px] font-bold line-clamp-1 !text-gray-900 force-dark-text`}>
+                    <h3 className={`text-[15px] font-bold line-clamp-2 !text-gray-900 force-dark-text leading-snug mb-0.5`}>
                         {shop.options?.blink && <span className="text-[9px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shadow-sm mr-1.5 align-middle">NEW</span>}
-                        <IconBadge iconId={shop.options?.icon} className="mr-1 inline-block align-middle" />
+                        <IconBadge iconId={shop.options?.icon} className="mr-1 inline-block align-middle shrink-0" />
                         <span
                             style={getHighlighterStyle(shop.options?.highlighter)}
-                            className="inline-block"
+                            className="inline align-middle"
                         >
                             {cleanShopTitle(shop.title, shop.name)}
                         </span>

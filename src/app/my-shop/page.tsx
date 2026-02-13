@@ -550,7 +550,8 @@ function MyShopContent() {
                                     setView={setView}
                                     userName={formState.shopName}
                                     ads={registeredAds.filter(ad => ad.isClosed)}
-                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
+                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
+                                    onOpenMenu={() => setShowMobileMenu(true)}
                                 />
                             )}
                             {view === 'payments' && (
@@ -589,7 +590,8 @@ function MyShopContent() {
                                     setView={setView}
                                     router={router}
                                     ads={registeredAds}
-                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
+                                    onOpenMenu={() => setShowMobileMenu(true)}
+                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
                                 />
                             )}
                         </div>

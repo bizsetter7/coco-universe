@@ -2,7 +2,7 @@ import React from 'react';
 import { List } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 
-export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu }: { setView: (v: any) => void, ads?: any[], userName?: string, onOpenMenu?: () => void }) => {
+export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, onShowAdDetail }: { setView: (v: any) => void, ads?: any[], userName?: string, onOpenMenu?: () => void, onShowAdDetail?: (ad: any) => void }) => {
     const brand = useBrand();
 
     return (
@@ -37,7 +37,10 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu }: 
                                 <div className="p-5 md:p-6 space-y-4">
                                     <div className="flex items-start gap-4">
                                         <span className="w-12 shrink-0 text-[11px] font-black text-gray-300 dark:text-gray-600 mt-1 uppercase tracking-tighter">◆ 제목</span>
-                                        <h3 className={`flex-1 font-black text-[16px] md:text-lg leading-snug ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        <h3
+                                            onClick={() => onShowAdDetail?.(ad)}
+                                            className={`flex-1 font-black text-[16px] md:text-lg leading-snug cursor-pointer hover:text-pink-500 transition ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                                        >
                                             {ad.title}
                                         </h3>
                                     </div>

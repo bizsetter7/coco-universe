@@ -6,8 +6,10 @@ import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Cl
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
-import { HIGHLIGHTERS, ICONS } from '@/constants/job-options';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { cleanShopTitle, getIconById } from '@/utils/shopUtils';
+import { IconBadge } from '@/components/common/IconBadge';
+import { getHighlighterStyle } from '@/utils/highlighter';
 
 interface JobDetailModalProps {
     shop: Shop | null;
@@ -114,51 +116,23 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                     {/* Ad Title White Box Layout (RE-RESTORED & CENTERED) */}
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                            {shop.options?.icon && (() => {
-                                const iconObj = ICONS.find(i => i.id === Number(shop.options?.icon));
-                                return iconObj ? (
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                                        <span className="text-lg">{iconObj.icon}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
-                                    </div>
-                                ) : null;
-                            })()}
+                            <IconBadge iconId={shop.options?.icon} showName={true} />
 
-                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
+                            <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
                                 <span
-                                    style={shop.options?.highlighter ? {
-                                        backgroundColor: HIGHLIGHTERS.find(h => h.id === Number(shop.options?.highlighter))?.color + 'cc',
-                                        color: '#000',
-                                        padding: '2px 8px',
-                                        borderRadius: '6px'
-                                    } : {}}
-                                    className="md:hidden"
+                                    style={getHighlighterStyle(shop.options?.highlighter)}
                                 >
-                                    {(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().length > 15
-                                        ? (shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim().slice(0, 15) + '...'
-                                        : (shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
-                                </span>
-                                <span
-                                    style={shop.options?.highlighter ? {
-                                        backgroundColor: HIGHLIGHTERS.find(h => h.id === Number(shop.options?.highlighter))?.color + 'cc',
-                                        color: '#000',
-                                        padding: '2px 10px',
-                                        borderRadius: '6px'
-                                    } : {}}
-                                    className="hidden md:inline"
-                                >
-                                    {(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                                    {cleanShopTitle(shop.title, shop.name)}
                                 </span>
                             </h2>
                         </div>
                     </div>
 
-                    {/* Nickname Area */}
                     <div className="flex items-center gap-2.5 opacity-95 font-black text-sm bg-black/10 px-4 py-1.5 rounded-full text-white">
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {(shop.nickname || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                        {cleanShopTitle(undefined, shop.nickname || shop.name)}
                     </div>
                 </div>
 

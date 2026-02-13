@@ -14,10 +14,11 @@ interface BusinessDashboardProps {
     router: any;
     ads?: any[];
     onOpenMenu?: () => void;
+    onShowAdDetail?: (ad: any) => void;
 }
 
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu
+    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail
 }) => {
     const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
 
@@ -93,7 +94,10 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         </span>
                                         <span className="text-gray-400">마감일: {ad.deadline || '2026-03-25'}</span>
                                     </div>
-                                    <h4 className={`font-bold text-[15px] line-clamp-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
+                                    <h4
+                                        onClick={() => onShowAdDetail?.(ad)}
+                                        className={`font-bold text-[15px] line-clamp-1 cursor-pointer hover:text-pink-500 transition ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
+                                    >
                                         🔥 {ad.title}
                                     </h4>
                                     <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>

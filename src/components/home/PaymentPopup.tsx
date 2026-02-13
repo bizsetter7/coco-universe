@@ -16,11 +16,11 @@ const PACKAGES = [
     {
         id: 1,
         tier: 'grand',
-        name: '1번 - 그랜드 (Grand)',
+        name: '타입1. 그랜드 (Grand)',
         desc: (
             <>
-                메인/지역 최상단 0순위 독점 노출<br />
-                <span className="text-amber-600 dark:text-amber-400 font-extrabold animate-pulse">(Glow 효과 포함)</span>
+                메인 최상단 노출 및<br />
+                압도적 광고 효과
             </>
         ),
         price: '350,000원'
@@ -28,11 +28,11 @@ const PACKAGES = [
     {
         id: 2,
         tier: 'premium',
-        name: '2번 - 프리미엄 (Premium)',
+        name: '타입2. 프리미엄 (Premium)',
         desc: (
             <>
-                메인 상단 전략적 고정<br />
-                <span className="text-violet-600 dark:text-violet-400 font-bold">(보라색 보더 적용)</span>
+                상단 시선 집중<br />
+                높은 효율성 노출
             </>
         ),
         price: '200,000원'
@@ -40,11 +40,11 @@ const PACKAGES = [
     {
         id: 3,
         tier: 'deluxe',
-        name: '3번 - 디럭스 (Deluxe)',
+        name: '타입3. 디럭스 (Deluxe)',
         desc: (
             <>
-                메인 중앙 집중 노출<br />
-                <span className="text-blue-600 dark:text-blue-400 font-bold">(블루 보더 적용)</span>
+                타겟 지역 집중<br />
+                전략적 배너 노출
             </>
         ),
         price: '150,000원'
@@ -52,11 +52,11 @@ const PACKAGES = [
     {
         id: 4,
         tier: 'special',
-        name: '4번 - 스페셜 (Special)',
+        name: '타입4. 스페셜 (Special)',
         desc: (
             <>
-                리스트 상단 핑크 보더 노출<br />
-                <span className="text-pink-600 dark:text-pink-400 font-bold">(관심 집중)</span>
+                가성비 최우선<br />
+                실속형 배너 노출
             </>
         ),
         price: '120,000원'
@@ -64,11 +64,11 @@ const PACKAGES = [
     {
         id: 5,
         tier: 'urgent',
-        name: '5번 - 급구/추천 (Urgent)',
+        name: '타입5. 급구/추천 (Urgent)',
         desc: (
             <>
-                빨간 제목 + 추천 배지<br />
-                <span className="text-red-600 dark:text-red-400 font-bold">(가독성 극대화)</span>
+                급구/추천 배지 노출로<br />
+                주목도 실속형
             </>
         ),
         price: '100,000원'
@@ -76,25 +76,36 @@ const PACKAGES = [
     {
         id: 6,
         tier: 'native',
-        name: '6번 - 네이티브 (Native)',
-        desc: '일반 리스트 노출 (네이티브 스타일)',
+        name: '타입6. 네이티브 (Native)',
+        desc: (
+            <>
+                리스트 광고에 배치<br />
+                랜덤 상단노출효과
+            </>
+        ),
         price: '80,000원'
     },
     {
         id: 7,
         tier: 'basic',
-        name: '7번 - 베이직/줄광고',
-        desc: '일반 리스트 노출 (실속형 구인 상품)',
+        name: '타입7. 베이직/줄광고',
+        desc: (
+            <>
+                최신 구인정보 리스트<br />
+                (실속형 구인 상품)
+            </>
+        ),
         price: '60,000원'
     },
     {
         id: 8,
         tier: 'extract',
-        name: '8번 - 강조옵션 (Emphasis)',
+        name: '기타-강조옵션 (Emphasis)',
         desc: (
             <>
-                아이콘/형광펜 효과<br />
-                <span className="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-1 rounded font-black">(주목도 200% 상승)</span>
+                아이콘/형광펜<br />
+                테두리/급여추가<br />
+                (주목도 200% 상승)
             </>
         ),
         price: '30,000원'
@@ -188,7 +199,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                             <span className="font-bold">[중요] 카드 결제 서비스 종료 안내</span><br />
                             2025년 6월 21일부터 카드 결제가 중단되며 무통장 입금으로 전환됩니다.
                             <button
-                                onClick={() => router.push('/notice/card-payment-termination')}
+                                onClick={() => router.push('/customer-center?tab=notice')}
                                 className="ml-1 underline font-bold"
                             >자세히 보기</button>
                         </p>

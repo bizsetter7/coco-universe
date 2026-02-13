@@ -6,7 +6,9 @@ import { ICONS } from '@/constants/job-options';
  */
 export const cleanShopTitle = (title?: string, name?: string): string => {
     const rawTitle = title || name || '공고 정보';
-    const cleaned = rawTitle.replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim();
+    // 1단계: [], (), {} 및 내부 텍스트 제거
+    // 2단계: 연속된 공백을 하나로 합치고 트림
+    const cleaned = rawTitle.replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, ' ').replace(/\s+/g, ' ').trim();
     // 정제 후 너무 짧아지면 원본 반환 (시인성 확보)
     return cleaned.length < 2 ? rawTitle : cleaned;
 };

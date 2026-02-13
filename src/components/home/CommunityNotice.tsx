@@ -52,7 +52,7 @@ export const CommunityNotice = () => {
                 </div>
                 <div className={listStyle}>
                     {[
-                        { title: '[중요] 카드 결제 서비스 종료 및 입금 방식 전환 안내', url: '/notice/card-payment-termination', important: true },
+                        { title: '[중요] 카드 결제 서비스 종료 및 입금 방식 전환 안내', url: '/customer-center?tab=notice', important: true },
                         { title: '[공지] 서비스 전면 개편 및 광고 상품 단가 확정 안내', url: '/customer-center?tab=notice' },
                         { title: 'PC 사이드배너 광고 시스템 정식 도입', url: '/customer-center?tab=notice' }
                     ].map((item, i) => (

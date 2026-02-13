@@ -97,7 +97,7 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         <div className="flex flex-wrap items-center justify-center gap-2">
                             <IconBadge iconId={ad.options?.icon} showName={true} />
 
-                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
+                            <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
                                 <span
                                     style={getHighlighterStyle(ad.options?.highlighter)}
                                 >

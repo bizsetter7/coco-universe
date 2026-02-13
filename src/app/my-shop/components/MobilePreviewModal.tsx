@@ -2,7 +2,9 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Store, MessageCircle, Phone, Info } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
-import { ICONS, HIGHLIGHTERS } from '../constants';
+import { cleanShopTitle } from '@/utils/shopUtils';
+import { IconBadge } from '@/components/common/IconBadge';
+import { getHighlighterStyle } from '@/utils/highlighter';
 
 interface PreviewModalProps {
     brand: any;
@@ -62,31 +64,18 @@ export const MobilePreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose
                     {/* Ad Title White Box Layout (CENTERED) */}
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2 w-full">
-                            {formData.selectedIcon && (() => {
-                                const iconObj = ICONS.find((i: any) => i.id === Number(formData.selectedIcon));
-                                return iconObj ? (
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                                        <span className="text-lg">{iconObj.icon}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
-                                    </div>
-                                ) : null;
-                            })()}
+                            <IconBadge iconId={formData.selectedIcon} showName={true} />
 
-                            <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
-                                <span style={formData.selectedHighlighter ? {
-                                    backgroundColor: HIGHLIGHTERS.find((h: any) => String(h.id) === String(formData.selectedHighlighter))?.color,
-                                    color: '#000',
-                                    padding: '0 8px',
-                                    borderRadius: '4px'
-                                } : {}}>
-                                    {formData.title || '제목을 입력해주세요'}
+                            <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
+                                <span style={getHighlighterStyle(formData.selectedHighlighter)}>
+                                    {cleanShopTitle(formData.title || formData.shopName, formData.shopName)}
                                 </span>
                             </h2>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
-                        {formData.nickname || formData.shopName || '비즈니스 파트너'}
+                        {cleanShopTitle(undefined, formData.nickname || formData.shopName || '비즈니스 파트너')}
                     </div>
                 </div>
 
