@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, MessageSquare, User, Sparkles, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Home, MessageSquare, User, Sparkles, Plus, ChevronDown, ChevronUp, ShieldCheck, Settings } from 'lucide-react';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
@@ -52,8 +52,8 @@ const MobileBottomNavContent = () => {
             href: '/admin?tab=users',
             isMain: true
         },
-        { label: '심사', icon: <MessageSquare size={24} />, href: '/admin?tab=ad-audit' },
-        { label: '설정', icon: <User size={24} />, href: '/admin?tab=settings' },
+        { label: '심사', icon: <ShieldCheck size={24} />, href: '/admin?tab=ad-audit' },
+        { label: '설정', icon: <Settings size={24} />, href: '/admin?tab=settings' },
     ] : [
         { label: '홈', icon: <Home size={24} />, href: '/' },
         { label: '커뮤니티', icon: <MessageSquare size={24} />, href: '/community' },
@@ -127,7 +127,9 @@ const MobileBottomNavContent = () => {
                         {navItems.map((item, index) => {
                             const isActive = item.href === '/'
                                 ? pathname === '/'
-                                : pathname?.startsWith(item.href) && item.href !== '#message-modal';
+                                : item.href.includes('?')
+                                    ? pathname === item.href.split('?')[0] && searchParams.get('tab') === item.href.split('tab=')[1]
+                                    : pathname?.startsWith(item.href) && item.href !== '#message-modal';
 
                             if (item.isMain) {
                                 return (

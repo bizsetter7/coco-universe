@@ -8,9 +8,12 @@ import ScrollToTop from "@/components/common/ScrollToTop";
 
 const inter = Inter({ subsets: ["latin"] });
 
+import { SEOManager } from "@/components/common/seo/SEOManager";
+import { SEOInjection } from "@/components/common/seo/SEOInjection";
+
 export const metadata: Metadata = {
-  title: "COCOALBA - 최고의 알바 매칭",
-  description: "대한민국 No.1 고소득 알바 플랫폼 COCOALBA",
+  title: "코코알바(COCOALBA) - 최고의 고소득 여성알바 매칭 (여우알바, 퀸알바 공식 제휴)",
+  description: "대한민국 1등 고소득 알바 플랫폼 코코알바. 여우알바, 퀸알바, 밤알바 구직 정보를 실시간으로 확인하세요. 가장 안전하고 빠른 매칭을 약속드립니다.",
   verification: {
     google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
   },
@@ -45,6 +48,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
+        <SEOManager />
+        <SEOInjection />
         <BrandProvider>
           <ScrollToTop />
           <div className="flex flex-col h-auto">

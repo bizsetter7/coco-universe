@@ -40,7 +40,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, tierId }
 
     // [Standardization] All cards now have the same 'Plain' (담백한) style
     return (
-        <div className={`group relative flex flex-col p-1 rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200 hover:scale-[1.01] active:scale-95 !bg-white border border-gray-200 shadow-md shadow-gray-200/50 ${!isUrgentType ? 'h-full' : ''}`}>
+        <a href={`/shop/${shop.id}`} className={`group relative flex flex-col p-1 rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200 hover:scale-[1.01] active:scale-95 !bg-white border border-gray-200 shadow-md shadow-gray-200/50 ${!isUrgentType ? 'h-full' : ''}`}>
             <div className={`w-full bg-white rounded-xl p-2 relative overflow-hidden flex flex-col gap-2 ${!isUrgentType ? 'h-full' : ''}`}>
 
                 {/* Image / Thumbnail Area (OR Title Banner Fallback) */}
@@ -130,7 +130,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, tierId }
                     </div>
                 </div>
             </div>
-        </div >
+        </a >
     );
 });
 ShopCard.displayName = 'ShopCard';

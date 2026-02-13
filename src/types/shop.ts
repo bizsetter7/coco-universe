@@ -49,4 +49,7 @@ export interface Shop {
     adPrice?: number;
     lat?: number;
     lng?: number;
+    // [Added] External Scraping Source Info
+    sourceUrl?: string;
+    sourceSite?: string;
 }

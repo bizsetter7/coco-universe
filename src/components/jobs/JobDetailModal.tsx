@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Clock, Crown } from 'lucide-react';
+import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Clock, Crown, Globe } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
@@ -180,6 +180,18 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                         <div className="text-sm leading-relaxed text-gray-600 break-words whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100 min-h-[120px]">
                             {shop.description || `${shop.name}에서 열정적인 분을 모십니다.\n가족같은 분위기에서 함께 성장할 수 있습니다.\n\n[근무조건]\n- 근무기간: 1년이상\n- 근무요일: 요일협의\n- 근무시간: 시간협의\n\n초보자도 환영합니다!`}
                         </div>
+                        {shop.sourceUrl && (
+                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-2">
+                                <div className="flex items-center gap-2 text-xs font-black text-gray-500">
+                                    <Globe size={14} className="text-blue-500" /> 외부 제휴처 수집 정보 안내
+                                </div>
+                                <p className="text-[11px] font-bold text-gray-400 leading-relaxed">
+                                    본 공고는 {shop.sourceSite || '제휴 사이트'}에서 수집된 정보입니다.
+                                    코코알바는 구직자 보호를 위해 외부 링크 직접 연결 대신
+                                    자체 내부 연락망 및 검증된 정보를 우선적으로 제공합니다.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* 위치 정보 */}
