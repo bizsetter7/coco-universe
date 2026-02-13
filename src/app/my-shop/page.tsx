@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    Store, List, User, LogOut, CreditCard, MessageCircle,
+    Store, List, User, CreditCard, MessageCircle,
     Home, Briefcase, Star, AlertTriangle, FileText,
     PlusSquare, AlignLeft, LayoutDashboard, Settings, Menu
 } from 'lucide-react';
@@ -96,7 +96,7 @@ function MyShopContent() {
     const brand = useBrand();
     const { userType: authUserType, user: authUser } = useAuth();
     const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'ongoing-ads' | 'closed-ads' | 'payments' | 'applicants' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
-    const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | null>(null);
+    const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | 'guest' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
     const [editingAdId, setEditingAdId] = useState<number | null>(null);
 

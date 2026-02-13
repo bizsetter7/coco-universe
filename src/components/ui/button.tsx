@@ -7,7 +7,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className = "", variant = "default", size = "default", asChild = false, ...props }, ref) => {
+    ({ className = "", variant = "default", size = "default", ...props }, ref) => {
 
         // Manual variant styles to avoid missing dependencies
         let variantClass = "bg-gray-900 text-white hover:bg-gray-800"; // default

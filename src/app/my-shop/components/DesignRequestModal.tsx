@@ -2,14 +2,14 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { Laptop } from 'lucide-react';
 
+import { BrandConfig } from '@/lib/brand-config';
+
 interface ModalProps {
-    brand: any;
+    brand: BrandConfig;
     onClose: () => void;
 }
 
-interface DesignsModalProps extends ModalProps { }
-
-export const DesignRequestModal: React.FC<DesignsModalProps> = ({ brand, onClose }) => {
+export const DesignRequestModal: React.FC<ModalProps> = ({ brand, onClose }) => {
     if (typeof document === 'undefined') return null;
     return createPortal(
         <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">

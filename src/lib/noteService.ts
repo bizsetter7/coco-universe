@@ -30,9 +30,9 @@ const notifyUpdate = () => {
 };
 
 export const NoteService = {
-    getInbox: (userId: string): Note[] => MOCK_NOTES.filter((n: Note) => n.receiver === '김대순' || n.receiver.includes('User')), // Mock
-    getUnread: (userId: string): Note[] => MOCK_NOTES.filter((n: Note) => (n.receiver === '김대순') && !n.isRead),
-    getSent: (userId: string): Note[] => MOCK_NOTES.filter((n: Note) => n.sender === '김대순'),
+    getInbox: (): Note[] => MOCK_NOTES.filter((n: Note) => n.receiver === '김대순' || n.receiver.includes('User')), // Mock
+    getUnread: (): Note[] => MOCK_NOTES.filter((n: Note) => (n.receiver === '김대순') && !n.isRead),
+    getSent: (): Note[] => MOCK_NOTES.filter((n: Note) => n.sender === '김대순'),
 
     sendNote: (content: string, receiver: string = '[관리자]') => {
         const newNote: Note = {

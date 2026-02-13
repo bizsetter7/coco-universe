@@ -26,7 +26,7 @@ export const SEOIndexingControl = () => {
         // Simulation delay
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        addLog('현재 도메인(cocoalba.com) 색인 요청 전송 완료.', 'success');
+        addLog(`현재 도메인(${brand.domain}) 색인 요청 전송 완료.`, 'success');
         addLog('구글 봇이 24시간 내에 사이트를 재방문할 예정입니다.', 'info');
         setIsRequesting(false);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -11,9 +11,7 @@ import {
     CheckCircle2,
     XCircle,
     Eye,
-    Palette,
     Zap,
-    Rainbow,
     Smartphone,
     ArrowRight,
     Search,
@@ -32,96 +30,117 @@ import { Shop } from '@/types/shop';
 import shopsData from '@/lib/data/shops.json';
 import { useAuth } from '@/hooks/useAuth';
 import { SEOIndexingControl } from '@/components/admin/SEOIndexingControl';
+import { supabase } from '@/lib/supabase';
 
 /**
  * 👩‍💻 Admin Dashboard
  * 사장님의 든든한 운영 도구 - 광고 심사 및 효과 원클릭 적용
  */
 export default function AdminPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">인증 확인 중...</div>}>
+            <AdminContent />
+        </Suspense>
+    );
+}
+
+function AdminContent() {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, user, userType } = useAuth();
     const searchParams = useSearchParams();
-    const [shops, setShops] = useState<Shop[]>([]);
-    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('stats');
 
+    // --- 1. Core State Section ---
+    const [shops, setShops] = useState<Shop[]>([]);
+    const [mockAds, setMockAds] = useState<any[]>([]); // This will sync with shops from DB
+    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('stats');
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
+    const [isMobileInquiryModalOpen, setIsMobileInquiryModalOpen] = useState(false);
 
-    // [New] URL Tab Synchronization & State Reset
-    useEffect(() => {
-        const tab = searchParams.get('tab');
-        setExpandedAd(null); // [Fix] Reset accordion on tab switch
+    // --- 2. Filter & UI State ---
+    const [userSearch, setUserSearch] = useState('');
+    const [userFilter, setUserFilter] = useState<'all' | 'corporate' | 'individual'>('all');
+    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-        if (tab === 'dashboard') setActiveTab('stats');
-        else if (tab === 'ad-audit') setActiveTab('ads');
-        else if (tab === 'users') setActiveTab('users');
-        else if (tab === 'inquiry') setActiveTab('inquiry');
-        else if (tab === 'messages') setActiveTab('messages');
-        else if (tab === 'settings') setActiveTab('seo');
-    }, [searchParams]);
-
-    // [New] Message Monitoring State
+    // --- 3. Message/Modal State ---
+    const [isGlobalMsgOpen, setIsGlobalMsgOpen] = useState(false);
+    const [msgTarget, setMsgTarget] = useState<'all' | 'corporate' | 'individual'>('all');
+    const [msgTitle, setMsgTitle] = useState('');
+    const [msgContent, setMsgContent] = useState('');
+    const [sendSuccess, setSendSuccess] = useState(false);
     const [allMessages, setAllMessages] = useState<any[]>([]);
     const [selectedMessageGroup, setSelectedMessageGroup] = useState<any>(null);
-
-    // [New] Inquiry State
     const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
+
+    // --- 4. Mock Users (Can be moved to DB later) ---
     const [mockUsers, setMockUsers] = useState<any[]>([
         { id: 'user_01', loginId: 'koko123', name: '김코코', nickname: '날아라코코', birth: '1995-05-15', phone: '010-1234-5678', email: 'koko@gmail.com', type: 'individual', status: 'active', joinDate: '2026-02-01', referrer: '구글 검색', statusHistory: ['2026-02-01 가입'] },
         { id: 'user_02', loginId: 'shop_master', name: '이사장', nickname: '강남구인구직', birth: '1988-11-22', phone: '010-9876-5432', email: 'ceo@shop.com', type: 'corporate', status: 'active', joinDate: '2026-01-15', referrer: '네이버', statusHistory: ['2026-01-15 기업회원 가입', '2026-02-10 광고 연장'] },
         { id: 'user_03', loginId: 'bad_boy', name: '박진상', nickname: '진상아지트', birth: '1992-03-03', phone: '010-4444-4444', email: 'bad@naver.com', type: 'individual', status: 'blocked', joinDate: '2026-02-12', referrer: '직접 유입', statusHistory: ['2026-02-12 가입', '2026-02-13 비매너 쪽지로 영구 정지'] },
     ]);
-    const [mockInquiries] = useState([
+
+    const mockInquiriesList = [
         { id: 1, sender: '해운대한라맨션', date: '10분 전', content: '광고 신청했는데 승인 언제 되나요?', status: 'new' },
         { id: 2, sender: '유성 핫플레이스', date: '25분 전', content: '이번 달 결제 내역서가 필요합니다.', status: 'replied' },
         { id: 3, sender: '신사동 사장님', date: '1시간 전', content: '무지개 효과 테두리 색상 변경 가능한가요?', status: 'new' },
-    ]);
+    ];
+    const [mockInquiries] = useState(mockInquiriesList);
 
-    const [mockAds, setMockAds] = useState<any[]>([]);
-    const [isMobileInquiryModalOpen, setIsMobileInquiryModalOpen] = useState(false);
+    // --- 5. Data Fetching (Supabase) ---
+    const fetchData = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('shops')
+                .select('*')
+                .order('updated_at', { ascending: false });
+
+            if (data) {
+                setShops(data);
+                setMockAds(data); // Sync mockAds with shops table
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
 
     useEffect(() => {
-        // Load persist data or initial data
-        const savedAds = localStorage.getItem('coco_admin_mockAds');
-        if (savedAds) {
-            setMockAds(JSON.parse(savedAds));
-        } else {
-            const initialAds = [
-                { id: 'ad_101', shopId: 'admin_shop', shopName: '강남 프라이빗 룸', ownerId: 'koko123', category: '룸싸롱', region: '서울 강남', price: 550000, options: '메인최상단 + 골드배너 + 강조효과', edits: 5, date: '2026-02-12', status: 'pending' },
-                { id: 'ad_102', shopId: 'shop_02', shopName: '마포 카페 알바', ownerId: 'cafe_boss', category: '카페', region: '서울 마포', price: 150000, options: '일반 리스트', edits: 12, date: '2026-02-11', status: 'active' },
-                { id: 'ad_103', shopId: 'shop_03', shopName: '수원 바리스타', ownerId: 'suwon_star', category: '바', region: '경기 수원', price: 300000, options: '지역 상단 고정', edits: 2, date: '2026-02-10', status: 'expired' },
-            ];
-            setMockAds(initialAds);
-            localStorage.setItem('coco_admin_mockAds', JSON.stringify(initialAds));
-        }
+        fetchData();
+
+        // Load messages
+        setAllMessages([
+            { id: 1, from: '해운대한라맨션', to: '개인회원A', content: '안녕하세요, 면접 가능하신가요?', date: '5분 전', status: 'normal' },
+            { id: 2, from: '신사동 사장님', to: '개인회원B', content: '텔레그램 아이디로 연락 주세요. @secret123', date: '12분 전', status: 'warning' },
+            { id: 3, from: '업주관리자', to: '지원자C', content: '기재하신 페이 조율 가능합니다.', date: '30분 전', status: 'normal' },
+        ]);
     }, []);
 
-    const [userSearch, setUserSearch] = useState('');
-    const [userFilter, setUserFilter] = useState<'all' | 'corporate' | 'individual'>('all');
-    // moved up to be near tab logic: const [expandedAd, setExpandedAd] = useState<string | null>(null);
-    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all'); // [New] Quick Filter
+    // [New] Ad Status Control Logic (Supabase Enabled)
+    const handleAdStatusChange = async (adId: string, newStatus: string) => {
+        try {
+            const { error } = await supabase
+                .from('shops')
+                .update({ status: newStatus, updated_at: new Date().toISOString() })
+                .eq('id', adId);
 
-    const [isGlobalMsgOpen, setIsGlobalMsgOpen] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [msgTarget, setMsgTarget] = useState<'all' | 'corporate' | 'individual'>('all');
-    const [msgTitle, setMsgTitle] = useState('');
-    const [msgContent, setMsgContent] = useState('');
-    const [sendSuccess, setSendSuccess] = useState(false);
+            if (error) throw error;
 
-    // [New] Ad Status Control Logic
-    const handleAdStatusChange = (adId: string, newStatus: 'active' | 'pending' | 'expired' | 'rejected') => {
-        setMockAds(prev => {
-            const nextAds = prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad);
-            localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
-            return nextAds;
-        });
+            // Update UI state
+            setMockAds(prev => prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad));
 
-        // [Optimization] Alert after state update to ensure UI reflects changes first
-        const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
-        setTimeout(() => {
-            alert(`광고 ${statusMsg} 처리가 완료되었습니다.`);
-        }, 100);
+            const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
+            alert(`광고 ${statusMsg} 처리가 완료되었습니다. (DB 반영 완료)`);
+        } catch (error) {
+            console.error('Error updating status:', error);
+            // Local fallback for demo
+            setMockAds(prev => {
+                const nextAds = prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad);
+                localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
+                return nextAds;
+            });
+            alert('데이터베이스 연결 실패: 로컬 세션에만 반영되었습니다.');
+        }
     };
 
     const formatPrice = (priceInWon: number) => {
@@ -155,42 +174,6 @@ export default function AdminPage() {
         }
         return () => { document.body.style.overflow = 'unset'; };
     }, [isGlobalMsgOpen, isMobileInquiryModalOpen]);
-
-    useEffect(() => {
-        setShops((shopsData as Shop[]).slice(0, 50).map(s => ({
-            ...s,
-            adStartDate: s.adStartDate || new Date().toISOString().split('T')[0],
-            adEndDate: s.adEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            adPrice: s.tier === 'grand' ? 350000 : (s.tier === 'premium' ? 200000 : 180000)
-        })));
-
-        // Mock All Messages for Monitoring
-        setAllMessages([
-            { id: 1, from: '해운대한라맨션', to: '개인회원A', content: '안녕하세요, 면접 가능하신가요?', date: '5분 전', status: 'normal' },
-            { id: 2, from: '신사동 사장님', to: '개인회원B', content: '텔레그램 아이디로 연락 주세요. @secret123', date: '12분 전', status: 'warning' },
-            { id: 3, from: '업주관리자', to: '지원자C', content: '기재하신 페이 조율 가능합니다.', date: '30분 전', status: 'normal' },
-        ]);
-
-        // Mock Users (Referrer Info Included)
-        // Note: Set initially above, this is for dynamic refresh logic if needed
-    }, []);
-
-    const toggleEffect = (id: string, effect: string) => {
-        setShops(prev => prev.map(shop => {
-            if (shop.id === id) {
-                let currentOptions = shop.options || {};
-                let newOptions = { ...currentOptions };
-
-                if (effect === 'NEON') newOptions.effect = newOptions.effect === 'neon' ? 'none' : 'neon';
-                if (effect === 'RAINBOW') newOptions.effect = newOptions.effect === 'rainbow' ? 'none' : 'rainbow';
-                if (effect === 'GLOW') newOptions.border = newOptions.border === 'glow' ? 'none' : 'glow';
-
-                return { ...shop, options: newOptions };
-            }
-            return shop;
-        }));
-        alert(`광고 효과 '${effect}'가 시뮬레이션 되었습니다!`);
-    };
 
     if (!isAuthorized) return null;
 

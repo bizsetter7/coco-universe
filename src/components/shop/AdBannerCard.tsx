@@ -1,7 +1,5 @@
 import React from 'react';
-import { Crown } from 'lucide-react';
 import { Shop } from '@/types/shop';
-import { useBrand } from '@/components/BrandProvider';
 import { useMobile } from '@/hooks/useMobile';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
@@ -18,7 +16,6 @@ interface AdBannerCardProps {
  * 밤이슬알바 스타일의 화려하고 동적인 광고 배너 컴포넌트
  */
 export const AdBannerCard = React.memo(({ shop }: AdBannerCardProps) => {
-    const brand = useBrand();
     const isMobile = useMobile(); // [Optimization] Detect mobile environment
 
     // 제목 추출 및 정제

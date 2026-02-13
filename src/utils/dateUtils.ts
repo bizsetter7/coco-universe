@@ -8,7 +8,7 @@ export const formatDate = (dateString?: string): string => {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${month}-${day}`;
-    } catch (e) {
+    } catch {
         return dateString;
     }
 };
@@ -24,7 +24,7 @@ export const formatTimeAgo = (dateString?: string): string => {
         if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`;
         if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`;
         return formatDate(dateString);
-    } catch (e) {
+    } catch {
         return '';
     }
 };

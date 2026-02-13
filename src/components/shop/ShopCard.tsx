@@ -1,10 +1,7 @@
 import React from 'react';
-import { Crown } from 'lucide-react';
 import { Shop } from '@/types/shop';
-import { useBrand } from '../BrandProvider';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
-import { useMobile } from '@/hooks/useMobile';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
@@ -13,15 +10,11 @@ interface ShopCardProps {
     shop: Shop;
     rank?: number;
     tierLabel?: string;
-    tierColor?: string;
     tierId?: string;
 }
 
 // [Optimization] Memoized ShopCard
-export const ShopCard = React.memo(({ shop, rank, tierLabel, tierColor, tierId }: ShopCardProps) => {
-    const brand = useBrand();
-    const isMobile = useMobile();
-    const isDark = brand.theme === 'dark';
+export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId }: ShopCardProps) => {
 
     // Image Error Handling state could be expensive if many fail at once,
     // but React handles this reasonably well.

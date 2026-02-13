@@ -13,7 +13,7 @@ export const BRANDS: Record<string, BrandConfig> = {
     coco: {
         id: 'coco',
         name: '코코알바',
-        domain: 'cocoalba.com',
+        domain: 'cocoalba.kr',
         primaryColor: '#D4AF37', // Gold
         logoText: 'COCO',
         displayName: 'COCO 코코알바',

@@ -8,7 +8,6 @@ import { useBrand } from '@/components/BrandProvider';
 import { StickyWrapper } from '@/components/ui/StickyWrapper';
 
 import {
-    Headphones,
     ChevronDown,
     ChevronUp,
 
@@ -16,7 +15,6 @@ import {
     ChevronRight,
     PhoneCall,
     MessageSquare,
-    ArrowLeft,
     Home,
 
     Megaphone,

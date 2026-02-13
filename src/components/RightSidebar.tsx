@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from './BrandProvider';
 import { REGIONS_MAP } from '@/constants/regions'; // 경로 확인 필요
-import { ChevronRight, Crown, Phone, User, Settings, LogOut, ChevronRightCircle, Megaphone } from 'lucide-react';
+import { ChevronRight, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function RightSidebar() {

@@ -55,7 +55,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
         };
 
         const updateUnreadCount = () => {
-            const unread = NoteService.getUnread('user');
+            const unread = NoteService.getUnread();
             setUnreadCount(unread.length);
         };
 
@@ -327,7 +327,6 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
             <MessageModal
                 isOpen={showMessageModal}
                 onClose={() => { setShowMessageModal(false); setInitialReceiver(''); }}
-                userRole={userRole || 'guest'}
                 initialReceiver={initialReceiver}
             />
 

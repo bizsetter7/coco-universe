@@ -17,8 +17,8 @@ export const SEOManager = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "COCOALBA (코코알바)",
-        "url": "https://cocoalba.com",
-        "logo": "https://cocoalba.com/logo.png",
+        "url": "https://cocoalba.kr",
+        "logo": "https://cocoalba.kr/logo.png",
         "sameAs": [
             "https://www.facebook.com/cocoalba",
             "https://www.instagram.com/cocoalba"
@@ -47,7 +47,7 @@ export const SEOManager = () => {
         "hiringOrganization": {
             "@type": "Organization",
             "name": "COCOALBA",
-            "sameAs": "https://cocoalba.com"
+            "sameAs": "https://cocoalba.kr"
         },
         "jobLocation": {
             "@type": "Place",

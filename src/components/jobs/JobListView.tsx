@@ -181,13 +181,11 @@ const getTierBadge = (tier?: string) => {
 const MobileJobRow = React.memo(({
     shop,
     isFav,
-    brandTheme,
     onSelect,
     onToggleFav
 }: {
     shop: Shop,
     isFav: boolean,
-    brandTheme: 'dark' | 'light',
     onSelect: (shop: Shop) => void,
     onToggleFav: (e: React.MouseEvent, id: string) => void
 }) => {
@@ -416,7 +414,6 @@ const JobListView: React.FC<JobListViewProps> = ({
                                             <MobileJobRow
                                                 shop={shop}
                                                 isFav={isFav}
-                                                brandTheme={brand.theme}
                                                 onSelect={setSelectedShop}
                                                 onToggleFav={toggleFavorite}
                                             />

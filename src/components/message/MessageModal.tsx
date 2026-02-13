@@ -9,13 +9,12 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 interface MessageModalProps {
     isOpen: boolean;
     onClose: () => void;
-    userRole: string;
     initialReceiver?: string; // New Prop
 }
 
 type Tab = 'inbox' | 'unread' | 'sent' | 'write';
 
-export default function MessageModal({ isOpen, onClose, userRole, initialReceiver }: MessageModalProps) {
+export default function MessageModal({ isOpen, onClose, initialReceiver }: MessageModalProps) {
     const [mounted, setMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>('inbox');
     const [userName, setUserName] = useState('회원');
@@ -78,9 +77,9 @@ export default function MessageModal({ isOpen, onClose, userRole, initialReceive
     }, [isOpen, activeTab, initialReceiver]); // Add initialReceiver to deps? verify
 
     const refreshData = () => {
-        setInbox(NoteService.getInbox('user'));
-        setUnread(NoteService.getUnread('user'));
-        setSent(NoteService.getSent('user'));
+        setInbox(NoteService.getInbox());
+        setUnread(NoteService.getUnread());
+        setSent(NoteService.getSent());
     };
 
     const handleSend = () => {

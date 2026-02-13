@@ -19,10 +19,9 @@ import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 
 interface JobClientProps {
     shops: Shop[];
-    jobTypes: string[];
 }
 
-export default function JobClient({ shops, jobTypes }: JobClientProps) {
+export default function JobClient({ shops }: JobClientProps) {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType, userName, userPoints } = useAuth();
@@ -112,7 +111,7 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                         onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={openPaymentPopup}
                         isLoggedIn={isLoggedIn}
-                        userType={userType}
+                        userType={userType === 'admin' || userType === 'guest' ? undefined : userType}
                         userName={userName}
                         userPoints={userPoints}
                     />
@@ -135,7 +134,6 @@ export default function JobClient({ shops, jobTypes }: JobClientProps) {
                                 shops={shops}
                                 onAdRegister={openPaymentPopup}
                                 onSelectShop={setSelectedShop}
-                                columns={3}
                             />
                         }
 

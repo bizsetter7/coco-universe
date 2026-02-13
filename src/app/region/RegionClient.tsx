@@ -19,15 +19,16 @@ import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 
 interface RegionClientProps {
     shops: Shop[];
+    initialRegion?: string;
 }
 
-export default function RegionClient({ shops }: RegionClientProps) {
+export default function RegionClient({ shops, initialRegion = '전체' }: RegionClientProps) {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType, userName, userPoints } = useAuth();
 
     // -- State --
-    const [selectedRegion, setSelectedRegion] = useState('전체');
+    const [selectedRegion, setSelectedRegion] = useState(initialRegion);
     const [selectedSubRegion, setSelectedSubRegion] = useState('전체');
     const [selectedJobType, setSelectedJobType] = useState('전체');
     const [selectedSubJobType, setSelectedSubJobType] = useState('전체');
@@ -97,7 +98,7 @@ export default function RegionClient({ shops }: RegionClientProps) {
                         onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={openPaymentPopup}
                         isLoggedIn={isLoggedIn}
-                        userType={userType}
+                        userType={userType as any}
                         userName={userName}
                         userPoints={userPoints}
                     />
@@ -119,8 +120,7 @@ export default function RegionClient({ shops }: RegionClientProps) {
                             <UnifiedAdGrid
                                 shops={shops}
                                 onAdRegister={openPaymentPopup}
-                                onSelectShop={setSelectedShop}
-                                columns={3}
+                                onSelectShop={setSelectedShop as any}
                             />
                         }
 

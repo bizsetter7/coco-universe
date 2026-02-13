@@ -22,7 +22,7 @@ const MobileBottomNavContent = () => {
     const brand = useBrand();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { userType, logout } = useAuth();
+    const { userType } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -33,7 +33,7 @@ const MobileBottomNavContent = () => {
         setMounted(true);
 
         const updateUnreadCount = () => {
-            const unread = NoteService.getUnread('user');
+            const unread = NoteService.getUnread();
             setUnreadCount(unread.length);
         };
 
@@ -80,12 +80,7 @@ const MobileBottomNavContent = () => {
         }
     };
 
-    const handleLogout = () => {
-        if (confirm('로그아웃 하시겠습니까?')) {
-            logout();
-            window.location.href = '/';
-        }
-    };
+
 
     const isRegForm = pathname === '/my-shop' && searchParams.get('view') === 'form';
 

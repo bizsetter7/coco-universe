@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 
 /**
  * usePreventLeave - 페이지 이탈 방지 후크 (강화판)
  * @param isDirty - 경고를 띄울 조건 (true일 때만 작동)
  */
 export const usePreventLeave = (isDirty: boolean) => {
-    const pathname = usePathname();
 
     // 1. 새로고침 및 탭 닫기 방지 (beforeunload)
     useEffect(() => {

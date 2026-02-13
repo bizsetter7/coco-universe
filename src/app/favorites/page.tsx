@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, Star, ChevronRight, X, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
+import { Home, Star, X, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import shopsData from '@/lib/data/shops.json';
 

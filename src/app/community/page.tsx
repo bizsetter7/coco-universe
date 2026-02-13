@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -8,23 +8,16 @@ import {
     MessageCircle,
     Heart,
     MessageSquare,
-    AlertCircle,
     Lock,
-    Search,
     PenLine,
-    ArrowLeft,
     User,
     ShieldAlert,
     Sparkles,
     Apple,
-    Info, // [Fix] Added Info Icon
-    MoreHorizontal,
-    Share2,
-    Filter,
+    Info,
     X,
     ChevronDown,
-    Moon, // [Fix] Added comma
-    ArrowRight,
+    Moon,
     ThumbsUp,
     ChevronRight,
     Calculator,
@@ -36,6 +29,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { Footer } from '@/components/layout/Footer';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { supabase } from '@/lib/supabase';
 
 // --- Types ---
 type UserType = 'individual' | 'corporate' | 'admin';
@@ -47,6 +41,8 @@ export default function CommunityPage() {
         </Suspense>
     );
 }
+
+import { Post } from '@/types/community';
 
 function CommunityContent() {
     const router = useRouter();
@@ -67,8 +63,31 @@ function CommunityContent() {
     // [Optimization] Prevent background scroll when modal is open (Fixes jitter)
     useBodyScrollLock(loginModalOpen || isCorporateModalOpen);
 
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchPosts = async () => {
+        setIsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('community_posts')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (data) setPosts(data);
+            else setPosts(MOCK_POSTS); // Fallback to mock if empty
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            setPosts(MOCK_POSTS);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         setMounted(true);
+        fetchPosts();
+
         const storedType = localStorage.getItem('user_type');
         if (storedType === 'shop') {
             setUserType('corporate');
@@ -101,9 +120,9 @@ function CommunityContent() {
 
     const filteredPosts = React.useMemo(() => {
         return activeTab === '전체'
-            ? MOCK_POSTS
-            : MOCK_POSTS.filter(post => post.category === activeTab);
-    }, [activeTab]);
+            ? posts
+            : posts.filter(post => post.category === activeTab);
+    }, [activeTab, posts]);
 
     const handlePostClick = (postId: number) => {
         if (!isLoggedIn) {
