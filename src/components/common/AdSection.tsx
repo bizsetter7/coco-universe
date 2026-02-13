@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { ShopCard } from '@/components/shop/ShopCard';
 import { useBrand } from '@/components/BrandProvider';
+import { AdBannerCard } from '@/components/shop/AdBannerCard';
 
 interface AdSectionProps {
     title: string;
@@ -14,21 +15,27 @@ interface AdSectionProps {
     onAdRegister: (tier: string) => void;
     rowCountPC: number;
     onSelectShop?: (shop: Shop) => void;
-    columns?: 3 | 4; // New Prop to control grid columns
 }
 
-export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister, rowCountPC, onSelectShop, columns = 4 }: AdSectionProps) => {
+export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister, rowCountPC, onSelectShop }: AdSectionProps) => {
     const brand = useBrand();
     const isDark = brand.theme === 'dark';
-    const totalPC = columns * rowCountPC; // Adjust slice count based on columns
-    const totalMob = 6;
 
-    // Grid Class Logic
-    // If columns=4 (Main Page): grid-cols-2 md:grid-cols-4
-    // If columns=3 (Sub Pages): grid-cols-2 md:grid-cols-3
-    const gridClass = columns === 4
-        ? "grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
-        : "grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4";
+    // [Tier-based Grid Settings Map]
+    const GRID_CONFIGS: Record<string, { gridClass: string, totalPC: number, totalMob: number, label: string }> = {
+        grand: { gridClass: "grid-cols-2 md:grid-cols-4", totalPC: 12, totalMob: 6, label: 'GRAND' },
+        premium: { gridClass: "grid-cols-2 md:grid-cols-5", totalPC: 15, totalMob: 6, label: 'PREMIUM' },
+        deluxe: { gridClass: "grid-cols-2 md:grid-cols-6", totalPC: 18, totalMob: 8, label: 'DELUXE' },
+        special: { gridClass: "grid-cols-2 md:grid-cols-6", totalPC: 18, totalMob: 8, label: 'SPECIAL' },
+        urgent: { gridClass: "grid-cols-2 md:grid-cols-6", totalPC: 18, totalMob: 6, label: 'URGENT' },
+        recommended: { gridClass: "grid-cols-2 md:grid-cols-6", totalPC: 18, totalMob: 6, label: 'RECOMMENDED' }
+    };
+
+    const config = GRID_CONFIGS[tierId] || GRID_CONFIGS.grand;
+    const gridClass = `grid gap-2 md:gap-3 ${config.gridClass}`;
+    const { totalPC, totalMob, label: tierLabel } = config;
+
+    const isHighTier = tierId === 'grand' || tierId === 'premium';
 
     return (
         <section className="mb-12 relative px-4 xl:px-0">
@@ -48,14 +55,19 @@ export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister,
             </div>
 
             {/* Grid */}
-            <div className={gridClass}>
+            <div className={`${gridClass} items-start`}>
                 {shops.slice(0, totalPC).map((shop, idx) => (
                     <div key={shop.id || idx} className={`${idx >= totalMob ? 'hidden md:block' : ''}`}>
                         <div onClick={() => onSelectShop && onSelectShop(shop)} className="cursor-pointer">
-                            <ShopCard
-                                shop={shop}
-                                tierLabel={tierId === 'grand' ? 'GRAND' : tierId === 'premium' ? 'PREMIUM' : tierId === 'deluxe' ? 'DELUXE' : tierId === 'special' ? 'SPECIAL' : 'URGENT'}
-                            />
+                            {isHighTier ? (
+                                <AdBannerCard shop={shop} />
+                            ) : (
+                                <ShopCard
+                                    shop={shop}
+                                    tierId={tierId}
+                                    tierLabel={tierLabel}
+                                />
+                            )}
                         </div>
                     </div>
                 ))}

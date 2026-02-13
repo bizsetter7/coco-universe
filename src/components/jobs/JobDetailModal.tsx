@@ -147,7 +147,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
                                     } : {}}
                                     className="hidden md:inline"
                                 >
-                                    {shop.title || shop.name}
+                                    {(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
                                 </span>
                             </h2>
                         </div>

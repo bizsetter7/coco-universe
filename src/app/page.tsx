@@ -30,7 +30,25 @@ function HomeContent() {
       // Distribute Grand/Premium
       if (tier === 'grand' && index % 3 === 1) tier = 'premium';
 
-      return { ...shop, tier };
+      // [Dynamic Ad Enhancement] Inject tags for Tier display
+      let title = shop.title || shop.name;
+      const effects = ['[네온]', '[무지개]', '[반짝]', '[GIF]', '[HOT]'];
+
+      if (tier === 'grand' || tier === 'premium') {
+        const effect = effects[index % effects.length];
+        title = `${effect} ${title}`;
+
+        // Visual enhancement: simulate media URLs for high tiers
+        const imgId = 100 + (index % 50);
+        if (!shop.options?.mediaUrl) {
+          shop.options = {
+            ...shop.options,
+            mediaUrl: `https://picsum.photos/id/${imgId}/400/300`
+          };
+        }
+      }
+
+      return { ...shop, tier, title };
     });
   }, []);
 

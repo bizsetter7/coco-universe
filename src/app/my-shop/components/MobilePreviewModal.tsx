@@ -74,10 +74,10 @@ export const MobilePreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose
 
                             <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
                                 <span style={formData.selectedHighlighter ? {
-                                    backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(formData.selectedHighlighter))?.color + 'cc',
+                                    backgroundColor: HIGHLIGHTERS.find((h: any) => String(h.id) === String(formData.selectedHighlighter))?.color,
                                     color: '#000',
-                                    padding: '2px 8px',
-                                    borderRadius: '6px'
+                                    padding: '0 8px',
+                                    borderRadius: '4px'
                                 } : {}}>
                                     {formData.title || '제목을 입력해주세요'}
                                 </span>

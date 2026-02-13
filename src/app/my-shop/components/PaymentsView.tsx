@@ -1,6 +1,11 @@
-import React from 'react';
 import { CreditCard, ArrowRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
+import { HIGHLIGHTERS } from '../constants';
+
+const getHighlighterStyle = (id: number | string | undefined) => {
+    const h = HIGHLIGHTERS.find(item => String(item.id) === String(id));
+    return h ? { backgroundColor: h.color + 'cc', color: '#000', padding: '0 4px', borderRadius: '4px' } : {};
+};
 
 export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDetail, onOpenMenu }: { setView: (v: any) => void, payments?: any[], userName?: string, onShowAdDetail?: (adId: any) => void, onOpenMenu?: () => void }) => {
     const brand = useBrand();
@@ -63,7 +68,8 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                         </div>
                                                         <span
                                                             onClick={() => onShowAdDetail?.(p.id)}
-                                                            className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                            className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                            style={getHighlighterStyle(p.options?.highlighter)}
                                                         >
                                                             {p.desc}
                                                         </span>
@@ -103,7 +109,8 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 </div>
                                                 <h3
                                                     onClick={() => onShowAdDetail?.(p.id)}
-                                                    className={`text-[15px] font-black leading-tight line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
+                                                    className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
+                                                    style={getHighlighterStyle(p.options?.highlighter)}
                                                 >
                                                     {p.desc}
                                                 </h3>

@@ -5,8 +5,11 @@ import { createPortal } from 'react-dom';
 import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info, Clock, Crown } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
-import { ICONS, HIGHLIGHTERS } from '../constants';
+import { HIGHLIGHTERS } from '../constants';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { getHighlighterStyle } from '@/utils/highlighter';
+import { cleanShopTitle } from '@/utils/shopUtils';
+import { IconBadge } from '@/components/common/IconBadge';
 
 const TIER_GRADIENTS: Record<string, string> = {
     grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
@@ -71,11 +74,6 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                 {/* 1. HEADER SECTION (Matches JobDetailModal / Capture 1) */}
                 <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
 
-                    {ad.id === 'preview' && (
-                        <div className="absolute top-0 left-0 right-0 bg-red-600/20 text-white text-[10px] font-black text-center py-1 z-50 backdrop-blur-sm">
-                            PREVIEW MODE
-                        </div>
-                    )}
 
                     {/* Top Row: Close Button Only (Simplified for AdDetail) */}
                     <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
@@ -97,26 +95,13 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                     {/* Ad Title White Box Layout (CENTERED) */}
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                            {ad.options?.icon && (() => {
-                                const iconObj = ICONS.find((i: any) => i.id === Number(ad.options.icon));
-                                return iconObj ? (
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
-                                        <span className="text-lg">{iconObj.icon}</span>
-                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
-                                    </div>
-                                ) : null;
-                            })()}
+                            <IconBadge iconId={ad.options?.icon} showName={true} />
 
                             <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
                                 <span
-                                    style={ad.options?.highlighter ? {
-                                        backgroundColor: HIGHLIGHTERS.find((h: any) => h.id === Number(ad.options.highlighter))?.color + 'cc',
-                                        color: '#000',
-                                        padding: '2px 8px',
-                                        borderRadius: '6px'
-                                    } : {}}
+                                    style={getHighlighterStyle(ad.options?.highlighter)}
                                 >
-                                    {(ad.title || ad.jobTitle || '').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                                    {cleanShopTitle(ad.title || ad.jobTitle, ad.shopName)}
                                 </span>
                             </h2>
                         </div>
@@ -127,7 +112,7 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {(ad.nickname || ad.shopName || '관리자').replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                        {cleanShopTitle(undefined, ad.nickname || ad.shopName || '관리자')}
                     </div>
                 </div>
 

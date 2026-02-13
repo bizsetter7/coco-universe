@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -16,7 +17,13 @@ import {
     ShieldAlert,
     Sparkles,
     Apple,
-    Moon,
+    Info, // [Fix] Added Info Icon
+    MoreHorizontal,
+    Share2,
+    Filter,
+    X,
+    ChevronDown,
+    Moon, // [Fix] Added comma
     ArrowRight,
     ThumbsUp,
     ChevronRight,
@@ -112,7 +119,7 @@ function CommunityContent() {
     };
 
     return (
-        <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'} ${isCorporateModalOpen ? 'overflow-hidden h-screen' : ''}`}>
+        <div className={`min-h-screen will-change-scroll ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'} ${isCorporateModalOpen ? 'overflow-hidden h-screen pointer-events-none' : ''}`}>
             {/* Removed redundant security blur layer to prevent additive blur effect */}
             {/* 모바일 전용: 현재 카테고리 타이틀 표시 (서브페이지일 때 누르면 라운지 메인으로) */}
             <div className="flex md:hidden items-center px-4 py-5">
@@ -251,7 +258,7 @@ function CommunityContent() {
             {/* Login Required Modal (z-200) (Restored to original lg) */}
             {loginModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                     <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                         <div className="flex flex-col items-center text-center">
                             <div className="w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-pink-500 ring-8 ring-pink-50 shadow-inner">
@@ -283,39 +290,49 @@ function CommunityContent() {
                 </div>
             )}
 
-            {/* 🔒 Corporate Access Denied Modal (z-[20000]) */}
-            {isCorporateModalOpen && (
-                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4 overflow-hidden">
-                    {/* Backdrop: Perfect Match with JobDetailModal (bg-black/75 + md blur for premium feel) */}
+            {/* 🔒 Corporate Access Denied Modal (Portal 적용으로 헤더 위로 띄움) */}
+            {mounted && isCorporateModalOpen && createPortal(
+                <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 overflow-hidden h-[100dvh]">
+                    {/* Backdrop: bg-black/60 with blur */}
                     <div
-                        className="absolute inset-0 bg-black/75 backdrop-blur-md animate-in fade-in duration-300"
-                        onClick={() => setIsCorporateModalOpen(false)}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsCorporateModalOpen(false);
+                        }}
                     ></div>
 
                     <div className={`
-                        rounded-[32px] md:rounded-[40px] w-[90%] md:w-full max-w-sm p-8 md:p-12 
-                        relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border 
+                        rounded-[32px] md:rounded-[40px] w-[90%] md:w-full max-w-sm p-8 md:p-12
+                        relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] border
                         animate-in slide-in-from-bottom-4 zoom-in-95 duration-300
                         ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}
                     `}>
-                        <div className="flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-600 shadow-inner ring-4 ring-blue-50/50">
-                                <AlertCircle size={32} />
+                        <div className="flex flex-col items-center text-center gap-6">
+                            <div className={`p-4 rounded-full ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-blue-50'}`}>
+                                <Info size={32} className="text-blue-500" />
                             </div>
-                            <h3 className={`text-xl font-black mb-3 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>접근 권한 제한</h3>
-                            <p className={`text-sm mb-8 leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                사장님 회원은 구직자들의 소통 공간을<br />
-                                열람하실 수 없습니다. 🙏
-                            </p>
+
+                            <div className="space-y-3 max-w-[240px] mx-auto">
+                                <h3 className="text-[22px] font-black text-gray-900 tracking-tight">접근 권한 제한</h3>
+                                <p className="text-gray-600 text-[15px] font-medium leading-[1.6] break-keep">
+                                    사장님 회원은 구직자들의 소통 공간을 열람하실 수 없습니다. 🙏
+                                </p>
+                            </div>
+
                             <button
-                                onClick={() => setIsCorporateModalOpen(false)}
-                                className={`w-full py-4 rounded-2xl font-black transition-all active:scale-95 shadow-lg shadow-blue-500/20 ${brand.theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-black'}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsCorporateModalOpen(false);
+                                }}
+                                className="w-full py-4 rounded-xl bg-gray-900 text-white font-bold text-lg active:scale-95 transition-transform cursor-pointer relative z-20"
                             >
                                 확인했습니다
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* Floating Action Button (z-40) */}

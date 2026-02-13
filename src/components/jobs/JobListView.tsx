@@ -9,6 +9,9 @@ import { ICONS } from '@/constants/job-options';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { formatDate } from '@/utils/dateUtils';
+import { getHighlighterStyle } from '@/utils/highlighter';
+import { cleanShopTitle } from '@/utils/shopUtils';
+import { IconBadge } from '../common/IconBadge';
 
 // Use Shop type directly
 type Job = Shop;
@@ -110,7 +113,7 @@ const JobRow = React.memo(({
             <td className="py-4 px-2 text-center">
                 <div className="flex items-center justify-center gap-1.5 w-full">
                     <span className={`font-black text-[14px] truncate max-w-full ${brandTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                        {shop.name.replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                        {cleanShopTitle(undefined, shop.name)}
                     </span>
                 </div>
             </td>
@@ -123,10 +126,17 @@ const JobRow = React.memo(({
             {/* 5. 모집내용 */}
             <td className="py-4 px-2 text-center">
                 <div className="flex items-center justify-center gap-2 w-full">
-                    {shop.options?.blink && <span className="text-[10px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-black whitespace-nowrap shrink-0">NEW</span>}
-
-                    <p className={`text-[14px] font-bold truncate max-w-[300px] ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {(shop.title || `${shop.name}에서 열정적인 가족을 모집합니다. 최고 대우 보장!`).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}
+                    <p
+                        className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} line-clamp-1 flex items-center justify-center gap-1.5`}
+                    >
+                        {shop.options?.blink && <span className="text-[10px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shrink-0 mr-0.5 align-middle shadow-sm">NEW</span>}
+                        <IconBadge iconId={shop.options?.icon} className="text-[14px]" />
+                        <span
+                            style={getHighlighterStyle(shop.options?.highlighter)}
+                            className="truncate"
+                        >
+                            {cleanShopTitle(shop.title, shop.name)}
+                        </span>
                     </p>
                 </div>
             </td>
@@ -191,28 +201,22 @@ const MobileJobRow = React.memo(({
             style={{ mixBlendMode: 'normal' }}
         >
             <div className="w-full bg-white rounded-lg p-3 flex justify-between items-start gap-1 relative shadow-sm border border-gray-100">
-                {/* Corner Badges (NEW ONLY) */}
-                <div className="absolute top-1 left-1 flex flex-wrap gap-1 z-10 pointer-events-none">
-                    {shop.options?.blink && <span className="text-[9px] bg-red-600 text-white px-1 py-0.5 rounded font-black whitespace-nowrap shadow-sm animate-pulse">NEW</span>}
-                </div>
-
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5 pr-2 pt-1">
                     {/* Line 1: Title (광고내용) */}
-                    <h3 className={`text-[15px] font-bold break-words line-clamp-1 !text-gray-900 force-dark-text`}>
-                        <span className="truncate">{(shop.title || shop.name).replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, '').trim()}</span>
+                    <h3 className={`text-[15px] font-bold line-clamp-1 !text-gray-900 force-dark-text`}>
+                        {shop.options?.blink && <span className="text-[9px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shadow-sm mr-1.5 align-middle">NEW</span>}
+                        <IconBadge iconId={shop.options?.icon} className="mr-1 inline-block align-middle" />
+                        <span
+                            style={getHighlighterStyle(shop.options?.highlighter)}
+                            className="inline-block"
+                        >
+                            {cleanShopTitle(shop.title, shop.name)}
+                        </span>
                     </h3>
 
                     {/* Line 2: Icons + Region + WorkType */}
                     <div className="flex items-center gap-1.5 text-[12px] flex-wrap">
-                        {shop.options?.icon && (() => {
-                            const iconObj = ICONS.find(i => i.id === Number(shop.options?.icon));
-                            return iconObj ? (
-                                <span className="flex items-center gap-0.5 animate-in fade-in zoom-in duration-300">
-                                    <span className="text-[11px]">{iconObj.icon}</span>
-                                    <span className="text-[9px] font-black text-pink-500 tracking-tighter uppercase">{iconObj.name}</span>
-                                </span>
-                            ) : null;
-                        })()}
+                        <IconBadge iconId={shop.options?.icon} showName={true} />
                         <span className="text-blue-600 font-bold truncate max-w-[100px]">{shop.region}</span>
                         <span className="text-gray-300">|</span>
                         <span className="text-gray-500 font-medium truncate">{shop.workType}</span>
@@ -221,9 +225,9 @@ const MobileJobRow = React.memo(({
                     {/* Line 3: Pay */}
                     <div className="flex items-center gap-1 mt-0.5">
                         <div className={`
-                        px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold text-white
-                        ${badgeColor}
-                    `}>
+                            px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold text-white
+                            ${badgeColor}
+                        `}>
                             {badgeLabel}
                         </div>
                         <div className={`text-[11px] font-black tracking-tighter !text-gray-900 force-dark-text`}>

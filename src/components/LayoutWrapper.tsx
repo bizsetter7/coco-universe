@@ -55,7 +55,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             */}
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                <div className="grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4 xl:px-0 min-h-full">
+                <div className={isMobile ? "block min-h-full" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4 xl:px-0 min-h-full"}>
                     {/* Left Sidebar Spacer + Component */}
                     {!isMobile && (
                         <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">

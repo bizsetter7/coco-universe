@@ -11,10 +11,9 @@ interface UnifiedAdGridProps {
     isLoading?: boolean;
     onAdRegister: (tier: string) => void;
     onSelectShop: (shop: Shop) => void;
-    columns?: 3 | 4; // Propagate column setting
 }
 
-export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, columns = 4 }: UnifiedAdGridProps) => {
+export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: UnifiedAdGridProps) => {
 
     if (isLoading || !shops) {
         return (
@@ -26,31 +25,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, co
         );
     }
 
-    // Slice based on columns to maintain consistent row appearance
-    const itemsPerSection = columns * 2; // e.g., 3 cols * 2 rows = 6 items, 4 cols * 2 rows = 8 items
-
-    // Actually, we need to map the global slice logic.
-    // The original data was flat shops array.
-    // If we change column count, we might display fewer items if we strictly follow "2 rows".
-    // 4 cols * 2 rows = 8 items.
-    // 3 cols * 2 rows = 6 items.
-    // If we just use the same slice indices (0-12, 12-24, etc), we might have extra items or wrap weirdly.
-    // Original slices: Grand 0-12 (12 items), Premium 12-24 (12 items)...
-    // 12 items / 4 cols = 3 rows.
-    // 12 items / 3 cols = 4 rows.
-    // If the user wants to keep "Look Same", they probably mean card size.
-    // So 3 cols is correct for smaller width.
-    // The slice logic in HomeClient was static. Let's keep using it but just display what fits?
-    // Or should we adjust the slice?
-    // AdSection now uses `shops.slice(0, totalPC)` where `totalPC = columns * rowCountPC`.
-    // We pass `rowCountPC={2}` previously.
-    // If cols=4, totalPC=8. (Wait, HomeClient passed rowCountPC=2, so 8 items shown?)
-    // Actually HomeClient slice was 0-12 (12 items).
-    // Let's re-read AdSection: `shops.slice(0, totalPC)`.
-    // If we pass rowCountPC=3 for Grand, totalPC=12.
-    // So for 3 cols, we probably want rowCountPC=4 to show 12 items? (3*4=12).
-    // Let's just pass the sliced arrays as is. AdSection handles the display limit.
-
+    // Static slices for each tier
     const grandShops = shops.slice(0, 12);
     const premiumShops = shops.slice(12, 24);
     const deluxeShops = shops.slice(24, 36);
@@ -65,14 +40,9 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, co
                 icon={<Crown className="text-amber-500" fill="currentColor" />}
                 shops={grandShops}
                 tierId="grand"
-                rowCountPC={3} // Showing more rows for Grand usually?
-                // HomeClient had `rowCountPC={2}` for all except maybe Grand? 
-                // Let's look at previous HomeClient... it was `rowCountPC={2}` for Grand too.
-                // But slice was 12. 4*2 = 8. So 4 items were hidden?
-                // Let's stick to passing `columns` prop.
+                rowCountPC={3}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
-                columns={columns}
             />
 
             {/* 2. Premium */}
@@ -81,17 +51,9 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, co
                 icon={<Trophy className="text-slate-500" fill="currentColor" />}
                 shops={premiumShops}
                 tierId="premium"
-                rowCountPC={3} // Increase row count to show more items if we reduce columns?
-                // If we want to show ALL items in the slice (12), 
-                // 4 cols -> 3 rows.
-                // 3 cols -> 4 rows.
-                // Let's just set rowCountPC high enough to cover the slice if we want to show all.
-                // Or stick to 2 rows (8 or 6 items).
-                // User said "Make it look the same".
-                // Layout-wise, 3 columns will look less squashed.
+                rowCountPC={3}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
-                columns={columns}
             />
 
             {/* 3. Deluxe */}
@@ -103,7 +65,6 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, co
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
-                columns={columns}
             />
 
             {/* 4. Special */}
@@ -115,19 +76,17 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, co
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
-                columns={columns}
             />
 
             {/* 5. Urgent */}
             <AdSection
-                title="긴급 구인"
+                title="급구/추천"
                 icon={<Flame className="text-red-500" fill="currentColor" />}
                 shops={urgentShops}
                 tierId="urgent"
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
-                columns={columns}
             />
         </div>
     );

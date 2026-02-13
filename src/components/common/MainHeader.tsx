@@ -236,29 +236,32 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                             </button>
 
                                             {userRole === 'admin' && (
-                                                <div onClick={() => router.push('/admin')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-                                                    <div className="w-6 h-6 rounded bg-gray-900 text-white flex items-center justify-center border border-gray-700 group-hover:bg-black transition-colors">
+                                                <div onClick={() => router.push('/admin')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-gray-200">
+                                                    <div className="w-6 h-6 rounded-lg bg-gray-900 text-white flex items-center justify-center border border-gray-700 shadow-sm group-hover:scale-105 transition-transform">
                                                         <span className="text-[10px] font-black">A</span>
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-900 dark:text-gray-400 group-hover:text-black transition-colors">관리자</span>
+                                                    <span className="text-xs font-black text-gray-900 dark:text-gray-400">관리자</span>
                                                 </div>
                                             )}
 
                                             {userRole === 'business' && (
-                                                <div onClick={() => router.push('/my-shop')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-                                                    <div className="w-6 h-6 rounded bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:bg-blue-100 transition-colors">
-                                                        <span className="text-[10px] font-black">B</span>
+                                                <div onClick={() => router.push('/my-shop')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-blue-100">
+                                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center border shadow-sm group-hover:scale-105 transition-transform ${user.id === 'admin_shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
+                                                        <span className="text-[10px] font-black">{user.id === 'admin_shop' ? 'PRO' : 'B'}</span>
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-500 group-hover:text-blue-600 transition-colors">기업회원</span>
+                                                    <div className="flex flex-col -space-y-0.5">
+                                                        <span className="text-[10px] font-bold text-gray-400">사장님</span>
+                                                        <span className={`text-xs font-black ${user.id === 'admin_shop' ? 'text-blue-600' : 'text-gray-900'}`}>{user.id === 'admin_shop' ? '프리미엄' : '일반'}</span>
+                                                    </div>
                                                 </div>
                                             )}
 
                                             {userRole === 'personal' && (
-                                                <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
-                                                    <div className="w-6 h-6 rounded bg-pink-50 text-pink-600 flex items-center justify-center border border-pink-100 group-hover:bg-pink-100 transition-colors">
+                                                <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-pink-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-pink-100">
+                                                    <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center border border-pink-100 shadow-sm group-hover:scale-105 transition-transform">
                                                         <span className="text-[10px] font-black">P</span>
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-500 group-hover:text-pink-600 transition-colors">개인회원</span>
+                                                    <span className="text-xs font-black text-gray-900">개인회원</span>
                                                 </div>
                                             )}
 
