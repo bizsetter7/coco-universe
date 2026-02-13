@@ -41,5 +41,12 @@ export interface Shop {
         keywords?: string[];
         border?: 'none' | 'color' | 'glow';
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
-    }
+    };
+    // [Added] Admin/Ad Management
+    adStartDate?: string;
+    adEndDate?: string;
+    adDuration?: 30 | 60 | 90;
+    adPrice?: number;
+    lat?: number;
+    lng?: number;
 }

@@ -14,7 +14,18 @@ import {
     Palette,
     Zap,
     Rainbow,
-    Smartphone
+    Smartphone,
+    ArrowRight,
+    Search,
+    TrendingUp,
+    CreditCard,
+    Bell,
+    HelpCircle,
+    Megaphone,
+    Mail,
+    Lock,
+    Unlock,
+    Info
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
@@ -28,175 +39,824 @@ import { useAuth } from '@/hooks/useAuth';
 export default function AdminPage() {
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn, user } = useAuth();
+    const { isLoggedIn, user, userType } = useAuth();
     const [shops, setShops] = useState<Shop[]>([]);
-    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users'>('ads');
+    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('ads');
     const [isAuthorized, setIsAuthorized] = useState(false);
 
+    // [New] Message Monitoring State
+    const [allMessages, setAllMessages] = useState<any[]>([]);
+    const [selectedMessageGroup, setSelectedMessageGroup] = useState<any>(null);
+
+    // [New] Inquiry State
+    const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
+    const [mockUsers, setMockUsers] = useState<any[]>([
+        { id: 'user_01', loginId: 'koko123', name: '김코코', nickname: '날아라코코', birth: '1995-05-15', phone: '010-1234-5678', email: 'koko@gmail.com', type: 'individual', status: 'active', joinDate: '2026-02-01', referrer: '구글 검색', statusHistory: ['2026-02-01 가입'] },
+        { id: 'user_02', loginId: 'shop_master', name: '이사장', nickname: '강남구인구직', birth: '1988-11-22', phone: '010-9876-5432', email: 'ceo@shop.com', type: 'corporate', status: 'active', joinDate: '2026-01-15', referrer: '네이버', statusHistory: ['2026-01-15 기업회원 가입', '2026-02-10 광고 연장'] },
+        { id: 'user_03', loginId: 'bad_boy', name: '박진상', nickname: '진상아지트', birth: '1992-03-03', phone: '010-4444-4444', email: 'bad@naver.com', type: 'individual', status: 'blocked', joinDate: '2026-02-12', referrer: '직접 유입', statusHistory: ['2026-02-12 가입', '2026-02-13 비매너 쪽지로 영구 정지'] },
+    ]);
+    const [mockInquiries] = useState([
+        { id: 1, sender: '해운대한라맨션', date: '10분 전', content: '광고 신청했는데 승인 언제 되나요?', status: 'new' },
+        { id: 2, sender: '유성 핫플레이스', date: '25분 전', content: '이번 달 결제 내역서가 필요합니다.', status: 'replied' },
+        { id: 3, sender: '신사동 사장님', date: '1시간 전', content: '무지개 효과 테두리 색상 변경 가능한가요?', status: 'new' },
+    ]);
+
+    const [mockAds, setMockAds] = useState<any[]>([]);
+
     useEffect(() => {
-        // 관리자 권한 체크 (데모용: 로컬 스토리지 또는 mock 데이터 기반)
+        // Load persist data or initial data
+        const savedAds = localStorage.getItem('coco_admin_mockAds');
+        if (savedAds) {
+            setMockAds(JSON.parse(savedAds));
+        } else {
+            const initialAds = [
+                { id: 'ad_101', shopId: 'admin_shop', shopName: '강남 프라이빗 룸', ownerId: 'koko123', category: '룸싸롱', region: '서울 강남', price: 550000, options: '메인최상단 + 골드배너 + 강조효과', edits: 5, date: '2026-02-12', status: 'pending' },
+                { id: 'ad_102', shopId: 'shop_02', shopName: '마포 카페 알바', ownerId: 'cafe_boss', category: '카페', region: '서울 마포', price: 150000, options: '일반 리스트', edits: 12, date: '2026-02-11', status: 'active' },
+                { id: 'ad_103', shopId: 'shop_03', shopName: '수원 바리스타', ownerId: 'suwon_star', category: '바', region: '경기 수원', price: 300000, options: '지역 상단 고정', edits: 2, date: '2026-02-10', status: 'expired' },
+            ];
+            setMockAds(initialAds);
+            localStorage.setItem('coco_admin_mockAds', JSON.stringify(initialAds));
+        }
+    }, []);
+
+    const [userSearch, setUserSearch] = useState('');
+    const [userFilter, setUserFilter] = useState<'all' | 'corporate' | 'individual'>('all');
+    const [expandedAd, setExpandedAd] = useState<string | null>(null);
+    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all'); // [New] Quick Filter
+
+    // [New] Global Message State
+    const [isGlobalMsgOpen, setIsGlobalMsgOpen] = useState(false);
+    const [msgTarget, setMsgTarget] = useState<'all' | 'corporate' | 'individual'>('all');
+    const [msgTitle, setMsgTitle] = useState('');
+    const [msgContent, setMsgContent] = useState('');
+    const [sendSuccess, setSendSuccess] = useState(false);
+
+    // [New] Ad Status Control Logic
+    const handleAdStatusChange = (adId: string, newStatus: 'active' | 'pending' | 'expired' | 'rejected') => {
+        setMockAds(prev => {
+            const nextAds = prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad);
+            localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
+            return nextAds;
+        });
+
+        // [Optimization] Alert after state update to ensure UI reflects changes first
+        const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
+        setTimeout(() => {
+            alert(`광고 ${statusMsg} 처리가 완료되었습니다.`);
+        }, 100);
+    };
+
+    const formatPrice = (priceInWon: number) => {
+        if (priceInWon >= 10000) {
+            return `${Math.floor(priceInWon / 10000)}만원`;
+        }
+        return `${priceInWon.toLocaleString()}원`;
+    };
+
+    useEffect(() => {
         const checkAuth = () => {
-            // 잠시 딜레이를 주어 useAuth가 초기화될 시간을 줍니다.
-            // 실제 프로덕션에서는 서버 사이드 체크나 미들웨어를 권장합니다.
-            if (!isLoggedIn || user.type !== 'admin') {
-                // 개발 편의성을 위해 로컬스토리지 직접 체크도 병행 (useAuth 업데이트 딜레이 방지)
-                const localType = localStorage.getItem('user_type');
-                if (localType !== 'admin') {
-                    alert('관리자 권한이 필요합니다.');
-                    router.push('/');
-                    return;
-                }
+            // [Fix] Use centralized userType from useAuth instead of direct type/localStorage check
+            if (!isLoggedIn || userType !== 'admin') {
+                alert('관리자 권한이 필요합니다.');
+                router.push('/');
+                return;
             }
             setIsAuthorized(true);
         };
 
         const timer = setTimeout(checkAuth, 100);
         return () => clearTimeout(timer);
-    }, [isLoggedIn, user, router]);
+    }, [isLoggedIn, userType, router]);
 
     useEffect(() => {
-        // 실제 운영 시에는 API에서 호출하겠지만, 현재는 로컬 데이터를 불러옵니다.
-        setShops((shopsData as Shop[]).slice(0, 50));
+        setShops((shopsData as Shop[]).slice(0, 50).map(s => ({
+            ...s,
+            adStartDate: s.adStartDate || new Date().toISOString().split('T')[0],
+            adEndDate: s.adEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            adPrice: s.tier === 'grand' ? 350000 : (s.tier === 'premium' ? 200000 : 180000)
+        })));
+
+        // Mock All Messages for Monitoring
+        setAllMessages([
+            { id: 1, from: '해운대한라맨션', to: '개인회원A', content: '안녕하세요, 면접 가능하신가요?', date: '5분 전', status: 'normal' },
+            { id: 2, from: '신사동 사장님', to: '개인회원B', content: '텔레그램 아이디로 연락 주세요. @secret123', date: '12분 전', status: 'warning' },
+            { id: 3, from: '업주관리자', to: '지원자C', content: '기재하신 페이 조율 가능합니다.', date: '30분 전', status: 'normal' },
+        ]);
+
+        // Mock Users (Referrer Info Included)
+        // Note: Set initially above, this is for dynamic refresh logic if needed
     }, []);
 
-    // 광고 효과 적용 핸들러
     const toggleEffect = (id: string, effect: string) => {
         setShops(prev => prev.map(shop => {
             if (shop.id === id) {
-                let newTitle = shop.title || shop.name;
-                const tag = `[${effect}]`;
+                let currentOptions = shop.options || {};
+                let newOptions = { ...currentOptions };
 
-                if (newTitle.includes(tag)) {
-                    newTitle = newTitle.replace(tag, '').trim();
-                } else {
-                    newTitle = `${tag} ${newTitle}`;
-                }
-                return { ...shop, title: newTitle };
+                if (effect === 'NEON') newOptions.effect = newOptions.effect === 'neon' ? 'none' : 'neon';
+                if (effect === 'RAINBOW') newOptions.effect = newOptions.effect === 'rainbow' ? 'none' : 'rainbow';
+                if (effect === 'GLOW') newOptions.border = newOptions.border === 'glow' ? 'none' : 'glow';
+
+                return { ...shop, options: newOptions };
             }
             return shop;
         }));
-        // TODO: 실제 서버 저장 로직
-        alert(`광고 효과 '${effect}'가 적용/해제 되었습니다!`);
+        alert(`광고 효과 '${effect}'가 시뮬레이션 되었습니다!`);
     };
 
     if (!isAuthorized) return null;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-slate-900 text-white flex flex-col">
-                <div className="p-6 border-b border-slate-800">
-                    <h1 className="text-xl font-black text-pink-400">COCO ADMIN</h1>
-                    <p className="text-[10px] text-slate-400 mt-1">Management System v1.0</p>
+        <div className="min-h-screen bg-white flex flex-col md:flex-row">
+            {/* Sidebar - Hide on mobile if needed or keep responsive */}
+            <aside className="w-full md:w-64 bg-slate-950 text-white flex flex-col border-r border-slate-900 z-[10001]">
+                <div className="p-6 border-b border-slate-900">
+                    <h1 className="text-xl font-black text-blue-400 tracking-tighter">COCO ADMIN</h1>
+                    <p className="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-widest">Master Control Hub</p>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
                     <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
                     <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} onClick={() => setActiveTab('ads')} />
+                    <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => setActiveTab('inquiry')} />
                     <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
-                    <NavItem icon={<Settings size={20} />} label="시스템 설정" />
+                    <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => setActiveTab('seo')} />
                 </nav>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-10">
-                <header className="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 className="text-3xl font-black text-gray-900">광고 심사 관리 ⚡️</h2>
-                        <p className="text-gray-500 mt-2">기업 회원이 신청한 광고를 검토하고 화려한 효과를 즉시 입히세요.</p>
+            <main className="flex-1 p-10">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-3">
+                            <span className="w-8 h-[2px] bg-blue-600 rounded-full"></span>
+                            CORE SYSTEM STABLE
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-950 tracking-tighter leading-none italic uppercase">
+                            Dashboard <span className="text-blue-600">.</span>
+                        </h2>
+                        <p className="text-slate-400 font-bold text-sm mt-2">환영합니다, 사장님. 플랫폼의 모든 흐름이 당신의 손끝에 있습니다.</p>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="bg-white px-6 py-4 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                                <CheckCircle2 size={24} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold">심사 완료</p>
-                                <p className="text-xl font-black text-gray-900">1,248건</p>
-                            </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex -space-x-3">
+                            <div className="w-10 h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[10px] font-black text-pink-600 shadow-sm z-30">AD</div>
+                            <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm z-20">MB</div>
+                            <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 shadow-sm z-10">+</div>
                         </div>
-                        <div className="bg-white px-6 py-4 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-3">
-                            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-                                <Zap size={24} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold">대기 중</p>
-                                <p className="text-xl font-black text-gray-900">12건</p>
-                            </div>
-                        </div>
+                        <button className="relative p-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                            <Bell size={20} className="text-slate-400" />
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white"></span>
+                        </button>
                     </div>
                 </header>
 
-                {/* Ads Table */}
-                <div className="bg-white rounded-[40px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest leading-none">상점 정보</th>
-                                <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest leading-none">지역/급여</th>
-                                <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest leading-none">신청 옵션 (유료)</th>
-                                <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest leading-none text-right">관리 액션</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {shops.slice(0, 10).map((shop) => (
-                                <tr key={shop.id} className="hover:bg-gray-50/50 transition-colors">
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-16 h-12 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                                                {shop.options?.mediaUrl ? (
-                                                    <img src={shop.options.mediaUrl} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-300"><Eye size={20} /></div>
+                {/* Intelligent Stats Cluster */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <StatCard
+                        title="누적 매출 총액"
+                        value={`${(mockAds.filter(a => a.status === 'active').reduce((acc, current) => acc + current.price, 0) + 124030000).toLocaleString()}₩`}
+                        trend="+12.5%"
+                        icon={<TrendingUp size={24} />}
+                        color="blue"
+                        onClick={() => alert('누적 성과 상세 리포트 페이지로 이동합니다. (v2.6 예정)')}
+                    />
+                    <StatCard
+                        title="활성 광고 슬롯"
+                        value={mockAds.filter(a => a.status === 'active').length.toLocaleString()}
+                        trend={`+${mockAds.filter(a => a.status === 'active').length}`}
+                        icon={<Megaphone size={24} />}
+                        color="pink"
+                        onClick={() => setActiveTab('ads')}
+                    />
+                    <StatCard
+                        title="신규 회원 유입"
+                        value={`${mockUsers.length + 3477}명`}
+                        trend="+24.2%"
+                        icon={<Users size={24} />}
+                        color="slate"
+                        onClick={() => setActiveTab('users')}
+                    />
+                    <StatCard
+                        title="전체 트래픽 (UV)"
+                        value="84.2K"
+                        trend="+5.4%"
+                        icon={<Eye size={24} />}
+                        color="indigo"
+                        onClick={() => alert('실시간 트래픽 히트맵 로드 중... (v2.7 예정)')}
+                    />
+                </div>
+
+                {/* Tab 2: Ad Approval Management (Advanced) */}
+                {activeTab === 'ads' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter">광고 심사 관리 허브 🛡️</h3>
+                                <p className="text-sm text-slate-400 font-bold mt-1">심사대기 건을 승인하고, 광고 가이드 준수 여부를 모니터링합니다.</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setAdFilter(adFilter === 'all' ? 'pending' : 'all')}
+                                    className={`px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 ${adFilter === 'pending' ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-200' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}
+                                >
+                                    {adFilter === 'pending' ? '전체 보기' : `심사대기 ${mockAds.filter(a => a.status === 'pending').length}건`}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50 border-b border-slate-100">
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상점 정보 (회원ID)</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">신청 옵션 (유료)</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">결제 금액</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">제어</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {mockAds
+                                        .filter(ad => {
+                                            if (adFilter === 'all') return true;
+                                            if (adFilter === 'pending') return ad.status === 'pending';
+                                            return true;
+                                        })
+                                        .map((ad) => (
+                                            <React.Fragment key={ad.id}>
+                                                <tr
+                                                    onClick={() => setExpandedAd(expandedAd === ad.id ? null : ad.id)}
+                                                    className={`border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group ${expandedAd === ad.id ? 'bg-blue-50/30' : ''}`}
+                                                >
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs ${ad.status === 'pending' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
+                                                                {ad.category[0]}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-black text-slate-900">{ad.shopName}</div>
+                                                                <div className="text-[10px] font-bold text-slate-400 italic">ID: {ad.ownerId} · {ad.region}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">{ad.options}</div>
+                                                        <div className="text-[9px] text-blue-500 font-black mt-0.5 uppercase tracking-tighter">최근 수정: {ad.edits}/30회</div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div className="text-sm font-black text-slate-950 tabular-nums">{formatPrice(ad.price)}</div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' : (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-400')}`}>
+                                                            {ad.status.toUpperCase()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleAdStatusChange(ad.id, 'active'); }}
+                                                                className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-50 hover:text-green-600 transition-all"
+                                                                title="승인"
+                                                            >
+                                                                <CheckCircle2 size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleAdStatusChange(ad.id, 'rejected'); }}
+                                                                className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                                title="거절"
+                                                            >
+                                                                <XCircle size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {expandedAd === ad.id && (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-8 py-0">
+                                                            <div className="bg-slate-900/5 border-x border-slate-100 p-10 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                                                    <div className="space-y-6">
+                                                                        <div className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest">
+                                                                            <Info size={14} /> 금칙어 및 정책 위반 정밀 검사
+                                                                        </div>
+                                                                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+                                                                            <div className="absolute top-0 right-0 px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black">NORMAL</div>
+                                                                            <p className="text-xs font-bold text-slate-600 leading-relaxed">
+                                                                                &quot;안녕하세요, 저희 상점은 최고의 대우와 안락한 환경을 보장합니다. 주저 말고 연락 주세요. {ad.shopName}은 언제나 열려 있습니다.&quot;
+                                                                            </p>
+                                                                            <div className="mt-4 pt-4 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
+                                                                                * 현재 본문 내 정책 위반 키워드가 발견되지 않았습니다.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="space-y-6">
+                                                                        <div className="text-slate-950 font-black text-sm tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">
+                                                                            광고주(회원) 통합 이력
+                                                                        </div>
+                                                                        <div className="space-y-3">
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
+                                                                                <span className="font-black text-blue-600">{ad.edits} / 30회</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">진행 중인 광고</span>
+                                                                                <span className="font-black text-slate-950">2건</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">마감된 광고</span>
+                                                                                <span className="font-black text-slate-400">14건</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <button className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg shadow-slate-200">광고주 상세 프로필 보기</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                                                 )}
+                                            </React.Fragment>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Tab 3: Member Management (Advanced) */}
+                {activeTab === 'users' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter">전체 회원 마스터 컨트롤 👥</h3>
+                                <p className="text-sm text-slate-400 font-bold mt-1">유입 경로 추적 및 블랙리스트 정밀 관리를 수행합니다.</p>
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <button
+                                    onClick={() => setIsGlobalMsgOpen(true)}
+                                    className="bg-slate-950 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-slate-200 hover:bg-black transition-all active:scale-95 flex items-center gap-2"
+                                >
+                                    <Mail size={14} className="text-blue-400" /> 전체 쪽지 발송
+                                </button>
+                                <select
+                                    onChange={(e) => setUserFilter(e.target.value as any)}
+                                    className="bg-white border border-slate-100 px-4 py-2 rounded-xl text-xs font-black text-slate-600 outline-none shadow-sm"
+                                >
+                                    <option value="all">전체 유형</option>
+                                    <option value="corporate">기업 회원</option>
+                                    <option value="individual">개인 회원</option>
+                                </select>
+                                <div className="relative flex-1 md:w-64">
+                                    <input
+                                        type="text"
+                                        placeholder="아이디, 닉네임 검색..."
+                                        value={userSearch}
+                                        onChange={(e) => setUserSearch(e.target.value)}
+                                        className="w-full bg-white border border-slate-100 px-4 py-2 pl-9 rounded-xl text-xs font-bold text-slate-600 outline-none shadow-sm focus:border-blue-200"
+                                    />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50 border-b border-slate-100">
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">회원 정보 (아이디/이름/닉네임)</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">연락처/이메일</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">유입경로</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {mockUsers
+                                        .filter(u => userFilter === 'all' || u.type === userFilter)
+                                        .filter(u => u.loginId.includes(userSearch) || u.nickname.includes(userSearch) || u.name.includes(userSearch))
+                                        .map((u) => (
+                                            <React.Fragment key={u.id}>
+                                                <tr
+                                                    onClick={() => alert(`'${u.name}' 회원의 상세 활동 타임라인을 불러옵니다. (준비중)`)}
+                                                    className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group"
+                                                >
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                                {u.name[0]}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-black text-slate-900">{u.name} <span className="text-[10px] text-slate-300 font-bold ml-1">({u.loginId})</span></div>
+                                                                <div className="text-[10px] font-bold text-blue-500">{u.nickname}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div className="text-[11px] font-black text-slate-700">{u.phone}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400">{u.email}</div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-[9px] font-black uppercase tracking-wider">{u.referrer}</span>
+                                                        <div className="text-[9px] text-slate-300 mt-1 font-bold">{u.joinDate} 가입</div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className={`px-2 py-1 rounded-md text-[10px] font-black ${u.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                            {u.status.toUpperCase()}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); alert(`${u.name}님의 비밀번호를 'coco1234!'로 초기화했습니다.`); }}
+                                                                className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all"
+                                                                title="비밀번호 초기화"
+                                                            >
+                                                                <Unlock size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); alert(`${u.name}님에게 관리자 메일을 발송합니다.`); }}
+                                                                className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all"
+                                                            >
+                                                                <Mail size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); alert(`${u.name} 회원의 계정 상태를 변경하시겠습니까?`); }}
+                                                                className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                            >
+                                                                <Lock size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </React.Fragment>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+                {activeTab === 'inquiry' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-8 h-[600px]">
+                        {/* Inquiry List */}
+                        <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+                                <h3 className="font-black text-gray-900 flex items-center gap-2">
+                                    <MessageSquare size={18} className="text-pink-500" />
+                                    최근 문의 내역
+                                </h3>
+                            </div>
+                            <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                                {mockInquiries.map((iq) => (
+                                    <div
+                                        key={iq.id}
+                                        onClick={() => setSelectedInquiry(iq)}
+                                        className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${selectedInquiry?.id === iq.id ? 'bg-pink-50/30' : ''}`}
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-sm font-black text-gray-900">{iq.sender}</span>
+                                            <span className="text-[10px] font-bold text-gray-400">{iq.date}</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 line-clamp-1">{iq.content}</p>
+                                        <div className="mt-3 flex items-center gap-1.5">
+                                            <span className={`w-1.5 h-1.5 rounded-full ${iq.status === 'new' ? 'bg-pink-500 animate-pulse' : 'bg-gray-300'}`}></span>
+                                            <span className={`text-[10px] font-black ${iq.status === 'new' ? 'text-pink-500' : 'text-gray-400'}`}>
+                                                {iq.status === 'new' ? '답변 대기' : '답변 완료'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Reply Section */}
+                        <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+                            {selectedInquiry ? (
+                                <>
+                                    <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-600 font-black">
+                                                {selectedInquiry.sender.substring(0, 1)}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black text-gray-900">{shop.name}</p>
-                                                <p className="font-bold text-pink-500 text-[11px] mt-1 line-clamp-1">{shop.title || shop.name}</p>
+                                                <p className="text-sm font-black text-gray-900">{selectedInquiry.sender}</p>
+                                                <p className="text-[10px] font-bold text-gray-400">온라인 문의 대응</p>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <p className="text-xs font-bold text-gray-500">{shop.region}</p>
-                                        <p className="text-sm font-black text-blue-600 mt-1">{shop.pay}</p>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => toggleEffect(shop.id, '네온')}
-                                                className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${shop.title?.includes('[네온]') ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-200' : 'bg-gray-100 text-gray-400 hover:bg-cyan-50'}`}
-                                            >
-                                                NEON
-                                            </button>
-                                            <button
-                                                onClick={() => toggleEffect(shop.id, '무지개')}
-                                                className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${shop.title?.includes('[무지개]') ? 'bg-purple-500 text-white shadow-lg shadow-purple-200' : 'bg-gray-100 text-gray-400 hover:bg-purple-50'}`}
-                                            >
-                                                RAINBOW
-                                            </button>
-                                            <button
-                                                onClick={() => toggleEffect(shop.id, '반짝')}
-                                                className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${shop.title?.includes('[반짝]') ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' : 'bg-gray-100 text-gray-400 hover:bg-amber-50'}`}
-                                            >
-                                                GLITTER
-                                            </button>
+                                    </div>
+                                    <div className="flex-1 p-8 overflow-y-auto space-y-6 bg-slate-50/30">
+                                        <div className="flex flex-col items-start gap-2">
+                                            <div className="bg-white px-5 py-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[80%] text-sm text-gray-700 leading-relaxed font-bold">
+                                                {selectedInquiry.content}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-gray-400 ml-1">{selectedInquiry.date}</span>
                                         </div>
-                                    </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <button className="p-2 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors" title="심사 승인">
-                                                <CheckCircle2 size={20} />
-                                            </button>
-                                            <button className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors" title="거절/반려">
-                                                <XCircle size={20} />
-                                            </button>
+
+                                        {/* Reply Mock (If any) */}
+                                        <div className="flex flex-col items-end gap-2">
+                                            <p className="text-[10px] font-bold text-gray-300 italic">여기에 답장을 작성하세요...</p>
                                         </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                    <div className="p-6 border-t border-gray-100 bg-white">
+                                        <div className="relative">
+                                            <textarea
+                                                placeholder="답변 내용을 입력하세요..."
+                                                className="w-full h-24 p-5 bg-gray-50 border border-gray-100 rounded-3xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/20 resize-none transition-all"
+                                            ></textarea>
+                                            <button
+                                                onClick={() => { alert('답변이 전송되었습니다!'); setSelectedInquiry(null); }}
+                                                className="absolute bottom-4 right-4 bg-pink-600 text-white px-6 py-2 rounded-2xl text-xs font-black shadow-lg shadow-pink-200 hover:bg-pink-700 active:scale-95 transition-all"
+                                            >답변 전송하기</button>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-gray-300 gap-4">
+                                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
+                                        <MessageSquare size={40} />
+                                    </div>
+                                    <p className="font-black text-sm">왼쪽 리스트에서 문의를 선택해 주세요.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+                {/* Tab 5: Message Monitoring */}
+                {activeTab === 'messages' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter">전체 쪽지 모니터링 🔍</h3>
+                                <p className="text-sm text-slate-400 font-bold mt-1">회원 간 평온한 소통을 위해 실시간으로 감시 중입니다.</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <span className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black border border-red-100 italic animate-pulse">주의 필요: 1건</span>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50 border-b border-slate-100">
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">보낸이 / 받는이</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">대화 내용</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">시간 / 상태</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">관리 액션</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {allMessages.map((msg) => (
+                                        <tr key={msg.id} className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors group">
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-slate-300 font-black">FROM</span>
+                                                        <span className="text-sm font-black text-slate-900 leading-none">{msg.from}</span>
+                                                    </div>
+                                                    <ArrowRight size={14} className="text-slate-200 mt-2" />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-slate-300 font-black">TO</span>
+                                                        <span className="text-sm font-black text-slate-900 leading-none">{msg.to}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className={`text-sm font-bold max-w-md truncate ${msg.status === 'warning' ? 'text-red-500 underline decoration-red-200' : 'text-slate-600'}`}>
+                                                    {msg.content}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-black text-slate-400">{msg.date}</span>
+                                                    <span className={`text-[10px] font-black mt-0.5 ${msg.status === 'warning' ? 'text-red-600' : 'text-blue-600'}`}>
+                                                        {msg.status === 'warning' ? '⚠️ 외부유입 의심' : '✅ 정상 소통'}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 text-right">
+                                                <button
+                                                    onClick={() => alert(`'${msg.from}' 회원에게 주의 쪽지를 발송했습니다.`)}
+                                                    className="px-5 py-2.5 bg-slate-950 text-white rounded-2xl text-[11px] font-black hover:bg-black hover:shadow-lg hover:shadow-slate-200 transition-all active:scale-95"
+                                                >
+                                                    주의 조치
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Tab 6: SEO & Search Control */}
+                {activeTab === 'seo' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex justify-between items-end mb-4">
+                            <div>
+                                <h3 className="text-3xl font-black text-slate-950 tracking-tighter">SEO & Search Engine Master <span className="text-blue-600">.</span></h3>
+                                <p className="text-sm text-slate-400 font-bold mt-2">구글과 네이버의 검색 로직을 지배하여 트래픽을 극대화합니다.</p>
+                            </div>
+                            <button
+                                onClick={() => alert('구글 서치 콘솔에 전체 사이트맵(17,482개 경로) 재전송을 요청했습니다.')}
+                                className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95"
+                            >
+                                <Zap size={14} /> 실시간 색인 강제 요청
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                {/* Sitemap Status */}
+                                <div className="bg-white p-8 rounded-[44px] border border-slate-100 shadow-sm">
+                                    <h4 className="text-sm font-black text-slate-900 mb-6 flex items-center gap-2">
+                                        <TrendingUp size={18} className="text-blue-600" />
+                                        포털 검색 노출 지표 (실시간)
+                                    </h4>
+                                    <div className="grid grid-cols-3 gap-6">
+                                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                            <p className="text-[10px] text-slate-400 font-black mb-1">인덱싱된 경로</p>
+                                            <p className="text-2xl font-black text-slate-950">14,285건</p>
+                                            <p className="text-[9px] text-blue-600 font-bold mt-1">상위 82% 도달</p>
+                                        </div>
+                                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                            <p className="text-[10px] text-slate-400 font-black mb-1">일일 클릭 유입</p>
+                                            <p className="text-2xl font-black text-slate-950">4,821회</p>
+                                            <p className="text-[9px] text-green-600 font-bold mt-1">+12% vs 어제</p>
+                                        </div>
+                                        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                            <p className="text-[10px] text-slate-400 font-black mb-1">평균 노출 순위</p>
+                                            <p className="text-2xl font-black text-slate-950">3.2위</p>
+                                            <p className="text-[9px] text-pink-600 font-bold mt-1">핵심키워드 점유 중</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Meta Tag Template */}
+                                <div className="bg-white p-8 rounded-[44px] border border-slate-100 shadow-sm">
+                                    <h4 className="text-sm font-black text-slate-900 mb-6 flex items-center gap-2">
+                                        <Palette size={18} className="text-pink-600" />
+                                        다이내믹 메타태크 테마 설정
+                                    </h4>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 mb-2 block uppercase">Title 구조 템플릿</label>
+                                            <input
+                                                defaultValue="{지역} {업종} 알바 1위 | {상점이름} - 실시간 구인구직 2026"
+                                                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 outline-none transition-all"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-400 mb-2 block uppercase">Description 형식</label>
+                                            <textarea
+                                                rows={3}
+                                                defaultValue="대한민국 No.1 고소득 {업종} 플랫폼. 현재 {지역}에서 가장 인기 있는 {상점이름} 광고를 확인하세요. 당일 지급, 숙소 제공 등 최고의 조건 보장."
+                                                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-200 outline-none transition-all resize-none"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => alert('전체 페이지의 메타태그 템플릿이 성공적으로 변경되었습니다! (SEO 반영 완료)')}
+                                            className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black hover:bg-black transition-all shadow-lg shadow-slate-200"
+                                        >
+                                            전체 페이지 템플릿 즉시 반영
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Signature Keyword AI */}
+                                <div className="bg-slate-950 p-8 rounded-[44px] text-white overflow-hidden relative">
+                                    <div className="absolute -right-6 -top-6 opacity-10">
+                                        <Zap size={100} />
+                                    </div>
+                                    <h4 className="text-sm font-black text-blue-400 mb-6 flex items-center gap-2">
+                                        <Info size={18} />
+                                        AI 키워드 인젝터
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 font-bold leading-relaxed mb-6">
+                                        경쟁사의 검색 상위 노출 키워드를 매시간 크롤링하여 우리 사이트의 숨겨진 메타 데이터에 자동으로 주입합니다.
+                                    </p>
+                                    <div className="space-y-3 mb-8">
+                                        <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest ml-1">실시간 모니터링 타겟</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {['퀸알바', '여우알바', '레이디알바', '밤이슬알바', '밤여우알바', '밤알바퀸', '미수다알바', '러브알바', '나나알바', '에스알바', '엄지알바'].map(site => (
+                                                <div key={site} className="bg-white/5 border border-white/10 px-3 py-2 rounded-xl flex items-center justify-between group hover:border-blue-500/50 transition-all">
+                                                    <span className="text-[10px] font-bold text-slate-300">{site}</span>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse"></span>
+                                                        <span className="text-[9px] font-black text-blue-400">연결됨</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">추출된 핵심 키워드</label>
+                                        {['2026년 밤알바 1위', '전국 최고 수입 보장', '실시간 면접 가능 업소', '검증된 럭셔리 알바'].map(k => (
+                                            <div key={k} className="bg-white/5 border border-white/10 px-4 py-2.5 rounded-xl flex items-center justify-between">
+                                                <span className="text-[11px] font-black text-slate-200">{k}</span>
+                                                <span className="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded-md">INJECTED</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button className="w-full mt-6 py-4 bg-blue-600 text-white rounded-2xl text-[11px] font-black shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all">전략 키워드 갱신하기</button>
+                                </div>
+
+                                <div className="bg-white p-8 rounded-[44px] border border-slate-100 shadow-sm italic">
+                                    <h4 className="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-[0.2em]">Sitemap Insight</h4>
+                                    <p className="text-xs font-bold text-slate-600 leading-relaxed">
+                                        &quot;현재 1.7만 개의 지역 랜딩 페이지 중 서울 지역의 구글 노출 강도가 가장 높습니다. 경기 남부 지역의 키워드 보강이 필요합니다.&quot;
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
+
+            {/* [New] Global Message Modal */}
+            {isGlobalMsgOpen && (
+                <div className="fixed inset-0 z-[30000] flex items-center justify-center p-6">
+                    <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md" onClick={() => setIsGlobalMsgOpen(false)} />
+                    <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-950 tracking-tighter">전체 회원 쪽지 발송 ✉️</h3>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Global Broadcast System</p>
+                            </div>
+                            <button onClick={() => setIsGlobalMsgOpen(false)} className="p-2 hover:bg-white rounded-full transition-colors"><XCircle className="text-slate-300" /></button>
+                        </div>
+
+                        <div className="p-10 space-y-8">
+                            {sendSuccess ? (
+                                <div className="py-10 text-center space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                                    <div className="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                                        <CheckCircle2 size={40} />
+                                    </div>
+                                    <h4 className="text-2xl font-black text-slate-900 tracking-tighter">발송 요청 완료!</h4>
+                                    <p className="text-sm font-bold text-slate-400">시스템이 수천 명의 회원에게 순차적으로 쪽지를 전달합니다.</p>
+                                    <button
+                                        onClick={() => { setIsGlobalMsgOpen(false); setSendSuccess(false); }}
+                                        className="mt-6 px-10 py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg"
+                                    >닫기</button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">수신 대상 그룹</label>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[
+                                                { id: 'all', label: '전체 회원' },
+                                                { id: 'corporate', label: '기업 회원' },
+                                                { id: 'individual', label: '개인 회원' }
+                                            ].map(t => (
+                                                <button
+                                                    key={t.id}
+                                                    onClick={() => setMsgTarget(t.id as any)}
+                                                    className={`py-3 rounded-2xl text-[11px] font-black transition-all border ${msgTarget === t.id ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-100' : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200'}`}
+                                                >
+                                                    {t.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">쪽지 제목</label>
+                                        <input
+                                            type="text"
+                                            placeholder="공지 사항 또는 이벤트 제목을 입력하세요."
+                                            value={msgTitle}
+                                            onChange={(e) => setMsgTitle(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">상세 내용</label>
+                                        <textarea
+                                            rows={5}
+                                            placeholder="회원들에게 전달할 상세 내용을 입력해 주세요."
+                                            value={msgContent}
+                                            onChange={(e) => setMsgContent(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all resize-none"
+                                        />
+                                    </div>
+
+                                    <button
+                                        onClick={() => {
+                                            if (!msgTitle || !msgContent) { alert('제목과 내용을 모두 입력해 주세요.'); return; }
+                                            setSendSuccess(true);
+                                        }}
+                                        className="w-full py-5 bg-slate-950 text-white rounded-3xl text-sm font-black shadow-xl shadow-slate-200 hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        <Zap size={18} className="text-blue-400" /> 대상에게 즉시 대량 발송
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -205,10 +865,44 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, labe
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${active ? 'bg-pink-600 text-white shadow-lg shadow-pink-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-slate-500 hover:bg-slate-900 hover:text-white'}`}
         >
-            {icon}
+            <div className={`shrink-0 ${active ? 'text-white' : 'text-slate-600 opacity-60'}`}>
+                {icon}
+            </div>
             <span>{label}</span>
         </button>
+    );
+}
+
+function StatCard({ title, value, trend, icon, color, onClick }: { title: string, value: string, trend: string, icon: React.ReactNode, color: 'blue' | 'pink' | 'slate' | 'indigo', onClick?: () => void }) {
+    const colorClasses = {
+        blue: 'bg-blue-50 text-blue-600',
+        pink: 'bg-pink-50 text-pink-600',
+        slate: 'bg-slate-50 text-slate-800',
+        indigo: 'bg-indigo-50 text-indigo-600'
+    };
+
+    return (
+        <div
+            onClick={onClick}
+            className={`bg-white p-8 rounded-[44px] border border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all group overflow-hidden relative ${onClick ? 'cursor-pointer' : ''}`}
+        >
+            <div className="absolute -right-6 -bottom-6 opacity-[0.03] group-hover:scale-150 group-hover:opacity-[0.08] transition-all duration-1000 transform rotate-12">
+                {icon}
+            </div>
+            <div className="flex items-center justify-between mb-8">
+                <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center shadow-inner ${colorClasses[color]}`}>
+                    {icon}
+                </div>
+                <div className="text-right">
+                    <span className="text-[10px] font-black text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">{trend}</span>
+                </div>
+            </div>
+            <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">{title}</p>
+                <h4 className="text-3xl font-black text-slate-950 tracking-tighter tabular-nums">{value}</h4>
+            </div>
+        </div>
     );
 }

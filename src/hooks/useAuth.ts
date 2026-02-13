@@ -6,6 +6,7 @@ export interface UserSession {
     name: string;
     points: number;
     id?: string;
+    referrer?: string; // [New] Inflow Source
 }
 
 // Simple event-based auth hook for client-side demo
@@ -20,6 +21,7 @@ export function useAuth() {
     const updateAuthStatus = () => {
         try {
             const sessionStr = localStorage.getItem('user_session');
+            const referrer = localStorage.getItem('user_referrer') || undefined;
             let session = null;
             if (sessionStr) {
                 if (sessionStr.startsWith('{')) {
@@ -29,7 +31,6 @@ export function useAuth() {
                         console.error('Session JSON parse error:', e);
                     }
                 } else if (sessionStr.startsWith('active_')) {
-                    // Legacy plain string format handling
                     session = { type: localStorage.getItem('user_type') || 'guest', name: localStorage.getItem('user_name') || '회원' };
                 }
             }
@@ -42,14 +43,15 @@ export function useAuth() {
 
             if (loggedIn && session) {
                 setUser({
-                    type: (session.type === 'shop' ? 'shop' : (session.type === 'personal' ? 'personal' : (session.type === 'admin' ? 'admin' : 'guest'))) as UserSession['type'],
+                    type: (session.type === 'admin' ? 'admin' : (session.type === 'shop' ? 'shop' : (session.type === 'personal' ? 'personal' : 'guest'))) as UserSession['type'],
                     name: name,
                     points: session.points || 50000,
-                    id: session.id
+                    id: session.id,
+                    referrer: session.referrer || referrer
                 });
             } else {
                 setUser({ type: 'guest', name: '게스트', points: 0 });
-                if (loggedIn) setIsLoggedInState(false); // Clean up inconsistent state
+                if (loggedIn) setIsLoggedInState(false);
             }
         } catch (e) {
             console.error('Auth status sync error:', e);
@@ -59,10 +61,21 @@ export function useAuth() {
     };
 
     useEffect(() => {
-        // Initial load
+        // [New] Capture Referrer on landing if not set
+        if (!localStorage.getItem('user_referrer') && typeof document !== 'undefined') {
+            const ref = document.referrer;
+            if (ref) {
+                const source = ref.includes('google') ? '구글 검색' :
+                    ref.includes('naver') ? '네이버' :
+                        ref.includes('daum') ? '다음' : '외부 유입';
+                localStorage.setItem('user_referrer', source);
+            } else {
+                localStorage.setItem('user_referrer', '직접 유입');
+            }
+        }
+
         updateAuthStatus();
 
-        // Listen for storage changes (cross-tab) or custom events
         const handleAuthChange = () => {
             updateAuthStatus();
         };
@@ -76,13 +89,13 @@ export function useAuth() {
         };
     }, []);
 
-    const login = (type: 'shop' | 'personal') => {
+    const login = (type: 'shop' | 'personal' | 'admin') => {
         const mockSession = {
             type,
-            name: type === 'shop' ? '업주 관리자' : '일반 회원',
-            id: 'mock_user'
+            name: type === 'admin' ? '시스템 최고 관리자' : (type === 'shop' ? '업주 관리자' : '일반 회원'),
+            id: type === 'admin' ? 'admin_master' : 'mock_user',
+            referrer: localStorage.getItem('user_referrer') || '기존 회원'
         };
-        localStorage.setItem('user_session', JSON.stringify(mockSession));
         localStorage.setItem('user_session', JSON.stringify(mockSession));
         localStorage.setItem('user_type', type);
         window.dispatchEvent(new Event('auth-change'));
@@ -90,7 +103,7 @@ export function useAuth() {
 
     const logout = () => {
         localStorage.removeItem('user_session');
-        localStorage.removeItem('adult_verified'); // Clear verification too for full reset
+        localStorage.removeItem('adult_verified');
         localStorage.removeItem('user_type');
         window.dispatchEvent(new Event('auth-change'));
     };
@@ -100,8 +113,18 @@ export function useAuth() {
         user,
         login,
         logout,
-        userType: (user.type === 'admin' ? 'admin' : (user.type === 'shop' || user.id === 'admin_shop' ? 'corporate' : 'individual')) as 'corporate' | 'individual' | 'admin',
+        userType: (() => {
+            // [Security] Strict White-list checking for Admin/Super roles
+            if (user.id === 'admin_shop' || user.id === 'admin_user') return 'admin';
+            if (user.id === 'test_shop' || user.type === 'shop' || user.type === 'business') return 'corporate';
+            if (user.id === 'test_user') return 'individual';
+
+            // Default mappings
+            if (user.type === 'admin') return 'admin'; // Only if explicitly set in session record
+            return user.type === 'shop' || user.type === 'business' ? 'corporate' : 'individual';
+        })() as 'corporate' | 'individual' | 'admin',
         userName: user.name,
-        userPoints: user.points
+        userPoints: user.points,
+        userReferrer: user.referrer
     };
 }

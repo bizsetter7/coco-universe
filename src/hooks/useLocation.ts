@@ -1,61 +1,66 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-export interface UserLocation {
-    region: string;
-    city: string;
-    isDetected: boolean;
+interface LocationState {
+    lat: number | null;
+    lng: number | null;
+    error: string | null;
+    loading: boolean;
 }
 
-export function useLocation() {
-    const [location, setLocation] = useState<UserLocation>({
-        region: '서울', // 기본값
-        city: '강남구',
-        isDetected: false
+/**
+ * useLocation Hook
+ * 브라우저 Geolocation API를 사용하여 이용자의 현재 위치를 감지합니다.
+ */
+export const useLocation = () => {
+    const [state, setState] = useState<LocationState>({
+        lat: null,
+        lng: null,
+        error: null,
+        loading: true
     });
 
     useEffect(() => {
-        const fetchLocation = async () => {
-            try {
-                // 타임아웃 처리를 위한 AbortController
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
+        if (!navigator.geolocation) {
+            setState(prev => ({ ...prev, error: 'Geolocation not supported', loading: false }));
+            return;
+        }
 
-                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-
-                if (data && data.region) {
-                    const regionMap: Record<string, { kr: string, city: string }> = {
-                        'Seoul': { kr: '서울', city: '강남구' },
-                        'Gyeonggi-do': { kr: '경기', city: '수원시' },
-                        'Busan': { kr: '부산', city: '해운대구' },
-                        'Daegu': { kr: '대구', city: '수성구' },
-                        'Incheon': { kr: '인천', city: '연수구' },
-                        'Gwangju': { kr: '광주', city: '서구' },
-                        'Daejeon': { kr: '대전', city: '유성구' },
-                        'Ulsan': { kr: '울산', city: '남구' },
-                    };
-
-                    const matched = regionMap[data.region] || { kr: '서울', city: '강남구' };
-
-                    setLocation({
-                        region: matched.kr,
-                        city: matched.city,
-                        isDetected: true
-                    });
-                }
-            } catch (error) {
-                // 에러 발생 시 무음 처리하여 UI 방해 금지
-                console.warn('Location detection failed, using defaults.');
-            }
+        const handleSuccess = (position: GeolocationPosition) => {
+            setState({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                error: null,
+                loading: false
+            });
         };
 
-        fetchLocation();
+        const handleError = (error: GeolocationPositionError) => {
+            setState(prev => ({ ...prev, error: error.message, loading: false }));
+        };
+
+        navigator.geolocation.getCurrentPosition(handleSuccess, handleError, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        });
     }, []);
 
-    return location;
-}
+    /**
+     * 하버사인(Haversine) 공식을 이용한 두 지점 간 거리 계산 (km 단위)
+     */
+    const calculateDistance = useCallback((lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371; // 지구 반지름 (km)
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }, []);
+
+    return { ...state, calculateDistance };
+};

@@ -28,8 +28,8 @@ export default function TalentPage() {
     const [accessDeniedModal, setAccessDeniedModal] = React.useState(false);
 
     // [Business Logic] Talent Info only for Paid Corporate Members or Admin
-    // For demo: Assume users with 'admin_shop' id or 'admin' type have access, others blocked.
-    const hasTalentAccess = userType === 'admin' || (userType === 'corporate' && user.id === 'admin_shop');
+    // For demo: Admin bypass enabled.
+    const hasTalentAccess = userType === 'admin' || (userType === 'corporate' && (user.id === 'admin_shop' || user.points > 100000));
 
     const handleActionClick = (e: React.MouseEvent) => {
         e.stopPropagation();

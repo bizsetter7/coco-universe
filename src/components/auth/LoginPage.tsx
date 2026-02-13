@@ -3,44 +3,42 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
 
 export const LoginPage = () => {
     const brand = useBrand();
     const router = useRouter();
+    const { login } = useAuth();
     const [loginId, setLoginId] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
     const handleLogin = () => {
-        if (loginId === 'admin_shop' && loginPassword === 'password123') {
-            // Simulate Shop Owner Login
-            const sessionData = {
-                type: 'shop',
-                name: '업주 관리자',
-                id: 'admin_shop',
-                shopId: 'shop_123' // Mock shop ID for testing
-            };
-            localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('user_type', 'shop');
+        const id = loginId.trim();
+        const pw = loginPassword.trim();
 
-            alert('업주 관리자로 로그인되었습니다.');
-            window.location.href = '/'; // Force reload to update header state
-        } else if (loginId === 'admin_user' && loginPassword === 'password123') {
-            // Simulate Regular User Login
-            const sessionData = {
-                type: 'personal',
-                name: '일반 회원',
-                id: 'admin_user'
-            };
-            localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('user_session', JSON.stringify(sessionData));
-            localStorage.setItem('user_type', 'personal');
-
-            alert('일반 회원으로 로그인되었습니다.');
+        if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
+            login('admin');
+            alert('마스터 관리자로 로그인되었습니다. (관리자 페이지 접근 가능)');
+            window.location.href = '/admin';
+        } else if (id === 'test_shop' && pw === 'password123') {
+            login('shop');
+            alert('기업 회원(업주)으로 로그인되었습니다.\n광고 신청 및 내 업소 관리가 가능합니다.');
+            window.location.href = '/';
+        } else if (id === 'test_user' && pw === 'password123') {
+            login('personal');
+            alert('일반 회원으로 로그인되었습니다.\n커뮤니티 및 인재정보 이용이 가능합니다.');
             window.location.href = '/';
         } else {
-            alert('아이디 또는 비밀번호가 올바르지 않습니다.\n(최고관리자: admin_shop / 비번: password123)');
+            alert(`아이디 또는 비밀번호가 올바르지 않습니다.\n입력값: [${id}]\n(관리자: admin_user / 기업: test_shop / 개인: test_user)`);
         }
+    };
+
+    const quickLogin = (type: 'admin' | 'shop' | 'personal') => {
+        login(type);
+        const label = type === 'admin' ? '마스터 관리자' : (type === 'shop' ? '기업 회원' : '일반 회원');
+        alert(`${label}로 즉시 로그인되었습니다.`);
+        if (type === 'admin') window.location.href = '/admin';
+        else window.location.href = '/';
     };
 
     const primaryStyle = { color: brand.primaryColor };
@@ -83,6 +81,33 @@ export const LoginPage = () => {
                     <span className="w-px h-3 bg-gray-200"></span>
                     <button className="text-gray-600 font-bold hover:underline" onClick={() => alert('회원가입 기능 준비중입니다.')}>회원가입</button>
                 </div>
+
+                {/* [Exclusive] Quick Login for Owner - Only visible in Development */}
+                {process.env.NODE_ENV !== 'production' && (
+                    <div className="mt-10 p-4 rounded-2xl bg-gray-50 border border-dashed border-gray-200">
+                        <p className="text-center text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">운영자 전용 원클릭 패스 (개발용)</p>
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                onClick={() => quickLogin('admin')}
+                                className="bg-red-600 text-white text-[10px] font-black py-3 rounded-xl shadow-md active:scale-95 transition-all"
+                            >
+                                마스터
+                            </button>
+                            <button
+                                onClick={() => quickLogin('shop')}
+                                className="bg-blue-600 text-white text-[10px] font-black py-3 rounded-xl shadow-md active:scale-95 transition-all"
+                            >
+                                기업(업주)
+                            </button>
+                            <button
+                                onClick={() => quickLogin('personal')}
+                                className="bg-slate-700 text-white text-[10px] font-black py-3 rounded-xl shadow-md active:scale-95 transition-all"
+                            >
+                                일반회원
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Social Login */}
                 <div className="mt-8 pt-8 border-t border-gray-100">

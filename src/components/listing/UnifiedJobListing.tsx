@@ -191,12 +191,15 @@ export const UnifiedJobListing = ({
                 </div>
 
                 {/* Announcement Bar */}
-                <div className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5 mx-4 md:mx-0`}>
+                <div
+                    onClick={() => router.push('/?page=support')}
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5 mx-4 md:mx-0 group/notice`}
+                >
                     <div className="flex items-center gap-3 overflow-hidden">
-                        <span className="bg-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm">공지사항</span>
-                        <p className="text-[13px] font-bold text-gray-700 truncate">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
+                        <span className="bg-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm group-hover/notice:bg-pink-700 transition-colors">공지사항</span>
+                        <p className="text-[13px] font-bold text-gray-700 truncate group-hover/notice:text-black transition-colors">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
                     </div>
-                    <ChevronRight size={16} className="text-gray-300 shrink-0" />
+                    <ChevronRight size={16} className="text-gray-300 shrink-0 group-hover/notice:text-gray-500 transition-colors" />
                 </div>
 
                 {/* Search Filter Box with Dropdowns */}

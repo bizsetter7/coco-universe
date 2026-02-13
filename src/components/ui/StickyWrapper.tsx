@@ -74,9 +74,22 @@ export const StickyWrapper = ({
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // [New] ResizeObserver to handle dynamic height changes (e.g. image loads)
+        const resizeObserver = new ResizeObserver(() => {
+            handleScroll();
+        });
+
+        if (wrapperRef.current) {
+            resizeObserver.observe(wrapperRef.current);
+        }
+
         handleScroll();
 
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            resizeObserver.disconnect();
+        };
     }, [isMobile, offsetTop, isInternal, yOffset]);
 
     // Apply smooth transition style

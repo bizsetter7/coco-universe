@@ -30,8 +30,8 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                     onClick={() => { setView('dashboard'); onClose(); }}
                     className="text-center pb-6 border-b border-gray-100 dark:border-gray-800 cursor-pointer active:opacity-70 transition"
                 >
-                    <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || '내 상점'}</h2>
-                    <p className="text-sm text-gray-500 font-bold tracking-tight">업주 관리자</p>
+                    <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (nickname === '최고 관리자' ? '관리 센터' : '내 상점')}</h2>
+                    <p className="text-sm text-gray-500 font-bold tracking-tight">{nickname === '최고 관리자' ? '시스템 최고 관리자' : '업주 관리자'}</p>
                 </div>
 
                 <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>

@@ -12,12 +12,12 @@ interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
-// Mock User Database for Validation (Always available for admin/test)
+// Mock User Database for Validation (Updated to match useAuth & LoginPage)
 const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = {
     'admin_shop': { type: 'business', name: '최고관리자' },
-    'admin_user': { type: 'personal', name: '테스트회원' },
-    'admin': { type: 'personal', name: '관리자' },
-    'test': { type: 'business', name: '테스트 계정' }
+    'admin_user': { type: 'personal', name: '마스터관리자' },
+    'test_shop': { type: 'business', name: '테스트 사장님' },
+    'test_user': { type: 'personal', name: '테스트 회원' }
 };
 
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
@@ -49,21 +49,30 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
 
         const foundUser = MOCK_USERS[targetId];
 
-        // Strict Validation: ID must exist AND its type must match the selected button
-        if (!foundUser || foundUser.type !== loginType) {
+        // [Fix] Bypass radio check for Admin accounts to prevent confusion
+        const isAdmin = targetId === 'admin_shop' || targetId === 'admin_user';
+
+        if (!foundUser || (!isAdmin && foundUser.type !== loginType)) {
             const typeText = loginType === 'business' ? '기업회원' : '개인회원';
             alert(`등록되지 않은 ID이거나,\n${typeText} 선택이 올바르지 않습니다.`);
             return;
         }
 
+        // [Security Hardening] Explicit Match Only for Admin/Test accounts
+        let sessionType: 'personal' | 'business' | 'admin' = foundUser.type === 'business' ? 'business' : 'personal';
+
+        // Exact IDs only for Admin elevation
+        if (targetId === 'admin_shop' || targetId === 'admin_user') {
+            sessionType = 'admin';
+        }
+
         // Success: Setup Session
-        const sessionType = foundUser.type === 'business' ? 'shop' : 'personal';
         const sessionData = {
             type: sessionType,
             name: foundUser.name,
-            id: targetId === 'admin_shop' ? 'admin_shop' : ('mock_user_' + targetId),
+            id: targetId,
             points: 50000,
-            shopId: targetId === 'admin_shop' ? 'shop_123' : undefined
+            shopId: (targetId === 'admin_shop' || targetId === 'test_shop') ? 'shop_123' : undefined
         };
         localStorage.setItem('user_session', JSON.stringify(sessionData));
         localStorage.setItem('user_type', sessionType);
@@ -153,12 +162,36 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
 
                     <div className="flex items-center gap-5 text-[10px] text-gray-400 font-bold">
                         <label className="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" /> 아이디저장
+                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" defaultChecked /> 아이디저장
                         </label>
                         <label className="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" /> 자동로그인
+                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" defaultChecked /> 자동로그인
                         </label>
                     </div>
+
+                    {/* [Quick Pass] Added for Manager Convenience - Only visible in Development */}
+                    {process.env.NODE_ENV !== 'production' && (
+                        <div className="pt-2 mt-2 border-t border-gray-50 grid grid-cols-3 gap-1.5">
+                            <button
+                                onClick={() => { setId('admin_user'); setPw('password123'); setLoginType('personal'); }}
+                                className="bg-gray-900 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
+                            >
+                                마스터퀵
+                            </button>
+                            <button
+                                onClick={() => { setId('test_shop'); setPw('password123'); setLoginType('business'); }}
+                                className="bg-red-500 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
+                            >
+                                기업퀵
+                            </button>
+                            <button
+                                onClick={() => { setId('test_user'); setPw('password123'); setLoginType('personal'); }}
+                                className="bg-slate-400 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
+                            >
+                                개인퀵
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* 4. Auth Box */}

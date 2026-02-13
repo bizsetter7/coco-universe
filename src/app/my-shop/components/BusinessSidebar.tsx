@@ -24,9 +24,17 @@ export const BusinessSidebar = ({
                     <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
                 </div>
                 <div className="mb-4">
-                    <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>{shopName || '내 상점'}</h2>
-                    {nickname && <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>{nickname}</p>}
-                    <p className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} `}>프리미엄 인증 업소</p>
+                    <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>
+                        {shopName || (nickname === '최고 관리자' ? '관리 센터' : '내 상점')}
+                    </h2>
+                    {nickname && (
+                        <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
+                            {nickname}
+                        </p>
+                    )}
+                    <p className={`text-xs font-bold ${nickname === '최고 관리자' ? 'text-purple-600 bg-purple-50 py-0.5 rounded-full inline-block px-3 border border-purple-100' : (brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')} `}>
+                        {nickname === '최고 관리자' ? '시스템 최상위 권한' : '프리미엄 인증 업소'}
+                    </p>
                 </div>
                 <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} `}>
                     사진 등록/수정

@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { Button } from '@/components/ui/button';
-import { Pencil, ChevronLeft, House, MessageCircle, Menu, LogOut, User } from 'lucide-react';
+import { Pencil, ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight } from 'lucide-react';
 
 import { PaymentPopup } from '../home/PaymentPopup';
 import MessageModal from '../message/MessageModal';
@@ -29,11 +29,9 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { isLoggedIn, user, logout } = useAuth();
+    const { isLoggedIn, user, userType, logout } = useAuth();
     const page = searchParams.get('page');
-
-    // Derive userRole for compatibility with existing logic
-    const userRole = user.type === 'shop' ? 'business' : (user.type === 'personal' ? 'personal' : (user.type === 'admin' ? 'admin' : 'guest'));
+    const userRole = userType;
 
     // [Auth] Role State
     const [isMounted, setIsMounted] = React.useState(false);
@@ -140,6 +138,16 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
             );
         }
 
+        // Admin Hub (New)
+        if (pathname?.startsWith('/admin')) {
+            return (
+                <div className="flex items-center gap-2">
+                    <ShieldCheck size={22} className="text-blue-600 animate-pulse" />
+                    <span className="text-lg md:text-xl font-black text-blue-600 tracking-tighter">시스템 최고 관리 센터</span>
+                </div>
+            );
+        }
+
         // Customer Center
         if (pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') {
             return (
@@ -169,7 +177,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
             <span className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 {brand.displayName?.split(' ')[0] || 'COCO'}
                 <span className="ml-0.5" style={{ color: brand.primaryColor || '#fbbf24' }}>
-                    {brand.displayName?.split(' ').slice(1).join(' ') || '코코알바'}
+                    {brand.displayName?.split(' ').slice(1).join(' ') || 'ALBA'}
                 </span>
             </span>
         );
@@ -216,13 +224,13 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                         <div className="hidden md:flex items-center gap-3 min-w-[120px] justify-end">
                             {isMounted && userRole && (
                                 <>
-                                    {userRole === 'guest' && (
+                                    {!isLoggedIn && (
                                         <span onClick={() => router.push('/?page=login')} className="cursor-pointer text-xs font-bold text-gray-500 hover:text-pink-500 transition-colors flex items-center gap-1">
                                             <User size={14} /> 로그인 / 회원가입
                                         </span>
                                     )}
 
-                                    {userRole !== 'guest' && (
+                                    {isLoggedIn && (
                                         <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => setShowMessageModal(true)}
@@ -236,27 +244,30 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                             </button>
 
                                             {userRole === 'admin' && (
-                                                <div onClick={() => router.push('/admin')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-gray-200">
-                                                    <div className="w-6 h-6 rounded-lg bg-gray-900 text-white flex items-center justify-center border border-gray-700 shadow-sm group-hover:scale-105 transition-transform">
-                                                        <span className="text-[10px] font-black">A</span>
+                                                <div onClick={() => router.push('/admin')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-slate-900 transition-all border border-transparent hover:border-slate-800">
+                                                    <div className="w-6 h-6 rounded-lg bg-slate-950 text-blue-400 flex items-center justify-center border border-slate-800 shadow-sm group-hover:scale-105 transition-transform">
+                                                        <ShieldCheck size={14} className="animate-pulse" />
                                                     </div>
-                                                    <span className="text-xs font-black text-gray-900 dark:text-gray-400">관리자</span>
+                                                    <div className="flex flex-col -space-y-0.5">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">System Master</span>
+                                                        <span className="text-xs font-black text-slate-900 group-hover:text-white transition-colors">시스템 관리자</span>
+                                                    </div>
                                                 </div>
                                             )}
 
-                                            {userRole === 'business' && (
+                                            {userRole === 'corporate' && (
                                                 <div onClick={() => router.push('/my-shop')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-blue-100">
-                                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center border shadow-sm group-hover:scale-105 transition-transform ${user.id === 'admin_shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
-                                                        <span className="text-[10px] font-black">{user.id === 'admin_shop' ? 'PRO' : 'B'}</span>
+                                                    <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm group-hover:scale-105 transition-transform">
+                                                        <span className="text-[10px] font-black">B</span>
                                                     </div>
                                                     <div className="flex flex-col -space-y-0.5">
                                                         <span className="text-[10px] font-bold text-gray-400">사장님</span>
-                                                        <span className={`text-xs font-black ${user.id === 'admin_shop' ? 'text-blue-600' : 'text-gray-900'}`}>{user.id === 'admin_shop' ? '프리미엄' : '일반'}</span>
+                                                        <span className="text-xs font-black text-gray-900">기업회원</span>
                                                     </div>
                                                 </div>
                                             )}
 
-                                            {userRole === 'personal' && (
+                                            {userRole === 'individual' && (
                                                 <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer group p-1.5 rounded-xl hover:bg-pink-50 dark:hover:bg-gray-800 transition-all border border-transparent hover:border-pink-100">
                                                     <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center border border-pink-100 shadow-sm group-hover:scale-105 transition-transform">
                                                         <span className="text-[10px] font-black">P</span>
@@ -280,7 +291,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                         </div>
 
                         <div className="md:hidden flex items-center gap-3">
-                            {isMounted && userRole && userRole !== 'guest' && (
+                            {isMounted && isLoggedIn && (
                                 <button
                                     onClick={() => setShowMessageModal(true)}
                                     className="p-1.5 text-gray-500 relative"
@@ -323,7 +334,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
             {/* Mobile Menu Drawer */}
             {
                 showMobileMenu && (
-                    <div className="fixed inset-0 z-[50000] md:hidden">
+                    <div className="fixed inset-0 z-[20000] md:hidden">
                         <div
                             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                             onClick={() => setShowMobileMenu(false)}
@@ -420,15 +431,19 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                                         ) : (
                                                             <div className="flex items-center gap-2">
                                                                 <div
-                                                                    onClick={() => { router.push('/my-shop'); setShowMobileMenu(false); }}
+                                                                    onClick={() => {
+                                                                        const targetPath = userRole === 'admin' ? '/admin' : '/my-shop';
+                                                                        router.push(targetPath);
+                                                                        setShowMobileMenu(false);
+                                                                    }}
                                                                     className={`flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg cursor-pointer transition-all active:scale-95 border ${brand.theme === 'dark'
                                                                         ? 'bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700'
                                                                         : 'bg-gray-50 border-gray-100 text-gray-700 hover:bg-gray-100'
                                                                         }`}
                                                                 >
-                                                                    <User size={14} className="text-purple-500" />
+                                                                    {userRole === 'admin' ? <ShieldCheck size={14} className="text-blue-400 animate-pulse" /> : <User size={14} className="text-purple-500" />}
                                                                     <span className="text-[11px] sm:text-sm font-black truncate max-w-[60px] sm:max-w-none">
-                                                                        {user?.name || '내 정보'}
+                                                                        {userRole === 'admin' ? '시스템 관리자' : (user?.name || '내 정보')}
                                                                     </span>
                                                                 </div>
                                                                 <button
@@ -448,8 +463,8 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                             </div>
                                         </div>
 
-                                        {userRole === 'personal' && (
-                                            <>
+                                        {userRole === 'individual' && (
+                                            <div className="space-y-1">
                                                 {[
                                                     { label: '이력서 리스트', id: 'resume-list' },
                                                     { label: '채용정보 스크랩', id: 'scrap-jobs' },
@@ -471,15 +486,29 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                                         {item.label}
                                                     </button>
                                                 ))}
-                                            </>
+                                            </div>
                                         )}
 
-                                        {userRole === 'business' && (
-                                            <>
-                                                <button onClick={() => { router.push('/my-shop?view=applicants'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">지원자 관리</button>
+                                        {userRole === 'corporate' && (
+                                            <div className="space-y-1">
+                                                <button onClick={() => { router.push('/my-shop?view=applicants'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50 group flex items-center justify-between">
+                                                    <span>지원자 관리</span>
+                                                    <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                                                </button>
                                                 <button onClick={() => { router.push('/my-shop?view=payments'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">결제 내역</button>
                                                 <button onClick={() => { router.push('/my-shop?view=member-info'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-gray-600 hover:bg-gray-50">회원정보 수정</button>
-                                            </>
+                                            </div>
+                                        )}
+
+                                        {userRole === 'admin' && (
+                                            <div className="space-y-1">
+                                                <div className="px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-gray-900 rounded-lg mb-1">Master Control</div>
+                                                <button onClick={() => { router.push('/admin'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-black text-blue-600 bg-blue-50/50 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2">
+                                                    <ShieldCheck size={16} /> 어드민 센터 이동
+                                                </button>
+                                                <button onClick={() => { router.push('/admin?tab=ads'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600 hover:bg-slate-50">광고 심사 관리</button>
+                                                <button onClick={() => { router.push('/admin?tab=users'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600 hover:bg-slate-50">전체 회원 관리</button>
+                                            </div>
                                         )}
 
                                         <div className="h-px bg-gray-100 dark:bg-gray-800 my-2"></div>
@@ -491,7 +520,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                     </div>
                 )
             }
-        </React.Fragment>
+        </React.Fragment >
     );
 }
 

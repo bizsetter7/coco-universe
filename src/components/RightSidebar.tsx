@@ -5,18 +5,20 @@ import { useRouter } from 'next/navigation';
 import { useBrand } from './BrandProvider';
 import { REGIONS_MAP } from '@/constants/regions'; // 경로 확인 필요
 import { ChevronRight, Crown, Phone, User, Settings, LogOut, ChevronRightCircle, Megaphone } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function RightSidebar() {
     const brand = useBrand();
     const router = useRouter();
 
-    // Mock User State
-    const isLoggedIn = true; // For demo
+    const { isLoggedIn, userName, userType, userPoints, logout } = useAuth();
+
+    // Derived User State for compatibility with sidebar UI
     const user = {
-        name: '게이00',
-        level: 1,
-        type: '기업회원',
-        points: 0,
+        name: userName || '게스트',
+        level: userType === 'admin' ? 99 : 1,
+        type: userType === 'admin' ? '최고 관리자' : (userType === 'corporate' ? '기업회원' : '일반회원'),
+        points: userPoints || 0,
     };
 
     const JOB_TYPES = ['룸싸롱', '나이트', '주점', '노래방', '바(Bar)', '카페', '일반음식점', 'PC방/오락실', '기타'];

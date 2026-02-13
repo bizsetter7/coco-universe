@@ -141,7 +141,9 @@ export default function LeftSidebar({
                                 </div>
                             </div>
                             <p className="text-[11px] text-gray-500 mb-2 text-center">
-                                회원님은 <span className="text-purple-600 font-bold">{userType === 'corporate' ? '기업회원' : '일반회원'}</span> 입니다.
+                                회원님은 <span className="text-purple-600 font-bold">
+                                    {userType === 'admin' ? '최고 관리자' : (userType === 'corporate' ? '기업회원' : '일반회원')}
+                                </span> 입니다.
                             </p>
                             <div className={`flex items-center gap-1 mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                                 <span className="text-[11px] text-gray-500">P</span>

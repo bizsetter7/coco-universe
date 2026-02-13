@@ -16,6 +16,11 @@ const SideAdCard = React.memo(({ ad, isGrand, onSelect }: { ad: Shop, isGrand: b
     const hasMedia = !!ad.options?.mediaUrl;
     const [imgError, setImgError] = useState(false);
 
+    // Reset error state when URL changes
+    useEffect(() => {
+        setImgError(false);
+    }, [ad.options?.mediaUrl]);
+
     // 2. Badge handling
     const getBadgeChar = () => {
         if (ad.payType) return ad.payType.substring(0, 1);
@@ -31,13 +36,17 @@ const SideAdCard = React.memo(({ ad, isGrand, onSelect }: { ad: Shop, isGrand: b
             className="group relative w-full h-[140px] bg-white rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all border border-gray-100 flex flex-col"
         >
             {/* 1. Image Area */}
-            <div className="relative w-full h-[85px] bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+            <div className={`relative w-full h-[85px] bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center ${!hasMedia || imgError ? 'animate-pulse' : ''}`}>
                 {hasMedia && !imgError ? (
                     <img
+                        key={ad.options?.mediaUrl} // Force re-render on URL change
                         src={ad.options?.mediaUrl}
                         alt={ad.name}
-                        loading="lazy" // [Optimization] Lazy load images
-                        onError={() => setImgError(true)}
+                        loading="eager" // [Optimization] Immediate load for banners
+                        onError={() => {
+                            // [Optimization] Silence network failures; UI shows fallback Crown icon
+                            setImgError(true);
+                        }}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 z-10 relative"
                     />
                 ) : (
