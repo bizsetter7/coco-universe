@@ -12,13 +12,10 @@ import {
     XCircle,
     Eye,
     Zap,
-    Smartphone,
     ArrowRight,
     Search,
     TrendingUp,
-    CreditCard,
     Bell,
-    HelpCircle,
     Megaphone,
     Mail,
     Lock,
@@ -27,7 +24,6 @@ import {
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
-import shopsData from '@/lib/data/shops.json';
 import { useAuth } from '@/hooks/useAuth';
 import { SEOIndexingControl } from '@/components/admin/SEOIndexingControl';
 import { supabase } from '@/lib/supabase';
@@ -47,12 +43,12 @@ export default function AdminPage() {
 function AdminContent() {
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn, user, userType } = useAuth();
-    const searchParams = useSearchParams();
+    const { isLoggedIn, userType } = useAuth();
+    useSearchParams();
 
     // --- 1. Core State Section ---
     const [shops, setShops] = useState<Shop[]>([]);
-    const [mockAds, setMockAds] = useState<any[]>([]); // This will sync with shops from DB
+    const [mockAds, setMockAds] = useState<Shop[]>([]); // This will sync with shops from DB
     const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('stats');
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
@@ -71,8 +67,8 @@ function AdminContent() {
     const [msgContent, setMsgContent] = useState('');
     const [sendSuccess, setSendSuccess] = useState(false);
     const [allMessages, setAllMessages] = useState<any[]>([]);
-    const [selectedMessageGroup, setSelectedMessageGroup] = useState<any>(null);
-    const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
+    const [selectedMessageGroup, setSelectedMessageGroup] = useState<any | null>(null);
+    const [selectedInquiry, setSelectedInquiry] = useState<any | null>(null);
 
     // --- 4. Mock Users (Can be moved to DB later) ---
     const [mockUsers, setMockUsers] = useState<any[]>([
@@ -91,17 +87,17 @@ function AdminContent() {
     // --- 5. Data Fetching (Supabase) ---
     const fetchData = async () => {
         try {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('shops')
                 .select('*')
                 .order('updated_at', { ascending: false });
 
             if (data) {
-                setShops(data);
-                setMockAds(data); // Sync mockAds with shops table
+                setShops(data as Shop[]);
+                setMockAds(data as Shop[]); // Sync mockAds with shops table
             }
-        } catch (error) {
-            console.error('Fetch error:', error);
+        } catch (err) {
+            console.error('Fetch error:', err);
         }
     };
 
@@ -271,7 +267,7 @@ function AdminContent() {
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                             <StatCard
                                 title="누적 매출 총액"
-                                value={`${(mockAds.filter(a => a.status === 'active').reduce((acc, current) => acc + current.price, 0) + 124030000).toLocaleString()} 원`}
+                                value={`${(mockAds.filter(a => a.status === 'active').reduce((acc, current) => acc + (current.price || 0), 0) + 124030000).toLocaleString()} 원`}
                                 trend="+12.5%"
                                 icon={<TrendingUp size={24} />}
                                 color="blue"
@@ -353,7 +349,7 @@ function AdminContent() {
                                                         <td className="px-8 py-6">
                                                             <div className="flex items-center gap-3">
                                                                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs shrink-0 ${ad.status === 'pending' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                                    {ad.category[0]}
+                                                                    {ad.category ? ad.category[0] : 'U'}
                                                                 </div>
                                                                 <div className="flex flex-col max-w-[120px] md:max-w-none">
                                                                     <div className="text-sm font-black text-slate-900 leading-tight mb-1 truncate">{ad.shopName}</div>
@@ -363,15 +359,15 @@ function AdminContent() {
                                                             </div>
                                                         </td>
                                                         <td className="px-8 py-6">
-                                                            <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">{ad.options}</div>
-                                                            <div className="text-[9px] text-blue-500 font-black mt-0.5 uppercase tracking-tighter">최근 수정: {ad.edits}/30회</div>
+                                                            <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">{ad.options ? JSON.stringify(ad.options) : '기본'}</div>
+                                                            <div className="text-[9px] text-blue-500 font-black mt-0.5 uppercase tracking-tighter">최근 수정: {ad.edits || 0}/30회</div>
                                                         </td>
                                                         <td className="px-8 py-6 text-center">
-                                                            <div className="text-sm font-black text-slate-950 tabular-nums whitespace-nowrap">{formatPrice(ad.price)}</div>
+                                                            <div className="text-sm font-black text-slate-950 tabular-nums whitespace-nowrap">{formatPrice(ad.price || 0)}</div>
                                                         </td>
                                                         <td className="px-8 py-6">
                                                             <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' : (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-400')}`}>
-                                                                {ad.status.toUpperCase()}
+                                                                {ad.status ? ad.status.toUpperCase() : 'UNKNOWN'}
                                                             </span>
                                                         </td>
                                                         <td className="px-8 py-6 text-right">
@@ -419,7 +415,7 @@ function AdminContent() {
                                                                             <div className="space-y-3">
                                                                                 <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
                                                                                     <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
-                                                                                    <span className="font-black text-blue-600">{ad.edits} / 30회</span>
+                                                                                    <span className="font-black text-blue-600">{ad.edits || 0} / 30회</span>
                                                                                 </div>
                                                                                 <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
                                                                                     <span className="font-bold text-slate-500">진행 중인 광고</span>

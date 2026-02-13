@@ -7,14 +7,16 @@ import { Step2JobDetail } from './components/form/steps/Step2JobDetail';
 import { Step3ProductSelect } from './components/form/steps/Step3ProductSelect';
 import { Step4Extras } from './components/form/steps/Step4Extras';
 
+import { BrandConfig } from '@/lib/brand-config';
+
 interface AdFormProps {
-    brand: any;
+    brand: BrandConfig;
     shopName: string; setShopName: (v: string) => void;
     isVerified: boolean;
     nickname: string; setNickname: (v: string) => void;
     managerName: string; setManagerName: (v: string) => void;
     managerPhone: string; setManagerPhone: (v: string) => void;
-    messengers: any; setMessengers: (v: any) => void;
+    messengers: { kakao: string; telegram: string }; setMessengers: (v: any) => void;
     title: string; setTitle: (v: string) => void;
     industryMain: string; setIndustryMain: (v: string) => void;
     industrySub: string; setIndustrySub: (v: string) => void;
@@ -22,8 +24,8 @@ interface AdFormProps {
     ageMax: number; setAgeMax: (v: number) => void;
     regionCity: string; setRegionCity: (v: string) => void;
     regionGu: string; setRegionGu: (v: string) => void;
-    payType: string; handlePayTypeChange: (e: any) => void;
-    payAmount: string; handlePayAmountChange: (e: any) => void;
+    payType: string; handlePayTypeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    payAmount: string; handlePayAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     selectedKeywords: string[]; setSelectedKeywords: (v: string[]) => void;
     setShowDesignModal: (v: boolean) => void;
     editorRef: React.RefObject<HTMLDivElement | null>;
@@ -33,7 +35,7 @@ interface AdFormProps {
     restoreSelection: () => void;
     syncEditorHtml: () => void;
     editorHtml: string;
-    toolbarStatus: any;
+    toolbarStatus: Record<string, boolean | string>;
     execCmd: (cmd: string, val?: string) => void;
     updateToolbarStatus: () => void;
     showFontMenu: boolean; setShowFontMenu: (v: boolean) => void;
@@ -43,16 +45,16 @@ interface AdFormProps {
     showEmojiMenu: boolean; setShowEmojiMenu: (v: boolean) => void;
     insertEmoji: (emoji: string) => void;
     selectedAdProduct: string | null; setSelectedAdProduct: (v: string) => void;
-    selectedAdPeriod: number; setSelectedAdPeriod: (v: any) => void;
+    selectedAdPeriod: number; setSelectedAdPeriod: (v: number) => void;
     paySuffixes: string[]; togglePaySuffix: (v: string) => void;
-    borderOption: string; setBorderOption: (v: any) => void;
-    borderPeriod: number; setBorderPeriod: (v: any) => void;
+    borderOption: string; setBorderOption: (v: string) => void;
+    borderPeriod: number; setBorderPeriod: (v: number) => void;
     selectedIcon: number | null; setSelectedIcon: (v: number | null) => void;
-    iconPeriod: number; setIconPeriod: (v: any) => void;
+    iconPeriod: number; setIconPeriod: (v: number) => void;
     selectedHighlighter: number | null; setSelectedHighlighter: (v: number | null) => void;
-    highlighterPeriod: number; setHighlighterPeriod: (v: any) => void;
+    highlighterPeriod: number; setHighlighterPeriod: (v: number) => void;
     totalAmount: number;
-    setExampleType: (v: any) => void;
+    setExampleType: (v: string) => void;
     setShowExampleModal: (v: boolean) => void;
     onSave?: () => void;
     onPreview?: () => void;

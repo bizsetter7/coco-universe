@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import {
-    MessageCircle,
     Heart,
     MessageSquare,
     Lock,
@@ -15,8 +14,6 @@ import {
     Sparkles,
     Apple,
     Info,
-    X,
-    ChevronDown,
     Moon,
     ThumbsUp,
     ChevronRight,
@@ -24,10 +21,8 @@ import {
     Star
 } from 'lucide-react';
 import { CATEGORIES, MOCK_POSTS } from '@/constants/community';
-import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { Footer } from '@/components/layout/Footer';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { supabase } from '@/lib/supabase';
 
@@ -64,23 +59,18 @@ function CommunityContent() {
     useBodyScrollLock(loginModalOpen || isCorporateModalOpen);
 
     const [posts, setPosts] = useState<Post[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
     const fetchPosts = async () => {
-        setIsLoading(true);
         try {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('community_posts')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (data) setPosts(data);
             else setPosts(MOCK_POSTS); // Fallback to mock if empty
-        } catch (error) {
-            console.error('Error fetching posts:', error);
+        } catch (err) {
+            console.error('Error fetching posts:', err);
             setPosts(MOCK_POSTS);
-        } finally {
-            setIsLoading(false);
         }
     };
 

@@ -43,10 +43,16 @@ export interface Shop {
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
     };
     // [Added] Admin/Ad Management
+    status?: 'pending' | 'approved' | 'rejected' | 'active' | 'expired';
+    category?: string;
+    shopName?: string;
+    ownerId?: string;
+    edits?: number;
     adStartDate?: string;
     adEndDate?: string;
     adDuration?: 30 | 60 | 90;
     adPrice?: number;
+    price?: number; // Legacy/Fallback
     lat?: number;
     lng?: number;
     // [Added] External Scraping Source Info

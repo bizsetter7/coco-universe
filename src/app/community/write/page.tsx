@@ -5,7 +5,6 @@ import {
     ArrowLeft,
     Image as ImageIcon,
     X,
-    Check,
     Home
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
