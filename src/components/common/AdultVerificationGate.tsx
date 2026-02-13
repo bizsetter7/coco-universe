@@ -70,6 +70,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
         const sessionData = {
             type: sessionType,
             name: foundUser.name,
+            nickname: targetId === 'admin_user' ? '전권대행' : (targetId === 'admin_shop' ? '슈퍼어드민' : foundUser.name),
             id: targetId,
             points: 50000,
             shopId: (targetId === 'admin_shop' || targetId === 'test_shop') ? 'shop_123' : undefined
@@ -173,7 +174,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                     {process.env.NODE_ENV !== 'production' && (
                         <div className="pt-2 mt-2 border-t border-gray-50 grid grid-cols-3 gap-1.5">
                             <button
-                                onClick={() => { setId('admin_user'); setPw('password123'); setLoginType('personal'); }}
+                                onClick={() => { setId('admin_user'); setPw('password123'); }}
                                 className="bg-gray-900 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
                             >
                                 마스터퀵

@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 
 // Unified user session type
 export interface UserSession {
-    type: 'shop' | 'personal' | 'admin' | 'guest';
+    type: 'corporate' | 'individual' | 'admin' | 'guest';
+    id: string;
     name: string;
+    nickname: string;
     points: number;
-    id?: string;
-    referrer?: string; // [New] Inflow Source
+    referrer?: string;
+    shopId?: string;
 }
 
 // Simple event-based auth hook for client-side demo
@@ -14,48 +16,44 @@ export function useAuth() {
     const [isLoggedIn, setIsLoggedInState] = useState(false);
     const [user, setUser] = useState<UserSession>({
         type: 'guest',
+        id: 'guest',
         name: '게스트',
+        nickname: '게스트',
         points: 0
     });
 
     const updateAuthStatus = () => {
         try {
             const sessionStr = localStorage.getItem('user_session');
-            const referrer = localStorage.getItem('user_referrer') || undefined;
-            let session = null;
-            if (sessionStr) {
-                if (sessionStr.startsWith('{')) {
-                    try {
-                        session = JSON.parse(sessionStr);
-                    } catch (e) {
-                        console.error('Session JSON parse error:', e);
-                    }
-                } else if (sessionStr.startsWith('active_')) {
-                    session = { type: localStorage.getItem('user_type') || 'guest', name: localStorage.getItem('user_name') || '회원' };
-                }
+            if (!sessionStr) {
+                setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+                setIsLoggedInState(false);
+                return;
             }
 
-            const type = (localStorage.getItem('user_type') || session?.type || 'guest') as UserSession['type'];
-            const name = session?.name || localStorage.getItem('user_name') || (type === 'guest' ? '로그인이 필요합니다' : '회원');
+            const session = JSON.parse(sessionStr);
+            setIsLoggedInState(true);
 
-            const loggedIn = !!sessionStr;
-            setIsLoggedInState(loggedIn);
+            // Normalize type based on whitelist or stored value
+            const finalType = (() => {
+                if (session.id === 'admin_user' || session.id === 'admin_shop') return 'admin';
+                if (session.id === 'test_shop' || session.type === 'corporate' || session.type === 'shop' || session.type === 'business') return 'corporate';
+                if (session.id === 'test_user' || session.type === 'individual' || session.type === 'personal') return 'individual';
+                return 'guest';
+            })() as UserSession['type'];
 
-            if (loggedIn && session) {
-                setUser({
-                    type: (session.type === 'admin' ? 'admin' : (session.type === 'shop' ? 'shop' : (session.type === 'personal' ? 'personal' : 'guest'))) as UserSession['type'],
-                    name: name,
-                    points: session.points || 50000,
-                    id: session.id,
-                    referrer: session.referrer || referrer
-                });
-            } else {
-                setUser({ type: 'guest', name: '게스트', points: 0 });
-                if (loggedIn) setIsLoggedInState(false);
-            }
+            setUser({
+                type: finalType,
+                id: session.id || 'unknown',
+                name: session.name || '회원',
+                nickname: session.nickname || session.name || '익명',
+                points: session.points || 0,
+                referrer: session.referrer,
+                shopId: session.shopId
+            });
         } catch (e) {
             console.error('Auth status sync error:', e);
-            setUser({ type: 'guest', name: '게스트', points: 0 });
+            setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
             setIsLoggedInState(false);
         }
     };
@@ -89,15 +87,20 @@ export function useAuth() {
         };
     }, []);
 
-    const login = (type: 'shop' | 'personal' | 'admin') => {
-        const mockSession = {
-            type,
-            name: type === 'admin' ? '시스템 최고 관리자' : (type === 'shop' ? '업주 관리자' : '일반 회원'),
-            id: type === 'admin' ? 'admin_master' : 'mock_user',
-            referrer: localStorage.getItem('user_referrer') || '기존 회원'
+    const login = (type: string, id?: string, name?: string, nickname?: string) => {
+        const targetType = (type === 'admin' ? 'admin' : (type === 'shop' || type === 'corporate' ? 'corporate' : 'individual')) as UserSession['type'];
+
+        const newUser: UserSession = {
+            type: targetType,
+            id: id || (targetType === 'admin' ? 'admin_shop' : (targetType === 'corporate' ? 'test_shop' : 'test_user')),
+            name: name || (targetType === 'admin' ? '최고관리자' : (targetType === 'corporate' ? '기업회원' : '일반회원')),
+            nickname: nickname || name || (targetType === 'admin' ? '최고관리자' : (targetType === 'corporate' ? '테스트사장님' : '테스트회원')),
+            points: 50000,
+            referrer: localStorage.getItem('user_referrer') || undefined
         };
-        localStorage.setItem('user_session', JSON.stringify(mockSession));
-        localStorage.setItem('user_type', type);
+        setUser(newUser);
+        localStorage.setItem('user_session', JSON.stringify(newUser));
+        localStorage.setItem('user_type', targetType);
         window.dispatchEvent(new Event('auth-change'));
     };
 
@@ -113,17 +116,9 @@ export function useAuth() {
         user,
         login,
         logout,
-        userType: (() => {
-            // [Security] Strict White-list checking for Admin/Super roles
-            if (user.id === 'admin_shop' || user.id === 'admin_user') return 'admin';
-            if (user.id === 'test_shop' || user.type === 'shop' || user.type === 'business') return 'corporate';
-            if (user.id === 'test_user') return 'individual';
-
-            // Default mappings
-            if (user.type === 'admin') return 'admin'; // Only if explicitly set in session record
-            return user.type === 'shop' || user.type === 'business' ? 'corporate' : 'individual';
-        })() as 'corporate' | 'individual' | 'admin',
+        userType: user.type,
         userName: user.name,
+        userNickname: user.nickname,
         userPoints: user.points,
         userReferrer: user.referrer
     };

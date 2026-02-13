@@ -17,19 +17,19 @@ export const LoginPage = () => {
         const pw = loginPassword.trim();
 
         if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
-            login('admin');
+            login('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
             alert('마스터 관리자로 로그인되었습니다. (관리자 페이지 접근 가능)');
             window.location.href = '/admin';
         } else if (id === 'test_shop' && pw === 'password123') {
-            login('shop');
+            login('shop', id, '테스트 사장님', '번창하는조사장');
             alert('기업 회원(업주)으로 로그인되었습니다.\n광고 신청 및 내 업소 관리가 가능합니다.');
             window.location.href = '/';
         } else if (id === 'test_user' && pw === 'password123') {
-            login('personal');
+            login('personal', id, '테스트 회원', '밤의요정');
             alert('일반 회원으로 로그인되었습니다.\n커뮤니티 및 인재정보 이용이 가능합니다.');
             window.location.href = '/';
         } else {
-            alert(`아이디 또는 비밀번호가 올바르지 않습니다.\n입력값: [${id}]\n(관리자: admin_user / 기업: test_shop / 개인: test_user)`);
+            alert(`아이디 또는 비밀번호가 올바르지 않습니다.\n입력값: [${id}]\\n(관리자: admin_user / 기업: test_shop / 개인: test_user)`);
         }
     };
 

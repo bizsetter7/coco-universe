@@ -3,12 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Home, MessageSquare, User, Sparkles, Plus, ChevronDown, ChevronUp } from 'lucide-react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useBrand } from '../BrandProvider';
-
-// ... imports
 import { PaymentPopup } from '@/components/home/PaymentPopup';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useBrand } from '@/components/BrandProvider';
 import { NoteService } from '@/lib/noteService';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -25,16 +22,15 @@ const MobileBottomNavContent = () => {
     const brand = useBrand();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { userType, logout } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
 
-    const [userType, setUserType] = useState<string | null>(null);
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
         setMounted(true);
-        setUserType(localStorage.getItem('user_type'));
 
         const updateUnreadCount = () => {
             const unread = NoteService.getUnread('user');
@@ -47,13 +43,24 @@ const MobileBottomNavContent = () => {
         return () => window.removeEventListener('notes-updated', updateUnreadCount);
     }, []);
 
-    const navItems = [
+    const navItems = userType === 'admin' ? [
+        { label: '홈', icon: <Home size={24} />, href: '/' },
+        { label: '통계', icon: <Sparkles size={24} />, href: '/admin?tab=dashboard' },
+        {
+            label: '회원관리',
+            icon: <Plus size={32} className="text-white" />,
+            href: '/admin?tab=users',
+            isMain: true
+        },
+        { label: '심사', icon: <MessageSquare size={24} />, href: '/admin?tab=ad-audit' },
+        { label: '설정', icon: <User size={24} />, href: '/admin?tab=settings' },
+    ] : [
         { label: '홈', icon: <Home size={24} />, href: '/' },
         { label: '커뮤니티', icon: <MessageSquare size={24} />, href: '/community' },
         {
-            label: mounted && userType === 'personal' ? '이력서등록' : '광고등록',
+            label: mounted && (userType === 'individual') ? '이력서등록' : '광고등록',
             icon: <Plus size={32} className="text-white" />,
-            href: mounted && userType === 'personal' ? '/my-shop?view=resume-form' : '/ad-register',
+            href: mounted && userType === 'individual' ? '/my-shop?view=resume-form' : '/ad-register',
             isMain: true
         },
         { label: '쪽지함', icon: <MessageSquare size={24} />, href: '#message-modal', isAction: true },
@@ -63,17 +70,15 @@ const MobileBottomNavContent = () => {
     const isDark = brand.theme === 'dark';
 
     const handleMainBtnClick = (e: React.MouseEvent) => {
-        if (mounted && userType === 'personal') {
-            // Personal users go to resume form
+        if (mounted && userType === 'individual') {
             router.push('/my-shop?view=resume-form');
+        } else if (mounted && userType === 'admin') {
+            router.push('/admin?tab=users');
         } else {
-            // Business or Guest users see payment popup
             e.preventDefault();
             setShowPaymentPopup(true);
         }
     };
-
-    const { logout } = useAuth();
 
     const handleLogout = () => {
         if (confirm('로그아웃 하시겠습니까?')) {

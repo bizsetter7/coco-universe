@@ -10,6 +10,7 @@ import {
 import { useBrand } from '@/components/BrandProvider';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useAuth } from '@/hooks/useAuth';
 
 // --- Components ---
 import BusinessDashboard from './components/dashboard/BusinessDashboard';
@@ -93,10 +94,9 @@ function MyShopContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const brand = useBrand();
-
-    // View States
+    const { userType: authUserType, user: authUser } = useAuth();
     const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'ongoing-ads' | 'closed-ads' | 'payments' | 'applicants' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
-    const [userType, setUserType] = useState<'business' | 'personal' | 'admin' | null>(null);
+    const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
     const [editingAdId, setEditingAdId] = useState<number | null>(null);
 
@@ -170,29 +170,25 @@ function MyShopContent() {
     // Prevent Leave
     usePreventLeave(formState.isDirty && view === 'form');
 
-    // --- Auth & Init ---
+    // --- Auth & Init (Synced with useAuth) ---
     useEffect(() => {
-        const storedUserType = localStorage.getItem('user_type');
-        const sessionStr = localStorage.getItem('user_session');
-        const session = sessionStr ? JSON.parse(sessionStr) : {};
-
-        if (storedUserType === 'admin' || session.id === 'admin_shop' || session.id === 'admin_user' || session.type === 'admin') {
-            setUserType('admin');
-            formState.setShopName(session.name || '관리 센터');
-            formState.setNickname('최고 관리자');
-            formState.setIsVerified(true);
-        } else {
-            setUserType(storedUserType === 'personal' ? 'personal' : 'business');
-            if (session.name) formState.setShopName(session.name);
-            if (session.nickname) formState.setNickname(session.nickname);
+        if (authUserType) {
+            if (authUserType === 'admin') {
+                // [Security] Admins should always use /admin for their dashboard
+                router.replace('/admin');
+                return;
+            }
+            setUserType(authUserType);
+            if (authUser.name) formState.setShopName(authUser.name);
+            if (authUser.nickname) formState.setNickname(authUser.nickname);
         }
 
-        const isLoggedIn = localStorage.getItem('user_session') || localStorage.getItem('isLoggedIn');
+        const isLoggedIn = localStorage.getItem('user_session');
         if (!isLoggedIn) {
             alert('로그인이 필요한 서비스입니다.');
             router.replace('/?page=login');
         }
-    }, [router]);
+    }, [authUserType, authUser, router]);
 
     // --- View Sync from URL ---
     useEffect(() => {
@@ -427,7 +423,7 @@ function MyShopContent() {
         return <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} />;
     }
 
-    if (userType === 'personal') {
+    if (userType === 'individual') {
         return <PersonalDashboard view={view} setView={setView} />;
     }
 
@@ -523,9 +519,9 @@ function MyShopContent() {
             {view !== 'form' && (
                 <div className="max-w-6xl mx-auto px-4 md:px-6">
 
-                    <div className={`grid grid-cols-1 ${(userType as string) === 'personal' ? '' : 'md:grid-cols-4'} gap-4 md:py-6`}>
+                    <div className={`grid grid-cols-1 ${(userType as string) === 'individual' ? '' : 'md:grid-cols-4'} gap-4 md:py-6`}>
                         {/* PC Sidebar Persistence for business views (excluding AdForm) */}
-                        {(userType === 'business' || userType === 'admin') && (
+                        {(userType === 'corporate' || userType === 'admin') && (
                             <BusinessSidebar
                                 brand={brand}
                                 shopName={formState.shopName}
@@ -535,7 +531,7 @@ function MyShopContent() {
                             />
                         )}
 
-                        <div className={(userType as string) === 'personal' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-4'}>
+                        <div className={(userType as string) === 'individual' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-4'}>
                             {view === 'member-info' && (
                                 <MemberInfoForm
                                     {...formState}
