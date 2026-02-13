@@ -77,9 +77,9 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                     </div>
                     <div>
                         <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>휴대폰 번호</label>
-                        <div className="flex gap-2">
-                            <input type="text" value={formData.phone} readOnly className={`flex-1 p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`} />
-                            <button className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shrink-0">재인증</button>
+                        <div className="flex items-center gap-2">
+                            <input type="text" value={formData.phone} readOnly className={`flex-1 min-w-0 p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`} />
+                            <button className="px-4 py-3 md:py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-black shrink-0 transition shadow-lg shadow-indigo-500/20 active:scale-95">재인증</button>
                         </div>
                     </div>
                 </div>

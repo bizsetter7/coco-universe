@@ -81,7 +81,7 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
             <div className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100 dark:border-gray-800">
                     <h2 className={`text-xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        <span className="text-pink-500">{userName}</span> 회원 이력서 등록
+                        나의 이력서 등록
                     </h2>
                     <div className="text-xs font-bold text-gray-400">MY PERSONAL HISTORY</div>
                 </div>

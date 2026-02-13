@@ -57,7 +57,7 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
                 </button>
             </div>
 
-            <nav className={`p-3 rounded-[32px] border shadow-sm space-y-1 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
+            <nav className={`hidden md:block p-3 rounded-[32px] border shadow-sm space-y-1 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
                 {menuItems.map((item) => (
                     <button
                         key={item.id}
@@ -75,7 +75,7 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
 
             <button
                 onClick={() => { localStorage.clear(); window.location.href = '/'; }}
-                className={`w-full p-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-400' : 'bg-gray-50 hover:bg-gray-100 text-gray-500'}`}
+                className={`hidden md:flex w-full p-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-400' : 'bg-gray-50 hover:bg-gray-100 text-gray-500'}`}
             >
                 <LogOut size={16} /> 로그아웃
             </button>
