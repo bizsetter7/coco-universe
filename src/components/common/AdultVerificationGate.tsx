@@ -55,7 +55,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             const response = await window.PortOne.requestIdentityVerification({
                 storeId: "store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a",
                 identityVerificationId: `verif-${Date.now()}`,
-                channelKey: "channel-key-831464c8-0402-4ec6-993d-4467773f9d37", // Needs update
+                channelKey: "channel-key-45817f30-f654-4332-ac51-d717a78d0846",
             });
 
             if (response.code !== undefined) {
@@ -83,7 +83,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             }
         } catch (error: any) {
             console.error('PortOne Error:', error);
-            alert(`인증 오류 발생: ${error.message || '알 수 없는 오류'}\n(Store ID와 Channel Key가 일치하는지 확인해주세요.)`);
+            alert(`인증 과정 중 오류가 발생했습니다. (사유: ${error.message || '네트워크 오류'})`);
         }
     };
 
