@@ -60,6 +60,8 @@ function AdminContent() {
     const [userFilter, setUserFilter] = useState<'all' | 'corporate' | 'individual'>('all');
     const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
     // --- 3. Message/Modal State ---
     const [isGlobalMsgOpen, setIsGlobalMsgOpen] = useState(false);
@@ -250,16 +252,73 @@ function AdminContent() {
                         <p className="text-slate-400 font-bold text-xs md:text-sm mt-2">환영합니다, 사장님. 플랫폼의 모든 흐름이 당신의 손끝에 있습니다.</p>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex -space-x-3">
+                    <div className="flex items-center gap-4 relative">
+                        <div
+                            className="flex -space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                        >
                             <div className="w-10 h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[10px] font-black text-pink-600 shadow-sm z-30">AD</div>
                             <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm z-20">MB</div>
                             <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 shadow-sm z-10">+</div>
                         </div>
-                        <button className="relative p-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
-                            <Bell size={20} className="text-slate-400" />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white"></span>
-                        </button>
+
+                        {isProfileMenuOpen && (
+                            <div className="absolute top-14 right-14 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-[10010] p-2 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="p-3 border-b border-slate-50 mb-1">
+                                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">MASTER ADMIN</p>
+                                    <p className="text-sm font-black text-slate-950">운영자 계정</p>
+                                </div>
+                                <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">프로필 설정</button>
+                                <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">로그 관리</button>
+                                <button
+                                    onClick={() => { localStorage.clear(); window.location.href = '/'; }}
+                                    className="w-full text-left px-3 py-2 text-xs font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+                                >
+                                    로그아웃
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                                className="relative p-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
+                            >
+                                <Bell size={20} className="text-slate-400" />
+                                {mockAds.filter(a => a.status === 'pending').length > 0 && (
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white animate-pulse"></span>
+                                )}
+                            </button>
+
+                            {isNotificationOpen && (
+                                <div className="absolute top-14 right-0 w-72 md:w-80 bg-white border border-slate-100 rounded-3xl shadow-2xl z-[10010] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                                        <p className="text-xs font-black text-slate-900">실시간 알림</p>
+                                        <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.5 rounded-full font-black">
+                                            {mockAds.filter(a => a.status === 'pending').length}
+                                        </span>
+                                    </div>
+                                    <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                                        {mockAds.filter(a => a.status === 'pending').map(ad => (
+                                            <div key={ad.id} className="p-4 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setActiveTab('ads'); setIsNotificationOpen(false); }}>
+                                                <p className="text-[11px] font-black text-slate-900">신규 광고 신청</p>
+                                                <p className="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight">
+                                                    [{ad.region}] {ad.shopName} 사장님이 승인을 기다리고 있습니다.
+                                                </p>
+                                            </div>
+                                        ))}
+                                        {mockAds.filter(a => a.status === 'pending').length === 0 && (
+                                            <div className="p-10 text-center">
+                                                <p className="text-xs text-slate-400 font-bold">새로운 알림이 없습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
+                                        <button className="text-[10px] font-black text-blue-600 hover:underline">모든 알림 읽음 처리</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </header>
 
