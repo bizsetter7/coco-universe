@@ -6,7 +6,6 @@ import { CreditCard, AlertCircle, ChevronLeft, Phone, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 
 export default function CardNoticePage() {
-    const brand = useBrand();
     const router = useRouter();
 
     const pinkColor = "#FF1B51"; // Vivid Pink from user screenshot

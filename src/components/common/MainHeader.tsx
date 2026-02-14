@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { Button } from '@/components/ui/button';
-import { Pencil, ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight } from 'lucide-react';
+import { ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight } from 'lucide-react';
 
 import { PaymentPopup } from '../home/PaymentPopup';
 import MessageModal from '../message/MessageModal';
@@ -188,7 +188,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
             <header
                 className={`sticky top-0 z-[10000] w-full h-[56px] border-b ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
             >
-                <div className="w-full max-w-[1432px] h-full flex items-center justify-between mx-auto px-4 xl:px-[176px]">
+                <div className="w-full max-w-[1432px] h-full flex items-center justify-between mx-auto px-4 xl:px-[192px]">
                     <div className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
                         {shouldShowBackButton && (
                             <div

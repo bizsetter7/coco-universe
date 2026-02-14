@@ -2,10 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info, Clock, Crown } from 'lucide-react';
+import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
-import { HIGHLIGHTERS } from '../constants';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
@@ -22,15 +21,9 @@ const TIER_GRADIENTS: Record<string, string> = {
     common: 'bg-gray-50'
 };
 
-const PAY_TYPE_BADGES: Record<string, string> = {
-    '시급': 'bg-red-100 text-red-600',
-    '일급': 'bg-blue-100 text-blue-600',
-    '주급': 'bg-green-100 text-green-600',
-    '월급': 'bg-purple-100 text-purple-600',
-    '건별': 'bg-gray-100 text-gray-600',
-};
 
-export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => void, brand: any }) => {
+
+export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void }) => {
     const [mounted, setMounted] = useState(false);
 
     useBodyScrollLock(!!ad);
@@ -47,14 +40,12 @@ export const AdDetailModal = ({ ad, onClose, brand }: { ad: any, onClose: () => 
     const tier = ad.productType === '그랜드' || ad.productType === 'p1' ? 'grand' :
         ad.productType === '프리미엄' || ad.productType === 'p2' ? 'premium' : 'grand'; // Default to grand for preview if unknown
 
-    const isTiered = true; // Always treated as tiered in this modal context
     const headerBg = TIER_GRADIENTS[tier] || TIER_GRADIENTS['grand'];
 
     // Keywords Simulation
     const keywords = ad.keywords || [];
 
-    // Pay Option Simulation
-    const payOption = ad.options?.paySuffixes?.[0] || '협의가능';
+
 
     return createPortal(
         <div

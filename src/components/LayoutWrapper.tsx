@@ -9,7 +9,6 @@ import { useMobile } from '@/hooks/useMobile';
 import { MobileBottomNav } from './ui/MobileBottomNav';
 import { useBrand } from './BrandProvider';
 import { Footer } from './layout/Footer';
-import { LAYOUT } from '@/constants/layout';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
 import { AdultVerificationGate } from './common/AdultVerificationGate';
@@ -22,7 +21,6 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
-    const brand = useBrand();
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
 
     React.useEffect(() => {
@@ -57,10 +55,10 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             */}
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                <div className={isMobile || isAdminPage ? "block min-h-full" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-4 xl:px-0 min-h-full"}>
+                <div className={isMobile || isAdminPage ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
                     {/* Left Sidebar Spacer + Component */}
                     {(!isMobile && !isAdminPage) && (
-                        <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
+                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
                             <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="left" shops={sideAds} />
                             </StickyWrapper>
@@ -74,7 +72,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
                     {/* Right Sidebar Spacer + Component */}
                     {(!isMobile && !isAdminPage) && (
-                        <aside className="hidden xl:block w-[160px] relative h-auto min-h-full z-[50]">
+                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
                             <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="right" shops={sideAds} />
                             </StickyWrapper>

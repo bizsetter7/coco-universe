@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
-import { Button } from '@/components/ui/button';
-import { Crown } from 'lucide-react';
+
 
 export const HeroSection = () => {
-    const brand = useBrand();
     const router = useRouter();
     const [bannerIndex, setBannerIndex] = useState(0);
 
@@ -32,14 +30,14 @@ export const HeroSection = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setBannerIndex(prev => (prev + 1) % BANNERS.length);
+            setBannerIndex(prev => (prev + 1) % 2); // BANNERS.length is 2
         }, 5000);
         return () => clearInterval(interval);
     }, []);
 
     const currentBanner = BANNERS[bannerIndex];
 
-    const primaryStyle = { color: brand.primaryColor };
+
 
     return (
         <div className="relative w-full h-[260px] md:h-[320px] overflow-hidden bg-gray-900 text-white shadow-md">

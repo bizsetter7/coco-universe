@@ -24,78 +24,96 @@ export const StickyWrapper = ({
     const isMobile = useMobile();
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [yOffset, setYOffset] = useState(0);
-    const prevScrollY = useRef(0);
+    const yOffsetRef = useRef(0);
+    const requestRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (isMobile) return;
+        if (isMobile) {
+            setYOffset(0);
+            return;
+        }
 
         const handleScroll = () => {
-            if (!wrapperRef.current) return;
+            const wrapper = wrapperRef.current;
+            const parent = wrapper?.parentElement;
+            if (!wrapper || !parent) return;
 
+            // 1. Fundamental dimensions
             const scrollY = window.scrollY;
             const viewportHeight = window.innerHeight;
-            const isScrollingDown = scrollY > prevScrollY.current;
-            const footer = document.querySelector('footer');
-            const footerTop = footer ? footer.offsetTop : document.body.scrollHeight;
+            const wrapperHeight = wrapper.offsetHeight;
+            const parentRect = parent.getBoundingClientRect();
+            const parentHeight = parent.offsetHeight;
 
-            const parentRect = wrapperRef.current.parentElement?.getBoundingClientRect();
-            const parentTop = parentRect ? parentRect.top + scrollY : 0;
-            const wrapperHeight = wrapperRef.current.offsetHeight;
+            // Calculate current relative position
+            // parentRect.top is the distance from viewport top to parent top
+            const parentTopInViewport = parentRect.top;
 
-            let targetY = yOffset;
+            let targetY = yOffsetRef.current;
 
-            // Scenario A: Wrapper is shorter than viewport -> Simple sticky top
+            // Simple Mode: Just follow the top with offset
             if (wrapperHeight + offsetTop < viewportHeight || !isInternal) {
-                targetY = Math.max(0, scrollY + offsetTop - parentTop);
+                targetY = offsetTop - parentTopInViewport;
             }
-            // Scenario B: Wrapper is taller than viewport -> Dual Sticky
+            // Dual Sticky Mode: Handle taller-than-viewport items
             else {
-                if (isScrollingDown) {
-                    // When scrolling down, follow when bottom hits viewport bottom
-                    const bottomLimit = scrollY + viewportHeight - wrapperHeight - parentTop - 20;
-                    targetY = Math.max(yOffset, bottomLimit);
+                const currentScrollY = window.scrollY;
+                const prevS = (wrapperRef as any)._prevS || 0;
+                const isDown = currentScrollY > prevS;
+                (wrapperRef as any)._prevS = currentScrollY;
+
+                if (isDown) {
+                    const bLimit = viewportHeight - wrapperHeight - parentTopInViewport - 20;
+                    targetY = Math.max(targetY, bLimit);
                 } else {
-                    // When scrolling up, follow when top hits viewport top (offsetTop)
-                    const topLimit = scrollY + offsetTop - parentTop;
-                    targetY = Math.min(yOffset, topLimit);
+                    const tLimit = offsetTop - parentTopInViewport;
+                    targetY = Math.min(targetY, tLimit);
                 }
             }
 
-            // Global Boundary: Don't push into footer
-            if (parentTop + targetY + wrapperHeight + 20 > footerTop) {
-                targetY = footerTop - 20 - wrapperHeight - parentTop;
+            // Boundary Check: Never leave parent area
+            // Ensure we don't go above the parent and stay within parent bounds
+            const maxAllowedY = parentHeight - wrapperHeight;
+            targetY = Math.max(0, Math.min(targetY, maxAllowedY));
+
+            // Smoothness Guard
+            if (Math.abs(yOffsetRef.current - targetY) > 0.01) {
+                yOffsetRef.current = targetY;
+                setYOffset(targetY);
             }
-
-            // Ensure we don't jump above parent starting point
-            targetY = Math.max(0, targetY);
-
-            setYOffset(targetY);
-            prevScrollY.current = scrollY;
         };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        const onScroll = () => {
+            if (requestRef.current !== null) {
+                cancelAnimationFrame(requestRef.current);
+            }
+            requestRef.current = requestAnimationFrame(handleScroll);
+        };
 
-        // [New] ResizeObserver to handle dynamic height changes (e.g. image loads)
-        const resizeObserver = new ResizeObserver(() => {
-            handleScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Resize observer to handle dynamic content height changes
+        const ro = new ResizeObserver(() => {
+            if (requestRef.current !== null) cancelAnimationFrame(requestRef.current);
+            requestRef.current = requestAnimationFrame(handleScroll);
         });
 
-        if (wrapperRef.current) {
-            resizeObserver.observe(wrapperRef.current);
-        }
+        if (wrapperRef.current) ro.observe(wrapperRef.current);
+        if (document.body) ro.observe(document.body);
 
+        // Initial call
         handleScroll();
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-            resizeObserver.disconnect();
+            window.removeEventListener('scroll', onScroll);
+            if (requestRef.current !== null) cancelAnimationFrame(requestRef.current);
+            ro.disconnect();
         };
-    }, [isMobile, offsetTop, isInternal, yOffset]);
+    }, [isMobile, offsetTop, isInternal]);
 
-    // Apply smooth transition style
     const followerStyle: React.CSSProperties = isMobile ? {} : {
         transform: `translateY(${yOffset}px)`,
-        transition: 'transform 1.0s cubic-bezier(0.15, 0.3, 0.15, 1)', // Adjusted to ~1s delay with smoother entry
+        transition: 'transform 0.4s cubic-bezier(0.2, 0, 0.2, 1)',
         willChange: 'transform',
         zIndex: 50
     };

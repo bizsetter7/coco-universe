@@ -3,8 +3,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    Store, List, User, CreditCard, MessageCircle,
-    Home, Briefcase, Star, AlertTriangle, FileText,
     PlusSquare, AlignLeft, LayoutDashboard, Settings, Menu
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
@@ -21,7 +19,6 @@ import { useAdFormState } from './useAdFormState';
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
 import { DesignRequestModal } from './components/DesignRequestModal';
-import { MobilePreviewModal as PreviewModal } from './components/MobilePreviewModal';
 import { ExampleModal } from './components/ExampleModal';
 import { AdDetailModal } from './components/AdDetailModal';
 import { BusinessMobileMenu } from './components/BusinessMobileMenu';
@@ -70,7 +67,6 @@ import { ApplicantsView } from './components/ApplicantsView';
 import { PersonalMobileMenu } from './components/PersonalMobileMenu';
 import { PersonalMemberEdit } from './components/PersonalMemberEdit';
 import { ResumeForm } from './components/ResumeForm';
-import { ComingSoonView } from './components/ComingSoonView';
 
 // --- Constants (Exported for sub-components) ---
 import { JOB_CATEGORY_MAP as INDUSTRY_DATA_MAP } from '@/constants/jobs';
@@ -155,7 +151,6 @@ function MyShopContent() {
     // Modal States
     const [showWarningModal, setShowWarningModal] = useState(false);
     const [showDesignModal, setShowDesignModal] = useState(false);
-    const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showExampleModal, setShowExampleModal] = useState(false);
     const [exampleType, setExampleType] = useState<any>(null);
@@ -165,7 +160,7 @@ function MyShopContent() {
     const formState = useAdFormState();
 
     // Body Scroll Lock (ALL MODALS)
-    useBodyScrollLock(!!selectedAdForModal || showWarningModal || showDesignModal || showPreviewModal || showMobileMenu || showExampleModal);
+    useBodyScrollLock(!!selectedAdForModal || showDesignModal || showMobileMenu || showExampleModal);
 
     // Prevent Leave
     usePreventLeave(formState.isDirty && view === 'form');
@@ -188,7 +183,7 @@ function MyShopContent() {
             alert('로그인이 필요한 서비스입니다.');
             router.replace('/?page=login');
         }
-    }, [authUserType, authUser, router]);
+    }, [authUserType, authUser, router, formState]);
 
     // --- View Sync from URL ---
     useEffect(() => {
@@ -228,7 +223,7 @@ function MyShopContent() {
                 }
             }
         }
-    }, [searchParams, view, isDataLoaded, registeredAds, editingAdId]);
+    }, [searchParams, view, isDataLoaded, registeredAds, editingAdId, formState]);
 
     // Handlers
     const onPreview = () => {
@@ -427,13 +422,7 @@ function MyShopContent() {
         return <PersonalDashboard view={view} setView={setView} />;
     }
 
-    // [New] Admin View handling - Use business layout but with admin identity
-    const isAdmin = userType === 'admin';
 
-    const currentFormData = {
-        ...formState,
-        editorHtml: formState.editorRef.current?.innerHTML || ''
-    };
 
     // Helper functions for AdForm (extracted from original logic)
     const execCmd = (cmd: string, val?: string) => {
@@ -498,7 +487,6 @@ function MyShopContent() {
             {selectedAdForModal && (
                 <ErrorBoundary>
                     <AdDetailModal
-                        brand={brand}
                         ad={selectedAdForModal}
                         onClose={() => setSelectedAdForModal(null)}
                     />
@@ -629,6 +617,11 @@ function MyShopContent() {
                         onSave={handleSave}
                         onBack={handleBack}
                         onPreview={onPreview}
+                        setSelectedAdPeriod={(v: number) => formState.setSelectedAdPeriod(v as 30 | 60 | 90)}
+                        setBorderOption={(v: string) => formState.setBorderOption(v as 'none' | 'color' | 'glow' | 'sparkle')}
+                        setBorderPeriod={(v: number) => formState.setBorderPeriod(v as 30 | 60 | 90)}
+                        setIconPeriod={(v: number) => formState.setIconPeriod(v as 30 | 60 | 90)}
+                        setHighlighterPeriod={(v: number) => formState.setHighlighterPeriod(v as 30 | 60 | 90)}
                     />
                 </div>
             ) : null}

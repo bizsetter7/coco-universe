@@ -66,8 +66,8 @@ function CommunityContent() {
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (data) setPosts(data);
-            else setPosts(MOCK_POSTS); // Fallback to mock if empty
+            if (data && data.length > 0) setPosts(data);
+            else setPosts(MOCK_POSTS); // Fallback to mock if empty or null
         } catch (err) {
             console.error('Error fetching posts:', err);
             setPosts(MOCK_POSTS);
@@ -647,7 +647,7 @@ function LoungeServiceCard({ title, desc, buttonText, icon, color, shadowColor, 
             className={`group p-4 md:p-8 rounded-[32px] cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm border flex flex-col items-start text-left gap-4 md:gap-6 ${brand.theme === 'dark' ? `bg-gray-800 border-gray-700` : `bg-white border-gray-100`}`}
         >
             <div className={`text-white ${color} ${shadowColor} w-10 h-10 md:w-16 md:h-16 rounded-2xl md:rounded-[20px] flex items-center justify-center shadow-lg transition-transform group-hover:rotate-6`}>
-                {React.cloneElement(icon as React.ReactElement, { className: 'w-5 h-5 md:w-8 md:h-8' } as any)}
+                {React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className: 'w-5 h-5 md:w-8 md:h-8' })}
             </div>
 
             <div className="space-y-1.5 md:space-y-3 flex-1">

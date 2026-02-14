@@ -26,6 +26,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
 import { useAuth } from '@/hooks/useAuth';
 import { SEOIndexingControl } from '@/components/admin/SEOIndexingControl';
+import { CompetitorAnalysis } from '@/components/admin/CompetitorAnalysis';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -41,13 +42,11 @@ export default function AdminPage() {
 }
 
 function AdminContent() {
-    const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType } = useAuth();
     useSearchParams();
 
     // --- 1. Core State Section ---
-    const [shops, setShops] = useState<Shop[]>([]);
     const [mockAds, setMockAds] = useState<Shop[]>([]); // This will sync with shops from DB
     const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('stats');
     const [isAuthorized, setIsAuthorized] = useState(false);
@@ -67,11 +66,10 @@ function AdminContent() {
     const [msgContent, setMsgContent] = useState('');
     const [sendSuccess, setSendSuccess] = useState(false);
     const [allMessages, setAllMessages] = useState<any[]>([]);
-    const [selectedMessageGroup, setSelectedMessageGroup] = useState<any | null>(null);
     const [selectedInquiry, setSelectedInquiry] = useState<any | null>(null);
 
     // --- 4. Mock Users (Can be moved to DB later) ---
-    const [mockUsers, setMockUsers] = useState<any[]>([
+    const [mockUsers] = useState<any[]>([
         { id: 'user_01', loginId: 'koko123', name: '김코코', nickname: '날아라코코', birth: '1995-05-15', phone: '010-1234-5678', email: 'koko@gmail.com', type: 'individual', status: 'active', joinDate: '2026-02-01', referrer: '구글 검색', statusHistory: ['2026-02-01 가입'] },
         { id: 'user_02', loginId: 'shop_master', name: '이사장', nickname: '강남구인구직', birth: '1988-11-22', phone: '010-9876-5432', email: 'ceo@shop.com', type: 'corporate', status: 'active', joinDate: '2026-01-15', referrer: '네이버', statusHistory: ['2026-01-15 기업회원 가입', '2026-02-10 광고 연장'] },
         { id: 'user_03', loginId: 'bad_boy', name: '박진상', nickname: '진상아지트', birth: '1992-03-03', phone: '010-4444-4444', email: 'bad@naver.com', type: 'individual', status: 'blocked', joinDate: '2026-02-12', referrer: '직접 유입', statusHistory: ['2026-02-12 가입', '2026-02-13 비매너 쪽지로 영구 정지'] },
@@ -93,7 +91,6 @@ function AdminContent() {
                 .order('updated_at', { ascending: false });
 
             if (data) {
-                setShops(data as Shop[]);
                 setMockAds(data as Shop[]); // Sync mockAds with shops table
             }
         } catch (err) {
@@ -113,7 +110,7 @@ function AdminContent() {
     }, []);
 
     // [New] Ad Status Control Logic (Supabase Enabled)
-    const handleAdStatusChange = async (adId: string, newStatus: string) => {
+    const handleStatusUpdate = async (adId: string, newStatus: string) => {
         try {
             const { error } = await supabase
                 .from('shops')
@@ -123,19 +120,23 @@ function AdminContent() {
             if (error) throw error;
 
             // Update UI state
-            setMockAds(prev => prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad));
+            setMockAds((prev: Shop[]) => prev.map((ad: Shop) =>
+                ad.id === adId ? ({ ...ad, status: newStatus as Shop['status'] } as Shop) : ad
+            ));
 
             const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
             alert(`광고 ${statusMsg} 처리가 완료되었습니다. (DB 반영 완료)`);
         } catch (error) {
             console.error('Error updating status:', error);
             // Local fallback for demo
-            setMockAds(prev => {
-                const nextAds = prev.map(ad => ad.id === adId ? { ...ad, status: newStatus } : ad);
+            setMockAds((prev: Shop[]) => {
+                const nextAds = prev.map((ad: Shop) =>
+                    ad.id === adId ? ({ ...ad, status: newStatus as any } as Shop) : ad
+                );
                 localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
                 return nextAds;
             });
-            alert('데이터베이스 연결 실패: 로컬 세션에만 반영되었습니다.');
+            alert('DB 업데이트 중 오류가 발생하여 로컬 상태만 변경되었습니다.');
         }
     };
 
@@ -359,28 +360,42 @@ function AdminContent() {
                                                             </div>
                                                         </td>
                                                         <td className="px-8 py-6">
-                                                            <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">{ad.options ? JSON.stringify(ad.options) : '기본'}</div>
-                                                            <div className="text-[9px] text-blue-500 font-black mt-0.5 uppercase tracking-tighter">최근 수정: {ad.edits || 0}/30회</div>
+                                                            <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">
+                                                                {ad.options ? (
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {ad.options.bold && <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px]">굵게</span>}
+                                                                        {ad.options.blink && <span className="px-1.5 py-0.5 bg-pink-50 text-pink-600 rounded text-[9px]">깜빡임</span>}
+                                                                        {ad.options.color && <span className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px]">색상</span>}
+                                                                        {!ad.options.bold && !ad.options.blink && !ad.options.color && '기본'}
+                                                                    </div>
+                                                                ) : '기본'}
+                                                            </div>
+                                                            <div className="text-[9px] text-blue-500 font-black mt-1 uppercase tracking-tighter">최근 수정: {ad.edits || 0}/30회</div>
                                                         </td>
                                                         <td className="px-8 py-6 text-center">
                                                             <div className="text-sm font-black text-slate-950 tabular-nums whitespace-nowrap">{formatPrice(ad.price || 0)}</div>
                                                         </td>
                                                         <td className="px-8 py-6">
-                                                            <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' : (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-400')}`}>
-                                                                {ad.status ? ad.status.toUpperCase() : 'UNKNOWN'}
+                                                            <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' :
+                                                                (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' :
+                                                                    (ad.status === 'rejected' ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-400'))
+                                                                }`}>
+                                                                {ad.status === 'active' ? '승인완료' :
+                                                                    (ad.status === 'pending' ? '심사대기' :
+                                                                        (ad.status === 'rejected' ? '거절됨' : '대기중'))}
                                                             </span>
                                                         </td>
                                                         <td className="px-8 py-6 text-right">
                                                             <div className="flex justify-end gap-2">
                                                                 <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleAdStatusChange(ad.id, 'active'); }}
+                                                                    onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'active'); }}
                                                                     className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-50 hover:text-green-600 transition-all"
                                                                     title="승인"
                                                                 >
                                                                     <CheckCircle2 size={16} />
                                                                 </button>
                                                                 <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleAdStatusChange(ad.id, 'rejected'); }}
+                                                                    onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'rejected'); }}
                                                                     className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
                                                                     title="거절"
                                                                 >
@@ -724,6 +739,7 @@ function AdminContent() {
                 {/* Tab 6: SEO & Search Control */}
                 {activeTab === 'seo' && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                        <CompetitorAnalysis />
                         <SEOIndexingControl />
                     </div>
                 )}

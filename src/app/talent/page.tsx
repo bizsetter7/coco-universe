@@ -6,8 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Home, Search, MapPin, Clock, Star, Filter, MessageSquare, ShieldAlert } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert } from 'lucide-react';
 
 // Mock Data for Talent (Reused from HomeClient or similar)
 const MOCK_TALENTS = [

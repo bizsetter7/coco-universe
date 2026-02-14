@@ -186,9 +186,7 @@ export default function CustomerCenterPage() {
 
 // --- Card Payment Notice Detail ---
 const CardPaymentNoticeDetail = () => {
-    const brand = useBrand();
     const pinkColor = "#FF1B51";
-    const goldColor = "#D4AF37";
 
     return (
         <div className="flex flex-col py-6 md:py-10 max-w-4xl mx-auto space-y-8 font-sans">
@@ -270,7 +268,6 @@ const CardPaymentNoticeDetail = () => {
 // Simplified Ad Type Description Component
 // --- Rich Components ---
 const ResumeNoticeDetail = () => {
-    const brand = useBrand();
 
     return (
         <div className="flex flex-col items-center py-6 md:py-10 px-1 md:px-0 max-w-4xl mx-auto space-y-10 md:space-y-12">
@@ -633,7 +630,7 @@ export function CustomerCenterContent() {
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const primaryBgStyle = { backgroundColor: brand.primaryColor };
+
 
     const TABS = [
         { id: '공지사항', icon: <Megaphone size={16} /> },
@@ -664,7 +661,7 @@ export function CustomerCenterContent() {
             <div className="px-4 pt-6">
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar / Mobile Nav (Sticky 지원) */}
-                    <aside className="w-full md:w-64 shrink-0 z-50">
+                    <aside className="w-full md:w-64 shrink-0 z-50 self-stretch relative">
                         <StickyWrapper offsetTop={56} isInternal={true}>
                             <div className={`rounded-2xl md:rounded-3xl md:border overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
                                 {/* PC Title / Mobile Toggle Header */}
