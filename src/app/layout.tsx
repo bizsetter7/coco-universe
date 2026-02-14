@@ -17,12 +17,14 @@ export const metadata: Metadata = {
   description: "대한민국 1등 고소득 알바 플랫폼 코코알바. 여우알바, 퀸알바, 밤알바 구직 정보를 실시간으로 확인하세요. 가장 안전하고 빠른 매칭을 약속드립니다.",
   verification: {
     google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
+    other: {
+      'naver-site-verification': ['e00636a23b3bd65d180a472e62a899cce54e9159'],
+    },
   },
   other: {
     google: "notranslate",
     "color-scheme": "light",
     "supported-color-schemes": "light",
-    "naver-site-verification": "e00636a23b3bd65d180a472e62a899cce54e9159",
   },
 };
 

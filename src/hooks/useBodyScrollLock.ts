@@ -43,13 +43,15 @@ export const useBodyScrollLock = (isOpen: boolean) => {
         }
 
         return () => {
-            // Cleanup on unmount - safely decrement
-            if (isOpen && window.__scrollLockCount && window.__scrollLockCount > 0) {
-                window.__scrollLockCount--;
-                if (window.__scrollLockCount === 0) {
-                    document.body.style.overflow = '';
-                    document.body.style.paddingRight = '';
-                    document.body.classList.remove('modal-open');
+            // Cleanup on unmount - Only decrement if it was actually locked by THIS instance
+            if (isOpen) {
+                if (window.__scrollLockCount && window.__scrollLockCount > 0) {
+                    window.__scrollLockCount--;
+                    if (window.__scrollLockCount === 0) {
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                        document.body.classList.remove('modal-open');
+                    }
                 }
             }
         };

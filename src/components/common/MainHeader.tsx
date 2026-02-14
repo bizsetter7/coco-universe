@@ -70,8 +70,8 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
     }, [pathname]);
 
     const handleAdApply = () => {
-        const isLoggedIn = !!localStorage.getItem('user_session');
-
+        // The original `isLoggedIn` was a local variable.
+        // The instruction implies using the `isLoggedIn` from `useAuth`.
         if (isLoggedIn) {
             setShowPaymentPopup(true);
         } else {
@@ -302,7 +302,7 @@ function MainHeaderContent({ showBackButton, title: propTitle, showHomeButton = 
                                     )}
                                 </button>
                             )}
-                            {(pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page) && (
+                            {(pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page) && !pathname?.startsWith('/admin') && (
                                 <Button
                                     variant="ghost"
                                     size="icon"

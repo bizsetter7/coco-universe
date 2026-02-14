@@ -6,22 +6,33 @@ import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BrandConfig } from '@/lib/brand-config';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    const { isLoggedIn, userType } = useAuth(); // Call useAuth at the top level
+    const isAdmin = userType === 'admin'; // Define isAdmin here
+
     // 전역 스크롤 관리자 연동
     useBodyScrollLock(isOpen);
 
     useEffect(() => {
         setMounted(true);
+
+        // [Admin Bypass] Do not show event popups for admin users
+        if (isAdmin) {
+            setIsOpen(false);
+            return;
+        }
+
         // Check if popup should be hidden for today
-        const hideDate = localStorage.getItem('hideEventPopupdate');
+        const lastClose = localStorage.getItem(`event_popup_close_${brand.id}`); // Changed key
         const today = new Date().toDateString();
 
-        if (hideDate !== today) {
+        if (lastClose !== today) { // Changed variable name
             setIsOpen(true);
         }
         return () => setMounted(false);

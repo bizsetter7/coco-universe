@@ -335,121 +335,143 @@ function AdminContent() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mockAds
-                                            .filter(ad => {
-                                                if (adFilter === 'all') return true;
-                                                if (adFilter === 'pending') return ad.status === 'pending';
-                                                return true;
-                                            })
-                                            .map((ad) => (
-                                                <React.Fragment key={ad.id}>
-                                                    <tr
-                                                        onClick={() => setExpandedAd(expandedAd === ad.id ? null : ad.id)}
-                                                        className={`border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group ${expandedAd === ad.id ? 'bg-blue-50/30' : ''}`}
-                                                    >
-                                                        <td className="px-8 py-6">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs shrink-0 ${ad.status === 'pending' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                                    {ad.category ? ad.category[0] : 'U'}
-                                                                </div>
-                                                                <div className="flex flex-col max-w-[120px] md:max-w-none">
-                                                                    <div className="text-sm font-black text-slate-900 leading-tight mb-1 truncate">{ad.shopName}</div>
-                                                                    <div className="text-[10px] font-bold text-slate-400 italic">ID: {ad.ownerId}</div>
-                                                                    <div className="text-[10px] font-bold text-slate-400 mt-0.5">{ad.region}</div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-8 py-6">
-                                                            <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">
-                                                                {ad.options ? (
-                                                                    <div className="flex flex-wrap gap-1">
-                                                                        {ad.options.bold && <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px]">굵게</span>}
-                                                                        {ad.options.blink && <span className="px-1.5 py-0.5 bg-pink-50 text-pink-600 rounded text-[9px]">깜빡임</span>}
-                                                                        {ad.options.color && <span className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px]">색상</span>}
-                                                                        {!ad.options.bold && !ad.options.blink && !ad.options.color && '기본'}
+                                        {mockAds.length > 0 ? (
+                                            mockAds
+                                                .filter(ad => {
+                                                    if (adFilter === 'all') return true;
+                                                    if (adFilter === 'pending') return ad.status === 'pending';
+                                                    return true;
+                                                })
+                                                .map((ad) => (
+                                                    <React.Fragment key={ad.id}>
+                                                        <tr
+                                                            onClick={() => setExpandedAd(expandedAd === ad.id ? null : ad.id)}
+                                                            className={`border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group ${expandedAd === ad.id ? 'bg-blue-50/30' : ''}`}
+                                                        >
+                                                            <td className="px-8 py-6">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs shrink-0 ${ad.status === 'pending' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
+                                                                        {ad.category ? ad.category[0] : 'U'}
                                                                     </div>
-                                                                ) : '기본'}
-                                                            </div>
-                                                            <div className="text-[9px] text-blue-500 font-black mt-1 uppercase tracking-tighter">최근 수정: {ad.edits || 0}/30회</div>
-                                                        </td>
-                                                        <td className="px-8 py-6 text-center">
-                                                            <div className="text-sm font-black text-slate-950 tabular-nums whitespace-nowrap">{formatPrice(ad.price || 0)}</div>
-                                                        </td>
-                                                        <td className="px-8 py-6">
-                                                            <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' :
-                                                                (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' :
-                                                                    (ad.status === 'rejected' ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-400'))
-                                                                }`}>
-                                                                {ad.status === 'active' ? '승인완료' :
-                                                                    (ad.status === 'pending' ? '심사대기' :
-                                                                        (ad.status === 'rejected' ? '거절됨' : '대기중'))}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-8 py-6 text-right">
-                                                            <div className="flex justify-end gap-2">
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'active'); }}
-                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-50 hover:text-green-600 transition-all"
-                                                                    title="승인"
-                                                                >
-                                                                    <CheckCircle2 size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'rejected'); }}
-                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
-                                                                    title="거절"
-                                                                >
-                                                                    <XCircle size={16} />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    {expandedAd === ad.id && (
-                                                        <tr>
-                                                            <td colSpan={5} className="px-8 py-0">
-                                                                <div className="bg-slate-900/5 border-x border-slate-100 p-10 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                                                        <div className="space-y-6">
-                                                                            <div className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest">
-                                                                                <Info size={14} /> 금칙어 및 정책 위반 정밀 검사
-                                                                            </div>
-                                                                            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
-                                                                                <div className="absolute top-0 right-0 px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black">NORMAL</div>
-                                                                                <p className="text-xs font-bold text-slate-600 leading-relaxed">
-                                                                                    &quot;안녕하세요, 저희 상점은 최고의 대우와 안락한 환경을 보장합니다. 주저 말고 연락 주세요. {ad.shopName}은 언제나 열려 있습니다.&quot;
-                                                                                </p>
-                                                                                <div className="mt-4 pt-4 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
-                                                                                    * 현재 본문 내 정책 위반 키워드가 발견되지 않았습니다.
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="space-y-6">
-                                                                            <div className="text-slate-950 font-black text-sm tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">
-                                                                                광고주(회원) 통합 이력
-                                                                            </div>
-                                                                            <div className="space-y-3">
-                                                                                <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                                    <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
-                                                                                    <span className="font-black text-blue-600">{ad.edits || 0} / 30회</span>
-                                                                                </div>
-                                                                                <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                                    <span className="font-bold text-slate-500">진행 중인 광고</span>
-                                                                                    <span className="font-black text-slate-950">2건</span>
-                                                                                </div>
-                                                                                <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                                    <span className="font-bold text-slate-500">마감된 광고</span>
-                                                                                    <span className="font-black text-slate-400">14건</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <button className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg shadow-slate-200">광고주 상세 프로필 보기</button>
-                                                                        </div>
+                                                                    <div className="flex flex-col max-w-[120px] md:max-w-none">
+                                                                        <div className="text-sm font-black text-slate-900 leading-tight mb-1 truncate">{ad.shopName}</div>
+                                                                        <div className="text-[10px] font-bold text-slate-400 italic">ID: {ad.ownerId}</div>
+                                                                        <div className="text-[10px] font-bold text-slate-400 mt-0.5">{ad.region}</div>
                                                                     </div>
                                                                 </div>
                                                             </td>
+                                                            <td className="px-8 py-6">
+                                                                <div className="text-xs font-bold text-slate-600 truncate max-w-[200px]">
+                                                                    {ad.options ? (
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {ad.options.bold && <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px]">굵게</span>}
+                                                                            {ad.options.blink && <span className="px-1.5 py-0.5 bg-pink-50 text-pink-600 rounded text-[9px]">깜빡임</span>}
+                                                                            {ad.options.color && <span className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[9px]">색상</span>}
+                                                                            {!ad.options.bold && !ad.options.blink && !ad.options.color && '기본'}
+                                                                        </div>
+                                                                    ) : '기본'}
+                                                                </div>
+                                                                <div className="text-[9px] text-blue-500 font-black mt-1 uppercase tracking-tighter">최근 수정: {ad.edits || 0}/30회</div>
+                                                            </td>
+                                                            <td className="px-8 py-6 text-center">
+                                                                <div className="text-sm font-black text-slate-950 tabular-nums whitespace-nowrap">{formatPrice(ad.price || 0)}</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <span className={`px-2 py-1 rounded-md text-[10px] font-black ${ad.status === 'active' ? 'bg-green-50 text-green-600' :
+                                                                    (ad.status === 'pending' ? 'bg-amber-50 text-amber-600' :
+                                                                        (ad.status === 'rejected' ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-400'))
+                                                                    }`}>
+                                                                    {ad.status === 'active' ? '승인완료' :
+                                                                        (ad.status === 'pending' ? '심사대기' :
+                                                                            (ad.status === 'rejected' ? '거절됨' : '대기중'))}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-8 py-6 text-right">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'active'); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-50 hover:text-green-600 transition-all"
+                                                                        title="승인"
+                                                                    >
+                                                                        <CheckCircle2 size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'rejected'); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                                        title="거절"
+                                                                    >
+                                                                        <XCircle size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
                                                         </tr>
-                                                    )}
-                                                </React.Fragment>
-                                            ))}
+                                                        {expandedAd === ad.id && (
+                                                            <tr>
+                                                                <td colSpan={5} className="px-8 py-0">
+                                                                    <div className="bg-slate-900/5 border-x border-slate-100 p-10 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                                                            <div className="space-y-6">
+                                                                                <div className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest">
+                                                                                    <Info size={14} /> 금칙어 및 정책 위반 정밀 검사
+                                                                                </div>
+                                                                                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+                                                                                    <div className="absolute top-0 right-0 px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black">NORMAL</div>
+                                                                                    <p className="text-xs font-bold text-slate-600 leading-relaxed">
+                                                                                        &quot;안녕하세요, 저희 상점은 최고의 대우와 안락한 환경을 보장합니다. 주저 말고 연락 주세요. {ad.shopName}은 언제나 열려 있습니다.&quot;
+                                                                                    </p>
+                                                                                    <div className="mt-4 pt-4 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
+                                                                                        * 현재 본문 내 정책 위반 키워드가 발견되지 않았습니다.
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="space-y-6">
+                                                                                <div className="text-slate-950 font-black text-sm tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">
+                                                                                    광고주(회원) 통합 이력
+                                                                                </div>
+                                                                                <div className="space-y-3">
+                                                                                    <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                        <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
+                                                                                        <span className="font-black text-blue-600">{ad.edits || 0} / 30회</span>
+                                                                                    </div>
+                                                                                    <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                        <span className="font-bold text-slate-500">진행 중인 광고</span>
+                                                                                        <span className="font-black text-slate-950">2건</span>
+                                                                                    </div>
+                                                                                    <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                        <span className="font-bold text-slate-500">마감된 광고</span>
+                                                                                        <span className="font-black text-slate-400">14건</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <button className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg shadow-slate-200">광고주 상세 프로필 보기</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </React.Fragment>
+                                                ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="px-8 py-20 text-center">
+                                                    <div className="flex flex-col items-center gap-4">
+                                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                                                            <Database size={32} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-black text-slate-900 tracking-tighter">운영 데이터베이스가 비어 있습니다.</p>
+                                                            <p className="text-xs text-slate-400 font-bold mt-1">로컬 데이터를 Supabase로 동기화(Migration)해야 리스트가 표시됩니다.</p>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => fetchData()}
+                                                            className="mt-2 px-6 py-2.5 bg-slate-950 text-white rounded-xl text-xs font-black hover:bg-black transition-all flex items-center gap-2"
+                                                        >
+                                                            <RefreshCw size={14} /> 데이터 새로고침
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
