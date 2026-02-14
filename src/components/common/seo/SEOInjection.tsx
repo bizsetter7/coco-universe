@@ -13,13 +13,6 @@ export const SEOInjection = () => {
 
     React.useEffect(() => {
         setMounted(true);
-        // [Critical] Force inject Naver Verification Tag to document head
-        if (typeof document !== 'undefined' && !document.querySelector('meta[name="naver-site-verification"]')) {
-            const meta = document.createElement('meta');
-            meta.name = "naver-site-verification";
-            meta.content = "e00636a23b3bd65d180a472e62a899cce54e9159";
-            document.head.appendChild(meta);
-        }
     }, []);
 
     // 사장님의 '경쟁사 키워드 흡수' 리스트 (공격적 타격 대상)

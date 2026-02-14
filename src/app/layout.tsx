@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     google: "notranslate",
     "color-scheme": "light",
     "supported-color-schemes": "light",
+    "naver-site-verification": "e00636a23b3bd65d180a472e62a899cce54e9159",
   },
 };
 
