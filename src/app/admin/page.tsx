@@ -20,7 +20,9 @@ import {
     Mail,
     Lock,
     Unlock,
-    Info
+    Info,
+    Database,
+    RefreshCw
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
