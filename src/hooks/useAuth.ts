@@ -10,6 +10,7 @@ export interface UserSession {
     points: number;
     referrer?: string;
     shopId?: string;
+    isSimulated?: boolean; // [New] 역할 체험 중인지 여부
 }
 
 // Supabase Auth 연동된 실제 인증 훅
@@ -25,76 +26,141 @@ export function useAuth() {
     });
 
     const syncUserSession = async (session: any) => {
-        if (!session?.user) {
-            setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
-            setIsLoggedIn(false);
+        // [Safety] 이미 Mock 세션으로 로그인된 상태라면, Supabase 연동 정보가 명확하지 않을 때 덮어쓰지 않음
+        const savedMock = typeof window !== 'undefined' ? localStorage.getItem('coco_mock_session') : null;
+        let mockData = null;
+        if (savedMock) {
+            try { mockData = JSON.parse(savedMock); } catch (e) { }
+        }
+
+        // 1. Supabase 실제 세션이 있는 경우 (UUID 기반 실제 회원)
+        if (session?.user) {
+            try {
+                const { user: authUser } = session;
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', authUser.id)
+                    .single();
+
+                if (profile) {
+                    const userType = profile.role === 'admin' ? 'admin' :
+                        (profile.role === 'corporate' ? 'corporate' : 'individual');
+
+                    let newUser: UserSession = {
+                        type: userType as UserSession['type'],
+                        id: authUser.id,
+                        name: profile.full_name || authUser.email?.split('@')[0] || '회원',
+                        nickname: profile.nickname || profile.full_name || '닉네임',
+                        points: profile.points || 0,
+                    };
+
+                    // [Simulation Check] 어드민인 경우 유지된 시뮬레이션 상태 확인
+                    if (newUser.type === 'admin') {
+                        const simType = typeof window !== 'undefined' ? localStorage.getItem('coco_sim_mode') : null;
+                        if (simType === 'corporate' || simType === 'individual') {
+                            newUser = {
+                                ...newUser,
+                                type: simType,
+                                isSimulated: true
+                            };
+                        }
+                    }
+
+                    setUser(newUser);
+                    setIsLoggedIn(true);
+                    setIsLoading(false);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Real profile fetch failed, checking mock...', err);
+            }
+        }
+
+        // 2. Mock 세션 복구 (Supabase 세션이 없거나 익명 상태일 때)
+        if (mockData) {
+            setUser(mockData);
+            setIsLoggedIn(true);
             setIsLoading(false);
+            console.log('Session restored from mock storage');
             return;
         }
 
-        const { user: authUser } = session;
-
-        // profiles 테이블에서 추가 정보(닉네임, 역할 등) 가져오기
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authUser.id)
-            .single();
-
-        const userType = profile?.role === 'admin' ? 'admin' :
-            (profile?.role === 'corporate' ? 'corporate' : 'individual');
-
-        const newUser: UserSession = {
-            type: userType as UserSession['type'],
-            id: authUser.id,
-            name: profile?.full_name || authUser.email?.split('@')[0] || '회원',
-            nickname: profile?.nickname || profile?.full_name || '닉네임',
-            points: profile?.points || 0,
-            referrer: profile?.referrer,
-            shopId: profile?.shop_id
-        };
-
-        setUser(newUser);
-        setIsLoggedIn(true);
+        // 3. 비로그인 상태 (완전한 게스트)
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+        setIsLoggedIn(false);
         setIsLoading(false);
     };
 
     useEffect(() => {
-        // 1. 초기 세션 확인
+        // [Critical] 마운트 즉시 Mock 세션부터 체크하여 UI 동기화 (Flicker 방지)
+        const savedMock = typeof window !== 'undefined' ? localStorage.getItem('coco_mock_session') : null;
+        if (savedMock) {
+            try {
+                const mockData = JSON.parse(savedMock);
+                if (mockData && mockData.type) {
+                    setUser(mockData);
+                    setIsLoggedIn(true);
+                    setIsLoading(false); // 로딩 즉시 종료
+                }
+            } catch (e) { }
+        }
+
+        // Supabase 세션 감지 시작
         supabase.auth.getSession().then(({ data: { session } }) => {
-            syncUserSession(session);
+            if (session) syncUserSession(session);
+            else if (!savedMock) setIsLoading(false); // Mock도 없으면 로딩 종료
         });
 
-        // 2. 인증 상태 변경 감지
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            syncUserSession(session);
+            if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
+                syncUserSession(session);
+            }
         });
 
         // [New] Capture Referrer on landing
-        if (!localStorage.getItem('user_referrer') && typeof document !== 'undefined') {
+        if (typeof window !== 'undefined' && !localStorage.getItem('user_referrer')) {
             const ref = document.referrer;
-            if (ref) {
-                const source = ref.includes('google') ? '구글 검색' :
+            const source = ref ? (
+                ref.includes('google') ? '구글 검색' :
                     ref.includes('naver') ? '네이버' :
-                        ref.includes('daum') ? '다음' : '외부 유입';
-                localStorage.setItem('user_referrer', source);
-            } else {
-                localStorage.setItem('user_referrer', '직접 유입');
-            }
+                        ref.includes('daum') ? '다음' : '외부 유입'
+            ) : '직접 유입';
+            localStorage.setItem('user_referrer', source);
         }
 
         return () => subscription.unsubscribe();
     }, []);
 
-    const login = async (email: string, id?: string) => {
-        // 이 함수는 이전 Mock 호환성을 위해 남겨두거나, 
-        // 실제 로그인 페이지에서는 supabase.auth.signInWithPassword를 직접 사용합니다.
-        console.log('Centralized login called for:', email);
+    const login = (type: 'admin' | 'shop' | 'personal', id?: string, name?: string, nickname?: string) => {
+        // [Exclusive] Mock Login for Development
+        const mockUser: UserSession = {
+            type: type === 'shop' ? 'corporate' : (type === 'personal' ? 'individual' : 'admin'),
+            id: id || `mock_${Math.random().toString(36).substr(2, 9)}`,
+            name: name || (type === 'admin' ? '관리자' : '테스트회원'),
+            nickname: nickname || (type === 'admin' ? '운영마스터' : '테스트닉네임'),
+            points: 1000,
+        };
+
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('coco_mock_session', JSON.stringify(mockUser));
+        }
+        setUser(mockUser);
+        setIsLoggedIn(true);
+        setIsLoading(false);
+        console.log('Login mock stored');
     };
 
     const logout = async () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('coco_mock_session');
+            localStorage.removeItem('adult_verified');
+            localStorage.removeItem('coco_sim_mode'); // 시뮬레이션 정보도 삭제
+        }
         await supabase.auth.signOut();
-        localStorage.removeItem('adult_verified');
+        setIsLoggedIn(false);
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+        window.location.href = '/';
     };
 
     return {
@@ -107,6 +173,7 @@ export function useAuth() {
         userName: user.name,
         userNickname: user.nickname,
         userPoints: user.points,
-        userReferrer: user.referrer
+        userReferrer: user.referrer,
+        isSimulated: user.isSimulated
     };
 }

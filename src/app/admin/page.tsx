@@ -46,7 +46,7 @@ export default function AdminPage() {
 
 function AdminContent() {
     const router = useRouter();
-    const { isLoggedIn, userType } = useAuth();
+    const { isLoggedIn, userType, isLoading } = useAuth();
     useSearchParams();
 
     // --- 1. Core State Section ---
@@ -232,19 +232,16 @@ function AdminContent() {
     };
 
     useEffect(() => {
-        const checkAuth = () => {
-            // [Fix] Use centralized userType from useAuth instead of direct type/localStorage check
-            if (!isLoggedIn || userType !== 'admin') {
-                alert('관리자 권한이 필요합니다.');
-                router.push('/');
-                return;
-            }
-            setIsAuthorized(true);
-        };
+        // [Fix] isLoading이 false가 된 후에만 권한 체크를 수행하여 리다이렉트 루프 방지
+        if (isLoading) return;
 
-        const timer = setTimeout(checkAuth, 100);
-        return () => clearTimeout(timer);
-    }, [isLoggedIn, userType, router]);
+        if (!isLoggedIn || userType !== 'admin') {
+            alert('관리자 권한이 필요합니다.');
+            router.push('/');
+            return;
+        }
+        setIsAuthorized(true);
+    }, [isLoggedIn, userType, router, isLoading]);
 
     // [New] Body Scroll Lock Logic
     useEffect(() => {
@@ -338,14 +335,20 @@ function AdminContent() {
                         {/* Role Simulator Icons */}
                         <div className="flex -space-x-2 mr-2">
                             <div
-                                onClick={() => router.push('/my-shop?simulate=corporate')}
+                                onClick={() => {
+                                    localStorage.setItem('coco_sim_mode', 'corporate');
+                                    router.push('/my-shop?simulate=corporate');
+                                }}
                                 title="기업 회원 시뮬레이션 (광고 등록/관리)"
                                 className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-pink-600 shadow-sm z-30 cursor-pointer hover:scale-110 hover:z-40 transition-all"
                             >
                                 AD
                             </div>
                             <div
-                                onClick={() => router.push('/my-shop?simulate=individual')}
+                                onClick={() => {
+                                    localStorage.setItem('coco_sim_mode', 'individual');
+                                    router.push('/my-shop?simulate=individual');
+                                }}
                                 title="개인 회원 시뮬레이션 (이력서/지원)"
                                 className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-blue-600 shadow-sm z-20 cursor-pointer hover:scale-110 hover:z-40 transition-all"
                             >

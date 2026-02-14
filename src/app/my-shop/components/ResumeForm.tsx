@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, User, ChevronRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
-import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants'; // Import from local constants which is re-exported map
+import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants';
+import { supabase } from '@/lib/supabase';
 
 export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void, onOpenMenu?: () => void }) => {
     const brand = useBrand();
@@ -10,40 +11,117 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
 
     // User Info State
     const [userName, setUserName] = useState('회원님');
-    const [userId, setUserId] = useState('admin_user');
+    const [userId, setUserId] = useState('');
+    const [authUser, setAuthUser] = useState<any>(null);
 
     // Form States
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+    const [payAmount, setPayAmount] = useState('0');
     const [selectedIndustryMain, setSelectedIndustryMain] = useState('');
     const [selectedIndustrySub, setSelectedIndustrySub] = useState('');
     const [selectedRegionMain, setSelectedRegionMain] = useState('');
     const [selectedRegionSub, setSelectedRegionSub] = useState('');
-    const [payType, setPayType] = useState('급여협의'); // Default match corporate
+    const [payType, setPayType] = useState('급여협의');
+    const [gender, setGender] = useState('여성');
+    const [birthYear, setBirthYear] = useState('2000');
+    const [birthMonth, setBirthMonth] = useState('1');
+    const [birthDay, setBirthDay] = useState('1');
 
     // Contact State
     const [contactMethod, setContactMethod] = useState('');
     const [contactValue, setContactValue] = useState('');
 
     useEffect(() => {
-        const storedName = localStorage.getItem('user_name');
-        const storedId = localStorage.getItem('user_id');
-        if (storedName) setUserName(storedName);
-        if (storedId) setUserId(storedId);
+        // useAuth 훅 대신 localStorage와 supabase 세션 직접 참조 (또는 props로 받아야 함)
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                setAuthUser(session.user);
+                setUserId(session.user.id);
+            } else {
+                const storedId = localStorage.getItem('user_id');
+                if (storedId) setUserId(storedId);
+            }
+            const storedName = localStorage.getItem('user_name');
+            if (storedName) setUserName(storedName);
+        };
+        checkUser();
     }, []);
+
+    const handleSaveResume = async () => {
+        if (!title.trim()) { alert('이력서 제목을 입력해주세요.'); return; }
+        if (!selectedIndustryMain || !selectedIndustrySub) { alert('희망 분야를 선택해주세요.'); return; }
+        if (!selectedRegionMain || !selectedRegionSub) { alert('희망 지역을 선택해주세요.'); return; }
+        if (!content.trim()) { alert('자기소개를 입력해주세요.'); return; }
+
+        const resumeData = {
+            user_id: userId,
+            ownerId: userId, // [Sync] DB 컬럼 명칭 통일을 위해 추가
+            title,
+            content,
+            gender,
+            birth_date: `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`,
+            industry_main: selectedIndustryMain,
+            industry_sub: selectedIndustrySub,
+            region_main: selectedRegionMain,
+            region_sub: selectedRegionSub,
+            pay_type: payType,
+            pay_amount: Number(payAmount) || 0,
+            contact_method: contactMethod,
+            contact_value: contactValue,
+            created_at: new Date().toISOString()
+        };
+
+        try {
+            const { error } = await supabase
+                .from('resumes')
+                .insert([resumeData]);
+
+            if (error) {
+                console.error("Resume Save Error:", error);
+                // [Fallback] 스키마 오류 발생 시 안내 강화
+                const isSchemaError =
+                    error.message.includes("relation \"resumes\" does not exist") ||
+                    error.message.includes("Could not find the table") ||
+                    error.message.includes("schema cache");
+
+                if (isSchemaError) {
+                    if (confirm('DB 테이블이 존재하지 않습니다. 임시 모드로 완료하시겠습니까?\n(근본 해결을 위해 db_setup.sql 스크립트 실행이 필요합니다.)')) {
+                        localStorage.setItem('mock_resume_saved', 'true');
+                        alert('임시 등록되었습니다. 관리자에게 DB 업데이트를 요청해주세요.');
+                        setView('dashboard');
+                        return;
+                    }
+                    return;
+                }
+                alert('저장 중 오류가 발생했습니다: ' + error.message);
+                return;
+            }
+
+            alert('이력서 등록이 완료되었습니다!');
+            setView('dashboard');
+            // 이력서 개수 갱신을 위해 상위 컴포넌트 이벤트 트리거 가능
+            window.dispatchEvent(new CustomEvent('resume-updated'));
+        } catch (err) {
+            alert('오류가 발생했습니다.');
+        }
+    };
 
     const handleContactMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const method = e.target.value;
         setContactMethod(method);
         if (method === 'phone') {
-            setContactValue('010-0000-0000'); // Mock verified phone
+            setContactValue('010-0000-0000');
         } else if (method === 'site_msg') {
             setContactValue('site_msg');
         } else {
-            setContactValue(''); // Clear for ID input
+            setContactValue('');
         }
     };
 
     return (
-        <div className={`space-y-6 animate-in fade-in slide-in-from-right-4 duration-500`}>
+        <div className={`space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20`}>
 
             {/* Warning Banner */}
             <div
@@ -66,8 +144,6 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
 
             <header className="flex flex-col gap-4 mb-4">
                 <div className={`p-6 sm:rounded-[32px] shadow-sm border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                    {/* Mobile Menu Button (Dashboard specific) */}
-
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <h2 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
                             <span className="w-2 h-8 bg-pink-500 rounded-full hidden md:block"></span>
@@ -96,12 +172,10 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
 
                     {/* Basic Info Fields */}
                     <div className="md:col-span-9 space-y-4">
-                        {/* ID - ReadOnly */}
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">아이디</label>
-                            <div className="sm:col-span-9 text-sm font-bold truncate w-full">{userId}</div>
+                            <div className="sm:col-span-9 text-sm font-bold truncate w-full">{userId || 'guest'}</div>
                         </div>
-                        {/* Nickname - Editable */}
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">이름(닉네임) <span className="text-red-500">*</span></label>
                             <div className="sm:col-span-9 flex gap-2 w-full">
@@ -115,22 +189,20 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                                 />
                             </div>
                         </div>
-                        {/* Birthdate/Sex */}
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">성별/생년월일 <span className="text-red-500">*</span></label>
                             <div className="sm:col-span-9 flex flex-wrap gap-2 items-center w-full">
-                                <select className="border border-gray-300 rounded p-1.5 text-xs font-bold bg-white text-gray-700 outline-none flex-shrink-0">
+                                <select value={gender} onChange={(e) => setGender(e.target.value)} className="border border-gray-300 rounded p-1.5 text-xs font-bold bg-white text-gray-700 outline-none flex-shrink-0">
                                     <option>여성</option>
                                     <option>남성</option>
                                 </select>
                                 <div className="flex items-center gap-1 flex-1 min-w-[200px]">
-                                    <input type="number" defaultValue="2000" className="w-[60px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">년</span>
-                                    <input type="number" defaultValue="1" className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">월</span>
-                                    <input type="number" defaultValue="1" className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">일</span>
+                                    <input type="number" value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className="w-[60px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">년</span>
+                                    <input type="number" value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)} className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">월</span>
+                                    <input type="number" value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className="w-[45px] border border-gray-300 rounded p-1.5 text-xs text-center outline-none" /> <span className="text-xs">일</span>
                                 </div>
                             </div>
                         </div>
-                        {/* Contact Method - Dynamic Input */}
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">연락방법 <span className="text-red-500">*</span></label>
                             <div className="sm:col-span-9 space-y-2 w-full">
@@ -174,17 +246,13 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                     </div>
                 </div>
 
-                {/* Section Divider */}
                 <div className="border-t border-dashed border-gray-200 my-6"></div>
 
-                {/* Resume Content */}
                 <div className="space-y-6">
-                    {/* Title */}
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-red-400 rounded-full"></span> 이력서 제목 <span className="text-red-500">*</span></label>
-                        <input type="text" placeholder="제목을 입력하세요" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500" />
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500" />
                     </div>
-                    {/* Pay - Corporate Mapping */}
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-blue-400 rounded-full"></span> 희망 급여</label>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -200,6 +268,8 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                             <div className="relative flex-1">
                                 <input
                                     type="text"
+                                    value={payAmount}
+                                    onChange={(e) => setPayAmount(e.target.value)}
                                     className="w-full bg-white border border-gray-200 rounded-lg p-2.5 pr-8 text-sm font-bold outline-none focus:border-pink-500"
                                     placeholder="금액 입력"
                                 />
@@ -207,7 +277,6 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                             </div>
                         </div>
                     </div>
-                    {/* Industry */}
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-purple-400 rounded-full"></span> 희망 분야 <span className="text-red-500">*</span></label>
                         <div className="flex gap-2">
@@ -237,7 +306,6 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                             </select>
                         </div>
                     </div>
-                    {/* Region */}
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-green-400 rounded-full"></span> 업무 가능 지역 <span className="text-red-500">*</span></label>
                         <div className="flex gap-2">
@@ -267,17 +335,16 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                             </select>
                         </div>
                     </div>
-                    {/* Intro */}
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-orange-400 rounded-full"></span> 자기소개 <span className="text-red-500">*</span></label>
-                        <textarea className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
+                        <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
                     </div>
                 </div>
 
                 {/* Form Actions */}
                 <div className="mt-8 flex justify-center gap-3">
-                    <button onClick={() => setView('member-info')} className="px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
-                    <button onClick={() => { alert('이력서가 등록되었습니다.'); setView('member-info'); }} className="px-8 py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition shadow-lg">이력서 등록완료</button>
+                    <button onClick={() => setView('dashboard')} className="px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
+                    <button onClick={handleSaveResume} className="px-8 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-black hover:brightness-110 transition shadow-lg active:scale-95">이력서 등록완료</button>
                 </div>
             </div>
         </div>

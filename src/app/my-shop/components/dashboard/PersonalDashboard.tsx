@@ -83,7 +83,7 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
     );
 }
 
-export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }) {
+export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (v: any) => void, resumeCount?: number }) {
     const brand = useBrand();
     const [userName, setUserName] = useState('회원님');
 
@@ -126,15 +126,15 @@ export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">이력서 등록수</div>
-                        <div className="text-3xl md:text-5xl font-black text-red-500 flex items-baseline justify-center gap-1">
-                            0<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
+                        <div className="text-3xl md:text-5xl font-black text-pink-500 flex items-baseline justify-center gap-1">
+                            {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">공개중인 이력서</div>
-                        <div className="text-3xl md:text-5xl font-black text-red-500 flex items-baseline justify-center gap-1">
-                            0<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
+                        <div className="text-3xl md:text-5xl font-black text-pink-500 flex items-baseline justify-center gap-1">
+                            {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
                 </div>
@@ -161,14 +161,14 @@ export function PersonalDashboardHome({ setView }: { setView: (v: any) => void }
     );
 }
 
-export default function PersonalDashboard({ view, setView }: { view: string, setView: (v: any) => void }) {
+export default function PersonalDashboard({ view, setView, resumeCount = 0 }: { view: string, setView: (v: any) => void, resumeCount?: number }) {
     const brand = useBrand();
 
     return (
         <div className="max-w-6xl mx-auto p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
             <PersonalSidebar view={view} setView={setView} />
             <main className="col-span-1 md:col-span-3">
-                {(view === 'member-info' || view === 'dashboard' || view === 'resume-list') && <PersonalDashboardHome setView={setView} />}
+                {(view === 'member-info' || view === 'dashboard' || view === 'resume-list') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
                 {view === 'member-edit' && <PersonalMemberEdit setView={setView} />}
                 {view === 'resume-form' && <ResumeForm setView={setView} />}
 

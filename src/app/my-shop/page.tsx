@@ -106,69 +106,123 @@ function MyShopContent() {
     const fetchRegisteredAds = async () => {
         if (!authUser?.id || authUser.id === 'guest') return;
 
-        const { data, error } = await supabase
-            .from('shops')
-            .select('*')
-            .eq('ownerId', authUser.id)
-            .order('created_at', { ascending: false });
+        try {
+            // [Fix] ownerId 컬럼이 없거나 타입이 안 맞으면 에러가 날 수 있으므로 감싸줌
+            const { data, error } = await supabase
+                .from('shops')
+                .select('*')
+                .eq('ownerId', authUser.id) // DB 컬럼명이 ownerId인 경우
+                .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error("Failed to fetch ads:", error);
-            return;
-        }
+            if (error) {
+                console.warn("Supabase fetch ads error (fallback to local):", error.message || error);
+                // 모의 계정인 경우 에러를 띄우지 않고 로컬/빈 데이터로 진행
+                if (authUser.id.startsWith('mock_')) {
+                    setRegisteredAds([]);
+                    setIsDataLoaded(true);
+                    return;
+                }
+                throw error;
+            }
 
-        if (data) {
-            setRegisteredAds(data.map((ad: any) => ({
-                ...ad,
-                deadline: ad.deadline || '2026-03-25'
-            })));
+            if (data) {
+                const dbAds = data.map((ad: any) => ({
+                    ...ad,
+                    deadline: ad.deadline || '2026-03-25'
+                }));
+
+                // [Mock Persistence] 로컬에 저장된 모의 공고가 있다면 합치기
+                const mockAdsRaw = localStorage.getItem('coco_mock_ads');
+                const mockAds = mockAdsRaw ? JSON.parse(mockAdsRaw) : [];
+
+                setRegisteredAds([...dbAds, ...mockAds]);
+            }
+        } catch (err) {
+            console.error("Critical fetch ads error:", err);
+            // 최후의 수단: 빈 배열로 초기화하여 로딩 무한 루프 방지
+            setRegisteredAds([]);
+        } finally {
+            setIsDataLoaded(true);
         }
-        setIsDataLoaded(true);
     };
 
     const fetchPaymentHistory = async () => {
         if (!authUser?.id || authUser.id === 'guest') return;
 
-        const { data, error } = await supabase
-            .from('payments')
-            .select('*')
-            .eq('user_id', authUser.id)
-            .order('created_at', { ascending: false });
+        try {
+            const { data, error } = await supabase
+                .from('payments')
+                .select('*')
+                .eq('user_id', authUser.id)
+                .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error("Failed to fetch payments:", error);
-            // Fallback for safety during transition
-            const savedPayments = localStorage.getItem('my_site_payment_history');
-            if (savedPayments) setPaymentHistory(JSON.parse(savedPayments));
-            return;
+            if (error) {
+                console.warn("Supabase fetch payments error:", error.message || error);
+                // Fallback for safety during transition
+                const savedPayments = localStorage.getItem('my_site_payment_history');
+                if (savedPayments) {
+                    setPaymentHistory(JSON.parse(savedPayments));
+                } else {
+                    setPaymentHistory([]);
+                }
+                return;
+            }
+
+            if (data) {
+                // UI 포맷에 맞춰 데이터 변환
+                setPaymentHistory(data.map((p: any) => ({
+                    id: p.id,
+                    desc: p.description || '광고 결제',
+                    price: (p.amount || 0).toLocaleString() + '원',
+                    method: p.method === 'bank_transfer' ? '무통장입금' : p.method,
+                    date: new Date(p.created_at).toLocaleString(),
+                    status: p.status === 'completed' ? '결제완료' : '대기',
+                    type: p.ad_type || 'AD'
+                })));
+            }
+        } catch (err) {
+            console.error("Critical fetch payments error:", err);
+            setPaymentHistory([]);
         }
+    };
 
-        if (data) {
-            // UI 포맷에 맞춰 데이터 변환
-            setPaymentHistory(data.map((p: any) => ({
-                id: p.id,
-                desc: p.description || '광고 결제',
-                price: (p.amount || 0).toLocaleString() + '원',
-                method: p.method === 'bank_transfer' ? '무통장입금' : p.method,
-                date: new Date(p.created_at).toLocaleString(),
-                status: p.status === 'completed' ? '결제완료' : '대기',
-                type: p.ad_type || 'AD'
-            })));
+    const [resumeCount, setResumeCount] = useState(0);
+
+    const fetchResumeCount = async () => {
+        if (!authUser?.id || authUser.id === 'guest') return;
+        try {
+            const { count, error } = await supabase
+                .from('resumes')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', authUser.id);
+
+            if (!error && count !== null) setResumeCount(count);
+        } catch (e) {
+            console.warn("Resume fetch failed (table may be missing):", e);
         }
     };
 
     useEffect(() => {
-        fetchRegisteredAds();
-        fetchPaymentHistory();
+        if (authUser?.id && authUser.id !== 'guest') {
+            fetchRegisteredAds();
+            fetchPaymentHistory();
+            fetchResumeCount();
+        }
     }, [authUser?.id]);
 
     const setView = (newView: any) => {
         if (newView === view) return;
+
+        // [Persistence Fix] 기존 쿼리 파라미터(simulate 등) 유지
+        const params = new URLSearchParams(searchParams.toString());
         if (newView === 'dashboard') {
-            router.push('/my-shop', { scroll: false });
+            params.delete('view');
+            params.delete('id'); // 상세 ID 제거
         } else {
-            router.push(`?view=${newView}`, { scroll: false });
+            params.set('view', newView);
         }
+
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     // Modal States
@@ -207,10 +261,11 @@ function MyShopContent() {
                 setUserType(authUserType);
             }
 
-            if (authUser.name) formState.setShopName(authUser.name);
-            if (authUser.nickname) formState.setNickname(authUser.nickname);
+            // [Fix] 값이 비어 있을 때만 초기화 (닉네임 입력 잠김 방지)
+            if (authUser.name && !formState.shopName) formState.setShopName(authUser.name);
+            if (authUser.nickname && !formState.nickname) formState.setNickname(authUser.nickname);
         }
-    }, [authUserType, authUser, router, formState, searchParams]);
+    }, [authUserType, authUser.id, authUser.name, authUser.nickname, router, searchParams]);
 
     // --- View Sync from URL ---
     useEffect(() => {
@@ -306,60 +361,87 @@ function MyShopContent() {
         if (payType === '종류선택') { alert('급여 종류를 선택해주세요.'); return; }
         if (payType !== '협의' && (!payAmount || payAmount === '0')) { alert('급여 금액을 입력해주세요.'); return; }
 
-        const adData = {
-            ownerId: authUser.id,
-            shopName: formState.shopName,
+        // [Mapping Fix] Supabase 실제 스키마(shops 테이블)에 맞춰 데이터 구성
+        const adData: any = {
+            name: formState.shopName,
             title: formState.title,
-            nickname: formState.nickname,
-            managerName: formState.managerName,
-            managerPhone: formState.managerPhone,
-            messengers: formState.messengers,
-            category: [formState.industryMain, formState.industrySub],
             region: `${formState.regionCity} ${formState.regionGu}`,
-            age: [formState.ageMin, formState.ageMax],
-            payType: formState.payType,
-            payAmount: Number(formState.payAmount) || 0,
-            content: formState.editorRef.current?.innerHTML || '',
-            keywords: formState.selectedKeywords,
-            status: 'pending', // 심사중
-            product_type: formState.selectedAdProduct,
-            product_period: formState.selectedAdPeriod,
+            phone: formState.managerPhone,
+            kakao: formState.messengers.kakao,
+            telegram: formState.messengers.telegram,
+            pay: `${formState.payType} ${formState.payAmount}`,
+            pay_type: formState.payType,
+            work_type: formState.industryMain,
+            site: brand.displayName,
+            tier: formState.selectedAdProduct || 'grand',
+            status: 'pending',
+            ownerId: authUser.id, // [New] 최상위 컬럼으로 추가 (shops 테이블 ownerId 대응)
             options: {
-                icon: formState.selectedIcon,
-                highlighter: formState.selectedHighlighter,
-                border: formState.borderOption,
-                paySuffixes: formState.paySuffixes
+                nickname: formState.nickname,
+                managerName: formState.managerName,
+                messengers: formState.messengers,
+                categorySub: formState.industrySub,
+                age: [formState.ageMin, formState.ageMax],
+                product_type: formState.selectedAdProduct,
+                product_period: formState.selectedAdPeriod,
+                payAmount: Number(formState.payAmount) || 0,
+                content: formState.editorRef.current?.innerHTML || '',
+                keywords: formState.selectedKeywords,
             },
             updated_at: new Date().toISOString()
         };
 
         if (isNewEntry) {
             if (confirm('공고를 등록하시겠습니까? 무통장 입금 확인 후 승인 처리됩니다.')) {
-                // 1. 광고 정보 저장
+                // ID 자동 생성 (UUID 지원)
+                const newId = `AD_${Date.now()}`;
                 const { data: shopData, error: shopError } = await supabase
                     .from('shops')
-                    .insert([{ ...adData, created_at: new Date().toISOString() }])
+                    .insert([{ ...adData, id: newId, created_at: new Date().toISOString() }])
                     .select();
 
                 if (shopError) {
+                    console.error("Ad Save Error:", shopError);
+                    // 스키마 에러인 경우 사용자에게 가이드 제공
+                    const isSchemaError =
+                        shopError.message.includes("column \"status\" does not exist") ||
+                        shopError.message.includes("Could not find") ||
+                        shopError.message.includes("schema cache");
+
+                    if (isSchemaError) {
+                        if (confirm('DB 스키마가 현재 버전과 맞지 않습니다. 임시 모드로 등록하시겠습니까?\n(근본 해결을 위해 제공된 SQL 스크립트 실행이 권장됩니다.)')) {
+                            const mockAdsRaw = localStorage.getItem('coco_mock_ads');
+                            const mockAds = mockAdsRaw ? JSON.parse(mockAdsRaw) : [];
+                            const finalAd = { ...adData, id: newId, isMock: true };
+                            localStorage.setItem('coco_mock_ads', JSON.stringify([finalAd, ...mockAds]));
+
+                            alert('임시 등록되었습니다. 관리자에게 DB 업데이트를 요청해주세요.');
+                            fetchRegisteredAds();
+                            setView('dashboard');
+                            formState.resetAdStates();
+                            return;
+                        }
+                        return;
+                    }
+
                     alert('공고 등록 중 오류가 발생했습니다: ' + shopError.message);
                     return;
                 }
 
                 const newShopId = shopData?.[0]?.id;
 
-                // 2. 결제 대기 내역 생생 (무통장 입금용)
+                // 2. 결제 대기 내역 생성 (무통장 입금용)
                 if (newShopId) {
                     const { error: payError } = await supabase
                         .from('payments')
                         .insert([{
                             user_id: authUser.id,
-                            shop_id: newShopId, // UUID 또는 ID 연동
-                            amount: 100000, // 기본 예시 금액 (실제로는 상품별 가격 로직 필요)
+                            shop_id: newShopId,
+                            amount: 100000,
                             method: 'bank_transfer',
                             status: 'pending',
-                            description: `[${adData.product_type}] ${adData.shopName} 광구 신청`,
-                            ad_type: adData.product_type,
+                            description: `[${adData.tier}] ${adData.name} 공고 신청`,
+                            ad_type: adData.tier,
                             created_at: new Date().toISOString()
                         }]);
 
@@ -368,7 +450,7 @@ function MyShopContent() {
 
                 alert('공고가 성공적으로 등록 되었습니다! 관리자 확인 후 승인됩니다.');
                 fetchRegisteredAds();
-                fetchPaymentHistory(); // 결제 내역도 새로고침
+                fetchPaymentHistory();
                 setView('dashboard');
                 formState.resetAdStates();
             }
@@ -409,7 +491,7 @@ function MyShopContent() {
     }
 
     if (userType === 'individual') {
-        return <PersonalDashboard view={view} setView={setView} />;
+        return <PersonalDashboard view={view} setView={setView} resumeCount={resumeCount} />;
     }
 
 
@@ -468,9 +550,6 @@ function MyShopContent() {
                     }}
                 />
             )}
-            {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
-
-
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
             {/* Removed separate PreviewModal to ensure 100% consistency with AdDetailModal */}
             {showExampleModal && <ExampleModal show={showExampleModal} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
