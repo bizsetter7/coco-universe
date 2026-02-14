@@ -9,6 +9,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 // --- Components ---
 import BusinessDashboard from './components/dashboard/BusinessDashboard';
@@ -101,43 +102,65 @@ function MyShopContent() {
     const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-    // --- Data Persistence (Load) ---
-    useEffect(() => {
-        const savedAds = localStorage.getItem('my_site_registered_ads');
-        const savedPayments = localStorage.getItem('my_site_payment_history');
-        if (savedAds) {
-            try {
-                const ads = JSON.parse(savedAds);
-                setRegisteredAds(ads.map((ad: any) => ({
-                    ...ad,
-                    deadline: ad.deadline || '2026-03-25'
-                })));
-            } catch (e) {
-                console.error("Failed to parse ads", e);
-            }
+    // --- Data Fetching (Supabase) ---
+    const fetchRegisteredAds = async () => {
+        if (!authUser?.id || authUser.id === 'guest') return;
+
+        const { data, error } = await supabase
+            .from('shops')
+            .select('*')
+            .eq('ownerId', authUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Failed to fetch ads:", error);
+            return;
         }
-        if (savedPayments) {
-            try {
-                setPaymentHistory(JSON.parse(savedPayments));
-            } catch (e) {
-                console.error("Failed to parse payments", e);
-            }
+
+        if (data) {
+            setRegisteredAds(data.map((ad: any) => ({
+                ...ad,
+                deadline: ad.deadline || '2026-03-25'
+            })));
         }
         setIsDataLoaded(true);
-    }, []);
+    };
 
-    // --- Data Persistence (Save) ---
-    useEffect(() => {
-        if (isDataLoaded) {
-            localStorage.setItem('my_site_registered_ads', JSON.stringify(registeredAds));
+    const fetchPaymentHistory = async () => {
+        if (!authUser?.id || authUser.id === 'guest') return;
+
+        const { data, error } = await supabase
+            .from('payments')
+            .select('*')
+            .eq('user_id', authUser.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Failed to fetch payments:", error);
+            // Fallback for safety during transition
+            const savedPayments = localStorage.getItem('my_site_payment_history');
+            if (savedPayments) setPaymentHistory(JSON.parse(savedPayments));
+            return;
         }
-    }, [registeredAds, isDataLoaded]);
+
+        if (data) {
+            // UI 포맷에 맞춰 데이터 변환
+            setPaymentHistory(data.map((p: any) => ({
+                id: p.id,
+                desc: p.description || '광고 결제',
+                price: (p.amount || 0).toLocaleString() + '원',
+                method: p.method === 'bank_transfer' ? '무통장입금' : p.method,
+                date: new Date(p.created_at).toLocaleString(),
+                status: p.status === 'completed' ? '결제완료' : '대기',
+                type: p.ad_type || 'AD'
+            })));
+        }
+    };
 
     useEffect(() => {
-        if (isDataLoaded) {
-            localStorage.setItem('my_site_payment_history', JSON.stringify(paymentHistory));
-        }
-    }, [paymentHistory, isDataLoaded]);
+        fetchRegisteredAds();
+        fetchPaymentHistory();
+    }, [authUser?.id]);
 
     const setView = (newView: any) => {
         if (newView === view) return;
@@ -167,31 +190,33 @@ function MyShopContent() {
 
     // --- Auth & Init (Synced with useAuth) ---
     useEffect(() => {
+        const simulate = searchParams.get('simulate');
+        const viewParam = searchParams.get('view');
+
         if (authUserType) {
-            if (authUserType === 'admin') {
-                // [Security] Admins should always use /admin for their dashboard
+            // [New] 관리자인데 시뮬레이션/폼 진입이 아닌 경우에만 리다이렉트
+            if (authUserType === 'admin' && !simulate && !viewParam) {
                 router.replace('/admin');
                 return;
             }
-            setUserType(authUserType);
+
+            // 관리자인 경우 시뮬레이션 파라미터에 따라 타입 설정 (기본값 corporate)
+            if (authUserType === 'admin') {
+                setUserType(simulate === 'individual' ? 'individual' : 'corporate');
+            } else {
+                setUserType(authUserType);
+            }
+
             if (authUser.name) formState.setShopName(authUser.name);
             if (authUser.nickname) formState.setNickname(authUser.nickname);
         }
-
-        const isLoggedIn = localStorage.getItem('user_session');
-        if (!isLoggedIn) {
-            alert('로그인이 필요한 서비스입니다.');
-            router.replace('/?page=login');
-        }
-    }, [authUserType, authUser, router, formState]);
+    }, [authUserType, authUser, router, formState, searchParams]);
 
     // --- View Sync from URL ---
     useEffect(() => {
         const viewParam = (searchParams.get('view') || 'dashboard') as any;
         if (viewParam !== view) {
             _setView(viewParam);
-            // Only scroll to top if not returning to dashboard (dashboard handles its own scroll or prefers natural position)
-            // Using 'auto' for better mobile feeling instead of 'instant' unless necessary
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
     }, [searchParams, view]);
@@ -207,19 +232,13 @@ function MyShopContent() {
     useEffect(() => {
         const adIdParam = searchParams.get('id');
         if (view === 'form' && adIdParam && isDataLoaded && registeredAds.length > 0) {
-            // If we are in form view with an ID, but editingAdId is lost (e.g. refresh), restore it.
-            // Or if we just navigated here via router.push with ID.
-            const adId = Number(adIdParam);
-            if (editingAdId !== adId) {
-                const ad = registeredAds.find(a => a.id === adId);
-                if (ad) {
-                    setEditingAdId(adId);
-                    setIsNewEntry(false);
-                    // Load data if form is empty (heuristic to avoid overwriting user unsaved input during weird re-renders)
-                    // But typically on first load/refresh it's empty.
-                    if (!formState.title) {
-                        formState.loadAdData(ad);
-                    }
+            const adId = adIdParam; // Supabase uses UUID/String usually, check ad.id type
+            const ad = registeredAds.find(a => String(a.id) === String(adId));
+            if (ad) {
+                setEditingAdId(adId as any);
+                setIsNewEntry(false);
+                if (!formState.title) {
+                    formState.loadAdData(ad);
                 }
             }
         }
@@ -264,7 +283,6 @@ function MyShopContent() {
             }
         };
 
-        console.log("page.tsx: Setting Preview Ad:", newAd);
         try {
             setSelectedAdForModal(newAd);
         } catch (e) {
@@ -272,7 +290,7 @@ function MyShopContent() {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // --- Validation ---
         const {
             title, shopName, managerName, managerPhone, industryMain, industrySub,
@@ -288,117 +306,89 @@ function MyShopContent() {
         if (payType === '종류선택') { alert('급여 종류를 선택해주세요.'); return; }
         if (payType !== '협의' && (!payAmount || payAmount === '0')) { alert('급여 금액을 입력해주세요.'); return; }
 
+        const adData = {
+            ownerId: authUser.id,
+            shopName: formState.shopName,
+            title: formState.title,
+            nickname: formState.nickname,
+            managerName: formState.managerName,
+            managerPhone: formState.managerPhone,
+            messengers: formState.messengers,
+            category: [formState.industryMain, formState.industrySub],
+            region: `${formState.regionCity} ${formState.regionGu}`,
+            age: [formState.ageMin, formState.ageMax],
+            payType: formState.payType,
+            payAmount: Number(formState.payAmount) || 0,
+            content: formState.editorRef.current?.innerHTML || '',
+            keywords: formState.selectedKeywords,
+            status: 'pending', // 심사중
+            product_type: formState.selectedAdProduct,
+            product_period: formState.selectedAdPeriod,
+            options: {
+                icon: formState.selectedIcon,
+                highlighter: formState.selectedHighlighter,
+                border: formState.borderOption,
+                paySuffixes: formState.paySuffixes
+            },
+            updated_at: new Date().toISOString()
+        };
+
         if (isNewEntry) {
-            if (confirm('공고를 등록하시겠습니까?')) {
-                // Simulate saving to state
-                const newId = Math.floor(Math.random() * 90000) + 10000;
+            if (confirm('공고를 등록하시겠습니까? 무통장 입금 확인 후 승인 처리됩니다.')) {
+                // 1. 광고 정보 저장
+                const { data: shopData, error: shopError } = await supabase
+                    .from('shops')
+                    .insert([{ ...adData, created_at: new Date().toISOString() }])
+                    .select();
 
-                const newAd = {
-                    id: newId,
-                    title: formState.title,
-                    nickname: formState.nickname,
-                    managerName: formState.managerName,
-                    managerPhone: formState.managerPhone,
-                    messengers: formState.messengers,
-                    category: formState.industryMain,
-                    categorySub: formState.industrySub,
-                    regionCity: formState.regionCity,
-                    regionGu: formState.regionGu,
-                    ageMin: formState.ageMin,
-                    ageMax: formState.ageMax,
-                    payType: formState.payType,
-                    payAmount: formState.payAmount,
-                    content: formState.editorRef.current?.innerHTML || '',
-                    keywords: formState.selectedKeywords,
-                    updateDate: new Date().toISOString().split('T')[0],
-                    deadline: new Date(Date.now() + (Number(formState.selectedAdPeriod) || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0,
-                    status: 'PENDING_REVIEW', // 심사중 
-                    productType: formState.selectedAdProduct || '그랜드', // Default for preview
-                    productPeriod: formState.selectedAdPeriod,
-                    options: {
-                        icon: formState.selectedIcon,
-                        iconPeriod: formState.iconPeriod,
-                        highlighter: formState.selectedHighlighter,
-                        highlighterPeriod: formState.highlighterPeriod,
-                        borderOption: formState.borderOption,
-                        borderPeriod: formState.borderPeriod,
-                        paySuffixes: formState.paySuffixes
-                    }
-                };
-                setRegisteredAds(prev => [newAd, ...prev]);
-                const newPayment = {
-                    id: newId, // Use the same NO.
-                    type: formState.selectedAdProduct || '일반등록',
-                    desc: formState.title, // User wanted ad title itself
-                    price: `${formState.totalAmount.toLocaleString()}원`, // Actual amount
-                    method: '입금', // User specified '입금'
-                    nickname: formState.nickname || '관리자',
-                    date: new Date().toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                    status: '심사중', // User requested '심사중'
-                    isConfirmed: false,
-                    options: {
-                        icon: formState.selectedIcon,
-                        highlighter: formState.selectedHighlighter,
-                        border: formState.borderOption !== 'none'
-                    }
-                };
-                setPaymentHistory(prev => [newPayment, ...prev]);
+                if (shopError) {
+                    alert('공고 등록 중 오류가 발생했습니다: ' + shopError.message);
+                    return;
+                }
 
-                alert('공고가 성공적으로 등록 되었습니다!');
+                const newShopId = shopData?.[0]?.id;
+
+                // 2. 결제 대기 내역 생생 (무통장 입금용)
+                if (newShopId) {
+                    const { error: payError } = await supabase
+                        .from('payments')
+                        .insert([{
+                            user_id: authUser.id,
+                            shop_id: newShopId, // UUID 또는 ID 연동
+                            amount: 100000, // 기본 예시 금액 (실제로는 상품별 가격 로직 필요)
+                            method: 'bank_transfer',
+                            status: 'pending',
+                            description: `[${adData.product_type}] ${adData.shopName} 광구 신청`,
+                            ad_type: adData.product_type,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (payError) console.error("Payment log creation failed:", payError);
+                }
+
+                alert('공고가 성공적으로 등록 되었습니다! 관리자 확인 후 승인됩니다.');
+                fetchRegisteredAds();
+                fetchPaymentHistory(); // 결제 내역도 새로고침
                 setView('dashboard');
                 formState.resetAdStates();
             }
         } else {
-            // Edit Mode: Update existing ad
-            if (editingAdId) {
-                setRegisteredAds(prev => prev.map(ad => {
-                    if (ad.id === editingAdId) {
-                        return {
-                            ...ad,
-                            title: formState.title,
-                            nickname: formState.nickname,
-                            managerName: formState.managerName,
-                            managerPhone: formState.managerPhone,
-                            messengers: formState.messengers,
-                            category: formState.industryMain,
-                            categorySub: formState.industrySub,
-                            regionCity: formState.regionCity,
-                            regionGu: formState.regionGu,
-                            ageMin: formState.ageMin,
-                            ageMax: formState.ageMax,
-                            payType: formState.payType,
-                            payAmount: formState.payAmount,
-                            content: formState.editorRef.current?.innerHTML || '',
-                            keywords: formState.selectedKeywords,
-                            updateDate: new Date().toISOString().split('T')[0],
-                            // Update deadline if period changed? Usually registration date is fixed, but let's assume update changes it if period changes.
-                            // For now, keep original logic (no deadline update on edit usually unless extended)
-                            options: {
-                                ...ad.options,
-                                paySuffixes: formState.paySuffixes,
-                                icon: formState.selectedIcon, // Also update options
-                                highlighter: formState.selectedHighlighter,
-                                borderOption: formState.borderOption
-                            }
-                        };
-                    }
-                    return ad;
-                }));
-                setPaymentHistory(prev => prev.map(p => {
-                    if (p.id === editingAdId) {
-                        return { ...p, desc: formState.title };
-                    }
-                    return p;
-                }));
+            if (editingAdId && confirm('공고 수정을 완료하시겠습니까?')) {
+                const { error } = await supabase
+                    .from('shops')
+                    .update(adData)
+                    .eq('id', editingAdId);
+
+                if (error) {
+                    alert('공고 수정 중 오류가 발생했습니다: ' + error.message);
+                    return;
+                }
+
                 alert('공고 수정이 완료되었습니다.');
+                fetchRegisteredAds();
                 setView('dashboard');
-                setEditingAdId(null); // Clear editing state
+                setEditingAdId(null);
                 formState.resetAdStates();
-            } else {
-                // Fallback if editingAdId is missing but we are in edit mode (should be caught by useEffect)
-                alert('수정할 공고 정보를 찾을 수 없습니다. 다시 시도해주세요.');
-                setView('dashboard');
             }
         }
     };

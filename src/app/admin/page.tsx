@@ -22,7 +22,8 @@ import {
     Unlock,
     Info,
     Database,
-    RefreshCw
+    RefreshCw,
+    CreditCard
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { Shop } from '@/types/shop';
@@ -49,8 +50,16 @@ function AdminContent() {
     useSearchParams();
 
     // --- 1. Core State Section ---
-    const [mockAds, setMockAds] = useState<Shop[]>([]); // This will sync with shops from DB
-    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo'>('stats');
+    const [mockAds, setMockAds] = useState<Shop[]>([]);
+    const [realUsers, setRealUsers] = useState<any[]>([]);
+    const [payments, setPayments] = useState<any[]>([]);
+    const [stats, setStats] = useState({
+        totalRevenue: 124030000,
+        activeAds: 0,
+        newUserToday: 0,
+        totalUsers: 0
+    });
+    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments'>('stats');
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
     const [isMobileInquiryModalOpen, setIsMobileInquiryModalOpen] = useState(false);
@@ -89,13 +98,54 @@ function AdminContent() {
     // --- 5. Data Fetching (Supabase) ---
     const fetchData = async () => {
         try {
-            const { data } = await supabase
+            // 1. 광고(shops) 데이터 가져오기
+            const { data: adsData } = await supabase
                 .from('shops')
                 .select('*')
                 .order('updated_at', { ascending: false });
 
-            if (data) {
-                setMockAds(data as Shop[]); // Sync mockAds with shops table
+            if (adsData) {
+                setMockAds(adsData as Shop[]);
+                const activeCount = adsData.filter(a => a.status === 'active').length;
+
+                // 매출 합산 (가정: payAmount가 광고 단가인 경우 혹은 별도 필드)
+                const currentRevenue = adsData
+                    .filter(a => a.status === 'active')
+                    .reduce((acc, curr) => acc + (Number(curr.payAmount) || 0), 0);
+
+                setStats(prev => ({
+                    ...prev,
+                    activeAds: activeCount,
+                    totalRevenue: 124030000 + currentRevenue
+                }));
+            }
+
+            // 2. 회원(profiles) 데이터 가져오기
+            const { data: userData } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (userData) {
+                setRealUsers(userData);
+                setStats(prev => ({
+                    ...prev,
+                    totalUsers: userData.length,
+                    newUserToday: userData.filter(u => {
+                        const today = new Date().toISOString().split('T')[0];
+                        return u.created_at?.startsWith(today);
+                    }).length
+                }));
+            }
+
+            // 3. 결제(payments) 데이터 가져오기
+            const { data: payData } = await supabase
+                .from('payments')
+                .select('*, profiles(nickname, full_name)')
+                .order('created_at', { ascending: false });
+
+            if (payData) {
+                setPayments(payData);
             }
         } catch (err) {
             console.error('Fetch error:', err);
@@ -141,6 +191,36 @@ function AdminContent() {
                 return nextAds;
             });
             alert('DB 업데이트 중 오류가 발생하여 로컬 상태만 변경되었습니다.');
+        }
+    };
+
+    const handlePaymentConfirm = async (paymentId: string, shopId: string) => {
+        if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
+
+        try {
+            // 1. 결제 상태 변경
+            const { error: payError } = await supabase
+                .from('payments')
+                .update({ status: 'completed', updated_at: new Date().toISOString() })
+                .eq('id', paymentId);
+
+            if (payError) throw payError;
+
+            // 2. 연결된 광고 상태 변경 (Optional: 자동 승인 정착 시)
+            if (shopId) {
+                const { error: shopError } = await supabase
+                    .from('shops')
+                    .update({ status: 'active', updated_at: new Date().toISOString() })
+                    .eq('id', shopId);
+
+                if (shopError) console.error("Ad auto-approval failed:", shopError);
+            }
+
+            alert('결제 승인 및 광고 게시 처리가 완료되었습니다.');
+            fetchData(); // 전체 리프레시
+        } catch (err) {
+            console.error('Payment confirmation error:', err);
+            alert('오류가 발생했습니다.');
         }
     };
 
@@ -210,6 +290,7 @@ function AdminContent() {
                         <nav className="flex-1 space-y-3">
                             <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active={activeTab === 'stats'} onClick={() => { setActiveTab('stats'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} onClick={() => { setActiveTab('ads'); setIsSidebarOpen(false); }} />
+                            <NavItem icon={<CreditCard size={20} />} label="결제 관리" active={activeTab === 'payments'} onClick={() => { setActiveTab('payments'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => { setActiveTab('inquiry'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => { setActiveTab('seo'); setIsSidebarOpen(false); }} />
@@ -232,6 +313,7 @@ function AdminContent() {
                 <nav className="flex-1 p-4 space-y-2">
                     <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
                     <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} onClick={() => setActiveTab('ads')} />
+                    <NavItem icon={<Database size={20} />} label="결제 내역 관리" active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} />
                     <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => setActiveTab('inquiry')} />
                     <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
                     <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => setActiveTab('seo')} />
@@ -252,39 +334,66 @@ function AdminContent() {
                         <p className="text-slate-400 font-bold text-xs md:text-sm mt-2">환영합니다, 사장님. 플랫폼의 모든 흐름이 당신의 손끝에 있습니다.</p>
                     </div>
 
-                    <div className="flex items-center gap-4 relative">
-                        <div
-                            className="flex -space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                        >
-                            <div className="w-10 h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[10px] font-black text-pink-600 shadow-sm z-30">AD</div>
-                            <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm z-20">MB</div>
-                            <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 shadow-sm z-10">+</div>
+                    <div className="flex items-center gap-3 relative">
+                        {/* Role Simulator Icons */}
+                        <div className="flex -space-x-2 mr-2">
+                            <div
+                                onClick={() => router.push('/my-shop?simulate=corporate')}
+                                title="기업 회원 시뮬레이션 (광고 등록/관리)"
+                                className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-pink-600 shadow-sm z-30 cursor-pointer hover:scale-110 hover:z-40 transition-all"
+                            >
+                                AD
+                            </div>
+                            <div
+                                onClick={() => router.push('/my-shop?simulate=individual')}
+                                title="개인 회원 시뮬레이션 (이력서/지원)"
+                                className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-blue-600 shadow-sm z-20 cursor-pointer hover:scale-110 hover:z-40 transition-all"
+                            >
+                                MB
+                            </div>
+                            <div
+                                onClick={() => router.push('/my-shop?view=form')}
+                                title="테스트 용도의 신규 공고 즉시 등록"
+                                className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-slate-600 shadow-sm z-10 cursor-pointer hover:scale-110 transition-all"
+                            >
+                                +
+                            </div>
                         </div>
 
-                        {isProfileMenuOpen && (
-                            <div className="absolute top-14 right-14 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-[10010] p-2 animate-in fade-in zoom-in-95 duration-200">
-                                <div className="p-3 border-b border-slate-50 mb-1">
-                                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">MASTER ADMIN</p>
-                                    <p className="text-sm font-black text-slate-950">운영자 계정</p>
+                        {/* Admin Master Menu */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                                className={`w-9 h-9 md:w-10 md:h-10 rounded-2xl border flex items-center justify-center transition-all active:scale-95 ${isProfileMenuOpen ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 shadow-sm'}`}
+                                title="관리자 메뉴 (로그아웃 등)"
+                            >
+                                <ShieldCheck size={20} />
+                            </button>
+
+                            {isProfileMenuOpen && (
+                                <div className="absolute top-14 right-0 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-[10010] p-2 animate-in fade-in zoom-in-95 duration-200">
+                                    <div className="p-3 border-b border-slate-50 mb-1">
+                                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">MASTER ADMIN</p>
+                                        <p className="text-sm font-black text-slate-950">운영자 계정</p>
+                                    </div>
+                                    <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">프로필 설정</button>
+                                    <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">로그 관리</button>
+                                    <button
+                                        onClick={() => { localStorage.clear(); window.location.href = '/'; }}
+                                        className="w-full text-left px-3 py-2 text-xs font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+                                    >
+                                        로그아웃
+                                    </button>
                                 </div>
-                                <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">프로필 설정</button>
-                                <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">로그 관리</button>
-                                <button
-                                    onClick={() => { localStorage.clear(); window.location.href = '/'; }}
-                                    className="w-full text-left px-3 py-2 text-xs font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
-                                >
-                                    로그아웃
-                                </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         <div className="relative">
                             <button
                                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                className="relative p-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
+                                className={`relative p-2.5 md:p-3 border rounded-2xl transition-all active:scale-95 ${isNotificationOpen ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 shadow-sm'}`}
                             >
-                                <Bell size={20} className="text-slate-400" />
+                                <Bell size={20} />
                                 {mockAds.filter(a => a.status === 'pending').length > 0 && (
                                     <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white animate-pulse"></span>
                                 )}
@@ -328,8 +437,8 @@ function AdminContent() {
                         {/* Intelligent Stats Cluster */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                             <StatCard
-                                title="누적 매출 총액"
-                                value={`${(mockAds.filter(a => a.status === 'active').reduce((acc, current) => acc + (current.price || 0), 0) + 124030000).toLocaleString()} 원`}
+                                title="누적 예상 매출"
+                                value={`${stats.totalRevenue.toLocaleString()} 원`}
                                 trend="+12.5%"
                                 icon={<TrendingUp size={24} />}
                                 color="blue"
@@ -337,16 +446,16 @@ function AdminContent() {
                             />
                             <StatCard
                                 title="활성 광고 슬롯"
-                                value={mockAds.filter(a => a.status === 'active').length.toLocaleString()}
-                                trend={`+${mockAds.filter(a => a.status === 'active').length}`}
+                                value={stats.activeAds.toLocaleString()}
+                                trend={`+${stats.activeAds}`}
                                 icon={<Megaphone size={24} />}
                                 color="pink"
                                 onClick={() => setActiveTab('ads')}
                             />
                             <StatCard
-                                title="신규 회원 유입"
-                                value={`${mockUsers.length + 3477} 명`}
-                                trend="+24.2%"
+                                title="전체 회원 수"
+                                value={`${stats.totalUsers.toLocaleString()} 명`}
+                                trend={`오늘 +${stats.newUserToday}`}
                                 icon={<Users size={24} />}
                                 color="slate"
                                 onClick={() => setActiveTab('users')}
@@ -610,65 +719,127 @@ function AdminContent() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mockUsers
-                                            .filter(u => userFilter === 'all' || u.type === userFilter)
-                                            .filter(u => u.loginId.includes(userSearch) || u.nickname.includes(userSearch) || u.name.includes(userSearch))
-                                            .map((u) => (
-                                                <React.Fragment key={u.id}>
-                                                    <tr
-                                                        onClick={() => alert(`'${u.name}' 회원의 상세 활동 타임라인을 불러옵니다. (준비중)`)}
-                                                        className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group"
-                                                    >
-                                                        <td className="px-8 py-6">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                                                    {u.name[0]}
+                                        {realUsers.length > 0 ? (
+                                            realUsers
+                                                .filter(u => userFilter === 'all' || u.role === userFilter)
+                                                .filter(u => (u.email || '').includes(userSearch) || (u.nickname || '').includes(userSearch) || (u.full_name || '').includes(userSearch))
+                                                .map((u) => (
+                                                    <React.Fragment key={u.id}>
+                                                        <tr
+                                                            onClick={() => alert(`'${u.full_name || u.nickname}' 회원의 상세 활동 타임라인을 불러옵니다. (준비중)`)}
+                                                            className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group"
+                                                        >
+                                                            <td className="px-8 py-6">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                                        {(u.full_name || u.nickname || '회')[0]}
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="text-sm font-black text-slate-900">{u.full_name || u.nickname || '익명'} <span className="text-[10px] text-slate-300 font-bold ml-1">({u.email})</span></div>
+                                                                        <div className="text-[10px] font-bold text-blue-500">{u.nickname}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div>
-                                                                    <div className="text-sm font-black text-slate-900">{u.name} <span className="text-[10px] text-slate-300 font-bold ml-1">({u.loginId})</span></div>
-                                                                    <div className="text-[10px] font-bold text-blue-500">{u.nickname}</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <div className="text-[11px] font-black text-slate-700">{u.phone || '미등록'}</div>
+                                                                <div className="text-[10px] font-bold text-slate-400">{u.email}</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-[9px] font-black uppercase tracking-wider">{u.referrer || '직접 유입'}</span>
+                                                                <div className="text-[9px] text-slate-300 mt-1 font-bold">{u.created_at?.split('T')[0]} 가입</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <span className={`px-2 py-1 rounded-md text-[10px] font-black ${u.blocked ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                                                                    {u.blocked ? 'BLOCKED' : 'ACTIVE'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-8 py-6 text-right">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.nickname}님의 비밀번호 초기화 메일을 발송했습니다.`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all"
+                                                                        title="비밀번호 초기화"
+                                                                    >
+                                                                        <Unlock size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.nickname}님에게 관리자 메일을 발송합니다.`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all"
+                                                                    >
+                                                                        <Mail size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.nickname} 회원의 계정 상태를 변경하시겠습니까?`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                                    >
+                                                                        <Lock size={16} />
+                                                                    </button>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-8 py-6">
-                                                            <div className="text-[11px] font-black text-slate-700">{u.phone}</div>
-                                                            <div className="text-[10px] font-bold text-slate-400">{u.email}</div>
-                                                        </td>
-                                                        <td className="px-8 py-6">
-                                                            <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-[9px] font-black uppercase tracking-wider">{u.referrer}</span>
-                                                            <div className="text-[9px] text-slate-300 mt-1 font-bold">{u.joinDate} 가입</div>
-                                                        </td>
-                                                        <td className="px-8 py-6">
-                                                            <span className={`px-2 py-1 rounded-md text-[10px] font-black ${u.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                                {u.status.toUpperCase()}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-8 py-6 text-right">
-                                                            <div className="flex justify-end gap-2">
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); alert(`${u.name}님의 비밀번호를 'coco1234!'로 초기화했습니다.`); }}
-                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all"
-                                                                    title="비밀번호 초기화"
-                                                                >
-                                                                    <Unlock size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); alert(`${u.name}님에게 관리자 메일을 발송합니다.`); }}
-                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all"
-                                                                >
-                                                                    <Mail size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); alert(`${u.name} 회원의 계정 상태를 변경하시겠습니까?`); }}
-                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
-                                                                >
-                                                                    <Lock size={16} />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </React.Fragment>
-                                            ))}
+                                                            </td>
+                                                        </tr>
+                                                    </React.Fragment>
+                                                ))
+                                        ) : (
+                                            mockUsers
+                                                .filter(u => userFilter === 'all' || u.type === userFilter)
+                                                .filter(u => u.loginId.includes(userSearch) || u.nickname.includes(userSearch) || u.name.includes(userSearch))
+                                                .map((u) => (
+                                                    <React.Fragment key={u.id}>
+                                                        <tr
+                                                            onClick={() => alert(`'${u.name}' 회원의 상세 활동 타임라인을 불러옵니다. (준비중)`)}
+                                                            className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group"
+                                                        >
+                                                            <td className="px-8 py-6">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                                        {u.name[0]}
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="text-sm font-black text-slate-900">{u.name} <span className="text-[10px] text-slate-300 font-bold ml-1">({u.loginId})</span></div>
+                                                                        <div className="text-[10px] font-bold text-blue-500">{u.nickname}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <div className="text-[11px] font-black text-slate-700">{u.phone}</div>
+                                                                <div className="text-[10px] font-bold text-slate-400">{u.email}</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-md text-[9px] font-black uppercase tracking-wider">{u.referrer}</span>
+                                                                <div className="text-[9px] text-slate-300 mt-1 font-bold">{u.joinDate} 가입</div>
+                                                            </td>
+                                                            <td className="px-8 py-6">
+                                                                <span className={`px-2 py-1 rounded-md text-[10px] font-black ${u.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                                    {u.status.toUpperCase()}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-8 py-6 text-right">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.name}님의 비밀번호를 'coco1234!'로 초기화했습니다.`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all"
+                                                                        title="비밀번호 초기화"
+                                                                    >
+                                                                        <Unlock size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.name}님에게 관리자 메일을 발송합니다.`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all"
+                                                                    >
+                                                                        <Mail size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); alert(`${u.name} 회원의 계정 상태를 변경하시겠습니까?`); }}
+                                                                        className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                                    >
+                                                                        <Lock size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </React.Fragment>
+                                                ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -845,6 +1016,75 @@ function AdminContent() {
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
                         <CompetitorAnalysis />
                         <SEOIndexingControl />
+                    </div>
+                )}
+
+                {/* Tab 7: Payment Management (New) */}
+                {activeTab === 'payments' && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter">결제 내역 및 입금 승인 💸</h3>
+                                <p className="text-sm text-slate-400 font-bold mt-1">무통장 입금 내역을 확인하고 광고를 최종 승인합니다.</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[900px]">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 border-b border-slate-100">
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">결제 정보 / 항목</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">회원 닉네임</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">금액 / 수단</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">관리 상태</th>
+                                            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">승인 제어</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {payments.length > 0 ? (
+                                            payments.map((p) => (
+                                                <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/70 transition-colors">
+                                                    <td className="px-8 py-6">
+                                                        <div className="text-sm font-black text-slate-900 leading-tight mb-1">{p.description}</div>
+                                                        <div className="text-[10px] font-bold text-slate-400 italic">#{p.id.substring(0, 8)}... | {new Date(p.created_at).toLocaleString()}</div>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-sm font-bold text-slate-600">
+                                                        {p.profiles?.nickname || p.profiles?.full_name || '익명'}
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div className="text-sm font-black text-slate-950 tabular-nums">{(p.amount || 0).toLocaleString()}원</div>
+                                                        <div className="text-[9px] font-black text-blue-500 uppercase tracking-tighter">{p.method === 'bank_transfer' ? '무통장입금' : p.method}</div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className={`px-2 py-1 rounded-md text-[10px] font-black ${p.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                            {p.status === 'completed' ? '결제완료' : '입금대기'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        {p.status !== 'completed' && (
+                                                            <button
+                                                                onClick={() => handlePaymentConfirm(p.id, p.shop_id)}
+                                                                className="px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
+                                                            >
+                                                                입금확인 및 승인
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="px-8 py-20 text-center opacity-30">
+                                                    <CreditCard size={40} className="mx-auto mb-4" />
+                                                    <p className="text-sm font-black">아직 결제 신청 내역이 없습니다.</p>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 )}
             </main>

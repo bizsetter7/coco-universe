@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 // Unified user session type
 export interface UserSession {
@@ -11,9 +12,10 @@ export interface UserSession {
     shopId?: string;
 }
 
-// Simple event-based auth hook for client-side demo
+// Supabase Auth 연동된 실제 인증 훅
 export function useAuth() {
-    const [isLoggedIn, setIsLoggedInState] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<UserSession>({
         type: 'guest',
         id: 'guest',
@@ -22,44 +24,53 @@ export function useAuth() {
         points: 0
     });
 
-    const updateAuthStatus = () => {
-        try {
-            const sessionStr = localStorage.getItem('user_session');
-            if (!sessionStr) {
-                setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
-                setIsLoggedInState(false);
-                return;
-            }
-
-            const session = JSON.parse(sessionStr);
-            setIsLoggedInState(true);
-
-            // Normalize type based on whitelist or stored value
-            const finalType = (() => {
-                if (session.id === 'admin_user' || session.id === 'admin_shop') return 'admin';
-                if (session.id === 'test_shop' || session.type === 'corporate' || session.type === 'shop' || session.type === 'business') return 'corporate';
-                if (session.id === 'test_user' || session.type === 'individual' || session.type === 'personal') return 'individual';
-                return 'guest';
-            })() as UserSession['type'];
-
-            setUser({
-                type: finalType,
-                id: session.id || 'unknown',
-                name: session.name || '회원',
-                nickname: session.nickname || session.name || '익명',
-                points: session.points || 0,
-                referrer: session.referrer,
-                shopId: session.shopId
-            });
-        } catch (e) {
-            console.error('Auth status sync error:', e);
+    const syncUserSession = async (session: any) => {
+        if (!session?.user) {
             setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
-            setIsLoggedInState(false);
+            setIsLoggedIn(false);
+            setIsLoading(false);
+            return;
         }
+
+        const { user: authUser } = session;
+
+        // profiles 테이블에서 추가 정보(닉네임, 역할 등) 가져오기
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authUser.id)
+            .single();
+
+        const userType = profile?.role === 'admin' ? 'admin' :
+            (profile?.role === 'corporate' ? 'corporate' : 'individual');
+
+        const newUser: UserSession = {
+            type: userType as UserSession['type'],
+            id: authUser.id,
+            name: profile?.full_name || authUser.email?.split('@')[0] || '회원',
+            nickname: profile?.nickname || profile?.full_name || '닉네임',
+            points: profile?.points || 0,
+            referrer: profile?.referrer,
+            shopId: profile?.shop_id
+        };
+
+        setUser(newUser);
+        setIsLoggedIn(true);
+        setIsLoading(false);
     };
 
     useEffect(() => {
-        // [New] Capture Referrer on landing if not set
+        // 1. 초기 세션 확인
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            syncUserSession(session);
+        });
+
+        // 2. 인증 상태 변경 감지
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            syncUserSession(session);
+        });
+
+        // [New] Capture Referrer on landing
         if (!localStorage.getItem('user_referrer') && typeof document !== 'undefined') {
             const ref = document.referrer;
             if (ref) {
@@ -72,47 +83,23 @@ export function useAuth() {
             }
         }
 
-        updateAuthStatus();
-
-        const handleAuthChange = () => {
-            updateAuthStatus();
-        };
-
-        window.addEventListener('storage', handleAuthChange);
-        window.addEventListener('auth-change', handleAuthChange);
-
-        return () => {
-            window.removeEventListener('storage', handleAuthChange);
-            window.removeEventListener('auth-change', handleAuthChange);
-        };
+        return () => subscription.unsubscribe();
     }, []);
 
-    const login = (type: string, id?: string, name?: string, nickname?: string) => {
-        const targetType = (type === 'admin' ? 'admin' : (type === 'shop' || type === 'corporate' ? 'corporate' : 'individual')) as UserSession['type'];
-
-        const newUser: UserSession = {
-            type: targetType,
-            id: id || (targetType === 'admin' ? 'admin_shop' : (targetType === 'corporate' ? 'test_shop' : 'test_user')),
-            name: name || (targetType === 'admin' ? '최고관리자' : (targetType === 'corporate' ? '기업회원' : '일반회원')),
-            nickname: nickname || name || (targetType === 'admin' ? '최고관리자' : (targetType === 'corporate' ? '테스트사장님' : '테스트회원')),
-            points: 50000,
-            referrer: localStorage.getItem('user_referrer') || undefined
-        };
-        setUser(newUser);
-        localStorage.setItem('user_session', JSON.stringify(newUser));
-        localStorage.setItem('user_type', targetType);
-        window.dispatchEvent(new Event('auth-change'));
+    const login = async (email: string, id?: string) => {
+        // 이 함수는 이전 Mock 호환성을 위해 남겨두거나, 
+        // 실제 로그인 페이지에서는 supabase.auth.signInWithPassword를 직접 사용합니다.
+        console.log('Centralized login called for:', email);
     };
 
-    const logout = () => {
-        localStorage.removeItem('user_session');
+    const logout = async () => {
+        await supabase.auth.signOut();
         localStorage.removeItem('adult_verified');
-        localStorage.removeItem('user_type');
-        window.dispatchEvent(new Event('auth-change'));
     };
 
     return {
         isLoggedIn,
+        isLoading,
         user,
         login,
         logout,
