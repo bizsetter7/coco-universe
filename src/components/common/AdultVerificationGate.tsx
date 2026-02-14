@@ -81,9 +81,9 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             } else {
                 alert(`성인 인증 실패: ${result.message || '만 19세 미만은 이용할 수 없습니다.'}`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('PortOne Error:', error);
-            alert('인증 과정 중 예기치 않은 오류가 발생했습니다.');
+            alert(`인증 오류 발생: ${error.message || '알 수 없는 오류'}\n(Store ID와 Channel Key가 일치하는지 확인해주세요.)`);
         }
     };
 
