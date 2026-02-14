@@ -464,11 +464,32 @@ function AdminContent() {
                                                             <p className="text-sm font-black text-slate-900 tracking-tighter">운영 데이터베이스가 비어 있습니다.</p>
                                                             <p className="text-xs text-slate-400 font-bold mt-1">로컬 데이터를 Supabase로 동기화(Migration)해야 리스트가 표시됩니다.</p>
                                                         </div>
+
+                                                        {/* --- 진단용 디버그 정보 (START) --- */}
+                                                        <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl text-left w-full max-w-sm">
+                                                            <p className="text-xs font-black text-red-600 mb-2 flex items-center gap-1">
+                                                                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                                                시스템 연결 진단 (System Diagnostic)
+                                                            </p>
+                                                            <div className="space-y-1 text-[11px] text-red-500 font-medium">
+                                                                <p>• URL Config: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ 설정됨' : '❌ 설정 안됨 (NULL)'}</p>
+                                                                <p>• URL Value: {process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 15) + '...' : '-'}</p>
+                                                                <p>• Placeholder: {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder') ? '⚠️ YES (연동 불가)' : '✅ NO (정상)'}</p>
+                                                                <p>• Data Count: {mockAds.length}건</p>
+                                                            </div>
+                                                            <p className="mt-2 text-[10px] text-red-400 border-t border-red-100 pt-2 leading-tight">
+                                                                {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder')
+                                                                    ? 'Vercel 환경 변수 미적용! 재배포 시 [Use existing Build Cache] 체크 해제 필수.'
+                                                                    : 'DB 연결은 정상입니다. 데이터가 0건이거나 조회 권한(RLS) 문제일 수 있습니다.'}
+                                                            </p>
+                                                        </div>
+                                                        {/* --- 진단용 디버그 정보 (END) --- */}
+
                                                         <button
-                                                            onClick={() => fetchData()}
+                                                            onClick={() => window.location.reload()}
                                                             className="mt-2 px-6 py-2.5 bg-slate-950 text-white rounded-xl text-xs font-black hover:bg-black transition-all flex items-center gap-2"
                                                         >
-                                                            <RefreshCw size={14} /> 데이터 새로고침
+                                                            <RefreshCw size={14} /> 데이터 새로고침 (페이지 로드)
                                                         </button>
                                                     </div>
                                                 </td>
