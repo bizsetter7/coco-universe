@@ -12,6 +12,15 @@ interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
+// PortOne V2 SDK Type Definition
+declare global {
+    interface Window {
+        PortOne?: {
+            requestIdentityVerification: (data: any) => Promise<any>;
+        };
+    }
+}
+
 // Mock User Database for Validation (Updated to match useAuth & LoginPage)
 const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = {
     'admin_shop': { type: 'business', name: '최고관리자' },
@@ -30,9 +39,51 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
         window.location.href = 'https://www.google.com';
     };
 
-    const handleNonMemberAuth = (type: string) => {
-        if (confirm(`${type} 인증을 진행하시겠습니까? (시뮬레이션)`)) {
-            onVerify();
+    const handleNonMemberAuth = async (type: string) => {
+        if (type !== '휴대폰') {
+            alert(`${type} 인증은 현재 준비 중입니다. 휴대폰 인증을 이용해 주세요.`);
+            return;
+        }
+
+        if (!window.PortOne) {
+            alert('인증 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+            return;
+        }
+
+        try {
+            // [PortOne V2] Identity Verification Request
+            const response = await window.PortOne.requestIdentityVerification({
+                storeId: "store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a",
+                identityVerificationId: `verif-${Date.now()}`,
+                channelKey: "channel-key-831464c8-0402-4ec6-993d-4467773f9d37", // Needs update
+            });
+
+            if (response.code !== undefined) {
+                // Failure or Cancel
+                console.error('Verification Failed:', response.message);
+                alert(`인증 실패: ${response.message}`);
+                return;
+            }
+
+            // Success: Verify on server
+            const verifyResponse = await fetch('/api/auth/verify-adult', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identityVerificationId: response.identityVerificationId }),
+            });
+
+            const result = await verifyResponse.json();
+
+            if (result.success) {
+                alert('성인 인증이 완료되었습니다. 환영합니다!');
+                localStorage.setItem('adult_verified', 'true');
+                onVerify();
+            } else {
+                alert(`성인 인증 실패: ${result.message || '만 19세 미만은 이용할 수 없습니다.'}`);
+            }
+        } catch (error) {
+            console.error('PortOne Error:', error);
+            alert('인증 과정 중 예기치 않은 오류가 발생했습니다.');
         }
     };
 

@@ -52,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
+        <script src="https://cdn.portone.io/v2/browser-sdk.js" async></script>
         <SEOManager />
         <SEOInjection />
         <BrandProvider>
