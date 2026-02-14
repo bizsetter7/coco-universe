@@ -479,8 +479,8 @@ function AdminContent() {
                                                             </div>
                                                             <p className="mt-2 text-[10px] text-red-400 border-t border-red-100 pt-2 leading-tight">
                                                                 {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder')
-                                                                    ? 'Vercel 환경 변수 미적용! 재배포 시 [Use existing Build Cache] 체크 해제 필수.'
-                                                                    : 'DB 연결은 정상입니다. 데이터가 0건이거나 조회 권한(RLS) 문제일 수 있습니다.'}
+                                                                    ? 'Vercel 환경 변수가 없지만 [Emergency Fallback]이 작동하여 연결되었습니다.'
+                                                                    : 'DB 연결 상태: 정상 (Environment Variable or Fallback Active)'}
                                                             </p>
                                                         </div>
                                                         {/* --- 진단용 디버그 정보 (END) --- */}

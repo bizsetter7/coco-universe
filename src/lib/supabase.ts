@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-// [Build-time Resilience] Use placeholders if environment variables are missing during build
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+// [Emergency Fallback] Hardcoded credentials to bypass Vercel environment variable issues
+// This ensures connection even if Vercel Project Settings are not configured correctly.
+const FALLBACK_URL = 'https://ronqwailyistjuyolmyh.supabase.co';
+const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvbnF3YWlseWlzdGp1eW9sbXloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5ODg0NzYsImV4cCI6MjA4NjU2NDQ3Nn0.0dUM7pVc7yClTIZ5J56TZbATzNgi5NGd2NZWLDcKD90';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    if (process.env.NODE_ENV === 'production') {
-        console.warn('⚠️ Supabase environment variables are missing in production build. Pre-rendering might fail for dynamic routes.');
-    }
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || FALLBACK_KEY;
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    console.warn('⚠️ using HARDCODED fallback credentials because process.env is missing.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
