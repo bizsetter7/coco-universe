@@ -10,7 +10,8 @@ export interface UserSession {
     points: number;
     referrer?: string;
     shopId?: string;
-    isSimulated?: boolean; // [New] 역할 체험 중인지 여부
+    isSimulated?: boolean;
+    isAdultVerified?: boolean; // [New] 성인인증 여부 (DB 연동)
 }
 
 // Supabase Auth 연동된 실제 인증 훅
@@ -69,6 +70,7 @@ export function useAuth() {
                         name: profile.full_name || authUser.email?.split('@')[0] || '회원',
                         nickname: profile.nickname || profile.full_name || '닉네임',
                         points: profile.points || 0,
+                        isAdultVerified: !!profile.is_adult_verified, // [New] DB 성인인증 여부 반영
                     };
 
                     // [Simulation Check] 어드민인 경우 유지된 시뮬레이션 상태 확인
@@ -78,6 +80,7 @@ export function useAuth() {
                             newUser = {
                                 ...newUser,
                                 type: simType,
+                                id: `${authUser.id}_sim_${simType}`, // [Fix] 행위 주체 ID를 시뮬레이션 역할에 맞게 분리
                                 isSimulated: true
                             };
                         }
@@ -183,7 +186,7 @@ export function useAuth() {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('coco_mock_session');
             localStorage.removeItem('adult_verified');
-            localStorage.removeItem('coco_sim_mode'); // 시뮬레이션 정보도 삭제
+            localStorage.removeItem('coco_sim_mode');
         }
 
         try {
@@ -195,21 +198,54 @@ export function useAuth() {
         setIsLoggedIn(false);
         setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
 
-        // Force Reload to clear all states
         window.location.href = '/';
+    };
+
+    /**
+     * [New] 실서비스용 실제 Supabase 로그인
+     */
+    const signIn = async (email: string, pw: string) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password: pw
+        });
+        if (error) throw error;
+        return data;
+    };
+
+    /**
+     * [New] 실서비스용 실제 Supabase 회원가입
+     */
+    const signUp = async (email: string, pw: string, metadata: any) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password: pw,
+            options: {
+                data: {
+                    full_name: metadata.name,
+                    nickname: metadata.nickname,
+                    role: metadata.role || 'individual'
+                }
+            }
+        });
+        if (error) throw error;
+        return data;
     };
 
     return {
         isLoggedIn,
         isLoading,
         user,
-        login,
+        login, // 이관용 Mock 유지
+        signIn,
+        signUp,
         logout,
         userType: user.type,
         userName: user.name,
         userNickname: user.nickname,
         userPoints: user.points,
         userReferrer: user.referrer,
-        isSimulated: user.isSimulated
+        isSimulated: user.isSimulated,
+        isAdultVerified: user.isAdultVerified
     };
 }

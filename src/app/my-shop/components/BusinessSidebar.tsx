@@ -1,17 +1,39 @@
 import React from 'react';
-import { Store, List, LogOut, User, CreditCard, Settings } from 'lucide-react';
+import { Store, List, LogOut, User, CreditCard, Settings, ShieldCheck } from 'lucide-react';
 
 export const BusinessSidebar = ({
     brand, shopName, nickname, view, setView
 }: {
     brand: any, shopName: string, nickname?: string, view: string, setView: (v: any) => void
 }) => {
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [profileImage, setProfileImage] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const saved = localStorage.getItem('business_profile_image');
+        if (saved) setProfileImage(saved);
+    }, []);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setProfileImage(base64String);
+                localStorage.setItem('business_profile_image', base64String);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const navItems = [
         { id: 'dashboard', label: '진행중인 채용정보', icon: List },
         { id: 'closed-ads', label: '마감된 채용정보', icon: LogOut },
         { id: 'applicants', label: '지원자 관리', icon: User },
         { id: 'payments', label: '결제 내역', icon: CreditCard },
         { id: 'member-info', label: '회원정보 수정', icon: Settings, borderTop: true },
+        { id: 'standards', label: '시스템 검증 센터', icon: ShieldCheck },
     ];
 
     const activeItemStyle = "bg-pink-50 text-pink-500 rounded-xl";
@@ -20,8 +42,18 @@ export const BusinessSidebar = ({
     return (
         <aside className="hidden md:block col-span-1 space-y-4">
             <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                <div className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}>
-                    <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
+                <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 cursor-pointer group relative ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}
+                >
+                    {profileImage ? (
+                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400"><Store size={32} /></div>
+                    )}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Settings size={16} className="text-white" />
+                    </div>
                 </div>
                 <div className="mb-4">
                     <h2 className={`font-black text-xl tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-black'} `}>
@@ -36,7 +68,17 @@ export const BusinessSidebar = ({
                         {nickname === '최고 관리자' ? '시스템 최상위 권한' : '프리미엄 인증 업소'}
                     </p>
                 </div>
-                <button className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} `}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+                <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`w-full py-2 rounded-lg text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} `}
+                >
                     사진 등록/수정
                 </button>
             </div>

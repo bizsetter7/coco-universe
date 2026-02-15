@@ -44,7 +44,7 @@ export const BG_COLORS = [
     { label: '회색', value: '#D1D5DB' }, // Gray-300
 ];
 
-export const PAY_TYPES = ['시급', '일급', '주급', '월급', '건별', '협의'];
+export const PAY_TYPES = ['시급', '일급', '주급', '월급', '연봉', 'TC', '건별', '협의'];
 
 // Helper to keep old reference working if strictly needed, 
 // though we usually replace it with CONVENIENCE_KEYWORDS.

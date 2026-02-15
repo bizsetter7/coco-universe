@@ -60,7 +60,15 @@ export default function LeftSidebar({
 }: LeftSidebarProps) {
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn: authIsLoggedIn, userName: authUserName, userType: authUserType, userPoints: authUserPoints, logout, login: authLogin } = useAuth();
+    const {
+        isLoggedIn: authIsLoggedIn,
+        userName: authUserName,
+        userType: authUserType,
+        userPoints: authUserPoints,
+        logout,
+        login: authLogin,
+        signIn
+    } = useAuth();
     const [selectedKeywords, setSelectedKeywords] = React.useState<string[]>([]);
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [isRegionOpen, setIsRegionOpen] = React.useState(false);
@@ -68,7 +76,7 @@ export default function LeftSidebar({
     const [isKeywordOpen, setIsKeywordOpen] = React.useState(false);
     const [isAdProductOpen, setIsAdProductOpen] = React.useState(false);
 
-    // Login Form State
+    const [isLoginLoading, setIsLoginLoading] = React.useState(false);
     const [loginId, setLoginId] = React.useState('');
     const [loginPw, setLoginPw] = React.useState('');
 
@@ -78,17 +86,49 @@ export default function LeftSidebar({
     const userType = propUserType ?? authUserType;
     const userPoints = propUserPoints ?? authUserPoints;
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!loginId || !loginPw) {
             alert('아이디와 비밀번호를 입력해주세요.');
             return;
         }
-        // Demo login logic: if ID includes 'shop', login as corporate
-        const type = loginId.includes('shop') ? 'shop' : 'personal';
-        authLogin(type);
-        setIsLoginOpen(false);
-        setLoginId('');
-        setLoginPw('');
+
+        const id = loginId.trim();
+        const pw = loginPw.trim();
+
+        setIsLoginLoading(true);
+        try {
+            // 1. Check for Test/Mock IDs
+            if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
+                authLogin('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
+                setIsLoginOpen(false);
+                setLoginId(''); setLoginPw('');
+                return;
+            } else if (id === 'test_shop' && pw === 'password123') {
+                authLogin('shop', id, '테스트 사장님', '번창하는조사장');
+                setIsLoginOpen(false);
+                setLoginId(''); setLoginPw('');
+                return;
+            } else if (id === 'test_user' && pw === 'password123') {
+                authLogin('personal', id, '테스트 회원', '밤의요정');
+                setIsLoginOpen(false);
+                setLoginId(''); setLoginPw('');
+                return;
+            }
+
+            // 2. Real Supabase Login
+            if (id.includes('@')) {
+                await signIn(id, pw);
+                setIsLoginOpen(false);
+                setLoginId(''); setLoginPw('');
+            } else {
+                alert('등록되지 않은 계정입니다.\n테스트 계정 또는 이메일 형식을 사용해주세요.');
+            }
+        } catch (err: any) {
+            console.error('Sidebar Login error:', err);
+            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+        } finally {
+            setIsLoginLoading(false);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {

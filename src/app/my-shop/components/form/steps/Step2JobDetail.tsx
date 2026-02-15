@@ -166,7 +166,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
         };
     }, [saveSelection, setShowFontMenu, setShowFontSizeMenu, setShowForeColorMenu, setShowHiliteColorMenu, setShowEmojiMenu]);
     return (
-        <section className={`p-2 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-green-950 via-gray-900 to-gray-950 border-green-900/50' : 'bg-gradient-to-br from-green-50 via-white to-emerald-50 border-green-200'}`}>
+        <section id="myshop-step-2" className={`p-2 md:p-6 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-indigo-950 via-gray-900 to-gray-950 border-indigo-900/50' : 'bg-gradient-to-br from-indigo-50 via-white to-blue-50 border-indigo-200'}`}>
             <div className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 text-white p-4 rounded-2xl mb-3 md:mb-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="text-center md:text-left">
                     <h2 className="font-black text-lg md:text-xl flex items-center justify-center md:justify-start gap-2">

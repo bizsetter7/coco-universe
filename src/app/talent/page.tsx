@@ -1,12 +1,14 @@
 'use client';
 
+import { createPortal } from 'react-dom';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Footer } from '@/components/layout/Footer';
 
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert } from 'lucide-react';
+import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Mock Data for Talent (Reused from HomeClient or similar)
 const MOCK_TALENTS = [
@@ -26,6 +28,22 @@ export default function TalentPage() {
     const { isLoggedIn, user, userType } = useAuth();
     const [accessDeniedModal, setAccessDeniedModal] = React.useState(false);
 
+    // Pagination Logic
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const ITEMS_PER_PAGE = 6;
+    const totalPages = Math.ceil(MOCK_TALENTS.length / ITEMS_PER_PAGE);
+
+    const currentTalents = MOCK_TALENTS.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     // [Business Logic] Talent Info only for Paid Corporate Members or Admin
     // For demo: Admin bypass enabled.
     const hasTalentAccess = userType === 'admin' || (userType === 'corporate' && (user.id === 'admin_shop' || user.points > 100000));
@@ -41,7 +59,7 @@ export default function TalentPage() {
     };
 
     return (
-        <div className={`h-auto min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} ${!hasTalentAccess ? 'overflow-hidden max-h-screen' : ''}`}>
+        <div className={`h-auto min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
             {/* Header Title Section */}
             <div className="bg-white border-b border-gray-100 py-6 px-4">
@@ -69,11 +87,11 @@ export default function TalentPage() {
 
                 {/* Talent List (Blurred for non-access users) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
-                    {MOCK_TALENTS.map((talent, index) => (
+                    {currentTalents.map((talent, index) => (
                         <div
                             key={index}
                             onClick={() => !hasTalentAccess && setAccessDeniedModal(true)}
-                            className={`p-6 rounded-3xl border transition-all hover:shadow-lg cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} ${!hasTalentAccess ? 'blur-[8px] opacity-40 select-none' : ''}`}
+                            className={`p-6 rounded-3xl border transition-all hover:shadow-lg cursor-pointer group ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">
@@ -90,7 +108,7 @@ export default function TalentPage() {
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-sm font-medium mb-4 line-clamp-2 text-gray-500">{talent.intro}</p>
+                            <p className={`text-sm font-medium mb-4 line-clamp-2 text-gray-500 ${!hasTalentAccess ? 'blur-[5px] select-none opacity-50' : ''}`}>{talent.intro}</p>
 
                             <div className="flex gap-2">
                                 <button
@@ -112,19 +130,43 @@ export default function TalentPage() {
                     )}
                 </div>
 
-                {/* Pagination (Hidden for non-access) */}
-                {hasTalentAccess && (
-                    <div className="mt-8 text-center">
-                        <button className="w-full py-4 rounded-xl font-black text-sm bg-gray-100 text-gray-500 hover:bg-gray-200">
-                            더 많은 인재 보기
+
+                {/* Pagination */}
+                <div className="mt-12 flex justify-center items-center gap-2">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl border ${brand.theme === 'dark' ? 'border-gray-800 text-gray-600' : 'border-gray-200 text-gray-300'} hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl font-black transition-all ${currentPage === page
+                                ? (brand.theme === 'dark' ? 'bg-pink-600 text-white border-pink-600' : 'bg-black text-white border-black')
+                                : (brand.theme === 'dark' ? 'border-gray-800 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 border')
+                                }`}
+                        >
+                            {page}
                         </button>
-                    </div>
-                )}
+                    ))}
+
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl border ${brand.theme === 'dark' ? 'border-gray-800 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
             </main>
 
             {/* 🔒 Access Denied Modal (Portal-ready) */}
-            {accessDeniedModal && (
-                <div className="fixed inset-0 z-[100000] flex items-center justify-center px-4">
+            {accessDeniedModal && createPortal(
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setAccessDeniedModal(false)}></div>
                     <div className="bg-white rounded-[40px] w-full max-w-sm p-10 relative z-10 shadow-2xl text-center border-white/20">
                         <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 text-blue-500">
@@ -151,7 +193,8 @@ export default function TalentPage() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

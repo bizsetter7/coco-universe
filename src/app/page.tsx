@@ -6,6 +6,7 @@ import HomeClient from '@/components/home/HomeClient';
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
 import { LoginPage } from '@/components/auth/LoginPage';
+import { SignupPage } from '@/components/auth/SignupPage';
 import { CustomerCenterContent } from '@/app/customer-center/page';
 import { useLocation } from '@/hooks/useLocation';
 
@@ -88,6 +89,10 @@ function HomeContent() {
 
   if (page === 'login') {
     return <LoginPage />;
+  }
+
+  if (page === 'signup') {
+    return <SignupPage />;
   }
 
   if (page === 'support' || page === 'faq' || page === 'inquiry') {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import {
-    List, LogOut, CreditCard, User, Settings
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -11,9 +11,10 @@ interface MobileMenuProps {
     shopName: string;
     nickname: string;
     router: any;
+    userType?: 'corporate' | 'individual' | 'admin' | 'guest';
 }
 
-export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, setView, shopName, nickname, router }) => {
+export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, setView, shopName, nickname, router, userType = 'corporate' }) => {
     if (typeof document === 'undefined') return null;
     return createPortal(
         <div className="fixed inset-0 z-[20000] flex justify-end">
@@ -30,25 +31,48 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                     onClick={() => { setView('dashboard'); onClose(); }}
                     className="text-center pb-6 border-b border-gray-100 dark:border-gray-800 cursor-pointer active:opacity-70 transition"
                 >
-                    <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (nickname === '최고 관리자' ? '관리 센터' : '내 상점')}</h2>
-                    <p className="text-sm text-gray-500 font-bold tracking-tight">{nickname === '최고 관리자' ? '시스템 최고 관리자' : '업주 관리자'}</p>
+                    <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (userType === 'individual' ? '회원님' : '내 상점')}</h2>
+                    <p className="text-sm text-gray-500 font-bold tracking-tight">{userType === 'individual' ? '일반 회원' : '업주 관리자'}</p>
                 </div>
 
                 <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <div onClick={() => { setView('ongoing-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
-                        <List size={18} /> 진행중인 공고
-                    </div>
-                    <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
-                        <LogOut size={18} /> 마감된 공고
-                    </div>
-                    <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
-                        <CreditCard size={18} /> 유료 결제 내역
-                    </div>
-                    <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
-                        <User size={18} /> 지원자 관리
-                    </div>
-                    <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
-                        <Settings size={18} /> 회원 정보 수정
+                    {userType === 'individual' ? (
+                        <>
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer text-pink-500 bg-pink-50/20">
+                                <Home size={18} /> 마이 대시보드
+                            </div>
+                            <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <List size={18} /> 이력서 리스트
+                            </div>
+                            <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <List size={18} /> 채용정보 스크랩
+                            </div>
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <Settings size={18} /> 회원 정보 수정
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div onClick={() => { setView('ongoing-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <List size={18} /> 진행중인 공고
+                            </div>
+                            <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <LogOut size={18} /> 마감된 공고
+                            </div>
+                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <CreditCard size={18} /> 유료 결제 내역
+                            </div>
+                            <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <User size={18} /> 지원자 관리
+                            </div>
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                                <Settings size={18} /> 회원 정보 수정
+                            </div>
+                        </>
+                    )}
+                    {/* 시스템 검증 센터 (관리자용) */}
+                    <div onClick={() => { setView('standards'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-indigo-50 hover:text-indigo-500 rounded-xl transition cursor-pointer bg-indigo-50/20">
+                        <ShieldCheck size={18} /> 시스템 검증 센터
                     </div>
                 </nav>
             </div>

@@ -4,21 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
-import { getPayColor } from '@/utils/payColors';
+// getPayColor is now imported from @/utils/payColors
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '@/components/common/IconBadge';
+import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
 const TIER_GRADIENTS: Record<string, string> = {
-    grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
-    premium: 'bg-gradient-to-r from-purple-600 to-pink-500',
-    deluxe: 'bg-gradient-to-r from-blue-500 to-cyan-400',
-    special: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-    urgent: 'bg-gradient-to-r from-rose-500 to-orange-400',
-    recommended: 'bg-gradient-to-r from-indigo-500 to-violet-400',
-    native: 'bg-gray-100',
-    common: 'bg-gray-50'
+    grand: 'bg-[#8B5CF6]',       // 보라 (Purple/Violet)
+    premium: 'bg-[#EF4444]',     // 빨강 (Red)
+    deluxe: 'bg-[#3B82F6]',      // 파랑 (Blue)
+    special: 'bg-[#10B981]',     // 민트 (Emerald/Mint)
+    urgent: 'bg-[#F97316]',      // 주황 (Orange)
+    recommended: 'bg-[#F59E0B]', // 추천 (Amber)
+    native: 'bg-[#94A3B8]',      // 그레이 (Gray)
+    common: 'bg-[#E2E8F0]'       // 연그레이 (Light Gray)
 };
 
 
@@ -36,16 +37,23 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
     if (!mounted || !ad) return null;
     if (typeof document === 'undefined') return null;
 
-    // Normalizing ad data to match standard Shop interface features
-    const tier = ad.productType === '그랜드' || ad.productType === 'p1' ? 'grand' :
-        ad.productType === '프리미엄' || ad.productType === 'p2' ? 'premium' : 'grand'; // Default to grand for preview if unknown
+    const formatPayAmount = (type: string, amount: number | string) => {
+        if (type === '협' || type === '급여협의' || !amount || amount === '0' || amount === 0) return '급여협의';
+        const cleanAmount = typeof amount === 'string' ? parseInt(amount.replace(/,/g, '')) : amount;
+        return `${cleanAmount.toLocaleString()}원`;
+    };
 
-    const headerBg = TIER_GRADIENTS[tier] || TIER_GRADIENTS['grand'];
-
-    // Keywords Simulation
-    const keywords = ad.keywords || [];
-
-
+    // Normalizing ad data with snapshot priority
+    const productType = ad.productType || 'p7';
+    const tier =
+        productType === '그랜드' || productType === 'p1' ? 'grand' :
+            productType === '프리미엄' || productType === 'p2' ? 'premium' :
+                productType === '디럭스' || productType === 'p3' ? 'deluxe' :
+                    productType === '스페셜' || productType === 'p4' ? 'special' :
+                        productType === '급구/추천' || productType === 'p5' ? 'urgent' :
+                            productType === '네이티브' || productType === 'p6' ? 'native' :
+                                productType === '일반' || productType === 'p7' ? 'common' : 'common';
+    const headerBg = TIER_GRADIENTS[tier] || TIER_GRADIENTS['common'];
 
     return createPortal(
         <div
@@ -62,48 +70,38 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 "
                 onClick={e => e.stopPropagation()}
             >
-                {/* 1. HEADER SECTION (Matches JobDetailModal / Capture 1) */}
+                {/* 1. HEADER SECTION */}
                 <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
-
-
-                    {/* Top Row: Close Button Only (Simplified for AdDetail) */}
                     <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
                             <X size={24} className="text-white" />
                         </button>
                     </div>
 
-                    {/* Star Button (Left) - Visual Only */}
                     <button className="absolute top-5 left-6 p-2 rounded-full transition-all bg-black/20 text-white hover:bg-white/20 z-50">
                         <Star size={20} className="hover:fill-current" />
                     </button>
 
-                    {/* Region & WorkType Badge */}
                     <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
-                        <MapPin size={10} /> {ad.regionCity} {ad.regionGu} | <Briefcase size={10} /> {ad.category || '업종'}
+                        <MapPin size={10} /> {ad.regionCity} {ad.regionGu} | <Briefcase size={10} /> {ad.category} | {ad.categorySub}
                     </div>
 
-                    {/* Ad Title White Box Layout (CENTERED) */}
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                            <IconBadge iconId={ad.options?.icon} showName={true} />
-
+                            <IconBadge iconId={ad.selectedIcon} showName={true} />
                             <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
-                                <span
-                                    style={getHighlighterStyle(ad.options?.highlighter)}
-                                >
-                                    {cleanShopTitle(ad.title || ad.jobTitle, ad.shopName)}
+                                <span style={getHighlighterStyle(ad.selectedHighlighter)}>
+                                    {ad.title}
                                 </span>
                             </h2>
                         </div>
                     </div>
 
-                    {/* Nickname Area */}
                     <div className="flex items-center gap-2.5 opacity-95 font-black text-sm bg-black/10 px-4 py-1.5 rounded-full text-white">
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {cleanShopTitle(undefined, ad.nickname || ad.shopName || '관리자')}
+                        {ad.nickname}
                     </div>
                 </div>
 
@@ -119,25 +117,25 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         {/* Left: Salary Info */}
                         <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
                             {/* Stylish Square Box Badge */}
-                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(ad.payType || (ad.adNo ? '시급' : ''))}`}>
-                                {(ad.payType || '').includes('TC') ? 'T' : (ad.payType || '')?.substring(0, 1) || '급'}
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(ad.payType)}`}>
+                                {getPayAbbreviation(ad.payType)}
                             </div>
                             <div className="flex flex-col gap-0.5 overflow-hidden">
                                 <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
-                                    {formatKoreanMoney(ad.payAmount)}
+                                    {ad.payType === '협의' || ad.payType === '급여협의' || (ad.payAmount || 0) === 0 ? '급여협의' : formatKoreanMoney(ad.payAmount)}
                                 </div>
                             </div>
                         </div>
 
                         {/* Right: Keywords (Grid 3 cols) */}
                         <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
-                            {(ad.options?.paySuffixes || []).slice(0, 6).map((kw: string, idx: number) => (
+                            {(ad.options?.pay_suffixes || ad.options?.paySuffixes || []).slice(0, 6).map((kw: string, idx: number) => (
                                 <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                     {kw}
                                 </span>
                             ))}
-                            {(ad.options?.paySuffixes || []).length === 0 && (
-                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
+                            {(ad.options?.pay_suffixes || ad.options?.paySuffixes || []).length === 0 && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 급여 옵션 없음</span>
                             )}
                         </div>
                     </div>
@@ -176,16 +174,16 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </h3>
 
                         {/* Keywords Grid Only (Subtle Style) */}
-                        {keywords && keywords.length > 0 ? (
+                        {(ad.keywords || ad.options?.keywords || []).length > 0 ? (
                             <div className="flex flex-wrap gap-1.5">
-                                {keywords.map((k: string, i: number) => (
+                                {(ad.keywords || ad.options?.keywords || []).map((k: string, i: number) => (
                                     <span key={i} className="text-[10px] font-normal text-gray-400 bg-gray-50/50 px-2 py-1 rounded border border-gray-100">
                                         #{k}
                                     </span>
                                 ))}
                             </div>
                         ) : (
-                            <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30"></div>
+                            <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30 flex items-center justify-center text-[10px] text-gray-300">등록된 키워드 없음</div>
                         )}
                     </div>
 
@@ -194,15 +192,38 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 {/* 3. FOOTER SECTION (Contact) */}
                 <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
                     <div className="flex gap-3">
-                        <button className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]">
+                        <button
+                            onClick={() => alert(`쪽지 기능을 준비 중입니다. (${ad.nickname || ad.name}님께)`)}
+                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
+                        >
                             <MessageSquare size={20} className="stroke-current" />
                             <span className="text-xs font-black">쪽지문의</span>
                         </button>
-                        <button className="flex-1 flex flex-col items-center justify-center gap-1 bg-yellow-400 text-yellow-900 py-3 rounded-xl hover:bg-yellow-500 transition active:scale-[0.98]">
+                        <button
+                            onClick={() => {
+                                const kakao = ad.messengers?.kakao || ad.options?.messengers?.kakao || ad.kakao_id;
+                                if (kakao) {
+                                    window.open(`https://qr.kakao.com/talk/${kakao}`, '_blank');
+                                } else {
+                                    alert('등록된 카카오톡 ID가 없습니다.');
+                                }
+                            }}
+                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-yellow-400 text-yellow-900 py-3 rounded-xl hover:bg-yellow-500 transition active:scale-[0.98]"
+                        >
                             <MessageSquare size={20} className="fill-yellow-900/20 stroke-current" />
                             <span className="text-xs font-black">카톡문의</span>
                         </button>
-                        <button className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200">
+                        <button
+                            onClick={() => {
+                                const phone = ad.managerPhone || ad.manager_phone;
+                                if (phone) {
+                                    window.location.href = `tel:${phone}`;
+                                } else {
+                                    alert('등록된 연락처가 없습니다.');
+                                }
+                            }}
+                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
+                        >
                             <Phone size={20} className="fill-white/20 stroke-current" />
                             <span className="text-xs font-black">전화/문자 지원하기</span>
                         </button>

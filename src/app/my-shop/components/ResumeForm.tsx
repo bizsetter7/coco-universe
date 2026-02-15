@@ -5,14 +5,13 @@ import { useBrand } from '@/components/BrandProvider';
 import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants';
 import { supabase } from '@/lib/supabase';
 
-export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void, onOpenMenu?: () => void }) => {
+export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any) => void, onOpenMenu?: () => void, authUser: any }) => {
     const brand = useBrand();
     const router = useRouter();
 
     // User Info State
-    const [userName, setUserName] = useState('회원님');
-    const [userId, setUserId] = useState('');
-    const [authUser, setAuthUser] = useState<any>(null);
+    const [userName, setUserName] = useState(authUser?.nickname || authUser?.name || '회원님');
+    const [userId, setUserId] = useState(authUser?.id || '');
 
     // Form States
     const [title, setTitle] = useState('');
@@ -22,7 +21,7 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
     const [selectedIndustrySub, setSelectedIndustrySub] = useState('');
     const [selectedRegionMain, setSelectedRegionMain] = useState('');
     const [selectedRegionSub, setSelectedRegionSub] = useState('');
-    const [payType, setPayType] = useState('급여협의');
+    const [payType, setPayType] = useState('시급');
     const [gender, setGender] = useState('여성');
     const [birthYear, setBirthYear] = useState('2000');
     const [birthMonth, setBirthMonth] = useState('1');
@@ -33,21 +32,13 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
     const [contactValue, setContactValue] = useState('');
 
     useEffect(() => {
-        // useAuth 훅 대신 localStorage와 supabase 세션 직접 참조 (또는 props로 받아야 함)
-        const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                setAuthUser(session.user);
-                setUserId(session.user.id);
-            } else {
-                const storedId = localStorage.getItem('user_id');
-                if (storedId) setUserId(storedId);
+        if (authUser) {
+            setUserId(authUser.id);
+            if (!userName || userName === '회원님') {
+                setUserName(authUser.nickname || authUser.name || '회원님');
             }
-            const storedName = localStorage.getItem('user_name');
-            if (storedName) setUserName(storedName);
-        };
-        checkUser();
-    }, []);
+        }
+    }, [authUser]);
 
     const handleSaveResume = async () => {
         if (!title.trim()) { alert('이력서 제목을 입력해주세요.'); return; }
@@ -57,8 +48,6 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
 
         const resumeData = {
             user_id: userId,
-            ownerId: userId, // [Sync] DB 컬럼 명칭 통일을 위해 유지 (shops 와 통일)
-            owner_id: userId, // [Sync] 혹시 모를 owner_id 형식 대응
             title,
             content,
             gender,
@@ -80,7 +69,7 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                 .insert([resumeData]);
 
             if (error) {
-                console.error("Resume Save Error:", error);
+                console.error("Resume Save Error:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
                 // [Fallback] 스키마 오류 발생 시 안내 강화
                 const isSchemaError =
                     error.message.includes("relation \"resumes\" does not exist") ||
@@ -88,12 +77,15 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                     error.message.includes("schema cache");
 
                 if (isSchemaError) {
-                    if (confirm('DB 테이블이 존재하지 않습니다. 임시 모드로 완료하시겠습니까?\n(근본 해결을 위해 db_setup.sql 스크립트 실행이 필요합니다.)')) {
-                        localStorage.setItem('mock_resume_saved', 'true');
-                        alert('임시 등록되었습니다. 관리자에게 DB 업데이트를 요청해주세요.');
-                        setView('dashboard');
-                        return;
-                    }
+                    console.warn("Resume DB missing, falling back to local storage");
+                    localStorage.setItem('mock_resume_saved', 'true');
+
+                    // Save mock resume data to local storage for persistence (optional but good)
+                    const existingResumes = JSON.parse(localStorage.getItem('coco_mock_resumes') || '[]');
+                    localStorage.setItem('coco_mock_resumes', JSON.stringify([resumeData, ...existingResumes]));
+
+                    alert('DB 테이블이 없어 임시(로컬) 저장되었습니다. 관리자에게 문의해주세요.');
+                    setView('dashboard');
                     return;
                 }
                 alert('저장 중 오류가 발생했습니다: ' + error.message);
@@ -152,8 +144,10 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                 </div>
             </div>
 
-            <header className="flex flex-col gap-4 mb-4">
-                <div className={`p-6 sm:rounded-[32px] shadow-sm border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
+            <header
+                className="flex flex-col gap-4 mb-4"
+            >
+                <div className={`p-6 sm:rounded-[32px] shadow-sm border relative mt-0 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <h2 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
                             <span className="w-2 h-8 bg-pink-500 rounded-full hidden md:block"></span>

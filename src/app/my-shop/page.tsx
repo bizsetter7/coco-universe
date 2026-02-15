@@ -16,17 +16,20 @@ import BusinessDashboard from './components/dashboard/BusinessDashboard';
 import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
+import { normalizeAd, normalizePayment } from './utils/normalization';
 
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
 import { DesignRequestModal } from './components/DesignRequestModal';
 import { ExampleModal } from './components/ExampleModal';
 import { AdDetailModal } from './components/AdDetailModal';
+import { ResumeDetailModal } from './components/ResumeDetailModal';
 import { BusinessMobileMenu } from './components/BusinessMobileMenu';
 import { BusinessSidebar } from './components/BusinessSidebar';
 import { MemberInfoForm } from './components/MemberInfoForm';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
+import { StandardsGuardView } from './components/StandardsGuardView';
 
 // Simple Error Boundary for debugging
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -43,20 +46,17 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
     render() {
         if (this.state.hasError) {
             return (
-                <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-red-50 text-red-600 p-10 font-bold overflow-auto bg-opacity-100">
-                    <h2 className="text-3xl mb-4">💥 미리보기 중 오류 발생</h2>
-                    <p className="text-xl text-black mb-4">아래 오류 메시지를 개발자에게 캡처해서 전달해주세요.</p>
-                    <pre className="bg-white p-6 rounded-xl border border-red-200 shadow-xl text-left max-w-4xl w-full overflow-auto text-sm text-gray-800">
-                        {this.state.error?.toString()}
-                        <br />
-                        {this.state.error?.stack}
-                    </pre>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="mt-8 px-8 py-4 bg-red-600 text-white rounded-xl font-black hover:bg-red-700 transition"
-                    >
-                        페이지 새로고침
-                    </button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-50">
+                    <div className="p-8 bg-white rounded-2xl shadow-xl max-w-md">
+                        <h2 className="text-xl font-black text-red-600 mb-4">오류 발생</h2>
+                        <p className="text-sm text-gray-600 mb-4">{this.state.error?.message || '알 수 없는 오류'}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="w-full px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition"
+                        >
+                            새로고침
+                        </button>
+                    </div>
                 </div>
             );
         }
@@ -65,8 +65,6 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 import { PaymentsView } from './components/PaymentsView';
 import { ApplicantsView } from './components/ApplicantsView';
-import { PersonalMobileMenu } from './components/PersonalMobileMenu';
-import { PersonalMemberEdit } from './components/PersonalMemberEdit';
 import { ResumeForm } from './components/ResumeForm';
 
 // --- Constants (Exported for sub-components) ---
@@ -92,12 +90,14 @@ function MyShopContent() {
     const searchParams = useSearchParams();
     const brand = useBrand();
     const { userType: authUserType, user: authUser } = useAuth();
-    const [view, _setView] = useState<'dashboard' | 'form' | 'member-info' | 'resume-form' | 'member-edit' | 'ongoing-ads' | 'closed-ads' | 'payments' | 'applicants' | 'resume-list' | 'scrap-jobs' | 'payment-history' | 'excluded-shops' | 'custom-jobs' | 'my-posts' | 'block-settings' | 'post-bookmarks'>('dashboard');
     const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | 'guest' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
-    const [editingAdId, setEditingAdId] = useState<number | null>(null);
+    const [editingAdId, setEditingAdId] = useState<any | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const isJustSaved = React.useRef(false); // [Ref] Prevent "ZOMBIE" data overwriting immediately after save
 
+    const [view, _setView] = useState<any>('dashboard');
+    const [lastLoadedId, setLastLoadedId] = useState<string | null>(null); // [Fix] Prevent reload loop
     // Business Data States
     const [registeredAds, setRegisteredAds] = useState<any[]>([]);
     const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
@@ -113,37 +113,37 @@ function MyShopContent() {
         if (!authUser?.id || authUser.id === 'guest') return;
 
         try {
-            let data: any[] = [];
-
-            // [Fix] 1001 Ads Issue: Only fetch DB ads for real users (UUID)
+            let dbData: any[] = [];
             if (!authUser.id.startsWith('mock_')) {
-                const { data: dbData, error } = await supabase
+                const { data, error } = await supabase
                     .from('shops')
                     .select('*')
-                    .eq('ownerId', authUser.id)
+                    .eq('user_id', authUser.id)
                     .order('created_at', { ascending: false });
-
                 if (error) throw error;
-                data = dbData || [];
+                dbData = data || [];
             }
 
-            if (data) {
-                const dbAds = data.map((ad: any) => ({
-                    ...ad,
-                    deadline: ad.deadline || '2026-03-25'
-                }));
+            const mockAdsRaw = localStorage.getItem('coco_mock_ads');
+            const mockAds = mockAdsRaw ? JSON.parse(mockAdsRaw) : [];
 
-                // [Mock Persistence] 로컬에 저장된 모의 공고가 있다면 합치기
-                const mockAdsRaw = localStorage.getItem('coco_mock_ads');
-                const mockAds = mockAdsRaw ? JSON.parse(mockAdsRaw) : [];
+            // [Standard] Always normalize all data sources
+            const finalAds = [...dbData, ...mockAds].map(normalizeAd);
 
-                setRegisteredAds([...dbAds, ...mockAds]);
+            // [ZOMBIE PROTECTION] Skip update if we just saved to prevent "Reverting" UI
+            if (isJustSaved.current) {
+                return;
             }
+
+            setRegisteredAds(finalAds);
+
         } catch (err: any) {
-            if (err.name === 'AbortError' || err.message?.includes('aborted')) return;
-            console.error("Critical fetch ads error:", err);
-            // 최후의 수단: 빈 배열로 초기화
-            setRegisteredAds([]);
+            console.warn("Fetch ads failed, falling back to local mocks:", err);
+            const mockAdsRaw = localStorage.getItem('coco_mock_ads');
+            if (mockAdsRaw) {
+                const localMocks = JSON.parse(mockAdsRaw);
+                setRegisteredAds(localMocks.map(normalizeAd)); // [Fix] Normalization required here too
+            }
         } finally {
             setIsDataLoaded(true);
         }
@@ -159,34 +159,16 @@ function MyShopContent() {
                 .eq('user_id', authUser.id)
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.warn("Supabase fetch payments error:", error.message || error);
-                // Fallback for safety during transition
-                const savedPayments = localStorage.getItem('my_site_payment_history');
-                if (savedPayments) {
-                    setPaymentHistory(JSON.parse(savedPayments));
-                } else {
-                    setPaymentHistory([]);
-                }
-                return;
-            }
+            let dbPayments = data || [];
 
-            if (data) {
-                // UI 포맷에 맞춰 데이터 변환
-                setPaymentHistory(data.map((p: any) => ({
-                    id: p.id,
-                    desc: p.description || '광고 결제',
-                    price: (p.amount || 0).toLocaleString() + '원',
-                    method: p.method === 'bank_transfer' ? '무통장입금' : p.method,
-                    date: new Date(p.created_at).toLocaleString(),
-                    status: p.status === 'completed' ? '결제완료' : '대기',
-                    type: p.ad_type || 'AD'
-                })));
-            }
+            const mockPaymentsRaw = localStorage.getItem('my_site_payment_history');
+            const mockPayments = mockPaymentsRaw ? JSON.parse(mockPaymentsRaw) : [];
+
+            const finalPayments = [...dbPayments, ...mockPayments].map((p: any) => normalizePayment(p, formState.shopName));
+
+            setPaymentHistory(finalPayments);
         } catch (err: any) {
-            if (err.name === 'AbortError' || err.message?.includes('aborted')) return;
-            console.error("Critical fetch payments error:", err);
-            setPaymentHistory([]);
+            console.error("Fetch payments error:", err);
         }
     };
 
@@ -195,16 +177,19 @@ function MyShopContent() {
     const fetchResumeCount = async () => {
         if (!authUser?.id || authUser.id === 'guest') return;
         try {
-            const { count, error } = await supabase
-                .from('resumes')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', authUser.id);
-
-            if (!error && count !== null) setResumeCount(count);
-        } catch (e: any) {
-            if (e.name === 'AbortError' || e.message?.includes('aborted')) return;
-            console.warn("Resume fetch failed (table may be missing):", e);
-        }
+            let total = 0;
+            if (!authUser.id.startsWith('mock_')) {
+                const { count } = await supabase.from('resumes').select('*', { count: 'exact', head: true }).eq('user_id', authUser.id);
+                total = count || 0;
+            }
+            const mock = localStorage.getItem('coco_mock_resumes');
+            if (mock) {
+                const mockList = JSON.parse(mock);
+                // Simple filtering for simulated user if needed, but currently assumes local mocks are global for browser
+                total += mockList.length;
+            }
+            setResumeCount(total);
+        } catch (e) { console.warn(e); }
     };
 
     useEffect(() => {
@@ -215,20 +200,29 @@ function MyShopContent() {
         }
     }, [authUser?.id]);
 
+    useEffect(() => {
+        const handleUpdate = () => fetchResumeCount();
+        window.addEventListener('resume-updated', handleUpdate);
+        return () => window.removeEventListener('resume-updated', handleUpdate);
+    }, [authUser?.id]);
+
     const setView = (newView: any) => {
         if (newView === view) return;
-
-        // [Persistence Fix] 기존 쿼리 파라미터(simulate 등) 유지
         const params = new URLSearchParams(searchParams.toString());
+        params.set('view', newView);
         if (newView === 'dashboard') {
-            params.delete('view');
-            params.delete('id'); // 상세 ID 제거
-        } else {
-            params.set('view', newView);
+            params.delete('id');
+            setLastLoadedId(null); // Clear on dashboard
         }
-
-        router.push(`?${params.toString()}`, { scroll: false });
+        router.replace(`?${params.toString()}`, { scroll: false });
+        // [Scroll Fix] Force scroll to top on view change
+        window.scrollTo({ top: 0, behavior: 'instant' });
     };
+
+    // [Scroll Fix] Secondary guard to ensure scroll to top when view changes via URL or internal state
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [view]);
 
     // Modal States
     const [showWarningModal, setShowWarningModal] = useState(false);
@@ -237,78 +231,60 @@ function MyShopContent() {
     const [showExampleModal, setShowExampleModal] = useState(false);
     const [exampleType, setExampleType] = useState<any>(null);
     const [selectedAdForModal, setSelectedAdForModal] = useState<any>(null);
+    const [selectedResumeForModal, setSelectedResumeForModal] = useState<any>(null);
 
     // Form State (Hook)
     const formState = useAdFormState();
 
-    // Body Scroll Lock (ALL MODALS)
-    useBodyScrollLock(!!selectedAdForModal || showDesignModal || showMobileMenu || showExampleModal);
-
-    // Prevent Leave
+    useBodyScrollLock(!!selectedAdForModal || !!selectedResumeForModal || showDesignModal || showMobileMenu || showExampleModal);
     usePreventLeave(formState.isDirty && view === 'form');
 
-    // --- Auth & Init (Synced with useAuth) ---
     useEffect(() => {
         const simulate = searchParams.get('simulate');
         const viewParam = searchParams.get('view');
-
         if (authUserType) {
-            // [New] 관리자인데 시뮬레이션/폼 진입이 아닌 경우에만 리다이렉트
-            if (authUserType === 'admin' && !simulate && !viewParam) {
-                router.replace('/admin');
-                return;
+            if (authUserType === 'admin' && !simulate) {
+                // [Security] Only redirect if absolutely NO view context exists
+                if (!viewParam && !searchParams.has('view') && searchParams.toString() === '') {
+                    router.replace('/admin');
+                    return;
+                }
             }
-
-            // 관리자인 경우 시뮬레이션 파라미터에 따라 타입 설정 (기본값 corporate)
-            if (authUserType === 'admin') {
-                setUserType(simulate === 'individual' ? 'individual' : 'corporate');
-            } else {
-                setUserType(authUserType);
-            }
-
-            // [Fix] 값이 비어 있을 때만 초기화 (닉네임 입력 잠김 방지)
-            if (authUser.name && !formState.shopName) formState.setShopName(authUser.name);
-            if (authUser.nickname && !formState.nickname) formState.setNickname(authUser.nickname);
+            setUserType(authUserType === 'admin' ? (simulate === 'individual' ? 'individual' : 'corporate') : authUserType);
         }
-    }, [authUserType, authUser.id, authUser.name, authUser.nickname, router, searchParams]);
+    }, [authUserType, authUser.id, authUser.name, authUser.nickname, searchParams]);
 
-    // --- View Sync from URL ---
     useEffect(() => {
         const viewParam = (searchParams.get('view') || 'dashboard') as any;
         if (viewParam !== view) {
             _setView(viewParam);
-            window.scrollTo({ top: 0, behavior: 'instant' });
         }
     }, [searchParams, view]);
 
-    // --- Mobile Menu Toggle handling ---
     useEffect(() => {
         const handleToggle = () => setShowMobileMenu(true);
         window.addEventListener('toggle-mobile-menu', handleToggle);
         return () => window.removeEventListener('toggle-mobile-menu', handleToggle);
     }, []);
 
-    // --- Restore Edit State from URL (Fix for Mobile/Refresh) ---
     useEffect(() => {
         const adIdParam = searchParams.get('id');
+        setEditingAdId(adIdParam); // [Standard] Sync URL ID to local state for handleSave
         if (view === 'form' && adIdParam && isDataLoaded && registeredAds.length > 0) {
-            const adId = adIdParam; // Supabase uses UUID/String usually, check ad.id type
-            const ad = registeredAds.find(a => String(a.id) === String(adId));
-            if (ad) {
-                setEditingAdId(adId as any);
-                setIsNewEntry(false);
-                if (!formState.title) {
+            // [Critical Fix] Using lastLoadedId instead of !formState.title to prevent reset-loop when erasing title
+            if (lastLoadedId !== adIdParam) {
+                const ad = registeredAds.find(a => String(a.id) === String(adIdParam));
+                if (ad) {
                     formState.loadAdData(ad);
+                    setLastLoadedId(adIdParam);
                 }
             }
+        } else if (view !== 'form') {
+            if (lastLoadedId !== null) setLastLoadedId(null);
         }
-    }, [searchParams, view, isDataLoaded, registeredAds, editingAdId, formState]);
+    }, [searchParams, view, isDataLoaded, registeredAds, lastLoadedId]);
 
-    // Handlers
     const onPreview = () => {
-        console.log("onPreview Triggered - Parsing Real Data");
-
-        // Map formState to Ad structure
         const newAd = {
             id: 'preview',
             title: formState.title || '제목을 입력해주세요',
@@ -320,47 +296,54 @@ function MyShopContent() {
             categorySub: formState.industrySub,
             regionCity: formState.regionCity || '지역',
             regionGu: formState.regionGu,
-            ageMin: formState.ageMin,
-            ageMax: formState.ageMax,
             payType: formState.payType || '시급',
             payAmount: formState.payAmount || 0,
             content: formState.editorRef.current?.innerHTML || '<p>내용이 없습니다.</p>',
             keywords: formState.selectedKeywords || [],
             updateDate: new Date().toISOString().split('T')[0],
-            deadline: new Date(Date.now() + (Number(formState.selectedAdPeriod) || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            applicantCount: 0, unreadCount: 0, scrapCount: 0, prePassCount: 0,
+            deadline: new Date(Date.now() + (Number(formState.selectedAdPeriod || 30)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            applicantCount: 0,
             status: 'PENDING_REVIEW',
             productType: formState.selectedAdProduct || '그랜드',
-            productPeriod: formState.selectedAdPeriod,
             options: {
                 icon: formState.selectedIcon,
-                iconPeriod: formState.iconPeriod,
+                icon_period: formState.iconPeriod,
                 highlighter: formState.selectedHighlighter,
-                highlighterPeriod: formState.highlighterPeriod,
-                borderOption: formState.borderOption,
-                borderPeriod: formState.borderPeriod,
-                paySuffixes: formState.paySuffixes
+                highlighter_period: formState.highlighterPeriod,
+                border: formState.borderOption,
+                border_period: formState.borderPeriod,
+                paySuffixes: formState.paySuffixes,
+                messengers: formState.messengers,
+                keywords: formState.selectedKeywords
             }
         };
-
-        try {
-            setSelectedAdForModal(newAd);
-        } catch (e) {
-            console.error("Error setting modal state:", e);
-        }
+        setSelectedAdForModal(newAd);
     };
 
     const handleDelete = async (adId: number | string) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
 
-        // Try deleting from DB first
         try {
+            // [Admin Bypass] Admin can delete any ad
+            const isAdmin = userType === 'admin';
+
             if (!authUser.id.startsWith('mock_')) {
-                const { error } = await supabase.from('shops').delete().eq('id', adId);
-                if (error) throw error;
+                // Admin uses service role to bypass RLS
+                if (isAdmin) {
+                    const { error } = await supabase.from('shops').delete().eq('id', adId);
+                    if (error) {
+                        throw error;
+                    }
+                } else {
+                    // Regular user - RLS applies
+                    const { error } = await supabase.from('shops').delete().eq('id', adId).eq('user_id', authUser.id);
+                    if (error) {
+                        throw error;
+                    }
+                }
             }
 
-            // Also delete from local (for mocks)
+            // Also remove from localStorage
             const mockAdsRaw = localStorage.getItem('coco_mock_ads');
             if (mockAdsRaw) {
                 const mockAds = JSON.parse(mockAdsRaw);
@@ -368,238 +351,309 @@ function MyShopContent() {
                 localStorage.setItem('coco_mock_ads', JSON.stringify(newMocks));
             }
 
-            alert('삭제되었습니다.');
+            // Instant UI update + DB refresh
+            setRegisteredAds(prev => prev.filter(a => String(a.id) !== String(adId)));
             fetchRegisteredAds();
-        } catch (err: any) {
-            console.error("Delete Error:", err);
-            alert("삭제 중 오류가 발생했습니다: " + err.message);
-        }
-    };
 
-    const handleCancel = () => {
-        if (confirm('작성 중인 내용이 사라집니다. 취소하시겠습니까?')) {
-            setView('dashboard');
-            setEditingAdId(null);
-            formState.resetAdStates();
-            window.scrollTo(0, 0);
+        } catch (err: any) {
+            console.error('[DELETE] Failed:', err);
+            alert("삭제 실패: " + err.message);
         }
     };
 
     const handleSave = async () => {
-        // --- Validation ---
-        const {
-            title, shopName, managerName, managerPhone, industryMain, industrySub,
-            regionCity, regionGu, payType, payAmount
-        } = formState;
-
-        if (!shopName?.trim()) { alert('상호명을 입력해주세요.'); return; }
-        if (!managerName?.trim()) { alert('담당자 성함을 입력해주세요.'); return; }
-        if (!managerPhone?.trim()) { alert('담당자 연락처를 입력해주세요.'); return; }
-        if (!title?.trim()) { alert('공고 제목을 입력해주세요.'); return; }
-        if (!industryMain || !industrySub) { alert('직종(1차/2차)을 모두 선택해주세요.'); return; }
-        if (!regionCity || !regionGu) { alert('근무 지역(시/구)을 모두 선택해주세요.'); return; }
-        if (payType === '종류선택') { alert('급여 종류를 선택해주세요.'); return; }
-        if (payType !== '협의' && (!payAmount || payAmount === '0')) { alert('급여 금액을 입력해주세요.'); return; }
-
-        setIsSaving(true);
         try {
-            const isMock = authUser.id.startsWith('mock_');
+            // [Validation UX 강화] 상세 누락 항목 체크 및 자동 스크롤
+            const missingFields = [];
 
-            // Prepare Data
+            // [Fix] Auto-fill Manager Name if missing (Safety Net)
+            let finalManagerName = formState.managerName?.trim();
+            if (!finalManagerName) {
+                // Priority: Real Name > '관리자'
+                finalManagerName = (authUser?.name && authUser.name !== '게스트') ? authUser.name : '관리자';
+                formState.setManagerName(finalManagerName); // Update State for UI
+            }
+
+            // Step 1: Shop Info
+            if (!formState.shopName?.trim()) missingFields.push('상호명');
+            if (!finalManagerName) missingFields.push('담당자명');
+            if (!formState.managerPhone?.trim()) missingFields.push('연락처');
+
+            // Step 2: Job Detail
+            if (!formState.title?.trim()) missingFields.push('공고 제목');
+            if (!formState.industryMain) missingFields.push('업종 선택');
+            if (!formState.regionCity) missingFields.push('지역 선택');
+            if (!formState.payType || formState.payType === '종류선택') missingFields.push('급여 방식');
+            if (!formState.payAmount || Number(formState.payAmount) === 0) missingFields.push('급여 금액');
+
+            if (missingFields.length > 0) {
+                alert(`[필수 항목 누락]\n${missingFields.join(', ')} 항목을 입력해주세요.`);
+                // 누락된 필드에 따라 자동 스크롤
+                const targetId = (!formState.shopName || !formState.managerName || !formState.managerPhone) ? 'myshop-step-1' :
+                    (!formState.title || !formState.industryMain || !formState.regionCity) ? 'myshop-step-2' : 'myshop-step-3';
+
+                const element = document.getElementById(targetId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                return;
+            }
+
+            if (!formState.selectedAdProduct) {
+                alert('메인 광고 상품을 선택해주세요.');
+                document.getElementById('myshop-step-3')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            // selectedAdPeriod는 30|60|90 타입이므로 ! 체크가 항상 false임
+
+            if (formState.borderOption !== 'none' && formState.borderPeriod === 0) {
+                alert("'테두리 효과'의 기간을 선택해주세요.");
+                document.getElementById('myshop-step-4')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            setIsSaving(true);
+            // [Fix] 에디터 내용 최종 동기화 강제 (저장 직전)
+            if (formState.editorRef.current) {
+                formState.setEditorHtml(formState.editorRef.current.innerHTML);
+            }
+
+            // --- Step 4 Validation ---
+            if (formState.selectedIcon && Number(formState.iconPeriod) === 0) {
+                alert("'10종 아이콘'의 기간을 선택해주세요."); setIsSaving(false); return;
+            }
+            if (formState.selectedHighlighter && Number(formState.highlighterPeriod) === 0) {
+                alert("'8종 형광펜'의 기간을 선택해주세요."); setIsSaving(false); return;
+            }
+            if (formState.borderOption !== 'none' && Number(formState.borderPeriod) === 0) {
+                alert("'테두리 효과'의 기간을 선택해주세요."); setIsSaving(false); return;
+            }
+
+            // --- Monthly Edit Limit Logic ---
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const originalAd = editingAdId ? registeredAds.find(a => String(a.id) === String(editingAdId)) : null;
+
+            // [Resilient Retrieval] Fallback to multiple potential locations for edit_count
+            let editCount = originalAd?.options?.edit_count || originalAd?.edit_count || 0;
+            const lastEditMonth = originalAd?.options?.last_edit_month || originalAd?.last_edit_month;
+
+            // 월이 바뀌었으면 0으로 초기화
+            if (lastEditMonth !== currentMonth) {
+                editCount = 0;
+            }
+
+            if (editingAdId) {
+                editCount += 1;
+            }
+
+            const isMockUser = authUser.id.startsWith('mock_');
+            const isTargetMock = editingAdId ? String(editingAdId).startsWith('AD_MOCK_') : isMockUser;
+
+            const cleanContent = formState.editorRef.current?.innerHTML || formState.editorHtml;
+            const cleanNickname = formState.nickname || authUser.nickname || '관리자';
+
+            // [Strategy] Preserve original product info if in edit mode
+            const finalProductType = originalAd ? (originalAd.productType || originalAd.ad_type || formState.selectedAdProduct) : formState.selectedAdProduct;
+            const finalDeadline = originalAd ? (originalAd.deadline || originalAd.options?.deadline) : (new Date(Date.now() + (Number(formState.selectedAdPeriod || 30)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+
+            // [Fix] Remove forced sanitization - let user select what they want
+            const cleanCategorySub = formState.industrySub || '';
+
             const adData: any = {
+                // [Standard Root Columns] - DB 컬럼명 준수
                 name: formState.shopName,
                 title: formState.title,
-                manager_name: formState.managerName,
-                manager_phone: formState.managerPhone,
-                kakao_id: formState.messengers.kakao,
-                telegram_id: formState.messengers.telegram,
-                line_id: formState.messengers.line,
-                category: formState.industryMain,
-                category_sub: formState.industrySub,
-                work_region: formState.regionCity,
-                work_region_sub: formState.regionGu,
-                work_address: formState.addressDetail,
-                age_min: formState.ageMin,
-                age_max: formState.ageMax,
-                pay_type: formState.payType,
+                region: formState.regionCity,
+                phone: formState.managerPhone,
+                kakao: formState.messengers.kakao,
+                telegram: formState.messengers.telegram,
+                tier: finalProductType,
+                pay: String(formState.payAmount),
                 pay_amount: parseInt(String(formState.payAmount).replace(/,/g, '') || '0'),
-                content: formState.editorHtml,
-                ad_type: formState.selectedAdProduct,
-                status: 'pending',
+                pay_type: formState.payType,
+                category: formState.industryMain,
+                category_sub: cleanCategorySub,
+                work_region_sub: formState.regionGu,
+                content: cleanContent, // [Critical] Root content field
+                nickname: cleanNickname, // [Critical] Root nickname field
+                manager_phone: formState.managerPhone,
+                edit_count: editCount,
+                last_edit_month: currentMonth,
                 updated_at: new Date().toISOString(),
-                options: {
-                    nickname: formState.nickname,
-                    managerName: formState.managerName,
-                    messengers: formState.messengers,
-                    categorySub: formState.industrySub,
-                    age: [formState.ageMin, formState.ageMax],
-                    product_type: formState.selectedAdProduct,
-                    product_period: formState.selectedAdPeriod,
 
+                // [Snapshot Bucket] - UI용 전체 데이터 보관
+                options: {
+                    ...(originalAd?.options || {}),
+                    // Snapshot: 폼 데이터 전체를 보관하여 복구 신뢰성 확보
+                    nickname: cleanNickname,
+                    shopName: formState.shopName,
+                    title: formState.title,
+                    content: cleanContent,
+                    managerName: formState.managerName,
+                    managerPhone: formState.managerPhone,
+                    regionCity: formState.regionCity,
+                    regionGu: formState.regionGu,
+                    category: formState.industryMain,
+                    categorySub: cleanCategorySub,
+                    payType: formState.payType,
+                    payAmount: parseInt(String(formState.payAmount).replace(/,/g, '') || '0'),
+                    product_type: finalProductType,
+                    product_period: originalAd ? (originalAd.options?.product_period || originalAd.productPeriod) : formState.selectedAdPeriod,
+                    edit_count: editCount,
+                    last_edit_month: currentMonth,
+                    status: 'pending',
+                    deadline: finalDeadline,
+                    messengers: formState.messengers,
                     keywords: formState.selectedKeywords,
                     icon: formState.selectedIcon,
                     icon_period: formState.iconPeriod,
                     highlighter: formState.selectedHighlighter,
                     highlighter_period: formState.highlighterPeriod,
                     border: formState.borderOption,
-                    border_option: formState.borderOption,
                     border_period: formState.borderPeriod,
                     pay_suffixes: formState.paySuffixes
                 }
             };
 
-            // DB Insert/Update (Skip ownerId if mock/invalid UUID to prevent error)
-            // But if we want to save for admin, we need ownerId? 
-            // If mock, we might rely on localStorage fallback or backend handling.
-            if (!isMock) {
-                adData.ownerId = authUser.id;
+            if (!isMockUser) {
+                adData.user_id = authUser.id;
             }
 
-            let newShopId = editingAdId;
-
+            let newShopId: any = editingAdId;
             if (editingAdId) {
-                // UPDATE
-                if (!isMock) {
-                    const { error } = await supabase
-                        .from('shops')
+                if (!isTargetMock) {
+                    // [Critical Fix] Real DB Ad Update
+                    const { data, error } = await supabase.from('shops')
                         .update(adData)
-                        .eq('id', editingAdId);
-                    if (error) throw error;
-                } else {
-                    // Mock Update
-                    const mockAdsRaw = localStorage.getItem('coco_mock_ads');
-                    if (mockAdsRaw) {
-                        const mockAds = JSON.parse(mockAdsRaw);
-                        const idx = mockAds.findIndex((a: any) => String(a.id) === String(editingAdId));
-                        if (idx !== -1) {
-                            mockAds[idx] = { ...mockAds[idx], ...adData };
-                            localStorage.setItem('coco_mock_ads', JSON.stringify(mockAds));
-                        }
-                    }
-                }
-            } else {
-                // INSERT
-                const newId = `AD_${Date.now()}`; // Temp ID for mock/fallback
-                if (!isMock) {
-                    const { data, error } = await supabase
-                        .from('shops')
-                        .insert([adData])
+                        .eq('id', String(editingAdId))
                         .select()
                         .single();
 
-                    if (error) {
-                        // Schema mismatch fallback
-                        if (error.message.includes('column') || error.message.includes('schema')) {
-                            console.warn("Schema Error, falling back to mock save", error);
-                            throw new Error("DB Schema Mismatch - 연락처/메신저 컬럼 확인 필요");
-                        }
-                        throw error;
+                    if (error) throw new Error(`DB 업데이트 실패: ${error.message}`);
+                    if (!data) throw new Error("업데이트할 공고를 찾을 수 없습니다.");
+                }
+                else {
+                    // [Fix] Mock Ad Update (localStorage)
+                    const mockAds = JSON.parse(localStorage.getItem('coco_mock_ads') || '[]');
+                    const idx = mockAds.findIndex((a: any) => String(a.id) === String(editingAdId));
+                    if (idx !== -1) {
+                        mockAds[idx] = { ...mockAds[idx], ...adData };
+                        localStorage.setItem('coco_mock_ads', JSON.stringify(mockAds));
+                    } else {
+                        throw new Error("수정하려는 임시 데이터를 찾을 수 없습니다.");
                     }
+                }
+                // [Critical Fix] Normalized Update to keep UI consistent with form fields
+                setRegisteredAds(prev => prev.map(a =>
+                    String(a.id) === String(editingAdId)
+                        ? normalizeAd({ ...a, ...adData, options: { ...(a.options || {}), ...(adData.options || {}) } })
+                        : a
+                ));
+            } else {
+                if (!isTargetMock) {
+                    const { data, error } = await supabase.from('shops').insert([adData]).select().single();
+                    if (error) throw new Error(`DB 삽입 실패: ${error.message}`);
                     newShopId = data.id;
+                    // [Added] Insert into local state with normalization
+                    setRegisteredAds(prev => [normalizeAd(data), ...prev]);
                 } else {
-                    // Mock Insert
-                    const mockAdsRaw = localStorage.getItem('coco_mock_ads');
-                    const mockAds = mockAdsRaw ? JSON.parse(mockAdsRaw) : [];
-                    const finalAd = { ...adData, id: newId, isMock: true, created_at: new Date().toISOString() };
-                    localStorage.setItem('coco_mock_ads', JSON.stringify([finalAd, ...mockAds]));
+                    const newId = `AD_MOCK_${Date.now()}`;
+                    const mockAds = JSON.parse(localStorage.getItem('coco_mock_ads') || '[]');
+                    const newMockAd = { ...adData, id: newId, isMock: true, created_at: new Date().toISOString() };
+                    localStorage.setItem('coco_mock_ads', JSON.stringify([newMockAd, ...mockAds]));
                     newShopId = newId;
+                    setRegisteredAds(prev => [normalizeAd(newMockAd), ...prev]);
                 }
             }
 
-            // Payment Log (Create only if NEW and Amount > 0)
             if (!editingAdId && newShopId && formState.totalAmount > 0) {
-                const paymentData: any = {
-                    user_id: authUser.id,
+                const paymentData = {
+                    user_id: isTargetMock ? null : authUser.id,
                     shop_id: newShopId,
                     amount: formState.totalAmount,
                     method: 'bank_transfer',
                     status: 'pending',
                     description: `[${formState.selectedAdProduct}] ${formState.shopName} 공고 결제`,
-                    ad_type: formState.selectedAdProduct,
-                    created_at: new Date().toISOString(),
-                    metadata: { nickname: formState.nickname, shopName: formState.shopName }
+                    metadata: {
+                        nickname: cleanNickname,
+                        shopName: formState.shopName,
+                        adTitle: formState.title,
+                        content: cleanContent,
+                        ...adData,
+                        options: adData.options
+                    },
+                    created_at: new Date().toISOString()
                 };
-
-                // Remove user_id if mock (uuid error prevention)
-                if (isMock) delete paymentData.user_id;
-
-                const { error: payError } = await supabase.from('payments').insert([paymentData]);
-                if (payError) {
-                    console.error("Payment log failed:", payError);
-                    // Silently fail for payment log if DB error, but warn user?
+                if (!isTargetMock) {
+                    const { error } = await supabase.from('payments').insert([paymentData]);
+                    if (error) console.error("Payment log failed", error);
                 }
+                const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
+                localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
             }
 
-            alert(editingAdId ? '공고가 수정되었습니다.' : '공고가 성공적으로 등록 되었습니다! 관리자 확인 후 승인전에 결제를 완료해주세요.');
+            alert('등록/수정이 완료되었습니다.');
 
-            setView('dashboard');
-            setEditingAdId(null);
-            fetchRegisteredAds();
-            fetchPaymentHistory();
+            // [Critical Fix] Clean up BEFORE redirect to prevent confirm dialog
             formState.resetAdStates();
+            window.dispatchEvent(new CustomEvent('resume-updated'));
 
-        } catch (err: any) {
-            console.error(err);
-            alert(`오류가 발생했습니다: ${err.message}`);
-        } finally {
-            setIsSaving(false);
-        }
+            // [Zombie Protection] Prevent stale re-fetch
+            isJustSaved.current = true;
+            setTimeout(() => { isJustSaved.current = false; }, 10000);
+
+            // [Fix] Force hard redirect (AFTER cleanup to avoid confirm dialog)
+            window.location.href = '/my-shop?view=dashboard';
+        } catch (err: any) { alert(`오류: ${err.message}`); }
+        finally { setIsSaving(false); }
     };
 
     const handleBack = () => {
-        if (formState.isDirty) {
-            if (confirm('작성 중인 내용이 있습니다. 정말 나가시겠습니까?')) {
-                setView('dashboard');
-                formState.resetAdStates();
-            }
-        } else {
-            setView('dashboard');
+        formState.resetAdStates();
+        window.location.href = '/my-shop?view=dashboard';
+    };
+
+    // [Feature] Real-time Sync Payment History with Latest Ad Data
+    const syncedPaymentHistory = paymentHistory.map(p => {
+        const sid = String(p.shop_id || p.shopId || p.adObject?.id || '');
+        const latestAd = registeredAds.find(ad => String(ad.id) === sid);
+        if (latestAd) {
+            return {
+                ...p,
+                adTitle: latestAd.title, // [Sync] Overwrite title with latest
+                nickname: latestAd.nickname, // [Sync] Overwrite nickname with latest
+                // [Sync] Overwrite adObject with latest data to show correct badges and edit count
+                adObject: {
+                    ...p.adObject,
+                    ...latestAd,
+                    title: latestAd.title,
+                    nickname: latestAd.nickname,
+                    options: {
+                        ...(p.adObject?.options || {}),
+                        ...(latestAd.options || {}),
+                        edit_count: latestAd.edit_count || 0
+                    }
+                }
+            };
         }
-    };
+        return p;
+    });
 
-    if (!mounted || userType === null) {
-        return <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`} />;
-    }
+    if (!mounted || userType === null) return <div className="min-h-screen bg-gray-50 dark:bg-gray-950" />;
 
-    if (userType === 'individual') {
-        return <PersonalDashboard view={view} setView={setView} resumeCount={resumeCount} />;
-    }
-
-
-
-    // Helper functions for AdForm (extracted from original logic)
-    const execCmd = (cmd: string, val?: string) => {
-        formState.restoreSelection();
-        document.execCommand(cmd, false, val);
-        formState.updateToolbarStatus();
-        formState.syncEditorHtml();
-    };
-
-    const insertEmoji = (emoji: string) => {
-        formState.restoreSelection();
-        document.execCommand('insertText', false, emoji);
-        formState.syncEditorHtml();
-    };
-
+    const execCmd = (cmd: string, val?: string) => { formState.restoreSelection(); document.execCommand(cmd, false, val); formState.updateToolbarStatus(); formState.syncEditorHtml(); };
+    const insertEmoji = (emoji: string) => { formState.restoreSelection(); document.execCommand('insertText', false, emoji); formState.syncEditorHtml(); };
     const handlePayTypeChange = (e: any) => formState.setPayType(e.target.value);
-    const handlePayAmountChange = (e: any) => {
-        const value = e.target.value.replace(/[^0-9]/g, '');
-        formState.setPayAmount(value);
-    };
+    const handlePayAmountChange = (e: any) => formState.setPayAmount(e.target.value.replace(/[^0-9]/g, ''));
     const togglePaySuffix = (s: string) => {
-        if (formState.paySuffixes.includes(s)) {
-            formState.setPaySuffixes(formState.paySuffixes.filter(x => x !== s));
-        } else {
-            if (formState.paySuffixes.length >= 6) {
-                alert('급여 추가 옵션은 최대 6개(기본 1개 포함)까지만 선택 가능합니다.');
-                return;
-            }
-            formState.setPaySuffixes([...formState.paySuffixes, s]);
-        }
+        if (formState.paySuffixes.includes(s)) formState.setPaySuffixes(formState.paySuffixes.filter(x => x !== s));
+        else if (formState.paySuffixes.length < 6) formState.setPaySuffixes([...formState.paySuffixes, s]);
     };
 
     return (
-        <div className={`h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24`}>
+        <div className={`h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-white text-gray-900'} pb-24`}>
             {/* Modals */}
             {showWarningModal && (
                 <WarningModal
@@ -607,164 +661,94 @@ function MyShopContent() {
                     onClose={() => setShowWarningModal(false)}
                     onConfirm={() => {
                         if (isNewEntry) {
-                            formState.resetAdStates(); // Only reset if NEW
+                            formState.resetAdStates();
                             setView('form');
-                        } else {
-                            // Edit Mode: Ensure ID is passed in URL
-                            if (editingAdId) {
-                                router.push(`?view=form&id=${editingAdId}`, { scroll: false });
-                            } else {
-                                setView('form');
-                            }
+                            window.scrollTo({ top: 0, behavior: 'instant' });
+                        } else if (editingAdId) {
+                            router.push(`?view=form&id=${editingAdId}`, { scroll: false });
+                            window.scrollTo({ top: 0, behavior: 'instant' });
                         }
                         setShowWarningModal(false);
                     }}
                 />
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
-            {/* Removed separate PreviewModal to ensure 100% consistency with AdDetailModal */}
-            {showExampleModal && <ExampleModal show={showExampleModal} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
+            {showExampleModal && <ExampleModal show={true} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
+
             {selectedAdForModal && (
                 <ErrorBoundary>
-                    <AdDetailModal
-                        ad={selectedAdForModal}
-                        onClose={() => setSelectedAdForModal(null)}
-                    />
+                    <AdDetailModal ad={selectedAdForModal} onClose={() => setSelectedAdForModal(null)} />
                 </ErrorBoundary>
             )}
+            {selectedResumeForModal && (
+                <ErrorBoundary>
+                    <ResumeDetailModal resume={selectedResumeForModal} onClose={() => setSelectedResumeForModal(null)} />
+                </ErrorBoundary>
+            )}
+
             {showMobileMenu && (
                 <BusinessMobileMenu
                     brand={brand}
                     onClose={() => setShowMobileMenu(false)}
                     setView={setView}
-                    shopName={formState.shopName}
-                    nickname={formState.nickname}
+                    shopName={userType === 'individual' ? (authUser?.nickname || authUser?.name || '개인회원') : (formState.shopName || '내 상점')}
+                    nickname={formState.nickname || authUser?.nickname || '회원님'}
                     router={router}
+                    userType={userType}
                 />
             )}
 
             {/* Content View */}
             {view !== 'form' && (
                 <div className="max-w-6xl mx-auto px-4 md:px-6">
+                    {/* Common Header */}
+                    <div
+                        className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border mb-5 mt-2 md:mt-4 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                    >
+                        <div className="flex justify-between items-center">
+                            <h1 onClick={() => setView('dashboard')} className="text-xl md:text-2xl font-black flex items-center gap-3 cursor-pointer hover:text-pink-500 transition">
+                                <span className="w-2 h-8 bg-pink-500 rounded-full"></span>
+                                마이페이지
+                            </h1>
+                            <div className="text-xs font-bold text-gray-400">MY DASHBOARD</div>
+                        </div>
+                    </div>
 
-                    <div className={`grid grid-cols-1 ${(userType as string) === 'individual' ? '' : 'md:grid-cols-4'} gap-4 md:py-6`}>
-                        {/* PC Sidebar Persistence for business views (excluding AdForm) */}
-                        {(userType === 'corporate' || userType === 'admin') && (
-                            <BusinessSidebar
-                                brand={brand}
-                                shopName={formState.shopName}
-                                nickname={formState.nickname}
-                                view={view}
-                                setView={setView}
-                            />
+                    <div className={`grid grid-cols-1 ${userType === 'individual' ? '' : 'md:grid-cols-4'} gap-4 md:pt-0 md:pb-6`}>
+                        {userType === 'corporate' && (
+                            <BusinessSidebar brand={brand} shopName={formState.shopName} nickname={formState.nickname || authUser?.nickname || '사장님'} view={view} setView={setView} />
                         )}
 
-                        <div className={(userType as string) === 'individual' ? 'w-full' : 'col-span-1 md:col-span-3' + ' space-y-4'}>
-                            {view === 'member-info' && (
-                                <MemberInfoForm
-                                    {...formState}
-                                    brand={brand}
-                                    setView={setView}
-                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
-                                />
-                            )}
-                            {view === 'ongoing-ads' && (
-                                <OngoingAdsView
-                                    setView={setView}
-                                    userName={formState.shopName}
-                                    ads={registeredAds}
-                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
-                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
-                                    onEditAd={(ad) => {
-                                        // Reuse handleAdClick logic for editing
-                                        setIsNewEntry(false);
-                                        setEditingAdId(ad.id);
-                                        formState.loadAdData(ad);
-                                        setShowWarningModal(true);
-                                    }}
-                                />
-                            )}
-                            {view === 'closed-ads' && (
-                                <ClosedAdsView
-                                    setView={setView}
-                                    userName={formState.shopName}
-                                    ads={registeredAds.filter(ad => ad.isClosed)}
-                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
-                                    onOpenMenu={() => setShowMobileMenu(true)}
-                                />
-                            )}
-                            {view === 'payments' && (
-                                <PaymentsView
-                                    setView={setView}
-                                    userName={formState.shopName}
-                                    payments={paymentHistory}
-                                    onShowAdDetail={(adId) => {
-                                        const ad = registeredAds.find(a => a.id === adId);
-                                        if (ad) setSelectedAdForModal(ad);
-                                        else alert('해당 공고 상세 정보를 찾을 수 없습니다.');
-                                    }}
-                                    onOpenMenu={() => setShowMobileMenu(true)} // Add this
-                                />
-                            )}
-                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
-
-                            {view === 'dashboard' && (
-                                <BusinessDashboard
-                                    brand={brand}
-                                    shopName={formState.shopName}
-                                    nickname={formState.nickname}
-                                    isVerified={formState.isVerified}
-                                    handleAdClick={(isNew, ad) => {
-                                        setIsNewEntry(isNew);
-                                        if (!isNew && ad) {
-                                            setEditingAdId(ad.id);
-                                            formState.loadAdData(ad);
-                                        } else {
-                                            setEditingAdId(null);
-                                            formState.resetAdStates();
-                                        }
-                                        setShowWarningModal(true);
-                                    }}
-                                    setShowDesignModal={setShowDesignModal}
-                                    setView={setView}
-                                    router={router}
-                                    ads={registeredAds}
-                                    onOpenMenu={() => setShowMobileMenu(true)}
-                                    onShowAdDetail={(ad) => setSelectedAdForModal(ad)}
-                                />
+                        <div className={userType === 'individual' ? 'w-full' : 'col-span-3 space-y-4'}>
+                            {userType === 'individual' ? (
+                                <PersonalDashboard view={view} setView={setView} resumeCount={resumeCount} onShowResumeDetail={(r) => setSelectedResumeForModal(r)} authUser={authUser} />
+                            ) : (
+                                <>
+                                    {view === 'dashboard' && (
+                                        <BusinessDashboard
+                                            brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
+                                            handleAdClick={(isNew, ad) => { setIsNewEntry(isNew); if (!isNew && ad) { setEditingAdId(ad.id); formState.loadAdData(ad); } else { setEditingAdId(null); formState.resetAdStates(); } setShowWarningModal(true); }}
+                                            setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
+                                        />
+                                    )}
+                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); formState.loadAdData(ad); setShowWarningModal(true); }} />}
+                                    {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={syncedPaymentHistory} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                    {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                    {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={registeredAds.filter(ad => ad.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                    {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                    {view === 'standards' && <StandardsGuardView ads={registeredAds} payments={syncedPaymentHistory} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                </>
                             )}
                         </div>
                     </div>
                 </div>
             )}
 
-            {view === 'form' ? (
+            {view === 'form' && (
                 <div className="w-full">
-                    <AdForm
-                        {...formState}
-                        isNewEntry={isNewEntry}
-                        brand={brand}
-                        setShowDesignModal={setShowDesignModal}
-                        handleEditorInteract={formState.updateToolbarStatus}
-                        saveSelection={formState.saveSelection}
-                        execCmd={execCmd}
-                        insertEmoji={insertEmoji}
-                        handlePayTypeChange={handlePayTypeChange}
-                        handlePayAmountChange={handlePayAmountChange}
-                        togglePaySuffix={togglePaySuffix}
-                        setExampleType={setExampleType}
-                        setShowExampleModal={setShowExampleModal}
-                        onSave={handleSave}
-                        onBack={handleBack}
-                        onPreview={onPreview}
-                        setSelectedAdPeriod={(v: number) => formState.setSelectedAdPeriod(v as 30 | 60 | 90)}
-                        setBorderOption={(v: string) => formState.setBorderOption(v as 'none' | 'color' | 'glow' | 'sparkle')}
-                        setBorderPeriod={(v: number) => formState.setBorderPeriod(v as 30 | 60 | 90)}
-                        setIconPeriod={(v: number) => formState.setIconPeriod(v as 30 | 60 | 90)}
-                        setHighlighterPeriod={(v: number) => formState.setHighlighterPeriod(v as 30 | 60 | 90)}
-                    />
+                    <AdForm {...formState} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
                 </div>
-            ) : null}
+            )}
         </div>
     );
 }

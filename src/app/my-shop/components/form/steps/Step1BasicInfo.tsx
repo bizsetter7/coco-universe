@@ -23,7 +23,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
     managerName, setManagerName, managerPhone, setManagerPhone, messengers, setMessengers
 }) => {
     return (
-        <section className={`p-2 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-blue-950 via-gray-900 to-gray-950 border-blue-900/50' : 'bg-gradient-to-br from-blue-50 via-white to-cyan-50 border-blue-200'}`}>
+        <section id="myshop-step-1" className={`p-2 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-blue-950 via-gray-900 to-gray-950 border-blue-900/50' : 'bg-gradient-to-br from-blue-50 via-white to-cyan-50 border-blue-200'}`}>
             <div className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 text-white p-4 rounded-2xl mb-3 md:mb-6 shadow-xl text-center md:text-left">
                 <h2 className="font-black text-lg md:text-xl flex items-center justify-center md:justify-start gap-2">
                     <FileText size={24} className="text-white" />
@@ -83,7 +83,14 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mb-3">
                         <div>
                             <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>성함</label>
-                            <input type="text" placeholder="김실장" value={managerName} onChange={(e) => setManagerName(e.target.value)} className={`w-full border rounded-lg p-2 text-sm font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-gray-50 border-gray-200 text-black focus:ring-blue-500'}`} />
+                            <input
+                                type="text"
+                                placeholder="김실장"
+                                value={managerName}
+                                onChange={(e) => setManagerName(e.target.value)}
+                                className={`w-full border rounded-lg p-2 text-sm font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:ring-blue-900/50' : 'bg-gray-50 border-gray-200 text-black focus:ring-blue-500'} opacity-60 cursor-not-allowed`}
+                                readOnly
+                            />
                         </div>
                         <div>
                             <label className={`block text-xs font-black mb-1.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-black'}`}><span className="text-red-500 mr-1">*</span>연락처</label>

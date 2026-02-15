@@ -7,7 +7,7 @@ import { DETAILED_PRICING } from '../../../constants';
 interface Step3Props {
     brand: any;
     selectedAdProduct: string | null;
-    setSelectedAdProduct: (v: string) => void;
+    setSelectedAdProduct: (v: string | null) => void;
     selectedAdPeriod: number;
     setSelectedAdPeriod: (v: number) => void;
 }
@@ -19,7 +19,7 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
     const mainProducts = DETAILED_PRICING.filter(p => p.isMain);
 
     return (
-        <section className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-purple-950 via-gray-900 to-gray-950 border-purple-900/50' : 'bg-gradient-to-br from-purple-50 via-white to-fuchsia-50 border-purple-200'}`}>
+        <section id="myshop-step-3" className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-purple-950 via-gray-900 to-gray-950 border-purple-900/50' : 'bg-gradient-to-br from-purple-50 via-white to-fuchsia-50 border-purple-200'}`}>
             <div className="bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-600 text-white p-3 md:p-5 rounded-2xl mb-4 md:mb-6 shadow-xl text-center md:text-left">
                 <h2 className="font-black text-base md:text-xl flex flex-col md:flex-row md:items-center justify-center md:justify-start gap-1 md:gap-2">
                     <div className="flex items-center justify-center gap-1.5">

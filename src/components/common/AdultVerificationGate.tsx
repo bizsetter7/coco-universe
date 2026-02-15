@@ -7,6 +7,7 @@ import {
     User
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
@@ -22,18 +23,20 @@ declare global {
 }
 
 // Mock User Database for Validation (Updated to match useAuth & LoginPage)
-const MOCK_USERS: Record<string, { type: 'business' | 'personal', name: string }> = {
-    'admin_shop': { type: 'business', name: '최고관리자' },
-    'admin_user': { type: 'personal', name: '마스터관리자' },
-    'test_shop': { type: 'business', name: '테스트 사장님' },
-    'test_user': { type: 'personal', name: '테스트 회원' }
+const MOCK_USERS: Record<string, { type: 'corporate' | 'individual', name: string }> = {
+    'admin_shop': { type: 'corporate', name: '최고관리자' },
+    'admin_user': { type: 'individual', name: '마스터관리자' },
+    'test_shop': { type: 'corporate', name: '테스트 사장님' },
+    'test_user': { type: 'individual', name: '테스트 회원' }
 };
 
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
     const brand = useBrand();
-    const [loginType, setLoginType] = useState<'business' | 'personal'>('business');
+    const { login, signIn, user: authUser } = useAuth();
+    const [loginType, setLoginType] = useState<'corporate' | 'individual'>('corporate');
     const [id, setId] = useState('');
     const [pw, setPw] = useState('');
+    const [isAuthenticating, setIsAuthenticating] = useState(false);
 
     const handleExit = () => {
         window.location.href = 'https://www.google.com';
@@ -50,16 +53,16 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             return;
         }
 
+        setIsAuthenticating(true);
         try {
             // [PortOne V2] Identity Verification Request
             const response = await window.PortOne.requestIdentityVerification({
-                storeId: "store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a",
+                storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a",
                 identityVerificationId: `verif-${Date.now()}`,
-                channelKey: "channel-key-45817f30-f654-4332-ac51-d717a78d0846",
+                channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-45817f30-f654-4332-ac51-d717a78d0846",
             });
 
             if (response.code !== undefined) {
-                // Failure or Cancel
                 console.error('Verification Failed:', response.message);
                 alert(`인증 실패: ${response.message}`);
                 return;
@@ -69,7 +72,10 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             const verifyResponse = await fetch('/api/auth/verify-adult', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identityVerificationId: response.identityVerificationId }),
+                body: JSON.stringify({
+                    identityVerificationId: response.identityVerificationId,
+                    userId: authUser?.id !== 'guest' ? authUser.id : null
+                }),
             });
 
             const result = await verifyResponse.json();
@@ -84,52 +90,54 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
         } catch (error: any) {
             console.error('PortOne Error:', error);
             alert(`인증 과정 중 오류가 발생했습니다. (사유: ${error.message || '네트워크 오류'})`);
+        } finally {
+            setIsAuthenticating(false);
         }
     };
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Trim and Lowercase for robustness
         const targetId = id.trim().toLowerCase();
-
         if (!targetId || !pw) {
             alert('아이디와 비밀번호를 입력해주세요.');
             return;
         }
 
-        const foundUser = MOCK_USERS[targetId];
+        setIsAuthenticating(true);
+        try {
+            // 1. Check for Test/Mock IDs first
+            const foundMockUser = MOCK_USERS[targetId];
+            if (foundMockUser) {
+                const isAdmin = targetId.startsWith('admin_');
+                if (!isAdmin && foundMockUser.type !== loginType) {
+                    const typeText = loginType === 'corporate' ? '기업회원' : '개인회원';
+                    alert(`등록되지 않은 ID이거나,\n${typeText} 선택이 올바르지 않습니다.`);
+                    setIsAuthenticating(false);
+                    return;
+                }
+                const sessionType = isAdmin ? 'admin' : (foundMockUser.type === 'corporate' ? 'shop' : 'personal');
+                login(sessionType as any, targetId, foundMockUser.name, targetId === 'admin_user' ? '전권대행' : (targetId === 'admin_shop' ? '슈퍼어드민' : foundMockUser.name));
+                onVerify();
+                return;
+            }
 
-        // [Fix] Bypass radio check for Admin accounts to prevent confusion
-        const isAdmin = targetId === 'admin_shop' || targetId === 'admin_user';
-
-        if (!foundUser || (!isAdmin && foundUser.type !== loginType)) {
-            const typeText = loginType === 'business' ? '기업회원' : '개인회원';
-            alert(`등록되지 않은 ID이거나,\n${typeText} 선택이 올바르지 않습니다.`);
-            return;
+            // 2. Try Actual Supabase Auth for real customers
+            // If targetId has '@', assume it's a real email
+            if (targetId.includes('@')) {
+                await signIn(targetId, pw);
+                // Success will trigger syncUserSession in useAuth, and LayoutWrapper will handle the gate
+                // But we still call onVerify to close the gate immediately if successful
+                alert('로그인되었습니다.');
+                onVerify();
+            } else {
+                alert('등록되지 않은 아이디입니다.\n(이메일 형식으로 입력하거나 테스트 아이디를 사용하세요)');
+            }
+        } catch (err: any) {
+            console.error('Login Error:', err);
+            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+        } finally {
+            setIsAuthenticating(false);
         }
-
-        // [Security Hardening] Explicit Match Only for Admin/Test accounts
-        let sessionType: 'personal' | 'business' | 'admin' = foundUser.type === 'business' ? 'business' : 'personal';
-
-        // Exact IDs only for Admin elevation
-        if (targetId === 'admin_shop' || targetId === 'admin_user') {
-            sessionType = 'admin';
-        }
-
-        // Success: Setup Session
-        const sessionData = {
-            type: sessionType,
-            name: foundUser.name,
-            nickname: targetId === 'admin_user' ? '전권대행' : (targetId === 'admin_shop' ? '슈퍼어드민' : foundUser.name),
-            id: targetId,
-            points: 50000,
-            shopId: (targetId === 'admin_shop' || targetId === 'test_shop') ? 'shop_123' : undefined
-        };
-        localStorage.setItem('user_session', JSON.stringify(sessionData));
-        localStorage.setItem('user_type', sessionType);
-
-        onVerify();
     };
 
     return (
@@ -173,21 +181,21 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                         <div className="flex items-center gap-3 text-[10px] font-black">
                             <label className="flex items-center gap-1 cursor-pointer group">
                                 <input
-                                    type="radio" name="loginType" value="business"
-                                    checked={loginType === 'business'}
-                                    onChange={() => setLoginType('business')}
+                                    type="radio" name="loginType" value="corporate"
+                                    checked={loginType === 'corporate'}
+                                    onChange={() => setLoginType('corporate')}
                                     className="w-3 h-3 accent-red-500"
                                 />
-                                <span className={loginType === 'business' ? 'text-red-600' : 'text-gray-400'}>기업회원</span>
+                                <span className={loginType === 'corporate' ? 'text-red-600' : 'text-gray-400'}>기업회원</span>
                             </label>
                             <label className="flex items-center gap-1 cursor-pointer group">
                                 <input
-                                    type="radio" name="loginType" value="personal"
-                                    checked={loginType === 'personal'}
-                                    onChange={() => setLoginType('personal')}
+                                    type="radio" name="loginType" value="individual"
+                                    checked={loginType === 'individual'}
+                                    onChange={() => setLoginType('individual')}
                                     className="w-3 h-3 accent-red-500"
                                 />
-                                <span className={loginType === 'personal' ? 'text-red-600' : 'text-gray-400'}>개인회원</span>
+                                <span className={loginType === 'individual' ? 'text-red-600' : 'text-gray-400'}>개인회원</span>
                             </label>
                         </div>
                     </div>
@@ -231,13 +239,13 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                                 마스터퀵
                             </button>
                             <button
-                                onClick={() => { setId('test_shop'); setPw('password123'); setLoginType('business'); }}
+                                onClick={() => { setId('test_shop'); setPw('password123'); setLoginType('corporate'); }}
                                 className="bg-red-500 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
                             >
                                 기업퀵
                             </button>
                             <button
-                                onClick={() => { setId('test_user'); setPw('password123'); setLoginType('personal'); }}
+                                onClick={() => { setId('test_user'); setPw('password123'); setLoginType('individual'); }}
                                 className="bg-slate-400 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
                             >
                                 개인퀵

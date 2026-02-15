@@ -113,7 +113,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
     );
 
     return (
-        <section className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-amber-950 via-gray-900 to-gray-950 border-amber-900/50' : 'bg-gradient-to-br from-amber-50 via-white to-orange-50 border-amber-200'}`}>
+        <section id="myshop-step-4" className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-rose-950 via-gray-900 to-gray-950 border-rose-900/50' : 'bg-gradient-to-br from-rose-50 via-white to-pink-50 border-rose-200'}`}>
             <div className="bg-gradient-to-r from-[#9333ea] via-[#a855f7] to-[#ec4899] text-white p-5 md:p-7 rounded-[24px] mb-6 md:mb-8 shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -299,14 +299,14 @@ export const Step4Extras: React.FC<Step4Props> = ({
                     </div>
                 </div>
 
-                {/* 5. 추가 강조 효과 (테두리/특수효과) */}
+                {/* 5. 테두리 효과 (테두리/특수효과) */}
                 <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                     <div className="rounded-2xl border-2 overflow-hidden border-gray-200 bg-white shadow-sm">
                         <div className="bg-gray-600 text-white p-2.5 md:p-3 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Radio size={18} /></div>
                                 <div>
-                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">추가 강조 효과</h3>
+                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">테두리 효과</h3>
                                     <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">테두리/특수효과로 나만의 광고를 돋보이세요!</p>
                                 </div>
                             </div>
@@ -333,7 +333,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                                 type="button"
                                                 onClick={() => {
                                                     if (!checkStep3()) return;
-                                                    setBorderOption(opt.id as any);
+                                                    setBorderOption(borderOption === opt.id ? 'none' : opt.id as any);
                                                 }}
                                                 className={`py-3 md:py-3.5 px-2 rounded-xl border-2 transition-all font-black text-[10px] md:text-[13px] ${borderOption === opt.id ? 'bg-purple-100 text-purple-700 border-purple-400' : 'bg-white border-gray-100 text-gray-400 hover:border-purple-200'}`}
                                             >

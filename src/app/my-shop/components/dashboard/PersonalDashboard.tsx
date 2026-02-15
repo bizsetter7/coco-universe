@@ -5,30 +5,41 @@ import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOu
 import { useBrand } from '@/components/BrandProvider';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
 import { ResumeForm } from '../ResumeForm';
+import { ResumeListView } from '../ResumeListView';
+import { ComingSoonView } from '../ComingSoonView';
 
 
-// Placeholder for missing components from main page
-const ComingSoonView = ({ title }: { title: string }) => {
-    const brand = useBrand();
-    return (
-        <div className={`p-10 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center text-center ${brand.theme === 'dark' ? 'bg-gray-900/20 border-gray-800 text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
-            <Settings size={48} className="mb-4 opacity-20" />
-            <h3 className="text-xl font-black mb-1">{title}</h3>
-            <p className="text-sm font-bold opacity-60">현재 준비 중인 서비스입니다.</p>
-        </div>
-    );
-};
+
 
 export function PersonalSidebar({ view, setView }: { view: string, setView: (v: any) => void }) {
     const brand = useBrand();
     const [userName, setUserName] = useState('회원님');
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
 
     useEffect(() => {
         const storedName = localStorage.getItem('user_name');
         if (storedName) setUserName(storedName);
+
+        const savedImg = localStorage.getItem('personal_profile_image');
+        if (savedImg) setProfileImage(savedImg);
     }, []);
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setProfileImage(base64String);
+                localStorage.setItem('personal_profile_image', base64String);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const menuItems = [
+        { id: 'dashboard', label: '마이 대시보드', icon: <Home size={16} /> },
         { id: 'resume-list', label: '이력서 리스트', icon: <List size={16} /> },
         { id: 'scrap-jobs', label: '채용정보 스크랩', icon: <Star size={16} /> },
         { id: 'payment-history', label: '유료결제 내역', icon: <CreditCard size={16} /> },
@@ -42,12 +53,28 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
     return (
         <aside className="col-span-1 space-y-4">
             <div className={`p-6 rounded-[32px] border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
-                <div className="w-20 h-20 bg-pink-50 rounded-full mx-auto mb-4 flex items-center justify-center text-pink-500 border-2 border-pink-100">
-                    <User size={32} />
+                <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-20 h-20 bg-pink-50 rounded-full mx-auto mb-4 flex items-center justify-center text-pink-500 border-2 border-pink-100 overflow-hidden cursor-pointer group relative"
+                >
+                    {profileImage ? (
+                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={32} />
+                    )}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Settings size={16} className="text-white" />
+                    </div>
                 </div>
                 <h2 className="font-black text-xl mb-1">{userName}</h2>
                 <div className="flex items-center justify-center gap-2 mb-4">
-                    <span className="px-2 py-0.5 bg-gray-100 text-[10px] font-black rounded uppercase">General</span>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-3 py-1 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100 hover:bg-pink-100 transition active:scale-95 flex items-center gap-1"
+                    >
+                        사진 등록/수정
+                    </button>
                 </div>
                 <button
                     onClick={() => setView('member-edit')}
@@ -62,23 +89,16 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
                     <button
                         key={item.id}
                         onClick={() => setView(item.id)}
-                        className={`w-full flex items-center justify-between p-3 rounded-2xl transition group ${view === item.id ? 'bg-pink-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}
+                        className={`w-full flex items-center justify-between p-3 rounded-2xl transition group ${view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'bg-pink-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
                         <div className="flex items-center gap-3">
-                            <span className={view === item.id ? 'text-white' : 'text-gray-400 group-hover:text-pink-500'}>{item.icon}</span>
+                            <span className={view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'text-white' : 'text-gray-400 group-hover:text-pink-500'}>{item.icon}</span>
                             <span className="text-xs font-black">{item.label}</span>
                         </div>
-                        <ChevronRight size={14} className={view === item.id ? 'text-white/50' : 'text-gray-300'} />
+                        <ChevronRight size={14} className={view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'text-white/50' : 'text-gray-300'} />
                     </button>
                 ))}
             </nav>
-
-            <button
-                onClick={() => { localStorage.clear(); window.location.href = '/'; }}
-                className={`hidden md:flex w-full p-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-400' : 'bg-gray-50 hover:bg-gray-100 text-gray-500'}`}
-            >
-                <LogOut size={16} /> 로그아웃
-            </button>
         </aside>
     );
 }
@@ -97,9 +117,9 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
             {/* 1. 기존 통계 그리드 섹션 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: '스크랩한 공고', val: '12', icon: <Star className="text-yellow-400" /> },
-                    { label: '열람한 기업', val: '45', icon: <Home className="text-blue-400" /> },
-                    { label: '지원한 내역', val: '3', icon: <FileText className="text-pink-400" /> }
+                    { label: '스크랩한 공고', val: '0', icon: <Star className="text-yellow-400" /> },
+                    { label: '열람한 기업', val: '0', icon: <Home className="text-blue-400" /> },
+                    { label: '지원한 내역', val: '0', icon: <FileText className="text-pink-400" /> }
                 ].map((item, idx) => (
                     <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                         <div className="flex items-center gap-3 mb-4">
@@ -161,16 +181,17 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
     );
 }
 
-export default function PersonalDashboard({ view, setView, resumeCount = 0 }: { view: string, setView: (v: any) => void, resumeCount?: number }) {
+export default function PersonalDashboard({ view, setView, resumeCount = 0, onShowResumeDetail, authUser }: { view: string, setView: (v: any) => void, resumeCount?: number, onShowResumeDetail?: (r: any) => void, authUser: any }) {
     const brand = useBrand();
 
     return (
-        <div className="max-w-6xl mx-auto p-3 md:py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="max-w-6xl mx-auto p-3 md:py-0 grid grid-cols-1 md:grid-cols-4 gap-6">
             <PersonalSidebar view={view} setView={setView} />
             <main className="col-span-1 md:col-span-3">
-                {(view === 'member-info' || view === 'dashboard' || view === 'resume-list') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
+                {(view === 'member-info' || view === 'dashboard') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
                 {view === 'member-edit' && <PersonalMemberEdit setView={setView} />}
-                {view === 'resume-form' && <ResumeForm setView={setView} />}
+                {view === 'resume-form' && <ResumeForm setView={setView} authUser={authUser} />}
+                {view === 'resume-list' && <ResumeListView setView={setView} onShowDetail={onShowResumeDetail} authUser={authUser} />}
 
                 {view === 'scrap-jobs' && <ComingSoonView title="채용정보 스크랩" />}
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}

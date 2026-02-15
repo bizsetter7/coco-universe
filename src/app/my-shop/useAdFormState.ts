@@ -3,7 +3,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { DETAILED_PRICING, FORBIDDEN_WORDS } from './constants';
 
+// [Total Reset] Robust Helper
+const getValid = (v1: any, v2: any, defaultValue: any = '') => {
+    const invalidValues = [null, undefined, '', 0, '0', '지역', '업종', '시급', '급여방식선택', '자유직종', '정보없음'];
+    if (!invalidValues.includes(v1)) return v1;
+    if (!invalidValues.includes(v2)) return v2;
+    return defaultValue;
+};
+
 export function useAdFormState() {
+    // ... (States remain same)
     // --- Form States ---
     const [shopName, setShopName] = useState('코코 라운지');
     const [isVerified, setIsVerified] = useState(true);
@@ -151,14 +160,26 @@ export function useAdFormState() {
         setAgeMax(35);
         setPayType('급여방식선택');
         setPayAmount('0');
+        setSelectedKeywords([]);
+
+        // Editor Reset
         setIsEditorDirty(false);
+        setEditorHtml('');
+        if (editorRef.current) {
+            editorRef.current.innerHTML = '';
+        }
+
+        // Product & Options Reset - [Critical] Force fresh start for Step 3
         setSelectedAdProduct(null);
         setSelectedAdPeriod(30);
         setSelectedIcon(null);
         setIconPeriod(0);
         setSelectedHighlighter(null);
         setHighlighterPeriod(0);
+        setPaySuffixes([]);
+        setBorderOption('none');
         setBorderPeriod(0);
+        setTotalAmount(0);
     };
 
     // Total Amount Calculation
@@ -212,62 +233,81 @@ export function useAdFormState() {
 
     const loadAdData = (ad: any) => {
         if (!ad) return;
-        // Basic Info
-        setShopName(ad.name || '코코 라운지');
-        setManagerName(ad.manager_name || ad.managerName || '');
-        setManagerPhone(ad.manager_phone || ad.managerPhone || '');
+        const opts = ad.options || {};
+
+        // [Total Reset] Robust Loading Logic using getValid
+        const norm = {
+            shopName: getValid(ad.name || ad.shopName, opts.shopName, '상호명 없음'),
+            nickname: getValid(ad.nickname, opts.nickname, ''),
+            managerName: getValid(ad.manager_name || ad.managerName, opts.managerName, ''),
+            managerPhone: getValid(ad.manager_phone || ad.phone || ad.managerPhone, opts.managerPhone, ''),
+            kakao: getValid(ad.kakao_id || ad.kakao, opts.kakao || opts.messengers?.kakao, ''),
+            telegram: getValid(ad.telegram_id || ad.telegram, opts.telegram || opts.messengers?.telegram, ''),
+            line: getValid(ad.line_id || ad.line, opts.line || opts.messengers?.line, ''),
+            content: getValid(ad.content, opts.content || ad.jobContent, ''),
+            title: getValid(ad.title, opts.title || ad.jobTitle, ''),
+            regionCity: getValid(ad.region || ad.regionCity || ad.work_region, opts.regionCity, ''),
+            regionGu: getValid(ad.regionGu || ad.work_region_sub, opts.regionGu, ''),
+            addressDetail: getValid(ad.work_address || ad.addressDetail, opts.addressDetail, ''),
+            category: getValid(ad.category || ad.industryMain, opts.category, ''),
+            industrySub: getValid(ad.category_sub || ad.categorySub, opts.categorySub || opts.industrySub, ''),
+            payType: getValid(ad.pay_type || ad.payType, opts.payType, '급여방식선택'),
+            payAmount: String(getValid(ad.pay_amount || ad.payAmount || ad.pay, opts.payAmount, '0')),
+            ageMin: ad.age_min || ad.ageMin || opts.ageMin || 20,
+            ageMax: ad.age_max || ad.ageMax || opts.ageMax || 35,
+            keywords: opts.keywords || ad.keywords || [],
+            productType: ad.tier || ad.productType || opts.product_type || ad.ad_type || 'p1',
+            productPeriod: opts.product_period || ad.productPeriod || 30,
+            icon: opts.icon || ad.icon || null,
+            icon_period: opts.icon_period || ad.icon_period || 0,
+            highlighter: opts.highlighter || ad.highlighter || null,
+            highlighter_period: opts.highlighter_period || ad.highlighter_period || 0,
+            border: opts.border || opts.border_option || ad.border || 'none',
+            border_period: opts.border_period || ad.border_period || 0,
+            pay_suffixes: opts.pay_suffixes || ad.pay_suffixes || []
+        };
+
+        // Apply to States
+        setShopName(norm.shopName);
+        setNickname(norm.nickname);
+        setManagerName(norm.managerName);
+        setManagerPhone(norm.managerPhone);
         setMessengers({
-            kakao: ad.kakao_id || ad.messengers?.kakao || '',
-            telegram: ad.telegram_id || ad.messengers?.telegram || '',
-            line: ad.line_id || ad.messengers?.line || ''
+            kakao: norm.kakao,
+            telegram: norm.telegram,
+            line: norm.line
         });
 
-        // Job Details
-        setTitle(ad.title || '');
-        setIndustryMain(ad.category || '');
-        setIndustrySub(ad.category_sub || ad.industrySub || '');
-        setRegionCity(ad.work_region || ad.regionCity || '');
-        setRegionGu(ad.work_region_sub || ad.regionGu || '');
-        setAddressDetail(ad.work_address || ad.addressDetail || '');
+        setTitle(norm.title);
+        setIndustryMain(norm.category);
+        setIndustrySub(norm.industrySub);
+        setRegionCity(norm.regionCity);
+        setRegionGu(norm.regionGu);
+        setAddressDetail(norm.addressDetail);
 
-        setAgeMin(ad.age_min || ad.ageMin || 20);
-        setAgeMax(ad.age_max || ad.ageMax || 35);
+        setAgeMin(norm.ageMin);
+        setAgeMax(norm.ageMax);
 
-        setPayType(ad.pay_type || ad.payType || '급여방식선택');
-        setPayAmount(String(ad.pay_amount || ad.payAmount || '0'));
+        setPayType(norm.payType);
+        setPayAmount(norm.payAmount);
 
         // Editor
-        setEditorHtml(ad.content || '');
+        setEditorHtml(norm.content);
         if (editorRef.current) {
-            editorRef.current.innerHTML = ad.content || '';
+            editorRef.current.innerHTML = norm.content;
         }
 
-        // Options (Parse from JSONB or direct fields)
-        const opts = ad.options || {};
-        setSelectedKeywords(opts.keywords || ad.keywords || []);
+        setSelectedKeywords(norm.keywords);
+        setSelectedAdProduct(norm.productType);
+        setSelectedAdPeriod(norm.productPeriod);
 
-        // Product Tier / Type
-        let pType = ad.ad_type || ad.productType || opts.product_type;
-        // Fallback if missing
-        if (!pType && ad.tier) {
-            const found = DETAILED_PRICING.find(p => p.tier === ad.tier || p.name.includes(ad.tier));
-            if (found) pType = found.id;
-        }
-        setSelectedAdProduct(pType || 'p1');
-        setSelectedAdPeriod(opts.product_period || ad.productPeriod || 30);
-
-        // Icons & Highlights
-        setSelectedIcon(opts.icon || null);
-        setIconPeriod(opts.icon_period || 0);
-        setSelectedHighlighter(opts.highlighter || null);
-        setHighlighterPeriod(opts.highlighter_period || 0);
-
-        // Borders
-        setBorderOption(opts.border || opts.border_option || 'none');
-        setBorderPeriod(opts.border_period || 0);
-
-        // Pay Suffixes
-        setPaySuffixes(opts.pay_suffixes || []);
+        setSelectedIcon(norm.icon);
+        setIconPeriod(norm.icon_period);
+        setSelectedHighlighter(norm.highlighter);
+        setHighlighterPeriod(norm.highlighter_period);
+        setBorderOption(norm.border as any);
+        setBorderPeriod(norm.border_period);
+        setPaySuffixes(norm.pay_suffixes);
     };
 
     return {

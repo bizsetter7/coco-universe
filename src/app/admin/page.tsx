@@ -30,6 +30,7 @@ import { Shop } from '@/types/shop';
 import { useAuth } from '@/hooks/useAuth';
 import { SEOIndexingControl } from '@/components/admin/SEOIndexingControl';
 import { CompetitorAnalysis } from '@/components/admin/CompetitorAnalysis';
+import { HealthDashboard } from '@/components/admin/HealthDashboard';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -59,7 +60,7 @@ function AdminContent() {
         newUserToday: 0,
         totalUsers: 0
     });
-    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments'>('stats');
+    const [activeTab, setActiveTab] = useState<'ads' | 'stats' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health'>('stats');
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
     const [isMobileInquiryModalOpen, setIsMobileInquiryModalOpen] = useState(false);
@@ -67,7 +68,7 @@ function AdminContent() {
     // --- 2. Filter & UI State ---
     const [userSearch, setUserSearch] = useState('');
     const [userFilter, setUserFilter] = useState<'all' | 'corporate' | 'individual'>('all');
-    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all');
+    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('pending');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -166,12 +167,33 @@ function AdminContent() {
     // [New] Ad Status Control Logic (Supabase Enabled)
     const handleStatusUpdate = async (adId: string, newStatus: string) => {
         try {
+            // Get ad details for notification
+            const ad = mockAds.find(a => a.id === adId);
+
             const { error } = await supabase
                 .from('shops')
                 .update({ status: newStatus, updated_at: new Date().toISOString() })
                 .eq('id', adId);
 
             if (error) throw error;
+
+            // [New] Create notification for rejected ads
+            if (newStatus === 'rejected' && ad) {
+                try {
+                    await supabase.from('notifications').insert({
+                        user_id: (ad as any).user_id || ad.ownerId,
+                        type: 'AD_REJECTED',
+                        title: '광고 심사 거절',
+                        message: `'${ad.title || ad.shopName}' 광고가 심사에서 거절되었습니다. 관리자에게 문의하세요.`,
+                        read: false,
+                        link: '/my-shop?view=dashboard',
+                        created_at: new Date().toISOString()
+                    });
+                } catch (notifError) {
+                    console.error('Notification creation failed:', notifError);
+                    // Continue even if notification fails
+                }
+            }
 
             // Update UI state
             setMockAds((prev: Shop[]) => prev.map((ad: Shop) =>
@@ -290,6 +312,7 @@ function AdminContent() {
                             <NavItem icon={<CreditCard size={20} />} label="결제 관리" active={activeTab === 'payments'} onClick={() => { setActiveTab('payments'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => { setActiveTab('inquiry'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }} />
+                            <NavItem icon={<ShieldCheck size={20} className="text-emerald-500" />} label="시스템 진단" active={activeTab === 'health'} onClick={() => { setActiveTab('health'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => { setActiveTab('seo'); setIsSidebarOpen(false); }} />
                         </nav>
                         <div className="pt-6 border-t border-slate-900">
@@ -313,6 +336,7 @@ function AdminContent() {
                     <NavItem icon={<Database size={20} />} label="결제 내역 관리" active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} />
                     <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => setActiveTab('inquiry')} />
                     <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
+                    <NavItem icon={<ShieldCheck size={20} className="text-emerald-500" />} label="시스템 진단" active={activeTab === 'health'} onClick={() => setActiveTab('health')} />
                     <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => setActiveTab('seo')} />
                 </nav>
             </aside>
@@ -637,21 +661,21 @@ function AdminContent() {
                                                         </div>
 
                                                         {/* --- 진단용 디버그 정보 (START) --- */}
-                                                        <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl text-left w-full max-w-sm">
-                                                            <p className="text-xs font-black text-red-600 mb-2 flex items-center gap-1">
-                                                                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                                        <div className={`mt-4 p-4 border rounded-xl text-left w-full max-w-sm ${mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? 'bg-slate-50 border-slate-200' : 'bg-red-50 border-red-100'}`}>
+                                                            <p className={`text-xs font-black mb-2 flex items-center gap-1 ${mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? 'text-slate-600' : 'text-red-600'}`}>
+                                                                <span className={`w-2 h-2 rounded-full animate-pulse ${mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? 'bg-blue-500' : 'bg-red-500'}`}></span>
                                                                 시스템 연결 진단 (System Diagnostic)
                                                             </p>
-                                                            <div className="space-y-1 text-[11px] text-red-500 font-medium">
+                                                            <div className={`space-y-1 text-[11px] font-medium ${mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? 'text-slate-500' : 'text-red-500'}`}>
                                                                 <p>• URL Config: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ 설정됨' : '❌ 설정 안됨 (NULL)'}</p>
                                                                 <p>• URL Value: {process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 15) + '...' : '-'}</p>
-                                                                <p>• Placeholder: {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder') ? '⚠️ YES (연동 불가)' : '✅ NO (정상)'}</p>
+                                                                <p>• DB 상태: {mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ 연결됨 (데이터 없음)' : '⚠️ 데이터 확인 불가'}</p>
                                                                 <p>• Data Count: {mockAds.length}건</p>
                                                             </div>
-                                                            <p className="mt-2 text-[10px] text-red-400 border-t border-red-100 pt-2 leading-tight">
+                                                            <p className={`mt-2 text-[10px] border-t pt-2 leading-tight ${mockAds.length === 0 && process.env.NEXT_PUBLIC_SUPABASE_URL ? 'text-slate-400 border-slate-200' : 'text-red-400 border-red-100'}`}>
                                                                 {process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder')
                                                                     ? 'Vercel 환경 변수가 없지만 [Emergency Fallback]이 작동하여 연결되었습니다.'
-                                                                    : 'DB 연결 상태: 정상 (Environment Variable or Fallback Active)'}
+                                                                    : 'DB 연결 상태: 정상 (연결 성공, 테이블이 비어있을 수 있습니다)'}
                                                             </p>
                                                         </div>
                                                         {/* --- 진단용 디버그 정보 (END) --- */}
@@ -1088,6 +1112,12 @@ function AdminContent() {
                                 </table>
                             </div>
                         </div>
+                    </div>
+                )}
+                {/* Tab 8: System Health Diagnostics */}
+                {activeTab === 'health' && (
+                    <div className="pb-20">
+                        <HealthDashboard />
                     </div>
                 )}
             </main>

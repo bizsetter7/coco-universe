@@ -62,8 +62,8 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose, form
                     {/* Ad Title White Box Layout (CENTERED) */}
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2 w-full">
-                            {formData.selectedIcon && (() => {
-                                const iconObj = ICONS.find((i: any) => i.id === Number(formData.selectedIcon));
+                            {(formData.options?.icon || formData.selectedIcon) && (() => {
+                                const iconObj = ICONS.find((i: any) => i.id === Number(formData.options?.icon || formData.selectedIcon));
                                 return iconObj ? (
                                     <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
                                         <span className="text-lg">{iconObj.icon}</span>
@@ -73,8 +73,8 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose, form
                             })()}
 
                             <h2 className="text-xl md:text-2xl font-black leading-tight text-gray-900 truncate text-center">
-                                <span style={formData.selectedHighlighter ? {
-                                    backgroundColor: HIGHLIGHTERS.find((h: any) => String(h.id) === String(formData.selectedHighlighter))?.color,
+                                <span style={(formData.options?.highlighter || formData.selectedHighlighter) ? {
+                                    backgroundColor: HIGHLIGHTERS.find((h: any) => String(h.id) === String(formData.options?.highlighter || formData.selectedHighlighter))?.color,
                                     color: '#000',
                                     padding: '0 8px',
                                     borderRadius: '4px'
@@ -109,13 +109,13 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose, form
 
                         {/* Right: Keywords (Grid 3 cols) */}
                         <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
-                            {formData.selectedKeywords?.slice(0, 6).map((kw: string, i: number) => (
+                            {(formData.options?.paySuffixes || formData.paySuffixes)?.slice(0, 6).map((kw: string, i: number) => (
                                 <span key={i} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                     {kw}
                                 </span>
                             ))}
-                            {(!formData.selectedKeywords || formData.selectedKeywords.length === 0) && (
-                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
+                            {(!(formData.options?.paySuffixes || formData.paySuffixes || formData.selectedKeywords) || (formData.options?.paySuffixes || formData.paySuffixes || formData.selectedKeywords).length === 0) && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 급여 옵션 없음</span>
                             )}
                         </div>
                     </div>

@@ -572,7 +572,7 @@ export function CustomerCenterContent() {
             else if (tab === 'ad') targetTab = '광고안내';
             else if (tab === 'guide') targetTab = '이용방법';
             else if (tab === 'faq') targetTab = '자주묻는질문';
-            else if (tab === 'inquiry') targetTab = '1:1문의';
+            else if (tab === 'inquiry') targetTab = '1:1 문의';
             else if (tab === 'policy') targetTab = '약관 및 정책';
 
             if (activeTab !== targetTab) {
@@ -597,7 +597,7 @@ export function CustomerCenterContent() {
     const [inquiryTitle, setInquiryTitle] = useState('');
     const [inquiryContent, setInquiryContent] = useState('');
 
-    const isDirty = activeTab === '1:1문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
+    const isDirty = activeTab === '1:1 문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
     usePreventLeave(isDirty);
 
     useEffect(() => {
@@ -623,7 +623,7 @@ export function CustomerCenterContent() {
         else if (tabName === '광고안내') tabParam = 'ad';
         else if (tabName === '이용방법') tabParam = 'guide';
         else if (tabName === '자주묻는질문') tabParam = 'faq';
-        else if (tabName === '1:1문의') tabParam = 'inquiry';
+        else if (tabName === '1:1 문의') tabParam = 'inquiry';
         else if (tabName === '약관 및 정책') tabParam = 'policy';
 
         params.set('tab', tabParam);
@@ -637,7 +637,7 @@ export function CustomerCenterContent() {
         { id: '광고안내', icon: <ShoppingBag size={16} /> },
         { id: '이용방법', icon: <Info size={16} /> },
         { id: '자주묻는질문', icon: <HelpCircle size={16} /> },
-        { id: '1:1문의', icon: <MessageSquare size={16} /> },
+        { id: '1:1 문의', icon: <MessageSquare size={16} /> },
         { id: '약관 및 정책', icon: <FileText size={16} /> },
     ];
 
@@ -729,7 +729,7 @@ export function CustomerCenterContent() {
                                     <div key={notice.id} className={`${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
                                         <div
                                             onClick={() => setExpandedNotice(expandedNotice === notice.id ? null : notice.id)}
-                                            className={`p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
+                                            className={`p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
                                         >
                                             <div className="flex items-center gap-3 min-w-0 flex-1">
                                                 <span className={`w-12 h-6 flex items-center justify-center shrink-0 rounded text-[10px] font-black ${notice.category === '필독' ? 'bg-red-600 text-white' : notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-pink-600 text-white'}`}>
@@ -1313,7 +1313,7 @@ export function CustomerCenterContent() {
                                                     <span className="text-2xl">🏆</span>
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <h4 className="text-[15px] font-black text-gray-900 leading-tight mb-0.5">우리 업소 무조건 1위</h4>
+                                                    <h4 className="text-[15px] font-black text-gray-900 leading-tight mb-0.5 whitespace-nowrap">우리 업소 무조건 1위</h4>
                                                     <p className="text-[10px] font-bold text-gray-400 leading-tight">골드 보더 + 상단 고정 효과</p>
                                                 </div>
                                             </div>

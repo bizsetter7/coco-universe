@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { ChevronLeft, Store, MapPin, Check, PlusSquare, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings } from 'lucide-react';
+import { getHighlighterStyle } from '@/utils/highlighter';
+import { IconBadge } from '@/components/common/IconBadge';
 
 interface BusinessDashboardProps {
     brand: any;
@@ -15,25 +17,52 @@ interface BusinessDashboardProps {
     ads?: any[];
     onOpenMenu?: () => void;
     onShowAdDetail?: (ad: any) => void;
+    onDeleteAd?: (adId: string) => void;
 }
 
+const TIER_COLORS: Record<string, string> = {
+    p1: 'bg-[#8B5CF6]', // GRAND
+    p2: 'bg-[#EF4444]', // PREMIUM
+    p3: 'bg-[#3B82F6]', // DELUXE
+    p4: 'bg-[#10B981]', // SPECIAL
+    p5: 'bg-[#F97316]', // URGENT
+    p7: 'bg-[#E2E8F0]'  // NORMAL
+};
+
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail
+    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd
 }) => {
     const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
 
-    // Filter ads based on status (assuming closed ads have a status or isClosed property, 
-    // for now we'll simulate sorting or using the prop)
     const ongoingAds = ads.filter(ad => !ad.isClosed);
     const closedAds = ads.filter(ad => ad.isClosed);
     const displayedAds = activeTab === 'ongoing' ? ongoingAds : closedAds;
 
+    // Helper to get tier label
+    const getTierLabel = (ad: any) => {
+        const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'GRAND';
+        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'PREMIUM';
+        if (pt === 'p3') return 'DELUXE';
+        if (pt === 'p4') return 'SPECIAL';
+        if (pt === 'p5') return 'URGENT';
+        return 'NORMAL';
+    };
+
+    const getTierColor = (ad: any) => {
+        const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return TIER_COLORS.p1;
+        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return TIER_COLORS.p2;
+        if (pt === 'p3') return TIER_COLORS.p3;
+        if (pt === 'p4') return TIER_COLORS.p4;
+        if (pt === 'p5') return TIER_COLORS.p5;
+        return TIER_COLORS.p7;
+    };
+
     return (
-        <div className="w-full space-y-3 md:space-y-6">
+        <div className="w-full space-y-3 md:space-y-6 pb-20">
             <header className="flex flex-col gap-2 md:gap-4 mb-2 md:mb-4">
                 <div className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
-                    {/* Mobile Menu Button */}
-
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4">
                         <div className="flex items-center gap-4">
                             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-pink-600'} `}>
@@ -87,41 +116,115 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                     displayedAds.map((ad: any) => (
                         <div key={ad.id} className={`p-6 rounded-2xl border transition shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 hover:bg-gray-800/50' : 'bg-white border-gray-100 hover:shadow-md'} `}>
                             <div className="flex flex-col md:flex-row justify-between gap-4">
-                                <div className="space-y-2">
+                                <div className="space-y-2 flex-1 min-w-0">
                                     <div className="flex gap-2 text-[11px] items-center font-black">
-                                        <span className={`${ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500')} px-2 py-0.5 rounded`}>
-                                            {ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감')}
+                                        <span className={`${(ad.status === 'rejected' || ad.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
+                                            {(ad.status === 'rejected' || ad.status === 'REJECTED') ? '반려' : (ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
                                         </span>
                                         <span className="text-gray-400">마감일: {ad.deadline || '2026-03-25'}</span>
                                     </div>
-                                    <h4
-                                        onClick={() => onShowAdDetail?.(ad)}
-                                        className={`font-bold text-[15px] line-clamp-1 cursor-pointer hover:text-pink-500 transition ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
-                                    >
-                                        🔥 {ad.title}
-                                    </h4>
+
+                                    {/* Title & Tier/Icon Badges (Stacked Layout) */}
+                                    <div className="flex flex-col gap-2 mb-3">
+                                        {/* Tier & Options Line */}
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            {/* Tier Code Badge (Mirroring Payments: bg-gray-900) */}
+                                            <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap">
+                                                {(() => {
+                                                    const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+                                                    const adProduct = [
+                                                        { id: 'p1', code: 'T1' }, { id: 'p2', code: 'T2' }, { id: 'p3', code: 'T3' },
+                                                        { id: 'p4', code: 'T4' }, { id: 'p5', code: 'T5' }, { id: 'p6', code: 'T6' }, { id: 'p7', code: 'T7' }
+                                                    ].find(tp => tp.id === pt || pt.includes(tp.id));
+
+                                                    if (pt.includes('grand')) return 'T1';
+                                                    if (pt.includes('premium')) return 'T2';
+                                                    return adProduct?.code || (pt === 'p7' ? 'T7' : 'AD');
+                                                })()}
+                                            </span>
+
+                                            {/* Option Mini Badges (PaymentsView Mapping) */}
+                                            <div className="flex items-center gap-1 shrink-0">
+                                                {(ad.options?.icon || ad.selectedIcon) && (
+                                                    <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아</span>
+                                                )}
+                                                {(ad.options?.highlighter || ad.selectedHighlighter) && (
+                                                    <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형</span>
+                                                )}
+                                                {(ad.options?.border && ad.options?.border !== 'none' || (ad.borderOption && ad.borderOption !== 'none')) && (
+                                                    <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>
+                                                )}
+                                                {(ad.options?.pay_suffixes || ad.options?.paySuffixes || ad.paySuffixes?.length > 0) && (
+                                                    <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Title Line (Under Badges) */}
+                                        <h4
+                                            onClick={() => onShowAdDetail?.(ad)}
+                                            className={`font-black text-[17px] md:text-[19px] cursor-pointer hover:text-pink-500 transition leading-tight block w-full ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
+                                            style={getHighlighterStyle(ad.options?.highlighter || ad.selectedHighlighter)}
+                                        >
+                                            {ad.title}
+                                        </h4>
+                                    </div>
+
+                                    {/* Info Area [Pure Reflection Mode] - Removed Shop Name */}
                                     <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
-                                        {shopName} {nickname && <span className="text-gray-400 ml-1">({nickname})</span>}
+                                        <span className="text-pink-600 font-extrabold uppercase">
+                                            {(() => {
+                                                const nick = ad.options?.nickname || ad.nickname || nickname || '';
+                                                if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
+                                                return nick;
+                                            })()}
+                                        </span>
                                         <span className="md:hidden"><br /></span>
                                         <span className="hidden md:inline"> | </span>
-                                        {ad.regionCity} {ad.regionGu} | {ad.category || '룸싸롱'} | 아가씨
+                                        {(ad.options?.regionCity || ad.regionCity)} {(ad.options?.regionGu || ad.regionGu)} | {(ad.options?.category || ad.category)} | {(ad.options?.categorySub || ad.categorySub || '자유직종')}
                                     </div>
                                 </div>
-                                <div className="flex gap-1.5 shrink-0 items-center justify-center md:justify-end">
-                                    <button onClick={() => handleAdClick(false, ad)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">수정</button>
-                                    <button className="px-3 py-2 border border-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-50 transition">마감</button>
-                                    <button className="flex items-center gap-1.2 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
-                                        <RefreshCw size={12} /> 점프
-                                    </button>
-                                    <button className="flex items-center gap-1.2 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition">
-                                        <Calendar size={12} /> 연장
-                                    </button>
-                                    <button className="px-3 py-2 border border-red-100 text-red-400 text-xs font-bold rounded-lg hover:bg-red-50 transition">삭제</button>
+                                <div className="flex flex-col items-end gap-2 mt-3 md:mt-0 shrink-0 w-full md:w-auto">
+                                    {/* [Feature] Monthly Edit Tracker - Clean Style */}
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 shadow-sm">
+                                        <span className="text-[14px]">📝</span>
+                                        <span className="text-[11px] font-black text-gray-500">월간 수정:</span>
+                                        <span className={`text-[12px] font-black ${(ad.edit_count || 0) >= 25 ? 'text-red-600' : 'text-gray-900'}`}>
+                                            {ad.edit_count || 0}
+                                        </span>
+                                        <span className="text-[11px] font-bold text-gray-400">/ 30회</span>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-1.5 items-center justify-end w-full md:w-auto">
+                                        <button onClick={() => handleAdClick(false, ad)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">
+                                            수정
+                                        </button>
+                                        <button className="flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
+                                            <RefreshCw size={12} /> 점프
+                                        </button>
+                                        <button className="flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition">
+                                            <Calendar size={12} /> 연장
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDeleteAd?.(ad.id);
+                                            }}
+                                            style={{
+                                                backgroundColor: '#ef4444',
+                                                color: 'white',
+                                                border: '2px solid #dc2626'
+                                            }}
+                                            className="px-3 py-2 text-xs font-bold rounded-lg hover:bg-red-600 transition"
+                                        >
+                                            삭제🔴
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Bottom Action Area (Applicants) */}
-                            <div className={`px-5 py-3 flex flex-wrap items-center justify-between gap-3 mt-4 border-t ${brand.theme === 'dark' ? 'bg-gray-800/30 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
+                            <div className={`px-5 py-3 flex flex-wrap items-center justify-between gap-3 mt-4 -mx-6 mb-[-24px] border-t ${brand.theme === 'dark' ? 'bg-gray-800/30 border-gray-800' : 'bg-gray-50 border-gray-100'}`}>
                                 <button
                                     onClick={() => setView('applicants')}
                                     className="bg-gray-900 text-white px-4 py-2 text-[12px] font-black rounded-xl shadow-lg hover:bg-black transition active:scale-95"

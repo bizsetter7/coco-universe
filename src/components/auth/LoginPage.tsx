@@ -8,28 +8,53 @@ import { useAuth } from '@/hooks/useAuth';
 export const LoginPage = () => {
     const brand = useBrand();
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, signIn } = useAuth();
     const [loginId, setLoginId] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         const id = loginId.trim();
         const pw = loginPassword.trim();
 
-        if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
-            login('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
-            alert('마스터 관리자로 로그인되었습니다. (관리자 페이지 접근 가능)');
-            window.location.href = '/admin';
-        } else if (id === 'test_shop' && pw === 'password123') {
-            login('shop', id, '테스트 사장님', '번창하는조사장');
-            alert('기업 회원(업주)으로 로그인되었습니다.\n광고 신청 및 내 업소 관리가 가능합니다.');
-            window.location.href = '/';
-        } else if (id === 'test_user' && pw === 'password123') {
-            login('personal', id, '테스트 회원', '밤의요정');
-            alert('일반 회원으로 로그인되었습니다.\n커뮤니티 및 인재정보 이용이 가능합니다.');
-            window.location.href = '/';
-        } else {
-            alert(`아이디 또는 비밀번호가 올바르지 않습니다.\n입력값: [${id}]\\n(관리자: admin_user / 기업: test_shop / 개인: test_user)`);
+        if (!id || !pw) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // 1. Check for Test/Mock IDs
+            if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
+                login('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
+                alert('마스터 관리자로 로그인되었습니다.');
+                window.location.href = '/admin';
+                return;
+            } else if (id === 'test_shop' && pw === 'password123') {
+                login('shop', id, '테스트 사장님', '번창하는조사장');
+                alert('기업 회원으로 로그인되었습니다.');
+                window.location.href = '/';
+                return;
+            } else if (id === 'test_user' && pw === 'password123') {
+                login('personal', id, '테스트 회원', '밤의요정');
+                alert('일반 회원으로 로그인되었습니다.');
+                window.location.href = '/';
+                return;
+            }
+
+            // 2. Real Supabase Login (Assume email format for real accounts)
+            if (id.includes('@')) {
+                await signIn(id, pw);
+                alert('로그인에 성공했습니다.');
+                window.location.href = '/';
+            } else {
+                alert('등록되지 않은 계정입니다.\n테스트 계정 또는 이메일 형식을 사용해주세요.');
+            }
+        } catch (err: any) {
+            console.error('Login error:', err);
+            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -79,7 +104,7 @@ export const LoginPage = () => {
                     <span className="w-px h-3 bg-gray-200"></span>
                     <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
                     <span className="w-px h-3 bg-gray-200"></span>
-                    <button className="text-gray-600 font-bold hover:underline" onClick={() => alert('회원가입 기능 준비중입니다.')}>회원가입</button>
+                    <button className="text-gray-600 font-bold hover:underline" onClick={() => router.push('/?page=signup')}>회원가입</button>
                 </div>
 
                 {/* [Exclusive] Quick Login for Owner - Only visible in Development */}

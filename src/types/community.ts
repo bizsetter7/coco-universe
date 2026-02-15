@@ -10,6 +10,11 @@ export interface Post {
     isHot?: boolean;
     created_at?: string;
     view_count?: number;
+    // [Added for Security & User Info]
+    author_id?: string;
+    author_nickname?: string;
+    is_secret?: boolean;
+    password?: string;
 }
 
 export interface Comment {

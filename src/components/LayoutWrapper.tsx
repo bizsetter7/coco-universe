@@ -13,6 +13,8 @@ import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
 import { AdultVerificationGate } from './common/AdultVerificationGate';
 
+import { useAuth } from '@/hooks/useAuth';
+
 interface LayoutWrapperProps {
     children: React.ReactNode;
     sideAds: Shop[]; // [Optimization]
@@ -21,14 +23,22 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
+    const { user: authUser, isLoggedIn, isLoading } = useAuth();
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
 
     React.useEffect(() => {
-        // Move all client-side checks here to ensure hydration matches
-        const verified = localStorage.getItem('adult_verified') === 'true';
-        const session = localStorage.getItem('user_session');
-        setIsVerified(verified || !!session);
-    }, []); // Run once on mount
+        if (isLoading) return;
+
+        // DB에서 인증된 회원인 경우
+        if (isLoggedIn && authUser.isAdultVerified) {
+            setIsVerified(true);
+            return;
+        }
+
+        // 비로그인 또는 DB 미인증 시 로컬 스토리지 확인
+        const localVerified = localStorage.getItem('adult_verified') === 'true';
+        setIsVerified(localVerified);
+    }, [isLoggedIn, authUser.isAdultVerified, isLoading]);
 
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
@@ -36,7 +46,11 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     };
 
     const isAdminPage = pathname?.startsWith('/admin');
-    const showGate = isVerified === false;
+
+    // 로딩 중에는 아무것도 보여주지 않거나 스플래시 노출
+    if (isLoading || isVerified === null) return null;
+
+    const showGate = !isVerified;
 
     if (showGate) {
         return <AdultVerificationGate onVerify={handleVerify} />;

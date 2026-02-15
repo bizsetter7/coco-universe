@@ -95,28 +95,12 @@ function CommunityContent() {
             if (data && data.length > 0) {
                 console.log("[Community] Loaded posts from Supabase.");
                 setPosts(data as Post[]);
+                // setPosts(MOCK_POSTS); // Forced Mock Data
                 localStorage.setItem('community_posts_backup', JSON.stringify(data));
             } else {
-                console.log("[Community] DB is empty. Checking recovery options...");
-                const localBackup = localStorage.getItem('community_posts_backup');
-                if (localBackup) {
-                    try {
-                        const parsed = JSON.parse(localBackup);
-                        if (parsed && parsed.length > 0) {
-                            console.log("[Community] DB is empty, using local backup for recovery.");
-                            setPosts(parsed);
-                        } else {
-                            console.log("[Community] DB and Backup empty. Using MOCK_POSTS.");
-                            setPosts(MOCK_POSTS);
-                        }
-                    } catch (e) {
-                        console.log("[Community] Backup parse error. Using MOCK_POSTS.");
-                        setPosts(MOCK_POSTS);
-                    }
-                } else {
-                    console.log("[Community] No data sources found. Using MOCK_POSTS.");
-                    setPosts(MOCK_POSTS);
-                }
+                console.log("[Community] DB is empty. Using MOCK_POSTS.");
+                setPosts(MOCK_POSTS);
+                localStorage.removeItem('community_posts_backup');
             }
         } catch (err) {
             console.error('[Community] Critical error in fetchPosts:', err);
