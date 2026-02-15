@@ -1,6 +1,6 @@
 import { CreditCard, ArrowRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
-import { HIGHLIGHTERS } from '../constants';
+import { HIGHLIGHTERS, DETAILED_PRICING } from '../constants';
 
 const getHighlighterStyle = (id: number | string | undefined) => {
     const h = HIGHLIGHTERS.find(item => String(item.id) === String(id));
@@ -53,96 +53,116 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                         </tr>
                                     </thead>
                                     <tbody className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        {payments.map((p: any) => (
-                                            <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition">
-                                                <td className="py-5 px-2 font-mono text-gray-400 text-[11px]">{p.id}</td>
-                                                <td className="py-5 px-2">
-                                                    <div className="flex flex-col gap-1.5 text-left">
-                                                        <div className="flex flex-wrap gap-1">
-                                                            <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0">
-                                                                {p.type?.includes('p') ? p.type.toUpperCase() : 'VIP'}
+                                        {payments.map((p: any, index: number) => {
+                                            // [Fix] Map Tier Name to Code (e.g., '그랜드' -> 'T1')
+                                            const product = DETAILED_PRICING.find(tp => tp.tier === p.type || tp.id === p.type);
+                                            const typeCode = product?.code || 'AD';
+                                            const displayPrice = typeof p.price === 'number'
+                                                ? p.price.toLocaleString() + '원'
+                                                : p.price;
+
+                                            return (
+                                                <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition">
+                                                    {/* [Fix] Sequential Number */}
+                                                    <td className="py-5 px-2 font-mono text-gray-400 text-[11px]">{payments.length - index}</td>
+                                                    <td className="py-5 px-2">
+                                                        <div className="flex flex-col gap-1.5 text-left">
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {/* [Fix] Show T-Code */}
+                                                                <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0">
+                                                                    {typeCode}
+                                                                </span>
+                                                                {p.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아이콘</span>}
+                                                                {p.options?.highlighter && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형광펜</span>}
+                                                                {p.options?.border && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테두리</span>}
+                                                            </div>
+                                                            <span
+                                                                onClick={() => onShowAdDetail?.(p.id)}
+                                                                className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                                style={getHighlighterStyle(p.options?.highlighter)}
+                                                            >
+                                                                {p.desc}
                                                             </span>
-                                                            {p.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아이콘</span>}
-                                                            {p.options?.highlighter && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형광펜</span>}
-                                                            {p.options?.border && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테두리</span>}
                                                         </div>
-                                                        <span
-                                                            onClick={() => onShowAdDetail?.(p.id)}
-                                                            className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                                                            style={getHighlighterStyle(p.options?.highlighter)}
-                                                        >
-                                                            {p.desc}
+                                                    </td>
+                                                    <td className="py-5 px-2 font-black text-pink-500">{displayPrice}</td>
+                                                    <td className="py-5 px-2 text-[11px] font-bold text-gray-400">{p.method}</td>
+                                                    {/* [Fix] Show Nickname from metadata or p.nickname */}
+                                                    <td className="py-5 px-2 font-black max-w-[100px] truncate">{p.metadata?.nickname || p.nickname || userName}</td>
+                                                    <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight whitespace-nowrap">
+                                                        <div className="flex flex-col">
+                                                            <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
+                                                            <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-5 px-2">
+                                                        <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'} shadow-sm whitespace-nowrap`}>
+                                                            {p.status || '대기'}
                                                         </span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-5 px-2 font-black text-pink-500">{p.price}</td>
-                                                <td className="py-5 px-2 text-[11px] font-bold text-gray-400">{p.method}</td>
-                                                <td className="py-5 px-2 font-black max-w-[100px] truncate">{p.nickname || userName}</td>
-                                                <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight whitespace-nowrap">
-                                                    <div className="flex flex-col">
-                                                        <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
-                                                        <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="py-5 px-2">
-                                                    <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'} shadow-sm whitespace-nowrap`}>
-                                                        {p.status || '대기'}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
 
                             {/* Mobile View (Cards) */}
                             <div className="md:hidden space-y-4">
-                                {payments.map((p: any) => (
-                                    <div key={p.id} className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} border rounded-[24px] p-5 shadow-sm space-y-4`}>
-                                        <div className="flex justify-between items-start gap-2">
-                                            <div className="space-y-1 overflow-hidden">
-                                                <div className="flex flex-wrap gap-1">
-                                                    <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black uppercase`}>
-                                                        {p.type?.includes('p') ? p.type.toUpperCase() : 'AD'}
-                                                    </span>
-                                                    {p.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아이콘</span>}
-                                                </div>
-                                                <h3
-                                                    onClick={() => onShowAdDetail?.(p.id)}
-                                                    className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
-                                                    style={getHighlighterStyle(p.options?.highlighter)}
-                                                >
-                                                    {p.desc}
-                                                </h3>
-                                            </div>
-                                            <span className={`shrink-0 px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'}`}>
-                                                {p.status || '대기'}
-                                            </span>
-                                        </div>
+                                {payments.map((p: any, index: number) => {
+                                    const product = DETAILED_PRICING.find(tp => tp.tier === p.type || tp.id === p.type);
+                                    const typeCode = product?.code || 'AD';
+                                    const displayPrice = typeof p.price === 'number'
+                                        ? p.price.toLocaleString() + '원'
+                                        : p.price;
 
-                                        <div className={`grid grid-cols-2 gap-3 p-4 rounded-2xl ${brand.theme === 'dark' ? 'bg-black/20 text-gray-400' : 'bg-gray-50 text-gray-500'} text-[11px] font-bold`}>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] text-gray-400">결제일시</p>
-                                                <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-tight`}>
-                                                    {p.date.split(' ').slice(0, 3).join(' ')}<br />
-                                                    <span className="text-[10px] text-gray-400">{p.date.split(' ').slice(3).join(' ')}</span>
-                                                </p>
+                                    return (
+                                        <div key={p.id} className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} border rounded-[24px] p-5 shadow-sm space-y-4`}>
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div className="space-y-1 overflow-hidden">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black uppercase`}>
+                                                            {typeCode}
+                                                        </span>
+                                                        {p.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아이콘</span>}
+                                                    </div>
+                                                    <h3
+                                                        onClick={() => onShowAdDetail?.(p.id)}
+                                                        className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
+                                                        style={getHighlighterStyle(p.options?.highlighter)}
+                                                    >
+                                                        {p.desc}
+                                                    </h3>
+                                                </div>
+                                                <span className={`shrink-0 px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' ? 'bg-green-500' : 'bg-orange-500'}`}>
+                                                    {p.status || '대기'}
+                                                </span>
                                             </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] text-gray-400">결제 금액</p>
-                                                <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-pink-600'}`}>{p.price}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] text-gray-400">결제 방식</p>
-                                                <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{p.method}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] text-gray-400">결제 번호</p>
-                                                <p className="font-mono">#{p.id}</p>
+
+                                            <div className={`grid grid-cols-2 gap-3 p-4 rounded-2xl ${brand.theme === 'dark' ? 'bg-black/20 text-gray-400' : 'bg-gray-50 text-gray-500'} text-[11px] font-bold`}>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] text-gray-400">결제일시</p>
+                                                    <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-tight`}>
+                                                        {p.date.split(' ').slice(0, 3).join(' ')}<br />
+                                                        <span className="text-[10px] text-gray-400">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                    </p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] text-gray-400">결제 금액</p>
+                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-pink-600'}`}>{displayPrice}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] text-gray-400">결제 방식</p>
+                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{p.method}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[9px] text-gray-400">결제 번호</p>
+                                                    <p className="font-mono">#{payments.length - index}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
 
                             <div className="flex justify-center items-center gap-1 mt-10">

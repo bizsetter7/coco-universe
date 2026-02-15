@@ -123,7 +123,7 @@ export function useAdFormState() {
     };
 
     // Ad Selection
-    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(null);
+    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>('p1');
     const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(30);
     const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
     const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(0);
@@ -212,35 +212,62 @@ export function useAdFormState() {
 
     const loadAdData = (ad: any) => {
         if (!ad) return;
-        setManagerName(ad.managerName || '');
-        setManagerPhone(ad.managerPhone || '');
-        setMessengers(ad.messengers || { kakao: '', line: '', telegram: '' });
+        // Basic Info
+        setShopName(ad.name || '코코 라운지');
+        setManagerName(ad.manager_name || ad.managerName || '');
+        setManagerPhone(ad.manager_phone || ad.managerPhone || '');
+        setMessengers({
+            kakao: ad.kakao_id || ad.messengers?.kakao || '',
+            telegram: ad.telegram_id || ad.messengers?.telegram || '',
+            line: ad.line_id || ad.messengers?.line || ''
+        });
+
+        // Job Details
         setTitle(ad.title || '');
-        setNickname(ad.nickname || '');
         setIndustryMain(ad.category || '');
-        setIndustrySub(ad.categorySub || '');
-        setRegionCity(ad.regionCity || '');
-        setRegionGu(ad.regionGu || '');
-        setAgeMin(ad.ageMin || 20);
-        setAgeMax(ad.ageMax || 35);
-        setPayType(ad.payType || '급여방식선택');
-        setPayAmount(ad.payAmount || '0');
-        setSelectedKeywords(ad.keywords || []);
+        setIndustrySub(ad.category_sub || ad.industrySub || '');
+        setRegionCity(ad.work_region || ad.regionCity || '');
+        setRegionGu(ad.work_region_sub || ad.regionGu || '');
+        setAddressDetail(ad.work_address || ad.addressDetail || '');
+
+        setAgeMin(ad.age_min || ad.ageMin || 20);
+        setAgeMax(ad.age_max || ad.ageMax || 35);
+
+        setPayType(ad.pay_type || ad.payType || '급여방식선택');
+        setPayAmount(String(ad.pay_amount || ad.payAmount || '0'));
+
+        // Editor
         setEditorHtml(ad.content || '');
         if (editorRef.current) {
             editorRef.current.innerHTML = ad.content || '';
         }
 
-        // Ad Options
-        setSelectedAdProduct(ad.productType || null);
-        setSelectedAdPeriod(ad.productPeriod || 30);
-        setSelectedIcon(ad.options?.icon || null);
-        setIconPeriod(ad.options?.iconPeriod || 0);
-        setSelectedHighlighter(ad.options?.highlighter || null);
-        setHighlighterPeriod(ad.options?.highlighterPeriod || 0);
-        setBorderOption(ad.options?.borderOption || 'none');
-        setBorderPeriod(ad.options?.borderPeriod || 0);
-        setPaySuffixes(ad.options?.paySuffixes || []);
+        // Options (Parse from JSONB or direct fields)
+        const opts = ad.options || {};
+        setSelectedKeywords(opts.keywords || ad.keywords || []);
+
+        // Product Tier / Type
+        let pType = ad.ad_type || ad.productType || opts.product_type;
+        // Fallback if missing
+        if (!pType && ad.tier) {
+            const found = DETAILED_PRICING.find(p => p.tier === ad.tier || p.name.includes(ad.tier));
+            if (found) pType = found.id;
+        }
+        setSelectedAdProduct(pType || 'p1');
+        setSelectedAdPeriod(opts.product_period || ad.productPeriod || 30);
+
+        // Icons & Highlights
+        setSelectedIcon(opts.icon || null);
+        setIconPeriod(opts.icon_period || 0);
+        setSelectedHighlighter(opts.highlighter || null);
+        setHighlighterPeriod(opts.highlighter_period || 0);
+
+        // Borders
+        setBorderOption(opts.border || opts.border_option || 'none');
+        setBorderPeriod(opts.border_period || 0);
+
+        // Pay Suffixes
+        setPaySuffixes(opts.pay_suffixes || []);
     };
 
     return {

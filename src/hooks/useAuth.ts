@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 // Unified user session type
@@ -15,15 +15,31 @@ export interface UserSession {
 
 // Supabase Auth 연동된 실제 인증 훅
 export function useAuth() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<UserSession>({
+    // State definitions with 'State' suffix for internal setters
+    const [isLoggedIn, setIsLoggedInState] = useState(false);
+    const [isLoading, setIsLoadingState] = useState(true);
+    const [user, setUserState] = useState<UserSession>({
         type: 'guest',
         id: 'guest',
         name: '게스트',
         nickname: '게스트',
         points: 0
     });
+
+    const isMounted = useRef(true);
+
+    // Guarded Setters
+    const setIsLoggedIn = (value: boolean) => {
+        if (isMounted.current) setIsLoggedInState(value);
+    };
+
+    const setIsLoading = (value: boolean) => {
+        if (isMounted.current) setIsLoadingState(value);
+    };
+
+    const setUser = (value: UserSession) => {
+        if (isMounted.current) setUserState(value);
+    };
 
     const syncUserSession = async (session: any) => {
         // [Safety] 이미 Mock 세션으로 로그인된 상태라면, Supabase 연동 정보가 명확하지 않을 때 덮어쓰지 않음
@@ -93,6 +109,8 @@ export function useAuth() {
     };
 
     useEffect(() => {
+        isMounted.current = true;
+
         // [Critical] 마운트 즉시 Mock 세션부터 체크하여 UI 동기화 (Flicker 방지)
         const savedMock = typeof window !== 'undefined' ? localStorage.getItem('coco_mock_session') : null;
         if (savedMock) {
@@ -110,11 +128,18 @@ export function useAuth() {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session) syncUserSession(session);
             else if (!savedMock) setIsLoading(false); // Mock도 없으면 로딩 종료
+        }).catch((err) => {
+            // [Fix] Ignore AbortError to prevent UI overlay
+            if (err.name === 'AbortError' || err.message?.includes('aborted')) return;
+
+            console.warn("Auth session check failed:", err);
+            // 에러 발생 시에도 로딩은 종료해야 함
+            if (!savedMock) setIsLoading(false);
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
-                syncUserSession(session);
+                syncUserSession(session).catch(() => { });
             }
         });
 
@@ -129,7 +154,10 @@ export function useAuth() {
             localStorage.setItem('user_referrer', source);
         }
 
-        return () => subscription.unsubscribe();
+        return () => {
+            isMounted.current = false;
+            subscription.unsubscribe();
+        };
     }, []);
 
     const login = (type: 'admin' | 'shop' | 'personal', id?: string, name?: string, nickname?: string) => {
@@ -157,9 +185,17 @@ export function useAuth() {
             localStorage.removeItem('adult_verified');
             localStorage.removeItem('coco_sim_mode'); // 시뮬레이션 정보도 삭제
         }
-        await supabase.auth.signOut();
+
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.warn("SignOut failed (ignoring):", e);
+        }
+
         setIsLoggedIn(false);
         setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+
+        // Force Reload to clear all states
         window.location.href = '/';
     };
 

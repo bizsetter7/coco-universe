@@ -303,8 +303,8 @@ const JobListView: React.FC<JobListViewProps> = ({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const showDesktop = !isMobile || !isMounted;
-    const showMobile = isMobile || !isMounted;
+    const showDesktop = isMounted && !isMobile;
+    const showMobile = isMounted && isMobile;
 
     return (
         <div id="latest-job-info-region" className="w-full clear-both mt-0 px-4 md:px-0">

@@ -57,7 +57,8 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
 
         const resumeData = {
             user_id: userId,
-            ownerId: userId, // [Sync] DB 컬럼 명칭 통일을 위해 추가
+            ownerId: userId, // [Sync] DB 컬럼 명칭 통일을 위해 유지 (shops 와 통일)
+            owner_id: userId, // [Sync] 혹시 모를 owner_id 형식 대응
             title,
             content,
             gender,

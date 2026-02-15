@@ -100,7 +100,7 @@ export default function AdForm(props: AdFormProps) {
                         </div>
                     </div>
                 )}
-                <div className={`space-y-5 transition-all duration-300 ${!props.isNewEntry ? 'opacity-40 grayscale-[0.3] pointer-events-none' : ''}`}>
+                <div className={`space-y-5 transition-all duration-300 ${!props.isNewEntry ? 'opacity-80 grayscale-[0.1] pointer-events-none' : ''}`}>
                     <Step3ProductSelect {...props} />
                     <Step4Extras
                         {...props}

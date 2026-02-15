@@ -62,10 +62,9 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         };
     }, [pathname]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (confirm('로그아웃 하시겠습니까?')) {
-            logout();
-            window.location.href = '/';
+            await logout();
         }
     };
 
@@ -237,7 +236,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                     {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />}
                                 </button>
                             )}
-                            {(pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page) && !pathname?.startsWith('/admin') && (
+                            {(pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page || isSimulated) && !pathname?.startsWith('/admin') && (
                                 <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(true)} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                                     <Menu size={24} />
                                 </Button>
@@ -270,16 +269,16 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                 <div className="space-y-1">
                                     {CATEGORIES.map((cat) => (
                                         <button
-                                            key={cat}
+                                            key={cat.id}
                                             onClick={() => {
                                                 const params = new URLSearchParams();
-                                                if (cat !== '전체') params.set('category', cat);
+                                                if (cat.name !== '전체') params.set('category', cat.name);
                                                 router.push(`/community?${params.toString()}`);
                                                 setShowMobileMenu(false);
                                             }}
-                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat || (!searchParams.get('category') && cat === '전체') ? 'bg-pink-50 text-pink-600' : 'text-gray-600'}`}
+                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat.name || (!searchParams.get('category') && cat.name === '전체') ? 'bg-pink-50 text-pink-600' : 'text-gray-600'}`}
                                         >
-                                            {cat}
+                                            {cat.name}
                                         </button>
                                     ))}
                                     <div className="h-px bg-gray-100 my-2" />

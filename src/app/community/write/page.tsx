@@ -5,17 +5,21 @@ import {
     ArrowLeft,
     Image as ImageIcon,
     X,
-    Home
+    Home,
+    Sparkles
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 
 const CATEGORIES = [
-    '밤 문화 Talk',
-    '같이일할단짝',
+    '그녀들의 수다',
+    '꿀팁 & 노하우',
     '뷰티·패션·이벤트',
-    '무료법률상담'
+    '같이일할단짝',
+    '중고거래',
+    '무료법률상담',
+    '프리미엄 라운지'
 ];
 
 export default function WritePostPage() {

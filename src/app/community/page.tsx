@@ -55,27 +55,76 @@ function CommunityContent() {
     const brand = useBrand();
     const primaryStyle = { color: brand.primaryColor };
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // [Optimization] Prevent background scroll when modal is open (Fixes jitter)
     useBodyScrollLock(loginModalOpen || isCorporateModalOpen);
 
     const [posts, setPosts] = useState<Post[]>([]);
+
     const fetchPosts = async () => {
         try {
-            const { data } = await supabase
+            console.log("[Community] Fetching posts from Supabase...");
+            const { data, error } = await supabase
                 .from('community_posts')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (data && data.length > 0) setPosts(data);
-            else setPosts(MOCK_POSTS); // Fallback to mock if empty or null
+            if (error) {
+                console.warn("[Community] Supabase fetch error, checking local backup:", error);
+                const localBackup = localStorage.getItem('community_posts_backup');
+                if (localBackup) {
+                    try {
+                        const parsed = JSON.parse(localBackup);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            console.log("[Community] Loaded posts from LocalBackup.");
+                            setPosts(parsed);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("[Community] Local backup parse error:", e);
+                    }
+                }
+                console.log("[Community] No DB, no Backup. Using MOCK_POSTS.");
+                setPosts(MOCK_POSTS);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                console.log("[Community] Loaded posts from Supabase.");
+                setPosts(data as Post[]);
+                localStorage.setItem('community_posts_backup', JSON.stringify(data));
+            } else {
+                console.log("[Community] DB is empty. Checking recovery options...");
+                const localBackup = localStorage.getItem('community_posts_backup');
+                if (localBackup) {
+                    try {
+                        const parsed = JSON.parse(localBackup);
+                        if (parsed && parsed.length > 0) {
+                            console.log("[Community] DB is empty, using local backup for recovery.");
+                            setPosts(parsed);
+                        } else {
+                            console.log("[Community] DB and Backup empty. Using MOCK_POSTS.");
+                            setPosts(MOCK_POSTS);
+                        }
+                    } catch (e) {
+                        console.log("[Community] Backup parse error. Using MOCK_POSTS.");
+                        setPosts(MOCK_POSTS);
+                    }
+                } else {
+                    console.log("[Community] No data sources found. Using MOCK_POSTS.");
+                    setPosts(MOCK_POSTS);
+                }
+            }
         } catch (err) {
-            console.error('Error fetching posts:', err);
+            console.error('[Community] Critical error in fetchPosts:', err);
             setPosts(MOCK_POSTS);
         }
     };
 
     useEffect(() => {
-        setMounted(true);
         fetchPosts();
 
         const storedType = localStorage.getItem('user_type');
@@ -127,6 +176,8 @@ function CommunityContent() {
         }
     };
 
+    if (!mounted) return <div className="min-h-screen" />;
+
     return (
         <div className={`min-h-screen will-change-scroll ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'} ${isCorporateModalOpen ? 'overflow-hidden h-screen pointer-events-none' : ''}`}>
             {/* Removed redundant security blur layer to prevent additive blur effect */}
@@ -172,14 +223,14 @@ function CommunityContent() {
                 <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center px-4 h-full gap-2 py-1">
                     {CATEGORIES.map((cat) => (
                         <button
-                            key={cat}
-                            onClick={() => handleTabChange(cat)}
-                            className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center whitespace-nowrap ${activeTab === cat
+                            key={cat.id}
+                            onClick={() => handleTabChange(cat.name)}
+                            className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center whitespace-nowrap ${activeTab === cat.name
                                 ? 'border-pink-500 text-pink-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-900'
                                 }`}
                         >
-                            {cat}
+                            {cat.name}
                         </button>
                     ))}
                 </div>
@@ -192,7 +243,7 @@ function CommunityContent() {
 
                     {activeTab === '프리미엄 라운지' ? (
                         /* Lounge View */
-                        <LoungeContent brand={brand} primaryStyle={primaryStyle} />
+                        <LoungeContent brand={brand} primaryStyle={primaryStyle} posts={posts} handlePostClick={handlePostClick} userType={userType} isLoggedIn={isLoggedIn} />
                     ) : (
                         /* Post List */
                         <div className="grid grid-cols-1 gap-4">
@@ -361,9 +412,13 @@ function CommunityContent() {
 interface LoungeContentProps {
     brand: ReturnType<typeof useBrand>;
     primaryStyle: { color: string };
+    posts: Post[];
+    handlePostClick: (id: number) => void;
+    userType: UserType;
+    isLoggedIn: boolean;
 }
 
-function LoungeContent({ brand, primaryStyle }: LoungeContentProps) {
+function LoungeContent({ brand, primaryStyle, posts, handlePostClick, userType, isLoggedIn }: LoungeContentProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -619,6 +674,48 @@ function LoungeContent({ brand, primaryStyle }: LoungeContentProps) {
                                 <button onClick={() => setShowLoungeResult(false)} className="mt-8 text-sm text-gray-400 underline">다른 생일로 확인하기</button>
                             </div>
                         )}
+                    </div>
+                    <div className="mt-12 space-y-4">
+                        <div className="flex items-center justify-between px-2">
+                            <h4 className="text-lg font-black flex items-center gap-2">
+                                <Sparkles className="text-pink-500" size={18} />
+                                라운지 전용 게시글
+                            </h4>
+                            <span className="text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full font-bold">Premium Only</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {posts.filter(p => p.category === '프리미엄 라운지').length > 0 ? (
+                                posts.filter(p => p.category === '프리미엄 라운지').map((post) => (
+                                    <div
+                                        key={post.id}
+                                        onClick={() => handlePostClick(post.id)}
+                                        className={`p-6 sm:rounded-[40px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                                    >
+                                        <h3 className={`font-black mb-1 lg:text-xl leading-snug ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                            {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1">🔥 HOT</span>}
+                                            {post.title}
+                                        </h3>
+                                        <p className={`text-sm line-clamp-2 mb-4 font-black group-hover:opacity-100 transition-opacity ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>
+                                            <span className={(userType === 'corporate' || !isLoggedIn) ? 'blur-[5px] select-none opacity-50' : ''}>
+                                                {post.content}
+                                            </span>
+                                        </p>
+                                        <div className="flex items-center justify-between text-[11px] pt-4 border-t border-gray-50">
+                                            <span className="text-gray-400 font-bold">{post.author} • {post.time}</span>
+                                            <div className="flex gap-4">
+                                                <span className="flex items-center gap-1 text-pink-600 font-black">❤️ {post.likes}</span>
+                                                <span className="flex items-center gap-1 text-blue-600 font-black">💬 {post.comments}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-20 bg-gray-50/30 rounded-[32px] border-2 border-dashed border-gray-200">
+                                    <p className="text-gray-400 text-sm font-bold">등록된 라운지 게시글이 없습니다. 🤫</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

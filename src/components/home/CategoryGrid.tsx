@@ -1,16 +1,16 @@
 import React from 'react';
-import { Building2, MapPin, Search, Coffee, Users, Siren, Scale, Megaphone, Bell } from 'lucide-react';
+import { Building2, MapPin, Search, Coffee, Users, Siren, Scale, Megaphone, Bell, Sparkles } from 'lucide-react';
 import { useBrand } from '../BrandProvider';
 import { useRouter } from 'next/navigation';
 
 const CATEGORIES = [
     { icon: Building2, label: '업종별채용', color: 'text-indigo-500', bg: 'bg-indigo-50', link: '/jobs' },
     { icon: MapPin, label: '지역별 채용', color: 'text-blue-500', bg: 'bg-blue-50', link: '/region' },
-    { icon: Search, label: '같이일할단짝', color: 'text-orange-500', bg: 'bg-orange-50', link: '/talent' }, /* Checked: /talent exists */
-    { icon: Coffee, label: '프리미엄\n라운지', color: 'text-purple-500', bg: 'bg-purple-50', link: '/community?category=프리미엄 라운지' }, /* Matched QuickMenu */
-    { icon: Users, label: '같이일할단짝', color: 'text-pink-500', bg: 'bg-pink-50', link: '/community?category=같이일할단짝' }, /* Matched QuickMenu */
-    { icon: Siren, label: '밤문화 톡', color: 'text-red-500', bg: 'bg-red-50', link: '/community?category=밤 문화 Talk' }, /* Matched QuickMenu */
-    { icon: Scale, label: '무료법률상담', color: 'text-slate-600', bg: 'bg-slate-50', link: '/community?category=무료법률상담' }, /* Updated Text */
+    { icon: Search, label: '같이일할단짝', color: 'text-orange-500', bg: 'bg-orange-50', link: '/talent' },
+    { icon: Coffee, label: '프리미엄\n라운지', color: 'text-purple-500', bg: 'bg-purple-50', link: '/community?category=프리미엄 라운지' },
+    { icon: Users, label: '같이일할단짝', color: 'text-pink-500', bg: 'bg-pink-50', link: '/community?category=같이일할단짝' },
+    { icon: Sparkles, label: '자유게시판', color: 'text-pink-500', bg: 'bg-pink-50', link: '/community?category=자유게시판' },
+    { icon: Scale, label: '무료법률상담', color: 'text-slate-600', bg: 'bg-slate-50', link: '/community?category=무료법률상담' },
     { icon: Megaphone, label: '광고문의', color: 'text-orange-500', bg: 'bg-orange-50', link: '/customer-center?tab=ad' },
 ];
 
