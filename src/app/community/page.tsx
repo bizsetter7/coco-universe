@@ -316,8 +316,10 @@ function CommunityContent() {
             </div>
 
             {/* Login Required Modal (z-200 -> z-20000) */}
-            {loginModalOpen && (
+            {/* Login Required Modal (z-200 -> z-20000) */}
+            {mounted && loginModalOpen && createPortal(
                 <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
+                    {/* Backdrop */}
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                     <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                         <div className="flex flex-col items-center text-center">
@@ -347,7 +349,8 @@ function CommunityContent() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* 🔒 Corporate Access Denied Modal (Portal 적용으로 헤더 위로 띄움) */}
@@ -540,6 +543,10 @@ function LoungeContent({ brand, primaryStyle, posts, handlePostClick, userType, 
             {/* 식단 관리 페이지 */}
             {activeLoungeTab === 'diet' && (
                 <div>
+                    <div className="hidden md:flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => handleLoungeTabChange('main')}>
+                        <ChevronRight size={24} className={`rotate-180 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`} />
+                        <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>프리미엄 라운지</span>
+                    </div>
                     <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                         {!showLoungeResult ? (
                             <>
@@ -603,6 +610,10 @@ function LoungeContent({ brand, primaryStyle, posts, handlePostClick, userType, 
             {/* MBTI 성향 테스트 */}
             {activeLoungeTab === 'mbti' && (
                 <div>
+                    <div className="hidden md:flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => handleLoungeTabChange('main')}>
+                        <ChevronRight size={24} className={`rotate-180 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`} />
+                        <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>프리미엄 라운지</span>
+                    </div>
                     <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                         <div className="text-center mb-10">
                             <div className="bg-purple-100 text-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/10 scale-110">
@@ -633,6 +644,10 @@ function LoungeContent({ brand, primaryStyle, posts, handlePostClick, userType, 
             {/* 사주/운세 */}
             {activeLoungeTab === 'fortune' && (
                 <div>
+                    <div className="hidden md:flex items-center gap-2 mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => handleLoungeTabChange('main')}>
+                        <ChevronRight size={24} className={`rotate-180 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`} />
+                        <span className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>프리미엄 라운지</span>
+                    </div>
                     <div className={`p-8 rounded-3xl shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-stone-100'}`}>
                         {!showLoungeResult ? (
                             <>
@@ -675,48 +690,7 @@ function LoungeContent({ brand, primaryStyle, posts, handlePostClick, userType, 
                             </div>
                         )}
                     </div>
-                    <div className="mt-12 space-y-4">
-                        <div className="flex items-center justify-between px-2">
-                            <h4 className="text-lg font-black flex items-center gap-2">
-                                <Sparkles className="text-pink-500" size={18} />
-                                라운지 전용 게시글
-                            </h4>
-                            <span className="text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full font-bold">Premium Only</span>
-                        </div>
 
-                        <div className="grid grid-cols-1 gap-4">
-                            {posts.filter(p => p.category === '프리미엄 라운지').length > 0 ? (
-                                posts.filter(p => p.category === '프리미엄 라운지').map((post) => (
-                                    <div
-                                        key={post.id}
-                                        onClick={() => handlePostClick(post.id)}
-                                        className={`p-6 sm:rounded-[40px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
-                                    >
-                                        <h3 className={`font-black mb-1 lg:text-xl leading-snug ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                            {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1">🔥 HOT</span>}
-                                            {post.title}
-                                        </h3>
-                                        <p className={`text-sm line-clamp-2 mb-4 font-black group-hover:opacity-100 transition-opacity ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>
-                                            <span className={(userType === 'corporate' || !isLoggedIn) ? 'blur-[5px] select-none opacity-50' : ''}>
-                                                {post.content}
-                                            </span>
-                                        </p>
-                                        <div className="flex items-center justify-between text-[11px] pt-4 border-t border-gray-50">
-                                            <span className="text-gray-400 font-bold">{post.author} • {post.time}</span>
-                                            <div className="flex gap-4">
-                                                <span className="flex items-center gap-1 text-pink-600 font-black">❤️ {post.likes}</span>
-                                                <span className="flex items-center gap-1 text-blue-600 font-black">💬 {post.comments}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-20 bg-gray-50/30 rounded-[32px] border-2 border-dashed border-gray-200">
-                                    <p className="text-gray-400 text-sm font-bold">등록된 라운지 게시글이 없습니다. 🤫</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

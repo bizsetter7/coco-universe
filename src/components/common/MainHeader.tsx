@@ -101,11 +101,35 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
             );
         }
 
+        if (pathname?.startsWith('/jobs')) {
+            return (
+                <span className={`text-lg md:text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    업종별 채용
+                </span>
+            );
+        }
+
+        if (pathname?.startsWith('/region')) {
+            return (
+                <span className={`text-lg md:text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    지역별 채용
+                </span>
+            );
+        }
+
+        if (pathname?.startsWith('/talent')) {
+            return (
+                <span className={`text-lg md:text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    인재(이력서)정보
+                </span>
+            );
+        }
+
         if (pathname?.startsWith('/community')) {
             return (
                 <div className="flex items-center gap-1.5">
                     <MessageCircle size={24} className="text-pink-500 fill-pink-500" />
-                    <span className="text-lg md:text-xl font-black text-pink-500">그녀들의수다</span>
+                    <span className="text-lg md:text-xl font-black text-pink-500">그녀들의수다(커뮤니티)</span>
                 </div>
             );
         }
@@ -145,7 +169,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
     return (
         <React.Fragment>
             <header className={`sticky top-0 z-[10000] w-full h-[56px] border-b ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                <div className="w-full h-full flex items-center justify-between mx-auto px-4 xl:px-8 max-w-[1432px]">
+                <div className="w-full max-w-[1432px] h-full flex items-center justify-between mx-auto px-4 xl:px-[192px]">
                     <div className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
                         {shouldShowBackButton && (
                             <div

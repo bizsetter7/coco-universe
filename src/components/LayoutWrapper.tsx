@@ -58,7 +58,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                 <div className={isMobile || isAdminPage ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
                     {/* Left Sidebar Spacer + Component */}
                     {(!isMobile && !isAdminPage) && (
-                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
+                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                             <StickyWrapper offsetTop={56} zIndex={10001}>
                                 <BannerSidebar side="left" shops={sideAds} />
                             </StickyWrapper>
@@ -72,7 +72,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
                     {/* Right Sidebar Spacer + Component */}
                     {(!isMobile && !isAdminPage) && (
-                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
+                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                             <StickyWrapper offsetTop={56} zIndex={10001}>
                                 <BannerSidebar side="right" shops={sideAds} />
                             </StickyWrapper>
