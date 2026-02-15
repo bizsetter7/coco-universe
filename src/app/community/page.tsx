@@ -315,9 +315,9 @@ function CommunityContent() {
                 </main>
             </div>
 
-            {/* Login Required Modal (z-200) (Restored to original lg) */}
+            {/* Login Required Modal (z-200 -> z-20000) */}
             {loginModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                     <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                         <div className="flex flex-col items-center text-center">

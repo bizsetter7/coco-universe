@@ -8,6 +8,7 @@ interface StickyWrapperProps {
     offsetTop?: number;
     className?: string;
     isInternal?: boolean; // New prop for dual-sticky behavior
+    zIndex?: number; // [Fix] User-defined Z-Index support
 }
 
 /**
@@ -19,7 +20,8 @@ export const StickyWrapper = ({
     children,
     offsetTop = 56,
     className = "",
-    isInternal = false
+    isInternal = false,
+    zIndex = 50
 }: StickyWrapperProps) => {
     const isMobile = useMobile();
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -115,7 +117,7 @@ export const StickyWrapper = ({
         transform: `translateY(${yOffset}px)`,
         transition: 'transform 0.4s cubic-bezier(0.2, 0, 0.2, 1)',
         willChange: 'transform',
-        zIndex: 50
+        zIndex: zIndex
     };
 
     return (

@@ -145,7 +145,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
     return (
         <React.Fragment>
             <header className={`sticky top-0 z-[10000] w-full h-[56px] border-b ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                <div className="w-full max-w-[1432px] h-full flex items-center justify-between mx-auto px-4 xl:px-[192px]">
+                <div className="w-full h-full flex items-center justify-between mx-auto px-4 xl:px-8 max-w-[1432px]">
                     <div className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
                         {shouldShowBackButton && (
                             <div
