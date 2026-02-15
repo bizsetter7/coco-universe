@@ -68,7 +68,7 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
             region_main: selectedRegionMain,
             region_sub: selectedRegionSub,
             pay_type: payType,
-            pay_amount: Number(payAmount) || 0,
+            pay_amount: parseInt(payAmount.replace(/,/g, ''), 10) || 0,
             contact_method: contactMethod,
             contact_value: contactValue,
             created_at: new Date().toISOString()
@@ -118,6 +118,15 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
             setContactValue('site_msg');
         } else {
             setContactValue('');
+        }
+    };
+
+    const handlePayAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.replace(/[^0-9]/g, '');
+        if (value) {
+            setPayAmount(Number(value).toLocaleString());
+        } else {
+            setPayAmount('');
         }
     };
 
@@ -270,7 +279,7 @@ export const ResumeForm = ({ setView, onOpenMenu }: { setView: (v: any) => void,
                                 <input
                                     type="text"
                                     value={payAmount}
-                                    onChange={(e) => setPayAmount(e.target.value)}
+                                    onChange={handlePayAmountChange}
                                     className="w-full bg-white border border-gray-200 rounded-lg p-2.5 pr-8 text-sm font-bold outline-none focus:border-pink-500"
                                     placeholder="금액 입력"
                                 />

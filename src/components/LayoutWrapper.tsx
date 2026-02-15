@@ -36,6 +36,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     };
 
     const isAdminPage = pathname?.startsWith('/admin');
+    const isCommunityPage = pathname?.startsWith('/community'); // [Fix] Hide sidebars for Community to focus on content
     const showGate = isVerified === false;
 
     if (showGate) {
@@ -55,9 +56,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             */}
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                <div className={isMobile || isAdminPage ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
+                <div className={isMobile || isAdminPage || isCommunityPage ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
                     {/* Left Sidebar Spacer + Component */}
-                    {(!isMobile && !isAdminPage) && (
+                    {(!isMobile && !isAdminPage && !isCommunityPage) && (
                         <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
                             <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="left" shops={sideAds} />
@@ -71,7 +72,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                     </main>
 
                     {/* Right Sidebar Spacer + Component */}
-                    {(!isMobile && !isAdminPage) && (
+                    {(!isMobile && !isAdminPage && !isCommunityPage) && (
                         <aside className="hidden xl:flex flex-col w-[160px] relative z-[50] self-stretch">
                             <StickyWrapper offsetTop={56}>
                                 <BannerSidebar side="right" shops={sideAds} />
