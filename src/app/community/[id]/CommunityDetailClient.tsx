@@ -41,7 +41,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
             setIsLoading(true);
             try {
                 // Fetch Post
-                const { data: postData, error: postError } = await supabase
+                const { data: postData, error: _postError } = await supabase
                     .from('community_posts')
                     .select('*')
                     .eq('id', postId)

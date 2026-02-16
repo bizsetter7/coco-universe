@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+
+export const dynamic = 'force-dynamic';
 import { normalizeAd } from '@/app/my-shop/utils/normalization';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 

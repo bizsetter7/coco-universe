@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase as supabaseAdmin } from '@/lib/supabase';
 
-// Server-side Supabase client for DB updates
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! // In production, consider using a service_role key for admin updates
-);
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {

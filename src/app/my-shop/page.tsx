@@ -198,7 +198,7 @@ function MyShopContent() {
             fetchPaymentHistory();
             fetchResumeCount();
         }
-    }, [authUser?.id]);
+    }, [authUser?.id, fetchRegisteredAds, fetchPaymentHistory, fetchResumeCount]);
 
     useEffect(() => {
         const handleUpdate = () => fetchResumeCount();
