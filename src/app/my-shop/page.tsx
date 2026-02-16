@@ -208,11 +208,20 @@ function MyShopContent() {
 
     const setView = (newView: any) => {
         if (newView === view) return;
+
+        // [Critical Fix] If newView is an object (contains data context like resume edit),
+        // we must set internal state DIRECTLY before router.replace.
+        // router.replace only updates the URL (string), which would lose the object data.
+        if (typeof newView === 'object') {
+            _setView(newView);
+        }
+
         const params = new URLSearchParams(searchParams.toString());
-        params.set('view', newView);
-        if (newView === 'dashboard') {
+        const viewId = typeof newView === 'object' ? newView.id : newView;
+        params.set('view', viewId);
+        if (viewId === 'dashboard') {
             params.delete('id');
-            setLastLoadedId(null); // Clear on dashboard
+            setLastLoadedId(null);
         }
         router.replace(`?${params.toString()}`, { scroll: false });
         // [Scroll Fix] Force scroll to top on view change
@@ -256,7 +265,11 @@ function MyShopContent() {
 
     useEffect(() => {
         const viewParam = (searchParams.get('view') || 'dashboard') as any;
-        if (viewParam !== view) {
+        const currentViewId = typeof view === 'object' ? view.id : view;
+
+        // [Critical Fix] If view is an object (contains edit data), don't overwrite it
+        // with a simple string from the URL if the IDs already match.
+        if (viewParam !== currentViewId) {
             _setView(viewParam);
         }
     }, [searchParams, view]);

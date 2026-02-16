@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings } from 'lucide-react';
+import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings, LayoutDashboard } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
 import { ResumeForm } from '../ResumeForm';
@@ -11,7 +11,7 @@ import { ComingSoonView } from '../ComingSoonView';
 
 
 
-export function PersonalSidebar({ view, setView }: { view: string, setView: (v: any) => void }) {
+export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any) => void }) {
     const brand = useBrand();
     const [userName, setUserName] = useState('회원님');
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -38,20 +38,27 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
         }
     };
 
+    const isItemActive = (id: string) => {
+        const currentViewId = typeof view === 'object' ? view.id : view;
+        if (id === 'resume-list') return currentViewId === 'resume-list' || currentViewId === 'resume-form';
+        return currentViewId === id;
+    };
+
     const menuItems = [
-        { id: 'dashboard', label: '마이 대시보드', icon: <Home size={16} /> },
-        { id: 'resume-list', label: '이력서 리스트', icon: <List size={16} /> },
-        { id: 'scrap-jobs', label: '채용정보 스크랩', icon: <Star size={16} /> },
-        { id: 'payment-history', label: '유료결제 내역', icon: <CreditCard size={16} /> },
-        { id: 'excluded-shops', label: '열람불가 업소설정', icon: <AlertTriangle size={16} /> },
-        { id: 'custom-jobs', label: '맞춤구인정보', icon: <Briefcase size={16} /> },
-        { id: 'my-posts', label: '내가 작성한 게시글', icon: <FileText size={16} /> },
-        { id: 'block-settings', label: '회원 차단 설정', icon: <User size={16} /> },
-        { id: 'post-bookmarks', label: '즐겨찾기한 게시글', icon: <Star size={16} /> },
+        { id: 'dashboard', icon: LayoutDashboard, label: '마이홈' },
+        { id: 'member-edit', icon: User, label: '정보수정' },
+        { id: 'resume-list', icon: FileText, label: '이력서 관리' },
+        { id: 'scrap-jobs', icon: Star, label: '채용정보 스크랩' },
+        { id: 'payment-history', icon: CreditCard, label: '유료결제 내역' },
+        { id: 'excluded-shops', icon: AlertTriangle, label: '열람불가 업소설정' },
+        { id: 'custom-jobs', icon: Briefcase, label: '맞춤구인정보' },
+        { id: 'my-posts', icon: FileText, label: '내가 작성한 게시글' },
+        { id: 'block-settings', icon: User, label: '회원 차단 설정' },
+        { id: 'post-bookmarks', icon: Star, label: '즐겨찾기한 게시글' }
     ];
 
     return (
-        <aside className="col-span-1 space-y-4">
+        <aside className="hidden md:block md:col-span-1 space-y-4">
             <div className={`p-6 rounded-[32px] border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
                 <div
                     onClick={() => fileInputRef.current?.click()}
@@ -67,38 +74,44 @@ export function PersonalSidebar({ view, setView }: { view: string, setView: (v: 
                     </div>
                 </div>
                 <h2 className="font-black text-xl mb-1">{userName}</h2>
-                <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="flex flex-col items-center gap-2 mb-4">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-3 py-1 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100 hover:bg-pink-100 transition active:scale-95 flex items-center gap-1"
+                        className="px-4 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100 hover:bg-pink-100 transition active:scale-95 flex items-center gap-1"
                     >
                         사진 등록/수정
                     </button>
+                    <button
+                        onClick={() => setView('member-edit')}
+                        className={`w-full py-2.5 mt-2 flex items-center justify-center gap-2 text-xs font-black rounded-2xl transition-all ${typeof view === 'string' && view === 'member-edit'
+                            ? 'bg-pink-500 text-white shadow-lg shadow-pink-100'
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                            }`}
+                    >
+                        <Settings size={14} />
+                        내 정보수정
+                    </button>
                 </div>
-                <button
-                    onClick={() => setView('member-edit')}
-                    className="w-full py-3 bg-gray-50 hover:bg-gray-100 text-gray-500 text-xs font-bold rounded-2xl transition flex items-center justify-center gap-2"
-                >
-                    프로필 관리
-                </button>
             </div>
 
-            <nav className={`hidden md:block p-3 rounded-[32px] border shadow-sm space-y-1 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
-                {menuItems.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => setView(item.id)}
-                        className={`w-full flex items-center justify-between p-3 rounded-2xl transition group ${view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'bg-pink-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className={view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'text-white' : 'text-gray-400 group-hover:text-pink-500'}>{item.icon}</span>
-                            <span className="text-xs font-black">{item.label}</span>
-                        </div>
-                        <ChevronRight size={14} className={view === item.id || (item.id === 'dashboard' && (view === 'member-info' || view === 'dashboard')) ? 'text-white/50' : 'text-gray-300'} />
-                    </button>
-                ))}
-            </nav>
+            <div className={`p-4 rounded-3xl border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
+                <div className="flex flex-col gap-1">
+                    {menuItems.filter(item => item.id !== 'member-edit').map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => setView(item.id)}
+                            className={`w-full flex items-center gap-3 p-3.5 rounded-2xl text-sm font-black transition-all ${isItemActive(item.id)
+                                ? 'bg-pink-500 text-white shadow-lg shadow-pink-100'
+                                : 'text-gray-500 hover:bg-gray-50'
+                                }`}
+                        >
+                            <item.icon size={18} />
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
         </aside>
     );
 }
@@ -168,7 +181,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                             <User size={32} className="md:w-10 md:h-10" />
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-3xl font-black mb-1">관심 공고를 확인하세요!</h2>
+                            <h2 className="text-lg md:text-3xl font-black mb-1 whitespace-nowrap">관심 공고를 확인하세요!</h2>
                             <p className="text-sm text-gray-500 font-bold">회원님만을 위한 맞춤 취업 정보를 제공합니다.</p>
                         </div>
                     </div>
@@ -188,10 +201,16 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
         <div className="max-w-6xl mx-auto p-3 md:py-0 grid grid-cols-1 md:grid-cols-4 gap-6">
             <PersonalSidebar view={view} setView={setView} />
             <main className="col-span-1 md:col-span-3">
-                {(view === 'member-info' || view === 'dashboard') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
-                {view === 'member-edit' && <PersonalMemberEdit setView={setView} />}
-                {view === 'resume-form' && <ResumeForm setView={setView} authUser={authUser} />}
-                {view === 'resume-list' && <ResumeListView setView={setView} onShowDetail={onShowResumeDetail} authUser={authUser} />}
+                {((view as any) === 'member-info' || (view as any) === 'dashboard') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
+                {(view as any) === 'member-edit' && <PersonalMemberEdit setView={setView} />}
+                {((view as any) === 'resume-form' || (typeof view === 'object' && (view as any).id === 'resume-form')) && (
+                    <ResumeForm
+                        setView={setView}
+                        authUser={authUser}
+                        editData={typeof view === 'object' ? (view as any).data : null}
+                    />
+                )}
+                {(view as any) === 'resume-list' && <ResumeListView setView={setView} onShowDetail={onShowResumeDetail} authUser={authUser} />}
 
                 {view === 'scrap-jobs' && <ComingSoonView title="채용정보 스크랩" />}
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}

@@ -5,37 +5,37 @@ import { useBrand } from '@/components/BrandProvider';
 import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants';
 import { supabase } from '@/lib/supabase';
 
-export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any) => void, onOpenMenu?: () => void, authUser: any }) => {
+export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setView: (v: any) => void, onOpenMenu?: () => void, authUser: any, editData?: any }) => {
     const brand = useBrand();
     const router = useRouter();
 
     // User Info State
-    const [userName, setUserName] = useState(authUser?.nickname || authUser?.name || '회원님');
+    const [userName, setUserName] = useState(editData?.nickname || authUser?.nickname || authUser?.name || '회원님');
     const [userId, setUserId] = useState(authUser?.id || '');
 
     // Form States
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [payAmount, setPayAmount] = useState('0');
-    const [selectedIndustryMain, setSelectedIndustryMain] = useState('');
-    const [selectedIndustrySub, setSelectedIndustrySub] = useState('');
-    const [selectedRegionMain, setSelectedRegionMain] = useState('');
-    const [selectedRegionSub, setSelectedRegionSub] = useState('');
-    const [payType, setPayType] = useState('시급');
-    const [gender, setGender] = useState('여성');
-    const [birthYear, setBirthYear] = useState('2000');
-    const [birthMonth, setBirthMonth] = useState('1');
-    const [birthDay, setBirthDay] = useState('1');
+    const [title, setTitle] = useState(editData?.title || '');
+    const [content, setContent] = useState(editData?.content || '');
+    const [payAmount, setPayAmount] = useState(editData?.pay_amount ? Number(editData.pay_amount).toLocaleString() : '0');
+    const [selectedIndustryMain, setSelectedIndustryMain] = useState(editData?.industry_main || '');
+    const [selectedIndustrySub, setSelectedIndustrySub] = useState(editData?.industry_sub || '');
+    const [selectedRegionMain, setSelectedRegionMain] = useState(editData?.region_main || '');
+    const [selectedRegionSub, setSelectedRegionSub] = useState(editData?.region_sub || '');
+    const [payType, setPayType] = useState(editData?.pay_type || '시급');
+    const [gender, setGender] = useState(editData?.gender || '여성');
+    const [birthYear, setBirthYear] = useState(editData?.birth_date?.split('-')[0] || '2000');
+    const [birthMonth, setBirthMonth] = useState(editData?.birth_date?.split('-')[1]?.replace(/^0/, '') || '1');
+    const [birthDay, setBirthDay] = useState(editData?.birth_date?.split('-')[2]?.replace(/^0/, '') || '1');
 
     // Contact State
-    const [contactMethod, setContactMethod] = useState('');
-    const [contactValue, setContactValue] = useState('');
+    const [contactMethod, setContactMethod] = useState(editData?.contact_method || '');
+    const [contactValue, setContactValue] = useState(editData?.contact_value || '');
 
     useEffect(() => {
         if (authUser) {
             setUserId(authUser.id);
             if (!userName || userName === '회원님') {
-                setUserName(authUser.nickname || authUser.name || '회원님');
+                setUserName(editData?.nickname || authUser.nickname || authUser.name || '회원님');
             }
         }
     }, [authUser]);
@@ -46,7 +46,8 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any
         if (!selectedRegionMain || !selectedRegionSub) { alert('희망 지역을 선택해주세요.'); return; }
         if (!content.trim()) { alert('자기소개를 입력해주세요.'); return; }
 
-        const resumeData = {
+        const resumeData: any = {
+            id: editData?.id || `mock_${Date.now()}`,
             user_id: userId,
             title,
             content,
@@ -59,44 +60,83 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any
             pay_type: payType,
             pay_amount: parseInt(payAmount.replace(/,/g, ''), 10) || 0,
             contact_method: contactMethod,
-            contact_value: contactValue,
-            created_at: new Date().toISOString()
+            contact_value: contactValue
         };
 
+        if (!editData) {
+            resumeData.created_at = new Date().toISOString();
+        }
+
         try {
-            const { error } = await supabase
-                .from('resumes')
-                .insert([resumeData]);
+            let error;
+            const isGuestOrMock = userId === 'guest' || (editData?.id && String(editData.id).startsWith('mock_'));
+
+            if (!isGuestOrMock) {
+                if (editData?.id) {
+                    // Real DB Update - Strip ID and created_at from fields
+                    const { id, created_at, ...updateFields } = resumeData;
+                    const { error: err } = await supabase
+                        .from('resumes')
+                        .update(updateFields)
+                        .eq('id', editData.id);
+                    error = err;
+                } else {
+                    // Real DB Insert - Strip initial mock ID
+                    const { id, ...insertFields } = resumeData;
+                    const { error: err } = await supabase
+                        .from('resumes')
+                        .insert([insertFields]);
+                    error = err;
+                }
+            } else {
+                // Force local storage fallback for guests/mocks by setting a dummy error
+                error = { message: 'guest_mode', code: 'GUEST' };
+            }
 
             if (error) {
-                console.error("Resume Save Error:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
-                // [Fallback] 스키마 오류 발생 시 안내 강화
-                const isSchemaError =
-                    error.message.includes("relation \"resumes\" does not exist") ||
-                    error.message.includes("Could not find the table") ||
-                    error.message.includes("schema cache");
+                console.error("Resume Save Error:", error);
+                const isSchemaError = error.message?.includes("relation \"resumes\" does not exist");
+                const isTypeError = error.message?.includes("invalid input syntax") || error.code === '22P02';
+                const isGuestMode = error.message === 'guest_mode';
 
-                if (isSchemaError) {
-                    console.warn("Resume DB missing, falling back to local storage");
-                    localStorage.setItem('mock_resume_saved', 'true');
-
-                    // Save mock resume data to local storage for persistence (optional but good)
+                if (isGuestMode || isSchemaError || isTypeError || isGuestOrMock) {
+                    // Update or Insert in Local Storage
                     const existingResumes = JSON.parse(localStorage.getItem('coco_mock_resumes') || '[]');
-                    localStorage.setItem('coco_mock_resumes', JSON.stringify([resumeData, ...existingResumes]));
+                    const targetId = editData?.id;
+                    const targetCreatedAt = editData?.created_at;
 
-                    alert('DB 테이블이 없어 임시(로컬) 저장되었습니다. 관리자에게 문의해주세요.');
+                    if (targetCreatedAt || targetId) {
+                        const idx = existingResumes.findIndex((r: any) =>
+                            (targetCreatedAt && String(r.created_at) === String(targetCreatedAt)) ||
+                            (targetId && String(r.id) === String(targetId)) ||
+                            (targetId && String(r.created_at) === String(targetId))
+                        );
+                        if (idx !== -1) {
+                            existingResumes[idx] = { ...existingResumes[idx], ...resumeData };
+                        } else {
+                            existingResumes.unshift(resumeData);
+                        }
+                    } else {
+                        existingResumes.unshift(resumeData);
+                    }
+                    localStorage.setItem('coco_mock_resumes', JSON.stringify(existingResumes));
+
+                    if (isSchemaError) alert('DB 테이블이 없어 임시(로컬) 저장되었습니다.');
+                    else alert('이력서 수정이 완료되었습니다!');
+
                     setView('dashboard');
+                    window.dispatchEvent(new CustomEvent('resume-updated'));
                     return;
                 }
                 alert('저장 중 오류가 발생했습니다: ' + error.message);
                 return;
             }
 
-            alert('이력서 등록이 완료되었습니다!');
+            alert(editData ? '이력서 수정이 완료되었습니다!' : '이력서 등록이 완료되었습니다!');
             setView('dashboard');
-            // 이력서 개수 갱신을 위해 상위 컴포넌트 이벤트 트리거 가능
             window.dispatchEvent(new CustomEvent('resume-updated'));
         } catch (err) {
+            console.error("Critical Save Error:", err);
             alert('오류가 발생했습니다.');
         }
     };
@@ -128,19 +168,19 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any
             {/* Warning Banner */}
             <div
                 onClick={() => router.push('/customer-center?tab=notice')}
-                className="w-full bg-red-50 border border-red-100 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:bg-red-100/50 transition group"
+                className="w-full bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-red-100/50 transition group"
             >
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-red-500 border border-red-100">
-                        <AlertTriangle size={24} fill="currentColor" strokeWidth={0} />
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-red-500 border border-red-100 shrink-0">
+                        <AlertTriangle size={20} fill="currentColor" strokeWidth={0} />
                     </div>
                     <div>
-                        <div className="text-xs font-bold text-gray-500 mb-0.5">이력서 등록 시</div>
-                        <div className="text-xl font-black text-red-500 tracking-tight">구직자 주의사항!</div>
+                        <div className="text-[10px] font-bold text-gray-500 leading-none mb-1">이력서 등록 시</div>
+                        <div className="text-sm font-black text-red-500 tracking-tight whitespace-nowrap">구직자 주의사항!</div>
                     </div>
                 </div>
-                <div className="text-sm font-bold text-gray-500 flex items-center gap-1 group-hover:text-red-500 transition">
-                    자세히 보기 <ChevronRight size={16} />
+                <div className="text-[11px] font-bold text-gray-400 flex items-center gap-1 text-right leading-tight group-hover:text-red-500 transition">
+                    자세히 <br /> 보기 <ChevronRight size={14} />
                 </div>
             </div>
 
@@ -160,17 +200,19 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any
 
             <div className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100 dark:border-gray-800">
-                    <h2 className={`text-xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        나의 이력서 등록
-                    </h2>
-                    <div className="text-xs font-bold text-gray-400">MY PERSONAL HISTORY</div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                        <h2 className={`text-xl font-black whitespace-nowrap ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                            나의 이력서 등록
+                        </h2>
+                        <div className="text-[10px] sm:text-xs font-bold text-gray-400 whitespace-nowrap">MY PERSONAL HISTORY</div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
                     {/* Photo Area */}
                     <div className="md:col-span-3 flex flex-col items-center sm:items-stretch gap-2">
-                        <div className="w-28 sm:w-full aspect-[3/4] rounded-lg border-2 border-dashed flex items-center justify-center bg-gray-50 text-gray-300">
-                            <User size={32} className="sm:w-[48px] sm:h-[48px]" />
+                        <div className="w-28 sm:w-full aspect-square sm:aspect-[3/4] rounded-lg border-2 border-dashed flex items-center justify-center bg-gray-50 text-gray-300 overflow-hidden">
+                            <User size={32} className="opacity-20" />
                         </div>
                     </div>
 
@@ -341,7 +383,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser }: { setView: (v: any
                     </div>
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-orange-400 rounded-full"></span> 자기소개 <span className="text-red-500">*</span></label>
-                        <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
+                        <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-48 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
                     </div>
                 </div>
 

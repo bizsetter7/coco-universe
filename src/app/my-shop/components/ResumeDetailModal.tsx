@@ -67,19 +67,15 @@ export const ResumeDetailModal = ({ resume, onClose }: { resume: any, onClose: (
                     {/* Pay & Date */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
-                            <div className={`w-10 h-10 flex items-center justify-center rounded-xl text-lg font-black shadow-sm shrink-0 ${getPayColor(resume.pay_type)}`}>
-                                {(() => {
-                                    const abbr = getPayAbbreviation(resume.pay_type);
-                                    if (abbr === '협' && resume.pay_amount > 0) return '시'; // 금액 있으면 '시'로 우대 표시
-                                    return abbr;
-                                })()}
+                            <div className={`px-2 h-10 flex items-center justify-center rounded-xl text-lg font-black shadow-sm shrink-0 ${getPayColor(resume.pay_type || '협의')}`}>
+                                {getPayAbbreviation(resume.pay_type || '협의')}
                             </div>
                             <div>
                                 <div className="text-[10px] font-black text-gray-400 mb-0.5 flex items-center gap-1">
                                     희망 급여
                                 </div>
-                                <div className="text-sm font-black text-gray-800">
-                                    {resume.pay_amount && resume.pay_amount > 0
+                                <div className={`text-sm font-black ${resume.pay_amount > 0 ? 'text-pink-600' : 'text-gray-400'}`}>
+                                    {(resume.pay_amount && Number(resume.pay_amount) > 0)
                                         ? `${Number(resume.pay_amount).toLocaleString()}원`
                                         : '급여협의'}
                                 </div>

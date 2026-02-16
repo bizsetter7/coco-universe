@@ -306,7 +306,6 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                         </button>
                                     ))}
                                     <div className="h-px bg-gray-100 my-2" />
-                                    <button onClick={() => { router.push('/'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 font-bold text-gray-500">홈으로</button>
                                 </div>
                             )}
 
@@ -333,7 +332,6 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                         </button>
                                     ))}
                                     <div className="h-px bg-gray-100 my-2" />
-                                    <button onClick={() => { router.push('/'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 font-bold text-gray-500">홈으로</button>
                                 </div>
                             )}
 
@@ -352,7 +350,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                         <div className="flex items-center justify-between w-full">
                                                             <div onClick={() => { router.push(userRole === 'admin' ? '/admin' : '/my-shop'); setShowMobileMenu(false); }} className="flex items-center gap-2 cursor-pointer">
                                                                 {userRole === 'admin' ? <ShieldCheck size={14} className="text-blue-400" /> : <User size={14} className="text-purple-500" />}
-                                                                <span className="text-sm font-black">{userRole === 'admin' ? '관리자' : (user?.name || '내 정보')}</span>
+                                                                <span className="text-sm font-black">{userRole === 'admin' ? '관리자' : (user?.name || '내 정보')} <span className="text-[10px] text-pink-500 font-bold">(메인)</span></span>
                                                             </div>
                                                             <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500"><LogOut size={16} /></button>
                                                         </div>
@@ -409,7 +407,6 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                     )}
 
                                     <div className="h-px bg-gray-100 my-2" />
-                                    <button onClick={() => { router.push('/'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 font-bold text-gray-500">홈으로</button>
                                 </div>
                             )}
                         </div>
