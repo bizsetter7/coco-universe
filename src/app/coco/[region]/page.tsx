@@ -12,11 +12,45 @@ export async function generateStaticParams() {
     }));
 }
 
-export default async function CocoRegionPage({ params }: { params: Promise<{ region: string }> }) {
-    const { region: _region } = await params;
-    const shops = shopsData as Shop[];
+export async function generateMetadata({ params }: { params: Promise<{ region: string }> }) {
+    const { region } = await params;
+    const decodedRegion = decodeURIComponent(region);
 
-    // 해당 지역의 데이터만 필터링하거나, RegionClient 내부에서 초기값으로 사용하게 할 수 있습니다.
-    // 현재 RegionClient는 props로 region을 받지 않으므로, 추후 확장을 고려하여 일단 shops만 넘깁니다.
-    return <RegionClient shops={shops} />;
+    // Find region data from master
+    const regionData = seoRegionsMaster.find(r => r.id === decodedRegion) || {
+        mainRegion: decodedRegion,
+        keywords: [`${decodedRegion} 알바`, `${decodedRegion} 고소득알바`]
+    };
+
+    const title = `${regionData.mainRegion} 고소득 알바 1위 - 코코알바 (당일지급/숙식제공)`;
+    const description = `${regionData.mainRegion} 지역 ${regionData.keywords.slice(0, 3).join(', ')} 추천 정보. 검증된 업소에서 안전하게 일하세요. 시급, 일급, 월급별 맞춤 일자리 제공.`;
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            url: `https://cocoalba.kr/coco/${region}`,
+            siteName: '코코알바',
+            images: [
+                {
+                    url: 'https://cocoalba.kr/og-image.png', // Fallback or Dynamic generation
+                    width: 1200,
+                    height: 630,
+                    alt: `${regionData.mainRegion} 알바 정보`,
+                },
+            ],
+            type: 'website',
+        },
+        keywords: [...regionData.keywords, '여성알바', '유흥알바', '밤알바', '고소득알바'],
+    };
+}
+
+export default async function CocoRegionPage({ params }: { params: Promise<{ region: string }> }) {
+    const { region } = await params;
+    const shops = shopsData as Shop[];
+    const decodedRegion = decodeURIComponent(region);
+
+    return <RegionClient shops={shops} initialRegion={decodedRegion} />;
 }
