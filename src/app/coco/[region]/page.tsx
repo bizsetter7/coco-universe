@@ -13,7 +13,7 @@ export async function generateStaticParams() {
 }
 
 export default async function CocoRegionPage({ params }: { params: Promise<{ region: string }> }) {
-    const { region } = await params;
+    const { region: _region } = await params;
     const shops = shopsData as Shop[];
 
     // 해당 지역의 데이터만 필터링하거나, RegionClient 내부에서 초기값으로 사용하게 할 수 있습니다.

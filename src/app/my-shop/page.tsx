@@ -159,7 +159,7 @@ function MyShopContent() {
                 .eq('user_id', authUser.id)
                 .order('created_at', { ascending: false });
 
-            let dbPayments = data || [];
+            const dbPayments = data || [];
 
             const mockPaymentsRaw = localStorage.getItem('my_site_payment_history');
             const mockPayments = mockPaymentsRaw ? JSON.parse(mockPaymentsRaw) : [];

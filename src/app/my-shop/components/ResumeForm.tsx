@@ -74,7 +74,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
             if (!isGuestOrMock) {
                 if (editData?.id) {
                     // Real DB Update - Strip ID and created_at from fields
-                    const { id, created_at, ...updateFields } = resumeData;
+                    const { id: _, created_at: __, ...updateFields } = resumeData;
                     const { error: err } = await supabase
                         .from('resumes')
                         .update(updateFields)
@@ -82,7 +82,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                     error = err;
                 } else {
                     // Real DB Insert - Strip initial mock ID
-                    const { id, ...insertFields } = resumeData;
+                    const { id: _, ...insertFields } = resumeData;
                     const { error: err } = await supabase
                         .from('resumes')
                         .insert([insertFields]);

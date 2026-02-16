@@ -14,7 +14,6 @@ import {
     Lock,
     Trash2,
     Edit,
-    X,
     Eye,
     EyeOff
 } from 'lucide-react';

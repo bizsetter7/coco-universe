@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { normalizeAd } from '@/app/my-shop/utils/normalization';
+import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
 export async function POST() {
     console.log('[API] Health check triggered (POST Mode)');
@@ -67,8 +68,7 @@ export async function POST() {
             adTiers: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         };
 
-        // Validate Pay Badge Utility
-        const { getPayColor, getPayAbbreviation } = require('@/utils/payColors');
+        // Validate Pay Badge Utility (Imported at top)
         const payErrors: string[] = [];
         const payTypes = ['시급', '일급', '주급', '월급', '연봉', 'TC', '건별', '협의'];
 

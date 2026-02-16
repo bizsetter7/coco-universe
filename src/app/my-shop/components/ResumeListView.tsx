@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, List, Search, MapPin, User, ChevronRight, FileText, Calendar, Trash2, Briefcase } from 'lucide-react';
+import { FileText, Calendar, Trash2, Briefcase, User, MapPin } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
-import { useAuth } from '@/hooks/useAuth';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { supabase } from '@/lib/supabase';
 
