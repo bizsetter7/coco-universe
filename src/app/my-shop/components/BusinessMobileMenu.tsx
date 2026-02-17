@@ -70,10 +70,6 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             </div>
                         </>
                     )}
-                    {/* 시스템 검증 센터 (관리자용) */}
-                    <div onClick={() => { setView('standards'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-indigo-50 hover:text-indigo-500 rounded-xl transition cursor-pointer bg-indigo-50/20">
-                        <ShieldCheck size={18} /> 시스템 검증 센터
-                    </div>
                 </nav>
             </div>
         </div>,

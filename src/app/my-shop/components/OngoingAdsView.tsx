@@ -34,12 +34,13 @@ export const OngoingAdsView = ({
     // Helper to get tier label
     const getTierLabel = (ad: any) => {
         const pt = (ad.tier || ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
-        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'GRAND';
-        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'PREMIUM';
-        if (pt === 'p3') return 'DELUXE';
-        if (pt === 'p4') return 'SPECIAL';
-        if (pt === 'p5') return 'URGENT';
-        return 'NORMAL';
+        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'T1';
+        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'T2';
+        if (pt === 'p3') return 'T3';
+        if (pt === 'p4') return 'T4';
+        if (pt === 'p5') return 'T5';
+        if (pt === 'p6') return 'T6';
+        return 'T7';
     };
 
     const getTierColor = (ad: any) => {
@@ -115,6 +116,18 @@ export const OngoingAdsView = ({
                                                 >
                                                     {ad.title}
                                                 </h3>
+
+                                                {/* [New] Rejection Reason Display */}
+                                                {(ad.status === 'rejected' || ad.status === 'REJECTED') && ad.rejection_reason && (
+                                                    <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-in slide-in-from-top-1 duration-300">
+                                                        <div className="flex gap-2">
+                                                            <span className="text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-sm h-fit shrink-0">거절 사유</span>
+                                                            <p className="text-[11px] font-bold text-red-700 leading-snug">
+                                                                {ad.rejection_reason}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 <div className={`flex flex-wrap items-center gap-2 text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                     <span className="text-pink-600 font-extrabold text-[13px]">

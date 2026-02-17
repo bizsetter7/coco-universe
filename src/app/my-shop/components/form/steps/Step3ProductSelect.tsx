@@ -42,19 +42,29 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
             {/* 그리드 설정: 모바일 2열(grid-cols-2), PC 3열(lg:grid-cols-3) */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 pb-3">
                 {mainProducts.map((p: any, index: number) => {
-                    const typeLabel = `타입 ${index + 1}`;
+                    const typeLabel = `Type ${index + 1}`;
                     return (
                         <div
                             key={p.id}
-                            className={`p-3 md:p-6 rounded-[24px] border-2 transition-all duration-300 flex items-center justify-between gap-2.5 md:gap-4 ${selectedAdProduct === p.id ? 'border-purple-500 bg-white shadow-xl shadow-purple-100' : 'border-gray-100 md:border-gray-200 bg-white/60 hover:border-purple-400 md:hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-100/50 hover:bg-white'}`}
+                            className={`p-3 md:p-6 rounded-[24px] border-2 transition-all duration-300 flex items-center justify-between gap-2.5 md:gap-4 ${selectedAdProduct === p.id
+                                ? (p.code === 'T1' ? 'border-amber-400 bg-white shadow-xl shadow-amber-100' :
+                                    p.code === 'T2' ? 'border-red-500 bg-white shadow-xl shadow-red-100' :
+                                        p.code === 'T3' ? 'border-blue-500 bg-white shadow-xl shadow-blue-100' :
+                                            'border-purple-500 bg-white shadow-xl shadow-purple-100')
+                                : 'border-gray-100 md:border-gray-200 bg-white/60 hover:border-purple-400 md:hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-100/50 hover:bg-white'}`}
                         >
                             {/* 왼쪽: 상품 정보 */}
                             <div className="flex-1 flex flex-col justify-center py-0.5 min-w-0">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className={`px-2 py-0.5 rounded-md text-[8px] md:text-[10px] font-black tracking-tight ${selectedAdProduct === p.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                        {typeLabel}
+                                    <span className={`px-2 py-0.5 rounded-md text-[8px] md:text-[10px] font-black tracking-tight ${selectedAdProduct === p.id
+                                        ? (p.code === 'T1' ? 'bg-amber-500 text-white' :
+                                            p.code === 'T2' ? 'bg-red-600 text-white' :
+                                                p.code === 'T3' ? 'bg-blue-600 text-white' :
+                                                    'bg-purple-600 text-white')
+                                        : 'bg-gray-100 text-gray-400'}`}>
+                                        {typeLabel} ({p.code})
                                     </span>
-                                    {selectedAdProduct === p.id && <Award size={16} className="text-purple-500 shrink-0" />}
+                                    {selectedAdProduct === p.id && <Award size={16} className={`${p.color.replace('text-', 'text-')} shrink-0`} />}
                                 </div>
                                 <div className="mb-2.5">
                                     <h3 className={`text-[15px] md:text-[19px] font-black leading-tight tracking-tight whitespace-nowrap ${p.color}`}>{p.tier}</h3>

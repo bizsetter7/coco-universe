@@ -33,7 +33,6 @@ export const BusinessSidebar = ({
         { id: 'applicants', label: '지원자 관리', icon: User },
         { id: 'payments', label: '결제 내역', icon: CreditCard },
         { id: 'member-info', label: '회원정보 수정', icon: Settings, borderTop: true },
-        { id: 'standards', label: '시스템 검증 센터', icon: ShieldCheck },
     ];
 
     const activeItemStyle = "bg-pink-50 text-pink-500 rounded-xl";

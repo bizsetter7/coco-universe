@@ -3,23 +3,24 @@ import RegionClient from '../../region/RegionClient';
 import shopsData from '@/lib/data/shops.json';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 import { Shop } from '@/types/shop';
+import { slugify } from '@/utils/shopUtils';
 
 export async function generateStaticParams() {
     // 17,000개를 다 빌드하면 너무 느리므로, 주요 지역 위주로 샘플링하거나 전체를 빌드합니다.
-    // 여기서는 sitemap과 일치시키기 위해 데이터 전체를 사용합니다.
+    // Use slugified region IDs for URL stability
     return seoRegionsMaster.map((region) => ({
-        region: region.id,
+        region: slugify(region.id),
     }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ region: string }> }) {
     const { region } = await params;
-    const decodedRegion = decodeURIComponent(region);
+    const decodedRegionSlug = decodeURIComponent(region);
 
-    // Find region data from master
-    const regionData = seoRegionsMaster.find(r => r.id === decodedRegion) || {
-        mainRegion: decodedRegion,
-        keywords: [`${decodedRegion} 알바`, `${decodedRegion} 고소득알바`]
+    // Find original region data by matching slugified id
+    const regionData = seoRegionsMaster.find(r => slugify(r.id) === decodedRegionSlug) || {
+        mainRegion: decodedRegionSlug.replace(/-/g, ' '),
+        keywords: [`${decodedRegionSlug.replace(/-/g, ' ')} 알바`]
     };
 
     const title = `${regionData.mainRegion} 고소득 알바 1위 - 코코알바 (당일지급/숙식제공)`;
@@ -49,8 +50,13 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
 
 export default async function CocoRegionPage({ params }: { params: Promise<{ region: string }> }) {
     const { region } = await params;
-    const shops = shopsData as Shop[];
-    const decodedRegion = decodeURIComponent(region);
+    const decodedRegionSlug = decodeURIComponent(region);
 
-    return <RegionClient shops={shops} initialRegion={decodedRegion} />;
+    // Find original region name to pass to client
+    const regionData = seoRegionsMaster.find(r => slugify(r.id) === decodedRegionSlug);
+    const initialRegion = regionData ? regionData.id : decodedRegionSlug.replace(/-/g, ' ');
+
+    const shops = shopsData as Shop[];
+
+    return <RegionClient shops={shops} initialRegion={initialRegion} />;
 }

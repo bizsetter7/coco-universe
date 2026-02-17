@@ -41,12 +41,13 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
     // Helper to get tier label
     const getTierLabel = (ad: any) => {
         const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
-        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'GRAND';
-        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'PREMIUM';
-        if (pt === 'p3') return 'DELUXE';
-        if (pt === 'p4') return 'SPECIAL';
-        if (pt === 'p5') return 'URGENT';
-        return 'NORMAL';
+        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'T1';
+        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'T2';
+        if (pt === 'p3') return 'T3';
+        if (pt === 'p4') return 'T4';
+        if (pt === 'p5') return 'T5';
+        if (pt === 'p6') return 'T6';
+        return 'T7';
     };
 
     const getTierColor = (ad: any) => {
@@ -121,7 +122,12 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         <span className={`${(ad.status === 'rejected' || ad.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
                                             {(ad.status === 'rejected' || ad.status === 'REJECTED') ? '반려' : (ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
                                         </span>
-                                        <span className="text-gray-400">마감일: {ad.deadline || '2026-03-25'}</span>
+                                        <div className="flex flex-col text-gray-400">
+                                            {ad.approved_at && (
+                                                <span>게시일: {new Date(ad.approved_at).toISOString().split('T')[0]}</span>
+                                            )}
+                                            <span>마감일: {ad.deadline || '2026-03-25'}</span>
+                                        </div>
                                     </div>
 
                                     {/* Title & Tier/Icon Badges (Stacked Layout) */}
@@ -168,6 +174,18 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         >
                                             {ad.title}
                                         </h4>
+
+                                        {/* [New] Rejection Reason Display */}
+                                        {(ad.status === 'rejected' || ad.status === 'REJECTED') && ad.rejection_reason && (
+                                            <div className="mt-1 p-3 bg-red-50 border border-red-100 rounded-xl animate-in slide-in-from-top-1 duration-300">
+                                                <div className="flex gap-2">
+                                                    <span className="text-[10px] font-black text-red-600 bg-white px-1.5 py-0.5 rounded shadow-sm h-fit shrink-0">거절사유</span>
+                                                    <p className="text-[12px] font-bold text-red-700 leading-snug">
+                                                        {ad.rejection_reason}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Info Area [Pure Reflection Mode] - Removed Shop Name */}

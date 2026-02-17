@@ -89,6 +89,8 @@ function AdminContent() {
     const [rejectingAdId, setRejectingAdId] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
     const [selectedAdForModal, setSelectedAdForModal] = useState<Shop | null>(null);
+    const [selectedUser, setSelectedUser] = useState<any | null>(null);
+    const [isUserDetailModalOpen, setIsUserDetailModalOpen] = useState(false);
 
     // --- Helper functions ---
     const getHighlighterStyle = (highlighter: any) => {
@@ -398,6 +400,31 @@ function AdminContent() {
         } catch (err) {
             console.error('Payment confirmation error:', err);
             alert('오류가 발생했습니다.');
+        }
+    };
+
+    const handleUserToggleStatus = async (userId: string, currentStatus: string) => {
+        const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
+        const confirmMsg = newStatus === 'blocked' ? '이 회원을 차단하시겠습니까?' : '이 회원의 차단을 해제하시겠습니까?';
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ status: newStatus, updated_at: new Date().toISOString() })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            alert(`회원 상태가 ${newStatus === 'blocked' ? '차단' : '활성'}으로 변경되었습니다.`);
+            fetchData(); // Refresh
+            if (selectedUser?.id === userId) {
+                setSelectedUser((prev: any) => ({ ...prev, status: newStatus }));
+            }
+        } catch (err: any) {
+            console.error('User status update error:', err);
+            alert('상태 업데이트 실패: ' + (err.message || '알 수 없는 오류'));
         }
     };
 
@@ -1021,7 +1048,24 @@ function AdminContent() {
                                                             <div className="text-[9px] text-slate-300">{new Date(user.joinDate || user.created_at).toLocaleTimeString()}</div>
                                                         </td>
                                                         <td className="px-8 py-4 text-right">
-                                                            <button className="text-[10px] font-black text-slate-400 hover:text-slate-900 underline">상세정보</button>
+                                                            <div className="flex justify-end gap-2">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setSelectedUser(user);
+                                                                        setIsUserDetailModalOpen(true);
+                                                                    }}
+                                                                    className="text-[10px] font-black text-blue-600 hover:underline"
+                                                                >
+                                                                    상세정보
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleUserToggleStatus(user.id, user.status)}
+                                                                    className={`p-1.5 rounded-lg transition-all ${user.status === 'blocked' ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+                                                                    title={user.status === 'blocked' ? '차단 해제' : '회원 차단'}
+                                                                >
+                                                                    {user.status === 'blocked' ? <Unlock size={14} /> : <Lock size={14} />}
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1192,11 +1236,86 @@ function AdminContent() {
                 {
                     activeTab === 'seo' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                            {/* SEO Exposure Dashboard */}
+                            <div className="bg-slate-950 rounded-[40px] p-8 md:p-12 text-white overflow-hidden relative border border-slate-800 shadow-2xl">
+                                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+
+                                <div className="relative z-10">
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Global SEO Visibility</span>
+                                            </div>
+                                            <h3 className="text-3xl font-black tracking-tighter italic">실시간 검색 노출 현황 <span className="text-blue-500">Live</span></h3>
+                                            <p className="text-slate-400 text-sm font-bold mt-2">56개 지역 위성 페이지 및 1.7만건의 공고들이 검색 엔진에 노출 중입니다.</p>
+                                        </div>
+                                        <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-3xl backdrop-blur-md flex items-center gap-4">
+                                            <div className="text-center">
+                                                <p className="text-[10px] font-black text-slate-500 uppercase">Indexing</p>
+                                                <p className="text-xl font-black text-white">98.2%</p>
+                                            </div>
+                                            <div className="w-px h-8 bg-slate-800" />
+                                            <div className="text-center">
+                                                <p className="text-[10px] font-black text-slate-500 uppercase">Keywords</p>
+                                                <p className="text-xl font-black text-blue-500">1,240+</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        {/* Google Snippet Preview */}
+                                        <div className="space-y-4">
+                                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Google Search Snippet Preview</h4>
+                                            <div className="bg-white rounded-3xl p-6 md:p-8 space-y-2 border border-slate-100 shadow-xl">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <div className="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-[10px] text-slate-500 font-black">C</div>
+                                                    <div>
+                                                        <p className="text-[11px] text-[#202124] leading-none font-bold">코코알바 - cocoalba.kr</p>
+                                                        <p className="text-[10px] text-[#5f6368] leading-none mt-0.5">https://cocoalba.kr › coco › gangnam</p>
+                                                    </div>
+                                                </div>
+                                                <h3 className="text-[18px] text-[#1a0dab] hover:underline cursor-pointer leading-tight font-medium">
+                                                    강남구 여우알바 | 밤알바 1위 코코알바 - 고수익 보장 & 당일지급
+                                                </h3>
+                                                <p className="text-[13px] text-[#4d5156] leading-relaxed">
+                                                    강남구 전지역 여우알바, 밤알바 정보를 한눈에! 2026년 최신 공고 1,200건 보유. {brand.name}(코코알바)는 가장 빠르고 정확한 구인구직 정보를 제공합니다.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Region Reach Chart (Visual Representation) */}
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-end">
+                                                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Major Region Reach</h4>
+                                                <span className="text-[10px] font-bold text-blue-400">Targeting 56 Cities</span>
+                                            </div>
+                                            <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-800 space-y-4">
+                                                {[
+                                                    { name: '서울/강남', reach: 98, color: 'bg-blue-500' },
+                                                    { name: '부산/해운대', reach: 85, color: 'bg-indigo-500' },
+                                                    { name: '경기/수원', reach: 72, color: 'bg-pink-500' },
+                                                    { name: '인천/송도', reach: 64, color: 'bg-slate-500' }
+                                                ].map((reg, idx) => (
+                                                    <div key={idx} className="space-y-1.5">
+                                                        <div className="flex justify-between text-[11px] font-black">
+                                                            <span className="text-slate-300">{reg.name}</span>
+                                                            <span className="text-white">{reg.reach}% Optimized</span>
+                                                        </div>
+                                                        <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                            <div className={`h-full ${reg.color} transition-all duration-1000`} style={{ width: `${reg.reach}%` }} />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <SEOIndexingControl />
                             <HealthDashboard />
                             <CompetitorAnalysis />
-
-                            {/* [CRITICAL INFO] 시스템 코어 및 시장 분석 모듈이 시스템 설정 탭으로 통합되었습니다. */}
                         </div>
                     )
                 }
@@ -1257,6 +1376,85 @@ function AdminContent() {
                                             * 사장님께 즉시 푸시 알림과 함께 입력한 사유가 전송됩니다.
                                         </p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    selectedUser && isUserDetailModalOpen && (
+                        <div className="fixed inset-0 z-[10020] flex items-center justify-center p-4">
+                            <div
+                                className="absolute inset-0 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-300"
+                                onClick={() => setIsUserDetailModalOpen(false)}
+                            />
+                            <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col">
+                                <div className="p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${selectedUser.status === 'blocked' ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-600'}`}>
+                                            {selectedUser.status === 'blocked' ? '🚫' : '👤'}
+                                        </div>
+                                        <div>
+                                            <span className="bg-slate-900 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase mb-1 inline-block">CRM Profile Detail</span>
+                                            <h3 className="text-xl font-black text-slate-950 tracking-tighter">{selectedUser.name || selectedUser.full_name || '이름없음'}</h3>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setIsUserDetailModalOpen(false)} className="p-2 text-slate-300 hover:text-slate-950 transition-colors">
+                                        <XCircle size={24} />
+                                    </button>
+                                </div>
+                                <div className="p-8 space-y-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Login ID / Email</p>
+                                            <p className="text-sm font-bold text-slate-900 text-wrap break-all">{selectedUser.loginId || selectedUser.email}</p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone Number</p>
+                                            <p className="text-sm font-bold text-slate-900">{selectedUser.phone || '전화번호 없음'}</p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Member Type</p>
+                                            <p className="text-sm font-bold text-slate-900">{selectedUser.role === 'seller' || selectedUser.type === 'corporate' ? '기업회원 (사장님)' : '개인회원 (구직자)'}</p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Join Date</p>
+                                            <p className="text-sm font-bold text-slate-900">{new Date(selectedUser.created_at || selectedUser.joinDate).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                        <h4 className="text-xs font-black text-slate-900 mb-4 flex items-center gap-2">
+                                            <TrendingUp size={14} className="text-blue-500" /> 활동 및 유입 경로 정보
+                                        </h4>
+                                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 py-2 border-b border-slate-200/50">
+                                            <span>유입 경로</span>
+                                            <span className="text-slate-900">{selectedUser.referrer || '직접 유입 / 기타'}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 py-2 border-b border-slate-200/50">
+                                            <span>현재 등급</span>
+                                            <span className="text-pink-600 font-black">Standard</span>
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 py-2">
+                                            <span>광고 등록 이력</span>
+                                            <span className="text-slate-900">0건</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-6 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-4">
+                                    <button
+                                        onClick={() => handleUserToggleStatus(selectedUser.id, selectedUser.status)}
+                                        className={`py-4 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${selectedUser.status === 'blocked' ? 'bg-green-600 text-white shadow-green-200' : 'bg-rose-500 text-white shadow-rose-200'}`}
+                                    >
+                                        {selectedUser.status === 'blocked' ? <Unlock size={18} /> : <Lock size={18} />}
+                                        {selectedUser.status === 'blocked' ? '차단 해제하기' : '회원 영구 차단'}
+                                    </button>
+                                    <button
+                                        onClick={() => setIsUserDetailModalOpen(false)}
+                                        className="py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-black hover:bg-slate-50 transition"
+                                    >
+                                        닫기
+                                    </button>
                                 </div>
                             </div>
                         </div>

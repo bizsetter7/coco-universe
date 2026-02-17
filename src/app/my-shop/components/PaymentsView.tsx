@@ -49,13 +49,34 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                             <th className="py-4 px-2">결제 금액</th>
                                             <th className="py-4 px-2">결제 방식</th>
                                             <th className="py-4 px-2">닉네임</th>
-                                            <th className="py-4 px-2">결제일</th>
+                                            <th className="py-4 px-2">
+                                                {(() => {
+                                                    const hasActive = payments.some(p => p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE');
+                                                    return hasActive ? '결제일/마감일' : '신청일';
+                                                })()}
+                                            </th>
                                             <th className="py-4 px-2">상태</th>
                                         </tr>
                                     </thead>
                                     <tbody className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         {payments.map((p: any, index: number) => {
-                                            const adProduct = DETAILED_PRICING.find(tp => tp.tier === p.type || tp.id === p.type || tp.code === p.type);
+                                            // [Fix] Robust Type Matching for 'AD' vs 'Tx' Badge
+                                            // Priority: p.type (DB Column) -> p.metadata.product_type -> p.metadata.tier
+                                            const rawType = p.type || p.metadata?.product_type || p.metadata?.tier || p.adObject?.productType || '';
+                                            const typeKey = (rawType || '').toLowerCase();
+
+                                            const adProduct = DETAILED_PRICING.find(tp =>
+                                                tp.tier === rawType ||
+                                                tp.id === rawType ||
+                                                tp.code === rawType ||
+                                                (typeKey.includes('grand') && tp.id === 'p1') ||
+                                                (typeKey.includes('premium') && tp.id === 'p2') ||
+                                                (typeKey.includes('deluxe') && tp.id === 'p3') ||
+                                                (typeKey.includes('special') && tp.id === 'p4') ||
+                                                ((typeKey.includes('urgent') || typeKey.includes('rec')) && tp.id === 'p5') ||
+                                                (typeKey.includes('native') && tp.id === 'p6') ||
+                                                (typeKey.includes('basic') && tp.id === 'p7')
+                                            );
                                             const typeCode = adProduct?.code || 'AD';
                                             const tierName = adProduct?.tier || '일반';
 
@@ -104,25 +125,49 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                     </td>
                                                     <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight whitespace-nowrap">
                                                         <div className="flex flex-col">
-                                                            {p.date && typeof p.date === 'string' ? (
+                                                            {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? (
                                                                 <>
-                                                                    <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
-                                                                    <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                                    <span className="text-blue-500 font-black">
+                                                                        {p.adObject.approved_at ? new Date(p.adObject.approved_at).toISOString().split('T')[0] : (p.date?.split(' ')[0] || '-')}
+                                                                    </span>
+                                                                    <span className="text-[10px] opacity-70">
+                                                                        {p.adObject.deadline || '2026-03-25'}
+                                                                    </span>
                                                                 </>
                                                             ) : (
-                                                                <span>{p.date || '-'}</span>
+                                                                p.date && typeof p.date === 'string' ? (
+                                                                    <>
+                                                                        <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
+                                                                        <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <span>{p.date || '-'}</span>
+                                                                )
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="py-5 px-2">
-                                                        <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' || p.status === 'success' ? 'bg-green-500' : 'bg-orange-500'} shadow-sm whitespace-nowrap`}>
-                                                            {p.status === 'pending' ? '결제대기' : (p.status === 'success' ? '결제완료' : (p.status || '대기'))}
-                                                        </span>
-                                                        {(p.adObject?.status === 'rejected' || p.adObject?.status === 'REJECTED') && (
-                                                            <span className="ml-1 px-2 py-1 bg-red-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">
-                                                                반려
-                                                            </span>
-                                                        )}
+                                                        {(() => {
+                                                            const adStatus = p.adObject?.status;
+                                                            const payStatus = p.status;
+
+                                                            if (adStatus === 'rejected' || adStatus === 'REJECTED') {
+                                                                return <span className="px-2 py-1 bg-red-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">반려</span>;
+                                                            }
+                                                            if (adStatus === 'active' || adStatus === 'ACTIVE') {
+                                                                return <span className="px-2 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">승인완료</span>;
+                                                            }
+                                                            if (adStatus === 'PENDING_REVIEW' || adStatus === 'pending_review') {
+                                                                return <span className="px-2 py-1 bg-orange-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">심사중</span>;
+                                                            }
+
+                                                            const isSuccess = payStatus === '결제완료' || payStatus === 'success';
+                                                            return (
+                                                                <span className={`px-2 py-1 text-white text-[10px] font-black rounded-lg ${isSuccess ? 'bg-green-500' : 'bg-orange-500'} shadow-sm whitespace-nowrap`}>
+                                                                    {payStatus === 'pending' ? '결제대기' : (isSuccess ? '결제완료' : (payStatus || '대기'))}
+                                                                </span>
+                                                            );
+                                                        })()}
                                                     </td>
                                                 </tr>
                                             )
@@ -134,7 +179,22 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                             {/* Mobile View (Cards) */}
                             <div className="md:hidden space-y-4">
                                 {payments.map((p: any, index: number) => {
-                                    const adProduct = DETAILED_PRICING.find(tp => tp.tier === p.type || tp.id === p.type || tp.code === p.type);
+                                    // [Fix] Robust Type Matching for 'AD' vs 'Tx' Badge
+                                    const rawType = p.type || p.metadata?.product_type || p.metadata?.tier || p.adObject?.productType || '';
+                                    const typeKey = (rawType || '').toLowerCase();
+
+                                    const adProduct = DETAILED_PRICING.find(tp =>
+                                        tp.tier === rawType ||
+                                        tp.id === rawType ||
+                                        tp.code === rawType ||
+                                        (typeKey.includes('grand') && tp.id === 'p1') ||
+                                        (typeKey.includes('premium') && tp.id === 'p2') ||
+                                        (typeKey.includes('deluxe') && tp.id === 'p3') ||
+                                        (typeKey.includes('special') && tp.id === 'p4') ||
+                                        ((typeKey.includes('urgent') || typeKey.includes('rec')) && tp.id === 'p5') ||
+                                        (typeKey.includes('native') && tp.id === 'p6') ||
+                                        (typeKey.includes('basic') && tp.id === 'p7')
+                                    );
                                     const typeCode = adProduct?.code || 'AD';
                                     const tierName = adProduct?.tier || '일반';
 
@@ -175,27 +235,53 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span className={`shrink-0 px-2 py-1 text-white text-[10px] font-black rounded-lg ${p.status === '결제완료' || p.status === 'success' ? 'bg-green-500' : 'bg-orange-500'}`}>
-                                                    {p.status === 'pending' ? '결제대기' : (p.status === 'success' ? '결제완료' : (p.status || '대기'))}
-                                                </span>
-                                                {(p.adObject?.status === 'rejected' || p.adObject?.status === 'REJECTED') && (
-                                                    <span className="shrink-0 px-2 py-1 bg-red-500 text-white text-[10px] font-black rounded-lg shadow-sm">
-                                                        반려
-                                                    </span>
-                                                )}
+                                                {(() => {
+                                                    const adStatus = p.adObject?.status;
+                                                    const payStatus = p.status;
+
+                                                    if (adStatus === 'rejected' || adStatus === 'REJECTED') {
+                                                        return <span className="shrink-0 px-2 py-1 bg-red-500 text-white text-[10px] font-black rounded-lg shadow-sm">반려</span>;
+                                                    }
+                                                    if (adStatus === 'active' || adStatus === 'ACTIVE') {
+                                                        return <span className="shrink-0 px-2 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg shadow-sm">승인완료</span>;
+                                                    }
+                                                    if (adStatus === 'PENDING_REVIEW' || adStatus === 'pending_review') {
+                                                        return <span className="shrink-0 px-2 py-1 bg-orange-500 text-white text-[10px] font-black rounded-lg shadow-sm">심사중</span>;
+                                                    }
+
+                                                    const isSuccess = payStatus === '결제완료' || payStatus === 'success';
+                                                    return (
+                                                        <span className={`shrink-0 px-2 py-1 text-white text-[10px] font-black rounded-lg ${isSuccess ? 'bg-green-500' : 'bg-orange-500'}`}>
+                                                            {payStatus === 'pending' ? '결제대기' : (isSuccess ? '결제완료' : (payStatus || '대기'))}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </div>
 
                                             <div className={`grid grid-cols-2 gap-3 p-4 rounded-2xl ${brand.theme === 'dark' ? 'bg-black/20 text-gray-400' : 'bg-gray-50 text-gray-500'} text-[11px] font-bold`}>
                                                 <div className="space-y-1">
-                                                    <p className="text-[9px] text-gray-400">결제일시</p>
+                                                    <p className="text-[9px] text-gray-400">
+                                                        {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? '결제일/마감일' : '신청일시'}
+                                                    </p>
                                                     <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-tight`}>
-                                                        {p.date && typeof p.date === 'string' ? (
+                                                        {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? (
                                                             <>
-                                                                {p.date.split(' ').slice(0, 3).join(' ')}<br />
-                                                                <span className="text-[10px] text-gray-400">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                                <span className="text-blue-500 font-black">
+                                                                    {p.adObject.approved_at ? new Date(p.adObject.approved_at).toISOString().split('T')[0] : (p.date?.split(' ')[0] || '-')}
+                                                                </span><br />
+                                                                <span className="text-[10px] text-gray-400">
+                                                                    {p.adObject.deadline || '2026-03-25'}
+                                                                </span>
                                                             </>
                                                         ) : (
-                                                            p.date || '-'
+                                                            p.date && typeof p.date === 'string' ? (
+                                                                <>
+                                                                    {p.date.split(' ').slice(0, 3).join(' ')}<br />
+                                                                    <span className="text-[10px] text-gray-400">{p.date.split(' ').slice(3).join(' ')}</span>
+                                                                </>
+                                                            ) : (
+                                                                p.date || '-'
+                                                            )
                                                         )}
                                                     </p>
                                                 </div>

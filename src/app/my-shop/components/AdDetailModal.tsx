@@ -43,8 +43,34 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
         return `${cleanAmount.toLocaleString()}원`;
     };
 
-    // Normalizing ad data with snapshot priority
-    const productType = ad.productType || 'p7';
+    // [Robust Normalization] Ensure all UI fields are populated from DB columns or Options
+    const norm = {
+        title: ad.title || ad.options?.title,
+        nickname: ad.nickname || ad.options?.nickname || '닉네임',
+        regionCity: ad.regionCity || ad.region || ad.options?.regionCity || '',
+        regionGu: ad.regionGu || ad.work_region_sub || ad.options?.regionGu || '',
+        category: ad.category || ad.options?.category || '',
+        categorySub: ad.categorySub || ad.category_sub || ad.options?.categorySub || '',
+
+        // Pay Info
+        payType: ad.payType || ad.pay_type || ad.options?.payType || '협의',
+        payAmount: ad.payAmount || ad.pay_amount || ad.options?.payAmount || 0,
+        paySuffixes: ad.paySuffixes || ad.options?.pay_suffixes || ad.options?.paySuffixes || [],
+
+        // Options
+        selectedIcon: ad.selectedIcon || ad.options?.icon || ad.options?.selectedIcon,
+        selectedHighlighter: ad.selectedHighlighter || ad.options?.highlighter || ad.options?.selectedHighlighter,
+
+        // Contact
+        managerPhone: ad.managerPhone || ad.manager_phone || ad.options?.managerPhone,
+        messengers: ad.messengers || ad.options?.messengers || {},
+
+        // Content
+        content: ad.content || ad.options?.content,
+        adNo: ad.adNo || ad.id?.toString().substring(0, 4) || '1004'
+    };
+
+    const productType = ad.productType || ad.tier || ad.options?.product_type || 'p7';
     const tier =
         productType === '그랜드' || productType === 'p1' ? 'grand' :
             productType === '프리미엄' || productType === 'p2' ? 'premium' :
@@ -83,15 +109,15 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                     </button>
 
                     <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
-                        <MapPin size={10} /> {ad.regionCity} {ad.regionGu} | <Briefcase size={10} /> {ad.category} | {ad.categorySub}
+                        <MapPin size={10} /> {norm.regionCity} {norm.regionGu} | <Briefcase size={10} /> {norm.category} | {norm.categorySub}
                     </div>
 
                     <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                            <IconBadge iconId={ad.selectedIcon} showName={true} />
+                            <IconBadge iconId={norm.selectedIcon} showName={true} />
                             <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
-                                <span style={getHighlighterStyle(ad.selectedHighlighter)}>
-                                    {ad.title}
+                                <span style={getHighlighterStyle(norm.selectedHighlighter)}>
+                                    {norm.title}
                                 </span>
                             </h2>
                         </div>
@@ -101,7 +127,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
-                        {ad.nickname}
+                        {norm.nickname}
                     </div>
                 </div>
 
@@ -109,7 +135,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate' }}>
                     {/* Ad Number (Moved to Body) */}
                     <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
-                        No.{ad.adNo || ad.id?.toString().substring(0, 4) || '1004'}
+                        No.{norm.adNo}
                     </div>
 
                     {/* Pay & Keywords Box (CENTERED/GRID) */}
@@ -117,24 +143,24 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         {/* Left: Salary Info */}
                         <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
                             {/* Stylish Square Box Badge */}
-                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(ad.payType)}`}>
-                                {getPayAbbreviation(ad.payType)}
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(norm.payType)}`}>
+                                {getPayAbbreviation(norm.payType)}
                             </div>
                             <div className="flex flex-col gap-0.5 overflow-hidden">
                                 <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
-                                    {ad.payType === '협의' || ad.payType === '급여협의' || (ad.payAmount || 0) === 0 ? '급여협의' : formatKoreanMoney(ad.payAmount)}
+                                    {norm.payType === '협의' || norm.payType === '급여협의' || (norm.payAmount || 0) === 0 ? '급여협의' : formatKoreanMoney(norm.payAmount)}
                                 </div>
                             </div>
                         </div>
 
                         {/* Right: Keywords (Grid 3 cols) */}
                         <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
-                            {(ad.options?.pay_suffixes || ad.options?.paySuffixes || []).slice(0, 6).map((kw: string, idx: number) => (
+                            {norm.paySuffixes.slice(0, 6).map((kw: string, idx: number) => (
                                 <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                     {kw}
                                 </span>
                             ))}
-                            {(ad.options?.pay_suffixes || ad.options?.paySuffixes || []).length === 0 && (
+                            {norm.paySuffixes.length === 0 && (
                                 <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 급여 옵션 없음</span>
                             )}
                         </div>
@@ -149,7 +175,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         {/* Using dangeroulsySetHtml for editor content compatibility */}
                         <div
                             className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed bg-white p-4 rounded-xl border border-gray-100 min-h-[120px]"
-                            dangerouslySetInnerHTML={{ __html: ad.content || '등록된 상세 내용이 없습니다.' }}
+                            dangerouslySetInnerHTML={{ __html: norm.content || '등록된 상세 내용이 없습니다.' }}
                         />
                     </div>
 
@@ -161,7 +187,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </h3>
                         <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
                             <MapPin size={32} className="opacity-50" />
-                            <span className="text-xs font-bold">{ad.regionCity} {ad.regionGu}</span>
+                            <span className="text-xs font-bold">{norm.regionCity} {norm.regionGu}</span>
                             <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
                         </div>
                     </div>
@@ -193,7 +219,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
                     <div className="flex gap-3">
                         <button
-                            onClick={() => alert(`쪽지 기능을 준비 중입니다. (${ad.nickname || ad.name}님께)`)}
+                            onClick={() => alert(`쪽지 기능을 준비 중입니다. (${norm.nickname || '사장님'}께)`)}
                             className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
                         >
                             <MessageSquare size={20} className="stroke-current" />
@@ -201,7 +227,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </button>
                         <button
                             onClick={() => {
-                                const kakao = ad.messengers?.kakao || ad.options?.messengers?.kakao || ad.kakao_id;
+                                const kakao = norm.messengers?.kakao;
                                 if (kakao) {
                                     window.open(`https://qr.kakao.com/talk/${kakao}`, '_blank');
                                 } else {
@@ -215,7 +241,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </button>
                         <button
                             onClick={() => {
-                                const phone = ad.managerPhone || ad.manager_phone;
+                                const phone = norm.managerPhone;
                                 if (phone) {
                                     window.location.href = `tel:${phone}`;
                                 } else {
