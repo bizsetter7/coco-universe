@@ -7,7 +7,7 @@ import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
-import { cleanShopTitle, getIconById } from '@/utils/shopUtils';
+import { cleanShopTitle, getIconById, generateSEOKeywords } from '@/utils/shopUtils';
 import { IconBadge } from '@/components/common/IconBadge';
 import { getHighlighterStyle } from '@/utils/highlighter';
 
@@ -51,7 +51,7 @@ export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onTo
     const headerBg = isTiered ? TIER_GRADIENTS[shop.tier!] : 'bg-white';
 
     return (
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-full bg-white min-h-0 w-full overflow-hidden">
             {/* 1. HEADER SECTION */}
             <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
                 {/* Star Button (Left) */}
@@ -88,7 +88,7 @@ export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onTo
             </div>
 
             {/* 2. BODY SECTION */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 !bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate', mixBlendMode: 'normal' }}>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 !bg-white relative min-h-0" style={{ backgroundColor: '#ffffff', isolation: 'isolate', mixBlendMode: 'normal' }}>
                 <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
                     No.{shop.adNo || shop.id?.substring(0, 4) || '1004'}
                 </div>
@@ -147,32 +147,87 @@ export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onTo
                         </div>
                     </div>
                 </div>
+                {/* 5. Keyword & Info (SEO & Tags) */}
+                {(() => {
+                    const autoKeywords = generateSEOKeywords(shop.region);
+                    const allKeywords = [...(keywords || []), ...autoKeywords];
+                    const hasIcons = (shop.options?.icons?.length ?? 0) > 0;
 
-                {/* Contact Footer */}
-                <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => {
-                                const event = new CustomEvent('open-note-modal', {
-                                    detail: { receiver: shop.managerName || shop.nickname || `${shop.name} 사장님` }
-                                });
-                                window.dispatchEvent(event);
-                            }}
-                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
-                        >
-                            <MessageSquare size={20} />
-                            <span className="text-xs font-black">쪽지문의</span>
-                        </button>
-                        <a
-                            href={`tel:${shop.phone}`}
-                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
-                        >
-                            <Phone size={20} />
-                            <span className="text-xs font-black">전화/문자 지원하기</span>
-                        </a>
-                    </div>
+                    if (!hasIcons && allKeywords.length === 0) return null;
+
+                    return (
+                        <div className="pt-3 mt-1 border-t border-gray-50/50">
+                            <div className="flex items-center gap-1.5 mb-1.5 opacity-40">
+                                <Info size={10} className="text-gray-300" />
+                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-wider">Keyword & Info</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1 opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                {/* Convenience Icons */}
+                                {shop.options?.icons?.map((icon, idx) => (
+                                    <span key={`icon-${idx}`} className="text-[11px] text-gray-300 font-medium bg-gray-50/30 px-1.5 py-0.5 rounded border border-gray-50/50">
+                                        #{icon}
+                                    </span>
+                                ))}
+                                {/* All Keywords (User + Auto) */}
+                                {allKeywords.map((kw, idx) => (
+                                    <span key={`kw-${idx}`} className="text-[11px] text-gray-300 font-medium bg-gray-50/30 px-1.5 py-0.5 rounded border border-gray-50/50">
+                                        #{kw}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })()}
+
+                {/* Scroll Margin for Safe Area */}
+                <div className="h-6"></div>
+            </div>
+
+            {/* 3. CONTACT FOOTER (Fixed at Bottom) */}
+            <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                <div className="flex gap-2">
+                    {/* 1. 쪽지문의 */}
+                    <button
+                        onClick={() => {
+                            const event = new CustomEvent('open-note-modal', {
+                                detail: { receiver: shop.managerName || shop.nickname || `${shop.name} 사장님` }
+                            });
+                            window.dispatchEvent(event);
+                        }}
+                        className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
+                    >
+                        <MessageSquare size={18} className="mb-0.5" />
+                        <span className="text-[10px] font-bold">쪽지문의</span>
+                    </button>
+
+                    {/* 2. 카톡/메신저 (New) */}
+                    <button
+                        onClick={() => {
+                            const messengerId = shop.kakao || shop.telegram;
+                            if (messengerId) {
+                                navigator.clipboard.writeText(messengerId);
+                                alert(`${shop.kakao ? '카카오톡' : '텔레그램'} ID가 복사되었습니다: ${messengerId}`);
+                            } else {
+                                alert('등록된 메신저 ID가 없습니다.');
+                            }
+                        }}
+                        className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-[#FAE100] border border-[#F4DC00] text-[#371D1E] py-2.5 rounded-xl hover:brightness-95 transition active:scale-[0.98]"
+                    >
+                        <MessageSquare size={18} className="mb-0.5" fill="currentColor" fillOpacity={0.3} />
+                        <span className="text-[10px] font-bold">카톡/메신저</span>
+                    </button>
+
+                    {/* 3. 전화/문자 */}
+                    <a
+                        href={`tel:${shop.phone}`}
+                        className="flex-[1.5] flex flex-col items-center justify-center gap-0.5 bg-pink-600 text-white py-2.5 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
+                    >
+                        <Phone size={18} className="mb-0.5" />
+                        <span className="text-[10px] font-bold">전화/문자</span>
+                    </a>
                 </div>
             </div>
+
         </div>
     );
 };
@@ -193,14 +248,14 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavori
 
     return createPortal(
         <div
-            className="modal-overlay fixed inset-0 z-[20000] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm touch-none overscroll-contain"
+            className="modal-overlay fixed inset-0 z-[20000] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm overscroll-contain"
             onClick={onClose}
         >
             <div
                 className="
                     bg-white shadow-2xl overflow-hidden flex flex-col
                     fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
-                    md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
+                    md:static md:w-[500px] lg:w-[600px] md:h-[85vh] md:rounded-[32px]
                     transform-gpu will-change-transform backface-hidden
                     animate-in slide-in-from-bottom duration-300 
                 "

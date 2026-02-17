@@ -6,7 +6,7 @@ import { normalizeAd } from '@/app/my-shop/utils/normalization';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
 export async function POST() {
-    console.log('[API] Health check triggered (POST Mode)');
+
     const healthStatus: any = {
         timestamp: new Date().toISOString(),
         overall: 'healthy',

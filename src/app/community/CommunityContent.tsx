@@ -66,7 +66,7 @@ function CommunityContentInner() {
 
     const fetchPosts = async () => {
         try {
-            console.log("[Community] Fetching posts from Supabase...");
+
             const { data, error } = await supabase
                 .from('community_posts')
                 .select('*')
@@ -79,7 +79,7 @@ function CommunityContentInner() {
                     try {
                         const parsed = JSON.parse(localBackup);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            console.log("[Community] Loaded posts from LocalBackup.");
+
                             setPosts(parsed);
                             return;
                         }
@@ -87,18 +87,18 @@ function CommunityContentInner() {
                         console.error("[Community] Local backup parse error:", e);
                     }
                 }
-                console.log("[Community] No DB, no Backup. Using MOCK_POSTS.");
+
                 setPosts(MOCK_POSTS);
                 return;
             }
 
             if (data && data.length > 0) {
-                console.log("[Community] Loaded posts from Supabase.");
+
                 setPosts(data as Post[]);
                 // setPosts(MOCK_POSTS); // Forced Mock Data
                 localStorage.setItem('community_posts_backup', JSON.stringify(data));
             } else {
-                console.log("[Community] DB is empty. Using MOCK_POSTS.");
+
                 setPosts(MOCK_POSTS);
                 localStorage.removeItem('community_posts_backup');
             }

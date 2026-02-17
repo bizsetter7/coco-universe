@@ -3,7 +3,7 @@ import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { getHighlighterStyle } from '@/utils/highlighter';
-import { cleanShopTitle } from '@/utils/shopUtils';
+import { cleanShopTitle, getShopDefaultImage } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
 
 interface ShopCardProps {
@@ -24,7 +24,10 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: 
     // Keeping state for now but ensuring memoization helps.
 
     const [imgError, setImgError] = React.useState(false);
-    const hasMedia = !!shop.options?.mediaUrl && !imgError;
+
+    // Determine image URL
+    const mediaUrl = shop.options?.mediaUrl || getShopDefaultImage(shop.workType);
+    const hasMedia = !!mediaUrl && !imgError;
 
     // 급구/추천 섹션 전체가 이미지 배제 모드일 때만 비활성화 (섹션 내 밸런스 유지)
     const isUrgentType = tierId === 'urgent' || tierId === 'recommended';
@@ -46,25 +49,25 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: 
         >
             <div className={`w-full bg-white rounded-xl p-2 relative overflow-hidden flex flex-col gap-2 ${!isUrgentType ? 'h-full' : ''}`}>
 
-                {/* Image / Thumbnail Area (OR Title Banner Fallback) */}
+                {/* Image / Thumbnail Area (OR Default Industry Banner) */}
                 {!isUrgentType && (
-                    <div className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden ${hasMedia ? 'bg-gray-100' : 'bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-100'}`}>
-                        {hasMedia ? (
-                            <img
-                                src={shop.options!.mediaUrl}
-                                alt=""
-                                loading="lazy"
-                                decoding="async"
-                                onError={() => setImgError(true)}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center">
-                                <span className="text-[11px] font-black text-gray-400 line-clamp-3 leading-tight break-keep">
+                    <div className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-100`}>
+                        <img
+                            src={mediaUrl}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            onError={() => setImgError(true)}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+
+                        {!shop.options?.mediaUrl && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-black/40 backdrop-blur-[2px]">
+                                <span className="text-[11px] font-black text-white line-clamp-2 leading-tight break-keep drop-shadow-md">
                                     {cleanTitle}
                                 </span>
-                                <div className="mt-2 text-[8px] font-bold text-gray-300 uppercase tracking-widest opacity-50">
-                                    {tierLabel || 'INFO'}
+                                <div className="mt-1 text-[8px] font-bold text-gray-200 uppercase tracking-widest opacity-80">
+                                    {tierLabel || 'PREMIUM'}
                                 </div>
                             </div>
                         )}

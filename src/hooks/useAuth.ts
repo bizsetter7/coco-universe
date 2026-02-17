@@ -101,7 +101,7 @@ export function useAuth() {
             setUser(mockData);
             setIsLoggedIn(true);
             setIsLoading(false);
-            console.log('Session restored from mock storage');
+
             return;
         }
 
@@ -179,7 +179,7 @@ export function useAuth() {
         setUser(mockUser);
         setIsLoggedIn(true);
         setIsLoading(false);
-        console.log('Login mock stored');
+
     };
 
     const logout = async () => {

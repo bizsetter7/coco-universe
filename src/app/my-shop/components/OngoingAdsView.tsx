@@ -173,17 +173,12 @@ export const OngoingAdsView = ({
                                                     </button>
                                                     <button
                                                         data-delete-btn="v2026021606"
-                                                        onMouseDown={() => console.log('[MOUSEDOWN] Delete button!')}
-                                                        onMouseUp={() => console.log('[MOUSEUP] Delete button!')}
                                                         onClick={(e) => {
-                                                            console.log('[ONCLICK START] Delete button clicked!');
-                                                            window.alert('삭제 버튼 클릭됨!');
-                                                            console.log('[OngoingAds] Delete button clicked!', ad.id);
-                                                            e.stopPropagation();
-                                                            console.log('[OngoingAds] Calling onDeleteAd with:', ad.id);
-                                                            onDeleteAd?.(ad.id);
-                                                        }}
-                                                        style={{
+                                                            e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+                                                            if (onDeleteAd) {
+                                                                onDeleteAd(ad.id);
+                                                            }
+                                                        }} style={{
                                                             position: 'relative',
                                                             zIndex: 9999,
                                                             pointerEvents: 'auto',

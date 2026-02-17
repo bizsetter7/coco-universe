@@ -547,6 +547,74 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Section 6: Detail Ad Card & SEO Policy */}
+                                <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:border-blue-100 transition-colors">
+                                    <button
+                                        onClick={() => setOpenSection(openSection === 'seo' ? null : 'seo')}
+                                        className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${openSection === 'seo' ? 'bg-blue-50/50' : 'bg-white hover:bg-slate-50'}`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-lg ${openSection === 'seo' ? 'bg-white shadow-sm text-blue-500' : 'bg-slate-50 text-slate-400'}`}>
+                                                <Search size={14} />
+                                            </div>
+                                            <span className="text-xs font-black text-slate-800 tracking-tight">6. 상세 광고 카드 레이아웃 및 SEO 정책</span>
+                                        </div>
+                                        {openSection === 'seo' ? <ChevronUp size={14} className="text-blue-500" /> : <ChevronDown size={14} className="text-slate-300" />}
+                                    </button>
+                                    {openSection === 'seo' && (
+                                        <div className="p-6 bg-white border-t border-slate-50 animate-in slide-in-from-top-2 duration-300 space-y-6">
+                                            {/* 6.1 Layout */}
+                                            <div>
+                                                <h4 className="text-sm font-black text-gray-900 mb-3 flex items-center gap-2">
+                                                    <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                                                    상세 광고 카드(Modal) 레이아웃
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                        <strong className="block text-slate-700 mb-1">2.1 전체 구조 (Flex-Col)</strong>
+                                                        <ul className="list-disc list-inside text-slate-500 space-y-1 text-[11px]">
+                                                            <li>Height: h-full (화면 전체)</li>
+                                                            <li>Content: Scrollable (Overflow-y-auto)</li>
+                                                            <li>Header/Footer: Sticky/Fixed</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                        <strong className="block text-slate-700 mb-1">2.4 하단 컨택 바 (Footer)</strong>
+                                                        <ul className="list-disc list-inside text-slate-500 space-y-1 text-[11px]">
+                                                            <li>Position: Sticky Bottom-0</li>
+                                                            <li>Shadow: Top Shadow 구분감</li>
+                                                            <li>Composition: 3분할 (쪽지/메신저/전화)</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* 6.2 SEO */}
+                                            <div>
+                                                <h4 className="text-sm font-black text-gray-900 mb-3 flex items-center gap-2">
+                                                    <span className="w-1 h-4 bg-indigo-500 rounded-full"></span>
+                                                    SEO 상세 페이지 및 메타데이터
+                                                </h4>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-start gap-3 p-3 bg-indigo-50 border border-dashed border-indigo-200 rounded-lg">
+                                                        <div className="text-indigo-600 font-black text-[10px] whitespace-nowrap mt-0.5">URL 구조</div>
+                                                        <div className="text-slate-600 text-[11px] font-mono">/jobs/[id] (SSR Rendering)</div>
+                                                    </div>
+                                                    <div className="flex items-start gap-3 p-3 bg-indigo-50 border border-dashed border-indigo-200 rounded-lg">
+                                                        <div className="text-indigo-600 font-black text-[10px] whitespace-nowrap mt-0.5">Title</div>
+                                                        <div className="text-slate-600 text-[11px] font-mono">[업소명] - [지역] [업종]알바 채용정보 | 코코알바</div>
+                                                    </div>
+                                                    <div className="flex items-start gap-3 p-3 bg-indigo-50 border border-dashed border-indigo-200 rounded-lg">
+                                                        <div className="text-indigo-600 font-black text-[10px] whitespace-nowrap mt-0.5">Keywords</div>
+                                                        <div className="text-slate-600 text-[11px] font-mono">generateSEOKeywords(region) 자동 생성 태그</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
                             </div>
                         </div>
 

@@ -1,0 +1,5 @@
+
+// This was already done in the previous step (lines 237 fallbacks), 
+// but I will verify if `options.ad_price` is covered.
+// "Number((ad.options as any)?.ad_price)" is in the code.
+// So running the script above should fix it.

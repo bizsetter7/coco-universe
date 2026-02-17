@@ -4,7 +4,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { getHighlighterStyle } from '@/utils/highlighter';
-import { cleanShopTitle } from '@/utils/shopUtils';
+import { cleanShopTitle, getShopDefaultImage } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
 
 interface AdBannerCardProps {
@@ -22,7 +22,10 @@ export const AdBannerCard = React.memo(({ shop }: AdBannerCardProps) => {
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
 
     const [imgError, setImgError] = React.useState(false);
-    const hasMedia = !!shop.options?.mediaUrl && !imgError;
+
+    // Determine image URL
+    const mediaUrl = shop.options?.mediaUrl || getShopDefaultImage(shop.workType);
+    const hasMedia = !!mediaUrl && !imgError;
 
     return (
         <div className={`
@@ -44,28 +47,28 @@ export const AdBannerCard = React.memo(({ shop }: AdBannerCardProps) => {
             <div className="w-full h-full bg-white rounded-xl p-2 relative overflow-hidden flex flex-col gap-2">
 
                 {/* 미디어 영역 (이미지/GIF OR 타이틀 배너) */}
-                <div className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden ${hasMedia ? 'bg-gray-50' : 'bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100'}`}>
-                    {hasMedia ? (
-                        <img
-                            src={shop.options!.mediaUrl}
-                            alt=""
-                            onError={() => setImgError(true)}
-                            loading="lazy"
-                            className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile ? 'group-hover:scale-110' : ''}`}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                            <span className="text-[12px] font-black text-amber-600/80 line-clamp-3 leading-tight break-keep">
+                <div className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-50 border border-gray-100`}>
+                    <img
+                        src={mediaUrl}
+                        alt=""
+                        onError={() => setImgError(true)}
+                        loading="lazy"
+                        className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile ? 'group-hover:scale-110' : ''}`}
+                    />
+
+                    {!shop.options?.mediaUrl && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-black/50 backdrop-blur-[2px]">
+                            <span className="text-[13px] font-black text-white line-clamp-2 leading-tight break-keep drop-shadow-lg">
                                 {cleanTitle}
                             </span>
-                            <div className="mt-2 text-[8px] font-bold text-amber-400 uppercase tracking-widest opacity-60">
+                            <div className="mt-2 text-[9px] font-black text-amber-300 uppercase tracking-[0.2em] drop-shadow-md">
                                 GRAND PREMIUM
                             </div>
                         </div>
                     )}
 
                     {/* 투명도 조절 오버레이 (이미지일 때만) */}
-                    {hasMedia && <div className={`absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent z-10`} />}
+                    <div className={`absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent z-10`} />
                 </div>
 
                 {/* Content Area (정보 노출 영역) */}

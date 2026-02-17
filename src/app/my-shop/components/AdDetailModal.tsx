@@ -30,7 +30,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
     useBodyScrollLock(!!ad);
 
     useEffect(() => {
-        console.log("AdDetailModal MOUNTED with ad:", ad);
+
         setMounted(true);
     }, [ad]);
 

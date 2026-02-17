@@ -37,17 +37,17 @@ function HomeContent() {
       if (tier === 'grand' && index % 3 === 1) tier = 'premium';
 
       // [Dynamic Ad Enhancement] Inject tags for Tier display
-      let title = shop.title || shop.name;
+      let currentTitle = shop.title || shop.name;
       const effects = ['[네온]', '[무지개]', '[반짝]', '[GIF]', '[HOT]'];
+      let currentOptions = { ...shop.options };
 
       if (tier === 'grand' || tier === 'premium') {
         const effect = effects[index % effects.length];
-        title = `${effect} ${title}`;
+        currentTitle = `${effect} ${currentTitle}`;
 
-        const imgId = 100 + (index % 50);
-        if (!shop.options?.mediaUrl) {
-          shop.options = {
-            ...shop.options,
+        if (!currentOptions.mediaUrl) {
+          currentOptions = {
+            ...currentOptions,
             mediaUrl: `https://picsum.photos/400/300?random=${index}`
           };
         }
@@ -64,7 +64,7 @@ function HomeContent() {
         lng = SEOUL_COORDS.lng + (Math.cos(index) * 0.05);
       }
 
-      return { ...shop, tier, title, lat, lng };
+      return { ...shop, tier, title: currentTitle, options: currentOptions, lat, lng };
     });
 
     // [Signature - Hyper-local Logic]
