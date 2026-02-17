@@ -51,7 +51,7 @@ const DATA_MAPPING_STANDARDS = [
     { item: '급여 수식어', db: 'options.pay_suffixes', ui: 'paySuffixes', required: false },
 ];
 
-export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu }: { ads?: any[], payments?: any[], onOpenMenu?: () => void }) => {
+export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpenMenu }: { ads?: any[], payments?: any[], onOpenMenu?: () => void }) => {
     const [health, setHealth] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
     Users,
@@ -11,9 +11,6 @@ import {
     CheckCircle2,
     XCircle,
     Eye,
-    Zap,
-    ArrowRight,
-    Search,
     TrendingUp,
     Bell,
     Megaphone,
@@ -91,16 +88,6 @@ function AdminContent() {
     const [selectedAdForModal, setSelectedAdForModal] = useState<Shop | null>(null);
     const [selectedUser, setSelectedUser] = useState<any | null>(null);
     const [isUserDetailModalOpen, setIsUserDetailModalOpen] = useState(false);
-
-    // --- Helper functions ---
-    const getHighlighterStyle = (highlighter: any) => {
-        if (!highlighter) return {};
-        const h = String(highlighter);
-        if (h === '1' || h.includes('yellow')) return { backgroundColor: '#fef08a', color: '#854d0e', padding: '0 4px', borderRadius: '4px' };
-        if (h === '2' || h.includes('pink')) return { backgroundColor: '#fce7f3', color: '#9d174d', padding: '0 4px', borderRadius: '4px' };
-        if (h === '3' || h.includes('blue')) return { backgroundColor: '#dbeafe', color: '#1e40af', padding: '0 4px', borderRadius: '4px' };
-        return { borderBottom: '2px solid #3b82f6' };
-    };
 
     // --- 4. Mock Users (Can be moved to DB later) ---
     const [mockUsers] = useState<any[]>([
