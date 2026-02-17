@@ -41,6 +41,7 @@ export interface Shop {
         keywords?: string[];
         border?: 'none' | 'color' | 'glow';
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
+        product_type?: string;
     };
     // [Added] Admin/Ad Management
     status?: 'pending' | 'approved' | 'rejected' | 'active' | 'expired';
@@ -58,4 +59,23 @@ export interface Shop {
     // [Added] External Scraping Source Info
     sourceUrl?: string;
     sourceSite?: string;
+    // [Added] Detailed Ad Info
+    user_id?: string;
+    regionCity?: string;
+    regionGu?: string;
+    productType?: string;
+    ad_type?: string;
+    selectedIcon?: string | number;
+    selectedHighlighter?: string | number;
+    paySuffixes?: string[];
+    payStatus?: string;
+    rejection_history?: any[];
+    edit_count?: number;
+    approved_at?: string;
+    created_at?: string;
+    deadline?: string;
+    pay_amount?: number;
+    work_region_sub?: string;
+    category_sub?: string;
+    ad_price?: number;
 }

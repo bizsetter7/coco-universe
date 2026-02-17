@@ -12,6 +12,9 @@ import { CATEGORIES } from '@/constants/community';
 import { NoteService } from '@/lib/noteService';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
+import dynamic from 'next/dynamic';
+
+import { NotificationBell } from './NotificationBell';
 
 interface MainHeaderProps {
     showBackButton?: boolean;
@@ -201,6 +204,9 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 <MessageCircle size={20} />
                                                 {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />}
                                             </button>
+
+                                            {/* [New] Notification Bell */}
+                                            <NotificationBell />
 
                                             {(userRole === 'admin' || isSimulated) && (
                                                 <div

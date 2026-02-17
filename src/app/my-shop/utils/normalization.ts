@@ -76,6 +76,7 @@ export const normalizeAd = (ad: any) => {
         jobContent: getValid(ad.content, opt.content || ad.jobContent, ''),
         deadline: ad.deadline || opt.deadline || '2026-03-25',
         status: ad.status || opt.status || '진행중',
+        rejection_reason: ad.rejection_reason || opt.rejection_reason || '',
 
         // 상품 및 디자인 옵션
         productType: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
@@ -85,7 +86,8 @@ export const normalizeAd = (ad: any) => {
         selectedIcon: opt.icon || ad.icon || null,
         selectedHighlighter: opt.highlighter || ad.selectedHighlighter || ad.highlighter || null,
         borderOption: opt.border || ad.borderOption || ad.border || 'none',
-        paySuffixes: opt.pay_suffixes || ad.paySuffixes || [],
+        // [Critical Fix] Ensure both camelCase and snake_case are handled
+        paySuffixes: opt.pay_suffixes || opt.paySuffixes || ad.pay_suffixes || ad.paySuffixes || [],
 
         // 카운터 (중요 필드) - 월이 바뀌었으면 0으로 리셋하여 반환 (Fallback: updated_at)
         edit_count: (() => {

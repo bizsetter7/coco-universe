@@ -52,13 +52,13 @@ export const TEXT_COLORS = GLOBAL_TEXT_COLORS;
 export const BG_COLORS = GLOBAL_BG_COLORS;
 
 export const DETAILED_PRICING = [
-    { id: 'p1', code: 'T1', tier: '그랜드', eng: '(Grand)', name: '타입1. 그랜드 (Grand)', color: 'text-purple-600', desc: '메인 최상단 노출 및\n압도적 광고 효과', d30: 350000, d60: 630000, d90: 840000, isMain: true },
-    { id: 'p2', code: 'T2', tier: '프리미엄', eng: '(Premium)', name: '타입2. 프리미엄 (Premium)', color: 'text-pink-600', desc: '상단 시선 집중\n높은 효율성 노출', d30: 200000, d60: 360000, d90: 480000, isMain: true },
+    { id: 'p1', code: 'T1', tier: '그랜드', eng: '(Grand)', name: '타입1. 그랜드 (Grand)', color: 'text-amber-600', desc: '메인 최상단 노출 및\n압도적 광고 효과', d30: 350000, d60: 630000, d90: 840000, isMain: true },
+    { id: 'p2', code: 'T2', tier: '프리미엄', eng: '(Premium)', name: '타입2. 프리미엄 (Premium)', color: 'text-red-600', desc: '상단 시선 집중\n높은 효율성 노출', d30: 200000, d60: 360000, d90: 480000, isMain: true },
     { id: 'p3', code: 'T3', tier: '디럭스', eng: '(Deluxe)', name: '타입3. 디럭스 (Deluxe)', color: 'text-blue-600', desc: '타겟 지역 집중\n전략적 배너 노출', d30: 180000, d60: 324000, d90: 432000, isMain: true },
-    { id: 'p4', code: 'T4', tier: '스페셜', eng: '(Special)', name: '타입4. 스페셜 (Special)', color: 'text-teal-600', desc: '가성비 최우선\n실속형 배너 노출', d30: 150000, d60: 270000, d90: 360000, isMain: true },
+    { id: 'p4', code: 'T4', tier: '스페셜', eng: '(Special)', name: '타입4. 스페셜 (Special)', color: 'text-emerald-600', desc: '가성비 최우선\n실속형 배너 노출', d30: 150000, d60: 270000, d90: 360000, isMain: true },
     { id: 'p5', code: 'T5', tier: '급구/추천', eng: '(Urgent/Rec)', name: '타입5. 급구/추천 (Urgent)', color: 'text-orange-600', desc: '급구/추천 배지 노출로\n주목도 실속형', d30: 120000, d60: 216000, d90: 288000, isMain: true },
-    { id: 'p6', code: 'T6', tier: '네이티브', eng: '(Native)', name: '타입6. 네이티브 (Native)', color: 'text-gray-600', desc: '리스트 광고에 배치\n랜덤 상단노출효과', d30: 100000, d60: 180000, d90: 240000, isMain: true },
-    { id: 'p7', code: 'T7', tier: '베이직', eng: '(Basic)', name: '타입7. 베이직/줄광고', color: 'text-gray-400', desc: '최신 구인정보 리스트\n(실속형 구인 상품)', d30: 60000, d60: 100000, d90: 140000, isMain: true },
+    { id: 'p6', code: 'T6', tier: '네이티브', eng: '(Native)', name: '타입6. 네이티브 (Native)', color: 'text-slate-600', desc: '리스트 광고에 배치\n랜덤 상단노출효과', d30: 100000, d60: 180000, d90: 240000, isMain: true },
+    { id: 'p7', code: 'T7', tier: '베이직', eng: '(Basic)', name: '타입7. 베이직/줄광고', color: 'text-slate-400', desc: '최신 구인정보 리스트\n(실속형 구인 상품)', d30: 60000, d60: 100000, d90: 140000, isMain: true },
     { id: 'bold', code: 'Opt', tier: '굵은글씨', eng: '', name: '기타-강조옵션 (Emphasis)', color: 'text-black', desc: '아이콘/형광펜\n테두리/급여추가\n(주목도 200% 상승)', d30: 30000, d60: 55000, d90: 70000, isMain: false },
 ];
 

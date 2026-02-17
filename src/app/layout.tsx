@@ -13,8 +13,8 @@ import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
 
 export const metadata: Metadata = {
-  title: "코코알바(COCOALBA) - 최고의 고소득 여성알바 매칭 (여우알바, 퀸알바 공식 제휴)",
-  description: "대한민국 1등 고소득 알바 플랫폼 코코알바. 여우알바, 퀸알바, 밤알바 구직 정보를 실시간으로 확인하세요. 가장 안전하고 빠른 매칭을 약속드립니다.",
+  title: "코코알바(COCOALBA) - No.1 고소득 여성알바 (여우알바, 퀸알바 공식 제휴 사이트)",
+  description: "대한민국 1등 여성 고소득 알바 플랫폼 코코알바. 여우알바, 퀸알바, 밤알바 구직 정보를 실시간으로 확인하고 가장 안전하고 빠른 매칭을 경험하세요. 일급 50만 이상, 당일지급 보장!",
   verification: {
     google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
     other: {
@@ -63,6 +63,14 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PTJ9T25K"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         {/* End Google Tag Manager (noscript) */}
 
         {/* Google Tag Manager */}
@@ -82,6 +90,18 @@ export default function RootLayout({
         {/* End Google Tag Manager */}
 
         <script src="https://cdn.portone.io/v2/browser-sdk.js" async></script>
+        {/* Google Tag Manager - PTJ9T25K */}
+        <Script
+          id="gtm-script-2"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-PTJ9T25K');`
+          }}
+        />
         <SEOManager />
         <SEOInjection />
         <BrandProvider>

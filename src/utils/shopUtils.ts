@@ -21,3 +21,15 @@ export const getIconById = (id?: number | string | null) => {
     if (!id) return null;
     return ICONS.find(icon => String(icon.id) === String(id)) || null;
 };
+/**
+ * 🔗 URL Slug 생성 유틸리티
+ * 지역명 등을 URL에 안전한 형태로 변환합니다.
+ */
+export const slugify = (str: string): string => {
+    if (!str) return 'all';
+    return str
+        .replace(/[\[\]\>\<\(\)\{\}]/g, '') // 특수문자 제거
+        .replace(/[\s\/]+/g, '-')           // 공백 및 슬래시를 하이픈으로 변경
+        .replace(/-+/g, '-')                // 중복 하이픈 제거
+        .trim();
+};

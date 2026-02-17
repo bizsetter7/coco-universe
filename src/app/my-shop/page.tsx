@@ -16,7 +16,7 @@ import BusinessDashboard from './components/dashboard/BusinessDashboard';
 import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
-import { normalizeAd, normalizePayment } from './utils/normalization';
+import { normalizeAd, normalizePayment } from './utils';
 
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
@@ -29,7 +29,6 @@ import { BusinessSidebar } from './components/BusinessSidebar';
 import { MemberInfoForm } from './components/MemberInfoForm';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
-import { StandardsGuardView } from './components/StandardsGuardView';
 
 // Simple Error Boundary for debugging
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -93,6 +92,7 @@ function MyShopContent() {
     const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | 'guest' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
     const [editingAdId, setEditingAdId] = useState<any | null>(null);
+    const editingAdIdRef = React.useRef<string | null>(null); // [Ref Fix] Synchronous ID storage
     const [isSaving, setIsSaving] = useState(false);
     const isJustSaved = React.useRef(false); // [Ref] Prevent "ZOMBIE" data overwriting immediately after save
 
@@ -206,25 +206,26 @@ function MyShopContent() {
         return () => window.removeEventListener('resume-updated', handleUpdate);
     }, [authUser?.id]);
 
-    const setView = (newView: any) => {
-        if (newView === view) return;
+    const setView = (newView: any, adId?: string) => {
+        const viewId = typeof newView === 'object' ? newView.id : newView;
+        if (viewId === view && !adId) return;
 
-        // [Critical Fix] If newView is an object (contains data context like resume edit),
-        // we must set internal state DIRECTLY before router.replace.
-        // router.replace only updates the URL (string), which would lose the object data.
-        if (typeof newView === 'object') {
-            _setView(newView);
-        }
+        // [Critical Sync] Update state IMMEDIATELY for snappy UI response
+        _setView(newView);
+
 
         const params = new URLSearchParams(searchParams.toString());
-        const viewId = typeof newView === 'object' ? newView.id : newView;
         params.set('view', viewId);
-        if (viewId === 'dashboard') {
+
+        // Preserve or set ID if provided or moving to form in edit mode
+        if (adId) {
+            params.set('id', adId);
+        } else if (viewId === 'dashboard') {
             params.delete('id');
             setLastLoadedId(null);
         }
+
         router.replace(`?${params.toString()}`, { scroll: false });
-        // [Scroll Fix] Force scroll to top on view change
         window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
@@ -269,10 +270,11 @@ function MyShopContent() {
 
         // [Critical Fix] If view is an object (contains edit data), don't overwrite it
         // with a simple string from the URL if the IDs already match.
+        // [Sync Optimization] Only sync from URL if it's a fresh navigation.
         if (viewParam !== currentViewId) {
             _setView(viewParam);
         }
-    }, [searchParams, view]);
+    }, [searchParams]); // Remove 'view' from dependencies to prevent race condition revert
 
     useEffect(() => {
         const handleToggle = () => setShowMobileMenu(true);
@@ -328,7 +330,12 @@ function MyShopContent() {
                 paySuffixes: formState.paySuffixes,
                 messengers: formState.messengers,
                 keywords: formState.selectedKeywords
-            }
+            },
+            // [Fix] Add flattened fields for AdDetailModal compatibility
+            selectedIcon: formState.selectedIcon,
+            selectedHighlighter: formState.selectedHighlighter,
+            borderOption: formState.borderOption,
+            paySuffixes: formState.paySuffixes
         };
         setSelectedAdForModal(newAd);
     };
@@ -494,7 +501,12 @@ function MyShopContent() {
                 manager_phone: formState.managerPhone,
                 edit_count: editCount,
                 last_edit_month: currentMonth,
+                // [Critical Fix] Sync BOTH fields to ensure persistence if 'ad_price' column is missing
+                ad_price: formState.totalAmount,
+                price: formState.totalAmount, // Legacy compatibility
                 updated_at: new Date().toISOString(),
+                // [Rule] Editing an ad requires re-approval -> Reset status to 'pending'
+                status: 'pending',
 
                 // [Snapshot Bucket] - UI용 전체 데이터 보관
                 options: {
@@ -526,7 +538,9 @@ function MyShopContent() {
                     highlighter_period: formState.highlighterPeriod,
                     border: formState.borderOption,
                     border_period: formState.borderPeriod,
-                    pay_suffixes: formState.paySuffixes
+                    pay_suffixes: formState.paySuffixes,
+                    // [Critical Fix] Store ad_price in options JSON since root columns are missing
+                    ad_price: formState.totalAmount
                 }
             };
 
@@ -538,8 +552,11 @@ function MyShopContent() {
             if (editingAdId) {
                 if (!isTargetMock) {
                     // [Critical Fix] Real DB Ad Update
+                    // Remove 'ad_price' AND 'price' from DB payload as columns may not exist
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { ad_price, price, ...dbAdData } = adData;
                     const { data, error } = await supabase.from('shops')
-                        .update(adData)
+                        .update(dbAdData)
                         .eq('id', String(editingAdId))
                         .select()
                         .single();
@@ -566,7 +583,10 @@ function MyShopContent() {
                 ));
             } else {
                 if (!isTargetMock) {
-                    const { data, error } = await supabase.from('shops').insert([adData]).select().single();
+                    // Remove 'ad_price' AND 'price' from DB payload
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { ad_price, price, ...dbAdData } = adData;
+                    const { data, error } = await supabase.from('shops').insert([dbAdData]).select().single();
                     if (error) throw new Error(`DB 삽입 실패: ${error.message}`);
                     newShopId = data.id;
                     // [Added] Insert into local state with normalization
@@ -586,6 +606,7 @@ function MyShopContent() {
                     user_id: isTargetMock ? null : authUser.id,
                     shop_id: newShopId,
                     amount: formState.totalAmount,
+                    type: formState.selectedAdProduct, // [Fix] Save product type (p1, p2...) to allow proper Badge display
                     method: 'bank_transfer',
                     status: 'pending',
                     description: `[${formState.selectedAdProduct}] ${formState.shopName} 공고 결제`,
@@ -601,7 +622,10 @@ function MyShopContent() {
                 };
                 if (!isTargetMock) {
                     const { error } = await supabase.from('payments').insert([paymentData]);
-                    if (error) console.error("Payment log failed", error);
+                    if (error) {
+                        console.error("Payment log failed", error);
+                        alert(`결제 내역 생성 실패: ${error.message}`);
+                    }
                 }
                 const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
                 localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
@@ -618,14 +642,15 @@ function MyShopContent() {
             setTimeout(() => { isJustSaved.current = false; }, 10000);
 
             // [Fix] Force hard redirect (AFTER cleanup to avoid confirm dialog)
-            window.location.href = '/my-shop?view=dashboard';
+            // [Fix] Use setView for SPA navigation to prevent browser confirm dialog
+            setView('dashboard');
         } catch (err: any) { alert(`오류: ${err.message}`); }
         finally { setIsSaving(false); }
     };
 
     const handleBack = () => {
         formState.resetAdStates();
-        window.location.href = '/my-shop?view=dashboard';
+        setView('dashboard');
     };
 
     // [Feature] Real-time Sync Payment History with Latest Ad Data
@@ -676,10 +701,15 @@ function MyShopContent() {
                         if (isNewEntry) {
                             formState.resetAdStates();
                             setView('form');
-                            window.scrollTo({ top: 0, behavior: 'instant' });
-                        } else if (editingAdId) {
-                            router.push(`?view=form&id=${editingAdId}`, { scroll: false });
-                            window.scrollTo({ top: 0, behavior: 'instant' });
+                        } else {
+                            // [Critical Fix] Read from Ref to guarantee we have the ID regardless of render cycle
+                            const targetId = editingAdIdRef.current;
+                            if (targetId) {
+                                setView('form', targetId);
+                            } else {
+                                // Fallback
+                                setView('form');
+                            }
                         }
                         setShowWarningModal(false);
                     }}
@@ -740,16 +770,29 @@ function MyShopContent() {
                                     {view === 'dashboard' && (
                                         <BusinessDashboard
                                             brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
-                                            handleAdClick={(isNew, ad) => { setIsNewEntry(isNew); if (!isNew && ad) { setEditingAdId(ad.id); formState.loadAdData(ad); } else { setEditingAdId(null); formState.resetAdStates(); } setShowWarningModal(true); }}
+                                            handleAdClick={(isNew, ad) => {
+                                                // [Critical Fix] Synchronous State Update Sequence
+                                                setIsNewEntry(isNew);
+                                                if (!isNew && ad) {
+                                                    setEditingAdId(ad.id);
+                                                    editingAdIdRef.current = ad.id; // [Ref Fix] Store immediately
+                                                    formState.loadAdData(ad);
+                                                } else {
+                                                    setEditingAdId(null);
+                                                    editingAdIdRef.current = null;
+                                                    formState.resetAdStates();
+                                                }
+                                                // Open modal immediately, Ref ensures safety
+                                                setShowWarningModal(true);
+                                            }}
                                             setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
                                         />
                                     )}
-                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); formState.loadAdData(ad); setShowWarningModal(true); }} />}
+                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
                                     {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={syncedPaymentHistory} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={registeredAds.filter(ad => ad.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                    {view === 'standards' && <StandardsGuardView ads={registeredAds} payments={syncedPaymentHistory} onOpenMenu={() => setShowMobileMenu(true)} />}
                                 </>
                             )}
                         </div>
