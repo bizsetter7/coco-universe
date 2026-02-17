@@ -58,17 +58,18 @@ export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister,
             <div className={`${gridClass} items-start`}>
                 {shops.slice(0, totalPC).map((shop, idx) => (
                     <div key={shop.id || idx} className={`${idx >= totalMob ? 'hidden md:block' : ''}`}>
-                        <div onClick={() => onSelectShop && onSelectShop(shop)} className="cursor-pointer">
-                            {isHighTier ? (
+                        {isHighTier ? (
+                            <div onClick={() => onSelectShop && onSelectShop(shop)} className="cursor-pointer">
                                 <AdBannerCard shop={shop} />
-                            ) : (
-                                <ShopCard
-                                    shop={shop}
-                                    tierId={tierId}
-                                    tierLabel={tierLabel}
-                                />
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <ShopCard
+                                shop={shop}
+                                tierId={tierId}
+                                tierLabel={tierLabel}
+                                onClick={() => onSelectShop && onSelectShop(shop)}
+                            />
+                        )}
                     </div>
                 ))}
             </div>
