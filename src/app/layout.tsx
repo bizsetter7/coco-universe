@@ -52,8 +52,8 @@ export default function RootLayout({
   const sideAds = [...grandAds, ...premiumAds];
 
   return (
-    <html lang="ko">
-      <body className={inter.className}>
+    <html lang="ko" className="notranslate" translate="no">
+      <body className={`${inter.className} notranslate`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
