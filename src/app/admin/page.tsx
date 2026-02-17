@@ -1153,7 +1153,10 @@ function AdminContent() {
                                         {mockInquiries.map((inquiry) => (
                                             <div
                                                 key={`inq-${inquiry.id}`}
-                                                onClick={() => setSelectedInquiry(inquiry)}
+                                                onClick={() => {
+                                                    setSelectedInquiry(inquiry);
+                                                    setIsMobileInquiryModalOpen(true);
+                                                }}
                                                 className={`p-4 rounded-3xl border transition-all cursor-pointer ${selectedInquiry?.id === inquiry.id ? 'bg-blue-50 border-blue-200 shadow-md ring-1 ring-blue-100' : 'bg-white border-slate-100 hover:bg-slate-50'}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
@@ -1170,7 +1173,10 @@ function AdminContent() {
                                         {allMessages.map((msg) => (
                                             <div
                                                 key={`msg-${msg.id}`}
-                                                onClick={() => setSelectedInquiry({ ...msg, type: 'message' })}
+                                                onClick={() => {
+                                                    setSelectedInquiry({ ...msg, type: 'message' });
+                                                    setIsMobileInquiryModalOpen(true);
+                                                }}
                                                 className="p-4 rounded-3xl border border-slate-100 hover:bg-slate-50 transition-all cursor-pointer"
                                             >
                                                 <div className="flex justify-between items-start mb-2">
@@ -1540,6 +1546,41 @@ function AdminContent() {
                                     >
                                         <XCircle size={18} /> 반려 / 거절
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                {/* Mobile Inquiry Detail Modal (Restore Popup) */}
+                {
+                    selectedInquiry && isMobileInquiryModalOpen && (
+                        <div className="fixed inset-0 z-[10030] flex items-center justify-center p-4 lg:hidden">
+                            <div
+                                className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-300"
+                                onClick={() => setIsMobileInquiryModalOpen(false)}
+                            />
+                            <div className="bg-slate-950 w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl relative z-10 animate-in zoom-in-95 duration-300 border border-slate-800 flex flex-col">
+                                <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 shrink-0">
+                                    <h3 className="text-white font-black">1:1 문의 상세</h3>
+                                    <button onClick={() => setIsMobileInquiryModalOpen(false)} className="p-2 text-slate-500 hover:text-white transition">
+                                        <XCircle size={24} />
+                                    </button>
+                                </div>
+                                <div className="p-8 flex flex-col items-center justify-center text-center overflow-y-auto">
+                                    <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-6 text-3xl">
+                                        💬
+                                    </div>
+                                    <h3 className="text-2xl font-black text-white mb-2">{selectedInquiry.sender || selectedInquiry.from}</h3>
+                                    <p className="text-slate-400 text-xs font-bold mb-8 uppercase tracking-widest">
+                                        {selectedInquiry.date} · {selectedInquiry.type === 'message' ? 'DIRECT MESSAGE' : 'SYSTEM INQUIRY'}
+                                    </p>
+                                    <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 mb-8 w-full text-left">
+                                        <p className="text-white text-base font-bold leading-relaxed">{selectedInquiry.content}</p>
+                                    </div>
+                                    <div className="flex gap-4 w-full">
+                                        <button className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-blue-900/50">답변하기</button>
+                                        <button onClick={() => setIsMobileInquiryModalOpen(false)} className="px-6 py-4 bg-slate-800 text-slate-400 rounded-2xl font-black text-sm">닫기</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
