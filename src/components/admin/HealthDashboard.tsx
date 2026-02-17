@@ -143,39 +143,44 @@ export const HealthDashboard = () => {
                     </div>
                 ))}
 
+                {/* [AI Insight] 사용자 지시: standards 카드 바로 옆 빈 공간(Captured Spot)에 배치 */}
+                {!loading && status && (
+                    <div className="p-6 rounded-3xl border border-slate-100 bg-white transition-all hover:shadow-xl hover:shadow-slate-200/50 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-black text-[10px]">
+                                    AI
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-black text-slate-950 tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">AI 시스템 분석 및 가이드</h3>
+                                    <p className="text-[9px] text-slate-400 font-bold">시스템 유지보수 포인트 분석 완료</p>
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-black text-blue-500 bg-white px-1.5 py-0.5 rounded border border-blue-100">TIP</span>
+                                        <span className="text-[11px] font-bold text-slate-700">포트원 성인인증 연동 오류 해결 가이드</span>
+                                    </div>
+                                    <RefreshCw size={12} className="text-slate-300 group-hover:text-blue-500 transition-all" />
+                                </div>
+                                <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-black text-emerald-500 bg-white px-1.5 py-0.5 rounded border border-emerald-100">SAFE</span>
+                                        <span className="text-[11px] font-bold text-slate-700">Supabase RLS 보안 정책 가이드</span>
+                                    </div>
+                                    <RefreshCw size={12} className="text-slate-300 group-hover:text-blue-500 transition-all" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {loading && !status && [1, 2, 3, 4].map(i => (
                     <div key={i} className="h-40 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse" />
                 ))}
             </div>
 
-            {/* AI Assistant Insight (System Knowledge) */}
-            <div className="p-6 md:p-8 bg-white border border-slate-100 rounded-[32px] md:rounded-[40px] shadow-sm">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
-                        <Search size={18} />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-black text-slate-950 tracking-tighter">AI 시스템 분석 및 가이드</h3>
-                        <p className="text-[10px] text-slate-400 font-bold">인공지능이 제안하는 시스템 유지보수 포인트</p>
-                    </div>
-                </div>
-                <div className="space-y-3">
-                    <div className="p-4 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
-                        <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black text-blue-500 bg-white px-2 py-1 rounded border border-blue-100">TIP</span>
-                            <span className="text-xs font-bold text-slate-700">포트원 성인인증 연동 시 '인증 실패' 오류 해결 방법</span>
-                        </div>
-                        <RefreshCw size={14} className="text-slate-300 group-hover:text-blue-500 transition-all" />
-                    </div>
-                    <div className="p-4 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
-                        <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black text-emerald-500 bg-white px-2 py-1 rounded border border-emerald-100">SAFE</span>
-                            <span className="text-xs font-bold text-slate-700">Supabase RLS 정책 설정 가이드 (회원 데이터 완벽 보호)</span>
-                        </div>
-                        <RefreshCw size={14} className="text-slate-300 group-hover:text-blue-500 transition-all" />
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
