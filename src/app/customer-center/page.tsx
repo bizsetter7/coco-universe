@@ -43,7 +43,8 @@ import {
     ShieldCheck,
     PenBox,
     List,
-    Paperclip
+    Paperclip,
+    Lock
 } from 'lucide-react';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
@@ -2076,7 +2077,7 @@ export function CustomerCenterContent() {
 
                                                             setIsInquirySubmitting(true);
                                                             try {
-                                                                let fileUrls: string[] = [];
+                                                                const fileUrls: string[] = [];
                                                                 const fileInputIds = ['inquiry_file_1', 'inquiry_file_2', 'inquiry_file_3'];
 
                                                                 for (const id of fileInputIds) {

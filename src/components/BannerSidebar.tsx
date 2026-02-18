@@ -93,13 +93,11 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const isVisible = useBannerControl(); // Global + Manual Control
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
 
-    // [Optimization] Valid Return for Mobile after hooks are called
-    if (isMobile) return null;
-
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';
 
-    const allShops = shops || [];
+    // [Optimization] wrap external props to avoid dependency warnings
+    const allShops = useMemo(() => shops || [], [shops]);
 
     const grandAds = useMemo(() => {
         if (isMobile) return [];
@@ -114,6 +112,9 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
         if (isLeft) return pr.slice(0, 2);
         return pr.slice(2, 4);
     }, [allShops, isLeft, isMobile]);
+
+    // [Optimization] Valid Return for Mobile after hooks are called
+    if (isMobile) return null;
 
     if (!isVisible && !selectedAd) return null;
 

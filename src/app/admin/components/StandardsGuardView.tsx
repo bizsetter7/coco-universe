@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, Server, Zap, CreditCard, Layout, HardDrive, Palette, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, Server, Zap, CreditCard, Layout, Palette, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import {
     AD_TIER_STANDARDS,
     PAY_BADGE_STANDARDS,
@@ -11,13 +11,14 @@ import {
 } from '@/constants/standards';
 
 export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpenMenu }: { ads?: any[], payments?: any[], onOpenMenu?: () => void }) => {
+    // Audit function is memoized to satisfy hooks dependency
     const [health, setHealth] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [auditResults, setAuditResults] = useState<any[]>([]);
     const [openSection, setOpenSection] = useState<string | null>(null);
 
-    const runAudit = () => {
+    const runAudit = React.useCallback(() => {
         const violations: any[] = [];
 
         // 1. Payment History Audit (Refined for V4 Schema)
@@ -123,9 +124,9 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
         });
 
         setAuditResults(violations);
-    };
+    }, [ads, payments]);
 
-    const fetchHealth = async () => {
+    const fetchHealth = React.useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -134,20 +135,21 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
             const data = res.ok ? await res.json() : { status: 'unstable' };
             setHealth(data);
         } catch (err: any) {
+            console.error('Health fetch error:', err);
             setHealth({ status: 'offline' });
         } finally {
             runAudit();
             setLoading(false);
         }
-    };
+    }, [runAudit]);
 
     useEffect(() => {
         fetchHealth();
-    }, []);
+    }, [fetchHealth]);
 
     useEffect(() => {
         runAudit();
-    }, [ads, payments]);
+    }, [ads, payments, runAudit]);
 
     const StatusIcon = ({ status }: { status: string }) => {
         if (status === 'healthy') return <CheckCircle2 className="text-emerald-500" size={18} />;
