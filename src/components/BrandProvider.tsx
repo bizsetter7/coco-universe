@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { BrandConfig, BRANDS, DEFAULT_BRAND } from '@/lib/brand-config';
 import { useSearchParams, usePathname } from 'next/navigation';
+import ReactQueryProvider from './common/ReactQueryProvider';
+import { Toaster } from 'react-hot-toast';
 
 const BrandContext = createContext<BrandConfig>(DEFAULT_BRAND);
 
@@ -55,16 +57,19 @@ export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <BrandContext.Provider value={brand}>
-            <React.Suspense fallback={null}>
-                <BrandSync setBrand={setBrand} />
-            </React.Suspense>
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                :root {
-                    --brand-primary: ${brand.primaryColor};
-                }
-            ` }} />
-            {children}
+            <ReactQueryProvider>
+                <React.Suspense fallback={null}>
+                    <BrandSync setBrand={setBrand} />
+                </React.Suspense>
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    :root {
+                        --brand-primary: ${brand.primaryColor};
+                    }
+                ` }} />
+                {children}
+                <Toaster position="top-center" />
+            </ReactQueryProvider>
         </BrandContext.Provider>
     );
 };
