@@ -22,7 +22,15 @@ interface JobDetailModalProps {
 }
 
 // [Optimization] Detached Content for SEO & Portal usage
-export const JobDetailContent = ({ shop, publisherAddress }: { shop: Shop, publisherAddress?: string | null }) => {
+interface JobDetailContentProps {
+    shop: Shop;
+    publisherAddress?: string | null;
+    onClose: () => void;
+    isFavorite: boolean;
+    onToggleFavorite: (e: React.MouseEvent) => void;
+}
+
+export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, onToggleFavorite }: JobDetailContentProps) => {
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
@@ -43,20 +51,51 @@ export const JobDetailContent = ({ shop, publisherAddress }: { shop: Shop, publi
     const themeConfig = getHeaderTheme(tierStandard.id);
     const headerBg = themeConfig.bg;
 
+    const borderOpt = shop.options?.border || (shop as any).borderOption;
+    const getBorderClass = (opt: string) => {
+        switch (opt) {
+            case 'color': return 'border-4 border-pink-500';
+            case 'glow': return 'border-4 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.4)]';
+            case 'sparkle': return 'border-4 border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse';
+            case 'rainbow': return 'animate-rainbow-border shadow-2xl';
+            default: return '';
+        }
+    };
+
     return (
         <div
-            className="
+            className={`
                 bg-white shadow-2xl overflow-hidden flex flex-col
                 fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
                 md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
                 transform-gpu will-change-transform backface-hidden 
-            "
+                ${getBorderClass(borderOpt)}
+            `}
             onClick={e => e.stopPropagation()}
         >
             {/* 1. HEADER SECTION */}
             <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-4 shrink-0 shadow-lg`}>
+
+                {/* [Mod Moved] Close Button (Inside Header) */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/30 text-white rounded-full transition-all z-20 backdrop-blur-sm"
+                    aria-label="닫기"
+                >
+                    <X size={20} />
+                </button>
+
+                {/* [Mod Moved] Favorite Button (Inside Header) */}
+                <button
+                    onClick={onToggleFavorite}
+                    className="absolute top-4 left-4 p-2 bg-black/20 hover:bg-black/30 text-white rounded-full transition-all z-20 backdrop-blur-sm group"
+                    aria-label="찜하기"
+                >
+                    <Star size={20} className={isFavorite ? "fill-yellow-400 text-yellow-400" : "text-white group-hover:scale-110 transition-transform"} />
+                </button>
+
                 {/* Region | Industry Badge */}
-                <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
+                <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white mt-2">
                     <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.category || shop.workType || '업종미기재'}
                 </div>
 
@@ -270,23 +309,15 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, i
             className="modal-overlay fixed inset-0 z-[99999] flex items-end md:items-center justify-center bg-black/90 md:bg-black/80 touch-none overscroll-contain"
             onClick={onClose}
         >
-            <div className="relative w-full h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
-                {/* Close Button UI in Modal (Outer) */}
-                <div className="absolute top-5 right-6 flex items-center gap-2 z-[100000]">
-                    <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
-                        <X size={24} className="text-white" />
-                    </button>
-                </div>
-
-                {/* Favorite Button UI in Modal (Outer) */}
-                <button
-                    onClick={onToggleFavorite}
-                    className="absolute top-5 left-6 p-2 rounded-full transition-all bg-black/20 text-white hover:bg-white/20 z-[100000] group"
-                >
-                    <Star size={20} className={isFavorite ? "fill-yellow-400 text-yellow-400" : "group-hover:fill-yellow-200"} />
-                </button>
-
-                <JobDetailContent shop={shop} publisherAddress={publisherAddress} />
+            <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={onClose}>
+                {/* [Mod] Buttons moved inside Content */}
+                <JobDetailContent
+                    shop={shop}
+                    publisherAddress={publisherAddress}
+                    onClose={onClose}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={onToggleFavorite}
+                />
             </div>
         </div>,
         document.body

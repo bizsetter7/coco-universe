@@ -29,9 +29,9 @@ export const AdBannerCard = React.memo(({ shop }: AdBannerCardProps) => {
 
     return (
         <div className={`
-            group relative flex flex-col rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200
+            h-full flex flex-col group relative rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200
             ${!isMobile ? 'hover:scale-[1.02] active:scale-95' : 'active:scale-95'} 
-            bg-white overflow-hidden h-full border border-gray-200 shadow-md shadow-gray-200/50 pb-2
+            bg-white overflow-hidden border border-gray-200 shadow-md shadow-gray-200/50 pb-2
         `}>
 
             {/* NEW 배지 - 바깥 테두리 안쪽 상단 좌측 */}
@@ -44,20 +44,30 @@ export const AdBannerCard = React.memo(({ shop }: AdBannerCardProps) => {
             )}
 
             {/* 1. 상단: 이미지 (꽉 채움, 하단 각진 모서리) */}
-            <div className={`relative w-full aspect-[4/3] bg-gray-50 border-b border-gray-100`}>
-                <img
-                    src={mediaUrl}
-                    alt=""
-                    onError={() => setImgError(true)}
-                    loading="lazy"
-                    className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile ? 'group-hover:scale-110' : ''}`}
-                />
-                {/* 투명도 조절 오버레이 */}
-                <div className={`absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/40 to-transparent z-10`} />
+            <div className={`relative w-full aspect-[4/3] bg-gray-50 border-b border-gray-100 overflow-hidden`}>
+                {!imgError ? (
+                    <>
+                        <img
+                            src={mediaUrl}
+                            alt=""
+                            onError={() => setImgError(true)}
+                            loading="lazy"
+                            className={`w-full h-full object-cover transition-transform duration-700 ${!isMobile ? 'group-hover:scale-110' : ''}`}
+                        />
+                        {/* 투명도 조절 오버레이 */}
+                        <div className={`absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/40 to-transparent z-10`} />
+                    </>
+                ) : (
+                    // [Fix] 이미지 로드 실패/누락 시 Fallback UI (텍스트 모드 느낌의 깔끔한 배경)
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-400 p-4 text-center">
+                        <span className="text-3xl mb-1">🏰</span>
+                        <span className="text-xs font-bold text-slate-500">{shop.workType || '채용 공고'}</span>
+                    </div>
+                )}
             </div>
 
             {/* 내부 컨텐츠 영역 */}
-            <div className="px-2 pt-1.5 flex flex-col gap-1 overflow-hidden font-medium">
+            <div className="px-2 pt-1.5 flex flex-col gap-1 overflow-hidden font-medium flex-1">
 
                 {/* 2. 좌측: 지역-상세 / 우측: 업종-상세 */}
                 <div className="flex justify-between items-baseline gap-2 pb-0.5">

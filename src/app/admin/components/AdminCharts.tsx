@@ -32,7 +32,7 @@ interface AdminChartsProps {
     adStats?: any[];
 }
 
-export default function AdminCharts({ userStats: _userStats = [], adStats: _adStats = [] }: AdminChartsProps) {
+export default function AdminCharts({ }: AdminChartsProps) {
     // 1. User Growth Data (Last 7 Days)
     const userLabels = ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '어제', '오늘'];
     const userData = {

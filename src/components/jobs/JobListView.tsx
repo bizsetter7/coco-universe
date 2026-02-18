@@ -5,10 +5,7 @@ import { Star, Flame, PlusCircle, Megaphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { Shop } from '@/types/shop';
-import { ICONS } from '@/constants/job-options';
 import { formatKoreanMoney } from '@/utils/formatMoney';
-import { getPayColor } from '@/utils/payColors';
-import { formatDate } from '@/utils/dateUtils';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
@@ -191,7 +188,6 @@ const MobileJobRow = React.memo(({
     onToggleFav: (e: React.MouseEvent, id: string) => void
 }) => {
     const { badgeLabel, badgeColor, amount } = getPayBadgeInfo(shop);
-    const tierInfo = getTierBadge(shop.tier);
 
     return (
         <div

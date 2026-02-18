@@ -134,6 +134,7 @@ export default function JobClient({ shops }: JobClientProps) {
                                 shops={shops}
                                 onAdRegister={openPaymentPopup}
                                 onSelectShop={setSelectedShop}
+                                hasSidebar={true}
                             />
                         }
 

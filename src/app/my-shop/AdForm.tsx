@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import { MessageCircle, PenBox } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Step1BasicInfo } from './components/form/steps/Step1BasicInfo';
 import { Step2JobDetail } from './components/form/steps/Step2JobDetail';
 import { Step3ProductSelect } from './components/form/steps/Step3ProductSelect';

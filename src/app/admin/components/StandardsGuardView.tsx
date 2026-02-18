@@ -10,7 +10,9 @@ import {
     DATA_MAPPING_STANDARDS
 } from '@/constants/standards';
 
-export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpenMenu }: { ads?: any[], payments?: any[], onOpenMenu?: () => void }) => {
+const EMPTY_ARRAY: any[] = [];
+
+export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }: { ads?: any[], payments?: any[] }) => {
     // Audit function is memoized to satisfy hooks dependency
     const [health, setHealth] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -151,11 +153,6 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
         runAudit();
     }, [ads, payments, runAudit]);
 
-    const StatusIcon = ({ status }: { status: string }) => {
-        if (status === 'healthy') return <CheckCircle2 className="text-emerald-500" size={18} />;
-        if (status === 'warning') return <AlertCircle className="text-amber-500" size={18} />;
-        return <AlertCircle className="text-rose-500" size={18} />;
-    };
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -794,6 +791,76 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
                                             <span>Nickname</span>
                                         </div>
                                         <div className="font-bold text-slate-700">3. [PayBadge] + Amount + Options</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 9. Responsive & Fallback Logic (New) */}
+                        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 space-y-6">
+                            <h3 className="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-teal-500 rounded-full"></span>
+                                반응형 레이아웃 및 리소스 방어 로직 (Responsive & Fallback)
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* 9.1 Sidebar Grid Adaptation */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-teal-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Sidebar Grid Adaptation</h4>
+                                    </div>
+                                    <div className="bg-teal-50 rounded-xl p-4 border border-teal-100 space-y-2">
+                                        <div className="flex justify-between text-[11px] items-center">
+                                            <span className="text-slate-500 font-bold">Standard Page (No Sidebar)</span>
+                                            <span className="bg-white px-2 py-1 rounded text-teal-600 font-mono font-bold border border-teal-200">Col-6 (PC)</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px] items-center">
+                                            <span className="text-slate-500 font-bold">Sidebar Page (Job/Region)</span>
+                                            <span className="bg-white px-2 py-1 rounded text-teal-600 font-mono font-bold border border-teal-200">Col-4 (PC)</span>
+                                        </div>
+                                        <div className="text-[10px] text-teal-600 font-bold mt-2 pt-2 border-t border-teal-200/50">
+                                            * `hasSidebar` prop controls `AdSection` grid columns automatically.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 9.2 Image Resource Defense */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Image Resource Defense (Fallback)</h4>
+                                    </div>
+                                    <div className="bg-rose-50 rounded-xl p-4 border border-rose-100 space-y-2">
+                                        <div className="flex justify-between text-[11px] items-center">
+                                            <span className="text-slate-500 font-bold">Image Load Error</span>
+                                            <span className="font-bold text-rose-500">Trigger `onError`</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px] items-center">
+                                            <span className="text-slate-500 font-bold">Fallback UI</span>
+                                            <span className="font-bold text-slate-700">[Icon] + [WorkType]</span>
+                                        </div>
+                                        <div className="text-[10px] text-rose-600 font-bold mt-2 pt-2 border-t border-rose-200/50">
+                                            * Prevents broken image icons. Maintains layout integrity (4:3 aspect ratio).
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 9.3 Layout Integrity */}
+                                <div className="space-y-3 md:col-span-2">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-indigo-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Visual Integrity Standards</h4>
+                                    </div>
+                                    <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="text-[11px] space-y-1">
+                                            <strong className="block text-indigo-700 mb-1">Height Synchronization</strong>
+                                            <p className="text-slate-600">All cards in a row must share equal height (`h-full` + `flex-1`).</p>
+                                        </div>
+                                        <div className="text-[11px] space-y-1">
+                                            <strong className="block text-indigo-700 mb-1">Text Alignment</strong>
+                                            <p className="text-slate-600">Row content uses `justify-between` to prevent squashing.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

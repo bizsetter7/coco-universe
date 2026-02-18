@@ -247,7 +247,14 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         }}
                                         className={`flex flex-col items-center justify-center py-2 md:py-3 rounded-lg transition-all border-2 ${selectedIcon === item.id ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
                                     >
-                                        <span className="text-lg md:text-2xl mb-1">{item.icon}</span>
+                                        {/* [New] Custom Badge for 'NEW' in Selection List */}
+                                        {item.icon === 'NEW' ? (
+                                            <span className="inline-flex items-center justify-center px-1.5 h-[18px] bg-red-600 text-white text-[9px] font-black rounded-[6px] tracking-tighter shrink-0 align-middle shadow-sm animate-seesaw mb-1">
+                                                NEW
+                                            </span>
+                                        ) : (
+                                            <span className="text-lg md:text-2xl mb-1 animate-seesaw inline-block origin-bottom">{item.icon}</span>
+                                        )}
                                         <span className={`text-[8px] md:text-[11px] font-black ${selectedIcon === item.id ? 'text-pink-600' : 'text-gray-400'}`}>{item.name}</span>
                                     </button>
                                 ))}
@@ -288,7 +295,11 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                     >
                                         <span
                                             className="w-full py-1 rounded text-[9px] md:text-[12px] font-black"
-                                            style={{ backgroundColor: item.color, color: '#333' }}
+                                            style={item.color === 'rainbow' ? {
+                                                background: 'linear-gradient(to right, #ef5350, #f48fb1, #7e57c2, #2196f3, #26c6da, #43a047, #eeff41, #f9a825, #ff5722)',
+                                                color: 'white',
+                                                textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                                            } : { backgroundColor: item.color, color: '#333' }}
                                         >
                                             {item.name}
                                         </span>
@@ -306,7 +317,10 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Radio size={18} /></div>
                                 <div>
-                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">테두리 효과</h3>
+                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">
+                                        테두리 효과
+                                        <span className="text-[10px] md:text-[11px] text-blue-500 font-bold ml-2">(프리미엄 미리보기 참고)</span>
+                                    </h3>
                                     <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">테두리/특수효과로 나만의 광고를 돋보이세요!</p>
                                 </div>
                             </div>
@@ -322,11 +336,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                     <h3 className="text-[13px] md:text-[16px] font-black mb-3 text-gray-700">
                                         테두리/특수효과 선택
                                     </h3>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-2 gap-2">
                                         {[
                                             { id: 'color', label: '컬러 테두리' },
                                             { id: 'glow', label: 'Glow 효과' },
-                                            { id: 'sparkle', label: '반짝이 효과' }
+                                            { id: 'sparkle', label: '반짝이 효과' },
+                                            { id: 'rainbow', label: '무지개 효과' }
                                         ].map(opt => (
                                             <button
                                                 key={opt.id}
@@ -353,10 +368,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
                                         : borderOption === 'sparkle'
                                             ? 'border-yellow-400 border-4 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse'
-                                            : 'border-gray-200 border-dashed'
+                                            : borderOption === 'rainbow'
+                                                ? 'animate-rainbow-border shadow-lg'
+                                                : 'border-gray-200 border-dashed'
                                     }`}>
                                     <div className="text-center group">
-                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : 'text-pink-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />
+                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : borderOption === 'rainbow' ? 'text-purple-500' : 'text-pink-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />
                                         <span className={`text-[11px] md:text-[13px] font-black transition-colors ${borderOption !== 'none' ? 'text-gray-900' : 'text-gray-400'}`}>실제 노출 효과 예시</span>
                                     </div>
                                 </div>

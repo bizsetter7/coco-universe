@@ -11,7 +11,7 @@ import { getPayColor } from '@/utils/payColors';
 import JobDetailModal from './jobs/JobDetailModal';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
-const SideAdCard = React.memo(({ ad, isGrand, onSelect }: { ad: Shop, isGrand: boolean, onSelect: (shop: Shop) => void }) => {
+const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
     // 1. Image handling
     const hasMedia = !!ad.options?.mediaUrl;
     const [imgError, setImgError] = useState(false);
@@ -142,10 +142,10 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
                         <div className="flex flex-col gap-1 px-1">
                             {grandAds.map((ad) => (
-                                <SideAdCard key={ad.id} ad={ad} isGrand={true} onSelect={setSelectedAd} />
+                                <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
                             ))}
                             {premiumAds.map((ad) => (
-                                <SideAdCard key={ad.id} ad={ad} isGrand={false} onSelect={setSelectedAd} />
+                                <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
                             ))}
                         </div>
                     </div>

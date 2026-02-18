@@ -121,6 +121,7 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                                 shops={shops}
                                 onAdRegister={openPaymentPopup}
                                 onSelectShop={setSelectedShop as any}
+                                hasSidebar={true}
                             />
                         }
 

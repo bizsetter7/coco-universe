@@ -11,9 +11,10 @@ interface UnifiedAdGridProps {
     isLoading?: boolean;
     onAdRegister: (tier: string) => void;
     onSelectShop: (shop: Shop) => void;
+    hasSidebar?: boolean;
 }
 
-export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: UnifiedAdGridProps) => {
+export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, hasSidebar }: UnifiedAdGridProps) => {
 
     if (isLoading || !shops) {
         return (
@@ -43,6 +44,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: 
                 rowCountPC={3}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
+                hasSidebar={hasSidebar}
             />
 
             {/* 2. Premium */}
@@ -54,6 +56,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: 
                 rowCountPC={3}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
+                hasSidebar={hasSidebar}
             />
 
             {/* 3. Deluxe */}
@@ -65,6 +68,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: 
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
+                hasSidebar={hasSidebar}
             />
 
             {/* 4. Special */}
@@ -76,6 +80,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: 
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
+                hasSidebar={hasSidebar}
             />
 
             {/* 5. Urgent */}
@@ -87,6 +92,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop }: 
                 rowCountPC={2}
                 onAdRegister={onAdRegister}
                 onSelectShop={onSelectShop}
+                hasSidebar={hasSidebar}
             />
         </div>
     );

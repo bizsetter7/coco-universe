@@ -50,8 +50,18 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
         return type?.[0] || '급';
     };
 
+    const getBorderClass = (opt: string) => {
+        switch (opt) {
+            case 'color': return 'border-4 border-pink-500';
+            case 'glow': return 'border-4 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.6)]';
+            case 'sparkle': return 'border-4 border-yellow-400 shadow-[0_0_35px_rgba(250,204,21,0.8)] animate-pulse';
+            case 'rainbow': return 'animate-rainbow-border shadow-lg';
+            default: return 'border border-gray-200';
+        }
+    };
+
     return (
-        <div className="flex flex-col h-full bg-white rounded-[32px] overflow-hidden border border-gray-200 shadow-sm">
+        <div className={`flex flex-col h-full bg-white rounded-[32px] overflow-hidden shadow-sm ${getBorderClass(formData.borderOption)}`}>
             {/* Header (Capture 3 style) */}
             <div className={`relative px-6 py-5 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 md:gap-4 shrink-0 shadow-lg`}>
                 <div className="absolute top-0 left-0 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg z-10">

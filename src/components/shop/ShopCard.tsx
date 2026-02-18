@@ -13,10 +13,11 @@ interface ShopCardProps {
     tierLabel?: string;
     tierId?: string;
     onClick?: (e: React.MouseEvent) => void;
+    hideImage?: boolean;
 }
 
 // [Optimization] Memoized ShopCard
-export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: ShopCardProps) => {
+export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hideImage }: ShopCardProps) => {
     const isMobile = useMobile();
     const [imgError, setImgError] = React.useState(false);
 
@@ -26,8 +27,9 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: 
     // 급구/추천 섹션은 이미지를 표시하지 않음 (텍스트 위주)
     const isUrgentType = tierId === 'urgent' || tierId === 'recommended';
 
-    // Deluxe, Special은 이미지를 표시함 (AdBannerCard와 유사한 스타일)
-    const showImage = !isUrgentType;
+    // Deluxe, Special은 이미지를 표시함
+    // 단, hideImage가 true면 강제로 숨김 (AdSection에서 기본 이미지 fallback 방지용)
+    const showImage = !isUrgentType && !hideImage;
 
     // Clean title for display
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
@@ -41,9 +43,9 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: 
                     onClick(e);
                 }
             }}
-            className={`group relative flex flex-col rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200 
+            className={`h-full flex flex-col group relative rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200 
             ${!isMobile ? 'hover:scale-[1.01] active:scale-95' : 'active:scale-95'}
-            !bg-white border border-gray-200 shadow-md shadow-gray-200/50 pb-2 overflow-hidden h-full`}
+            !bg-white border border-gray-200 shadow-md shadow-gray-200/50 pb-2 overflow-hidden`}
         >
             {/* NEW 배지 - 상단 좌측 */}
             {shop.options?.blink && (
@@ -56,29 +58,39 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick }: 
 
             {/* 1. 상단: 이미지 (꽉 채움, 하단 각진 모서리) - 급구 제외 */}
             {showImage && (
-                <div className={`relative w-full aspect-[4/3] bg-gray-50 border-b border-gray-100`}>
-                    <img
-                        src={mediaUrl}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                        onError={() => setImgError(true)}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                <div className={`relative w-full aspect-[4/3] bg-gray-50 border-b border-gray-100 overflow-hidden`}>
+                    {!imgError ? (
+                        <>
+                            <img
+                                src={mediaUrl}
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                                onError={() => setImgError(true)}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
 
-                    {/* Rank Badge (if used) */}
-                    {rank && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-10">
-                            <span className="text-[10px] font-black text-black">{rank}</span>
+                            {/* Rank Badge (if used) */}
+                            {rank && (
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-10">
+                                    <span className="text-[10px] font-black text-black">{rank}</span>
+                                </div>
+                            )}
+
+                            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-40" />
+                        </>
+                    ) : (
+                        // [Fix] 이미지 Fallback (깔끔한 플레이스홀더)
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 p-4">
+                            <span className="text-2xl mb-1">✨</span>
+                            <span className="text-[10px] font-bold text-slate-400">{shop.workType || 'HOT'}</span>
                         </div>
                     )}
-
-                    <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-40" />
                 </div>
             )}
 
             {/* 내부 컨텐츠 영역 */}
-            <div className={`px-2 ${showImage ? 'pt-1.5' : 'pt-3'} flex flex-col gap-1 overflow-hidden font-medium`}>
+            <div className={`px-2 ${showImage ? 'pt-1.5' : 'pt-3'} flex flex-col gap-1 overflow-hidden font-medium flex-1 justify-between`}>
 
                 {/* 2. 지역/업종 표시 영역 (이미지 유무에 따른 분기) */}
                 {!showImage ? (

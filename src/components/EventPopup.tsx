@@ -13,7 +13,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
-    const { isLoggedIn, userType } = useAuth(); // Call useAuth at the top level
+    const { userType } = useAuth(); // Call useAuth at the top level
     const isAdmin = userType === 'admin'; // Define isAdmin here
 
     // 전역 스크롤 관리자 연동
@@ -36,7 +36,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
             setIsOpen(true);
         }
         return () => setMounted(false);
-    }, []);
+    }, [brand.id, isAdmin]);
 
     const closePopup = (hideForToday: boolean) => {
         setIsOpen(false);
