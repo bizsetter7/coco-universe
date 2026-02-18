@@ -41,8 +41,6 @@ import {
     Phone,
     RefreshCw,
     ShieldCheck,
-    Lock,
-    ExternalLink,
     PenBox,
     List,
     Paperclip
@@ -672,7 +670,7 @@ export function CustomerCenterContent() {
     const isDirty = (activeTab === '1 : 1 문의' || activeTab === '1:1문의') && inquiryMode === 'write' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
 
     // Fetch inquiries with search, pagination, and category filter
-    const fetchInquiries = async () => {
+    const fetchInquiries = React.useCallback(async () => {
         setIsSearching(true);
         try {
             // 1. Fetch Inquiries with Advanced Sorting (Notice First -> Grouped by Thread -> Created Order)
@@ -695,31 +693,22 @@ export function CustomerCenterContent() {
                 .order('created_at', { ascending: false })
                 .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
+            if (error) throw error;
+
             // [IMPORTANT] In-memory sorting for reply grouping
             if (data) {
-                // [ADVANCED THREADED SORTING]
-                // We group items by thread (COALESCE(parent_id, id))
-                // Threads are sorted by the Parent's original created_at (DESC)
-                // Within a thread, Parent comes first, then Replies (ASC by creation)
                 const sortedData = [...data].sort((a, b) => {
                     const aThreadId = a.parent_id || a.id;
                     const bThreadId = b.parent_id || b.id;
 
                     if (aThreadId !== bThreadId) {
-                        // To sort threads correctly, we need the parent's creation date.
-                        // Since we have all items in memory (18 items total), we can find them.
                         const aParent = data.find(item => item.id === aThreadId) || a;
                         const bParent = data.find(item => item.id === bThreadId) || b;
-
                         return new Date(bParent.created_at).getTime() - new Date(aParent.created_at).getTime();
                     }
 
-                    // Same Thread: Question (parent) must be above Reply (child)
-                    // If a.parent_id is null, it's the parent.
                     if (!a.parent_id && b.parent_id) return -1;
                     if (a.parent_id && !b.parent_id) return 1;
-
-                    // If both are replies (rare in this simple 1:1), sort by time
                     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
                 });
                 setInquiries(sortedData);
@@ -727,7 +716,6 @@ export function CustomerCenterContent() {
 
             if (count !== null) setTotalCount(count);
 
-            // 2. Fetch Category Counts for Tabs (Aggregated)
             const { data: countData } = await supabase
                 .from('inquiries')
                 .select('type');
@@ -744,13 +732,13 @@ export function CustomerCenterContent() {
         } finally {
             setIsSearching(false);
         }
-    };
+    }, [activeCategory, searchQuery, searchType, currentPage, itemsPerPage]);
 
     useEffect(() => {
-        if (activeTab === '1:1 문의' || activeTab === '1:1문의') {
+        if (isMounted && (activeTab === '1:1 문의' || activeTab === '1:1문의')) {
             fetchInquiries();
         }
-    }, [activeTab, currentPage, activeCategory]);
+    }, [activeTab, fetchInquiries, isMounted]);
 
     const handleSearch = () => {
         setCurrentPage(1);

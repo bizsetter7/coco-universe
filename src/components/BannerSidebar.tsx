@@ -91,11 +91,10 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const brand = useBrand();
     const isMobile = useMobile();
     const isVisible = useBannerControl(); // Global + Manual Control
-
-    // [Optimization] Valid Return for Mobile to prevent mounting and computation
-    if (isMobile) return null;
-
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
+
+    // [Optimization] Valid Return for Mobile after hooks are called
+    if (isMobile) return null;
 
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';

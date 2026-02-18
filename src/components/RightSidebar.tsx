@@ -12,11 +12,10 @@ export default function RightSidebar() {
     const isMobile = useMobile();
     const brand = useBrand();
     const router = useRouter();
-
-    // [Optimization] Early return for mobile
-    if (isMobile) return null;
-
     const { isLoggedIn, userName, userType, userPoints, logout } = useAuth();
+
+    // [Optimization] Early return for mobile after all hooks
+    if (isMobile) return null;
 
     // Derived User State for compatibility with sidebar UI
     const user = {

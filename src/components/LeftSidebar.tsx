@@ -62,9 +62,6 @@ export default function LeftSidebar({
     const isMobile = useMobile();
     const brand = useBrand();
     const router = useRouter();
-
-    // [Optimization] Early return for mobile
-    if (isMobile) return null;
     const {
         isLoggedIn: authIsLoggedIn,
         userName: authUserName,
@@ -84,6 +81,9 @@ export default function LeftSidebar({
     const [isLoginLoading, setIsLoginLoading] = React.useState(false);
     const [loginId, setLoginId] = React.useState('');
     const [loginPw, setLoginPw] = React.useState('');
+
+    // [Optimization] Early return for mobile after all hooks are called
+    if (isMobile) return null;
 
     // Use auth hook values for better sync across pages if props are not explicitly updated
     const isLoggedIn = propIsLoggedIn ?? authIsLoggedIn;
