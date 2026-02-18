@@ -38,10 +38,19 @@ import {
     Monitor,
     AlertTriangle,
     CreditCard,
-    Phone
+    Phone,
+    RefreshCw,
+    ShieldCheck,
+    Lock,
+    ExternalLink,
+    PenBox,
+    List,
+    Paperclip
 } from 'lucide-react';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
 // --- Mock Data ---
 const NOTICES = [
@@ -133,43 +142,43 @@ const FAQS = [
 const AD_TIERS = [
     {
         id: 'grand',
-        name: (<span>그랜드 <span className="font-normal">(Tier 1)</span></span>),
+        name: (<span>그랜드<br /><span className="font-normal">(Grand)</span></span>),
         icon: <Crown className="text-amber-600" />,
         price: '350,000원 / 30일',
-        benefits: ['PC+모바일 통합 노출 패키지', '메인 최상단 0순위 고정 (Glow)', '전 지역 검색 결과 압도적 선점', '인재열람권 + 강조옵션 풀패키지']
+        benefits: ['메인 최상단 노출', '압도적 광고 효과']
     },
     {
         id: 'premium',
-        name: (<span>프리미엄 <span className="font-normal">(Tier 2)</span></span>),
+        name: (<span>프리미엄<br /><span className="font-normal">(Premium)</span></span>),
         icon: <Star className="text-purple-500" />,
         price: '200,000원 / 30일',
-        benefits: ['PC+모바일 통합 노출 패키지', '메인 상단 전략적 노출', '보라색 강조 보더', '제목 강조/아이콘 효과 기본']
+        benefits: ['상단 시선 집중', '높은 효율성 노출']
     },
     {
         id: 'deluxe',
-        name: (<span>디럭스 <span className="font-normal">(Tier 3)</span></span>),
+        name: (<span>디럭스<br /><span className="font-normal">(Deluxe)</span></span>),
         icon: <Zap className="text-blue-500" />,
         price: '180,000원 / 30일',
-        benefits: ['PC+모바일 통합 노출 패키지', '블루 보더 / 메인 중앙 노출', '자동 점프 30회 지원']
+        benefits: ['타겟 지역 집중', '전략적 배너 노출']
     },
     {
         id: 'basic',
-        name: (<span>베이직(줄광고) <span className="font-normal">(Tier 7)</span></span>),
+        name: (<span>베이직<br /><span className="font-normal">(줄광고)</span></span>),
         icon: <FileText className="text-gray-400" />,
         price: '60,000원 / 30일',
-        benefits: ['PC+모바일 통합 노출 패키지', '일반 리스트 기본 노출', '업소 기본 정보 제공', '자동 점프 10회 지원']
+        benefits: ['최신 구인정보 리스트', '(실속형 구인 상품)']
     },
 ];
 
 const DETAILED_PRICING = [
-    { type: '메인 독점', name: '1번 - 그랜드 (Grand)', d30: 350000, d60: 630000, d90: 840000, benefit: (<span>PC+모바일 통합 노출<br />Glow 효과<br />전 지역 검색 결과<br />압도적 선점</span>) },
-    { type: '메인 상단', name: '2번 - 프리미엄 (Premium)', d30: 200000, d60: 360000, d90: 480000, benefit: (<span>PC+모바일 통합 노출<br />보라색 보더 / 상단 고정</span>) },
-    { type: '메인 일반', name: '3번 - 디럭스 (Deluxe)', d30: 180000, d60: 324000, d90: 432000, benefit: (<span>PC+모바일 통합 노출<br />블루 보더 / 메인 중앙</span>) },
-    { type: '리스트 상단', name: '4번 - 스페셜 (Special)', d30: 150000, d60: 270000, d90: 360000, benefit: (<span>PC+모바일 통합 노출<br />핑크 보더 / 목록 상단</span>) },
-    { type: '리스트 강조', name: '5번 - 급구/추천 (Urgent/Rec)', d30: 120000, d60: 216000, d90: 288000, benefit: (<span>PC+모바일 통합 노출<br />빨간 제목 / 가독성 강화</span>) },
-    { type: '리스트 네이티브', name: '6번 - 네이티브 (Native)', d30: 100000, d60: 180000, d90: 240000, benefit: (<span>PC+모바일 통합노출<br />네이티브 스타일</span>) },
-    { type: '리스트 기본', name: '7번 - 베이직/줄광고 (Basic)', d30: 60000, d60: 100000, d90: 140000, benefit: (<span>PC+모바일 통합 노출<br />일반 리스트</span>) },
-    { type: '리스트 옵션', name: '8번 - 강조옵션 (Icon/Highlight)', d30: 30000, d60: 55000, d90: 70000, benefit: (<span>아이콘(10종) / 형광펜(8색)<br />선택 가능</span>) },
+    { type: '메인 독점', name: '타입1. 그랜드(Grand)', d30: 350000, d60: 630000, d90: 840000, benefit: (<span>메인 최상단 노출 및<br />압도적 광고 효과</span>) },
+    { type: '메인 상단', name: '타입2. 프리미엄(Premium)', d30: 200000, d60: 360000, d90: 480000, benefit: (<span>상단 시선 집중<br />높은 효율성 노출</span>) },
+    { type: '메인 일반', name: '타입3. 디럭스(Deluxe)', d30: 180000, d60: 324000, d90: 432000, benefit: (<span>타겟 지역 집중<br />전략적 배너 노출</span>) },
+    { type: '리스트 상단', name: '타입4. 스페셜(Special)', d30: 150000, d60: 270000, d90: 360000, benefit: (<span>가성비 최우선<br />실속형 배너 노출</span>) },
+    { type: '리스트 강조', name: '타입5. 급구/추천(Urgent)', d30: 120000, d60: 216000, d90: 288000, benefit: (<span>급구/추천 배지 노출로<br />주목도 실속형</span>) },
+    { type: '리스트 네이티브', name: '타입6. 네이티브(Native)', d30: 100000, d60: 180000, d90: 240000, benefit: (<span>리스트 광고에 배치<br />랜덤 상단노출효과</span>) },
+    { type: '리스트 기본', name: '타입7. 베이직(줄광고)', d30: 60000, d60: 100000, d90: 140000, benefit: (<span>최신 구인정보 리스트<br />(실속형 구인 상품)</span>) },
+    { type: '리스트 옵션', name: '8번-강조옵션(Emphasis)', d30: 30000, d60: 55000, d90: 70000, benefit: (<span>아이콘/형광펜<br />테두리/급여추가 선택가능<br />(주목도 200% 상승)</span>) },
 ];
 
 export default function CustomerCenterPage() {
@@ -553,7 +562,7 @@ export function CustomerCenterContent() {
     const brand = useBrand();
 
     // SSR 안전한 탭 상태 관리
-    const [activeTab, setActiveTab] = useState('공지사항');
+    const [activeTab, setActiveTab] = useState('센터 홈');
     const [isMounted, setIsMounted] = useState(false);
 
 
@@ -562,13 +571,14 @@ export function CustomerCenterContent() {
     }, []);
 
     // 쿼리 스트링 변경 감지하여 탭 전환 및 스크롤 제어
+    // Sync activeTab with URL query parameters & Reset Filters
     useEffect(() => {
         if (!isMounted) return;
-
         const tab = searchParams.get('tab') || searchParams.get('page');
         if (tab) {
             let targetTab = '공지사항';
-            if (tab === 'notice' || tab === 'support') targetTab = '공지사항';
+            if (tab === 'dashboard' || tab === 'home') targetTab = '센터 홈';
+            else if (tab === 'notice' || tab === 'support') targetTab = '공지사항';
             else if (tab === 'ad') targetTab = '광고안내';
             else if (tab === 'guide') targetTab = '이용방법';
             else if (tab === 'faq') targetTab = '자주묻는질문';
@@ -577,11 +587,25 @@ export function CustomerCenterContent() {
 
             if (activeTab !== targetTab) {
                 setActiveTab(targetTab);
-                // 탭이 '진짜로' 변경될 때만 최상단으로 이동 (불필요한 떨림 방지)
+                // 1:1 문의 탭을 벗어나거나 진입할 때 필터 및 상태 초기화
+                setActiveCategory('전체');
+                setInquiryMode('list');
+                setIsPasswordVerified(false);
+                setPasswordInput('');
+                setViewingInquiry(null);
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
         }
     }, [searchParams, isMounted, activeTab]);
+
+    // [NEW] Clear State on Unmount/Navigation
+    useEffect(() => {
+        return () => {
+            setInquiryMode('list');
+            setIsPasswordVerified(false);
+            setViewingInquiry(null);
+        };
+    }, [pathname]);
 
     const [expandedNotice, setExpandedNotice] = useState<number | null>(null);
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -597,7 +621,142 @@ export function CustomerCenterContent() {
     const [inquiryTitle, setInquiryTitle] = useState('');
     const [inquiryContent, setInquiryContent] = useState('');
 
-    const isDirty = activeTab === '1:1 문의' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
+    const [isInquirySubmitting, setIsInquirySubmitting] = useState(false);
+    const [inquiries, setInquiries] = useState<any[]>([]);
+    const [inquiryMode, setInquiryMode] = useState<'list' | 'write' | 'detail'>('list');
+    const [viewingInquiry, setViewingInquiry] = useState<any | null>(null);
+    const [passwordInput, setPasswordInput] = useState('');
+    const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+
+    // Pagination & Search States
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const [searchType, setSearchType] = useState('title');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
+
+    // Category Filter State & Counts
+    const [activeCategory, setActiveCategory] = useState('전체');
+    const INQUIRY_CATEGORIES = ['전체', '디자인문의', '제휴/광고문의', '자주하는질문', '일반문의'];
+    const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({
+        '디자인문의': 0,
+        '제휴/광고문의': 0,
+        '자주하는질문': 0,
+        '일반문의': 0
+    });
+
+    // Admin & Session State
+    const { user: authUser, isLoggedIn } = useAuth();
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const isAdmin = !!(
+        authUser?.email === 'admin_user' ||
+        authUser?.type === 'admin' ||
+        currentUser?.email === 'admin_user' ||
+        currentUser?.user_metadata?.role === 'admin'
+    );
+
+    useEffect(() => {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            setCurrentUser(user);
+        });
+    }, []);
+
+    // 1:1 문의 상태 변경 시 자동 상단 스크롤
+    useEffect(() => {
+        if (isMounted && (activeTab === '1 : 1 문의' || activeTab === '1:1문의')) {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+    }, [inquiryMode, activeCategory, currentPage, isMounted, activeTab]);
+
+    const isDirty = (activeTab === '1 : 1 문의' || activeTab === '1:1문의') && inquiryMode === 'write' && (inquiryContact !== '' || inquiryTitle !== '' || inquiryContent !== '');
+
+    // Fetch inquiries with search, pagination, and category filter
+    const fetchInquiries = async () => {
+        setIsSearching(true);
+        try {
+            // 1. Fetch Inquiries with Advanced Sorting (Notice First -> Grouped by Thread -> Created Order)
+            let query = supabase
+                .from('inquiries')
+                .select('*', { count: 'exact' });
+
+            if (activeCategory !== '전체') {
+                query = query.eq('type', activeCategory);
+            }
+
+            if (searchQuery) {
+                if (searchType === 'title') query = query.ilike('title', `%${searchQuery}%`);
+                else if (searchType === 'content') query = query.ilike('content', `%${searchQuery}%`);
+                else if (searchType === 'writer') query = query.ilike('writer_name', `%${searchQuery}%`);
+            }
+
+            const { data, count, error } = await query
+                .order('type', { ascending: false })
+                .order('created_at', { ascending: false })
+                .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+
+            // [IMPORTANT] In-memory sorting for reply grouping
+            if (data) {
+                // [ADVANCED THREADED SORTING]
+                // We group items by thread (COALESCE(parent_id, id))
+                // Threads are sorted by the Parent's original created_at (DESC)
+                // Within a thread, Parent comes first, then Replies (ASC by creation)
+                const sortedData = [...data].sort((a, b) => {
+                    const aThreadId = a.parent_id || a.id;
+                    const bThreadId = b.parent_id || b.id;
+
+                    if (aThreadId !== bThreadId) {
+                        // To sort threads correctly, we need the parent's creation date.
+                        // Since we have all items in memory (18 items total), we can find them.
+                        const aParent = data.find(item => item.id === aThreadId) || a;
+                        const bParent = data.find(item => item.id === bThreadId) || b;
+
+                        return new Date(bParent.created_at).getTime() - new Date(aParent.created_at).getTime();
+                    }
+
+                    // Same Thread: Question (parent) must be above Reply (child)
+                    // If a.parent_id is null, it's the parent.
+                    if (!a.parent_id && b.parent_id) return -1;
+                    if (a.parent_id && !b.parent_id) return 1;
+
+                    // If both are replies (rare in this simple 1:1), sort by time
+                    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+                });
+                setInquiries(sortedData);
+            }
+
+            if (count !== null) setTotalCount(count);
+
+            // 2. Fetch Category Counts for Tabs (Aggregated)
+            const { data: countData } = await supabase
+                .from('inquiries')
+                .select('type');
+
+            if (countData) {
+                const counts: Record<string, number> = { '디자인문의': 0, '제휴/광고문의': 0, '자주하는질문': 0, '일반문의': 0 };
+                countData.forEach(item => {
+                    if (counts[item.type] !== undefined) counts[item.type]++;
+                });
+                setCategoryCounts(counts);
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === '1:1 문의' || activeTab === '1:1문의') {
+            fetchInquiries();
+        }
+    }, [activeTab, currentPage, activeCategory]);
+
+    const handleSearch = () => {
+        setCurrentPage(1);
+        fetchInquiries();
+    };
+
     usePreventLeave(isDirty);
 
     useEffect(() => {
@@ -610,6 +769,20 @@ export function CustomerCenterContent() {
         return () => document.body.classList.remove('modal-open');
     }, [selectedImage]); // isPaymentPopupOpen 의존성 제거
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+        }
+    };
+
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        }
+    };
+
     // 탭 변경 시 URL만 변경 (상태는 useEffect가 searchParams를 감지하여 변경함)
     const handleTabChange = (tabName: string) => {
         // 아코디언 상태 초기화
@@ -618,12 +791,13 @@ export function CustomerCenterContent() {
         setActiveAccordion(null);
 
         const params = new URLSearchParams(searchParams.toString());
-        let tabParam = 'notice';
-        if (tabName === '공지사항') tabParam = 'notice';
+        let tabParam = 'dashboard';
+        if (tabName === '센터 홈' || tabName === 'dashboard') tabParam = 'dashboard';
+        else if (tabName === '공지사항') tabParam = 'notice';
         else if (tabName === '광고안내') tabParam = 'ad';
         else if (tabName === '이용방법') tabParam = 'guide';
         else if (tabName === '자주묻는질문') tabParam = 'faq';
-        else if (tabName === '1:1 문의') tabParam = 'inquiry';
+        else if (tabName === '1:1 문의' || tabName === '1:1문의') tabParam = 'inquiry';
         else if (tabName === '약관 및 정책') tabParam = 'policy';
 
         params.set('tab', tabParam);
@@ -633,6 +807,7 @@ export function CustomerCenterContent() {
 
 
     const TABS = [
+        { id: '센터 홈', icon: <Home size={16} /> },
         { id: '공지사항', icon: <Megaphone size={16} /> },
         { id: '광고안내', icon: <ShoppingBag size={16} /> },
         { id: '이용방법', icon: <Info size={16} /> },
@@ -641,19 +816,7 @@ export function CustomerCenterContent() {
         { id: '약관 및 정책', icon: <FileText size={16} /> },
     ];
 
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    const scrollLeft = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: -280, behavior: 'smooth' });
-        }
-    };
-
-    const scrollRight = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: 280, behavior: 'smooth' });
-        }
-    };
 
     return (
         <>
@@ -715,6 +878,101 @@ export function CustomerCenterContent() {
 
                     {/* Content Area */}
                     <div className="flex-1 min-w-0 pb-20">
+                        {/* 0. Center Dashboard (Landing View) */}
+                        {(activeTab === '센터 홈' || !activeTab) && (
+                            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                                {/* Hero Section */}
+                                <div className="bg-slate-950 rounded-[50px] p-10 md:p-16 text-white overflow-hidden relative border border-slate-800 shadow-2xl">
+                                    <div className="absolute top-0 right-0 w-96 h-96 bg-pink-600/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+                                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
+
+                                    <div className="relative z-10 max-w-2xl">
+                                        <div className="flex items-center gap-2 mb-6">
+                                            <span className="bg-pink-600 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">Professional Support</span>
+                                            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Customer Center 2.0</span>
+                                        </div>
+                                        <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6 leading-[1.1]">
+                                            무엇을 <span className="text-pink-600">도와드릴까요?</span><br />
+                                            코코플러스가 해결해 드립니다.
+                                        </h2>
+                                        <p className="text-slate-400 text-base md:text-lg font-bold leading-relaxed mb-10 opacity-80">
+                                            광고 효과를 극대화하는 전략부터 안전한 채용을 위한<br className="hidden md:block" />
+                                            운영 정책까지, 모든 궁금증을 한곳에서 해결하세요.
+                                        </p>
+                                        <div className="flex flex-wrap gap-4">
+                                            <button onClick={() => handleTabChange('1 : 1 문의')} className="px-8 py-4 bg-pink-600 rounded-2xl font-black text-[15px] hover:bg-pink-700 transition-colors shadow-lg shadow-pink-900/20">
+                                                지금 문의하기
+                                            </button>
+                                            <button onClick={() => handleTabChange('자주묻는질문')} className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-2xl font-black text-[15px] hover:bg-slate-800 transition-colors">
+                                                자주 묻는 질문
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Summary Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Notice Summary */}
+                                    <div onClick={() => handleTabChange('공지사항')} className={`p-8 rounded-[40px] border group cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-100'}`}>
+                                        <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                            <Megaphone size={24} />
+                                        </div>
+                                        <h3 className="text-xl font-black mb-2">공지사항</h3>
+                                        <p className="text-gray-400 text-sm font-bold leading-relaxed mb-6">최신 업데이트와 중요한 정책 변경 사항을 확인하세요.</p>
+                                        <div className="flex items-center gap-2 text-blue-500 text-xs font-black uppercase tracking-widest">
+                                            View All <ArrowRight size={14} />
+                                        </div>
+                                    </div>
+
+                                    {/* Ad Guide Summary */}
+                                    <div onClick={() => handleTabChange('광고안내')} className={`p-8 rounded-[40px] border group cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-100 shadow-sm shadow-pink-100/10'}`}>
+                                        <div className="w-12 h-12 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                            <Zap size={24} />
+                                        </div>
+                                        <h3 className="text-xl font-black mb-2">광고 가이드</h3>
+                                        <p className="text-gray-400 text-sm font-bold leading-relaxed mb-6">최고의 광고 효과를 위한 위치별 단가 및 상품 안내입니다.</p>
+                                        <div className="flex items-center gap-2 text-pink-500 text-xs font-black uppercase tracking-widest">
+                                            View Price <ArrowRight size={14} />
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ Summary */}
+                                    <div onClick={() => handleTabChange('자주묻는질문')} className={`p-8 rounded-[40px] border group cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-1 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-100'}`}>
+                                        <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                            <Search size={24} />
+                                        </div>
+                                        <h3 className="text-xl font-black mb-2">FAQ</h3>
+                                        <p className="text-gray-400 text-sm font-bold leading-relaxed mb-6">궁금해 하시는 질문들을 카테고리별로 모았습니다.</p>
+                                        <div className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest">
+                                            Solve Fast <ArrowRight size={14} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Support Info Card */}
+                                <div className={`p-10 rounded-[50px] border flex flex-col md:flex-row items-center justify-between gap-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-16 h-16 bg-gray-900 text-white rounded-[24px] flex items-center justify-center shrink-0">
+                                            <PhoneCall size={30} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-2xl font-black text-gray-900 italic">1544-5568</h4>
+                                            <p className="text-sm font-bold text-gray-400 mt-1">평일 10:00 - 18:00 (점심 12:00 - 13:00)</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <div className="p-4 bg-gray-50 rounded-2xl text-center min-w-[100px]">
+                                            <p className="text-[10px] font-black text-gray-300 uppercase mb-1">Telegram</p>
+                                            <p className="text-[13px] font-black text-blue-500">@cocoplus_ad</p>
+                                        </div>
+                                        <div className="p-4 bg-gray-50 rounded-2xl text-center min-w-[100px]">
+                                            <p className="text-[10px] font-black text-gray-300 uppercase mb-1">Kakao</p>
+                                            <p className="text-[13px] font-black text-yellow-600">COCOPLUS</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {/* 1. Notice Board */}
                         {activeTab === '공지사항' && (
                             <div className="space-y-5">
@@ -780,15 +1038,7 @@ export function CustomerCenterContent() {
 
                                 {/* Mobile: Horizontal Scroll / Desktop: Grid */}
                                 <div className="relative group px-1">
-                                    {/* Scroll Buttons (Mobile Only) */}
-                                    <button onClick={scrollLeft} className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/90 shadow-lg rounded-full text-gray-800 border border-gray-100 active:scale-95 transition-transform" aria-label="Previous">
-                                        <ChevronLeft size={20} />
-                                    </button>
-                                    <button onClick={scrollRight} className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/90 shadow-lg rounded-full text-gray-800 border border-gray-100 active:scale-95 transition-transform" aria-label="Next">
-                                        <ChevronRight size={20} />
-                                    </button>
-
-                                    <div ref={scrollContainerRef} className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-hidden -mx-5 px-5 md:mx-0 md:px-0 pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide scroll-smooth">
+                                    <div ref={scrollContainerRef} className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
                                         {AD_TIERS.map((tier) => (
                                             <div
                                                 key={tier.id}
@@ -796,9 +1046,9 @@ export function CustomerCenterContent() {
                                                     setPaymentInitialTier(tier.id);
                                                     setIsPaymentPopupOpen(true);
                                                 }}
-                                                className={`flex-none w-[280px] md:w-auto p-6 md:p-8 rounded-[32px] border shadow-sm flex flex-col transition-transform hover:scale-[1.02] active:scale-95 cursor-pointer snap-center ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20' : 'border-pink-300 shadow-lg shadow-pink-100/50') : (brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100')}`}
+                                                className={`w-full md:w-auto p-4 md:p-5 rounded-[28px] border shadow-sm flex flex-col transition-all hover:scale-[1.02] active:scale-95 cursor-pointer hover:border-pink-500 hover:shadow-md hover:z-10 relative ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'} ${tier.id === 'grand' ? (brand.theme === 'dark' ? 'border-pink-900/50 shadow-lg shadow-pink-900/20 hover:bg-pink-900/30' : 'border-pink-300 shadow-lg shadow-pink-100/50 hover:bg-pink-50') : (brand.theme === 'dark' ? 'border-gray-700 hover:bg-pink-900/30' : 'border-gray-200 hover:bg-pink-50')}`}
                                             >
-                                                <div className="flex items-center justify-between mb-5 md:mb-6">
+                                                <div className="flex items-center justify-between mb-3 md:mb-4">
                                                     <div className={`p-4 md:p-4 rounded-2xl shadow-inner text-pink-600 ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-pink-50'}`}>
                                                         {React.cloneElement(tier.icon as React.ReactElement<{ size?: number }>, { size: 24 })}
                                                     </div>
@@ -807,17 +1057,17 @@ export function CustomerCenterContent() {
                                                 <h3 className={`text-xl md:text-xl font-black mb-1 md:mb-2 tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
                                                 <p className="text-pink-600 font-black text-lg md:text-lg mb-6 md:mb-8 tracking-tighter leading-none">{tier.price.split(' ')[0]}</p>
 
-                                                <div className="flex-1 space-y-3.5 md:space-y-4 mb-8">
+                                                <div className="flex-1 space-y-2.5 md:space-y-3 mb-6">
                                                     {tier.benefits.map((benefit, i) => (
                                                         <p key={i} className={`text-xs md:text-xs flex items-start gap-2.5 font-bold leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-400'}`}>
                                                             <CheckCircle2 size={14} className="text-pink-600 shrink-0 mt-0.5" />
-                                                            <span className="">{benefit}</span>
+                                                            <span className="leading-tight break-keep tracking-tight">{benefit}</span>
                                                         </p>
                                                     ))}
                                                 </div>
 
                                                 <button
-                                                    className={`w-full py-4 rounded-2xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}
+                                                    className={`w-full py-3 rounded-xl text-sm font-black transition ${tier.id === 'grand' ? 'bg-pink-600 text-white shadow-lg shadow-pink-100/50 hover:bg-pink-700' : `text-white hover:bg-black ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-900'}`}`}
                                                 >
                                                     신청하기
                                                 </button>
@@ -843,8 +1093,8 @@ export function CustomerCenterContent() {
                                         <table className="w-full border-collapse">
                                             <thead>
                                                 <tr className={`border-b-2 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-pink-100'}`}>
-                                                    <th className="py-5 text-left text-[13px] font-black text-gray-400 uppercase tracking-widest w-24">구분</th>
-                                                    <th className="py-5 text-left text-[13px] font-black text-gray-600 uppercase tracking-widest pl-4">상품명 및 혜택</th>
+                                                    <th className="py-5 text-left text-[13px] font-black text-gray-400 uppercase tracking-widest w-36">구분</th>
+                                                    <th className="py-5 text-left text-[13px] font-black text-gray-600 uppercase tracking-widest pl-4 w-[40%]">상품명 및 혜택</th>
                                                     <th className="py-5 text-right text-[13px] font-black text-pink-600 uppercase tracking-widest pr-8 pl-8">30일</th>
                                                     <th className={`py-5 text-right text-[13px] font-black uppercase tracking-widest pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>60일 (10%↓)</th>
                                                     <th className={`py-5 text-right text-[13px] font-black uppercase tracking-widest pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>90일 (20%↓)</th>
@@ -853,7 +1103,7 @@ export function CustomerCenterContent() {
                                             <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-700' : 'divide-gray-50'}`}>
                                                 {DETAILED_PRICING.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-pink-50/20 transition-colors group">
-                                                        <td className="py-3 text-[12px] font-black text-gray-400 group-hover:text-pink-500 transition-colors">{item.type}</td>
+                                                        <td className="py-3 text-[12px] font-black text-gray-400 group-hover:text-pink-500 transition-colors whitespace-nowrap">{item.type}</td>
                                                         <td className="py-3 pl-4">
                                                             <div className="flex flex-col">
                                                                 <span className={`text-[15px] font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</span>
@@ -891,7 +1141,7 @@ export function CustomerCenterContent() {
                                                     </div>
                                                 </div>
 
-                                                <div className={`mt-3 pt-2.5 border-t space-y-1 font-mono ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                <div className={`mt-3 pt-2.5 border-t space-y-1 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
                                                     <div className={`flex justify-between items-center px-2 py-1.5 rounded-lg ${brand.theme === 'dark' ? 'bg-pink-900/10' : 'bg-pink-50'}`}>
                                                         <span className="text-[8px] font-black text-pink-400 uppercase">30일</span>
                                                         <span className="text-[11px] font-black text-pink-600 tabular-nums">{item.d30.toLocaleString()}원</span>
@@ -984,33 +1234,51 @@ export function CustomerCenterContent() {
                                                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-px bg-gray-100 dark:bg-gray-800">
                                                     <ExposureItem
                                                         rank="GRAND"
-                                                        desc="메인 최상단 특수배너 및 사이드 고정 전 영역 노출"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_1.png')}
+                                                        desc="메인 최상단 노출 및 압도적 광고 효과"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_1');
+                                                            setSelectedImage('/images/guide/pc_1.png');
+                                                        }}
                                                     />
                                                     <ExposureItem
                                                         rank="PREMIUM"
-                                                        desc="업종/지역별 상단 전략적 노출 및 보라색 효과"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_1.png')}
+                                                        desc="상단 시선 집중 높은 효율성 노출"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_1');
+                                                            setSelectedImage('/images/guide/pc_1.png');
+                                                        }}
                                                     />
                                                     <ExposureItem
                                                         rank="DELUXE"
-                                                        desc="메인 중앙 및 리스트 상단 블루 색상 강조"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_3.png')}
+                                                        desc="타겟 지역 집중 전략적 배너 노출"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_3');
+                                                            setSelectedImage('/images/guide/pc_3.png');
+                                                        }}
                                                     />
                                                     <ExposureItem
                                                         rank="SPECIAL"
-                                                        desc="리스트 상단 핑크 테두리 강조 가독성 확보"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_3.png')}
+                                                        desc="가성비 최우선 실속형 배너 노출"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_3');
+                                                            setSelectedImage('/images/guide/pc_3.png');
+                                                        }}
                                                     />
                                                     <ExposureItem
                                                         rank="BASIC"
-                                                        desc="일반 리스트 기본 노출 및 업소 정보 안내"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_4.png')}
+                                                        desc="최신 구인정보 리스트 (실속형 구인 상품)"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_4');
+                                                            setSelectedImage('/images/guide/pc_4.png');
+                                                        }}
                                                     />
                                                     <ExposureItem
                                                         rank="NATIVE"
-                                                        desc="리스트 중간 삽입형 네이티브 광고 스타일"
-                                                        onArrowClick={() => setSelectedImage('/images/guide/pc_4.png')}
+                                                        desc="리스트 광고에 배치 랜덤 상단노출효과"
+                                                        onArrowClick={() => {
+                                                            setActiveAccordion('pc_4');
+                                                            setSelectedImage('/images/guide/pc_4.png');
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
@@ -1019,15 +1287,7 @@ export function CustomerCenterContent() {
                                             </p>
                                         </div>
                                     </div>
-
-                                    <div className={`p-6 rounded-3xl border ${brand.theme === 'dark' ? 'bg-pink-900/10 border-pink-900/30' : 'bg-pink-50/50 border-pink-100'}`}>
-                                        <p className={`text-[13px] leading-relaxed font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            <strong className="text-pink-600">※ 통합 노출 정책:</strong> 모든 광고 상품은 PC와 모바일 버전에 최적화된 형태로 동시 노출됩니다. 사이드 배너의 경우 PC에서는 스크롤 고정형으로, 모바일에서는 메인 상단 롤링 배너 형태로 전략적 변환 노출됩니다.
-                                        </p>
-                                    </div>
                                 </section>
-
-
 
                                 {/* Design Guide Section */}
                                 <section className="space-y-6">
@@ -1080,7 +1340,7 @@ export function CustomerCenterContent() {
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div
-                                                onClick={() => handleTabChange('inquiry')}
+                                                onClick={() => handleTabChange('1:1 문의')}
                                                 className="p-6 bg-pink-600 rounded-3xl text-white shadow-lg shadow-pink-200 flex items-center justify-between group cursor-pointer hover:bg-pink-700 transition"
                                             >
                                                 <div>
@@ -1090,7 +1350,7 @@ export function CustomerCenterContent() {
                                                 <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
                                             </div>
                                             <div
-                                                onClick={() => handleTabChange('inquiry')}
+                                                onClick={() => handleTabChange('1:1 문의')}
                                                 className="p-6 bg-gray-900 rounded-3xl text-white shadow-lg shadow-gray-200 flex items-center justify-between group cursor-pointer hover:bg-black transition"
                                             >
                                                 <div>
@@ -1247,7 +1507,7 @@ export function CustomerCenterContent() {
                                                     setPaymentInitialTier(row.tier);
                                                     setIsPaymentPopupOpen(true);
                                                 }}
-                                                className={`p-3 md:p-6 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-100'}`}
+                                                className={`p-3 md:p-6 rounded-[24px] md:rounded-[35px] border-2 flex flex-col justify-between group hover:border-pink-500 transition-all shadow-sm hover:shadow-xl hover:shadow-pink-100/20 cursor-pointer ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 hover:bg-pink-900/30' : 'bg-gray-50 border-gray-100 hover:bg-pink-50'}`}
                                             >
                                                 <div className="space-y-2.5">
                                                     <div className="flex justify-between items-start">
@@ -1355,230 +1615,722 @@ export function CustomerCenterContent() {
                                     </div>
                                 </section>
                             </div>
-                        )}
+                        )
+                        }
+
 
                         {/* 3. Usage Guide */}
-                        {activeTab === '이용방법' && (
-                            <div className="space-y-12">
-                                <section>
-                                    <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구직자 이용가이드</h3>
-                                    </div>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        {[
-                                            { step: '01', title: '회원가입', icon: <UserCheck />, desc: 'SNS 연동 간편 가입' },
-                                            { step: '02', title: '이력서 등록', icon: <FileText />, desc: '자유 형식의 강점 어필' },
-                                            { step: '03', title: '업소 서칭', icon: <Search />, desc: '맞춤 필터링 시스템' },
-                                            { step: '04', title: '1:1 상담', icon: <MessageSquare />, desc: '안심 면접을 위한 소통' },
-                                        ].map((item, i) => (
-                                            <div key={i} className={`p-6 rounded-[30px] border text-center relative overflow-hidden group hover:shadow-xl transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                                <span className={`absolute -top-3 -left-3 text-5xl font-black transition-colors pointer-events-none ${brand.theme === 'dark' ? 'text-gray-700' : 'text-gray-50'} group-hover:text-pink-50/50`}>{item.step}</span>
-                                                <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-5 relative z-10 shadow-inner">
-                                                    {item.icon}
-                                                </div>
-                                                <h4 className={`font-black text-[15px] mb-1 relative z-10 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h4>
-                                                <p className={`text-[11px] relative z-10 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{item.desc}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구인자(사장님) 가이드</h3>
-                                    </div>
-                                    <div className={`p-8 md:p-10 rounded-[45px] border shadow-xl shadow-pink-100/10 space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
-                                        <div className="flex flex-col md:flex-row items-center gap-8">
-                                            <div className="w-20 h-20 bg-pink-50 text-pink-600 rounded-[28px] flex items-center justify-center shrink-0 border border-pink-100">
-                                                <Briefcase size={36} />
-                                            </div>
-                                            <div className="text-center md:text-left flex flex-col items-center md:items-start">
-                                                <h4 className="text-xl md:text-2xl font-black mb-3 md:mb-2 tracking-tight text-gray-900 whitespace-nowrap">사장님, 안심하고 이용하세요!</h4>
-                                                <div className="text-[14px] md:text-[15px] text-gray-500 font-bold leading-relaxed flex flex-col items-center md:items-start">
-                                                    <span className="whitespace-nowrap">철저한 사업자 인증을 통해 클린하고 신뢰할 수 있는</span>
-                                                    <span className="whitespace-nowrap">구인 공고 문화를 만들어갑니다.</span>
-                                                </div>
-                                            </div>
-                                            <button className="w-full md:w-auto md:ml-auto px-8 py-4 bg-gray-900 text-white rounded-2xl text-[15px] font-black shadow-xl hover:bg-black transition">
-                                                사업자 인증하러 가기
-                                            </button>
+                        {
+                            activeTab === '이용방법' && (
+                                <div className="space-y-12">
+                                    <section>
+                                        <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                            <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                            <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구직자 이용가이드</h3>
                                         </div>
-                                        <div className="h-px bg-gray-100 w-full" />
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             {[
-                                                { num: '1', title: '상품 선택', sub: '효율적인 광고 상품을 직접 픽업하세요.' },
-                                                { num: '2', title: '공고 등록', sub: '상세한 업소 정보는 채용 성공률을 높입니다.' },
-                                                { num: '3', title: '컨택 & 매칭', sub: '열람권을 통해 적합한 인재를 먼저 선점하세요.' }
-                                            ].map((box, i) => (
-                                                <div key={i} className={`flex items-start gap-4 md:gap-5 p-6 md:p-0 rounded-3xl border md:border-0 ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 md:bg-transparent border-gray-100'}`}>
-                                                    <span className="text-4xl md:text-5xl font-black text-pink-500/20 shrink-0 leading-none w-[36px] md:w-12 text-center">{box.num}</span>
-                                                    <div className="flex flex-col items-start text-left pt-1 md:pt-2">
-                                                        <h5 className="font-black text-base md:text-lg text-gray-900 leading-none mb-2">{box.title}</h5>
-                                                        <p className="text-[12px] md:text-[13px] text-gray-500 font-bold leading-relaxed break-keep">
-                                                            {box.sub}
-                                                        </p>
+                                                { step: '01', title: '회원가입', icon: <UserCheck />, desc: 'SNS 연동 간편 가입' },
+                                                { step: '02', title: '이력서 등록', icon: <FileText />, desc: '자유 형식의 강점 어필' },
+                                                { step: '03', title: '업소 서칭', icon: <Search />, desc: '맞춤 필터링 시스템' },
+                                                { step: '04', title: '1:1 상담', icon: <MessageSquare />, desc: '안심 면접을 위한 소통' },
+                                            ].map((item, i) => (
+                                                <div key={i} className={`p-6 rounded-[30px] border text-center relative overflow-hidden group hover:shadow-xl transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                    <span className={`absolute -top-3 -left-3 text-5xl font-black transition-colors pointer-events-none ${brand.theme === 'dark' ? 'text-gray-700' : 'text-gray-50'} group-hover:text-pink-50/50`}>{item.step}</span>
+                                                    <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-5 relative z-10 shadow-inner">
+                                                        {item.icon}
                                                     </div>
+                                                    <h4 className={`font-black text-[15px] mb-1 relative z-10 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.title}</h4>
+                                                    <p className={`text-[11px] relative z-10 font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{item.desc}</p>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
-                                </section>
-                            </div>
-                        )}
+                                    </section>
+
+                                    <section>
+                                        <div className="flex items-center gap-3 mb-8 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                            <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                            <h3 className={`text-2xl font-black uppercase tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>구인자(사장님) 가이드</h3>
+                                        </div>
+                                        <div className={`p-8 md:p-10 rounded-[45px] border shadow-xl shadow-pink-100/10 space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-100 text-gray-900'}`}>
+                                            <div className="flex flex-col md:flex-row items-center gap-8">
+                                                <div className="w-20 h-20 bg-pink-50 text-pink-600 rounded-[28px] flex items-center justify-center shrink-0 border border-pink-100">
+                                                    <Briefcase size={36} />
+                                                </div>
+                                                <div className="text-center md:text-left flex flex-col items-center md:items-start">
+                                                    <h4 className="text-xl md:text-2xl font-black mb-3 md:mb-2 tracking-tight text-gray-900 whitespace-nowrap">사장님, 안심하고 이용하세요!</h4>
+                                                    <div className="text-[14px] md:text-[15px] text-gray-500 font-bold leading-relaxed flex flex-col items-center md:items-start">
+                                                        <span className="whitespace-nowrap">철저한 사업자 인증을 통해 클린하고 신뢰할 수 있는</span>
+                                                        <span className="whitespace-nowrap">구인 공고 문화를 만들어갑니다.</span>
+                                                    </div>
+                                                </div>
+                                                <button className="w-full md:w-auto md:ml-auto px-8 py-4 bg-gray-900 text-white rounded-2xl text-[15px] font-black shadow-xl hover:bg-black transition">
+                                                    사업자 인증하러 가기
+                                                </button>
+                                            </div>
+                                            <div className="h-px bg-gray-100 w-full" />
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+                                                {[
+                                                    { num: '1', title: '상품 선택', sub: '효율적인 광고 상품을 직접 픽업하세요.' },
+                                                    { num: '2', title: '공고 등록', sub: '상세한 업소 정보는 채용 성공률을 높입니다.' },
+                                                    { num: '3', title: '컨택 & 매칭', sub: '열람권을 통해 적합한 인재를 먼저 선점하세요.' }
+                                                ].map((box, i) => (
+                                                    <div key={i} className={`flex items-start gap-4 md:gap-5 p-6 md:p-0 rounded-3xl border md:border-0 ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700' : 'bg-gray-50 md:bg-transparent border-gray-100'}`}>
+                                                        <span className="text-4xl md:text-5xl font-black text-pink-500/20 shrink-0 leading-none w-[36px] md:w-12 text-center">{box.num}</span>
+                                                        <div className="flex flex-col items-start text-left pt-1 md:pt-2">
+                                                            <h5 className="font-black text-base md:text-lg text-gray-900 leading-none mb-2">{box.title}</h5>
+                                                            <p className="text-[12px] md:text-[13px] text-gray-500 font-bold leading-relaxed break-keep">
+                                                                {box.sub}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            )
+                        }
 
                         {/* 4. FAQ */}
-                        {activeTab === '자주묻는질문' && (
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                    <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                    <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h3>
+                        {
+                            activeTab === '자주묻는질문' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>자주 묻는 질문</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {FAQS.map(faq => (
+                                            <div key={faq.id} className={`rounded-[28px] shadow-sm border overflow-hidden transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                <button
+                                                    onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
+                                                    className={`w-full p-7 flex items-center justify-between text-left transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
+                                                >
+                                                    <span className={`font-black text-[15px] flex gap-4 pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                        <span className="text-pink-600">Q.</span> {faq.question}
+                                                    </span>
+                                                    {expandedFaq === faq.id ? <ChevronUp size={24} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} /> : <ChevronDown size={24} className="text-gray-400" />}
+                                                </button>
+                                                {expandedFaq === faq.id && (
+                                                    <div className={`p-8 border-t text-[15px] leading-loose font-bold ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-800'}`}>
+                                                        {faq.answer}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="space-y-4">
-                                    {FAQS.map(faq => (
-                                        <div key={faq.id} className={`rounded-[28px] shadow-sm border overflow-hidden transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                            <button
-                                                onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
-                                                className={`w-full p-7 flex items-center justify-between text-left transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
-                                            >
-                                                <span className={`font-black text-[15px] flex gap-4 pr-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                                    <span className="text-pink-600">Q.</span> {faq.question}
-                                                </span>
-                                                {expandedFaq === faq.id ? <ChevronUp size={24} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} /> : <ChevronDown size={24} className="text-gray-400" />}
-                                            </button>
-                                            {expandedFaq === faq.id && (
-                                                <div className={`p-8 border-t text-[15px] leading-loose font-bold ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-800'}`}>
-                                                    {faq.answer}
+                            )
+                        }
+
+                        {/* 5. 1:1 Inquiry Board System */}
+                        {
+                            (activeTab === '1:1 문의' || activeTab === '1:1문의') && (
+                                <div className="space-y-8">
+                                    {/* Dashboard Info Card */}
+                                    <div className="bg-gradient-to-br from-pink-600 to-pink-500 p-8 md:p-10 rounded-[40px] text-white shadow-xl shadow-pink-100 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-10 opacity-10">
+                                            <MessageCircle size={150} />
+                                        </div>
+                                        <div className="relative z-10">
+                                            <h3 className="text-2xl md:text-3xl font-black mb-2 tracking-tighter">1:1 맞춤 상담 게시판</h3>
+                                            <p className="text-pink-50 text-sm font-bold opacity-90 leading-relaxed">
+                                                광고, 채용, 정책 등 궁금하신 점을 남겨주시면<br className="hidden md:block" />
+                                                전문 상담원이 보안이 유지된 상태에서 24시간 이내에 답변해 드립니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {inquiryMode === 'list' && (
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 border-t border-gray-900 pt-4 pb-2 text-center">
+                                                {INQUIRY_CATEGORIES.filter(cat => cat !== '전체').map((cat) => (
+                                                    <button
+                                                        key={cat}
+                                                        onClick={() => {
+                                                            setActiveCategory(cat === activeCategory ? '전체' : cat);
+                                                            setCurrentPage(1);
+                                                        }}
+                                                        className={`py-4 md:py-8 px-4 border rounded-none transition-all flex flex-col items-center justify-center gap-1.5 md:gap-3 ${activeCategory === cat
+                                                            ? 'border-pink-500 bg-pink-50/10'
+                                                            : 'border-gray-100 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        <span className={`text-[15px] font-bold ${activeCategory === cat ? 'text-pink-600' : 'text-gray-500'}`}>{cat}</span>
+                                                        <span className={`text-[24px] font-black ${activeCategory === cat ? 'text-pink-600' : 'text-gray-900'}`}>
+                                                            {categoryCounts[cat] || 0}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-1.5 h-6 bg-pink-600 rounded-full"></div>
+                                                    <h4 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{activeCategory === '전체' ? '1:1 맞춤 상담 내역' : activeCategory} <span className="text-pink-600 ml-1">{totalCount}</span></h4>
+                                                </div>
+                                                <div className="flex items-center justify-center md:justify-end gap-2 w-full md:w-auto">
+                                                    <button
+                                                        onClick={() => {
+                                                            // Clear form states
+                                                            setInquiryTitle('');
+                                                            setInquiryContent('');
+                                                            setPasswordInput('');
+                                                            // Set default nickname if logged in
+                                                            const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '';
+                                                            setInquiryContact(`|${nickname}`);
+
+                                                            setInquiryMode('write');
+                                                        }}
+                                                        className="px-5 py-3 bg-gray-900 text-white rounded-xl text-[13px] font-black hover:bg-black transition shadow-lg flex items-center gap-1.5"
+                                                    >
+                                                        <PenBox size={16} /> 글쓰기
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSearchQuery('');
+                                                            setActiveCategory('전체');
+                                                            setCurrentPage(1);
+                                                            fetchInquiries();
+                                                        }}
+                                                        className="px-5 py-3 border border-gray-200 bg-white text-gray-700 rounded-xl text-[13px] font-black hover:bg-gray-50 transition shadow-sm flex items-center gap-1.5"
+                                                    >
+                                                        <List size={16} /> 글목록
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Board List (Desktop & Mobile Unified Overhaul) */}
+                                            <div className={`rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+                                                <div className="overflow-hidden p-0 md:p-1">
+                                                    <table className="w-full text-left table-fixed border-collapse">
+                                                        <thead>
+                                                            <tr className={`border-b text-[8.5px] md:text-[10px] font-black uppercase tracking-[0.05em] ${brand.theme === 'dark' ? 'bg-gray-700/50 border-gray-700 text-gray-500' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+                                                                <th className="px-1 py-2 w-8 md:w-16 text-center">번호</th>
+                                                                <th className="px-2 py-2">제목</th>
+                                                                <th className="px-1 py-2 w-14 md:w-28 text-center">등록인</th>
+                                                                <th className="px-1 py-2 w-14 md:w-32 text-center">등록일</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-700' : 'divide-gray-50'}`}>
+                                                            {inquiries.length > 0 ? inquiries.map((inq, idx) => {
+                                                                const isNotice = inq.type === '공지';
+                                                                const isReply = !!inq.parent_id;
+
+                                                                return (
+                                                                    <tr
+                                                                        key={inq.id}
+                                                                        onClick={async () => {
+                                                                            const { data, error } = await supabase
+                                                                                .from('inquiries')
+                                                                                .select('*')
+                                                                                .eq('id', inq.id)
+                                                                                .single();
+
+                                                                            if (data) {
+                                                                                setViewingInquiry(data);
+                                                                                // [SECURITY TIGHTENING] 오직 시스템이 보증하는 역할과 정확한 이메일 매칭만 허용
+                                                                                const canBypass = !!(
+                                                                                    isAdmin ||
+                                                                                    authUser?.email === 'admin_user' ||
+                                                                                    authUser?.type === 'admin' ||
+                                                                                    currentUser?.email === 'admin_user' ||
+                                                                                    currentUser?.user_metadata?.role === 'admin'
+                                                                                );
+
+                                                                                if (data.is_secret && !isNotice && !canBypass) {
+                                                                                    setInquiryMode('detail');
+                                                                                    setIsPasswordVerified(false);
+                                                                                    setPasswordInput('');
+                                                                                } else {
+                                                                                    setInquiryMode('detail');
+                                                                                    setIsPasswordVerified(true);
+                                                                                }
+                                                                                window.scrollTo({ top: 0, behavior: 'instant' });
+                                                                            }
+                                                                        }}
+                                                                        className={`cursor-pointer border-b last:border-0 transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-pink-50/30'}`}
+                                                                    >
+                                                                        <td className="px-1 py-1.5 md:py-3.5 text-center text-[9px] md:text-[10px] font-bold text-gray-400 italic">
+                                                                            {isNotice ? <Megaphone size={11} className="text-pink-600 mx-auto" /> : (totalCount - ((currentPage - 1) * itemsPerPage + idx))}
+                                                                        </td>
+                                                                        <td className="px-2 py-1.5 md:py-3.5">
+                                                                            <div className="flex items-center gap-1 overflow-hidden">
+                                                                                {isReply && (
+                                                                                    <div className="ml-0.5 md:ml-4 flex items-center gap-0.5 text-gray-400 flex-shrink-0">
+                                                                                        <span className="text-[12px] font-thin leading-none opacity-50">↳</span>
+                                                                                    </div>
+                                                                                )}
+                                                                                {inq.file_url && <Paperclip size={10} className="text-pink-500/60 flex-shrink-0" />}
+                                                                                <span className={`text-[11px] md:text-[12.5px] tracking-tight truncate ${isNotice ? 'font-black text-pink-700 underline underline-offset-4 decoration-pink-200' : isReply ? 'text-gray-500 font-medium' : 'text-gray-900 font-bold'}`}>
+                                                                                    {inq.title.replace(/^[↳\s]+/, '')}
+                                                                                </span>
+                                                                                {inq.is_secret && <Lock size={8} className="text-gray-300 ml-0.5 flex-shrink-0" />}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>{isNotice ? '운영팀' : inq.writer_name}</td>
+                                                                        <td className="px-0.5 py-1.5 md:py-3.5 text-[9px] md:text-[10.5px] text-center font-medium text-gray-400 tabular-nums whitespace-nowrap">
+                                                                            {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/-/g, '.').replace(/\.$/, '')}
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            }) : (
+                                                                <tr>
+                                                                    <td colSpan={4} className="px-6 py-20 text-center text-gray-400 font-bold">
+                                                                        {isSearching ? <RefreshCw className="animate-spin mx-auto text-pink-600" size={24} /> : '등록된 문의 내역이 없습니다.'}
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            {/* Bottom Action Area (Pagination & Buttons) */}
+                                            <div className="flex flex-col items-center gap-8 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => setInquiryMode('write')}
+                                                        className="px-6 py-3.5 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg flex items-center gap-2"
+                                                    >
+                                                        <PenBox size={18} /> 글쓰기
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSearchQuery('');
+                                                            setCurrentPage(1);
+                                                            fetchInquiries();
+                                                        }}
+                                                        className="px-6 py-3.5 border border-gray-200 bg-white text-gray-700 rounded-2xl text-sm font-black hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
+                                                    >
+                                                        <List size={18} /> 글목록
+                                                    </button>
+                                                </div>
+
+                                                {/* Pagination */}
+                                                <div className="flex items-center gap-1">
+                                                    {Array.from({ length: Math.ceil(totalCount / itemsPerPage) }, (_, i) => i + 1).map((pageNum) => (
+                                                        <button
+                                                            key={pageNum}
+                                                            onClick={() => {
+                                                                setCurrentPage(pageNum);
+                                                                window.scrollTo({ top: 0, behavior: 'instant' });
+                                                            }}
+                                                            className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-black transition-all ${currentPage === pageNum
+                                                                ? 'bg-pink-600 text-white shadow-lg shadow-pink-200'
+                                                                : 'bg-white border border-gray-100 text-gray-400 hover:border-pink-200 hover:text-pink-600'
+                                                                }`}
+                                                        >
+                                                            {pageNum}
+                                                        </button>
+                                                    ))}
+                                                    {totalCount > itemsPerPage * currentPage && (
+                                                        <button className="px-4 h-10 bg-white border border-gray-100 rounded-lg text-sm font-black text-gray-400 hover:border-pink-200 hover:text-pink-600">다음</button>
+                                                    )}
+                                                </div>
+
+                                                {/* Search Bar */}
+                                                <div className="flex flex-wrap items-center justify-center gap-2 p-4 bg-gray-50 rounded-[28px] border border-gray-100">
+                                                    <select
+                                                        value={searchType}
+                                                        onChange={(e) => setSearchType(e.target.value)}
+                                                        className="px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-black outline-none focus:border-pink-500"
+                                                    >
+                                                        <option value="title">제목</option>
+                                                        <option value="content">내용</option>
+                                                        <option value="writer">등록인</option>
+                                                    </select>
+                                                    <div className="relative flex-1 min-w-[200px]">
+                                                        <input
+                                                            type="text"
+                                                            value={searchQuery}
+                                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                                            className="w-full px-5 py-3 pr-12 bg-white border border-gray-200 rounded-xl text-sm font-black outline-none focus:border-pink-500"
+                                                            placeholder="검색어를 입력해 주세요"
+                                                        />
+                                                        <button
+                                                            onClick={handleSearch}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-600 transition"
+                                                        >
+                                                            <Search size={20} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {inquiryMode === 'write' && (
+                                        <div className="space-y-6 px-1">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <button onClick={() => setInquiryMode('list')} className="p-2 hover:bg-gray-100 rounded-full transition"><ChevronLeft /></button>
+                                                    <h4 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 작성하기</h4>
+                                                </div>
+                                            </div>
+
+                                            <div className={`p-6 md:p-10 rounded-[45px] border shadow-sm space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                    <div>
+                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">문의 유형 <span className="text-pink-600">*</span></label>
+                                                        <select
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                            value={inquiryTitle.match(/^\[(.*?)\]/) ? inquiryTitle.match(/^\[(.*?)\]/)![1] : ''}
+                                                            onChange={(e) => {
+                                                                const type = e.target.value;
+                                                                const currentTitleWithoutType = inquiryTitle.includes(']') ? inquiryTitle.split(']')[1].trim() : inquiryTitle;
+                                                                setInquiryTitle(`[${type}] ${currentTitleWithoutType}`);
+                                                            }}
+                                                        >
+                                                            <option value="" disabled>유형 선택</option>
+                                                            <option value="광고 상품">광고 상품 문의 (사장님)</option>
+                                                            <option value="채용 관련">채용 관련 문의 (구직자)</option>
+                                                            <option value="신고/정책">신고 및 운영 정책</option>
+                                                            <option value="기타">기타 문의</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
+                                                        <input
+                                                            type="text"
+                                                            value={inquiryContact.split('|')[1] || ''}
+                                                            readOnly
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black bg-gray-50 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-gray-500' : 'border-gray-100 bg-gray-50 text-gray-400'}`}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">비밀번호 (선택)</label>
+                                                        <input
+                                                            type="password"
+                                                            value={passwordInput}
+                                                            onChange={(e) => setPasswordInput(e.target.value)}
+                                                            placeholder="조회 시 필요 (미입력 가능)"
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 gap-6">
+                                                    <div>
+                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">연락처/회신처 <span className="text-pink-600">*</span></label>
+                                                        <input
+                                                            type="text"
+                                                            value={inquiryContact.split('|')[0]}
+                                                            onChange={(e) => setInquiryContact(prev => `${e.target.value}|${prev.split('|')[1] || ''}`)}
+                                                            placeholder="회신 받을 번호 또는 이메일"
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">문의 제목 <span className="text-pink-600">*</span></label>
+                                                    <input
+                                                        type="text"
+                                                        value={inquiryTitle.replace(/^\[.*?\]\s*/, '')}
+                                                        onChange={(e) => {
+                                                            const typeMatch = inquiryTitle.match(/^\[(.*?)\]/);
+                                                            const typePrefix = typeMatch ? `[${typeMatch[1]}] ` : '';
+                                                            setInquiryTitle(`${typePrefix}${e.target.value}`);
+                                                        }}
+                                                        placeholder="핵심 내용을 요약해주세요"
+                                                        className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">상세 내용 <span className="text-pink-600">*</span></label>
+                                                    <textarea
+                                                        value={inquiryContent}
+                                                        onChange={(e) => setInquiryContent(e.target.value)}
+                                                        placeholder="상담을 위해 구체적인 내용을 작성해주세요."
+                                                        className={`w-full border-2 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                    />
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                    {[1, 2, 3].map(num => (
+                                                        <div key={num}>
+                                                            <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">첨부파일 {num} (선택)</label>
+                                                            <input
+                                                                type="file"
+                                                                id={`inquiry_file_${num}`}
+                                                                className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <div className="flex gap-4">
+                                                    <button
+                                                        onClick={() => {
+                                                            if (inquiryTitle || inquiryContent) {
+                                                                if (!confirm('작성 중인 내용은 저장되지 않습니다. 정말 취소하시겠습니까?')) return;
+                                                            }
+                                                            setInquiryMode('list');
+                                                        }}
+                                                        className={`flex-1 py-5 rounded-2xl text-base font-black transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                                    >
+                                                        취소
+                                                    </button>
+                                                    <button
+                                                        disabled={isInquirySubmitting}
+                                                        onClick={async () => {
+                                                            const contact = inquiryContact.split('|')[0];
+                                                            const writer = inquiryContact.split('|')[1];
+
+                                                            if (!contact || !writer || !inquiryTitle || !inquiryContent) {
+                                                                alert('필수 항목(*)을 모두 입력해주세요.');
+                                                                return;
+                                                            }
+
+                                                            setIsInquirySubmitting(true);
+                                                            try {
+                                                                let fileUrls: string[] = [];
+                                                                const fileInputIds = ['inquiry_file_1', 'inquiry_file_2', 'inquiry_file_3'];
+
+                                                                for (const id of fileInputIds) {
+                                                                    const input = document.getElementById(id) as HTMLInputElement;
+                                                                    const file = input?.files?.[0];
+                                                                    if (file) {
+                                                                        const fileExt = file.name.split('.').pop();
+                                                                        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`; // Unique filename
+                                                                        const { error: uploadError } = await supabase.storage
+                                                                            .from('inquiry-attachments')
+                                                                            .upload(fileName, file);
+                                                                        if (uploadError) throw uploadError;
+                                                                        const { data: { publicUrl } } = supabase.storage.from('inquiry-attachments').getPublicUrl(fileName);
+                                                                        fileUrls.push(publicUrl);
+                                                                    }
+                                                                }
+                                                                const finalFileUrl = fileUrls.length > 0 ? JSON.stringify(fileUrls) : '';
+
+                                                                const typeMatch = inquiryTitle.match(/^\[(.*?)\]/);
+                                                                const finalType = typeMatch ? typeMatch[1] : '기타';
+
+                                                                const { error } = await supabase.from('inquiries').insert([{
+                                                                    type: finalType,
+                                                                    writer_name: writer,
+                                                                    password: passwordInput,
+                                                                    contact: contact,
+                                                                    shop_name: '',
+                                                                    title: inquiryTitle,
+                                                                    content: inquiryContent,
+                                                                    status: 'new',
+                                                                    is_secret: true,
+                                                                    file_url: finalFileUrl
+                                                                }]);
+
+                                                                if (error) throw error;
+
+                                                                alert('문의가 접수되었습니다. 목록에서 확인해 주세요.');
+                                                                setInquiryContact('');
+                                                                setInquiryTitle('');
+                                                                setInquiryContent('');
+                                                                setPasswordInput('');
+                                                                setInquiryMode('list');
+                                                                fetchInquiries();
+                                                                window.scrollTo({ top: 0, behavior: 'instant' });
+                                                            } catch (err: any) {
+                                                                console.error('Inquiry Submission Error:', err);
+                                                                alert('접수 중 오류가 발생했습니다.');
+                                                            } finally {
+                                                                setIsInquirySubmitting(false);
+                                                            }
+                                                        }}
+                                                        className="flex-[2] py-5 bg-pink-600 text-white rounded-2xl text-base font-black shadow-lg shadow-pink-100 hover:bg-pink-700 transition flex items-center justify-center gap-2"
+                                                    >
+                                                        {isInquirySubmitting ? <RefreshCw className="animate-spin" size={20} /> : '문의 등록하기'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {inquiryMode === 'detail' && viewingInquiry && (
+                                        <div className="space-y-6">
+                                            <div className="flex items-center gap-3">
+                                                <button onClick={() => {
+                                                    if (inquiryTitle || inquiryContent) {
+                                                        if (!confirm('작성 중인 내용은 저장되지 않습니다. 정말 목록으로 돌아가시겠습니까?')) return;
+                                                    }
+                                                    setInquiryMode('list');
+                                                    setIsPasswordVerified(false);
+                                                    setPasswordInput('');
+                                                }} className="p-2 hover:bg-gray-100 rounded-full transition"><ChevronLeft /></button>
+                                                <h4 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 내용 확인</h4>
+                                            </div>
+
+                                            {!isPasswordVerified ? (
+                                                <div className={`p-10 md:p-16 rounded-[45px] border text-center space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                    <div className="w-16 h-16 bg-pink-50 text-pink-500 rounded-3xl flex items-center justify-center mx-auto shadow-inner">
+                                                        <Zap size={32} />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <h5 className="text-xl font-black text-gray-900">비밀글입니다.</h5>
+                                                        <p className="text-sm font-bold text-gray-400">작성 시 설정한 비밀번호를 입력해주세요.</p>
+                                                    </div>
+                                                    <div className="max-w-xs mx-auto space-y-4">
+                                                        <input
+                                                            type="password"
+                                                            value={passwordInput}
+                                                            onChange={(e) => setPasswordInput(e.target.value)}
+                                                            placeholder="비밀번호 입력"
+                                                            className={`w-full border-2 rounded-2xl p-4 text-center text-lg font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                // Always permit admin or correct password
+                                                                if (isAdmin || passwordInput === viewingInquiry.password || viewingInquiry.writer_name === '운영팀') {
+                                                                    setIsPasswordVerified(true);
+                                                                    setPasswordInput('');
+                                                                } else {
+                                                                    alert('비밀번호가 일치하지 않습니다.');
+                                                                }
+                                                            }}
+                                                            className="w-full py-5 bg-gray-900 text-white rounded-2xl text-base font-black hover:bg-black transition shadow-lg"
+                                                        >
+                                                            비밀번호 확인
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-6">
+                                                    {/* Customer Content */}
+                                                    <div className={`p-4 md:p-12 rounded-[30px] md:rounded-[45px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
+                                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
+                                                            <div className="space-y-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs font-black text-pink-600 uppercase tracking-widest">{viewingInquiry.type}</span>
+                                                                    <span className="text-xs text-gray-300">|</span>
+                                                                    <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(viewingInquiry.created_at).toLocaleString()}</span>
+                                                                </div>
+                                                                <h5 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{viewingInquiry.title}</h5>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`px-4 py-1.5 rounded-full text-xs font-black ${viewingInquiry.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-pink-100 text-pink-600'}`}>
+                                                                    {viewingInquiry.status === 'completed' ? '답변완료' : '답변대기중'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Writer</p>
+                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.writer_name}</p>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Contact</p>
+                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.contact}</p>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Shop Name</p>
+                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.shop_name || '-'}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'} p-8 rounded-[35px] border border-dashed min-h-[200px]`}>
+                                                            <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium leading-relaxed whitespace-pre-wrap`}>{viewingInquiry.content}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Admin Reply */}
+                                                    {viewingInquiry.status === 'completed' && (
+                                                        <div className="bg-slate-900 text-white p-8 md:p-12 rounded-[45px] shadow-2xl relative overflow-hidden">
+                                                            <div className="absolute top-0 right-0 p-10 opacity-5">
+                                                                <MessageSquare size={120} />
+                                                            </div>
+                                                            <div className="relative z-10 space-y-6">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                                                        <ShieldCheck size={20} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h6 className="text-[15px] font-black italic">Administrator Advice</h6>
+                                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(viewingInquiry.replied_at).toLocaleString()}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="h-px bg-white/10 w-full" />
+                                                                <div className="text-base font-medium leading-relaxed text-slate-300 whitespace-pre-wrap">
+                                                                    {viewingInquiry.reply_content}
+                                                                </div>
+                                                                <div className="pt-4 border-t border-white/5">
+                                                                    <p className="text-xs text-slate-500 font-bold">※ 더 자세한 답변을 원하시면 추가 문의 또는 고객센터(1544-5568)로 연락 바랍니다.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="pt-4 text-center">
+                                                        <button onClick={() => {
+                                                            setInquiryMode('list');
+                                                            setIsPasswordVerified(false);
+                                                            setPasswordInput('');
+                                                        }} className="px-10 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm hover:bg-gray-200 transition">목록으로 돌아가기</button>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
-                            </div>
-                        )}
-
-                        {/* 5. 1:1 Inquiry */}
-                        {activeTab === '1:1문의' && (
-                            <div className="space-y-10">
-                                <div className="bg-gradient-to-br from-pink-50 to-white p-8 md:p-10 rounded-[40px] border border-pink-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
-                                    <div className={`p-5 rounded-[30px] text-pink-600 shadow-sm border border-pink-100 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-                                        <MessageCircle size={36} />
-                                    </div>
-                                    <div className="text-center md:text-left">
-                                        <h3 className={`text-2xl font-black mb-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>무엇을 도와드릴까요?</h3>
-                                        <p className={`text-[14px] leading-relaxed font-black ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>궁금한 점을 남겨주시면 24시간 이내에 전문가가 답변을 드립니다.</p>
-                                    </div>
-                                </div>
-
-                                <div className={`p-10 rounded-[45px] border shadow-sm space-y-10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 유형 <span className="text-pink-600">*</span></label>
-                                            <select
-                                                className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
-                                                onChange={(e) => setInquiryTitle(`[${e.target.value}] ` + (inquiryTitle || ''))}
-                                            >
-                                                <option>광고 상품 문의 (사장님)</option>
-                                                <option>채용 관련 문의 (구직자)</option>
-                                                <option>신고 및 운영 정책</option>
-                                                <option>기타 제휴 문의</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>연락처/회신처 <span className="text-pink-600">*</span></label>
-                                            <input
-                                                type="text"
-                                                value={inquiryContact}
-                                                onChange={(e) => setInquiryContact(e.target.value)}
-                                                placeholder="회신 받을 번호나 메일을 적어주세요"
-                                                className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 제목 <span className="text-pink-600">*</span></label>
-                                        <input
-                                            type="text"
-                                            value={inquiryTitle}
-                                            onChange={(e) => setInquiryTitle(e.target.value)}
-                                            placeholder="핵심 내용을 한 문장으로 요약해주세요"
-                                            className={`w-full border-2 rounded-[22px] p-5 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className={`block text-xs font-black mb-3 ml-2 uppercase tracking-widest ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>상세 내용 <span className="text-pink-600">*</span></label>
-                                        <textarea
-                                            value={inquiryContent}
-                                            onChange={(e) => setInquiryContent(e.target.value)}
-                                            placeholder="구체적인 상황을 적어주시면 더 정확한 답변이 가능합니다."
-                                            className={`w-full border-2 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
-                                        />
-                                    </div>
-
-                                    <button
-                                        className={`w-full font-black py-6 rounded-[28px] text-xl shadow-2xl transition-all hover:scale-[1.01] active:scale-95 outline-none ${brand.theme === 'dark' ? 'bg-pink-600 text-white hover:bg-pink-700' : 'bg-gray-900 text-white hover:bg-black'}`}
-                                        onClick={() => alert('접수되었습니다. 담당자 확인 후 빠르게 답변 드리겠습니다!')}
-                                    >
-                                        상담 등록하기
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                            )
+                        }
 
                         {/* 6. 약관 및 정책 */}
-                        {activeTab === '약관 및 정책' && (
-                            <div className="space-y-10">
-                                <section id="terms" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>서비스 이용약관</h3>
-                                    </div>
-                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 1조 (목적)</p>
-                                        <p className="mb-6 ml-2 text-gray-500">본 약관은 코코알바(이하 &quot;회사&quot;)가 제공하는 온라인 구인구직 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.</p>
+                        {
+                            activeTab === '약관 및 정책' && (
+                                <div className="space-y-10">
+                                    <section id="terms" className="scroll-mt-32">
+                                        <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                            <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                            <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>서비스 이용약관</h3>
+                                        </div>
+                                        <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">제 1조 (목적)</p>
+                                            <p className="mb-6 ml-2 text-gray-500">본 약관은 코코알바(이하 &quot;회사&quot;)가 제공하는 온라인 구인구직 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 2조 (서비스의 내용)</p>
-                                        <p className="mb-6 ml-2 text-gray-500">1. 회사가 제공하는 서비스는 구인공고 등록, 이력서 등록, 광고 대행, 인재 매칭 지원 서비스 등이 포함됩니다.<br />2. 회사는 서비스의 품질 향상을 위해 필요한 경우 서비스의 내용을 변경하거나 중단할 수 있습니다.</p>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">제 2조 (서비스의 내용)</p>
+                                            <p className="mb-6 ml-2 text-gray-500">1. 회사가 제공하는 서비스는 구인공고 등록, 이력서 등록, 광고 대행, 인재 매칭 지원 서비스 등이 포함됩니다.<br />2. 회사는 서비스의 품질 향상을 위해 필요한 경우 서비스의 내용을 변경하거나 중단할 수 있습니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">제 3조 (이용자의 의무)</p>
-                                        <p className="ml-2 text-gray-500">회원은 관계 법령, 본 약관의 규정, 이용 가이드 및 서비스와 관련하여 공지한 주의사항을 준수하여야 하며, 기타 회사의 업무에 방해되는 행위를 해서는 안 됩니다.</p>
-                                    </div>
-                                </section>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">제 3조 (이용자의 의무)</p>
+                                            <p className="ml-2 text-gray-500">회원은 관계 법령, 본 약관의 규정, 이용 가이드 및 서비스와 관련하여 공지한 주의사항을 준수하여야 하며, 기타 회사의 업무에 방해되는 행위를 해서는 안 됩니다.</p>
+                                        </div>
+                                    </section>
 
-                                <section id="privacy" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
-                                    </div>
-                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
-                                        <p className="mb-6 text-gray-500 italic">&quot;코코알바&quot;는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
+                                    <section id="privacy" className="scroll-mt-32">
+                                        <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                            <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                            <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>개인정보처리방침</h3>
+                                        </div>
+                                        <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                            <p className="mb-6 text-gray-500 italic">&quot;코코알바&quot;는 회원의 개인정보를 보호하고 관련 법령을 준수하기 위해 다음과 같은 처리 방침을 수립하여 운영하고 있습니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">1. 개인정보의 수집 및 이용 목적</p>
-                                        <p className="mb-6 ml-2 text-gray-500">회사는 회원가입, 원활한 고객 상담, 각종 서비스 제공을 위해 최소한의 개인정보를 수집하며, 수집된 정보는 회원 식별 및 공고 관리 목적으로만 사용됩니다.</p>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">1. 개인정보의 수집 및 이용 목적</p>
+                                            <p className="mb-6 ml-2 text-gray-500">회사는 회원가입, 원활한 고객 상담, 각종 서비스 제공을 위해 최소한의 개인정보를 수집하며, 수집된 정보는 회원 식별 및 공고 관리 목적으로만 사용됩니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">2. 보유 및 이용 기간</p>
-                                        <p className="ml-2 text-gray-500">회원의 개인정보는 원칙적으로 회원 탈퇴 시 즉시 파기되나, 관계 법령에 의해 보존할 필요가 있는 경우 법정 기간 동안 안전하게 보관됩니다.</p>
-                                    </div>
-                                </section>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">2. 보유 및 이용 기간</p>
+                                            <p className="ml-2 text-gray-500">회원의 개인정보는 원칙적으로 회원 탈퇴 시 즉시 파기되나, 관계 법령에 의해 보존할 필요가 있는 경우 법정 기간 동안 안전하게 보관됩니다.</p>
+                                        </div>
+                                    </section>
 
-                                <section id="youth" className="scroll-mt-32">
-                                    <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
-                                        <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
-                                        <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>청소년 보호정책</h3>
-                                    </div>
-                                    <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
-                                        <p className="mb-6 text-gray-500">회사는 청소년이 건전한 인격체로 성장할 수 있도록 정보통신망 이용촉진 및 정보보호 등에 관한 법률 및 청소년 보호법에 근거하여 청소년 보호정책을 시행하고 있습니다.</p>
+                                    <section id="youth" className="scroll-mt-32">
+                                        <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
+                                            <div className="w-2 h-8 bg-pink-600 rounded-full"></div>
+                                            <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>청소년 보호정책</h3>
+                                        </div>
+                                        <div className={`p-8 rounded-[30px] border leading-relaxed text-[14px] font-medium ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-600 shadow-sm'}`}>
+                                            <p className="mb-6 text-gray-500">회사는 청소년이 건전한 인격체로 성장할 수 있도록 정보통신망 이용촉진 및 정보보호 등에 관한 법률 및 청소년 보호법에 근거하여 청소년 보호정책을 시행하고 있습니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">1. 청소년 유해정보에 대한 금지행위</p>
-                                        <p className="mb-6 ml-2 text-gray-500">청소년에게 유해한 영향을 미칠 수 있는 게시물이나 광고는 엄격히 금지되며, 상시 모니터링을 통해 즉각적인 조치를 취하고 있습니다.</p>
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">1. 청소년 유해정보에 대한 금지행위</p>
+                                            <p className="mb-6 ml-2 text-gray-500">청소년에게 유해한 영향을 미칠 수 있는 게시물이나 광고는 엄격히 금지되며, 상시 모니터링을 통해 즉각적인 조치를 취하고 있습니다.</p>
 
-                                        <p className="mb-4 font-black text-gray-900 dark:text-white">2. 유해환경으로부터의 차단</p>
-                                        <p className="ml-2 text-gray-500">성인 인증 시스템과 필터링 기능을 통해 청소년이 의도치 않게 유해 정보에 노출되지 않도록 최선의 기술적 조치를 다하고 있습니다.</p>
-                                    </div>
-                                </section>
-                            </div>
-                        )}
+                                            <p className="mb-4 font-black text-gray-900 dark:text-white">2. 유해환경으로부터의 차단</p>
+                                            <p className="ml-2 text-gray-500">성인 인증 시스템과 필터링 기능을 통해 청소년이 의도치 않게 유해 정보에 노출되지 않도록 최선의 기술적 조치를 다하고 있습니다.</p>
+                                        </div>
+                                    </section>
+                                </div>
+                            )
+                        }
 
                         {/* Customer Service Box (Mobile Lower Position) */}
                         <div className={`md:hidden mt-6 p-5 rounded-[30px] border shadow-xl shadow-pink-100/10 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-white to-pink-50/30 border-pink-100'}`}>
@@ -1597,51 +2349,52 @@ export function CustomerCenterContent() {
                                 <MessageCircle size={18} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
-                    </div>
-                </div>
+                    </div >
+                </div >
 
                 {/* [Modal] 사장님 전용 상품 안내 (PaymentPopup) */}
-                {isPaymentPopupOpen && (
-                    <PaymentPopup
-                        isOpen={isPaymentPopupOpen}
-                        onClose={() => setIsPaymentPopupOpen(false)}
-                        initialTier={paymentInitialTier}
-                    />
-                )}
+                {
+                    isPaymentPopupOpen && (
+                        <PaymentPopup
+                            isOpen={isPaymentPopupOpen}
+                            onClose={() => setIsPaymentPopupOpen(false)}
+                            initialTier={paymentInitialTier}
+                        />
+                    )
+                }
 
-                {selectedImage && createPortal(
-                    <div className="fixed inset-0 z-[20000] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
-                        <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
-                            <div className="mb-6 text-center">
-                                <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
-                                <div className="w-12 h-1 bg-pink-600 mx-auto rounded-full"></div>
-                            </div>
+                {
+                    selectedImage && createPortal(
+                        <div className="fixed inset-0 z-[20000] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
+                            <div className="relative max-w-5xl w-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
+                                <div className="mb-6 text-center">
+                                    <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter mb-2">노출 상세 및 영역 안내</h3>
+                                    <div className="w-12 h-1 bg-pink-600 mx-auto rounded-full"></div>
+                                </div>
 
-                            <div className="relative w-full h-full flex items-center justify-center">
-                                <Image
-                                    src={selectedImage || ''}
-                                    alt="Ad Placement Guide Full"
-                                    width={1000}
-                                    height={1500}
-                                    className="max-width-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10"
-                                />
-                                <button
-                                    onClick={() => setSelectedImage(null)}
-                                    className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
-                                >
-                                    <X size={24} />
-                                </button>
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                    <Image
+                                        src={selectedImage || ''}
+                                        alt="Ad Placement Guide Full"
+                                        width={1000}
+                                        height={1500}
+                                        className="max-width-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+                                    />
+                                    <button
+                                        onClick={() => setSelectedImage(null)}
+                                        className="absolute -top-12 md:-top-10 right-0 md:-right-16 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/20 shadow-lg"
+                                    >
+                                        <X size={24} />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </div>,
-                    document.body
-                )}
-                {/* Deployment Verification Tag */}
+                        </div>,
+                        document.body
+                    )
+                }
                 <div data-deploy-version="2026-02-04-02:40" style={{ display: 'none' }}></div>
-
-            </div >
-
-
+            </div>
         </>
     );
 }
+

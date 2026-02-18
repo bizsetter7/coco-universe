@@ -83,6 +83,7 @@ function AdminContent() {
     const [sendSuccess, setSendSuccess] = useState(false);
     const [allMessages, setAllMessages] = useState<any[]>([]);
     const [selectedInquiry, setSelectedInquiry] = useState<any | null>(null);
+    const [inquiryReply, setInquiryReply] = useState('');
 
     // --- 4. Ad Rejection State ---
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -105,9 +106,20 @@ function AdminContent() {
         { id: 3, sender: '김사장님', date: '1시간 전', content: '문의가 효과 테두리 색상 변경 가능한가요?', status: 'new' },
     ];
     const [mockInquiries] = useState(mockInquiriesList);
+    const [realInquiries, setRealInquiries] = useState<any[]>([]);
     // --- 5. Data Fetching (Supabase) ---
     const fetchData = async () => {
         try {
+            // 0. Fetch Inquiries
+            const { data: inqData } = await supabase
+                .from('inquiries')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (inqData) {
+                setRealInquiries(inqData);
+            }
+
             // 1. Fetch Shops
             const { data: adsData } = await supabase
                 .from('shops')
@@ -418,6 +430,37 @@ function AdminContent() {
         }
     };
 
+    const handleInquiryStatusUpdate = async (inquiryId: string, newStatus: string, reply?: string) => {
+        const confirmMsg = newStatus === 'completed' ? '답변을 저장하고 완료 처리하시겠습니까?' : '이 문의를 보관/차단하시겠습니까?';
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const updateData: any = { status: newStatus };
+            if (newStatus === 'completed' && reply) {
+                updateData.reply_content = reply;
+                updateData.replied_at = new Date().toISOString();
+            }
+
+            const { error } = await supabase
+                .from('inquiries')
+                .update(updateData)
+                .eq('id', inquiryId);
+
+            if (error) throw error;
+
+            alert(newStatus === 'completed' ? '답변이 저장되었습니다.' : '문의 상태가 변경되었습니다.');
+            setInquiryReply(''); // Reset reply input
+            fetchData(); // Refresh list to update badges and list
+            if (selectedInquiry?.id === inquiryId) {
+                setSelectedInquiry((prev: any) => prev ? { ...prev, ...updateData } : null);
+            }
+            if (isMobileInquiryModalOpen) setIsMobileInquiryModalOpen(false);
+        } catch (err: any) {
+            console.error('Inquiry status update error:', err);
+            alert('업데이트 실패: ' + (err.message || '알 수 없는 오류'));
+        }
+    };
+
     const formatPrice = (priceInWon: number) => {
         if (priceInWon >= 10000) {
             return `${Math.floor(priceInWon / 10000)}만원`;
@@ -446,20 +489,16 @@ function AdminContent() {
         setIsAuthorized(true);
     }, [isLoggedIn, userType, router, isLoading]);
 
-    // [New] Body Scroll Lock Logic
-    useEffect(() => {
-        if (isGlobalMsgOpen || isMobileInquiryModalOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => { document.body.style.overflow = 'unset'; };
-    }, [isGlobalMsgOpen, isMobileInquiryModalOpen]);
-
     if (!isAuthorized) return null;
 
+    // --- [New] Badge Counter Calculations ---
+    const pendingAdsCount = mockAds.filter(a => a.status === 'pending').length;
+    const pendingInquiriesCount = realInquiries.filter(i => i.status === 'new').length;
+    const pendingPaymentsCount = payments.filter(p => p.status !== 'completed').length;
+    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount;
+
     return (
-        <div className="min-h-screen bg-white flex flex-col md:flex-row">
+        <div className="min-h-screen bg-white flex flex-col md:flex-row h-screen overflow-hidden">
             {/* Mobile Header with Hamburger */}
             <header className="md:hidden bg-slate-950 text-white p-4 flex justify-between items-center sticky top-0 z-[10002]">
                 <div className="flex items-center gap-2">
@@ -489,9 +528,9 @@ function AdminContent() {
                         </div>
                         <nav className="flex-1 space-y-3">
                             <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active={activeTab === 'stats'} onClick={() => { setActiveTab('stats'); setIsSidebarOpen(false); }} />
-                            <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} onClick={() => { setActiveTab('ads'); setIsSidebarOpen(false); }} />
-                            <NavItem icon={<CreditCard size={20} />} label="결제 관리" active={activeTab === 'payments'} onClick={() => { setActiveTab('payments'); setIsSidebarOpen(false); }} />
-                            <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => { setActiveTab('inquiry'); setIsSidebarOpen(false); }} />
+                            <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} badge={pendingAdsCount} onClick={() => { setActiveTab('ads'); setIsSidebarOpen(false); }} />
+                            <NavItem icon={<CreditCard size={20} />} label="결제 관리" active={activeTab === 'payments'} badge={pendingPaymentsCount} onClick={() => { setActiveTab('payments'); setIsSidebarOpen(false); }} />
+                            <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} badge={pendingInquiriesCount} onClick={() => { setActiveTab('inquiry'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<ShieldCheck size={20} className="text-emerald-500" />} label="시스템 검증 센터" active={activeTab === 'health'} onClick={() => { setActiveTab('health'); setIsSidebarOpen(false); }} />
                             <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => { setActiveTab('seo'); setIsSidebarOpen(false); }} />
@@ -513,15 +552,15 @@ function AdminContent() {
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
                     <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
-                    <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} onClick={() => setActiveTab('ads')} />
-                    <NavItem icon={<Database size={20} />} label="결제 내역 관리" active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} />
-                    <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} onClick={() => setActiveTab('inquiry')} />
+                    <NavItem icon={<Zap size={20} />} label="광고 심사 관리" active={activeTab === 'ads'} badge={pendingAdsCount} onClick={() => setActiveTab('ads')} />
+                    <NavItem icon={<Database size={20} />} label="결제 내역 관리" active={activeTab === 'payments'} badge={pendingPaymentsCount} onClick={() => setActiveTab('payments')} />
+                    <NavItem icon={<MessageSquare size={20} />} label="통합 문의 관리" active={activeTab === 'inquiry'} badge={pendingInquiriesCount} onClick={() => setActiveTab('inquiry')} />
                     <NavItem icon={<Users size={20} />} label="회원 관리" active={activeTab === 'users'} onClick={() => setActiveTab('users')} />
                     <NavItem icon={<ShieldCheck size={20} className="text-emerald-500" />} label="시스템 검증 센터" active={activeTab === 'health'} onClick={() => setActiveTab('health')} />
                     <NavItem icon={<Settings size={20} />} label="시스템 설정" active={activeTab === 'seo'} onClick={() => setActiveTab('seo')} />
                 </nav>
             </aside>
-            <main className="flex-1 p-5 md:p-10">
+            <main className="flex-1 overflow-y-auto p-5 md:p-10 scrollbar-hide">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-3">
@@ -600,7 +639,7 @@ function AdminContent() {
                                 className={`relative p-2.5 md:p-3 border rounded-2xl transition-all active:scale-95 ${isNotificationOpen ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 shadow-sm'}`}
                             >
                                 <Bell size={20} />
-                                {mockAds.filter(a => a.status === 'pending').length > 0 && (
+                                {totalNotifications > 0 && (
                                     <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white animate-pulse"></span>
                                 )}
                             </button>
@@ -610,19 +649,47 @@ function AdminContent() {
                                     <div className="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                                         <p className="text-xs font-black text-slate-900">실시간 알림</p>
                                         <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.5 rounded-full font-black">
-                                            {mockAds.filter(a => a.status === 'pending').length}
+                                            {totalNotifications}
                                         </span>
                                     </div>
                                     <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                                        {/* 광고 알림 */}
                                         {mockAds.filter(a => a.status === 'pending').map(ad => (
                                             <div key={ad.id} className="p-4 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setActiveTab('ads'); setIsNotificationOpen(false); }}>
-                                                <p className="text-[11px] font-black text-slate-900">신규 광고 신청</p>
-                                                <p className="text-[10px] text-slate-400 font-bold mt-0.5 leading-tight">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Zap size={12} className="text-amber-500" />
+                                                    <p className="text-[11px] font-black text-slate-900">신규 광고 신청</p>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 font-bold leading-tight">
                                                     [{ad.region}] {ad.shopName} 사장님이 승인을 기다리고 있습니다.
                                                 </p>
                                             </div>
                                         ))}
-                                        {mockAds.filter(a => a.status === 'pending').length === 0 && (
+                                        {/* 문의 알림 */}
+                                        {realInquiries.filter(i => i.status === 'new').map(inq => (
+                                            <div key={inq.id} className="p-4 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setActiveTab('inquiry'); setIsNotificationOpen(false); }}>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <MessageSquare size={12} className="text-blue-500" />
+                                                    <p className="text-[11px] font-black text-slate-900">신규 1:1 문의</p>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 font-bold leading-tight">
+                                                    [{inq.type}] {inq.title}
+                                                </p>
+                                            </div>
+                                        ))}
+                                        {/* 결제 알림 */}
+                                        {payments.filter(p => p.status !== 'completed').map(pay => (
+                                            <div key={pay.id} className="p-4 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setActiveTab('payments'); setIsNotificationOpen(false); }}>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <CreditCard size={12} className="text-pink-500" />
+                                                    <p className="text-[11px] font-black text-slate-900">미결제 내역 확인</p>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 font-bold leading-tight">
+                                                    {pay.depositor_name || pay.amount.toLocaleString() + '원'} 입금 대기 중입니다.
+                                                </p>
+                                            </div>
+                                        ))}
+                                        {totalNotifications === 0 && (
                                             <div className="p-10 text-center">
                                                 <p className="text-xs text-slate-400 font-bold">새로운 알림이 없습니다.</p>
                                             </div>
@@ -1147,26 +1214,36 @@ function AdminContent() {
                                 <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl overflow-hidden flex flex-col">
                                     <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
                                         <h3 className="text-lg font-black text-slate-900">1:1 문의 및 메시지</h3>
-                                        <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg text-[10px] font-black">{mockInquiries.length + allMessages.length}건</span>
+                                        <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded-lg text-[10px] font-black">{realInquiries.length + allMessages.length}건</span>
                                     </div>
                                     <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                                        {mockInquiries.map((inquiry) => (
+                                        {realInquiries.map((inquiry) => (
                                             <div
                                                 key={`inq-${inquiry.id}`}
                                                 onClick={() => {
-                                                    setSelectedInquiry(inquiry);
+                                                    setSelectedInquiry({
+                                                        ...inquiry,
+                                                        sender: inquiry.contact, // Map contact to sender for viewer
+                                                        date: new Date(inquiry.created_at).toLocaleString()
+                                                    });
                                                     setIsMobileInquiryModalOpen(true);
                                                 }}
                                                 className={`p-4 rounded-3xl border transition-all cursor-pointer ${selectedInquiry?.id === inquiry.id ? 'bg-blue-50 border-blue-200 shadow-md ring-1 ring-blue-100' : 'bg-white border-slate-100 hover:bg-slate-50'}`}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="bg-slate-900 text-white px-2 py-1 rounded-md text-[9px] font-black">문의</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold">{inquiry.date}</span>
+                                                    <span className="bg-slate-900 text-white px-2 py-1 rounded-md text-[9px] font-black">문의: {inquiry.type}</span>
+                                                    <span className="text-[10px] text-slate-400 font-bold">{new Date(inquiry.created_at).toLocaleDateString()}</span>
                                                 </div>
-                                                <p className="text-sm font-black text-slate-800 line-clamp-1 mb-1">{inquiry.content}</p>
+                                                <p className="text-sm font-black text-slate-800 line-clamp-1 mb-1">{inquiry.title}</p>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] text-slate-500 font-bold">{inquiry.sender}</span>
-                                                    {inquiry.status === 'new' && <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>}
+                                                    <span className="text-[10px] text-slate-500 font-bold">{inquiry.contact}</span>
+                                                    {inquiry.status === 'new' ? (
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>
+                                                    ) : (
+                                                        <span className={`px-1 rounded-md text-[8px] font-black ${inquiry.status === 'completed' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                            {inquiry.status === 'completed' ? '답변완료' : '보관됨'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -1197,20 +1274,78 @@ function AdminContent() {
                                 {/* Viewer (Hidden on Mobile, Desktop Only) */}
                                 <div className="hidden lg:flex bg-slate-950 rounded-[40px] shadow-xl p-8 text-white flex-col items-center justify-center text-center relative overflow-hidden">
                                     {selectedInquiry ? (
-                                        <div className="w-full max-w-md animate-in zoom-in-95 duration-300 relative z-10">
-                                            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl">
-                                                💬
+                                        <div className="w-full max-w-2xl animate-in zoom-in-95 duration-300 relative z-10 text-left">
+                                            <div className="flex items-center justify-between mb-8">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-2xl">
+                                                        {selectedInquiry.type === '광고 상품' ? '💰' : selectedInquiry.type === '채용 관련' ? '💼' : '💬'}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-xl font-black">{selectedInquiry.writer_name || selectedInquiry.sender || '익명 작성자'}</h3>
+                                                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                                                            {new Date(selectedInquiry.created_at || selectedInquiry.date).toLocaleString()} · {selectedInquiry.type}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${selectedInquiry.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-pink-500/20 text-pink-400 animate-pulse'}`}>
+                                                    {selectedInquiry.status === 'completed' ? '답변완료' : '신규문의'}
+                                                </div>
                                             </div>
-                                            <h3 className="text-2xl font-black mb-2">{selectedInquiry.sender || selectedInquiry.from}</h3>
-                                            <p className="text-slate-400 text-xs font-bold mb-8 uppercase tracking-widest">
-                                                {selectedInquiry.date} · {selectedInquiry.type === 'message' ? 'DIRECT MESSAGE' : 'SYSTEM INQUIRY'}
-                                            </p>
-                                            <div className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 mb-8 backdrop-blur-sm">
-                                                <p className="text-lg font-bold leading-relaxed">{selectedInquiry.content}</p>
+
+                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+                                                    <p className="text-[10px] text-slate-500 font-black mb-1">연락처 / 회신처</p>
+                                                    <p className="text-sm font-bold text-slate-200">{selectedInquiry.contact}</p>
+                                                </div>
+                                                <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+                                                    <p className="text-[10px] text-slate-500 font-black mb-1">관련 상점 / 회원ID</p>
+                                                    <p className="text-sm font-bold text-slate-200">{selectedInquiry.shop_name || selectedInquiry.user_id || '정보 없음'}</p>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-4 justify-center">
-                                                <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-black text-sm hover:bg-blue-500 transition shadow-lg shadow-blue-900/50">답변하기</button>
-                                                <button className="px-6 py-3 bg-slate-800 text-slate-300 rounded-xl font-black text-sm hover:bg-slate-700 transition">차단/보관</button>
+
+                                            <div className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 mb-6 backdrop-blur-sm min-h-[150px]">
+                                                <h4 className="text-sm font-black text-blue-400 mb-3">[{selectedInquiry.type}] {selectedInquiry.title}</h4>
+                                                <p className="text-base font-medium text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedInquiry.content}</p>
+                                            </div>
+
+                                            {/* Admin Reply Section */}
+                                            <div className="space-y-4">
+                                                <label className="text-[10px] font-black text-slate-500 uppercase ml-2">Admin Reply</label>
+                                                <textarea
+                                                    value={selectedInquiry.status === 'completed' ? (selectedInquiry.reply_content || '') : inquiryReply}
+                                                    onChange={(e) => setInquiryReply(e.target.value)}
+                                                    disabled={selectedInquiry.status === 'completed'}
+                                                    placeholder="답변 내용을 입력해주세요..."
+                                                    className="w-full bg-slate-900/80 border border-slate-800 rounded-3xl p-5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none h-32 disabled:opacity-70"
+                                                />
+                                                <div className="flex gap-4">
+                                                    {selectedInquiry.status !== 'completed' ? (
+                                                        <button
+                                                            onClick={() => handleInquiryStatusUpdate(selectedInquiry.id, 'completed', inquiryReply)}
+                                                            className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-500 transition shadow-lg shadow-blue-900/50"
+                                                        >
+                                                            답변 저장 및 완료
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => {
+                                                                if (confirm('답변을 수정하시겠습니까?')) {
+                                                                    setSelectedInquiry((prev: any) => ({ ...prev, status: 'ing' }));
+                                                                    setInquiryReply(selectedInquiry.reply_content || '');
+                                                                }
+                                                            }}
+                                                            className="flex-1 py-4 bg-slate-800 text-slate-300 rounded-2xl font-black text-sm hover:bg-slate-700 transition"
+                                                        >
+                                                            답변 수정하기
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleInquiryStatusUpdate(selectedInquiry.id, 'archived')}
+                                                        className="px-8 py-4 bg-slate-800 text-slate-400 rounded-2xl font-black text-sm hover:bg-red-900/30 hover:text-red-400 transition"
+                                                    >
+                                                        보관/차단
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
@@ -1466,14 +1601,14 @@ function AdminContent() {
                                 onClick={() => setSelectedAdForModal(null)}
                             />
                             <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-                                <div className="p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
+                                <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
                                     <div className="flex items-center gap-4">
                                         <div>
                                             <span className="bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md font-black uppercase mb-2 inline-block">
                                                 Ad Preview Detail <span className="text-slate-400">|</span> No. {(selectedAdForModal as any).adNo || String(selectedAdForModal.id || '').substring(0, 8)}
                                             </span>
-                                            <div className="flex items-center gap-3">
-                                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter truncate max-w-[400px]">{selectedAdForModal.title}</h3>
+                                            <div className="flex items-center gap-2 md:gap-3">
+                                                <h3 className="text-2xl font-black text-slate-950 tracking-tighter line-clamp-2 max-w-[400px]">{selectedAdForModal.title}</h3>
                                                 {/* [규정] 결제 금액(Price)만 제목 옆에 노출 */}
                                                 <div className="bg-pink-50 border border-pink-100 px-3 py-1.5 rounded-xl flex items-baseline gap-1 animate-in slide-in-from-left-2">
                                                     <span className="text-[10px] font-black text-pink-400 uppercase leading-none">Price</span>
@@ -1578,7 +1713,12 @@ function AdminContent() {
                                         <p className="text-white text-base font-bold leading-relaxed">{selectedInquiry.content}</p>
                                     </div>
                                     <div className="flex gap-4 w-full">
-                                        <button className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-blue-900/50">답변하기</button>
+                                        <button
+                                            onClick={() => handleInquiryStatusUpdate(selectedInquiry.id, 'completed')}
+                                            className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-blue-900/50"
+                                        >
+                                            답변하기
+                                        </button>
                                         <button onClick={() => setIsMobileInquiryModalOpen(false)} className="px-6 py-4 bg-slate-800 text-slate-400 rounded-2xl font-black text-sm">닫기</button>
                                     </div>
                                 </div>
@@ -1591,16 +1731,23 @@ function AdminContent() {
     );
 }
 
-function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
+function NavItem({ icon, label, active, badge, onClick }: { icon: React.ReactNode, label: string, active?: boolean, badge?: number, onClick?: () => void }) {
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-slate-500 hover:bg-slate-900 hover:text-white'}`}
+            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl font-black text-sm transition-all ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-slate-500 hover:bg-slate-900 hover:text-white'}`}
         >
-            <div className={`shrink-0 ${active ? 'text-white' : 'text-slate-600 opacity-60'}`}>
-                {icon}
+            <div className="flex items-center gap-3">
+                <div className={`shrink-0 ${active ? 'text-white' : 'text-slate-600 opacity-60'}`}>
+                    {icon}
+                </div>
+                <span>{label}</span>
             </div>
-            <span>{label}</span>
+            {badge !== undefined && badge > 0 && (
+                <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-black ${active ? 'bg-white text-blue-600' : 'bg-pink-500 text-white'}`}>
+                    {badge}
+                </span>
+            )}
         </button>
     );
 }

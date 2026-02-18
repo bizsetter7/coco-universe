@@ -123,21 +123,22 @@ const JobRow = React.memo(({
                 <span className="text-[13px] font-bold text-gray-500 truncate block">{shop.workType}</span>
             </td>
 
-            {/* 5. 모집내용 */}
+            {/* 5. 공고제목 (1줄 제한) */}
             <td className="py-4 px-2 text-center">
-                <div className="flex items-center justify-center gap-2 w-full px-2">
-                    <p
-                        className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} line-clamp-2 flex items-center justify-center gap-1.5 text-center leading-snug`}
+                {/* 5. 공고제목 (1줄 제한 - Flex Refactor for PC Table) */}
+                <div className="flex items-center justify-center gap-1 w-full px-2">
+                    {shop.options?.blink && <span className="text-[10px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shrink-0 shadow-sm">NEW</span>}
+                    <IconBadge iconId={shop.options?.icon} className="text-[14px] shrink-0" />
+                    <div
+                        className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} truncate text-center leading-snug max-w-[300px]`}
                     >
-                        {shop.options?.blink && <span className="text-[10px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shrink-0 mr-0.5 align-middle shadow-sm">NEW</span>}
-                        <IconBadge iconId={shop.options?.icon} className="text-[14px] shrink-0" />
                         <span
                             style={getHighlighterStyle(shop.options?.highlighter)}
-                            className="inline"
+                            className="truncate"
                         >
                             {cleanShopTitle(shop.title, shop.name)}
                         </span>
-                    </p>
+                    </div>
                 </div>
             </td>
 
@@ -200,46 +201,53 @@ const MobileJobRow = React.memo(({
         >
             <div className="w-full bg-white rounded-lg p-3 flex justify-between items-start gap-1 relative shadow-sm border border-gray-100">
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5 pr-2 pt-1">
-                    {/* Line 1: Title (광고내용) */}
-                    <h3 className={`text-[15px] font-bold line-clamp-2 !text-gray-900 force-dark-text leading-snug mb-0.5`}>
-                        {shop.options?.blink && <span className="text-[9px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shadow-sm mr-1.5 align-middle">NEW</span>}
-                        <IconBadge iconId={shop.options?.icon} className="mr-1 inline-block align-middle shrink-0" />
-                        <span
-                            style={getHighlighterStyle(shop.options?.highlighter)}
-                            className="inline align-middle"
-                        >
-                            {cleanShopTitle(shop.title, shop.name)}
-                        </span>
-                    </h3>
 
-                    {/* Line 2: Icons + Region + WorkType */}
-                    <div className="flex items-center gap-1.5 text-[12px] flex-wrap">
-                        <IconBadge iconId={shop.options?.icon} showName={true} />
-                        <span className="text-blue-600 font-bold truncate max-w-[100px]">{shop.region}</span>
-                        <span className="text-gray-300">|</span>
-                        <span className="text-gray-500 font-medium truncate">{shop.workType}</span>
+                    {/* Line 1: IconOption + Highlighter + Title (2줄까지) */}
+                    {/* Line 1: IconOption + Highlighter + Title (1줄 제한 - Flex Refactor) */}
+                    <div className="flex items-center gap-1 mb-0.5 min-w-0">
+                        {shop.options?.blink && <span className="text-[9px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shadow-sm shrink-0">NEW</span>}
+                        <IconBadge iconId={shop.options?.icon} className="shrink-0" />
+                        <h3 className={`text-[15px] font-bold !text-gray-900 force-dark-text leading-snug line-clamp-2 break-all w-full`}>
+                            <span
+                                style={getHighlighterStyle(shop.options?.highlighter)}
+                            >
+                                {cleanShopTitle(shop.title, shop.name)}
+                            </span>
+                        </h3>
                     </div>
 
-                    {/* Line 3: Pay */}
-                    <div className="flex items-center gap-1 mt-0.5">
+                    {/* Line 2: Left(Region + Industry) / Right(Nickname) */}
+                    <div className="flex justify-between items-center text-[12px]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-blue-600 font-bold truncate">{shop.region}</span>
+                            <span className="text-gray-300">|</span>
+                            <span className="text-gray-500 font-medium truncate">{shop.workType}</span>
+                        </div>
+                        <div className="text-gray-800 font-bold truncate ml-2">
+                            {shop.nickname || cleanShopTitle(undefined, shop.name)}
+                        </div>
+                    </div>
+
+                    {/* Line 3: Pay Badge + Amount + Options */}
+                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                         <div className={`
-                            px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold text-white
+                            px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold text-white shrink-0
                             ${badgeColor}
                         `}>
                             {badgeLabel}
                         </div>
-                        <div className={`text-[11px] font-black tracking-tighter !text-gray-900 force-dark-text`}>
+                        <div className={`text-[11px] font-black tracking-tighter !text-gray-900 force-dark-text shrink-0`}>
                             {amount}
                         </div>
-                        {shop.options?.paySuffixes?.map((suffix, i) => (
-                            <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200">
+                        {shop.options?.paySuffixes?.slice(0, 2).map((suffix, i) => (
+                            <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
                                 {suffix}
                             </span>
                         ))}
                     </div>
                 </div>
 
-                {/* Right: Star Icon (Using Flexbox instead of Absolute) */}
+                {/* Right: Star Icon */}
                 <button
                     onClick={(e) => onToggleFav(e, shop.id)}
                     className="p-1 shrink-0 text-gray-300 active:scale-90 transition-transform"
@@ -297,7 +305,7 @@ const JobListView: React.FC<JobListViewProps> = ({
 
     React.useEffect(() => {
         setIsMounted(true);
-        const checkMobile = () => setIsMobile(window.innerWidth < 768); // md breakpoint
+        const checkMobile = () => setIsMobile(window.innerWidth < 1024); // Unified 1024px breakpoint (lg)
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);

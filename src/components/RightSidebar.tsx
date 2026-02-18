@@ -6,10 +6,15 @@ import { useBrand } from './BrandProvider';
 import { REGIONS_MAP } from '@/constants/regions'; // 경로 확인 필요
 import { ChevronRight, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useMobile } from '@/hooks/useMobile';
 
 export default function RightSidebar() {
+    const isMobile = useMobile();
     const brand = useBrand();
     const router = useRouter();
+
+    // [Optimization] Early return for mobile
+    if (isMobile) return null;
 
     const { isLoggedIn, userName, userType, userPoints, logout } = useAuth();
 

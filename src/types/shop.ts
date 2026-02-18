@@ -12,6 +12,7 @@ export interface Shop {
     payType?: string;
     workType: string;
     // [Added] Missing properties for UI
+    businessAddress?: string; // Business Registration Address
     workTime?: string;
     gender?: string;
     age?: string;

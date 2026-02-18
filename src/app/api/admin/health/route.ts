@@ -65,7 +65,7 @@ export async function POST() {
         const standards: any = {
             payBadges: {
                 expected: ['시', '일', '주', '월', '연', 'T', '건', '협'],
-                colors: ['bg-cyan-500', 'bg-blue-600', 'bg-pink-500', 'bg-purple-600', 'bg-green-600', 'bg-indigo-600', 'bg-emerald-500', 'bg-gray-400']
+                colors: ['bg-cyan-500', 'bg-[#3B82F6]', 'bg-[#EC4899]', 'bg-[#7C3AED]', 'bg-[#EF4444]', 'bg-emerald-500', 'bg-emerald-500', 'bg-[#6B7280]']
             },
             adTiers: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         };

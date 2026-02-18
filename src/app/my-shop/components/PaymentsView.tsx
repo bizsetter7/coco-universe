@@ -8,6 +8,19 @@ const getHighlighterStyle = (id: number | string | undefined) => {
     return h ? { backgroundColor: h.color + 'cc', color: '#000', padding: '0 4px', borderRadius: '4px' } : {};
 };
 
+// [Fix] Robust date parsing helper for cross-browser/mobile compatibility (Safari/iOS)
+const safeParseDate = (dateStr: string | null | undefined): Date | null => {
+    if (!dateStr) return null;
+    let d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d;
+
+    // Try forcing ISO format if space exists (common SQL timestamp issue)
+    d = new Date(dateStr.replace(' ', 'T'));
+    if (!isNaN(d.getTime())) return d;
+
+    return null;
+};
+
 export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDetail, onOpenMenu }: { setView: (v: any) => void, payments?: any[], userName?: string, onShowAdDetail?: (adId: any) => void, onOpenMenu?: () => void }) => {
     const brand = useBrand();
 
@@ -60,15 +73,16 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                     </thead>
                                     <tbody className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                                         {payments.map((p: any, index: number) => {
-                                            // [Fix] Robust Type Matching for 'AD' vs 'Tx' Badge
-                                            // Priority: p.type (DB Column) -> p.metadata.product_type -> p.metadata.tier
-                                            const rawType = p.type || p.metadata?.product_type || p.metadata?.tier || p.adObject?.productType || '';
+                                            // [Fix] Robust Type Matching for 'T1-T7' Badge
+                                            // Priority: p.pay_type (V4 Schema Column) -> p.metadata.product_type -> p.metadata.ad_tier
+                                            const rawType = p.pay_type || p.payType || p.metadata?.product_type || p.metadata?.ad_tier || p.adObject?.productType || '';
                                             const typeKey = (rawType || '').toLowerCase();
 
                                             const adProduct = DETAILED_PRICING.find(tp =>
                                                 tp.tier === rawType ||
                                                 tp.id === rawType ||
                                                 tp.code === rawType ||
+                                                tp.altId === rawType ||
                                                 (typeKey.includes('grand') && tp.id === 'p1') ||
                                                 (typeKey.includes('premium') && tp.id === 'p2') ||
                                                 (typeKey.includes('deluxe') && tp.id === 'p3') ||
@@ -77,7 +91,8 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 (typeKey.includes('native') && tp.id === 'p6') ||
                                                 (typeKey.includes('basic') && tp.id === 'p7')
                                             );
-                                            const typeCode = adProduct?.code || 'AD';
+                                            const typeCode = adProduct?.code || 'T7'; // 기본값 T7 (AD 탈피)
+                                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                             const tierName = adProduct?.tier || '일반';
 
                                             const displayPrice = typeof p.price === 'number'
@@ -128,21 +143,30 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                             {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? (
                                                                 <>
                                                                     <span className="text-blue-500 font-black">
-                                                                        {p.adObject.approved_at ? new Date(p.adObject.approved_at).toISOString().split('T')[0] : (p.date?.split(' ')[0] || '-')}
+                                                                        {(() => {
+                                                                            const d = safeParseDate(p.adObject.approved_at || p.date);
+                                                                            return d ? d.toISOString().split('T')[0] : '-';
+                                                                        })()}
                                                                     </span>
                                                                     <span className="text-[10px] opacity-70">
                                                                         {p.adObject.deadline || '2026-03-25'}
                                                                     </span>
                                                                 </>
                                                             ) : (
-                                                                p.date && typeof p.date === 'string' ? (
-                                                                    <>
-                                                                        <span>{p.date.split(' ').slice(0, 3).join(' ')}</span>
-                                                                        <span className="text-[10px] opacity-70">{p.date.split(' ').slice(3).join(' ')}</span>
-                                                                    </>
-                                                                ) : (
-                                                                    <span>{p.date || '-'}</span>
-                                                                )
+                                                                <div className="flex flex-col items-center">
+                                                                    <span className="font-bold">
+                                                                        {(() => {
+                                                                            const d = safeParseDate(p.date);
+                                                                            return d ? d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\.$/, '') : '-';
+                                                                        })()}
+                                                                    </span>
+                                                                    <span className="text-[10px] text-gray-400 font-mono">
+                                                                        {(() => {
+                                                                            const d = safeParseDate(p.date);
+                                                                            return d ? d.toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '';
+                                                                        })()}
+                                                                    </span>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </td>
@@ -179,14 +203,15 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                             {/* Mobile View (Cards) */}
                             <div className="md:hidden space-y-4">
                                 {payments.map((p: any, index: number) => {
-                                    // [Fix] Robust Type Matching for 'AD' vs 'Tx' Badge
-                                    const rawType = p.type || p.metadata?.product_type || p.metadata?.tier || p.adObject?.productType || '';
+                                    // [Fix] Robust Type Matching for 'T1-T7' Badge (Mobile)
+                                    const rawType = p.pay_type || p.payType || p.metadata?.product_type || p.metadata?.ad_tier || p.adObject?.productType || '';
                                     const typeKey = (rawType || '').toLowerCase();
 
                                     const adProduct = DETAILED_PRICING.find(tp =>
                                         tp.tier === rawType ||
                                         tp.id === rawType ||
                                         tp.code === rawType ||
+                                        tp.altId === rawType ||
                                         (typeKey.includes('grand') && tp.id === 'p1') ||
                                         (typeKey.includes('premium') && tp.id === 'p2') ||
                                         (typeKey.includes('deluxe') && tp.id === 'p3') ||
@@ -195,19 +220,20 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                         (typeKey.includes('native') && tp.id === 'p6') ||
                                         (typeKey.includes('basic') && tp.id === 'p7')
                                     );
-                                    const typeCode = adProduct?.code || 'AD';
+                                    const typeCode = adProduct?.code || 'T7';
+                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                     const tierName = adProduct?.tier || '일반';
 
                                     const displayPrice = typeof p.price === 'number'
                                         ? p.price.toLocaleString() + '원'
-                                        : p.price;
+                                        : (p.price || '0') + '원';
 
                                     return (
                                         <div key={p.id} className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} border rounded-[24px] p-5 shadow-sm space-y-4`}>
                                             <div className="flex justify-between items-start gap-2">
                                                 <div className="space-y-1 overflow-hidden">
                                                     <div className="flex flex-wrap gap-1">
-                                                        <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black uppercase whitespace-nowrap`}>
+                                                        <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9.5px] px-2 py-0.5 rounded-sm font-black uppercase whitespace-nowrap tracking-tighter`}>
                                                             {typeCode}
                                                         </span>
                                                         {p.adObject?.selectedIcon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
@@ -263,27 +289,36 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                     <p className="text-[9px] text-gray-400">
                                                         {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? '결제일/마감일' : '신청일시'}
                                                     </p>
-                                                    <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-tight`}>
+                                                    <div className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-tight`}>
                                                         {p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE' ? (
                                                             <>
                                                                 <span className="text-blue-500 font-black">
-                                                                    {p.adObject.approved_at ? new Date(p.adObject.approved_at).toISOString().split('T')[0] : (p.date?.split(' ')[0] || '-')}
+                                                                    {(() => {
+                                                                        const d = safeParseDate(p.adObject.approved_at || p.date);
+                                                                        return d ? d.toISOString().split('T')[0] : '-';
+                                                                    })()}
                                                                 </span><br />
                                                                 <span className="text-[10px] text-gray-400">
                                                                     {p.adObject.deadline || '2026-03-25'}
                                                                 </span>
                                                             </>
                                                         ) : (
-                                                            p.date && typeof p.date === 'string' ? (
-                                                                <>
-                                                                    {p.date.split(' ').slice(0, 3).join(' ')}<br />
-                                                                    <span className="text-[10px] text-gray-400">{p.date.split(' ').slice(3).join(' ')}</span>
-                                                                </>
-                                                            ) : (
-                                                                p.date || '-'
-                                                            )
+                                                            <div className="flex flex-col">
+                                                                <span className="font-black text-[12px]">
+                                                                    {(() => {
+                                                                        const d = safeParseDate(p.date);
+                                                                        return d ? d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\.$/, '') : '-';
+                                                                    })()}
+                                                                </span>
+                                                                <span className="text-[10px] text-gray-400 font-mono">
+                                                                    {(() => {
+                                                                        const d = safeParseDate(p.date);
+                                                                        return d ? d.toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '';
+                                                                    })()}
+                                                                </span>
+                                                            </div>
                                                         )}
-                                                    </p>
+                                                    </div>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[9px] text-gray-400">결제 금액</p>
@@ -291,9 +326,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[9px] text-gray-400">결제 방식</p>
-                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                                        {p.method === 'bank_transfer' ? '무통장입금' : p.method}
-                                                    </p>
+                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>무통장입금</p>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[9px] text-gray-400">결제 번호</p>

@@ -101,8 +101,8 @@ export const OngoingAdsView = ({
                                             {/* Title & Product Badges (Stacked Layout) */}
                                             <div className="flex flex-col gap-2 mb-3">
                                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                                    <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap">
-                                                        {ad.productType?.toUpperCase() || 'AD'}
+                                                    <span className="bg-gray-900 text-white text-[9.5px] px-2 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap tracking-tighter">
+                                                        {getTierLabel(ad)}
                                                     </span>
                                                     {ad.selectedIcon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
                                                     {ad.selectedHighlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">형</span>}
@@ -138,7 +138,7 @@ export const OngoingAdsView = ({
                                                         })()}
                                                     </span>
                                                     <span className="w-px h-2.5 bg-gray-300 mx-0.5"></span>
-                                                    <span className="shrink-0">{ad.regionCity} {ad.regionGu}</span>
+                                                    <span className="shrink-0">{ad.regionCity || '지역 정보 없음'} {ad.regionGu || ''}</span>
                                                     <span className="w-px h-2.5 bg-gray-300 mx-0.5"></span>
                                                     <span className="truncate">
                                                         {ad.category} | {ad.categorySub || '자유직종'}

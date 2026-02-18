@@ -2,54 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, Server, Zap, CreditCard, Layout, HardDrive, Palette, Search, ChevronDown, ChevronUp } from 'lucide-react';
-
-// --- 플랫폼 통합 기술 표준 (Single Source of Truth) ---
-const AD_TIER_STANDARDS = [
-    { name: 'T1 (Grand)', id: 'p1', altId: 'grand', tw: 'bg-amber-500', hex: '#F59E0B' },
-    { name: 'T2 (Premium)', id: 'p2', altId: 'premium', tw: 'bg-red-600', hex: '#DC2626' },
-    { name: 'T3 (Deluxe)', id: 'p3', altId: 'deluxe', tw: 'bg-blue-600', hex: '#2563EB' },
-    { name: 'T4 (Special)', id: 'p4', altId: 'special', tw: 'bg-emerald-600', hex: '#059669' },
-    { name: 'T5 (Recommended)', id: 'p5', altId: 'recommended', tw: 'bg-orange-500', hex: '#F97316' },
-    { name: 'T6 (Native)', id: 'p6', altId: 'native', tw: 'bg-slate-600', hex: '#475569' },
-    { name: 'T7 (Basic)', id: 'p7', altId: 'basic', tw: 'bg-slate-900', hex: '#0F172A' },
-];
-
-const PAY_BADGE_STANDARDS = [
-    { name: '월급', id: 'monthly', abbr: '월', hex: '#7C3AED', tw: 'bg-[#7C3AED]' },
-    { name: '주급', id: 'weekly', abbr: '주', hex: '#EC4899', tw: 'bg-[#EC4899]' },
-    { name: '일급', id: 'daily', abbr: '일', hex: '#3B82F6', tw: 'bg-[#3B82F6]' },
-    { name: '시급', id: 'hourly', abbr: '시', hex: '#10B981', tw: 'bg-[#10B981]' },
-    { name: '건당', id: 'per_job', abbr: '건', hex: '#F59E0B', tw: 'bg-[#F59E0B]' },
-    { name: '연봉', id: 'yearly', abbr: '연', hex: '#EF4444', tw: 'bg-[#EF4444]' },
-    { name: '협의', id: 'nego', abbr: '협', hex: '#6B7280', tw: 'bg-[#6B7280]' },
-];
-
-const PAID_OPTION_STANDARDS = [
-    { name: '아이콘', abbr: '아', tw: 'bg-indigo-500', key: 'selectedIcon', dbKey: 'icon' },
-    { name: '형광펜', abbr: '형', tw: 'bg-gray-600', key: 'selectedHighlighter', dbKey: 'highlighter' },
-    { name: '테두리', abbr: '테', tw: 'bg-blue-500', key: 'borderOption', dbKey: 'border' },
-    { name: '급여수식어', abbr: '급', tw: 'bg-pink-500', key: 'paySuffixes', dbKey: 'pay_suffixes' },
-];
-
-const NORMALIZATION_STANDARDS = [
-    { target: '상세직종', from: '정보없음 / NULL', to: '일반', reason: 'UX 가용성 확보 및 미려한 텍스트 유지', checkKey: 'categorySub' },
-    { target: '닉네임', from: 'NULL / 공백', to: '상호명 (Fallback)', reason: '게시자 식별성 및 신뢰도 보장', checkKey: 'nickname' },
-    { target: '강조 옵션', from: 'NULL / 미정', to: 'none / []', reason: '렌더링 에러 방지 및 기본값 고정', checkKey: 'options' },
-    { target: '급여 타입', from: 'NULL', to: '협의', reason: '데이터 무결성(SYSTEM_MAPPING) 준수', checkKey: 'payType' },
-];
-
-const DATA_MAPPING_STANDARDS = [
-    { item: '공고 제목', db: 'title', ui: 'title', required: true },
-    { item: '업종 정보', db: 'category', ui: 'industryMain', required: true },
-    { item: '상세 직종', db: 'category_sub', ui: 'categorySub', required: false },
-    { item: '급여 타입', db: 'pay_type', ui: 'payType', required: true },
-    { item: '급여 금액', db: 'pay_amount', ui: 'payAmount', required: true },
-    { item: '광고 등급', db: 'tier / ad_type', ui: 'selectedAdProduct', required: true },
-    { item: '강조 아이콘', db: 'options.icon', ui: 'selectedIcon', required: false },
-    { item: '하이라이터', db: 'options.highlighter', ui: 'selectedHighlighter', required: false },
-    { item: '테두리 옵션', db: 'options.border', ui: 'borderOption', required: false },
-    { item: '급여 수식어', db: 'options.pay_suffixes', ui: 'paySuffixes', required: false },
-];
+import {
+    AD_TIER_STANDARDS,
+    PAY_BADGE_STANDARDS,
+    PAID_OPTION_STANDARDS,
+    NORMALIZATION_STANDARDS,
+    DATA_MAPPING_STANDARDS
+} from '@/constants/standards';
 
 export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpenMenu }: { ads?: any[], payments?: any[], onOpenMenu?: () => void }) => {
     const [health, setHealth] = useState<any>(null);
@@ -61,20 +20,24 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
     const runAudit = () => {
         const violations: any[] = [];
 
-        // 1. Payment History Audit (Refined)
+        // 1. Payment History Audit (Refined for V4 Schema)
         payments.forEach((p: any) => {
             const desc = p.description || p.desc || '';
-            const opts = p.adObject?.options || {};
+            const tier = p.pay_type || p.payType || p.metadata?.product_type || '';
 
             // [Check 1] 비표준 약칭 감지
             if (desc.includes('[주]') || desc.includes('(주)')) {
                 violations.push({ id: p.id, type: 'DATA_INTEGRITY', message: `결제 #${p.id}: 제목에 비표준 약어(주)가 포함됨 (플랫폼 가이드 위반)`, severity: 'error' });
             }
 
-            // [Check 2] 급여 타입 표준 준수 여부
-            const payType = p.pay_type || p.payType;
-            if (payType && !PAY_BADGE_STANDARDS.find(s => s.id === payType)) {
-                violations.push({ id: p.id, type: 'SYSTEM_MAPPING', message: `결제 #${p.id}: 정의되지 않은 급여 타입 '${payType}' 탐지 (표준 외 데이터)`, severity: 'error' });
+            // [Check 2] 광고 등급 약속 준수 (T1~T7)
+            if (tier && !AD_TIER_STANDARDS.find(s => s.id === tier || s.altId === tier)) {
+                violations.push({ id: p.id, type: 'SYSTEM_MAPPING', message: `결제 #${p.id}: 정의되지 않은 결제 등급 타입 '${tier}' 탐지 ('AD' 배지 노출 위험)`, severity: 'error' });
+            }
+
+            // [Check 3] 결제 방식 표준 (method 사용 여부)
+            if (p.payment_method && !p.method) {
+                violations.push({ id: p.id, type: 'SYSTEM_MAPPING', message: `결제 #${p.id}: 잘못된 결제 방식 필드명 사용 (payment_method -> method 로 수정 필요)`, severity: 'warning' });
             }
         });
 
@@ -96,16 +59,15 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
                 });
             }
 
-            // [Check 2] 닉네임 유실 및 금지 패턴 (운영자/게스트 등)
+            // [Check 2] 닉네임 유실 검사 (admin_user 외 일반 사용자 대상)
+            // (admin_user ID는 시스템에서 별도 프리패스로 관리됨)
             const nicknameStr = (ad.nickname || '').trim();
-            const forbiddenNames = ['게스트', '관리자', '운영자', '라운지'];
-            const isForbidden = forbiddenNames.some(name => nicknameStr.includes(name));
 
-            if (!nicknameStr || isForbidden) {
+            if (!nicknameStr) {
                 violations.push({
                     id: ad.id,
                     type: 'DATA_INTEGRITY',
-                    message: `공고 '${adTitle}': 부적절하거나 누락된 닉네임('${nicknameStr || 'NULL'}')`,
+                    message: `공고 '${adTitle}': 닉네임 유실 탐지`,
                     severity: 'error'
                 });
             }
@@ -630,14 +592,208 @@ export const StandardsGuardView = ({ ads = [], payments = [], onOpenMenu: _onOpe
                                     { title: 'Normalization', desc: 'Auto-fallback logic for missing industry/nicknames' },
                                     { title: 'Visual Standard', desc: '18px fixed badges for all paid options (아/형/테/급)' },
                                     { title: 'Color Invariant', desc: 'Ad Tiers (p1-p7) follow official HSL palettes' },
-                                    { title: 'Integrity Audit', desc: 'Detects orphaned snapshots or outdated labels' },
-                                    { title: 'Standard Sync', desc: 'All fields must match the unified standards guide' }
+                                    { title: 'Integrity Audit', desc: 'Detects orphaned orphaned snapshots or outdated labels' },
+                                    { title: 'Standard Sync', desc: 'All fields must match the unified standards guide' },
+                                    { title: 'Ad Number', desc: 'Fixed at Top-Right (Body relative) for visibility' },
+                                    { title: 'Address Logic', desc: 'Business Address (Sign-up) > Ad Region (Fallback)' },
+                                    { title: 'Popup Header', desc: '3-Row Layout: Badge / Title / Nickname' },
+                                    { title: 'Keyword Logic', desc: 'Step4 Options + Auto-Tags (#[Region]Woman/Fox/Room) Merge' }
                                 ].map((rule, idx) => (
                                     <div key={idx} className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                                         <p className="text-xs font-black text-indigo-600 mb-1">{rule.title}</p>
                                         <p className="text-[10px] text-gray-500 font-medium">{rule.desc}</p>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* 7. Ad Specs & Typography (Source of Truth) */}
+                        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 space-y-6">
+                            <h3 className="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-pink-500 rounded-full"></span>
+                                광고 UI 표준 (Ad Specs & Typography)
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* 7.1 List View */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">List View (Table)</h4>
+                                    </div>
+                                    <div className="bg-slate-50 rounded-xl p-4 space-y-2 border border-slate-100">
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Row Padding</span>
+                                            <span className="font-mono font-bold text-slate-700">py-4 (1rem)</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Region Font</span>
+                                            <span className="font-mono font-bold text-slate-700">13px Bold</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Title Font</span>
+                                            <span className="font-mono font-bold text-slate-700">14px Bold</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Pay Text</span>
+                                            <span className="font-mono font-bold text-slate-700">12px Black</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Badge Size</span>
+                                            <span className="font-mono font-bold text-slate-700">18x18px</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 7.2 Grid View */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Grid View (Card)</h4>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-xl p-4 space-y-2 border border-blue-100">
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Image Ratio</span>
+                                            <span className="font-mono font-bold text-slate-700">4:3 (Aspect)</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Container</span>
+                                            <span className="font-mono font-bold text-slate-700">p-2 Rounded-2xl</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Region Font</span>
+                                            <span className="font-mono font-bold text-slate-700">11px Bold</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Title Font</span>
+                                            <span className="font-mono font-bold text-slate-700">14px Bold</span>
+                                        </div>
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Pay Text</span>
+                                            <span className="font-mono font-bold text-slate-700">12px Black</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 7.3 Popup View */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-pink-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Popup (Detail)</h4>
+                                    </div>
+                                    <div className="bg-pink-50 rounded-xl p-4 space-y-2 border border-pink-100">
+                                        <div className="flex justify-between text-[11px]">
+                                            <span className="text-slate-500">Header Color</span>
+                                            <span className="font-mono font-bold text-slate-700">Dynamic (7 Types)</span>
+                                        </div>
+                                        <div className="flex flex-col gap-1 text-[11px] border-t border-pink-100 pt-2 mt-1">
+                                            <span className="text-slate-500 font-bold mb-0.5">Header Layout (3-Row)</span>
+                                            <div className="flex justify-between pl-2"><span className="text-slate-400">Row 1</span> <span className="font-mono font-bold text-slate-700">Region | Job Type</span></div>
+                                            <div className="flex justify-between pl-2"><span className="text-slate-400">Row 2</span> <span className="font-mono font-bold text-slate-700">Icon+Highlighter+Title</span></div>
+                                            <div className="flex justify-between pl-2"><span className="text-slate-400">Row 3</span> <span className="font-mono font-bold text-slate-700">Nickname (Step1 Input)</span></div>
+                                        </div>
+                                        <div className="flex flex-col gap-1 text-[11px] border-t border-pink-100 pt-2 mt-1">
+                                            <span className="text-slate-500 font-bold mb-0.5">Body Logic</span>
+                                            <div className="flex justify-between pl-2"><span className="text-slate-400">Location</span> <span className="font-mono font-bold text-slate-700">Business Address (Sign-up)</span></div>
+                                            <div className="flex justify-between pl-2"><span className="text-slate-400">Search</span> <span className="font-mono font-bold text-slate-700">Filter by Ad Region</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* 8. Ad Card Layout Standards (The Bible) */}
+                        <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 space-y-6">
+                            <h3 className="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                                광고 카드 레이아웃 표준 (Ad Card Layouts)
+                            </h3>
+
+                            {/* 8.1 General Rules */}
+                            <div className="bg-purple-50 rounded-xl p-4 border border-purple-100 mb-6">
+                                <h4 className="text-xs font-black text-purple-700 mb-2">공통 규칙 (General Rules)</h4>
+                                <ul className="text-[11px] text-slate-600 space-y-1 list-disc pl-4">
+                                    <li><strong>상세 팝업 일관성</strong>: 미리보기, 마이페이지, 결제내역, 관리자심사 등 모든 경로에서 동일한 디자인/로직 적용</li>
+                                    <li><strong>제목 줄바꿈</strong>: 카드형 최대 2줄(line-clamp-2), PC 리스트형 1줄(truncate)</li>
+                                    <li><strong>모바일 아이콘</strong>: 아이콘 이미지 대신 텍스트 배지(Text Badge) 형태로 간소화</li>
+                                    <li><strong>제목 배치</strong>: 아이콘 + 제목은 항상 <strong>가로(Horizontal)</strong> 배치 (세로 금지)</li>
+                                </ul>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* 8.2 Standard Card (Grand~Special) */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Standard Card (Grand~Special)</h4>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                                        <div className="bg-slate-100 px-3 py-2 text-[10px] font-bold text-slate-500 border-b border-slate-200">PC / Mobile Common Structure</div>
+                                        <div className="p-3 space-y-2 text-[11px]">
+                                            <div className="bg-gray-100 text-center py-4 text-gray-400 rounded">1. Main Image (4:3)</div>
+                                            <div className="flex justify-between text-slate-600 font-bold"><span>2. Region (Detail)</span><span>Job (Detail)</span></div>
+                                            <div className="text-slate-500">3. Nickname</div>
+                                            <div className="bg-yellow-50 p-1 border border-yellow-100 rounded text-slate-800">
+                                                4. [Icon/TextBadge] + [Highlighter] + Title (Max 2 lines)
+                                            </div>
+                                            <div className="font-bold text-slate-700">5. [PayBadge] + Amount</div>
+                                            <div className="text-slate-400 text-[10px]">6. Pay Options</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 8.3 Urgent Card */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Urgent / Recommended Card</h4>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                                        <div className="bg-slate-100 px-3 py-2 text-[10px] font-bold text-slate-500 border-b border-slate-200">No Image Structure</div>
+                                        <div className="p-3 space-y-2 text-[11px]">
+                                            <div className="flex justify-between text-slate-600 font-bold border-b pb-2"><span>1. Region (Detail)</span><span>Job (Detail)</span></div>
+                                            <div className="text-slate-500">2. Nickname</div>
+                                            <div className="bg-yellow-50 p-1 border border-yellow-100 rounded text-slate-800">
+                                                3. [Icon/TextBadge] + [Highlighter] + Title (Max 2 lines)
+                                            </div>
+                                            <div className="font-bold text-slate-700">4. [PayBadge] + Amount</div>
+                                            <div className="text-slate-400 text-[10px]">5. Pay Options</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 8.4 Latest List (PC) */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Latest List (PC Table)</h4>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 p-3 text-[11px] space-y-1 font-mono">
+                                        <div className="flex gap-2 border-b pb-1 mb-1">
+                                            <span className="w-1/6">Region</span>
+                                            <span className="w-1/6">Name</span>
+                                            <span className="w-1/6">Job</span>
+                                            <span className="w-2/6">Title(1line) + Options</span>
+                                            <span className="w-1/6 text-right">Pay + Opt</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 8.5 Latest List (Mobile) */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                                        <h4 className="text-xs font-black text-slate-700">Latest List (Mobile Card)</h4>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 p-3 text-[11px] space-y-2">
+                                        <div className="font-bold text-slate-800 border-b pb-1">1. [Icon] + [High] + Title (Max 2 lines)</div>
+                                        <div className="flex justify-between text-slate-500">
+                                            <span>2. Region + Job</span>
+                                            <span>Nickname</span>
+                                        </div>
+                                        <div className="font-bold text-slate-700">3. [PayBadge] + Amount + Options</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

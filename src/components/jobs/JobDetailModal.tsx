@@ -2,191 +2,266 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Siren, Info, Clock, Crown, Globe } from 'lucide-react';
+import { X, Heart, Star, Share2, MapPin, Briefcase, User, Info, MessageSquare, Phone, Store, MessageCircle, Navigation, Printer, Siren, Building2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
-import { getPayColor } from '@/utils/payColors';
-import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
-import { cleanShopTitle, getIconById, generateSEOKeywords } from '@/utils/shopUtils';
-import { IconBadge } from '@/components/common/IconBadge';
 import { getHighlighterStyle } from '@/utils/highlighter';
+import { cleanShopTitle, generateSEOKeywords } from '@/utils/shopUtils';
+import { ICONS, HIGHLIGHTERS } from '@/constants/job-options';
+import { useBrand } from '@/components/BrandProvider';
+import {
+    AD_TIER_STANDARDS,
+    PAY_BADGE_STANDARDS,
+    PAID_OPTION_STANDARDS
+} from '@/constants/standards';
+import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
 interface JobDetailModalProps {
-    shop: Shop | null;
+    shop: Shop;
     onClose: () => void;
-    isFavorite?: boolean;
-    onToggleFavorite?: (e: React.MouseEvent, id: string) => void;
+    isFavorite: boolean;
+    onToggleFavorite: (e: React.MouseEvent) => void;
 }
 
-const TIER_GRADIENTS: Record<string, string> = {
-    grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
-    premium: 'bg-gradient-to-r from-purple-600 to-pink-500',
-    deluxe: 'bg-gradient-to-r from-blue-500 to-cyan-400',
-    special: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-    urgent: 'bg-gradient-to-r from-rose-500 to-orange-400',
-    recommended: 'bg-gradient-to-r from-indigo-500 to-violet-400',
-    native: 'bg-gray-100',
-    common: 'bg-gray-50'
-};
+export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavorite, onToggleFavorite }) => {
+    useBodyScrollLock(true);
+    const { theme } = useBrand();
+    const [mounted, setMounted] = useState(false);
+    const [publisherAddress, setPublisherAddress] = useState<string | null>(null);
 
-const PAY_TYPE_BADGES: Record<string, string> = {
-    '시급': 'bg-red-100 text-red-600',
-    '일급': 'bg-blue-100 text-blue-600',
-    '주급': 'bg-green-100 text-green-600',
-    '월급': 'bg-purple-100 text-purple-600',
-    '건별': 'bg-gray-100 text-gray-600',
-};
+    // [New] Fetch Publisher Address from User Profile (Sign-up Info)
+    useEffect(() => {
+        const fetchProfileAddress = async () => {
+            if (!shop) return;
+            const targetId = shop.user_id || shop.ownerId;
 
-export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onToggleFavorite?: (e: React.MouseEvent, id: string) => void }> = ({ shop, isFavorite, onToggleFavorite }) => {
-    // Keywords Simulation
-    const keywords = shop.options?.keywords || ['초보가능', '경력우대', '당일지급', '숙식제공', '자유복장'];
+            if (!targetId) return;
 
-    const handleFavoriteClick = (e: React.MouseEvent) => {
-        if (onToggleFavorite && shop.id) {
-            onToggleFavorite(e, shop.id);
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('address, address_detail')
+                    .eq('id', targetId)
+                    .single();
+
+                if (data) {
+                    const fullAddr = `${data.address || ''} ${data.address_detail || ''}`.trim();
+                    if (fullAddr) setPublisherAddress(fullAddr);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch publisher address:', err);
+            }
+        };
+
+        fetchProfileAddress();
+    }, [shop]);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // [Theme Logic centralized via AD_TIER_STANDARDS]
+    const productType = shop.productType || shop.tier || 'p7';
+    const pt = String(productType).toLowerCase();
+    const tierStandard = AD_TIER_STANDARDS.find(s => pt.includes(s.id) || pt.includes(s.altId)) || AD_TIER_STANDARDS[6];
+
+    // Map tier to dynamic colors (Mapping logic for Modal Header)
+    // T1: Amber, T2: Red, T3: Blue, T4: Emerald, T5: Orange, T6: Slate, T7: Slate-900
+    const getHeaderTheme = (tid: string) => {
+        switch (tid) {
+            case 'p1': return { bg: "from-amber-500 to-amber-600", accent: "text-amber-600", badge: "bg-amber-100" };
+            case 'p2': return { bg: "from-red-600 to-red-700", accent: "text-red-600", badge: "bg-red-100" };
+            case 'p3': return { bg: "from-blue-600 to-blue-700", accent: "text-blue-600", badge: "bg-blue-100" };
+            case 'p4': return { bg: "from-emerald-600 to-emerald-700", accent: "text-emerald-600", badge: "bg-emerald-100" };
+            case 'p5': return { bg: "from-orange-500 to-orange-600", accent: "text-orange-500", badge: "bg-orange-100" };
+            case 'p6': return { bg: "from-slate-600 to-slate-700", accent: "text-slate-600", badge: "bg-slate-100" };
+            default: return { bg: "from-slate-900 to-slate-950", accent: "text-slate-900", badge: "bg-slate-100" };
         }
     };
 
-    const isTiered = shop.tier && ['grand', 'premium', 'deluxe', 'special', 'urgent', 'recommended'].includes(shop.tier);
-    const headerBg = isTiered ? TIER_GRADIENTS[shop.tier!] : 'bg-white';
+    const themeConfig = getHeaderTheme(tierStandard.id);
+    const headerBg = themeConfig.bg;
+    const accentColor = themeConfig.accent;
+    const badgeBg = themeConfig.badge;
 
-    return (
-        <div className="flex flex-col h-full bg-white min-h-0 w-full overflow-hidden">
-            {/* 1. HEADER SECTION */}
-            <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
-                {/* Star Button (Left) */}
-                <button
-                    onClick={handleFavoriteClick}
-                    className={`absolute top-5 left-6 p-2 rounded-full transition-all active:scale-95 z-50 ${isTiered ? 'bg-black/20 text-white hover:bg-white/20' : 'bg-gray-100 text-gray-400 hover:text-amber-400 hover:bg-amber-50'}`}
-                >
-                    <Star size={20} className={isFavorite ? "fill-white text-white" : "hover:fill-current"} />
-                </button>
+    const payBadgeColorClass = accentColor.replace('text-', 'bg-');
 
-                {/* Region & WorkType Badge */}
-                <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
-                    <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.workType}
-                </div>
+    if (!mounted) return null;
 
-                {/* Ad Title White Box Layout */}
-                <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                        <IconBadge iconId={shop.options?.icon} showName={true} />
-                        <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
-                            <span style={getHighlighterStyle(shop.options?.highlighter)}>
-                                {cleanShopTitle(shop.title, shop.name)}
-                            </span>
-                        </h2>
+    return createPortal(
+        <div
+            className="modal-overlay fixed inset-0 z-[99999] flex items-end md:items-center justify-center bg-black/90 md:bg-black/80 touch-none overscroll-contain"
+            onClick={onClose}
+        >
+            <div
+                className="
+                    bg-white shadow-2xl overflow-hidden flex flex-col
+                    fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
+                    md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
+                    transform-gpu will-change-transform backface-hidden 
+                "
+                onClick={e => e.stopPropagation()}
+            >
+                {/* 1. HEADER SECTION [Copied from NewPreviewModal] */}
+                <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-4 shrink-0 shadow-lg`}>
+
+                    {/* Close Button */}
+                    <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
+                        <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
+                            <X size={24} className="text-white" />
+                        </button>
                     </div>
-                </div>
 
-                <div className="flex items-center gap-2.5 opacity-95 font-black text-sm bg-black/10 px-4 py-1.5 rounded-full text-white">
-                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
-                        <User size={12} className="fill-current" />
+                    {/* Favorite Button (JobDetailModal specific feature - Star Icon) */}
+                    <button
+                        onClick={onToggleFavorite}
+                        className="absolute top-5 left-6 p-2 rounded-full transition-all bg-black/20 text-white hover:bg-white/20 z-50 group"
+                    >
+                        <Star size={20} className={isFavorite ? "fill-yellow-400 text-yellow-400" : "group-hover:fill-yellow-200"} />
+                    </button>
+
+                    {/* Region | Industry Badge */}
+                    <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white">
+                        <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.category || shop.workType || '업종미기재'}
                     </div>
-                    {cleanShopTitle(undefined, shop.nickname || shop.name)}
-                </div>
-            </div>
 
-            {/* 2. BODY SECTION */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 !bg-white relative min-h-0" style={{ backgroundColor: '#ffffff', isolation: 'isolate', mixBlendMode: 'normal' }}>
-                <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
-                    No.{shop.adNo || shop.id?.substring(0, 4) || '1004'}
-                </div>
+                    {/* Ad Title White Box Layout (CENTERED) */}
+                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2 w-full">
+                            {/* Icon Logic */}
+                            {(shop.options?.icon) && (() => {
+                                const iconId = Number(shop.options.icon);
+                                const iconObj = ICONS.find((i) => i.id === iconId);
+                                return iconObj ? (
+                                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+                                        <span className="text-lg">{iconObj.icon}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                    </div>
+                                ) : null;
+                            })()}
 
-                {/* Pay & Keywords Box */}
-                <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
-                        <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(shop.payType || shop.pay)}`}>
-                            {(shop.payType || shop.pay)?.substring(0, 1) || '시'}
+                            {/* Title Logic */}
+                            <h2 className="text-[15px] md:text-[16px] font-black leading-tight text-gray-900 truncate text-center break-keep">
+                                <span style={getHighlighterStyle(shop.options?.highlighter)}>
+                                    {cleanShopTitle(shop.title, shop.name)}
+                                </span>
+                            </h2>
                         </div>
-                        <div className="flex flex-col gap-0.5 overflow-hidden">
-                            <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
-                                {formatKoreanMoney(shop.pay)}
+                    </div>
+
+                    {/* Nickname Badge */}
+                    <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
+                        {cleanShopTitle(undefined, shop.nickname || shop.name)}
+                    </div>
+                </div>
+
+                {/* 2. BODY SECTION [Copied from NewPreviewModal] */}
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gray-50/30 relative">
+
+                    {/* Ad No (JobDetailModal specific) */}
+                    <div className="absolute top-2 right-4 text-[10px] font-mono font-bold text-gray-400 select-all z-10">
+                        No.{shop.adNo || shop.id?.substring(0, 4) || '1004'}
+                    </div>
+
+                    {/* Pay & Keywords Box (CENTERED/GRID) */}
+                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
+                        {/* Left: Salary Info */}
+                        <div className="flex items-center gap-3 pr-4 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 shrink-0">
+                            {/* Stylish Square Box Badge */}
+                            <div className={`w-9 h-9 flex items-center justify-center rounded-xl text-md font-black shadow-inner shrink-0 text-white ${getPayColor(shop.payType || shop.pay)}`}>
+                                {getPayAbbreviation(shop.payType || shop.pay)}
+                            </div>
+                            <div className="flex flex-col gap-0.5 overflow-hidden">
+                                <div className="text-[18px] md:text-[22px] font-black text-gray-800 tracking-tighter leading-tight flex items-baseline gap-1">
+                                    {formatKoreanMoney(shop.pay)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right: Keywords (Grid 3 cols) - Using shop.options.paySuffixes */}
+                        <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
+                            {(shop.options?.paySuffixes || []).slice(0, 6).map((kw: string, i: number) => (
+                                <span key={i} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                                    {kw}
+                                </span>
+                            ))}
+                            {(!shop.options?.paySuffixes || shop.options.paySuffixes.length === 0) && (
+                                <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 급여 옵션 없음</span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 상세 모집내용 */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-1.5 h-6 bg-pink-500 rounded-full" />
+                            <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
+                            <div className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words whitespace-pre-wrap">
+                                {shop.description || `${shop.name}에서 열정적인 분을 모십니다!`}
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
-                        {keywords.slice(0, 6).map((kw, idx) => (
-                            <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
-                                {kw}
-                            </span>
-                        ))}
-                    </div>
-                </div>
 
-                {/* 상세 모집내용 */}
-                <div className="space-y-3">
-                    <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-pink-500 rounded-full"></span>
-                        상세 모집내용
-                    </h3>
-                    <div className="text-sm leading-relaxed text-gray-600 break-words whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100 min-h-[120px]">
-                        {shop.description || `${shop.name}에서 열정적인 분을 모십니다.\n가족같은 분위기에서 함께 성장할 수 있습니다.\n\n[근무조건]\n- 근무기간: 1년이상\n- 근무요일: 요일협의\n- 근무시간: 시간협의\n\n초보자도 환영합니다!`}
-                    </div>
-                </div>
-
-                {/* 위치 정보 */}
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    {/* 위치 정보 */}
+                    <div className="space-y-3">
                         <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
                             <span className="w-1 h-4 bg-green-500 rounded-full"></span>
                             위치 정보
                         </h3>
+                        {/* Using NewPreviewModal style for Map Area */}
+                        <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50 overflow-hidden relative">
+                            {/* Map Image (Simulated) */}
+                            <img
+                                src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff4444(${shop.lng || 126.9780},${shop.lat || 37.5665})/${shop.lng || 126.9780},${shop.lat || 37.5665},15,0/600x300?access_token=pk.eyJ1IjoibW9ja3VzaGVyIiwiYSI6ImNrNzh6Zzh6ejAwMXAzZHBkbmR6Zzh6ejAifQ`}
+                                alt="Map"
+                                className="absolute inset-0 w-full h-full object-cover grayscale-[20%]"
+                            />
+                            <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm p-3 border-t border-gray-100 flex items-center gap-3">
+                                <MapPin size={24} className="text-gray-400" />
+                                <div>
+                                    <div className="text-[12px] font-black text-gray-900">사업자 등록 주소</div>
+                                    <div className="text-[11px] text-gray-500 font-medium">
+                                        {publisherAddress || shop.businessAddress || shop.region || '주소 정보 없음'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="relative aspect-video rounded-3xl overflow-hidden border border-gray-100 shadow-inner group">
-                        <img
-                            src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff4444(${shop.lng || 126.9780},${shop.lat || 37.5665})/${shop.lng || 126.9780},${shop.lat || 37.5665},15,0/600x400?access_token=pk.eyJ1IjoibW9ja3VzaGVyIiwiYSI6ImNrNzh6Zzh6ejAwMXAzZHBkbmR6Zzh6ejAifQ`}
-                            alt="Map"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-lg flex items-center justify-between">
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[12px] font-black text-gray-900">{shop.region} 상세위치</span>
-                                <span className="text-[10px] font-bold text-gray-500">정확한 주소는 지원 시 확인 가능합니다.</span>
+
+                    {/* Keyword & Info */}
+                    <div className="space-y-2 pt-2">
+                        <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
+                            <Info size={12} />
+                            Keyword & Info
+                        </h3>
+                        <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
+                            <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
+                                {(() => {
+                                    const autoKeywords = generateSEOKeywords(shop.region);
+                                    const userKeywords = shop.options?.keywords || [];
+                                    const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords]));
+
+                                    if (allKeywords.length > 0) {
+                                        return allKeywords.map((kw: any, i: number) => (
+                                            <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
+                                                #{kw}
+                                            </span>
+                                        ));
+                                    } else {
+                                        return <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>;
+                                    }
+                                })()}
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* 5. Keyword & Info (SEO & Tags) */}
-                {(() => {
-                    const autoKeywords = generateSEOKeywords(shop.region);
-                    const allKeywords = [...(keywords || []), ...autoKeywords];
-                    const hasIcons = (shop.options?.icons?.length ?? 0) > 0;
 
-                    if (!hasIcons && allKeywords.length === 0) return null;
-
-                    return (
-                        <div className="pt-3 mt-1 border-t border-gray-50/50">
-                            <div className="flex items-center gap-1.5 mb-1.5 opacity-40">
-                                <Info size={10} className="text-gray-300" />
-                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-wider">Keyword & Info</span>
-                            </div>
-                            <div className="flex flex-wrap gap-1 opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                {/* Convenience Icons */}
-                                {shop.options?.icons?.map((icon, idx) => (
-                                    <span key={`icon-${idx}`} className="text-[11px] text-gray-300 font-medium bg-gray-50/30 px-1.5 py-0.5 rounded border border-gray-50/50">
-                                        #{icon}
-                                    </span>
-                                ))}
-                                {/* All Keywords (User + Auto) */}
-                                {allKeywords.map((kw, idx) => (
-                                    <span key={`kw-${idx}`} className="text-[11px] text-gray-300 font-medium bg-gray-50/30 px-1.5 py-0.5 rounded border border-gray-50/50">
-                                        #{kw}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })()}
-
-                {/* Scroll Margin for Safe Area */}
-                <div className="h-6"></div>
-            </div>
-
-            {/* 3. CONTACT FOOTER (Fixed at Bottom) */}
-            <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-                <div className="flex gap-2">
-                    {/* 1. 쪽지문의 */}
+                {/* 3. FOOTER SECTION [Copied from NewPreviewModal] */}
+                <div className="p-6 bg-white border-t border-gray-100 grid grid-cols-4 gap-3 shrink-0 safe-area-bottom">
                     <button
                         onClick={() => {
                             const event = new CustomEvent('open-note-modal', {
@@ -194,13 +269,11 @@ export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onTo
                             });
                             window.dispatchEvent(event);
                         }}
-                        className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
+                        className="col-span-1 py-4 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
                     >
-                        <MessageSquare size={18} className="mb-0.5" />
-                        <span className="text-[10px] font-bold">쪽지문의</span>
+                        <MessageSquare size={20} className="mb-0.5 text-gray-400" />
+                        <span className="text-[10px] font-black">쪽지문의</span>
                     </button>
-
-                    {/* 2. 카톡/메신저 (New) */}
                     <button
                         onClick={() => {
                             const messengerId = shop.kakao || shop.telegram;
@@ -211,62 +284,21 @@ export const JobDetailContent: React.FC<{ shop: Shop; isFavorite?: boolean; onTo
                                 alert('등록된 메신저 ID가 없습니다.');
                             }
                         }}
-                        className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-[#FAE100] border border-[#F4DC00] text-[#371D1E] py-2.5 rounded-xl hover:brightness-95 transition active:scale-[0.98]"
+                        className="col-span-1 py-4 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
                     >
-                        <MessageSquare size={18} className="mb-0.5" fill="currentColor" fillOpacity={0.3} />
-                        <span className="text-[10px] font-bold">카톡/메신저</span>
+                        <MessageCircle size={20} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                        <span className="text-[10px]">카톡문의</span>
                     </button>
-
-                    {/* 3. 전화/문자 */}
                     <a
                         href={`tel:${shop.phone}`}
-                        className="flex-[1.5] flex flex-col items-center justify-center gap-0.5 bg-pink-600 text-white py-2.5 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
+                        className="col-span-2 py-4 bg-pink-600 text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-pink-700 transition shadow-lg shadow-pink-600/30 group"
                     >
-                        <Phone size={18} className="mb-0.5" />
-                        <span className="text-[10px] font-bold">전화/문자</span>
+                        <div className="flex items-center gap-2">
+                            <Phone size={18} fill="currentColor" className="group-hover:animate-bounce" />
+                            <span className="text-[15px] font-black">전화/문자 지원하기</span>
+                        </div>
                     </a>
                 </div>
-            </div>
-
-        </div>
-    );
-};
-
-const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavorite, onToggleFavorite }) => {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-        return () => setMounted(false);
-    }, []);
-
-    useBodyScrollLock(!!shop);
-
-    if (!shop || !mounted) return null;
-
-    const isTiered = shop.tier && ['grand', 'premium', 'deluxe', 'special', 'urgent', 'recommended'].includes(shop.tier);
-
-    return createPortal(
-        <div
-            className="modal-overlay fixed inset-0 z-[20000] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm overscroll-contain"
-            onClick={onClose}
-        >
-            <div
-                className="
-                    bg-white shadow-2xl overflow-hidden flex flex-col
-                    fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
-                    md:static md:w-[500px] lg:w-[600px] md:h-[85vh] md:rounded-[32px]
-                    transform-gpu will-change-transform backface-hidden
-                    animate-in slide-in-from-bottom duration-300 
-                "
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="absolute top-5 right-6 flex items-center gap-2 z-[20005]">
-                    <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
-                        <X size={24} className={isTiered ? 'text-white' : 'text-gray-900'} />
-                    </button>
-                </div>
-                <JobDetailContent shop={shop} isFavorite={isFavorite} onToggleFavorite={onToggleFavorite} />
             </div>
         </div>,
         document.body

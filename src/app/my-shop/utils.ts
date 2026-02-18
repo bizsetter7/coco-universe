@@ -14,11 +14,24 @@ export const normalizeAd = (ad: any) => {
     safeAd.ad_price = adPrice;
     safeAd.price = adPrice; // Legacy compat
 
-    // 2. Options Normalization
-    safeAd.options = safeAd.options || {};
+    // 3. Region & Industry Mapping (DB -> UI)
+    // [CRITICAL SAFEGUARD] Never remove or break these mappings.
+    // Dashboard header address must remain "서울 강남구 테헤란로" in BusinessDashboard.tsx.
+    safeAd.regionCity = ad.regionCity || ad.region || '';
+    safeAd.regionGu = ad.regionGu || ad.work_region_sub || '';
+    safeAd.category = ad.category || ad.industryMain || '';
+    safeAd.categorySub = ad.categorySub || ad.category_sub || ad.industrySub || '';
+    safeAd.nickname = ad.nickname || ad.options?.nickname || '';
 
-    // Ensure critical display fields exist in options for badges
-    if (!safeAd.options.ad_price) safeAd.options.ad_price = adPrice;
+    // 4. Tier Normalization for T1-T7 Standard
+    const rawTier = (ad.tier || ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+    if (rawTier.includes('grand') || rawTier === 'p1' || rawTier.includes('그랜드')) safeAd.productType = 'p1';
+    else if (rawTier.includes('premium') || rawTier === 'p2' || rawTier.includes('프리미엄')) safeAd.productType = 'p2';
+    else if (rawTier.includes('deluxe') || rawTier === 'p3' || rawTier.includes('디럭스')) safeAd.productType = 'p3';
+    else if (rawTier.includes('special') || rawTier === 'p4' || rawTier.includes('스페셜')) safeAd.productType = 'p4';
+    else if (rawTier.includes('recommended') || rawTier === 'p5' || rawTier.includes('급구')) safeAd.productType = 'p5';
+    else if (rawTier.includes('native') || rawTier === 'p6' || rawTier.includes('네이티브')) safeAd.productType = 'p6';
+    else safeAd.productType = 'p7';
 
     return safeAd;
 };
@@ -29,6 +42,7 @@ export const normalizePayment = (payment: any, shopName?: string) => {
         ...payment,
         amount: amount,
         price: amount, // [Fix] Compatibility for PaymentsView which uses .price
+        pay_type: payment.pay_type || payment.payType || payment.metadata?.product_type || '', // [Fix] Badge Sync
         shopName: payment.metadata?.shopName || shopName || '알 수 없음',
         adTitle: payment.metadata?.adTitle || '광고 결제',
         status: payment.status || 'completed',

@@ -52,8 +52,8 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
 
     return (
         <div className="flex flex-col h-full bg-white rounded-[32px] overflow-hidden border border-gray-200 shadow-sm">
-            {/* Header (Capture 2 style) */}
-            <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-4 shrink-0 shadow-lg`}>
+            {/* Header (Capture 3 style) */}
+            <div className={`relative px-6 py-5 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 md:gap-4 shrink-0 shadow-lg`}>
                 <div className="absolute top-0 left-0 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg z-10">
                     MOBILE PREVIEW
                 </div>
@@ -63,11 +63,11 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                 </div>
 
                 {/* Ad Title White Box Layout (CENTERED) */}
-                <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
-                    <div className="flex flex-wrap items-center justify-center gap-2 w-full">
+                <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2 md:gap-3">
+                    <div className="flex items-center justify-center gap-2 md:gap-3 w-full">
                         <IconBadge iconId={formData.selectedIcon} showName={true} />
 
-                        <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
+                        <h2 className="text-[13px] md:text-sm font-black leading-tight text-gray-900 line-clamp-2 text-center break-all">
                             <span style={getHighlighterStyle(formData.selectedHighlighter)}>
                                 {cleanShopTitle(formData.title || formData.shopName, formData.shopName)}
                             </span>
@@ -81,7 +81,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
             </div>
 
             {/* Content (Scrollable) */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gray-50/30">
+            <div className="flex-1 overflow-y-auto pt-6 px-6 pb-2 md:p-8 space-y-8 bg-gray-50/30">
                 {/* Pay & Keywords Box (CENTERED/GRID) */}
                 <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-stretch group hover:shadow-md transition-shadow">
                     {/* Left: Salary Info */}
@@ -157,6 +157,9 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                         </div>
                     </div>
                 </div>
+
+                {/* Scroll Margin for Safe Area */}
+                <div className="h-2"></div>
             </div>
 
             {/* Footer Buttons (Mockup style) */}

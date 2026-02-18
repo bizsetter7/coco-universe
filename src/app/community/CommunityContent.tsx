@@ -27,7 +27,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { supabase } from '@/lib/supabase';
 
 // --- Types ---
-type UserType = 'individual' | 'corporate' | 'admin';
+type UserType = 'individual' | 'corporate' | 'admin' | 'guest';
 
 export default function CommunityContent() {
     return (
@@ -48,8 +48,8 @@ function CommunityContentInner() {
     const activeTab = searchParams.get('category') || '전체';
 
     const [mounted, setMounted] = useState(false);
-    const [userType, setUserType] = useState<UserType>('individual');
-    const { isLoggedIn } = useAuth(); // Shared Auth State
+    // [Fix] Use reactive userType from useAuth instead of fragile local state
+    const { isLoggedIn, userType } = useAuth();
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [isCorporateModalOpen, setIsCorporateModalOpen] = useState(false);
     const brand = useBrand();
@@ -57,6 +57,8 @@ function CommunityContentInner() {
 
     useEffect(() => {
         setMounted(true);
+        fetchPosts();
+        // [Cleanup] Removed manual localStorage check for user_type
     }, []);
 
     // [Optimization] Prevent background scroll when modal is open (Fixes jitter)
@@ -66,7 +68,6 @@ function CommunityContentInner() {
 
     const fetchPosts = async () => {
         try {
-
             const { data, error } = await supabase
                 .from('community_posts')
                 .select('*')
@@ -79,7 +80,6 @@ function CommunityContentInner() {
                     try {
                         const parsed = JSON.parse(localBackup);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-
                             setPosts(parsed);
                             return;
                         }
@@ -87,18 +87,13 @@ function CommunityContentInner() {
                         console.error("[Community] Local backup parse error:", e);
                     }
                 }
-
-                setPosts(MOCK_POSTS);
                 return;
             }
 
             if (data && data.length > 0) {
-
                 setPosts(data as Post[]);
-                // setPosts(MOCK_POSTS); // Forced Mock Data
                 localStorage.setItem('community_posts_backup', JSON.stringify(data));
             } else {
-
                 setPosts(MOCK_POSTS);
                 localStorage.removeItem('community_posts_backup');
             }
@@ -107,17 +102,6 @@ function CommunityContentInner() {
             setPosts(MOCK_POSTS);
         }
     };
-
-    useEffect(() => {
-        fetchPosts();
-
-        const storedType = localStorage.getItem('user_type');
-        if (storedType === 'shop') {
-            setUserType('corporate');
-        } else {
-            setUserType('individual');
-        }
-    }, []);
 
     // 탭 변경 시 URL 즉시 업데이트 및 스크롤 핸들링
     const handleTabChange = (cat: string) => {
@@ -153,6 +137,7 @@ function CommunityContentInner() {
             return;
         }
 
+        // [Security] Strict check for corporate users
         if (userType === 'corporate') {
             setIsCorporateModalOpen(true);
         } else {

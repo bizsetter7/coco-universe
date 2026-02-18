@@ -47,18 +47,25 @@ export const HeroSection = () => {
 
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
-                <div className="bg-red-600/90 backdrop-blur-sm text-white text-[10px] md:text-xs font-bold px-2 py-0.5 md:px-3 md:py-1 rounded-full mb-3 md:mb-4 animate-bounce shadow-lg border border-red-500/50">
-                    GRAND OPEN
+                <div className="bg-gradient-to-r from-pink-600 to-red-600 text-white text-[10px] md:text-xs font-black px-3 py-1 rounded-full mb-3 md:mb-5 animate-bounce shadow-xl border border-white/20">
+                    🔥 GRAND OPEN: 역대급 혜택
                 </div>
-                <h1 className="text-[22px] md:text-4xl font-black mb-2 md:mb-4 tracking-tight drop-shadow-xl text-center leading-tight">
-                    사장님! <span className="text-amber-400">3개월 광고 무료</span> 이벤트
+                <h1 className="text-[26px] md:text-5xl font-black mb-3 md:mb-6 tracking-tighter drop-shadow-2xl text-center leading-[1.1]">
+                    사장님! <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500 drop-shadow-none">3개월 광고 무료</span> 지원
                 </h1>
-                <p className="text-sm md:text-lg text-gray-200 mb-5 md:mb-8 font-medium drop-shadow-md text-center max-w-[90%] break-keep">
-                    지금 가입하면 유료 상품 <span className="font-bold text-white border-b border-white/40 pb-0.5">300만원 상당이 0원!</span>
-                </p>
+                <div className="flex flex-col items-center gap-1 mb-6 md:mb-10 text-center">
+                    <p className="text-[13px] md:text-xl text-gray-100 font-bold drop-shadow-md break-keep">
+                        지금 가입하면 유료 상품 <span className="text-white bg-white/20 px-2 py-0.5 rounded-lg border border-white/20">300만원 상당</span> 구성이
+                    </p>
+                    <p className="text-lg md:text-2xl font-black text-amber-400 drop-shadow-md">조건 없이 0원! 즉시 노출 혜택!</p>
+                </div>
                 <div className="flex gap-4">
-                    <button className="bg-white text-black font-bold py-2 px-5 md:py-2.5 md:px-8 rounded-full shadow-[0_4px_14px_rgba(255,255,255,0.4)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.6)] hover:scale-105 active:scale-95 transition-all text-xs md:text-base">
-                        무료로 광고 올리기
+                    <button
+                        onClick={() => router.push('/my-shop?view=form&new=true')}
+                        className="group relative bg-white text-black font-black py-3 px-8 md:py-4 md:px-12 rounded-2xl shadow-[0_8px_30px_rgb(255,255,255,0.4)] hover:shadow-[0_12px_40px_rgb(255,255,255,0.6)] hover:-translate-y-1 active:translate-y-0.5 transition-all text-sm md:text-lg overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        무료로 광고 올리기 🚀
                     </button>
                 </div>
             </div>

@@ -97,7 +97,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 onClick={e => e.stopPropagation()}
             >
                 {/* 1. HEADER SECTION */}
-                <div className={`p-6 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-4`}>
+                <div className={`p-5 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-3 md:gap-4`}>
                     <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
                             <X size={24} className="text-white" />
@@ -112,10 +112,10 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         <MapPin size={10} /> {norm.regionCity} {norm.regionGu} | <Briefcase size={10} /> {norm.category} | {norm.categorySub}
                     </div>
 
-                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
-                        <div className="flex flex-wrap items-center justify-center gap-2">
+                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2 md:gap-3">
+                        <div className="flex items-center justify-center gap-2 md:gap-3">
                             <IconBadge iconId={norm.selectedIcon} showName={true} />
-                            <h2 className="text-sm font-black leading-tight text-gray-900 truncate text-center">
+                            <h2 className="text-[13px] md:text-sm font-black leading-tight text-gray-900 line-clamp-2 text-center break-all">
                                 <span style={getHighlighterStyle(norm.selectedHighlighter)}>
                                     {norm.title}
                                 </span>
@@ -132,7 +132,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 </div>
 
                 {/* 2. BODY SECTION */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-8 bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate' }}>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pt-6 px-6 pb-2 space-y-8 bg-white relative" style={{ backgroundColor: '#ffffff', isolation: 'isolate' }}>
                     {/* Ad Number (Moved to Body) */}
                     <div className="absolute top-2 right-4 text-[9px] font-mono font-bold text-gray-300 z-10">
                         No.{norm.adNo}
@@ -213,6 +213,8 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         )}
                     </div>
 
+                    {/* Scroll Margin for Safe Area */}
+                    <div className="h-2"></div>
                 </div>
 
                 {/* 3. FOOTER SECTION (Contact) */}

@@ -92,6 +92,9 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const isMobile = useMobile();
     const isVisible = useBannerControl(); // Global + Manual Control
 
+    // [Optimization] Valid Return for Mobile to prevent mounting and computation
+    if (isMobile) return null;
+
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
 
     const isLeft = side === 'left';
@@ -100,19 +103,19 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const allShops = shops || [];
 
     const grandAds = useMemo(() => {
+        if (isMobile) return [];
         const gr = allShops.filter(s => s.tier === 'grand');
         if (isLeft) return [gr[0], gr[2]].filter(Boolean);
         return [gr[1], gr[3]].filter(Boolean);
-    }, [allShops, isLeft]);
+    }, [allShops, isLeft, isMobile]);
 
     const premiumAds = useMemo(() => {
+        if (isMobile) return [];
         const pr = allShops.filter(s => s.tier === 'premium' || s.is_premium);
         if (isLeft) return pr.slice(0, 2);
         return pr.slice(2, 4);
-    }, [allShops, isLeft]);
+    }, [allShops, isLeft, isMobile]);
 
-    // [Optimization] Valid Return for Mobile to prevent mounting - MUST BE AFTER HOOKS
-    if (isMobile) return null;
     if (!isVisible && !selectedAd) return null;
 
     // [Optimization] Removed backdrop-blur-md, replaced with solid bg/opacity to reduce paint cost
@@ -161,6 +164,8 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                 <JobDetailModal
                     shop={selectedAd}
                     onClose={() => setSelectedAd(null)}
+                    isFavorite={false}
+                    onToggleFavorite={(e) => { e.stopPropagation(); }}
                 />
             )}
         </>

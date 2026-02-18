@@ -43,6 +43,7 @@ const CATEGORY_LINKS = [
 ];
 
 import { useAuth } from '@/hooks/useAuth';
+import { useMobile } from '@/hooks/useMobile';
 
 export default function LeftSidebar({
     selectedRegion,
@@ -58,8 +59,12 @@ export default function LeftSidebar({
     userType: propUserType,
     userPoints: propUserPoints,
 }: LeftSidebarProps) {
+    const isMobile = useMobile();
     const brand = useBrand();
     const router = useRouter();
+
+    // [Optimization] Early return for mobile
+    if (isMobile) return null;
     const {
         isLoggedIn: authIsLoggedIn,
         userName: authUserName,

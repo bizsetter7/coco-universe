@@ -23,7 +23,14 @@ export const useBodyScrollLock = (isOpen: boolean) => {
             // Only apply initial lock style if it's the first one
             if (window.__scrollLockCount === 1) {
                 document.body.style.overflow = 'hidden';
-                if (scrollBarWidth > 0 && window.innerWidth >= 768) {
+
+                // [Optimization] Prevent pull-to-refresh and jitter on mobile
+                if (window.innerWidth < 1024) {
+                    document.body.style.touchAction = 'none';
+                    document.body.style.overscrollBehavior = 'none';
+                }
+
+                if (scrollBarWidth > 0 && window.innerWidth >= 1024) {
                     document.body.style.paddingRight = `${scrollBarWidth}px`;
                 }
                 document.body.classList.add('modal-open');
@@ -37,6 +44,8 @@ export const useBodyScrollLock = (isOpen: boolean) => {
                 if (window.__scrollLockCount === 0) {
                     document.body.style.overflow = '';
                     document.body.style.paddingRight = '';
+                    document.body.style.touchAction = '';
+                    document.body.style.overscrollBehavior = '';
                     document.body.classList.remove('modal-open');
                 }
             }

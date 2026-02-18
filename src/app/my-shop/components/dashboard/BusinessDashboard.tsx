@@ -188,18 +188,17 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         )}
                                     </div>
 
-                                    {/* Info Area [Pure Reflection Mode] - Removed Shop Name */}
                                     <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
                                         <span className="text-pink-600 font-extrabold uppercase">
                                             {(() => {
-                                                const nick = ad.options?.nickname || ad.nickname || nickname || '';
+                                                const nick = ad.nickname || nickname || '';
                                                 if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
                                                 return nick;
                                             })()}
                                         </span>
                                         <span className="md:hidden"><br /></span>
                                         <span className="hidden md:inline"> | </span>
-                                        {(ad.options?.regionCity || ad.regionCity)} {(ad.options?.regionGu || ad.regionGu)} | {(ad.options?.category || ad.category)} | {(ad.options?.categorySub || ad.categorySub || '자유직종')}
+                                        {ad.regionCity || '지역 정보 없음'} {ad.regionGu || ''} | {ad.category || '종류'} | {ad.categorySub || '자유직종'}
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2 mt-3 md:mt-0 shrink-0 w-full md:w-auto">

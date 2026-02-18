@@ -322,7 +322,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                         { label: '광고안내', id: 'ad' },
                                         { label: '이용방법', id: 'guide' },
                                         { label: '자주묻는질문', id: 'faq' },
-                                        { label: '1:1문의', id: 'inquiry' },
+                                        { label: '1:1 문의', id: 'inquiry' },
                                         { label: '약관 및 정책', id: 'policy' }
                                     ].map((item) => (
                                         <button

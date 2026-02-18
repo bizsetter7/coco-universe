@@ -132,7 +132,7 @@ export function useAdFormState() {
     };
 
     // Ad Selection
-    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>('p1');
+    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(null);
     const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(30);
     const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
     const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(0);
@@ -169,7 +169,7 @@ export function useAdFormState() {
             editorRef.current.innerHTML = '';
         }
 
-        // Product & Options Reset - [Critical] Force fresh start for Step 3
+        // [Fix] Reset all paid options to StandardsGuard defaults to ensure clean UI
         setSelectedAdProduct(null);
         setSelectedAdPeriod(30);
         setSelectedIcon(null);
@@ -256,7 +256,7 @@ export function useAdFormState() {
             ageMin: ad.age_min || ad.ageMin || opts.ageMin || 20,
             ageMax: ad.age_max || ad.ageMax || opts.ageMax || 35,
             keywords: opts.keywords || ad.keywords || [],
-            productType: ad.tier || ad.productType || opts.product_type || ad.ad_type || 'p1',
+            productType: ad.tier || ad.productType || opts.product_type || ad.ad_type || null,
             productPeriod: opts.product_period || ad.productPeriod || 30,
             icon: opts.icon || ad.icon || null,
             icon_period: opts.icon_period || ad.icon_period || 0,

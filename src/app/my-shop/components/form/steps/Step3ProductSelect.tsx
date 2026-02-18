@@ -62,15 +62,13 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                                                 p.code === 'T3' ? 'bg-blue-600 text-white' :
                                                     'bg-purple-600 text-white')
                                         : 'bg-gray-100 text-gray-400'}`}>
-                                        {typeLabel} ({p.code})
+                                        {selectedAdProduct === p.id ? '선택 완료' : '광고 상품'}
                                     </span>
                                     {selectedAdProduct === p.id && <Award size={16} className={`${p.color.replace('text-', 'text-')} shrink-0`} />}
                                 </div>
                                 <div className="mb-2.5">
-                                    <h3 className={`text-[15px] md:text-[19px] font-black leading-tight tracking-tight whitespace-nowrap ${p.color}`}>{p.tier}</h3>
-                                    {p.eng && (
-                                        <div className={`text-[10px] md:text-[12px] font-bold opacity-70 italic ${p.color}`}>{p.eng}</div>
-                                    )}
+                                    <h3 className={`text-[18px] md:text-[24px] font-black leading-tight tracking-tighter ${p.color}`}>{p.tier}</h3>
+                                    <div className={`text-[10px] md:text-[12px] font-bold opacity-70 italic ${p.color}`}>{p.eng || ''}</div>
                                 </div>
                                 <p className="text-[10px] md:text-[12px] text-gray-500 font-bold whitespace-pre-line leading-tight opacity-90 break-keep">
                                     {p.desc}

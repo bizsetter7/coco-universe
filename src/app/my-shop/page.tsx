@@ -166,6 +166,11 @@ function MyShopContent() {
 
             const finalPayments = [...dbPayments, ...mockPayments].map((p: any) => normalizePayment(p, formState.shopName));
 
+            // [Debug/Test] If no payments exist, add a sample one for verification
+            if (finalPayments.length === 0 && authUser.id !== 'guest') {
+                // Removed auto-mock to avoid confusion
+            }
+
             setPaymentHistory(finalPayments);
         } catch (err: any) {
             console.error("Fetch payments error:", err);
@@ -206,16 +211,25 @@ function MyShopContent() {
         return () => window.removeEventListener('resume-updated', handleUpdate);
     }, [authUser?.id]);
 
-    const setView = (newView: any, adId?: string) => {
+    const setView = (newView: any, adId?: string, isNew?: boolean) => {
         const viewId = typeof newView === 'object' ? newView.id : newView;
-        if (viewId === view && !adId) return;
+        if (viewId === view && !adId && isNew === undefined) return;
 
         // [Critical Sync] Update state IMMEDIATELY for snappy UI response
         _setView(newView);
 
-
         const params = new URLSearchParams(searchParams.toString());
         params.set('view', viewId);
+
+        // [New Sync] Handle new entry state explicitly in URL and State
+        const finalIsNew = isNew !== undefined ? isNew : isNewEntry;
+        setIsNewEntry(finalIsNew);
+
+        if (finalIsNew && viewId === 'form') {
+            params.set('new', 'true');
+        } else {
+            params.delete('new');
+        }
 
         // Preserve or set ID if provided or moving to form in edit mode
         if (adId) {
@@ -225,7 +239,14 @@ function MyShopContent() {
             setLastLoadedId(null);
         }
 
-        router.replace(`?${params.toString()}`, { scroll: false });
+        // [Fix] Use native replaceState to avoid "Failed to fetch" on RSC data fetching during simple view transitions
+        // Next.js 14.1+ officially supports this for updating query params without server roundtrips.
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState(null, '', newUrl);
+
+        // [Safety Fix] Force state update again after router call to ensure it sticks
+        if (finalIsNew !== isNewEntry) setIsNewEntry(finalIsNew);
+
         window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
@@ -284,9 +305,23 @@ function MyShopContent() {
 
     useEffect(() => {
         const adIdParam = searchParams.get('id');
-        setEditingAdId(adIdParam); // [Standard] Sync URL ID to local state for handleSave
+        const viewParam = searchParams.get('view');
+        const hasNewParam = searchParams.has('new');
+        const isNewParam = searchParams.get('new') === 'true';
+
+        // [Critical Fix] Only sync isNewEntry from URL if we are NOT in the middle of a view transition
+        // or if the URL explicitly has the 'new' parameter.
+        if (viewParam === 'form') {
+            if (hasNewParam) {
+                setIsNewEntry(isNewParam);
+            } else if (!editingAdId && !adIdParam) {
+                // If we're in form but no ID and no 'new' param, it might be a weird state, 
+                // but we should default to what it was or true if it was triggered as new.
+            }
+        }
+
+        setEditingAdId(adIdParam);
         if (view === 'form' && adIdParam && isDataLoaded && registeredAds.length > 0) {
-            // [Critical Fix] Using lastLoadedId instead of !formState.title to prevent reset-loop when erasing title
             if (lastLoadedId !== adIdParam) {
                 const ad = registeredAds.find(a => String(a.id) === String(adIdParam));
                 if (ad) {
@@ -474,6 +509,13 @@ function MyShopContent() {
             const cleanContent = formState.editorRef.current?.innerHTML || formState.editorHtml;
             const cleanNickname = formState.nickname || authUser.nickname || '관리자';
 
+            // [Strategy] Reject if payload contains massive Base64 images
+            if (cleanContent.includes('data:image/') && cleanContent.length > 800000) {
+                alert("이미지 용량이 너무 큽니다. 에디터에 직접 붙여넣은 이미지는 한 개당 0.5MB를 초과할 수 없습니다. 이미지를 압축하거나 파일 업로드 기능을 이용해주세요.");
+                setIsSaving(false);
+                return;
+            }
+
             // [Strategy] Preserve original product info if in edit mode
             const finalProductType = originalAd ? (originalAd.productType || originalAd.ad_type || formState.selectedAdProduct) : formState.selectedAdProduct;
             const finalDeadline = originalAd ? (originalAd.deadline || originalAd.options?.deadline) : (new Date(Date.now() + (Number(formState.selectedAdPeriod || 30)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
@@ -482,7 +524,7 @@ function MyShopContent() {
             const cleanCategorySub = formState.industrySub || '';
 
             const adData: any = {
-                // [Standard Root Columns] - DB 컬럼명 준수
+                // [Standard Root Columns] - V4 DB 컬럼명 100% 준수
                 name: formState.shopName,
                 title: formState.title,
                 region: formState.regionCity,
@@ -496,41 +538,30 @@ function MyShopContent() {
                 category: formState.industryMain,
                 category_sub: cleanCategorySub,
                 work_region_sub: formState.regionGu,
-                content: cleanContent, // [Critical] Root content field
-                nickname: cleanNickname, // [Critical] Root nickname field
+                content: cleanContent,
+                nickname: cleanNickname,
+                manager_name: formState.managerName,
                 manager_phone: formState.managerPhone,
                 edit_count: editCount,
                 last_edit_month: currentMonth,
-                // [Critical Fix] Sync BOTH fields to ensure persistence if 'ad_price' column is missing
                 ad_price: formState.totalAmount,
-                price: formState.totalAmount, // Legacy compatibility
                 updated_at: new Date().toISOString(),
-                // [Rule] Editing an ad requires re-approval -> Reset status to 'pending'
                 status: 'pending',
+                user_id: authUser.id,
+                deadline: finalDeadline,
+                product_type: finalProductType,
 
-                // [Snapshot Bucket] - UI용 전체 데이터 보관
+                // [Snapshot Bucket] - UI용 핵심 정보 보관
                 options: {
                     ...(originalAd?.options || {}),
-                    // Snapshot: 폼 데이터 전체를 보관하여 복구 신뢰성 확보
-                    nickname: cleanNickname,
-                    shopName: formState.shopName,
-                    title: formState.title,
-                    content: cleanContent,
                     managerName: formState.managerName,
                     managerPhone: formState.managerPhone,
-                    regionCity: formState.regionCity,
-                    regionGu: formState.regionGu,
-                    category: formState.industryMain,
-                    categorySub: cleanCategorySub,
                     payType: formState.payType,
                     payAmount: parseInt(String(formState.payAmount).replace(/,/g, '') || '0'),
                     product_type: finalProductType,
                     product_period: originalAd ? (originalAd.options?.product_period || originalAd.productPeriod) : formState.selectedAdPeriod,
-                    edit_count: editCount,
-                    last_edit_month: currentMonth,
                     status: 'pending',
                     deadline: finalDeadline,
-                    messengers: formState.messengers,
                     keywords: formState.selectedKeywords,
                     icon: formState.selectedIcon,
                     icon_period: formState.iconPeriod,
@@ -539,14 +570,14 @@ function MyShopContent() {
                     border: formState.borderOption,
                     border_period: formState.borderPeriod,
                     pay_suffixes: formState.paySuffixes,
-                    // [Critical Fix] Store ad_price in options JSON since root columns are missing
-                    ad_price: formState.totalAmount
+                    ad_price: formState.totalAmount,
+                    ageMin: formState.ageMin,
+                    ageMax: formState.ageMax,
+                    addressDetail: formState.addressDetail,
+                    regionCity: formState.regionCity,
+                    regionGu: formState.regionGu
                 }
             };
-
-            if (!isMockUser) {
-                adData.user_id = authUser.id;
-            }
 
             let newShopId: any = editingAdId;
             if (editingAdId) {
@@ -554,9 +585,24 @@ function MyShopContent() {
                     // [Critical Fix] Real DB Ad Update
                     // Remove 'ad_price' AND 'price' from DB payload as columns may not exist
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { ad_price, price, ...dbAdData } = adData;
+                    // [Critical Fix] Strictly filter payload for 'shops' table update
+                    const validColumns = [
+                        'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
+                        'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
+                        'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type'
+                    ];
+                    const dbPayload: any = {};
+                    validColumns.forEach(col => {
+                        const val = adData[col];
+                        if (val !== undefined && val !== null) {
+                            // [Standard Fix] Trust Supabase-js for automatic JSON serialization
+                            dbPayload[col] = val;
+                        }
+                    });
+
                     const { data, error } = await supabase.from('shops')
-                        .update(dbAdData)
+                        .update(dbPayload)
                         .eq('id', String(editingAdId))
                         .select()
                         .single();
@@ -583,10 +629,23 @@ function MyShopContent() {
                 ));
             } else {
                 if (!isTargetMock) {
-                    // Remove 'ad_price' AND 'price' from DB payload
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { ad_price, price, ...dbAdData } = adData;
-                    const { data, error } = await supabase.from('shops').insert([dbAdData]).select().single();
+                    // [Critical Fix] Payload Sanitization - Filter only valid shops table columns
+                    const validColumns = [
+                        'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
+                        'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
+                        'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type'
+                    ];
+                    const dbPayload: any = {};
+                    validColumns.forEach(col => {
+                        const val = adData[col];
+                        if (val !== undefined && val !== null) {
+                            // [Standard Fix] Trust Supabase-js for automatic JSON serialization
+                            dbPayload[col] = val;
+                        }
+                    });
+
+                    const { data, error } = await supabase.from('shops').insert([dbPayload]).select().single();
                     if (error) throw new Error(`DB 삽입 실패: ${error.message}`);
                     newShopId = data.id;
                     // [Added] Insert into local state with normalization
@@ -606,17 +665,15 @@ function MyShopContent() {
                     user_id: isTargetMock ? null : authUser.id,
                     shop_id: newShopId,
                     amount: formState.totalAmount,
-                    type: formState.selectedAdProduct, // [Fix] Save product type (p1, p2...) to allow proper Badge display
-                    method: 'bank_transfer',
+                    // pay_type removed - stored in metadata.product_type
+                    method: 'bank_transfer',               // [Standard] V4 스키마 준수 (method)
                     status: 'pending',
                     description: `[${formState.selectedAdProduct}] ${formState.shopName} 공고 결제`,
                     metadata: {
                         nickname: cleanNickname,
                         shopName: formState.shopName,
                         adTitle: formState.title,
-                        content: cleanContent,
-                        ...adData,
-                        options: adData.options
+                        product_type: finalProductType // Legacy/Audit compat
                     },
                     created_at: new Date().toISOString()
                 };
@@ -644,11 +701,39 @@ function MyShopContent() {
             // [Fix] Force hard redirect (AFTER cleanup to avoid confirm dialog)
             // [Fix] Use setView for SPA navigation to prevent browser confirm dialog
             setView('dashboard');
-        } catch (err: any) { alert(`오류: ${err.message}`); }
+        } catch (err: any) {
+            console.error("Save Error:", err);
+            if (err.message?.includes('Failed to fetch')) {
+                alert(`DB 연결 오류 (Failed to fetch): 네트워크가 불안정하거나 서버 응답 크기가 너무 큽니다.\n\n[진단 팁]\n1. 브라우저의 '광고 차단 프로그램(AdBlock 등)'을 끈 뒤 재시도해주세요.\n2. 에디터에 붙여넣은 대용량 이미지가 있다면 삭제 후 다시 작성해주세요.\n3. 계속 발생할 경우 사내망 방화벽을 확인해주세요.`);
+            } else {
+                alert(`오류: ${err.message}`);
+            }
+        }
         finally { setIsSaving(false); }
     };
 
+    // [Feature] Auto-fill Manager Info from Auth
+    useEffect(() => {
+        if (view === 'form' && authUser && authUser.id !== 'guest') {
+            if (!formState.managerName) {
+                const name = (authUser.name && authUser.name !== '게스트') ? authUser.name : '관리자';
+                formState.setManagerName(name);
+            }
+            // phone exists in some session structures, check and fill if available
+            const userPhone = (authUser as any).phone || (authUser as any).phoneNumber;
+            if (!formState.managerPhone && userPhone) {
+                formState.setManagerPhone(userPhone);
+            }
+        }
+    }, [view, authUser, formState.managerName, formState.managerPhone]);
+
     const handleBack = () => {
+        // [Fix] Restore exit confirmation logic
+        if (formState.isDirty) {
+            if (!window.confirm('작성 중인 내용이 저장되지 않았습니다. 정말 나가시겠습니까?')) {
+                return;
+            }
+        }
         formState.resetAdStates();
         setView('dashboard');
     };
@@ -700,15 +785,15 @@ function MyShopContent() {
                     onConfirm={() => {
                         if (isNewEntry) {
                             formState.resetAdStates();
-                            setView('form');
+                            setView('form', undefined, true);
                         } else {
                             // [Critical Fix] Read from Ref to guarantee we have the ID regardless of render cycle
                             const targetId = editingAdIdRef.current;
                             if (targetId) {
-                                setView('form', targetId);
+                                setView('form', targetId, false);
                             } else {
                                 // Fallback
-                                setView('form');
+                                setView('form', undefined, false);
                             }
                         }
                         setShowWarningModal(false);
@@ -802,7 +887,7 @@ function MyShopContent() {
 
             {view === 'form' && (
                 <div className="w-full">
-                    <AdForm {...formState} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
+                    <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
                 </div>
             )}
         </div>

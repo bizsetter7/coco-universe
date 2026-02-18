@@ -12,6 +12,7 @@ export interface UserSession {
     shopId?: string;
     isSimulated?: boolean;
     isAdultVerified?: boolean; // [New] 성인인증 여부 (DB 연동)
+    email?: string; // [New] 이메일 필드 추가
 }
 
 // Supabase Auth 연동된 실제 인증 훅
@@ -71,6 +72,7 @@ export function useAuth() {
                         nickname: profile.nickname || profile.full_name || '닉네임',
                         points: profile.points || 0,
                         isAdultVerified: !!profile.is_adult_verified, // [New] DB 성인인증 여부 반영
+                        email: authUser.email
                     };
 
                     // [Simulation Check] 어드민인 경우 유지된 시뮬레이션 상태 확인
@@ -171,6 +173,7 @@ export function useAuth() {
             name: name || (type === 'admin' ? '관리자' : '테스트회원'),
             nickname: nickname || (type === 'admin' ? '운영마스터' : '테스트닉네임'),
             points: 1000,
+            email: type === 'admin' ? 'admin_user@example.com' : 'test@example.com'
         };
 
         if (typeof window !== 'undefined') {

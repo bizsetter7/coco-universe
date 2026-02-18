@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { MessageCircle } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { MessageCircle, PenBox } from 'lucide-react';
 import { Step1BasicInfo } from './components/form/steps/Step1BasicInfo';
 import { Step2JobDetail } from './components/form/steps/Step2JobDetail';
 import { Step3ProductSelect } from './components/form/steps/Step3ProductSelect';
@@ -60,20 +61,147 @@ interface AdFormProps {
     onPreview?: () => void;
     onBack?: () => void;
     isNewEntry?: boolean;
+    isSaving?: boolean;
 }
 
-export default function AdForm(props: AdFormProps) {
-    const { brand } = props;
+// --- Internal Components ---
+const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Done, isStep4Done }: { currentStep: number, brand: any, isStep1Done: boolean, isStep2Done: boolean, isStep3Done: boolean, isStep4Done: boolean }) => {
+    const steps = [
+        { id: 1, label: '기본 정보', target: 'myshop-step-1', isDone: isStep1Done },
+        { id: 2, label: '상세 내용', target: 'myshop-step-2', isDone: isStep2Done },
+        { id: 3, label: '상품 선택', target: 'myshop-step-3', isDone: isStep3Done },
+        { id: 4, label: '추가 옵션', target: 'myshop-step-4', isDone: isStep4Done },
+    ];
 
-    // [Fix] Force Reset Step 3 on New Entry
+    const scrollToStep = (id: string) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    return (
+        <div className={`sticky top-[56px] z-[100] py-5 md:py-3 px-4 md:px-6 mb-4 backdrop-blur-md border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-950/80 border-gray-800' : 'bg-white/80 border-gray-100 shadow-sm'}`}>
+            <div className="flex items-center gap-3 md:gap-8 overflow-x-auto no-scrollbar scrollbar-hide max-w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {steps.map((step) => {
+                    const isActive = currentStep === step.id;
+                    const isCompleted = !!step.isDone;
+                    return (
+                        <button
+                            key={step.id}
+                            onClick={() => scrollToStep(step.target)}
+                            className="flex items-center gap-2 shrink-0 group transition-all"
+                        >
+                            <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-[10px] md:text-sm font-black transition-all ${isActive ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30 scale-110' : isCompleted ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 text-gray-400'}`}>
+                                {isCompleted ? <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg> : step.id}
+                            </div>
+                            <span className={`text-[10px] md:text-sm font-black whitespace-nowrap transition-colors ${isActive ? 'text-pink-600' : isCompleted ? 'text-green-600' : 'text-gray-400'} group-hover:text-pink-500`}>
+                                {step.label}
+                            </span>
+                            {step.id < 4 && <div className={`hidden md:block w-4 h-px ${isCompleted ? 'bg-green-200' : 'bg-gray-100'}`} />}
+                        </button>
+                    );
+                })}
+            </div>
+            <div className="hidden md:flex items-center gap-4 text-[11px] font-bold text-gray-400">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-pink-500"></span>진행중</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span>완료</span>
+            </div>
+        </div>
+    );
+};
+
+export default function AdForm(props: AdFormProps) {
+    const searchParams = useSearchParams();
+    const viewParam = searchParams.get('view');
+    const { brand } = props;
+    const [currentStep, setCurrentStep] = React.useState(1);
+
+    // [Logic] Calculate Step Completion Status - [Strict Validation]
+    // Step 1: 기본 정보 (상호명, 성함, 번호가 모두 유효해야 함)
+    const isStep1Done = !!(props.shopName && props.shopName !== '상호명 없음' && props.managerName && props.managerName !== '관리자' && props.managerPhone);
+
+    // Step 2: 상세 내용 (제목, 업종, 지역, 급여방식이 모두 선택/입력되어야 함)
+    const isStep2Done = !!(
+        props.title && props.title !== '제목 없음' &&
+        props.industryMain && props.industryMain !== '업종' &&
+        props.regionCity && props.regionCity !== '지역' &&
+        props.payType && props.payType !== '급여방식선택' && props.payType !== '시급' &&
+        props.payAmount && props.payAmount !== '0' && props.payAmount !== ''
+    );
+
+    // Step 3: 상품 선택 (StandardsGuard 규정에 따라 p1~p7 유효 코드만 인정)
+    const isStep3Done = !!(props.selectedAdProduct && /^p[1-7]$/.test(props.selectedAdProduct));
+
+    // Step 4: 추가 옵션 (아이콘, 형광펜, 키워드, 테두리 중 하나라도 '실제로' 선택된 경우만 완료)
+    const isStep4Done = !!(
+        (props.selectedKeywords && props.selectedKeywords.length > 0) ||
+        props.selectedIcon !== null ||
+        props.selectedHighlighter !== null ||
+        (props.borderOption && props.borderOption !== 'none')
+    );
+
+    // [Fix] Force Reset Step 3/4 states on New Entry to ensure clean UI
+    // Done at render level if isNewEntry is true to prevent any flickering
     React.useEffect(() => {
         if (props.isNewEntry) {
             props.setSelectedAdProduct(null);
+            // [New] Also reset scroll to ensure user starts at the top
+            window.scrollTo({ top: 0, behavior: 'instant' });
         }
     }, [props.isNewEntry]);
 
+    // [Safety] If in New Entry mode but somehow a product is selected without interaction, force null
+    // (This handles weird race conditions or state leakage from previous edited ads)
+    if (props.isNewEntry && props.selectedAdProduct && !props.title) {
+        // This is a defensive check; if we have a product but the mandatory title is missing in a "New" form, 
+        // it's likely leaked state.
+        // props.setSelectedAdProduct(null); // Careful with infinite loops, better to let useEffect handle it
+    }
+
+    // [Feature] Track active step on scroll (Intelligent Detection via BoundingRect)
+    React.useEffect(() => {
+        const handleScroll = () => {
+            const steps = [
+                { id: 1, el: document.getElementById('myshop-step-1') },
+                { id: 2, el: document.getElementById('myshop-step-2') },
+                { id: 3, el: document.getElementById('myshop-step-3') },
+                { id: 4, el: document.getElementById('myshop-step-4') }
+            ];
+
+            let activeStep = 1;
+            const threshold = 160; // Offset for header height
+
+            steps.forEach(step => {
+                if (step.el && !props.isSaving) {
+                    const rect = step.el.getBoundingClientRect();
+                    // If the top of the element is within view (with offset), it's potentially active
+                    if (rect.top <= threshold + 50) {
+                        activeStep = step.id;
+                    }
+                }
+            });
+
+            setCurrentStep(activeStep);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Initial check
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isStep1Done, isStep2Done, isStep3Done]);
+
     return (
-        <div className="w-full max-w-[1120px] mx-auto space-y-2 md:space-y-5 pb-8 pt-2.5 px-2 md:px-3 xl:px-0 relative mb-3">
+        <div className="w-full max-w-[1120px] mx-auto space-y-2 md:space-y-5 pb-8 pt-0 px-2 md:px-3 xl:px-0 relative mb-3">
+            {/* Sticky Step Progress */}
+            <StepIndicator
+                currentStep={currentStep}
+                brand={brand}
+                isStep1Done={isStep1Done}
+                isStep2Done={isStep2Done}
+                isStep3Done={isStep3Done}
+                isStep4Done={isStep4Done}
+            />
+
             {/* Recruitment Registration Header (Capture 3) */}
             <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">
@@ -85,8 +213,25 @@ export default function AdForm(props: AdFormProps) {
                 </p>
             </div>
 
+            {/* [Onboarding] Welcome Alert for New Posters */}
+            {props.isNewEntry && (
+                <div className="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="flex items-start gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-sm shrink-0">✨</div>
+                        <div>
+                            <h3 className="text-sm md:text-lg font-black text-pink-600 mb-0.5 md:mb-1">사장님, 코코알바에 오신 것을 환영합니다!</h3>
+                            <p className="text-[11px] md:text-[13px] text-pink-800/70 font-bold leading-relaxed">
+                                지금 첫 공고를 등록하고 <span className="text-pink-600 font-black underline underline-offset-2">SNS 홍보 혜택</span>을 받아보세요. <br className="hidden md:block" />
+                                작성이 어려우시면 언제든 우측 상단의 '예시 보기'를 참고해주세요!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} />
+
             {/* Step 3 & 4: Restricted in Edit Mode */}
             <div className="relative group space-y-2 md:space-y-5">
                 {!props.isNewEntry && (
@@ -121,7 +266,7 @@ export default function AdForm(props: AdFormProps) {
             </div>
 
             {/* Total Amount Display (Redesigned matching Capture 1/2) */}
-            <div className="max-w-[900px] mx-auto w-full px-4 md:px-0">
+            <div className="max-w-[900px] mx-auto w-full px-4 md:px-0 mt-5">
                 <div className="bg-[#e0007b] text-white py-3 px-4 md:p-8 rounded-[24px] shadow-xl flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6 overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div className="text-center md:text-left z-10 shrink-0">
@@ -163,6 +308,13 @@ export default function AdForm(props: AdFormProps) {
                     </button>
                 </div>
             </div>
+            <style jsx global>{`
+                .description-preview p { margin-bottom: 0.5rem; }
+                .description-preview strong { font-weight: 900; }
+                .description-preview img { max-width: 100%; border-radius: 8px; }
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
         </div>
     );
 }

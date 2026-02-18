@@ -69,20 +69,43 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
         setShowEmojiMenu(menuName === 'emoji' ? !showEmojiMenu : false);
     }, [showFontMenu, showFontSizeMenu, showForeColorMenu, showHiliteColorMenu, showEmojiMenu, setShowFontMenu, setShowFontSizeMenu, setShowForeColorMenu, setShowHiliteColorMenu, setShowEmojiMenu]);
 
-    const insertImage = (file: File) => {
+    const [isUploading, setIsUploading] = React.useState(false);
+
+    const insertImage = async (file: File) => {
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const url = e.target?.result;
-            if (url) {
-                restoreSelection();
-                const img = `<img src="${url}" style="max-width: 100%; height: auto; border-radius: 12px; margin: 8px 0;" />`;
-                document.execCommand('insertHTML', false, img);
-                syncEditorHtml();
-                editorRef.current?.focus();
-            }
-        };
-        reader.readAsDataURL(file);
+
+        try {
+            setIsUploading(true);
+            // 1. Supabase Storage Upload
+            const { supabase } = await import('@/lib/supabase');
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2, 12)}_${Date.now()}.${fileExt}`;
+            const filePath = `ad-contents/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('job-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('job-images')
+                .getPublicUrl(filePath);
+
+            // 3. Insert into Editor
+            restoreSelection();
+            const img = `<img src="${publicUrl}" style="max-width: 100%; height: auto; border-radius: 12px; margin: 8px 0;" alt="직접 업로드 이미지" />`;
+            document.execCommand('insertHTML', false, img);
+            syncEditorHtml();
+            editorRef.current?.focus();
+
+        } catch (err: any) {
+            console.error('이미지 업로드 실패:', err);
+            alert(`이미지 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const applyPxFontSize = useCallback((size: string) => {
@@ -189,15 +212,15 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
                                 <label className="block text-sm font-black"><span className="text-red-500 mr-1">*</span>공고 제목</label>
-                                <span className={`text-[10px] font-bold ${title.length >= 25 ? 'text-red-500' : 'text-gray-400'}`}>
-                                    {title.length}/25 (텍스트+숫자+특수문자 포함)
+                                <span className={`text-[10px] font-bold ${title.length >= 26 ? 'text-red-500' : 'text-gray-400'}`}>
+                                    {title.length}/26 (한글 기준 약 13자 이내 권장)
                                 </span>
                             </div>
                             <input
                                 type="text"
                                 placeholder="EX) 강남 1등 가게! 갯수 보장!"
                                 value={title}
-                                maxLength={25}
+                                maxLength={26}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className={`w-full border rounded-lg p-3 text-base font-black outline-none placeholder:text-gray-200 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-black shadow-inner'}`}
                             />
@@ -296,12 +319,17 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                 </div>
 
                                 {/* Media Upload Moved Here */}
-                                <label className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0 h-[34px] md:h-[38px] w-[34px] md:w-[38px]" title="기존 업로드 위치에서 이동됨">
-                                    <ImageIcon size={18} />
+                                <label className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0 h-[34px] md:h-[38px] w-[34px] md:w-[38px] relativeoverflow-hidden" title="이미지 업로드">
+                                    {isUploading ? (
+                                        <div className="animate-spin text-pink-500"><svg className="w-5 h-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                    ) : (
+                                        <ImageIcon size={18} />
+                                    )}
                                     <input
                                         type="file"
                                         accept="image/*,image/gif"
                                         className="hidden"
+                                        disabled={isUploading}
                                         onChange={(e) => {
                                             if (e.target.files?.[0]) {
                                                 insertImage(e.target.files[0]);
