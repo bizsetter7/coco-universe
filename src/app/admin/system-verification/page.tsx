@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types/supabase';
+import { supabase } from '@/lib/supabase';
 import { Shop } from '@/types/shop';
-import { AlertTriangle, CheckCircle, RefreshCcw, ExternalLink } from 'lucide-react';
+import { AlertTriangle, CheckCircle, RefreshCcw, ExternalLink, MapPin, Briefcase } from 'lucide-react';
 
 export default function SystemVerificationPage() {
-    const supabase = createClientComponentClient<Database>();
     const [shops, setShops] = useState<Shop[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<'all' | 'issue'>('issue');
