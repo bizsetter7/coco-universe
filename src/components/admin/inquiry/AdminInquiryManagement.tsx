@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
     MessageSquare,
     Save,
-    Send
+    Send,
+    Paperclip,
+    PenBox
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { NoteService } from '@/lib/noteService';
@@ -21,6 +23,38 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
     const [inquiryReply, setInquiryReply] = useState('');
 
     const ADMIN_ALIASES_LIST = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin', '운영팀', '[관리자]'];
+
+    const [editingWriterName, setEditingWriterName] = useState(false);
+    const [tempWriterName, setTempWriterName] = useState('');
+    const [isUpdatingWriter, setIsUpdatingWriter] = useState(false);
+
+    const handleWriterNameUpdate = async () => {
+        if (!selectedInquiry || !tempWriterName.trim() || tempWriterName === selectedInquiry.writer_name) {
+            setEditingWriterName(false);
+            return;
+        }
+
+        setIsUpdatingWriter(true);
+        try {
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ writer_name: tempWriterName.trim() })
+                .eq('id', selectedInquiry.id);
+
+            if (error) throw error;
+
+            // Local update to avoid full re-fetch if possible, though fetchData is safer
+            selectedInquiry.writer_name = tempWriterName.trim();
+            setEditingWriterName(false);
+            await fetchData();
+            alert('작성자 이름이 수정되었습니다.');
+        } catch (error) {
+            console.error('Error updating writer name:', error);
+            alert('수정 중 오류가 발생했습니다.');
+        } finally {
+            setIsUpdatingWriter(false);
+        }
+    };
 
     const handleMessageDelete = async (id: string) => {
         if (!confirm('정말 삭제하시겠습니까? (복구 불가)')) return;
@@ -132,7 +166,7 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                     {/* Inquiry Type Filter */}
                     {activeTab === 'inquiry' && (
                         <div className="px-6 pb-4 flex gap-2 overflow-x-auto scrollbar-hide">
-                            {['전체', '디자인문의', '제휴/광고문의', '자주하는질문', '일반문의'].map((filter) => (
+                            {['전체', '입금확인문의', '배너문의', '주문형광고문의', '기간연장문의', '개인회원문의', '제휴문의', '광고 상품', '채용 관련', '신고/정책', '기타문의'].map((filter) => (
                                 <button
                                     key={filter}
                                     onClick={() => setInquiryFilter(filter)}
@@ -317,9 +351,51 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                             <div className="px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-black border border-indigo-500/30">
                                                 {selectedInquiry.type === 'message' ? '쪽지 문의' : selectedInquiry.type}
                                             </div>
-                                            <span className="text-xs font-bold text-slate-500">
-                                                {new Date(selectedInquiry.created_at || selectedInquiry.date).toLocaleString()}
-                                            </span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1.5 group relative">
+                                                    {editingWriterName ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="text"
+                                                                value={tempWriterName}
+                                                                onChange={(e) => setTempWriterName(e.target.value)}
+                                                                className="px-2 py-1 bg-slate-800 border border-indigo-500 rounded text-xs text-white outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') handleWriterNameUpdate();
+                                                                    if (e.key === 'Escape') setEditingWriterName(false);
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={handleWriterNameUpdate}
+                                                                disabled={isUpdatingWriter}
+                                                                className="text-indigo-400 hover:text-indigo-300 disabled:opacity-50"
+                                                            >
+                                                                <Save size={14} />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                                                                {selectedInquiry.writer_name || selectedInquiry.sender || 'Unknown'}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setTempWriterName(selectedInquiry.writer_name || '');
+                                                                    setEditingWriterName(true);
+                                                                }}
+                                                                className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-indigo-400 transition-all"
+                                                            >
+                                                                <PenBox size={10} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <span className="text-slate-800 font-bold">•</span>
+                                                <span className="text-xs font-bold text-slate-500">
+                                                    {new Date(selectedInquiry.created_at || selectedInquiry.date).toLocaleString()}
+                                                </span>
+                                            </div>
                                         </div>
                                         <h2 className="text-2xl font-black text-white tracking-tight leading-snug">
                                             {selectedInquiry.title || selectedInquiry.sender || '제목 없음'}
@@ -341,6 +417,32 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                     <div className="text-base font-medium text-slate-300 leading-loose whitespace-pre-wrap pl-4 border-l-2 border-slate-800">
                                         {selectedInquiry.content || '(내용 없음)'}
                                     </div>
+                                    {selectedInquiry.file_url && (() => {
+                                        try {
+                                            const files = JSON.parse(selectedInquiry.file_url);
+                                            if (Array.isArray(files) && files.length > 0) {
+                                                return (
+                                                    <div className="mt-4 pt-4 border-t border-white/5 pl-4">
+                                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Attachments</p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {files.map((url: string, idx: number) => (
+                                                                <a
+                                                                    key={idx}
+                                                                    href={url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-[11px] font-bold text-slate-400 hover:text-white hover:border-slate-700 transition"
+                                                                >
+                                                                    <Paperclip size={12} />
+                                                                    <span>파일 {idx + 1}</span>
+                                                                </a>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        } catch (e) { return null; }
+                                    })()}
                                 </div>
 
                                 {inquiryThread.length > 0 && (

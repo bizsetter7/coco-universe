@@ -544,6 +544,7 @@ function MyShopContent() {
                 nickname: cleanNickname,
                 manager_name: formState.managerName,
                 manager_phone: formState.managerPhone,
+                media_url: formState.mediaUrl,
                 edit_count: editCount,
                 last_edit_month: currentMonth,
                 ad_price: formState.totalAmount,
@@ -577,7 +578,8 @@ function MyShopContent() {
                     ageMax: formState.ageMax,
                     addressDetail: formState.addressDetail,
                     regionCity: formState.regionCity,
-                    regionGu: formState.regionGu
+                    regionGu: formState.regionGu,
+                    mediaUrl: formState.mediaUrl
                 }
             };
 
@@ -592,7 +594,7 @@ function MyShopContent() {
                         'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
-                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type'
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url'
                     ];
                     const dbPayload: any = {};
                     validColumns.forEach(col => {
@@ -636,7 +638,7 @@ function MyShopContent() {
                         'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
-                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type'
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url'
                     ];
                     const dbPayload: any = {};
                     validColumns.forEach(col => {

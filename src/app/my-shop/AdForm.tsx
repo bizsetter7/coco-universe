@@ -63,6 +63,7 @@ interface AdFormProps {
     onBack?: () => void;
     isNewEntry?: boolean;
     isSaving?: boolean;
+    mediaUrl: string; setMediaUrl: (v: string) => void;
 }
 
 // --- Internal Components ---
@@ -262,6 +263,8 @@ export default function AdForm(props: AdFormProps) {
                         selectedAdProduct={props.selectedAdProduct}
                         setExampleType={props.setExampleType}
                         setShowExampleModal={props.setShowExampleModal}
+                        mediaUrl={props.mediaUrl}
+                        setMediaUrl={props.setMediaUrl}
                     />
                 </div>
             </div>

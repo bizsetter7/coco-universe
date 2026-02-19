@@ -130,12 +130,14 @@ export default function JobClient({ shops }: JobClientProps) {
 
                         // Pass Ad Grid here
                         adGrid={
-                            <UnifiedAdGrid
-                                shops={shops}
-                                onAdRegister={openPaymentPopup}
-                                onSelectShop={setSelectedShop}
-                                hasSidebar={true}
-                            />
+                            useMemo(() => (
+                                <UnifiedAdGrid
+                                    shops={shops}
+                                    onAdRegister={openPaymentPopup}
+                                    onSelectShop={setSelectedShop}
+                                    hasSidebar={true}
+                                />
+                            ), [shops, openPaymentPopup])
                         }
 
                         selectedRegion={selectedRegion}

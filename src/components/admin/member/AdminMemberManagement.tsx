@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Unlock, Lock, XCircle, TrendingUp } from 'lucide-react';
+import { Search, Unlock, Lock, XCircle, TrendingUp, Zap } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { AdminAdRegistrationModal } from '../ad/AdminAdRegistrationModal';
 
 interface AdminMemberManagementProps {
     users: any[];
@@ -13,6 +14,8 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
     const [search, setSearch] = useState('');
     const [selectedUser, setSelectedUser] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+    const [adTargetUser, setAdTargetUser] = useState<any | null>(null);
 
     const handleUserToggleStatus = async (userId: string, currentStatus: string) => {
         const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
@@ -109,6 +112,8 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                                 {user.status === 'blocked' ? '차단됨' : '활동중'}
                                             </span>
                                             <span className="ml-2 text-[10px] font-bold text-slate-500">{user.type === 'corporate' || user.role === 'seller' ? '기업회원' : '개인회원'}</span>
+                                            {/* [Admin Feature] Show Ad Count if possible (simplified badge) */}
+                                            <span className="ml-2 px-1.5 py-0.5 bg-indigo-50 text-indigo-500 rounded text-[9px] font-black">Ad: {user.ad_count || 0}</span>
                                         </td>
                                         <td className="px-8 py-4">
                                             <div className="text-[11px] font-bold text-slate-500">{new Date(user.joinDate || user.created_at).toLocaleDateString()}</div>
@@ -124,6 +129,15 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                                     className="text-[10px] font-black text-blue-600 hover:underline"
                                                 >
                                                     상세정보
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setAdTargetUser(user);
+                                                        setIsAdModalOpen(true);
+                                                    }}
+                                                    className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-black hover:bg-blue-700 transition active:scale-95 shadow-sm shadow-blue-100"
+                                                >
+                                                    <Zap size={12} fill="currentColor" /> 광고등록
                                                 </button>
                                                 <button
                                                     onClick={() => handleUserToggleStatus(user.id, user.status)}
@@ -166,9 +180,20 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                     <h3 className="text-xl font-black text-slate-950 tracking-tighter">{selectedUser.name || selectedUser.full_name || '이름없음'}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsDetailModalOpen(false)} className="p-2 text-slate-300 hover:text-slate-950 transition-colors">
-                                <XCircle size={24} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => {
+                                        setAdTargetUser(selectedUser);
+                                        setIsAdModalOpen(true);
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-700 transition active:scale-95 shadow-lg shadow-blue-100"
+                                >
+                                    <Zap size={14} fill="currentColor" /> 광고 등록하기
+                                </button>
+                                <button onClick={() => setIsDetailModalOpen(false)} className="p-2 text-slate-300 hover:text-slate-950 transition-colors">
+                                    <XCircle size={24} />
+                                </button>
+                            </div>
                         </div>
                         <div className="p-8 space-y-6 overflow-y-auto custom-scrollbar">
                             <div className="grid grid-cols-2 gap-4">
@@ -227,6 +252,18 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Admin Ad Registration Modal */}
+            {isAdModalOpen && adTargetUser && (
+                <AdminAdRegistrationModal
+                    user={adTargetUser}
+                    onClose={() => {
+                        setIsAdModalOpen(false);
+                        setAdTargetUser(null);
+                    }}
+                    fetchData={fetchData}
+                />
             )}
         </div>
     );

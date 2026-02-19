@@ -85,6 +85,7 @@ export default function MarketingPage() {
             {
                 '이름': '홍길동',
                 '전화번호': '010-1234-5678',
+                '전화번호2': '010-5678-1234',
                 '업체명': '강남스타일',
                 '업종': '룸알바',
                 '상세업종': '퍼블릭',
@@ -555,7 +556,30 @@ export default function MarketingPage() {
                                                 <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] flex items-center justify-center font-black" title="Adult Verified">19</span>
                                             )}
                                         </div>
-                                        <div className="text-xs text-gray-400 font-mono tracking-tight">{target.phone_number}</div>
+                                        <div
+                                            className="text-xs text-gray-400 font-mono tracking-tight cursor-pointer hover:text-blue-600 flex items-center gap-1 group/p1"
+                                            onClick={() => handleQuickEdit(target.id, 'phone_number', '기본 연락처', target.phone_number || '')}
+                                        >
+                                            {target.phone_number}
+                                            <Edit2 size={8} className="opacity-0 group-hover/p1:opacity-100" />
+                                        </div>
+                                        {target.phone_number_2 && (
+                                            <div
+                                                className="text-[10px] text-gray-400 font-mono tracking-tight cursor-pointer hover:text-blue-600 flex items-center gap-1 group/p2"
+                                                onClick={() => handleQuickEdit(target.id, 'phone_number_2', '추가 연락처', target.phone_number_2 || '')}
+                                            >
+                                                (2) {target.phone_number_2}
+                                                <Edit2 size={8} className="opacity-0 group-hover/p2:opacity-100" />
+                                            </div>
+                                        )}
+                                        {!target.phone_number_2 && (
+                                            <div
+                                                className="text-[9px] text-gray-300 cursor-pointer hover:text-blue-500 mt-0.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => handleQuickEdit(target.id, 'phone_number_2', '추가 연락처', '')}
+                                            >
+                                                <Plus size={8} /> 번호추가
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="p-4 text-left">
                                         <div className="flex flex-col gap-1">

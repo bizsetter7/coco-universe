@@ -25,12 +25,12 @@ export const AD_TEMPLATES: AdTemplate[] = [
         thumbnail: 'https://api.placeholder.com/200/4c1d95/ffffff?text=Luxury+Purple',
         themeColor: '#4c1d95',
         defaultBlocks: [
-            { type: 'main_title', values: { text: '포미미 최GO 페이' } },
+            { type: 'main_title', values: { text: '업계 최GO 페이 보장' } },
             { type: 'sub_title', values: { text: '화려한 글들보다 핵심만 드리고 싶습니다.' } },
             { type: 'benefit', values: { title: '1. 사이즈 안좋으셔도 됩니다.', desc: '외모보다 마인드 하나, 의지만 있으면 됩니다.' } },
             { type: 'benefit', values: { title: '2. 모든 유흥일에 초보이셔도 됩니다.', desc: '처음은 누구나 다 어렵습니다. 하나하나 도와드리겠습니다.' } },
             { type: 'salary', values: { text: '최고 페이 보장 + @ 보너스' } },
-            { type: 'contact', values: { text: '010-1234-5678' } },
+            { type: 'contact', values: { text: '010-1234-1234' } },
         ],
         wrapperHtml: (_, rendered) => `
 <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 60px 20px; color: white; border-radius: 40px; font-family: 'Pretendard', sans-serif; text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
@@ -75,7 +75,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
             { type: 'salary', values: { text: '시급 15~25+@ / 하루 100~150 보장' } },
             { type: 'benefit', values: { title: '모집대상', desc: '20~30대 주부/대한민국 국적이면 OK' } },
             { type: 'benefit', values: { title: '근무시간', desc: '주간조: AM 10:00 ~ PM 06:00 / 야간조: PM 08:00 ~ AM 04:00' } },
-            { type: 'contact', values: { text: '010-8224-9415 / 카톡: yooy007' } },
+            { type: 'contact', values: { text: '010-1234-1234 / 카톡: cocoalba' } },
         ],
         wrapperHtml: (_, rendered) => `
 <div style="background: #000 url('https://www.transparenttextures.com/patterns/dark-matter.png'); padding: 60px 20px; color: white; border-radius: 0; font-family: 'Pretendard', sans-serif; text-align: center; border: 2px solid #ff00ff; box-shadow: inset 0 0 50px rgba(255,0,255,0.2), 0 0 20px rgba(255,0,255,0.5);">
@@ -111,11 +111,11 @@ export const AD_TEMPLATES: AdTemplate[] = [
         thumbnail: 'https://api.placeholder.com/200/ff0000/ffffff?text=Red+Impact',
         themeColor: '#ff0000',
         defaultBlocks: [
-            { type: 'main_title', values: { text: '인계동 지오' } },
+            { type: 'main_title', values: { text: '강남 1등 핫플레이스' } },
             { type: 'sub_title', values: { text: '시스템 1등 / 정통룸 1등 / 중간방 1등' } },
             { type: 'benefit', values: { title: '첫번째', desc: '당일 수급 및 다양한 편의 제공' } },
             { type: 'benefit', values: { title: '두번째', desc: '초보자도 정착할 수 있는 최고의 환경' } },
-            { type: 'contact', values: { text: '010-5929-3252 / 카톡: sccpdh' } },
+            { type: 'contact', values: { text: '010-1234-1234 / 카톡: cocoalba' } },
         ],
         wrapperHtml: (blocks, rendered) => {
             const titleIdx = blocks.findIndex(b => b.type === 'main_title');
@@ -159,9 +159,9 @@ export const AD_TEMPLATES: AdTemplate[] = [
         defaultBlocks: [
             { type: 'main_title', values: { text: 'HEAVEN 헤븐' } },
             { type: 'sub_title', values: { text: '믿고 따라와주시면 끝까지 책임지겠습니다!' } },
-            { type: 'benefit', values: { title: '지역', desc: '강북/노원/의정부 전지역 콜 최다 보유' } },
+            { type: 'benefit', values: { title: '지역', desc: '서울/경기/인천 전지역 콜 최다 보유' } },
             { type: 'benefit', values: { title: '페이', desc: '1T = 10만원 / 당일 결제 무조건' } },
-            { type: 'contact', values: { text: '010-6629-1519 / 카톡: fjffaf' } },
+            { type: 'contact', values: { text: '010-1234-1234 / 카톡: cocoalba' } },
         ],
         wrapperHtml: (blocks, rendered) => {
             const titleIdx = blocks.findIndex(b => b.type === 'main_title');
@@ -204,8 +204,8 @@ export const AD_TEMPLATES: AdTemplate[] = [
             { type: 'main_title', values: { text: '아자아자 대박나자' } },
             { type: 'sub_title', values: { text: '압도적인 규모! 갯수 미기재 시 100% 보상!' } },
             { type: 'salary', values: { text: '1일 평균 50~70만원 이상!' } },
-            { type: 'benefit', values: { title: 'LOCATION', desc: '분당 정자동 157-8번지 (정자역 5분)' } },
-            { type: 'contact', values: { text: '010-6370-1954 / Kakao: success' } },
+            { type: 'benefit', values: { title: 'LOCATION', desc: '서울 강남구 역삼동 (역세권 5분)' } },
+            { type: 'contact', values: { text: '010-1234-1234 / Kakao: cocoalba' } },
         ],
         wrapperHtml: (_, rendered) => `
 <div style="background: #18181b; padding: 50px 20px; color: white; border-radius: 24px; font-family: 'Pretendard', sans-serif; text-align: center; border: 4px solid #facc15; box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);">
@@ -242,11 +242,11 @@ export const AD_TEMPLATES: AdTemplate[] = [
         thumbnail: 'https://api.placeholder.com/200/fdf2f8/ec4899?text=Sweet+Pink',
         themeColor: '#fff1f2',
         defaultBlocks: [
-            { type: 'main_title', values: { text: '박프로 가족 모집' } },
+            { type: 'main_title', values: { text: '김실장 패밀리 모집' } },
             { type: 'sub_title', values: { text: '함께 웃으며 일할 식구들을 모십니다!' } },
             { type: 'benefit', values: { title: '💕 우리들의 약속', desc: '성실함만 있으면OK!\\n친구와 함께 지원 환영!\\n초보자 교육 철저!' } },
             { type: 'salary', values: { text: '1시간 기준 18만 드립니다!' } },
-            { type: 'contact', values: { text: '010-9878-4154 / Kakao: pinkpro' } },
+            { type: 'contact', values: { text: '010-1234-1234 / Kakao: cocoalba' } },
         ],
         wrapperHtml: (_, rendered) => `
 <div style="background: #fff1f2; padding: 50px 20px; color: #be123c; border-radius: 24px; font-family: 'Pretendard', sans-serif; text-align: center; border: 6px solid #fb7185; position: relative;">
@@ -272,6 +272,94 @@ export const AD_TEMPLATES: AdTemplate[] = [
                 case 'contact': return `
                     <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 900; color: #be123c;">
                         연락처: ${v.text}
+                    </div>`;
+                default: return '';
+            }
+        }
+    },
+    {
+        id: 'summer-beach',
+        name: '썸머 비치',
+        description: '시원한 여름 바다와 휴양지 느낌을 주는 청량한 디자인.',
+        thumbnail: 'https://api.placeholder.com/200/0ea5e9/ffffff?text=Summer+Beach',
+        themeColor: '#0ea5e9',
+        defaultBlocks: [
+            { type: 'main_title', values: { text: '지역 최고의 수입보장!' } },
+            { type: 'sub_title', values: { text: '저희는 이 구역에서 1등하는 곳입니다. 꼭! 돈 많이 벌게 해 드릴게요' } },
+            { type: 'contact', values: { text: '010-1234-1234' } },
+            { type: 'benefit', values: { title: '돈 벌이 엄청나요', desc: '믿고 오세용!ㅎ 손님 눈 낮고 사이즈 안 봐요!!!' } },
+            { type: 'benefit', values: { title: '100% 당일결제', desc: '타지분들 대환영합니다! 먹자 완전 편하게 가능~!! 개인방 다 준비 돼 이써용^^' } },
+            { type: 'salary', values: { text: '진자 맘 편하게 연락 주셔요^^' } },
+            { type: 'contact', values: { text: '010-1234-1234 / 카톡: cocoalba' } },
+        ],
+        wrapperHtml: (_, rendered) => `
+<div style="background: linear-gradient(180deg, #a5f3fc 0%, #38bdf8 100%); padding: 60px 20px; color: white; border-radius: 20px; font-family: 'Pretendard', sans-serif; text-align: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);">
+    <div style="position: absolute; top: 20px; left: 20px; font-size: 40px;">🏖️</div>
+    <div style="position: absolute; top: 40px; right: 30px; font-size: 30px;">🍹</div>
+    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 100px; opacity: 0.2; pointer-events: none;">🌊</div>
+    ${rendered.join('')}
+</div>`,
+        renderBlock: (block) => {
+            const v = block.values;
+            switch (block.type) {
+                case 'main_title': return `<h2 style="font-size: 40px; font-weight: 900; color: #fff; text-shadow: 2px 2px 0px #0284c7; margin: 20px 0;">${v.text}</h2>`;
+                case 'sub_title': return `<p style="font-size: 16px; color: #fff; font-weight: 700; background: rgba(0,0,0,0.1); display: inline-block; padding: 10px 20px; border-radius: 20px; margin-bottom: 30px;">${v.text}</p>`;
+                case 'contact': return `
+                    <div style="background: #fff; color: #0284c7; padding: 15px 30px; border-radius: 50px; font-size: 26px; font-weight: 900; margin: 20px 0; border: 4px solid #bae6fd; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        ${v.text}
+                    </div>`;
+                case 'benefit': return `
+                    <div style="background: rgba(255,255,255,0.9); border-radius: 20px; padding: 25px; margin: 15px 0; color: #0c4a6e; text-align: left; border: 2px dashed #7dd3fc;">
+                        <h3 style="font-size: 20px; font-weight: 900; color: #0284c7; margin-bottom: 8px;">🌴 ${v.title}</h3>
+                        <p style="font-size: 15px; line-height: 1.6; font-weight: 700;">${v.desc.replace(/\n/g, '<br/>')}</p>
+                    </div>`;
+                case 'salary': return `
+                    <div style="margin: 30px 0; padding: 20px; background: #0284c7; border-radius: 15px; color: white;">
+                        <div style="font-size: 18px; font-weight: 900;">${v.text}</div>
+                    </div>`;
+                default: return '';
+            }
+        }
+    },
+    {
+        id: 'neon-city',
+        name: '네온 시티',
+        description: '도시의 밤과 네온 사인을 모티브로 한 현대적인 디자인.',
+        thumbnail: 'https://api.placeholder.com/200/1e1b4b/818cf8?text=Neon+City',
+        themeColor: '#1e1b4b',
+        defaultBlocks: [
+            { type: 'main_title', values: { text: '노블레스 OOO' } },
+            { type: 'sub_title', values: { text: '강남 1등 하이엔드 룸 / 정통 마담 언니 OOO' } },
+            { type: 'contact', values: { text: '010-1234-1234' } },
+            { type: 'main_title', values: { text: '이것이 강남이다!!!!!' } },
+            { type: 'benefit', values: { title: '점통 여자 마담', desc: '가게 상주 영업 및 직접 관리. 애들만 던져 놓는 영업진 아닙니다.' } },
+            { type: 'benefit', values: { title: '머리부터 발끝까지', desc: '세련되고 럭셔리하게 코디 꽃게 해 드립니다.' } },
+            { type: 'benefit', values: { title: '철저한 블랙 관리', desc: '광고 손님 X, 10년이상 단골 & 검증된 고급 손님들만 받습니다.' } },
+            { type: 'salary', values: { text: '지원금 최소 200만 ~ 300만 + @' } },
+            { type: 'contact', values: { text: '010-1234-1234' } },
+        ],
+        wrapperHtml: (_, rendered) => `
+<div style="background: #0f172a; padding: 50px 20px; color: white; border-radius: 0; font-family: 'Pretendard', sans-serif; text-align: center; border: 2px solid #6366f1; box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);">
+    <div style="font-size: 12px; letter-spacing: 5px; color: #818cf8; margin-bottom: 20px;">PREMIUM LOUNGE</div>
+    ${rendered.join('')}
+</div>`,
+        renderBlock: (block) => {
+            const v = block.values;
+            switch (block.type) {
+                case 'main_title': return `<h2 style="font-size: 36px; font-weight: 900; color: #fff; text-shadow: 0 0 10px #818cf8; margin: 30px 0; border: 2px solid #818cf8; padding: 15px; border-radius: 10px; display: inline-block;">${v.text}</h2>`;
+                case 'sub_title': return `<p style="font-size: 16px; color: #c7d2fe; font-weight: 500; margin-bottom: 20px;">${v.text}</p>`;
+                case 'contact': return `
+                    <div style="margin: 20px auto; border: 1px solid #4f46e5; padding: 15px; width: fit-content; border-radius: 10px; color: #a5b4fc; font-size: 20px; font-weight: 700;">
+                        ${v.text}
+                    </div>`;
+                case 'benefit': return `
+                    <div style="background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(79,70,229,0.1) 100%); border-left: 4px solid #6366f1; padding: 20px; margin: 15px 0; text-align: left;">
+                        <h3 style="font-size: 18px; font-weight: 900; color: #818cf8; margin-bottom: 5px;">${v.title}</h3>
+                        <p style="font-size: 14px; color: #e2e8f0; line-height: 1.6;">${v.desc.replace(/\n/g, '<br/>')}</p>
+                    </div>`;
+                case 'salary': return `
+                    <div style="margin: 40px 0; padding: 20px; border: 2px solid #c084fc; border-radius: 50px; background: rgba(192, 132, 252, 0.1);">
+                        <div style="font-size: 22px; font-weight: 900; color: #e879f9;">${v.text}</div>
                     </div>`;
                 default: return '';
             }

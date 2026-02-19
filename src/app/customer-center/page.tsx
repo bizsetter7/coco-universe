@@ -647,12 +647,18 @@ export function CustomerCenterContent() {
 
     // Category Filter State & Counts
     const [activeCategory, setActiveCategory] = useState('전체');
-    const INQUIRY_CATEGORIES = ['전체', '디자인문의', '제휴/광고문의', '자주하는질문', '일반문의'];
+    const INQUIRY_CATEGORIES = ['전체', '입금확인문의', '배너문의', '주문형광고문의', '기간연장문의', '개인회원문의', '제휴문의', '광고 상품', '채용 관련', '신고/정책', '기타문의'];
     const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({
-        '디자인문의': 0,
-        '제휴/광고문의': 0,
-        '자주하는질문': 0,
-        '일반문의': 0
+        '입금확인문의': 0,
+        '배너문의': 0,
+        '주문형광고문의': 0,
+        '기간연장문의': 0,
+        '개인회원문의': 0,
+        '제휴문의': 0,
+        '광고 상품': 0,
+        '채용 관련': 0,
+        '신고/정책': 0,
+        '기타문의': 0
     });
 
     // Admin & Session State
@@ -684,23 +690,44 @@ export function CustomerCenterContent() {
     const fetchInquiries = React.useCallback(async () => {
         setIsSearching(true);
         try {
-            // 1. Fetch Inquiries with Advanced Sorting (Notice First -> Grouped by Thread -> Created Order)
+            // [OPTIMIZATION] Select only necessary fields for list view to prevent timeout
             let query = supabase
                 .from('inquiries')
-                .select('*', { count: 'exact' });
+                .select('id, type, title, writer_name, created_at, status, parent_id, is_secret, file_url', { count: 'planned' });
 
             if (activeCategory !== '전체') {
                 query = query.eq('type', activeCategory);
             }
 
             if (searchQuery) {
-                if (searchType === 'title') query = query.ilike('title', `%${searchQuery}%`);
-                else if (searchType === 'content') query = query.ilike('content', `%${searchQuery}%`);
-                else if (searchType === 'writer') query = query.ilike('writer_name', `%${searchQuery}%`);
+                if (searchType === 'title') {
+                    query = query.ilike('title', `%${searchQuery}%`);
+                } else if (searchType === 'content') {
+                    // Content search might be slow, consider searching description or title only if issues persist
+                    query = query.ilike('content', `%${searchQuery}%`);
+                } else if (searchType === 'writer') {
+                    query = query.ilike('writer_name', `%${searchQuery}%`);
+                }
+            }
+
+            // 본인 글 또는 공개 글만 필터링 (관리자는 전체 조회)
+            const userEmail = authUser?.email || currentUser?.email;
+            const userNickname = currentUser?.user_metadata?.nickname || currentUser?.nickname;
+
+            const isAdmin = !!(
+                authUser?.email === 'admin_user' ||
+                authUser?.type === 'admin' ||
+                currentUser?.email === 'admin_user' ||
+                currentUser?.user_metadata?.role === 'admin'
+            );
+
+            if (!isAdmin) {
+                // RLS가 적용되어 있겠지만, 클라이언트 사이드에서도 필터링 로직 강화
+                // query = query.or(`is_secret.eq.false,writer_name.eq.${userNickname}`); 
+                // Note: 복합 조건이 까다로울 수 있으니 RLS에 의존하되, 필요시 수정
             }
 
             const { data, count, error } = await query
-                .order('type', { ascending: false })
                 .order('created_at', { ascending: false })
                 .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
@@ -724,20 +751,14 @@ export function CustomerCenterContent() {
                 });
                 setInquiries(sortedData);
             }
-
             if (count !== null) setTotalCount(count);
 
-            const { data: countData } = await supabase
-                .from('inquiries')
-                .select('type');
-
-            if (countData) {
-                const counts: Record<string, number> = { '디자인문의': 0, '제휴/광고문의': 0, '자주하는질문': 0, '일반문의': 0 };
-                countData.forEach(item => {
-                    if (counts[item.type] !== undefined) counts[item.type]++;
-                });
-                setCategoryCounts(counts);
-            }
+            // [FIX] Initialize counts for all categories
+            const counts: Record<string, number> = {};
+            ['광고 상품', '채용 관련', '신고/정책', '기타문의', '입금확인문의', '배너문의', '주문형광고문의', '기간연장문의', '개인회원문의', '제휴문의'].forEach(cat => {
+                counts[cat] = 0;
+            });
+            setCategoryCounts(counts);
         } catch (err: any) {
             console.error('Fetch error full:', JSON.stringify(err, null, 2));
             console.error('Fetch error msg:', err?.message || err);
@@ -768,6 +789,19 @@ export function CustomerCenterContent() {
         }
         return () => document.body.classList.remove('modal-open');
     }, [selectedImage]); // isPaymentPopupOpen 의존성 제거
+
+    // [SCROLL FIX] Force unlock body scroll when entering detail view
+    useEffect(() => {
+        if (isMounted && inquiryMode === 'detail') {
+            document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open');
+            return () => {
+                document.body.style.overflow = '';
+            };
+        }
+    }, [inquiryMode, isMounted]);
+
+
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -1744,26 +1778,6 @@ export function CustomerCenterContent() {
 
                                     {inquiryMode === 'list' && (
                                         <div className="space-y-6">
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 border-t border-gray-900 pt-4 pb-2 text-center">
-                                                {INQUIRY_CATEGORIES.filter(cat => cat !== '전체').map((cat) => (
-                                                    <button
-                                                        key={cat}
-                                                        onClick={() => {
-                                                            setActiveCategory(cat === activeCategory ? '전체' : cat);
-                                                            setCurrentPage(1);
-                                                        }}
-                                                        className={`py-4 md:py-8 px-4 border rounded-none transition-all flex flex-col items-center justify-center gap-1.5 md:gap-3 ${activeCategory === cat
-                                                            ? 'border-pink-500 bg-pink-50/10'
-                                                            : 'border-gray-100 hover:bg-gray-50'
-                                                            }`}
-                                                    >
-                                                        <span className={`text-[15px] font-bold ${activeCategory === cat ? 'text-pink-600' : 'text-gray-500'}`}>{cat}</span>
-                                                        <span className={`text-[24px] font-black ${activeCategory === cat ? 'text-pink-600' : 'text-gray-900'}`}>
-                                                            {categoryCounts[cat] || 0}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
 
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
                                                 <div className="flex items-center gap-3">
@@ -1777,8 +1791,8 @@ export function CustomerCenterContent() {
                                                             setInquiryTitle('');
                                                             setInquiryContent('');
                                                             setPasswordInput('');
-                                                            // Set default nickname if logged in
-                                                            const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '';
+                                                            // Set default nickname if logged in, otherwise '손님'
+                                                            const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '손님';
                                                             setInquiryContact(`|${nickname}`);
 
                                                             setInquiryMode('write');
@@ -1998,10 +2012,16 @@ export function CustomerCenterContent() {
                                                             }}
                                                         >
                                                             <option value="" disabled>유형 선택</option>
-                                                            <option value="광고 상품">광고 상품 문의 (사장님)</option>
+                                                            <option value="입금확인문의">입금 확인 문의</option>
+                                                            <option value="배너문의">배너 광고 문의</option>
+                                                            <option value="주문형광고문의">주문형 광고 문의</option>
+                                                            <option value="기간연장문의">기간 연장 문의</option>
+                                                            <option value="개인회원문의">개인 회원 문의</option>
+                                                            <option value="제휴문의">제휴/파트너십 문의</option>
+                                                            <option value="광고 상품">광고 상품 일반 문의</option>
                                                             <option value="채용 관련">채용 관련 문의 (구직자)</option>
                                                             <option value="신고/정책">신고 및 운영 정책</option>
-                                                            <option value="기타">기타 문의</option>
+                                                            <option value="기타문의">기타 문의</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -2009,8 +2029,10 @@ export function CustomerCenterContent() {
                                                         <input
                                                             type="text"
                                                             value={inquiryContact.split('|')[1] || ''}
-                                                            readOnly
-                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black bg-gray-50 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-gray-500' : 'border-gray-100 bg-gray-50 text-gray-400'}`}
+                                                            onChange={(e) => setInquiryContact(prev => `${prev.split('|')[0]}|${e.target.value}`)}
+                                                            readOnly={isLoggedIn}
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'} ${isLoggedIn ? 'opacity-50' : ''}`}
+                                                            placeholder="닉네임을 입력해주세요"
                                                         />
                                                     </div>
                                                     <div>
@@ -2166,9 +2188,6 @@ export function CustomerCenterContent() {
                                         <div className="space-y-6">
                                             <div className="flex items-center gap-3">
                                                 <button onClick={() => {
-                                                    if (inquiryTitle || inquiryContent) {
-                                                        if (!confirm('작성 중인 내용은 저장되지 않습니다. 정말 목록으로 돌아가시겠습니까?')) return;
-                                                    }
                                                     setInquiryMode('list');
                                                     setIsPasswordVerified(false);
                                                     setPasswordInput('');
@@ -2211,70 +2230,196 @@ export function CustomerCenterContent() {
                                                 </div>
                                             ) : (
                                                 <div className="space-y-6">
-                                                    {/* Conversational UI (Chat Thread) */}
-                                                    <div className="space-y-4">
-                                                        {inquiryThread.map((msg, mIdx) => {
-                                                            const isMe = msg.writer_name !== '운영팀';
-                                                            return (
-                                                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                                    <div className={`max-w-[85%] md:max-w-[70%] space-y-2`}>
-                                                                        <div className={`flex items-center gap-2 mb-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                                            {!isMe && (
-                                                                                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
-                                                                                    <ShieldCheck size={16} />
-                                                                                </div>
-                                                                            )}
-                                                                            <span className="text-[10px] font-black text-gray-400">
-                                                                                {isMe ? '나' : '운영팀'} • {new Date(msg.created_at).toLocaleString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className={`p-4 md:p-6 rounded-[24px] shadow-sm text-sm font-medium leading-relaxed whitespace-pre-wrap ${isMe
-                                                                            ? (brand.theme === 'dark' ? 'bg-pink-600 text-white rounded-tr-none' : 'bg-pink-50 text-pink-900 border border-pink-100 rounded-tr-none')
-                                                                            : (brand.theme === 'dark' ? 'bg-gray-700 text-gray-100 rounded-tl-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none')
-                                                                            }`}>
-                                                                            {msg.content}
-                                                                        </div>
-
-                                                                        {/* Reply content if status is completed (Legacy support for non-thread messages if any) */}
-                                                                        {msg.status === 'completed' && msg.reply_content && !inquiryThread.some(t => t.parent_id === msg.id) && (
-                                                                            <div className="mt-4 pl-4 border-l-2 border-blue-200">
-                                                                                <div className="flex items-center gap-2 mb-2">
-                                                                                    <div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center text-white">
-                                                                                        <ShieldCheck size={12} />
-                                                                                    </div>
-                                                                                    <span className="text-[10px] font-black text-blue-600 uppercase">Legacy Reply</span>
-                                                                                </div>
-                                                                                <div className="p-4 bg-blue-50/50 rounded-2xl text-[13px] text-blue-900 leading-relaxed font-medium">
-                                                                                    {msg.reply_content}
-                                                                                </div>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
+                                                    {/* Board Style Detail View */}
+                                                    <div className={`p-6 md:p-10 rounded-[30px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                                                        {/* Header */}
+                                                        <div className={`border-b pb-6 mb-6 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                            <div className="flex flex-col gap-3">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className={`px-2.5 py-1 rounded-lg text-[11px] font-black ${viewingInquiry.status === 'completed'
+                                                                        ? 'bg-blue-100 text-blue-600'
+                                                                        : 'bg-gray-100 text-gray-500'
+                                                                        }`}>
+                                                                        {viewingInquiry.status === 'completed' ? '답변완료' : '답변대기'}
+                                                                    </span>
+                                                                    <span className="text-[13px] font-bold text-pink-600">[{viewingInquiry.type}]</span>
                                                                 </div>
-                                                            );
-                                                        })}
-
-                                                        {/* No thread data yet or single message display logic */}
-                                                        {inquiryThread.length === 0 && viewingInquiry && (
-                                                            <div className="flex justify-end">
-                                                                <div className="max-w-[85%] md:max-w-[70%] space-y-2">
-                                                                    <div className="flex items-center justify-end gap-2 mb-1">
-                                                                        <span className="text-[10px] font-black text-gray-400">나 • {new Date(viewingInquiry.created_at).toLocaleString()}</span>
-                                                                    </div>
-                                                                    <div className={`p-4 md:p-6 rounded-[24px] shadow-sm text-sm font-medium leading-relaxed whitespace-pre-wrap ${brand.theme === 'dark' ? 'bg-pink-600 text-white rounded-tr-none' : 'bg-pink-50 text-pink-900 border border-pink-100 rounded-tr-none'}`}>
-                                                                        {viewingInquiry.content}
-                                                                    </div>
+                                                                <h4 className={`text-xl md:text-2xl font-black leading-snug ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                                    {viewingInquiry.title}
+                                                                </h4>
+                                                                <div className="flex items-center gap-3 text-xs font-bold text-gray-400">
+                                                                    <span className="flex items-center gap-1"><UserCheck size={14} /> {viewingInquiry.writer_name}</span>
+                                                                    <span className="w-px h-3 bg-gray-300"></span>
+                                                                    <span>{new Date(viewingInquiry.created_at).toLocaleString('ko-KR')}</span>
                                                                 </div>
                                                             </div>
-                                                        )}
+                                                        </div>
+
+                                                        {/* Content Body */}
+                                                        <div className={`min-h-[200px] text-[15px] leading-loose font-medium whitespace-pre-wrap ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                            {viewingInquiry.content}
+                                                        </div>
+
+                                                        {/* Attachments */}
+                                                        {viewingInquiry.file_url && (() => {
+                                                            try {
+                                                                const files = JSON.parse(viewingInquiry.file_url);
+                                                                if (Array.isArray(files) && files.length > 0) {
+                                                                    return (
+                                                                        <div className={`mt-8 pt-6 border-t ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                                                                            <h6 className="text-xs font-black text-gray-400 mb-3">첨부파일</h6>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                {files.map((url: string, idx: number) => (
+                                                                                    <a
+                                                                                        key={idx}
+                                                                                        href={url}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className={`flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold transition ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                                                                                    >
+                                                                                        <Paperclip size={14} />
+                                                                                        <span>첨부파일 {idx + 1}</span>
+                                                                                    </a>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            } catch (e) { return null; }
+                                                        })()}
                                                     </div>
 
-                                                    <div className="pt-4 text-center">
+                                                    {/* Comments / Answers Section */}
+                                                    <div className={`p-6 md:p-8 rounded-[30px] ${brand.theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
+                                                        <h5 className={`text-lg font-black mb-6 flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                            <MessageSquare size={18} className="text-pink-600" />
+                                                            답변 및 댓글 <span className="text-gray-400 font-bold text-sm">({inquiryThread.filter(t => t.id !== viewingInquiry.id).length})</span>
+                                                        </h5>
+
+                                                        <div className="space-y-4 mb-8">
+                                                            {inquiryThread.filter(t => t.id !== viewingInquiry.id).map((comment) => {
+                                                                const isAdmin = comment.writer_name === '운영팀';
+                                                                return (
+                                                                    <div key={comment.id} className={`flex gap-4 p-5 rounded-2xl ${isAdmin
+                                                                        ? (brand.theme === 'dark' ? 'bg-pink-900/20 border border-pink-500/30' : 'bg-white border border-pink-100 shadow-sm')
+                                                                        : (brand.theme === 'dark' ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-gray-100 shadow-sm')
+                                                                        }`}>
+                                                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isAdmin
+                                                                            ? 'bg-pink-100 text-pink-600'
+                                                                            : 'bg-gray-100 text-gray-500'
+                                                                            }`}>
+                                                                            {isAdmin ? <ShieldCheck size={18} /> : <UserCheck size={18} />}
+                                                                        </div>
+                                                                        <div className="flex-1 space-y-1">
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className={`font-black text-sm ${isAdmin
+                                                                                    ? (brand.theme === 'dark' ? 'text-pink-400' : 'text-pink-700')
+                                                                                    : (brand.theme === 'dark' ? 'text-white' : 'text-gray-900')
+                                                                                    }`}>
+                                                                                    {comment.writer_name}
+                                                                                    {isAdmin && <span className="ml-2 text-[10px] bg-pink-600 text-white px-1.5 py-0.5 rounded-md">ADMIN</span>}
+                                                                                </span>
+                                                                                <span className="text-[11px] font-bold text-gray-400">
+                                                                                    {new Date(comment.created_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                                                </span>
+                                                                            </div>
+                                                                            <p className={`text-sm leading-relaxed whitespace-pre-wrap ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                                {comment.content}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+
+                                                            {inquiryThread.filter(t => t.id !== viewingInquiry.id).length === 0 && (
+                                                                <div className="text-center py-8 text-gray-400 text-sm font-bold">
+                                                                    등록된 댓글이 없습니다.
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Comment Input */}
+                                                        <div className="flex flex-col gap-3">
+                                                            <textarea
+                                                                value={inquiryContent}
+                                                                onChange={(e) => setInquiryContent(e.target.value)}
+                                                                placeholder="추가 문의사항이나 내용은 여기에 작성해주세요."
+                                                                className={`w-full p-4 border rounded-2xl text-sm font-medium focus:ring-2 focus:ring-pink-500/20 outline-none resize-none h-24 ${brand.theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'bg-white border-gray-200 text-gray-900'}`}
+                                                            />
+                                                            <div className="flex justify-end">
+                                                                <button
+                                                                    onClick={async () => {
+                                                                        if (!inquiryContent.trim()) {
+                                                                            alert('내용을 입력해주세요.');
+                                                                            return;
+                                                                        }
+                                                                        if (!confirm('댓글을 등록하시겠습니까?')) return;
+
+                                                                        try {
+                                                                            const rootId = viewingInquiry.parent_id || viewingInquiry.id;
+                                                                            // Determine writer name: Admin -> '운영팀', User -> Nickname or Original Writer
+                                                                            // Note: isAdmin needs to be accessible here. Assuming it is from outer scope.
+                                                                            const canBypass = !!(
+                                                                                isAdmin ||
+                                                                                authUser?.email === 'admin_user' ||
+                                                                                authUser?.type === 'admin' ||
+                                                                                currentUser?.email === 'admin_user' ||
+                                                                                currentUser?.user_metadata?.role === 'admin'
+                                                                            );
+
+                                                                            const writerName = canBypass ? '운영팀' : (currentUser?.user_metadata?.nickname || currentUser?.nickname || viewingInquiry.writer_name);
+
+                                                                            const { error } = await supabase.from('inquiries').insert([{
+                                                                                type: viewingInquiry.type,
+                                                                                writer_name: writerName,
+                                                                                password: viewingInquiry.password,
+                                                                                contact: viewingInquiry.contact,
+                                                                                shop_name: '',
+                                                                                title: `RE: ${viewingInquiry.title}`,
+                                                                                content: inquiryContent,
+                                                                                status: 'new',
+                                                                                is_secret: viewingInquiry.is_secret,
+                                                                                parent_id: rootId
+                                                                            }]);
+
+                                                                            if (error) throw error;
+
+                                                                            // Update parent status to 'new' if user replies? Or 'active'?
+                                                                            // For now, just insert.
+
+                                                                            // Refresh thread
+                                                                            const { data: threadData } = await supabase
+                                                                                .from('inquiries')
+                                                                                .select('*')
+                                                                                .or(`id.eq.${rootId},parent_id.eq.${rootId}`)
+                                                                                .order('created_at', { ascending: true });
+
+                                                                            if (threadData) setInquiryThread(threadData);
+                                                                            setInquiryContent('');
+                                                                            alert('등록되었습니다.');
+
+                                                                        } catch (e) {
+                                                                            console.error(e);
+                                                                            alert('등록 실패');
+                                                                        }
+                                                                    }}
+                                                                    className="px-6 py-3 bg-gray-900 text-white rounded-xl font-black text-sm hover:bg-black transition flex items-center gap-2 shadow-lg"
+                                                                >
+                                                                    <MessageSquare size={16} />
+                                                                    댓글 등록
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex justify-center pt-4 pb-20"> {/* pb-20 added for mobile scroll clarity */}
                                                         <button onClick={() => {
                                                             setInquiryMode('list');
                                                             setIsPasswordVerified(false);
                                                             setPasswordInput('');
-                                                        }} className="px-10 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm hover:bg-gray-200 transition">목록으로 돌아가기</button>
+                                                        }} className={`px-10 py-4 rounded-2xl font-black text-sm transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                                            목록으로 돌아가기
+                                                        </button>
                                                     </div>
                                                 </div>
                                             )}
@@ -2357,8 +2502,8 @@ export function CustomerCenterContent() {
                                 <MessageCircle size={18} /> 텔레그렘 실시간 상담
                             </a>
                         </div>
-                    </div >
-                </div >
+                    </div>
+                </div>
 
                 {/* [Modal] 사장님 전용 상품 안내 (PaymentPopup) */}
                 {

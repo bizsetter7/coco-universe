@@ -42,6 +42,7 @@ export function useAdFormState() {
     // Pay
     const [payType, setPayType] = useState('급여방식선택');
     const [payAmount, setPayAmount] = useState('0');
+    const [mediaUrl, setMediaUrl] = useState('');
 
     const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
@@ -160,6 +161,7 @@ export function useAdFormState() {
         setAgeMax(35);
         setPayType('급여방식선택');
         setPayAmount('0');
+        setMediaUrl('');
         setSelectedKeywords([]);
 
         // Editor Reset
@@ -255,6 +257,7 @@ export function useAdFormState() {
             payAmount: String(getValid(ad.pay_amount || ad.payAmount || ad.pay, opts.payAmount, '0')),
             ageMin: ad.age_min || ad.ageMin || opts.ageMin || 20,
             ageMax: ad.age_max || ad.ageMax || opts.ageMax || 35,
+            mediaUrl: getValid(ad.media_url || ad.mediaUrl, opts.mediaUrl || opts.media_url, ''),
             keywords: opts.keywords || ad.keywords || [],
             productType: ad.tier || ad.productType || opts.product_type || ad.ad_type || null,
             productPeriod: opts.product_period || ad.productPeriod || 30,
@@ -290,6 +293,7 @@ export function useAdFormState() {
 
         setPayType(norm.payType);
         setPayAmount(norm.payAmount);
+        setMediaUrl(norm.mediaUrl);
 
         // Editor
         setEditorHtml(norm.content);
@@ -318,6 +322,7 @@ export function useAdFormState() {
         industryMain, setIndustryMain, industrySub, setIndustrySub, ageMin, setAgeMin,
         ageMax, setAgeMax, payType, setPayType,
         payAmount, setPayAmount,
+        mediaUrl, setMediaUrl,
         selectedKeywords, setSelectedKeywords, editorRef, selectionRange, isEditorDirty, setIsEditorDirty,
         editorHtml, setEditorHtml, syncEditorHtml, updateToolbarStatus, saveSelection, restoreSelection,
         toolbarStatus, setToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,

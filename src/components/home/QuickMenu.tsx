@@ -1,12 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Briefcase, MapPin, User, Moon, Users, Siren, Scale, Megaphone, Gift, Home, Sparkles, MessageCircle, Headphones, Crown, Search, Coffee } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 
-export const QuickMenu = () => {
-    const router = useRouter();
+export const QuickMenu = React.memo(() => {
     const brand = useBrand();
 
     // 퀵메뉴 순서 및 라벨 (최종 테마 반영)
@@ -29,9 +28,10 @@ export const QuickMenu = () => {
                 {/* Quick Icon Grid - Perfect 4x2 Alignment */}
                 <div className="grid grid-cols-4 md:grid-cols-8 gap-3 md:gap-4 justify-items-center">
                     {MENU_ITEMS.map((item, i) => (
-                        <div
+                        <Link
                             key={i}
-                            onClick={() => router.push(item.link)}
+                            href={item.link}
+                            prefetch={true}
                             className="w-full aspect-[1/1] overflow-hidden flex flex-col items-center justify-center p-2 rounded-2xl cursor-pointer hover:scale-105 transition-transform border bg-white border-stone-100 shadow-sm"
                         >
                             <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-full mb-1 flex items-center justify-center ${item.bg} ${item.color}`}>
@@ -45,10 +45,12 @@ export const QuickMenu = () => {
                                     </React.Fragment>
                                 ))}
                             </span>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>
         </div>
     );
-};
+});
+
+QuickMenu.displayName = 'QuickMenu';

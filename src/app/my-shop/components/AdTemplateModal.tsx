@@ -172,7 +172,14 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                                                     <div className="p-1.5 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
                                                         {getBlockIcon(block.type)}
                                                     </div>
-                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{block.type}</span>
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                                        {block.type === 'main_title' ? '메인 제목' :
+                                                            block.type === 'sub_title' ? '서브 제목' :
+                                                                block.type === 'benefit' ? '혜택/안내' :
+                                                                    block.type === 'salary' ? '급여 정보' :
+                                                                        block.type === 'contact' ? '연락처' :
+                                                                            '텍스트'}
+                                                    </span>
                                                 </div>
                                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button onClick={() => handleMoveBlock(index, 'up')} disabled={index === 0} className="p-1.5 text-gray-300 hover:text-blue-500 disabled:opacity-30"><ArrowUp size={14} /></button>

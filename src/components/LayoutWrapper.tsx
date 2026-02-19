@@ -48,7 +48,14 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isAdminPage = pathname?.startsWith('/admin');
 
     // 로딩 중에는 아무것도 보여주지 않거나 스플래시 노출
-    if (isLoading || isVerified === null) return null;
+    // [Optimization] Prevent white screen flash by showing a minimal loader or Skeleton
+    if (isLoading || isVerified === null) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+        );
+    }
 
     const showGate = !isVerified;
 

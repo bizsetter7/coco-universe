@@ -21,6 +21,7 @@ export interface MarketingTarget {
     batch_id?: string;
     created_at: string;
     is_adult?: boolean; // Added for Adult Verification Filter
+    phone_number_2?: string; // Secondary Phone Number
 }
 
 export interface Campaign {
@@ -362,6 +363,9 @@ export const uploadMarketingTargets = async (file: File) => {
                     const rawPhone = findVal(['phone', '번호', '연락처', '전법', 'hp']);
                     const cleanPhone = rawPhone ? String(rawPhone).replace(/[^0-9]/g, '') : '';
 
+                    const rawPhone2 = findVal(['phone2', '전화번호2', '번호2', '연락처2', '추가연락처']);
+                    const cleanPhone2 = rawPhone2 ? String(rawPhone2).replace(/[^0-9]/g, '') : '';
+
                     const shopName = findVal(['shop_name', '업체명', '상호명', '상호', '상소']);
                     const rawRegion = findVal(['region', '지역', '주소']);
                     const rawUrl = findVal(['url', '링크', '사이트', '주소', '수집경로']);
@@ -383,6 +387,7 @@ export const uploadMarketingTargets = async (file: File) => {
                         batch_id: batch.id,
                         name: findVal(['이름', 'name']) || shopName || 'Unknown',
                         phone_number: cleanPhone,
+                        phone_number_2: cleanPhone2,
                         shop_name: shopName || '',
                         industry: findVal(['work_type', '업종', '분류', 'work', 'industry']) || '',
                         industry_detail: findVal(['상세업종', '업종상세', 'detail']) || '',
@@ -418,6 +423,11 @@ export const uploadMarketingTargets = async (file: File) => {
                         // 3. Messenger IDs (Update if empty)
                         if (!existing.kakao_id) existing.kakao_id = t.kakao_id;
                         if (!existing.telegram_id) existing.telegram_id = t.telegram_id;
+
+                        // 4. Phone 2 (Update if empty)
+                        if (!existing.phone_number_2 && t.phone_number_2) {
+                            existing.phone_number_2 = t.phone_number_2;
+                        }
                     } else {
                         aggregatedMap.set(t.phone_number, t);
                     }
