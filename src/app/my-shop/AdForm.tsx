@@ -29,6 +29,7 @@ interface AdFormProps {
     payAmount: string; handlePayAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     selectedKeywords: string[]; setSelectedKeywords: (v: string[]) => void;
     setShowDesignModal: (v: boolean) => void;
+    setShowTemplateModal: (v: boolean) => void;
     editorRef: React.RefObject<HTMLDivElement | null>;
     handleEditorInteract: () => void;
     setIsEditorDirty: (v: boolean) => void;
@@ -230,7 +231,7 @@ export default function AdForm(props: AdFormProps) {
             )}
 
             <Step1BasicInfo {...props} />
-            <Step2JobDetail {...props} />
+            <Step2JobDetail {...props} setShowTemplateModal={props.setShowTemplateModal} />
 
             {/* Step 3 & 4: Restricted in Edit Mode */}
             <div className="relative group space-y-2 md:space-y-5">

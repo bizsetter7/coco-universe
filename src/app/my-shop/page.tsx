@@ -27,6 +27,7 @@ import { ResumeDetailModal } from './components/ResumeDetailModal';
 import { BusinessMobileMenu } from './components/BusinessMobileMenu';
 import { BusinessSidebar } from './components/BusinessSidebar';
 import { MemberInfoForm } from './components/MemberInfoForm';
+import { AdTemplateModal } from './components/AdTemplateModal';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
 
@@ -260,6 +261,7 @@ function MyShopContent() {
     const [showDesignModal, setShowDesignModal] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showExampleModal, setShowExampleModal] = useState(false);
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
     const [exampleType, setExampleType] = useState<any>(null);
     const [selectedAdForModal, setSelectedAdForModal] = useState<any>(null);
     const [selectedResumeForModal, setSelectedResumeForModal] = useState<any>(null);
@@ -802,6 +804,19 @@ function MyShopContent() {
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
             {showExampleModal && <ExampleModal show={true} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
+            {showTemplateModal && (
+                <AdTemplateModal
+                    brand={brand}
+                    onClose={() => setShowTemplateModal(false)}
+                    onApply={(html) => {
+                        if (formState.editorRef.current) {
+                            formState.editorRef.current.innerHTML = html;
+                            formState.syncEditorHtml();
+                            formState.setIsEditorDirty(true);
+                        }
+                    }}
+                />
+            )}
 
             {selectedAdForModal && (
                 <ErrorBoundary>
@@ -887,7 +902,7 @@ function MyShopContent() {
 
             {view === 'form' && (
                 <div className="w-full">
-                    <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
+                    <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} setShowTemplateModal={setShowTemplateModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
                 </div>
             )}
         </div>

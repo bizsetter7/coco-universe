@@ -622,8 +622,20 @@ export function CustomerCenterContent() {
     const [inquiries, setInquiries] = useState<any[]>([]);
     const [inquiryMode, setInquiryMode] = useState<'list' | 'write' | 'detail'>('list');
     const [viewingInquiry, setViewingInquiry] = useState<any | null>(null);
+    const [inquiryThread, setInquiryThread] = useState<any[]>([]);
     const [passwordInput, setPasswordInput] = useState('');
     const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+
+    // 모달/상세보기 오픈 시 배경 스크롤 방지
+    useEffect(() => {
+        if (inquiryMode === 'detail') {
+            const originalStyle = window.getComputedStyle(document.body).overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalStyle;
+            };
+        }
+    }, [inquiryMode]);
 
     // Pagination & Search States
     const [currentPage, setCurrentPage] = useState(1);
@@ -726,8 +738,9 @@ export function CustomerCenterContent() {
                 });
                 setCategoryCounts(counts);
             }
-        } catch (err) {
-            console.error('Fetch error:', err);
+        } catch (err: any) {
+            console.error('Fetch error full:', JSON.stringify(err, null, 2));
+            console.error('Fetch error msg:', err?.message || err);
         } finally {
             setIsSearching(false);
         }
@@ -1817,6 +1830,19 @@ export function CustomerCenterContent() {
 
                                                                             if (data) {
                                                                                 setViewingInquiry(data);
+
+                                                                                // [NEW] Fetch entire thread
+                                                                                const threadId = data.parent_id || data.id;
+                                                                                const { data: threadData } = await supabase
+                                                                                    .from('inquiries')
+                                                                                    .select('*')
+                                                                                    .or(`id.eq.${threadId},parent_id.eq.${threadId}`)
+                                                                                    .order('created_at', { ascending: true });
+
+                                                                                if (threadData) {
+                                                                                    setInquiryThread(threadData);
+                                                                                }
+
                                                                                 // [SECURITY TIGHTENING] 오직 시스템이 보증하는 역할과 정확한 이메일 매칭만 허용
                                                                                 const canBypass = !!(
                                                                                     isAdmin ||
@@ -2185,68 +2211,63 @@ export function CustomerCenterContent() {
                                                 </div>
                                             ) : (
                                                 <div className="space-y-6">
-                                                    {/* Customer Content */}
-                                                    <div className={`p-4 md:p-12 rounded-[30px] md:rounded-[45px] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 shadow-sm'}`}>
-                                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
-                                                            <div className="space-y-1">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-xs font-black text-pink-600 uppercase tracking-widest">{viewingInquiry.type}</span>
-                                                                    <span className="text-xs text-gray-300">|</span>
-                                                                    <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{new Date(viewingInquiry.created_at).toLocaleString()}</span>
-                                                                </div>
-                                                                <h5 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{viewingInquiry.title}</h5>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`px-4 py-1.5 rounded-full text-xs font-black ${viewingInquiry.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-pink-100 text-pink-600'}`}>
-                                                                    {viewingInquiry.status === 'completed' ? '답변완료' : '답변대기중'}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                            <div className="space-y-1">
-                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Writer</p>
-                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.writer_name}</p>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Contact</p>
-                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.contact}</p>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <p className="text-[10px] text-gray-300 font-black uppercase">Shop Name</p>
-                                                                <p className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{viewingInquiry.shop_name || '-'}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'} p-8 rounded-[35px] border border-dashed min-h-[200px]`}>
-                                                            <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} font-medium leading-relaxed whitespace-pre-wrap`}>{viewingInquiry.content}</p>
-                                                        </div>
-                                                    </div>
+                                                    {/* Conversational UI (Chat Thread) */}
+                                                    <div className="space-y-4">
+                                                        {inquiryThread.map((msg, mIdx) => {
+                                                            const isMe = msg.writer_name !== '운영팀';
+                                                            return (
+                                                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                                                    <div className={`max-w-[85%] md:max-w-[70%] space-y-2`}>
+                                                                        <div className={`flex items-center gap-2 mb-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                                                            {!isMe && (
+                                                                                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                                                                                    <ShieldCheck size={16} />
+                                                                                </div>
+                                                                            )}
+                                                                            <span className="text-[10px] font-black text-gray-400">
+                                                                                {isMe ? '나' : '운영팀'} • {new Date(msg.created_at).toLocaleString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className={`p-4 md:p-6 rounded-[24px] shadow-sm text-sm font-medium leading-relaxed whitespace-pre-wrap ${isMe
+                                                                            ? (brand.theme === 'dark' ? 'bg-pink-600 text-white rounded-tr-none' : 'bg-pink-50 text-pink-900 border border-pink-100 rounded-tr-none')
+                                                                            : (brand.theme === 'dark' ? 'bg-gray-700 text-gray-100 rounded-tl-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none')
+                                                                            }`}>
+                                                                            {msg.content}
+                                                                        </div>
 
-                                                    {/* Admin Reply */}
-                                                    {viewingInquiry.status === 'completed' && (
-                                                        <div className="bg-slate-900 text-white p-8 md:p-12 rounded-[45px] shadow-2xl relative overflow-hidden">
-                                                            <div className="absolute top-0 right-0 p-10 opacity-5">
-                                                                <MessageSquare size={120} />
-                                                            </div>
-                                                            <div className="relative z-10 space-y-6">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                                                                        <ShieldCheck size={20} />
+                                                                        {/* Reply content if status is completed (Legacy support for non-thread messages if any) */}
+                                                                        {msg.status === 'completed' && msg.reply_content && !inquiryThread.some(t => t.parent_id === msg.id) && (
+                                                                            <div className="mt-4 pl-4 border-l-2 border-blue-200">
+                                                                                <div className="flex items-center gap-2 mb-2">
+                                                                                    <div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center text-white">
+                                                                                        <ShieldCheck size={12} />
+                                                                                    </div>
+                                                                                    <span className="text-[10px] font-black text-blue-600 uppercase">Legacy Reply</span>
+                                                                                </div>
+                                                                                <div className="p-4 bg-blue-50/50 rounded-2xl text-[13px] text-blue-900 leading-relaxed font-medium">
+                                                                                    {msg.reply_content}
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                    <div>
-                                                                        <h6 className="text-[15px] font-black italic">Administrator Advice</h6>
-                                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(viewingInquiry.replied_at).toLocaleString()}</p>
+                                                                </div>
+                                                            );
+                                                        })}
+
+                                                        {/* No thread data yet or single message display logic */}
+                                                        {inquiryThread.length === 0 && viewingInquiry && (
+                                                            <div className="flex justify-end">
+                                                                <div className="max-w-[85%] md:max-w-[70%] space-y-2">
+                                                                    <div className="flex items-center justify-end gap-2 mb-1">
+                                                                        <span className="text-[10px] font-black text-gray-400">나 • {new Date(viewingInquiry.created_at).toLocaleString()}</span>
+                                                                    </div>
+                                                                    <div className={`p-4 md:p-6 rounded-[24px] shadow-sm text-sm font-medium leading-relaxed whitespace-pre-wrap ${brand.theme === 'dark' ? 'bg-pink-600 text-white rounded-tr-none' : 'bg-pink-50 text-pink-900 border border-pink-100 rounded-tr-none'}`}>
+                                                                        {viewingInquiry.content}
                                                                     </div>
                                                                 </div>
-                                                                <div className="h-px bg-white/10 w-full" />
-                                                                <div className="text-base font-medium leading-relaxed text-slate-300 whitespace-pre-wrap">
-                                                                    {viewingInquiry.reply_content}
-                                                                </div>
-                                                                <div className="pt-4 border-t border-white/5">
-                                                                    <p className="text-xs text-slate-500 font-bold">※ 더 자세한 답변을 원하시면 추가 문의 또는 고객센터(1544-5568)로 연락 바랍니다.</p>
-                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
+                                                    </div>
 
                                                     <div className="pt-4 text-center">
                                                         <button onClick={() => {

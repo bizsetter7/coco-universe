@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useCallback } from 'react';
-import { Edit3, Laptop, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Smile, ChevronDown, Image as ImageIcon } from 'lucide-react';
+import { Edit3, Laptop, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Palette, Smile, ChevronDown, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { INDUSTRY_DATA, REGION_DATA, AGES, PAY_TYPES, FONT_DISPLAY_NAMES, FONT_SIZES, TEXT_COLORS, BG_COLORS } from '../../../constants';
 
 interface Step2Props {
@@ -25,6 +25,7 @@ interface Step2Props {
     payAmount: string;
     handlePayAmountChange: (e: any) => void;
     setShowDesignModal: (v: boolean) => void;
+    setShowTemplateModal: (v: boolean) => void;
     editorRef: React.RefObject<HTMLDivElement | null>;
     handleEditorInteract: () => void;
     setIsEditorDirty: (v: boolean) => void;
@@ -54,7 +55,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
     brand, title, setTitle, industryMain, setIndustryMain, industrySub, setIndustrySub,
     ageMin, setAgeMin, ageMax, setAgeMax, regionCity, setRegionCity, regionGu, setRegionGu,
     payType, handlePayTypeChange, payAmount, handlePayAmountChange,
-    setShowDesignModal, editorRef, handleEditorInteract, setIsEditorDirty, saveSelection,
+    setShowDesignModal, setShowTemplateModal, editorRef, handleEditorInteract, setIsEditorDirty, saveSelection,
     restoreSelection, syncEditorHtml, editorHtml,
     toolbarStatus, execCmd, updateToolbarStatus, showFontMenu, setShowFontMenu, showFontSizeMenu, setShowFontSizeMenu,
     showForeColorMenu, setShowForeColorMenu, showHiliteColorMenu, setShowHiliteColorMenu,
@@ -301,7 +302,10 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                     <div className={`p-5 md:p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
                         <div className="flex items-center justify-between mb-3">
                             <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>상세내용 작성 (에디터)</h2>
-                            <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인이 필요한가요?</button>
+                            <div className="flex items-center gap-1.5">
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowTemplateModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-[10px] font-black border border-pink-100 transition shadow-sm hover:bg-pink-100 ring-2 ring-pink-500/20 animate-pulse"><Sparkles size={12} /> Premium 템플릿 사용</button>
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인 의뢰</button>
+                            </div>
                         </div>
 
                         {/* Sticky Toolbar */}

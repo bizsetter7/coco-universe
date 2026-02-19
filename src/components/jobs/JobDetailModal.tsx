@@ -170,9 +170,10 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                         <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
                     </div>
                     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
-                        <div className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words whitespace-pre-wrap">
-                            {shop.description || `${shop.name}에서 열정적인 분을 모십니다!`}
-                        </div>
+                        <div
+                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm"
+                            dangerouslySetInnerHTML={{ __html: shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>` }}
+                        />
                     </div>
                 </div>
 

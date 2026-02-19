@@ -76,37 +76,44 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
         }
     }, [isOpen, activeTab, initialReceiver]); // Add initialReceiver to deps? verify
 
-    const refreshData = () => {
-        setInbox(NoteService.getInbox());
-        setUnread(NoteService.getUnread());
-        setSent(NoteService.getSent());
+    const refreshData = async () => {
+        const [inboxRes, unreadRes, sentRes] = await Promise.all([
+            NoteService.getInbox(userName),
+            NoteService.getUnread(userName),
+            NoteService.getSent(userName)
+        ]);
+        setInbox(inboxRes);
+        setUnread(unreadRes);
+        setSent(sentRes);
     };
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!writeContent.trim()) return;
 
-        // Use the current receiver state, default to [관리자] if empty (though UI should force it?)
         const target = receiver.trim() || '[관리자]';
 
-        NoteService.sendNote(writeContent, target);
-        setWriteContent('');
-        alert(`${target}님께 쪽지를 보냈습니다.`);
-        setActiveTab('sent');
-        // Do not reset receiver here, they might want to send another? Or reset?
-        // Let's keep it for now.
+        try {
+            await NoteService.sendNote(writeContent, userName, target);
+            setWriteContent('');
+            alert(`${target}님께 쪽지를 보냈습니다.`);
+            setActiveTab('sent');
+            refreshData();
+        } catch (err) {
+            alert('쪽지 전송에 실패했습니다. (DB 연결 확인 필요)');
+        }
     };
 
-    const handleDelete = (id: string, e: React.MouseEvent) => {
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         if (confirm('삭제하시겠습니까?')) {
-            NoteService.deleteNote(id);
+            await NoteService.deleteNote(id);
             refreshData();
         }
     };
 
-    const handleView = (note: Note) => {
+    const handleView = async (note: Note) => {
         if (!note.isRead) {
-            NoteService.markAsRead(note.id);
+            await NoteService.markAsRead(note.id);
             refreshData();
         }
         setSelectedNote(note);
@@ -237,9 +244,9 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-t-2 border-b border-pink-600 text-gray-700 bg-gray-50 text-xs sm:text-sm">
-                                        <th className="py-3 text-center w-full sm:w-1/2">내 용</th>
+                                        <th className="py-3 text-center w-full sm:w-auto">내 용</th>
                                         <th className="py-3 w-20 text-center hidden sm:table-cell">보낸사람</th>
-                                        <th className="py-3 w-24 text-center hidden sm:table-cell">받은시간</th>
+                                        <th className="py-3 w-32 text-center hidden sm:table-cell">받은시간</th>
                                         <th className="py-3 w-12 text-center hidden sm:table-cell">삭제</th>
                                     </tr>
                                 </thead>
@@ -251,7 +258,9 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
                                                 {note.content}
                                             </td>
                                             <td className={`py-3 text-center hidden sm:table-cell ${note.isAdmin ? 'text-pink-600 font-bold' : 'text-gray-600'}`}>{note.sender}</td>
-                                            <td className="py-3 text-center text-xs text-gray-400 hidden sm:table-cell">{note.date.split(' ')[0]}<br />{note.date.split(' ')[1]}</td>
+                                            <td className="py-3 text-center text-[10px] sm:text-xs text-gray-400 hidden sm:table-cell whitespace-nowrap px-2">
+                                                {note.date}
+                                            </td>
                                             <td className="py-3 text-center hidden sm:table-cell">
                                                 <button
                                                     onClick={(e) => handleDelete(note.id, e)}
