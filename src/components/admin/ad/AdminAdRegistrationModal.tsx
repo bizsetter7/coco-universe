@@ -6,7 +6,6 @@ import {
     Save,
     Zap,
     MapPin,
-    Phone,
     CreditCard,
     FileText,
     Layout,
@@ -18,8 +17,16 @@ import { supabase } from '@/lib/supabase';
 import { JOB_CATEGORY_MAP } from '@/constants/jobs';
 import { REGIONS_MAP } from '@/constants/regions';
 
+interface User {
+    id: string;
+    name?: string;
+    full_name?: string;
+    phone?: string;
+    nickname?: string;
+}
+
 interface AdminAdRegistrationModalProps {
-    user: any;
+    user: User;
     onClose: () => void;
     fetchData: () => void;
 }
@@ -107,9 +114,10 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
             alert('광고가 성공적으로 등록 및 활성화되었습니다.');
             fetchData();
             onClose();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Ad registration error:', error);
-            alert('등록 중 오류가 발생했습니다: ' + error.message);
+            const message = error instanceof Error ? error.message : '알 수 없는 오류';
+            alert('등록 중 오류가 발생했습니다: ' + message);
         } finally {
             setIsSaving(false);
         }
@@ -135,9 +143,10 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                 .getPublicUrl(fileName);
 
             setFormData(prev => ({ ...prev, mediaUrl: publicUrl }));
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Upload error:', error);
-            alert(`이미지 업로드 실패: ${error.message}`);
+            const message = error instanceof Error ? error.message : '알 수 없는 오류';
+            alert(`이미지 업로드 실패: ${message}`);
         } finally {
             setIsUploading(false);
         }
