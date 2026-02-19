@@ -1,30 +1,11 @@
 import React, { useState } from 'react';
 import {
-    LayoutDashboard,
-    Users,
-    MessageSquare,
-    Settings,
-    ShieldCheck,
     CheckCircle2,
     XCircle,
-    Eye,
-    Zap,
-    ArrowRight,
-    Search,
-    TrendingUp,
-    Bell,
-    Megaphone,
-    Mail,
-    Lock,
-    Unlock,
     Info,
     Database,
     RefreshCw,
-    CreditCard,
-    Check,
-    LogOut,
-    Save,
-    Send
+    Check
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Shop } from '@/types/shop';
@@ -399,10 +380,10 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                             </div>
 
                                             <button
-                                                onClick={() => window.location.reload()}
+                                                onClick={() => fetchData()}
                                                 className="mt-2 px-6 py-2.5 bg-slate-950 text-white rounded-xl text-xs font-black hover:bg-black transition-all flex items-center gap-2"
                                             >
-                                                <RefreshCw size={14} /> 데이터 새로고침 (페이지 로드)
+                                                <RefreshCw size={14} /> 데이터 새로고침
                                             </button>
                                         </div>
                                     </td>

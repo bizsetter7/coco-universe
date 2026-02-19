@@ -63,12 +63,7 @@ function AdminContent() {
         if (tab) setActiveTab(tab);
     }, [searchParams]);
 
-    const handleNavigate = (tab: AdminTab) => {
-        setActiveTab(tab);
-        // Optional: Update URL without full reload (shallow push)
-        const newUrl = `/admin?tab=${tab}`;
-        window.history.pushState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
-    };
+
     const [isAuthorized, setIsAuthorized] = useState(false);
 
 
