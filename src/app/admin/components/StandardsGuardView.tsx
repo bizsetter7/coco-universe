@@ -864,6 +864,56 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                     </div>
                                 </div>
                             </div>
+                            {/* 10. Integrated Inquiry System (New) */}
+                            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 space-y-6">
+                                <h3 className="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
+                                    <span className="w-1.5 h-6 bg-slate-800 rounded-full"></span>
+                                    통합 문의 관리 시스템 (Inquiry System Architecture)
+                                </h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* 10.1 List View Logic */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                                            <h4 className="text-xs font-black text-slate-700">List View Logic (2-Row)</h4>
+                                        </div>
+                                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                                            <div className="flex items-start gap-3 p-2 bg-white rounded-lg border border-slate-100 shadow-sm">
+                                                <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">Badge</div>
+                                                <div className="flex-1 space-y-1">
+                                                    <div className="h-2 w-3/4 bg-slate-200 rounded"></div>
+                                                    <div className="h-1.5 w-1/2 bg-slate-100 rounded"></div>
+                                                </div>
+                                            </div>
+                                            <ul className="text-[10px] text-slate-500 space-y-1 list-disc pl-4">
+                                                <li><strong>Row 1</strong>: [Type Badge] + Title (Truncated)</li>
+                                                <li><strong>Row 2</strong>: ShopName + UserID + Contact</li>
+                                                <li><strong>Sort</strong>: Latest Activity (Created or Replied)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    {/* 10.2 Detail View Logic */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                            <h4 className="text-xs font-black text-slate-700">Detail View (Chat Thread)</h4>
+                                        </div>
+                                        <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 space-y-3">
+                                            <div className="space-y-2">
+                                                <div className="flex justify-end"><div className="bg-indigo-100 text-indigo-800 text-[9px] px-2 py-1 rounded-lg">Admin Reply</div></div>
+                                                <div className="flex justify-start"><div className="bg-white text-slate-700 text-[9px] px-2 py-1 rounded-lg border border-slate-200">User Inquiry</div></div>
+                                            </div>
+                                            <ul className="text-[10px] text-slate-500 space-y-1 list-disc pl-4">
+                                                <li><strong>Thread</strong>: Grouped by `parent_id` or `partner_id`</li>
+                                                <li><strong>Input</strong>: Fixed Bottom (Sticky)</li>
+                                                <li><strong>Optimistic UI</strong>: Immediate update on send</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
