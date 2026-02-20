@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMarketingTargets, upsertMarketingTarget, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
-import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2 } from 'lucide-react';
+import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { REGION_DATA, INDUSTRY_DATA } from '@/constants/marketing-data';
 
@@ -45,7 +45,7 @@ export default function MarketingPage() {
 
     // --- Mutations ---
     const sendMutation = useMutation({
-        mutationFn: async (campaign: { title: string; message_content: string; channel: string }) => {
+        mutationFn: async (campaign: { title: string; message_content: string; channel: "sms" | "lms" | "kakao" | "telegram" }) => {
             if (!data?.data || data.data.length === 0) throw new Error('No targets selected');
             return sendCampaignMessage(campaign, data.data);
         },
@@ -270,7 +270,7 @@ export default function MarketingPage() {
         sendMutation.mutate({
             title: campaignForm.title,
             message_content: campaignForm.message,
-            channel: campaignForm.channel
+            channel: campaignForm.channel as "sms" | "lms" | "kakao" | "telegram"
         });
     };
 
