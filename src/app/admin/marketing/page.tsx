@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMarketingTargets, upsertMarketingTarget, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
+import { getMarketingTargets, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
 import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { REGION_DATA, INDUSTRY_DATA } from '@/constants/marketing-data';
@@ -119,9 +119,9 @@ export default function MarketingPage() {
             toast.success('업로드 완료!');
             refetch(); // Refresh list
             queryClient.invalidateQueries({ queryKey: ['marketing-upload-history'] });
-        } catch (error: any) {
+        } catch (error) {
             console.error('Upload failed:', error);
-            toast.error(`업로드 실패: ${error.message}`);
+            toast.error(`업로드 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -143,7 +143,7 @@ export default function MarketingPage() {
             toast.success('삭제되었습니다.');
             setSelectedIds(prev => prev.filter(curr => curr !== id));
             refetch();
-        } catch (error: any) {
+        } catch (error) {
             toast.error(`삭제 실패: ${error instanceof Error ? error.message : '삭제 실패'}`);
         }
     };
@@ -156,7 +156,7 @@ export default function MarketingPage() {
             toast.success('링크가 삭제되었습니다.');
 
             // Local cache update to prevent jumpy UI/refetch
-            queryClient.setQueryData(['marketing-targets', page, filters, sortConfig], (old: any) => {
+            queryClient.setQueryData(['marketing-targets', page, filters, sortConfig], (old: { data: MarketingTarget[]; count: number } | undefined) => {
                 if (!old) return old;
                 return {
                     ...old,
@@ -167,8 +167,8 @@ export default function MarketingPage() {
                     )
                 };
             });
-        } catch (error: any) {
-            toast.error(`링크 삭제 실패: ${error.message}`);
+        } catch (error) {
+            toast.error(`링크 삭제 실패: ${error instanceof Error ? error.message : '오류 발생'}`);
         }
     };
 
@@ -181,7 +181,7 @@ export default function MarketingPage() {
             toast.success('수정되었습니다.');
 
             // Local cache update to prevent jumpy UI/refetch
-            queryClient.setQueryData(['marketing-targets', page, filters, sortConfig], (old: any) => {
+            queryClient.setQueryData(['marketing-targets', page, filters, sortConfig], (old: { data: MarketingTarget[]; count: number } | undefined) => {
                 if (!old) return old;
                 return {
                     ...old,
@@ -190,8 +190,8 @@ export default function MarketingPage() {
                     )
                 };
             });
-        } catch (error: any) {
-            toast.error(`수정 실패: ${error.message}`);
+        } catch (error) {
+            toast.error(`수정 실패: ${error instanceof Error ? error.message : '오류 발생'}`);
         }
     };
 
@@ -199,7 +199,7 @@ export default function MarketingPage() {
         const batchId = filters.batch_id;
         if (!batchId) return;
 
-        const batch = uploadHistory?.find((h: any) => h.id === batchId);
+        const batch = uploadHistory?.find((h: { id: string; filename: string }) => h.id === batchId);
         const fileName = batch?.filename || '해당 회차';
 
         if (!confirm(`'${fileName}' 업로드 회차와 연결된 모든 데이터를 삭제하시겠습니까?`)) return;
@@ -210,8 +210,8 @@ export default function MarketingPage() {
             handleFilterChange('batch_id', '');
             queryClient.invalidateQueries({ queryKey: ['marketing-upload-history'] });
             refetch();
-        } catch (error: any) {
-            toast.error(`삭제 실패: ${error.message}`);
+        } catch (error) {
+            toast.error(`삭제 실패: ${error instanceof Error ? error.message : '오류 발생'}`);
         }
     };
 
@@ -219,7 +219,7 @@ export default function MarketingPage() {
         const batchId = filters.batch_id;
         if (!batchId) return;
 
-        const batch = uploadHistory?.find((h: any) => h.id === batchId);
+        const batch = uploadHistory?.find((h: { id: string; filename: string }) => h.id === batchId);
         const currentName = batch?.filename || '';
         const newName = prompt('회차 이름을 변경하시겠습니까?', currentName);
 
@@ -229,8 +229,8 @@ export default function MarketingPage() {
             await updateUploadBatchName(batchId, newName);
             toast.success('이름이 변경되었습니다.');
             queryClient.invalidateQueries({ queryKey: ['marketing-upload-history'] });
-        } catch (error: any) {
-            toast.error(`이름 변경 실패: ${error.message}`);
+        } catch (error) {
+            toast.error(`이름 변경 실패: ${error instanceof Error ? error.message : '오류 발생'}`);
         }
     };
 
@@ -243,8 +243,8 @@ export default function MarketingPage() {
             toast.success('삭제되었습니다.');
             setSelectedIds([]);
             refetch();
-        } catch (error: any) {
-            toast.error(`삭제 실패: ${error.message}`);
+        } catch (error) {
+            toast.error(`삭제 실패: ${error instanceof Error ? error.message : '오류 발생'}`);
         }
     };
 
@@ -420,7 +420,7 @@ export default function MarketingPage() {
                         onChange={(e) => handleFilterChange('batch_id', e.target.value)}
                     >
                         <option value="">전체 업로드 회차</option>
-                        {uploadHistory?.map((h: any) => (
+                        {uploadHistory?.map((h: { id: string; created_at: string; filename: string; unique_count: number }) => (
                             <option key={h.id} value={h.id}>
                                 {new Date(h.created_at).toLocaleDateString()} - {h.filename} ({h.unique_count}건)
                             </option>
