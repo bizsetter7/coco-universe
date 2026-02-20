@@ -625,6 +625,7 @@ export function CustomerCenterContent() {
     const [inquiryThread, setInquiryThread] = useState<any[]>([]);
     const [passwordInput, setPasswordInput] = useState('');
     const [isPasswordVerified, setIsPasswordVerified] = useState(false);
+    const [isSecretInquiry, setIsSecretInquiry] = useState(false);
 
     // 모달/상세보기 오픈 시 배경 스크롤 방지
     useEffect(() => {
@@ -644,6 +645,21 @@ export function CustomerCenterContent() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
+
+    // [NEW] Responsive Placeholder for Content
+    const [contentPlaceholder, setContentPlaceholder] = useState("상담을 위해 구체적인 내용을 작성해주세요.");
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setContentPlaceholder("상담을 위해 구체적인 내용을\n작성해주세요.");
+            } else {
+                setContentPlaceholder("상담을 위해 구체적인 내용을 작성해주세요.");
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Category Filter State & Counts
     const [activeCategory, setActiveCategory] = useState('전체');
@@ -1828,7 +1844,7 @@ export function CustomerCenterContent() {
                                                             </tr>
                                                         </thead>
                                                         <tbody className={`divide-y ${brand.theme === 'dark' ? 'divide-gray-700' : 'divide-gray-50'}`}>
-                                                            {inquiries.length > 0 ? inquiries.map((inq, idx) => {
+                                                            {inquiries.length > 0 ? (inquiries.map((inq, idx) => {
                                                                 const isNotice = inq.type === '공지';
                                                                 const isReply = !!inq.parent_id;
 
@@ -1894,6 +1910,16 @@ export function CustomerCenterContent() {
                                                                                     {inq.title.replace(/^[↳\s]+/, '')}
                                                                                 </span>
                                                                                 {inq.is_secret && <Lock size={8} className="text-gray-300 ml-0.5 flex-shrink-0" />}
+                                                                                {/* [NEW] Status & Reply Count Stickers (Only for non-admin/notice posts) */}
+                                                                                <div className="flex items-center gap-1 ml-1.5 shrink-0">
+                                                                                    {!isNotice && inq.writer_name !== '운영팀' && (
+                                                                                        inq.status === 'completed' ? (
+                                                                                            <span className="px-1 py-0.5 bg-blue-100 text-blue-600 text-[8px] md:text-[9px] rounded font-black whitespace-nowrap">답변완료</span>
+                                                                                        ) : (
+                                                                                            <span className="px-1 py-0.5 bg-gray-100 text-gray-400 text-[8px] md:text-[9px] rounded font-black whitespace-nowrap">답변대기</span>
+                                                                                        )
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
                                                                         </td>
                                                                         <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>{isNotice ? '운영팀' : inq.writer_name}</td>
@@ -1902,7 +1928,7 @@ export function CustomerCenterContent() {
                                                                         </td>
                                                                     </tr>
                                                                 );
-                                                            }) : (
+                                                            })) : (
                                                                 <tr>
                                                                     <td colSpan={4} className="px-6 py-20 text-center text-gray-400 font-bold">
                                                                         {isSearching ? <RefreshCw className="animate-spin mx-auto text-pink-600" size={24} /> : '등록된 문의 내역이 없습니다.'}
@@ -1998,10 +2024,10 @@ export function CustomerCenterContent() {
                                                 </div>
                                             </div>
 
-                                            <div className={`p-6 md:p-10 rounded-[45px] border shadow-sm space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className={`p-6 md:p-10 rounded-[45px] border shadow-sm space-y-6 md:space-y-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                                     <div>
-                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">문의 유형 <span className="text-pink-600">*</span></label>
+                                                        <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">문의 유형 <span className="text-pink-600">*</span></label>
                                                         <select
                                                             className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none appearance-none cursor-pointer ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                                             value={inquiryTitle.match(/^\[(.*?)\]/) ? inquiryTitle.match(/^\[(.*?)\]/)![1] : ''}
@@ -2025,7 +2051,7 @@ export function CustomerCenterContent() {
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
+                                                        <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
                                                         <input
                                                             type="text"
                                                             value={inquiryContact.split('|')[1] || ''}
@@ -2035,33 +2061,55 @@ export function CustomerCenterContent() {
                                                             placeholder="닉네임을 입력해주세요"
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">비밀번호 (선택)</label>
-                                                        <input
-                                                            type="password"
-                                                            value={passwordInput}
-                                                            onChange={(e) => setPasswordInput(e.target.value)}
-                                                            placeholder="조회 시 필요 (미입력 가능)"
-                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
-                                                        />
+                                                </div>
+
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 bg-gray-50/50 rounded-[35px] border border-gray-100 gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <label className="relative flex items-center gap-3 cursor-pointer group">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="peer hidden"
+                                                                checked={isSecretInquiry}
+                                                                onChange={(e) => setIsSecretInquiry(e.target.checked)}
+                                                            />
+                                                            <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isSecretInquiry ? 'bg-pink-500 border-pink-500' : 'bg-white border-gray-200'} group-hover:border-pink-200`}>
+                                                                {isSecretInquiry && <Zap size={14} className="text-white fill-white" />}
+                                                            </div>
+                                                            <span className="text-sm font-black text-gray-700">비밀글 설정</span>
+                                                        </label>
+                                                        <span className="text-[10px] text-gray-400 font-bold hidden xs:inline">관리자와 작성자만 확인 가능</span>
+                                                    </div>
+
+                                                    <div className={`flex items-center gap-3 transition-all duration-300 ${isSecretInquiry ? 'opacity-100 translate-x-0' : 'opacity-20 pointer-events-none grayscale'}`}>
+                                                        <div className="relative flex-1 sm:w-56">
+                                                            <Lock size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                            <input
+                                                                type="password"
+                                                                value={passwordInput}
+                                                                onChange={(e) => setPasswordInput(e.target.value)}
+                                                                placeholder="비밀번호 (4자리 이상)"
+                                                                className={`w-full border-2 rounded-2xl pl-12 pr-6 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-pink-500/10 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-white text-gray-900 shadow-sm'}`}
+                                                                maxLength={20}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 gap-6">
+                                                <div className="grid grid-cols-1 gap-4 md:gap-6">
                                                     <div>
-                                                        <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">연락처/회신처 <span className="text-pink-600">*</span></label>
+                                                        <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">연락처/회신처 <span className="text-pink-600">*</span></label>
                                                         <input
                                                             type="text"
                                                             value={inquiryContact.split('|')[0]}
                                                             onChange={(e) => setInquiryContact(prev => `${e.target.value}|${prev.split('|')[1] || ''}`)}
                                                             placeholder="회신 받을 번호 또는 이메일"
-                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                            className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none placeholder-gray-400 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">문의 제목 <span className="text-pink-600">*</span></label>
+                                                    <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">문의 제목 <span className="text-pink-600">*</span></label>
                                                     <input
                                                         type="text"
                                                         value={inquiryTitle.replace(/^\[.*?\]\s*/, '')}
@@ -2071,29 +2119,42 @@ export function CustomerCenterContent() {
                                                             setInquiryTitle(`${typePrefix}${e.target.value}`);
                                                         }}
                                                         placeholder="핵심 내용을 요약해주세요"
-                                                        className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                        className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none placeholder-gray-400 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                                     />
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">상세 내용 <span className="text-pink-600">*</span></label>
+                                                    <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">상세 내용 <span className="text-pink-600">*</span></label>
                                                     <textarea
                                                         value={inquiryContent}
                                                         onChange={(e) => setInquiryContent(e.target.value)}
-                                                        placeholder="상담을 위해 구체적인 내용을 작성해주세요."
-                                                        className={`w-full border-2 rounded-[35px] p-8 text-sm font-black h-60 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
+                                                        placeholder={contentPlaceholder}
+                                                        className={`w-full border-2 rounded-[35px] p-6 md:p-8 text-sm font-black h-56 md:h-64 resize-none focus:ring-4 focus:ring-pink-500/10 outline-none placeholder-gray-400 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
                                                     />
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                                     {[1, 2, 3].map(num => (
                                                         <div key={num}>
-                                                            <label className="block text-xs font-black mb-3 ml-2 text-gray-400 uppercase tracking-widest">첨부파일 {num} (선택)</label>
-                                                            <input
-                                                                type="file"
-                                                                id={`inquiry_file_${num}`}
-                                                                className={`w-full border-2 rounded-2xl p-4 text-sm font-black focus:ring-4 focus:ring-pink-500/10 outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'}`}
-                                                            />
+                                                            <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">첨부파일 {num} (선택)</label>
+                                                            <div className="relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    id={`inquiry_file_${num}`}
+                                                                    className={`w-full border-2 rounded-2xl p-4 text-xs font-black focus:ring-4 focus:ring-pink-500/10 outline-none text-transparent file:hidden ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}
+                                                                    onChange={(e) => {
+                                                                        const fileName = e.target.files?.[0]?.name || '선택된 파일없음';
+                                                                        const displayEl = document.getElementById(`inquiry_file_name_${num}`);
+                                                                        if (displayEl) displayEl.innerText = fileName;
+                                                                    }}
+                                                                />
+                                                                <div
+                                                                    id={`inquiry_file_name_${num}`}
+                                                                    className="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 pointer-events-none"
+                                                                >
+                                                                    선택된 파일없음
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -2154,7 +2215,7 @@ export function CustomerCenterContent() {
                                                                     title: inquiryTitle,
                                                                     content: inquiryContent,
                                                                     status: 'new',
-                                                                    is_secret: true,
+                                                                    is_secret: isSecretInquiry,
                                                                     file_url: finalFileUrl
                                                                 }]);
 

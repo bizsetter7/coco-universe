@@ -234,40 +234,18 @@ export default function AdForm(props: AdFormProps) {
             <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} setShowTemplateModal={props.setShowTemplateModal} />
 
-            {/* Step 3 & 4: Restricted in Edit Mode */}
-            <div className="relative group space-y-2 md:space-y-5">
-                {!props.isNewEntry && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 rounded-[32px] pointer-events-none animate-in fade-in duration-500">
-                        <div className="bg-white/90 shadow-xl border border-pink-100 p-6 rounded-3xl text-center max-w-sm">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-pink-600">
-                                <MessageCircle size={20} fill="currentColor" />
-                                <span className="font-black text-sm uppercase tracking-wider">Product Info</span>
-                            </div>
-                            <h3 className="text-lg font-black text-gray-900 mb-1">상품 및 추가 옵션 변경 안내</h3>
-                            <p className="text-[12px] text-gray-500 font-bold leading-relaxed mb-4">
-                                이미 등록된 공고의 상품 등급 및 옵션은 직접 수정이 불가능합니다. <br />
-                                <span className="text-pink-600 font-black underline">관리자 1:1 문의</span>를 통해 요청해주세요.
-                            </p>
-                            <button className="pointer-events-auto px-5 py-2 bg-gray-900 text-white text-xs font-black rounded-xl hover:bg-black transition-all active:scale-95 shadow-lg">
-                                고객센터 문의하기
-                            </button>
-                        </div>
-                    </div>
-                )}
-                <div className={`space-y-5 transition-all duration-300 ${!props.isNewEntry ? 'opacity-80 grayscale-[0.1] pointer-events-none' : ''}`}>
-                    <Step3ProductSelect {...props} />
-                    <Step4Extras
-                        {...props}
-                        selectedKeywords={props.selectedKeywords}
-                        setSelectedKeywords={props.setSelectedKeywords}
-                        selectedAdProduct={props.selectedAdProduct}
-                        setExampleType={props.setExampleType}
-                        setShowExampleModal={props.setShowExampleModal}
-                        mediaUrl={props.mediaUrl}
-                        setMediaUrl={props.setMediaUrl}
-                    />
-                </div>
-            </div>
+            <Step3ProductSelect {...props} isNewEntry={props.isNewEntry} />
+            <Step4Extras
+                {...props}
+                isNewEntry={props.isNewEntry}
+                selectedKeywords={props.selectedKeywords}
+                setSelectedKeywords={props.setSelectedKeywords}
+                selectedAdProduct={props.selectedAdProduct}
+                setExampleType={props.setExampleType}
+                setShowExampleModal={props.setShowExampleModal}
+                mediaUrl={props.mediaUrl}
+                setMediaUrl={props.setMediaUrl}
+            />
 
             {/* Total Amount Display (Redesigned matching Capture 1/2) */}
             <div className="max-w-[900px] mx-auto w-full px-4 md:px-0 mt-5">

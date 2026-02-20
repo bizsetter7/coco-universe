@@ -75,4 +75,5 @@ export const HIGHLIGHTERS = [
     { id: 7, name: '분홍', color: '#ff99ff' },
     { id: 8, name: '핫핑크', color: '#ff00ff' },
     { id: 9, name: '무지개', color: 'rainbow' },
+    { id: 10, name: '반짝이', color: 'blink' },
 ];

@@ -18,7 +18,8 @@ import {
     ThumbsUp,
     ChevronRight,
     Calculator,
-    Star
+    Star,
+    Eye
 } from 'lucide-react';
 import { CATEGORIES, MOCK_POSTS } from '@/constants/community';
 import { useBrand } from '@/components/BrandProvider';
@@ -48,6 +49,8 @@ function CommunityContentInner() {
     const activeTab = searchParams.get('category') || '전체';
 
     const [mounted, setMounted] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 8;
     // [Fix] Use reactive userType from useAuth instead of fragile local state
     const { isLoggedIn, userType } = useAuth();
     const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -119,6 +122,7 @@ function CommunityContentInner() {
 
         // URL 업데이트 (Next.js router.push가 searchParams를 업데이트하여 컴포넌트 리랜더링 유도)
         window.scrollTo({ top: 0, behavior: 'auto' });
+        setCurrentPage(1); // Reset to first page
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
 
         // 사이드바 워프 등 필요한 커스텀 이벤트 발생
@@ -130,6 +134,12 @@ function CommunityContentInner() {
             ? posts
             : posts.filter(post => post.category === activeTab);
     }, [activeTab, posts]);
+
+    const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+    const paginatedPosts = filteredPosts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     const handlePostClick = (postId: number) => {
         if (!isLoggedIn) {
@@ -143,6 +153,18 @@ function CommunityContentInner() {
         } else {
             router.push(`/community/${postId}`);
         }
+    };
+
+    const handleWriteClick = () => {
+        if (!isLoggedIn) {
+            setLoginModalOpen(true);
+            return;
+        }
+        if (userType === 'corporate') {
+            setIsCorporateModalOpen(true);
+            return;
+        }
+        router.push('/community/write');
     };
 
     if (!mounted) return <div className="min-h-screen" />;
@@ -214,72 +236,127 @@ function CommunityContentInner() {
                         /* Lounge View */
                         <LoungeContent brand={brand} primaryStyle={primaryStyle} posts={posts} handlePostClick={handlePostClick} userType={userType} isLoggedIn={isLoggedIn} />
                     ) : (
-                        /* Post List */
-                        <div className="grid grid-cols-1 gap-4">
-                            {filteredPosts.map((post, idx) => {
-                                const isAdPos = (idx + 1) % 4 === 0;
+                        /* Post List & Write Button Area */
+                        <>
+                            {/* [NEW] Desktop/Mobile Top Action Bar */}
+                            <div className="flex justify-between items-center mb-4 px-4 sm:px-0">
+                                <h3 className="text-lg font-black text-gray-800">최신 게시글</h3>
+                                {userType !== 'corporate' && (
+                                    <button
+                                        onClick={handleWriteClick}
+                                        className="bg-pink-600 text-white px-5 py-2.5 rounded-2xl font-black text-sm shadow-lg shadow-pink-200 hover:bg-pink-700 active:scale-95 transition-all flex items-center gap-2"
+                                    >
+                                        <PenLine size={18} /> 글쓰기
+                                    </button>
+                                )}
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {paginatedPosts.map((post, idx) => {
+                                    const isAdPos = (idx + 1) % 4 === 0;
 
-                                return (
-                                    <React.Fragment key={post.id}>
-                                        <div
-                                            onClick={() => handlePostClick(post.id)}
-                                            className={`p-6 sm:rounded-[32px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                                    return (
+                                        <React.Fragment key={post.id}>
+                                            <div
+                                                onClick={() => handlePostClick(post.id)}
+                                                className={`p-6 sm:rounded-[32px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                                            >
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors">
+                                                        {post.category}
+                                                    </span>
+                                                    <span className="text-[11px] text-gray-500 font-bold">{post.time}</span>
+                                                </div>
+
+                                                <h3 className={`font-black mb-1 lg:text-xl leading-snug ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                                    {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1"><ShieldAlert size={16} className="fill-red-600 text-white" /> HOT</span>}
+                                                    {post.title}
+                                                </h3>
+
+                                                <p className={`text-sm line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>
+                                                    <span className={(userType === 'corporate' || !isLoggedIn) ? 'blur-[5px] select-none opacity-50' : ''}>
+                                                        {post.content}
+                                                    </span>
+                                                </p>
+
+                                                <div className="flex items-center justify-between text-xs border-t border-gray-50 pt-5">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
+                                                            <User size={16} />
+                                                        </div>
+                                                        <span className={`font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>{post.author}</span>
+                                                    </div>
+                                                    <div className="flex gap-5">
+                                                        <span className="flex items-center gap-1.5 text-pink-600 font-black">
+                                                            <Heart size={16} className="fill-current" /> {post.likes}
+                                                        </span>
+                                                        <span className="flex items-center gap-1.5 text-blue-600 font-black">
+                                                            <MessageSquare size={16} className="fill-current" /> {post.comments}
+                                                        </span>
+                                                        <span className="flex items-center gap-1.5 text-gray-400 font-black">
+                                                            <Eye size={16} /> {post.views || 0}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* 커뮤니티 네이티브 광고 (4번째 게시글마다 삽입) */}
+                                            {isAdPos && (
+                                                <div className="bg-gradient-to-br from-rose-50 to-orange-50 border-y sm:border border-orange-100 sm:rounded-[32px] p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all group">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
+                                                            <Sparkles size={24} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Sponsored Content</p>
+                                                            <h4 className={`font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>[VIP 추천] {brand.name} 런칭 기념<br />역대급 혜택 받는 법! ✨</h4>
+                                                        </div>
+                                                    </div>
+                                                    <button className="bg-orange-600 text-white text-[11px] font-black px-6 py-3 rounded-2xl group-hover:scale-105 transition-transform shadow-lg shadow-orange-200/50">지금 확인하기</button>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </div>
+
+                            {/* [NEW] Pagination UI - Always Show if posts exist */}
+                            {filteredPosts.length > 0 && (
+                                <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+                                    <button
+                                        onClick={() => {
+                                            setCurrentPage(prev => Math.max(1, prev - 1));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        disabled={currentPage === 1}
+                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === 1 ? 'text-gray-300' : 'text-pink-600 hover:bg-pink-50'}`}
+                                    >
+                                        이전
+                                    </button>
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <button
+                                            key={i + 1}
+                                            onClick={() => {
+                                                setCurrentPage(i + 1);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className={`w-10 h-10 rounded-xl font-black transition-all ${currentPage === i + 1 ? 'bg-pink-600 text-white shadow-lg shadow-pink-200' : 'text-gray-400 hover:bg-gray-100'}`}
                                         >
-                                            <div className="flex justify-between items-start mb-3">
-                                                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors">
-                                                    {post.category}
-                                                </span>
-                                                <span className="text-[11px] text-gray-500 font-bold">{post.time}</span>
-                                            </div>
-
-                                            <h3 className={`font-black mb-1 lg:text-xl leading-snug ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                                {post.isHot && <span className="text-red-600 mr-2 inline-flex items-center gap-1"><ShieldAlert size={16} className="fill-red-600 text-white" /> HOT</span>}
-                                                {post.title}
-                                            </h3>
-
-                                            <p className={`text-sm line-clamp-2 mb-5 font-black group-hover:opacity-100 transition-opacity ${brand.theme === 'dark' ? 'text-gray-300' : 'text-black'}`}>
-                                                <span className={(userType === 'corporate' || !isLoggedIn) ? 'blur-[5px] select-none opacity-50' : ''}>
-                                                    {post.content}
-                                                </span>
-                                            </p>
-
-                                            <div className="flex items-center justify-between text-xs border-t border-gray-50 pt-5">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
-                                                        <User size={16} />
-                                                    </div>
-                                                    <span className={`font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>{post.author}</span>
-                                                </div>
-                                                <div className="flex gap-5">
-                                                    <span className="flex items-center gap-1.5 text-pink-600 font-black">
-                                                        <Heart size={16} className="fill-current" /> {post.likes}
-                                                    </span>
-                                                    <span className="flex items-center gap-1.5 text-blue-600 font-black">
-                                                        <MessageSquare size={16} className="fill-current" /> {post.comments}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* 커뮤니티 네이티브 광고 (4번째 게시글마다 삽입) */}
-                                        {isAdPos && (
-                                            <div className="bg-gradient-to-br from-rose-50 to-orange-50 border-y sm:border border-orange-100 sm:rounded-[32px] p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all group">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
-                                                        <Sparkles size={24} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Sponsored Content</p>
-                                                        <h4 className={`font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>[VIP 추천] {brand.name} 런칭 기념<br />역대급 혜택 받는 법! ✨</h4>
-                                                    </div>
-                                                </div>
-                                                <button className="bg-orange-600 text-white text-[11px] font-black px-6 py-3 rounded-2xl group-hover:scale-105 transition-transform shadow-lg shadow-orange-200/50">지금 확인하기</button>
-                                            </div>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
+                                            {i + 1}
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => {
+                                            setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        disabled={currentPage === totalPages}
+                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === totalPages ? 'text-gray-300' : 'text-pink-600 hover:bg-pink-50'}`}
+                                    >
+                                        다음
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </main>
             </div>
@@ -367,11 +444,11 @@ function CommunityContentInner() {
                 document.body
             )}
 
-            {/* Floating Action Button (z-40) */}
-            {isLoggedIn && userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
+            {/* Floating Action Button (Always visible on mobile for better accessibility) */}
+            {userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
                 <button
-                    onClick={() => alert('게시글 작성은 정식 출시 후 가능합니다!')}
-                    className="fixed bottom-24 right-6 bg-pink-600 text-white p-5 rounded-full shadow-2xl hover:bg-pink-700 active:scale-90 transition-all z-40 lg:right-12"
+                    onClick={handleWriteClick}
+                    className="fixed bottom-24 right-5 md:right-10 bg-pink-600 text-white p-5 rounded-full shadow-2xl hover:bg-pink-700 active:scale-90 transition-all z-50 hover:shadow-pink-300/50"
                 >
                     <PenLine size={28} />
                 </button>

@@ -108,140 +108,177 @@ export default function WritePostPage() {
     return (
         <div className="min-h-0 bg-white">
             {/* Header */}
-            <header className="sticky top-0 bg-white border-b z-10 flex items-center justify-between px-4 h-14">
-                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600 pt-2">
+            <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b z-10 flex items-center justify-between px-4 h-14">
+                <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-base font-bold text-gray-800 pt-3">글쓰기</h1>
-                <div className="flex items-center gap-2 pt-2">
-                    <button onClick={() => router.push('/')} className="text-gray-400 hover:text-gray-600">
-                        <Home size={24} />
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        className="px-4 py-1.5 bg-pink-500 text-white rounded-full text-sm font-bold shadow-sm hover:bg-pink-600 transition disabled:opacity-50"
-                        disabled={!title.trim() || !content.trim() || !password.trim()}
-                    >
-                        등록
+                <h1 className="text-lg font-black text-gray-900">글쓰기</h1>
+                <div className="flex items-center gap-2">
+                    <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
+                        <Home size={22} />
                     </button>
                 </div>
             </header>
 
             {/* Form */}
-            <main className="max-w-4xl mx-auto p-5 space-y-6">
+            <main className="max-w-4xl mx-auto pb-32">
+                {/* 1. Category Section */}
+                <section className="p-6 border-b border-gray-100 bg-white">
+                    <label className="block text-[11px] font-black text-pink-600 uppercase tracking-widest mb-4">카테고리 선택</label>
 
-                {/* Category Select */}
-                <div>
-                    <label className="block text-xs font-bold text-gray-400 mb-2">카테고리</label>
-                    <div className="flex flex-wrap gap-2">
+                    {/* Desktop: Buttons */}
+                    <div className="hidden md:flex flex-wrap gap-2">
                         {CATEGORIES.map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setCategory(cat)}
-                                className={`px-3 py-2 rounded-lg text-xs font-bold border transition-colors ${category === cat
-                                    ? 'border-pink-500 bg-pink-50 text-pink-500'
-                                    : 'border-gray-200 text-gray-500 bg-white'
+                                className={`px-4 py-2.5 rounded-2xl text-[13px] font-black border transition-all ${category === cat
+                                    ? 'border-pink-500 bg-pink-500 text-white shadow-lg shadow-pink-100'
+                                    : 'border-gray-100 text-gray-500 bg-gray-50 hover:bg-gray-100'
                                     }`}
                             >
                                 {cat}
                             </button>
                         ))}
                     </div>
-                </div>
 
-                {/* Secret Option & Password */}
-                <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <div className="flex items-center gap-4">
-                        <div
-                            className="flex items-center gap-2 cursor-pointer"
-                            onClick={() => setIsSecret(!isSecret)}
+                    {/* Mobile: Dropdown */}
+                    <div className="md:hidden">
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-pink-500 transition-all appearance-none cursor-pointer"
                         >
-                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isSecret ? 'bg-pink-500 border-pink-500' : 'bg-white border-gray-300'}`}>
-                                {isSecret && <Sparkles size={12} className="text-white" />}
-                            </div>
-                            <span className="text-sm font-bold text-gray-700">비밀글 설정</span>
+                            {CATEGORIES.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                    </div>
+                </section>
+
+                {/* 2. Security Section - Darker Background */}
+                <section className="p-6 border-b border-gray-200 bg-gray-100/80">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <label className="relative flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    className="peer hidden"
+                                    checked={isSecret}
+                                    onChange={(e) => setIsSecret(e.target.checked)}
+                                />
+                                <div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center transition-all peer-checked:bg-pink-500 peer-checked:border-pink-500 group-hover:border-pink-400 bg-white">
+                                    {isSecret && <Sparkles size={14} className="text-white" />}
+                                </div>
+                                <span className="text-sm font-black text-gray-800">비밀글로 등록</span>
+                            </label>
+                            <span className="text-[10px] text-gray-400 font-bold">관리자와 작성자만 확인 가능</span>
                         </div>
-                        <span className="text-[10px] text-gray-400 hidden sm:inline">관리자와 작성자만 볼 수 있습니다.</span>
-                    </div>
 
-                    <div className="flex items-center gap-2 relative">
-                        <Lock size={16} className="text-gray-400" />
+                        <div className={`flex items-center gap-3 transition-all duration-300 ${isSecret ? 'opacity-100 translate-x-0' : 'opacity-40 pointer-events-none'}`}>
+                            <div className="relative flex-1 sm:w-48">
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="비밀번호 (4자리 이상)"
+                                    className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-12 py-3 text-sm font-black outline-none focus:border-pink-500 transition-all shadow-sm placeholder-gray-400"
+                                    maxLength={20}
+                                />
+                                <button
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 3. Content Section - Darker Background for Title/Content Area */}
+                <section className="p-4 md:p-6 space-y-4 md:space-y-6 bg-gray-100/50">
+                    <div className="bg-white p-3 md:p-4 rounded-[22px] md:rounded-[28px] border border-gray-200 shadow-sm">
                         <input
-                            type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="비밀번호 (4자리 이상)"
-                            className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm w-40 outline-none focus:border-pink-500 transition-colors"
-                            maxLength={20}
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="제목을 입력하세요"
+                            className="w-full text-sm md:text-lg font-black placeholder-gray-400 border-none outline-none p-1 focus:ring-0 text-gray-900 bg-transparent"
                         />
-                        <button
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 text-gray-400 hover:text-gray-600"
-                        >
-                            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
                     </div>
-                </div>
 
-                {/* Title Input */}
-                <div>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="제목을 입력하세요"
-                        className="w-full text-lg font-bold placeholder-gray-300 border-none outline-none p-0 focus:ring-0"
-                    />
-                </div>
+                    <div className="min-h-[300px] bg-white p-5 md:p-6 rounded-[30px] md:rounded-[35px] border border-gray-200 shadow-sm">
+                        <textarea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder={"자유롭게 이야기를 나누어보세요.\n(욕설, 비방 금지)"}
+                            className="w-full h-[400px] text-[15px] md:text-[16px] text-gray-700 placeholder-gray-400 border-none outline-none resize-none p-0 focus:ring-0 leading-relaxed font-medium bg-transparent"
+                        />
+                    </div>
+                </section>
 
-                {/* Content Input */}
-                <div className="min-h-[200px]">
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="자유롭게 이야기를 나누어보세요. (욕설, 비방 금지)"
-                        className="w-full h-[300px] text-sm text-gray-700 placeholder-gray-300 border-none outline-none resize-none p-0 focus:ring-0 leading-relaxed"
-                    />
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                    <div className="flex gap-3 overflow-x-auto pb-2">
-                        <label className="w-20 h-20 bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center text-gray-400 cursor-pointer shrink-0">
-                            <ImageIcon size={24} className="mb-1" />
-                            <span className="text-[10px]">{images.length}/3</span>
+                {/* 4. Media Section */}
+                <section className="px-6 py-5 bg-gray-50/50">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">사진 첨부 (최대 3장)</label>
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                        <label className="w-24 h-24 bg-white border-2 border-dashed border-gray-200 rounded-[28px] flex flex-col items-center justify-center text-gray-400 cursor-pointer shrink-0 hover:border-pink-200 hover:text-pink-400 transition-all active:scale-95 shadow-sm">
+                            <ImageIcon size={28} className="mb-1" />
+                            <span className="text-[11px] font-black">{images.length}/3</span>
                             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                         </label>
 
                         {images.map((img, idx) => (
-                            <div key={idx} className="w-20 h-20 rounded-lg border border-gray-100 overflow-hidden relative shrink-0">
+                            <div key={idx} className="w-24 h-24 rounded-[28px] border border-gray-100 overflow-hidden relative shrink-0 shadow-md group">
                                 <Image
                                     src={img}
                                     alt="preview"
-                                    width={80}
-                                    height={80}
-                                    className="w-full h-full object-cover"
-                                    unoptimized // Since it's a blob URL
+                                    width={96}
+                                    height={96}
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                    unoptimized
                                 />
                                 <button
                                     onClick={() => removeImage(idx)}
-                                    className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white"
+                                    className="absolute top-2 right-2 w-7 h-7 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-colors shadow-lg"
                                 >
-                                    <X size={12} />
+                                    <X size={14} strokeWidth={3} />
                                 </button>
                             </div>
                         ))}
                     </div>
-                </div>
+                </section>
+
+                {/* Guidelines */}
+                <section className="p-6 text-[11px] text-gray-400 leading-relaxed font-bold border-t border-gray-50 mt-4">
+                    <div className="flex flex-col gap-1 max-w-full overflow-hidden">
+                        <p className="whitespace-nowrap overflow-hidden text-ellipsis">• 부적절한 게시글은 관리자에 의해 제재를 받을 수 있습니다.</p>
+                        <p className="whitespace-nowrap overflow-hidden text-ellipsis">• 타인의 권리를 침해하거나 명예를 훼손하는 내용은 금지됩니다.</p>
+                        <p className="text-pink-500 whitespace-nowrap md:whitespace-normal">
+                            • 설정하신 비밀번호는 글 수정 및 삭제 시 본인확인을 위해 꼭 필요합니다.
+                        </p>
+                    </div>
+                </section>
             </main>
 
-            {/* Guidelines */}
-            <div className="p-5 bg-gray-50 text-xs text-gray-400 leading-relaxed mb-6">
-                <p>
-                    * 부적절한 게시글은 제재 대상이 될 수 있습니다. <br />
-                    * 타인의 권리를 침해하거나 명예를 훼손하는 내용은 금지됩니다.<br />
-                    * <strong>비밀번호는 게시글 수정 및 삭제 시 필요하므로 꼭 기억해주세요.</strong>
-                </p>
+            {/* Bottom Actions */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t z-20">
+                <div className="max-w-4xl mx-auto flex gap-3">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all active:scale-95"
+                    >
+                        취소
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        className="flex-[2] py-4 bg-pink-600 text-white rounded-2xl font-black text-base shadow-xl shadow-pink-200 hover:bg-pink-700 transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
+                        disabled={isSubmitting || !title.trim() || !content.trim() || !password.trim()}
+                    >
+                        {isSubmitting ? '등록 중...' : '게시글 등록하기'}
+                    </button>
+                </div>
             </div>
         </div>
     );

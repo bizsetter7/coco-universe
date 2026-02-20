@@ -478,10 +478,10 @@ function MyShopContent() {
 
             // --- Step 4 Validation ---
             if (formState.selectedIcon && Number(formState.iconPeriod) === 0) {
-                alert("'10종 아이콘'의 기간을 선택해주세요."); setIsSaving(false); return;
+                alert("'10종 무빙 아이콘'의 기간을 선택해주세요."); setIsSaving(false); return;
             }
             if (formState.selectedHighlighter && Number(formState.highlighterPeriod) === 0) {
-                alert("'8종 형광펜'의 기간을 선택해주세요."); setIsSaving(false); return;
+                alert("'10종 형광펜'의 기간을 선택해주세요."); setIsSaving(false); return;
             }
             if (formState.borderOption !== 'none' && Number(formState.borderPeriod) === 0) {
                 alert("'테두리 효과'의 기간을 선택해주세요."); setIsSaving(false); return;

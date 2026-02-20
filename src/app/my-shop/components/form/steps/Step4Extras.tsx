@@ -27,6 +27,7 @@ interface Step4Props {
     setShowExampleModal: (v: boolean) => void;
     mediaUrl: string;
     setMediaUrl: (v: string) => void;
+    isNewEntry?: boolean;
 }
 
 export const Step4Extras: React.FC<Step4Props> = ({
@@ -35,7 +36,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
     selectedHighlighter, setSelectedHighlighter, highlighterPeriod, setHighlighterPeriod,
     selectedKeywords, setSelectedKeywords,
     selectedAdProduct, setExampleType, setShowExampleModal,
-    mediaUrl, setMediaUrl
+    mediaUrl, setMediaUrl, isNewEntry
 }) => {
     const [isUploading, setIsUploading] = React.useState(false);
 
@@ -47,28 +48,41 @@ export const Step4Extras: React.FC<Step4Props> = ({
         return true;
     };
 
+    const checkEditMode = (allowImage: boolean = false) => {
+        if (isNewEntry === false && !allowImage) {
+            alert('등록한 옵션은 변경이 불가합니다.\nstep1, step2의 영역만 수정가능.');
+            return false;
+        }
+        return true;
+    };
+
     const handleTogglePaySuffix = (s: string) => {
+        if (!checkEditMode()) return;
         if (!checkStep3()) return;
         togglePaySuffix(s);
     };
 
     const handleSetBorderPeriod = (v: number) => {
+        if (!checkEditMode()) return;
         if (v > 0 && !checkStep3()) return;
         setBorderPeriod(v);
         if (v > 0 && borderOption === 'none') setBorderOption('color');
     };
 
     const handleSetIconPeriod = (v: number) => {
+        if (!checkEditMode()) return;
         if (v > 0 && !checkStep3()) return;
         setIconPeriod(v);
     };
 
     const handleSetHighlighterPeriod = (v: number) => {
+        if (!checkEditMode()) return;
         if (v > 0 && !checkStep3()) return;
         setHighlighterPeriod(v);
     };
 
     const toggleKeyword = (kw: string) => {
+        if (!checkEditMode()) return;
         if (selectedKeywords.includes(kw)) {
             setSelectedKeywords(selectedKeywords.filter(k => k !== kw));
         } else {
@@ -84,8 +98,19 @@ export const Step4Extras: React.FC<Step4Props> = ({
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!checkEditMode(true)) {
+            e.target.value = ''; // Reset input
+            return;
+        }
         const file = e.target.files?.[0];
         if (!file) return;
+
+        // [New] File Size Check (5MB Limit)
+        const MAX_SIZE = 5 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            alert('파일 크기가 너무 큽니다. 5MB 이하의 이미지만 업로드 가능합니다.');
+            return;
+        }
 
         try {
             setIsUploading(true);
@@ -97,7 +122,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                 .from('job-images')
                 .upload(fileName, file);
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                if (uploadError.message.includes('fetch')) {
+                    throw new Error('네트워크 연결이 불안정합니다. 잠시 후 다시 시도해주세요.');
+                }
+                throw uploadError;
+            }
 
             const { data: { publicUrl } } = supabase.storage
                 .from('job-images')
@@ -106,7 +136,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
             setMediaUrl(publicUrl);
         } catch (error: any) {
             console.error('Upload error:', error);
-            alert(`이미지 업로드 실패: ${error.message}`);
+            alert(`이미지 업로드 실패: ${error.message || '알 수 없는 오류가 발생했습니다.'}`);
         } finally {
             setIsUploading(false);
         }
@@ -190,7 +220,10 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         <>
                                             <img src={mediaUrl} alt="Ad Preview" className="w-full h-full object-cover" />
                                             <button
-                                                onClick={() => setMediaUrl('')}
+                                                onClick={() => {
+                                                    if (!checkEditMode(true)) return;
+                                                    setMediaUrl('');
+                                                }}
                                                 className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
                                                 <XCircle size={16} />
@@ -208,18 +241,21 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         그랜드~스페셜 광고는 리스트 상단 카드 영역에 <span className="text-pink-600 font-black">대표 이미지</span>가 노출됩니다. <br />
                                         업소를 가장 잘 나타내는 사진을 올리거나 인터넷 주소(URL)를 입력해주세요.
                                     </p>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-1.5 md:gap-2">
                                         <input
                                             type="text"
                                             value={mediaUrl}
-                                            onChange={(e) => setMediaUrl(e.target.value)}
-                                            placeholder="예: https://mysite.com/image.jpg (이미지 주소 붙여넣기)"
-                                            className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-2xl text-xs md:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                                            onChange={(e) => {
+                                                if (!checkEditMode(true)) return;
+                                                setMediaUrl(e.target.value);
+                                            }}
+                                            placeholder="예: https://mysite.com/image.jpg"
+                                            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 bg-white border border-gray-200 rounded-2xl text-[10px] md:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/20"
                                             disabled={isUploading}
                                         />
-                                        <label className={`px-4 py-3 bg-gray-900 text-white rounded-2xl text-xs md:text-sm font-black hover:bg-black transition active:scale-95 shadow-lg whitespace-nowrap cursor-pointer flex items-center gap-2 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        <label className={`px-3 py-2.5 md:px-4 md:py-3 bg-gray-900 text-white rounded-2xl text-[10px] md:text-sm font-black hover:bg-black transition active:scale-95 shadow-lg whitespace-nowrap cursor-pointer flex items-center gap-1.5 md:gap-2 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                                             {isUploading ? (
-                                                <><Loader2 size={14} className="animate-spin" /> 업로드 중...</>
+                                                <><Loader2 size={12} className="animate-spin" /> 업로드 중...</>
                                             ) : (
                                                 <><ImageIcon size={14} /> 내 PC에서 불러오기</>
                                             )}
@@ -323,7 +359,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><MousePointer2 size={18} fill="currentColor" className="rotate-90" /></div>
                                 <div>
-                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">10종 아이콘</h3>
+                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">10종 무빙 아이콘</h3>
                                     <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">제목앞에 아이콘을 노출하여 주목도를 높이세요!</p>
                                 </div>
                             </div>
@@ -343,6 +379,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         key={item.id}
                                         type="button"
                                         onClick={() => {
+                                            if (!checkEditMode()) return;
                                             if (!checkStep3()) return;
                                             setSelectedIcon(selectedIcon === item.id ? null : item.id);
                                         }}
@@ -369,7 +406,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shadow-inner"><Highlighter size={18} fill="currentColor" /></div>
                                 <div>
-                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">8종 형광펜</h3>
+                                    <h3 className="text-[13px] md:text-[16px] font-black leading-none">10종 형광펜</h3>
                                     <p className="text-[10px] md:text-[11px] font-bold opacity-80 mt-1">제목에 시각적인 광고효과를 입혀보세요!</p>
                                 </div>
                             </div>
@@ -389,6 +426,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         key={item.id}
                                         type="button"
                                         onClick={() => {
+                                            if (!checkEditMode()) return;
                                             if (!checkStep3()) return;
                                             setSelectedHighlighter(selectedHighlighter === item.id ? null : item.id);
                                         }}
@@ -400,6 +438,10 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                                 background: 'linear-gradient(to right, #ef5350, #f48fb1, #7e57c2, #2196f3, #26c6da, #43a047, #eeff41, #f9a825, #ff5722)',
                                                 color: 'white',
                                                 textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                                            } : item.color === 'blink' ? {
+                                                backgroundColor: '#ffff00',
+                                                color: '#000',
+                                                animation: 'blink 1s ease-in-out infinite'
                                             } : { backgroundColor: item.color, color: '#333' }}
                                         >
                                             {item.name}
@@ -448,6 +490,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                                 key={opt.id}
                                                 type="button"
                                                 onClick={() => {
+                                                    if (!checkEditMode()) return;
                                                     if (!checkStep3()) return;
                                                     setBorderOption(borderOption === opt.id ? 'none' : opt.id as any);
                                                 }}

@@ -75,6 +75,13 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
     const insertImage = async (file: File) => {
         if (!file) return;
 
+        // [New] File Size Check (5MB Limit)
+        const MAX_SIZE = 5 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            alert('파일 크기가 너무 큽니다. 5MB 이하의 이미지만 업로드 가능합니다.');
+            return;
+        }
+
         try {
             setIsUploading(true);
             // 1. Supabase Storage Upload
@@ -87,7 +94,12 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                 .from('job-images')
                 .upload(filePath, file);
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                if (uploadError.message.includes('fetch')) {
+                    throw new Error('네트워크 연결이 불안정합니다. 잠시 후 다시 시도해주세요.');
+                }
+                throw uploadError;
+            }
 
             // 2. Get Public URL
             const { data: { publicUrl } } = supabase.storage
@@ -103,7 +115,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
 
         } catch (err: any) {
             console.error('이미지 업로드 실패:', err);
-            alert(`이미지 업로드에 실패했습니다: ${err.message || '알 수 없는 오류'}`);
+            alert(`이미지 업로드 실패: ${err.message || '알 수 없는 오류가 발생했습니다.'}`);
         } finally {
             setIsUploading(false);
         }
@@ -301,9 +313,14 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                     {/* Editor Side */}
                     <div className={`p-5 md:p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
                         <div className="flex items-center justify-between mb-3">
-                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>상세내용 작성 (에디터)</h2>
+                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm">
+                                <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
+                                상세내용 작성<br className="md:hidden" /> (에디터)
+                            </h2>
                             <div className="flex items-center gap-1.5">
-                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowTemplateModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-[10px] font-black border border-pink-100 transition shadow-sm hover:bg-pink-100 ring-2 ring-pink-500/20 animate-pulse"><Sparkles size={12} /> Premium 템플릿 사용</button>
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowTemplateModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-[10px] font-black border border-pink-100 transition shadow-sm hover:bg-pink-100 ring-2 ring-pink-500/20 animate-pulse">
+                                    <Sparkles size={12} /> Premium<br className="md:hidden" /> 템플릿 사용
+                                </button>
                                 <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인 의뢰</button>
                             </div>
                         </div>

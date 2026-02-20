@@ -56,7 +56,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                 case 'contact': return `
                     <div style="margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; color: white;">
                         <span style="font-size: 11px; opacity: 0.7;">CONTACT ME</span>
-                        <div style="font-size: 20px; font-weight: 900;">${v.text}</div>
+                        <div style="font-size: 20px; font-weight: 900;">${v.text.replace(/\n/g, '<br/>')}</div>
                     </div>`;
                 case 'spacer': return `<div style="height: 30px;"></div>`;
                 default: return '';
@@ -98,7 +98,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                     </div>`;
                 case 'contact': return `
                     <div style="margin-top: 40px; border-top: 1px dashed #ff00ff; padding-top: 20px;">
-                        <div style="font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px;">${v.text}</div>
+                        <div style="font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px;">${v.text.replace(/\n/g, '<br/>')}</div>
                     </div>`;
                 default: return '';
             }
@@ -144,7 +144,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                     </div>`;
                 case 'contact': return `
                     <div style="margin-top: 30px; background: #ff0000; color: #fff; padding: 25px; border-radius: 40px; font-size: 22px; font-weight: 900;">
-                        ${v.text}
+                        ${v.text.replace(/\n/g, '<br/>')}
                     </div>`;
                 default: return '';
             }
@@ -188,7 +188,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                     </div>`;
                 case 'contact': return `
                     <div style="background: #030852; color: #ffff00; padding: 30px; border-radius: 0; font-size: 24px; font-weight: 900; margin-top: 40px;">
-                        전화번호: ${v.text}
+                        연락처: ${v.text.replace(/\n/g, '<br/>')}
                     </div>`;
                 default: return '';
             }
@@ -229,7 +229,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                 case 'contact': return `
                     <div style="background: #facc15; color: #000; padding: 20px; border-radius: 15px; font-weight: 900; margin-top: 10px;">
                         <div style="font-size: 13px; opacity: 0.7;">📱 CONTACT</div>
-                        <div style="font-size: 20px;">${v.text}</div>
+                        <div style="font-size: 20px;">${v.text.replace(/\n/g, '<br/>')}</div>
                     </div>`;
                 default: return '';
             }
@@ -271,7 +271,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                     </div>`;
                 case 'contact': return `
                     <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 900; color: #be123c;">
-                        연락처: ${v.text}
+                        연락처: ${v.text.replace(/\n/g, '<br/>')}
                     </div>`;
                 default: return '';
             }
@@ -289,8 +289,8 @@ export const AD_TEMPLATES: AdTemplate[] = [
             { type: 'contact', values: { text: '010-1234-1234' } },
             { type: 'benefit', values: { title: '돈 벌이 엄청나요', desc: '믿고 오세용!ㅎ 손님 눈 낮고 사이즈 안 봐요!!!' } },
             { type: 'benefit', values: { title: '100% 당일결제', desc: '타지분들 대환영합니다! 먹자 완전 편하게 가능~!! 개인방 다 준비 돼 이써용^^' } },
-            { type: 'salary', values: { text: '진자 맘 편하게 연락 주셔요^^' } },
-            { type: 'contact', values: { text: '010-1234-1234 / 카톡: cocoalba' } },
+            { type: 'salary', values: { text: '진짜 맘 편하게 연락 주셔요^^' } },
+            { type: 'contact', values: { text: "010-1234-1234\n카톡: cocoalba" } },
         ],
         wrapperHtml: (_, rendered) => `
 <div style="background: linear-gradient(180deg, #a5f3fc 0%, #38bdf8 100%); padding: 60px 20px; color: white; border-radius: 20px; font-family: 'Pretendard', sans-serif; text-align: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);">
@@ -306,7 +306,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                 case 'sub_title': return `<p style="font-size: 16px; color: #fff; font-weight: 700; background: rgba(0,0,0,0.1); display: inline-block; padding: 10px 20px; border-radius: 20px; margin-bottom: 30px;">${v.text}</p>`;
                 case 'contact': return `
                     <div style="background: #fff; color: #0284c7; padding: 15px 30px; border-radius: 50px; font-size: 26px; font-weight: 900; margin: 20px 0; border: 4px solid #bae6fd; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                        ${v.text}
+                        ${v.text.replace(/\n/g, '<br/>')}
                     </div>`;
                 case 'benefit': return `
                     <div style="background: rgba(255,255,255,0.9); border-radius: 20px; padding: 25px; margin: 15px 0; color: #0c4a6e; text-align: left; border: 2px dashed #7dd3fc;">
@@ -350,7 +350,7 @@ export const AD_TEMPLATES: AdTemplate[] = [
                 case 'sub_title': return `<p style="font-size: 16px; color: #c7d2fe; font-weight: 500; margin-bottom: 20px;">${v.text}</p>`;
                 case 'contact': return `
                     <div style="margin: 20px auto; border: 1px solid #4f46e5; padding: 15px; width: fit-content; border-radius: 10px; color: #a5b4fc; font-size: 20px; font-weight: 700;">
-                        ${v.text}
+                        ${v.text.replace(/\n/g, '<br/>')}
                     </div>`;
                 case 'benefit': return `
                     <div style="background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(79,70,229,0.1) 100%); border-left: 4px solid #6366f1; padding: 20px; margin: 15px 0; text-align: left;">

@@ -26,6 +26,16 @@ export default function CommunityDetailClient({ id }: { id: string }) {
     const router = useRouter();
     const postId = parseInt(id);
     const [post, setPost] = useState<Post | null>(null);
+
+    // [New] Views increment logic
+    useEffect(() => {
+        if (post?.id) {
+            const incrementViews = async () => {
+                await supabase.rpc('increment_community_post_views', { post_id: post.id });
+            };
+            incrementViews();
+        }
+    }, [post?.id]);
     const [comments, setComments] = useState<Comment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -179,7 +189,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                                         </span>
                                     )}
                                 </div>
-                                <span className="text-xs text-gray-400 font-medium">{post.created_at?.substring(0, 10) || post.time} · 조회 1.2k</span>
+                                <span className="text-xs text-gray-400 font-medium">{post.created_at?.substring(0, 10) || post.time} · 조회 {post.views || 0}</span>
                             </div>
                         </div>
 
@@ -219,6 +229,16 @@ export default function CommunityDetailClient({ id }: { id: string }) {
 
                     <div className="text-gray-700 leading-loose text-lg mb-10 whitespace-pre-wrap break-words">
                         {post.content}
+                    </div>
+
+                    {/* [NEW] Buttons row */}
+                    <div className="flex flex-col gap-4 mt-12 pb-8 border-b border-gray-100">
+                        <button
+                            onClick={() => router.push('/community')}
+                            className="w-full py-4 border-2 border-pink-500 text-pink-600 rounded-2xl font-black hover:bg-pink-50 transition-all flex items-center justify-center gap-2"
+                        >
+                            목록으로 돌아가기
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-6 py-4 px-6 bg-gray-50 rounded-3xl w-fit">

@@ -7,6 +7,7 @@ export interface Post {
     time: string;
     likes: number;
     comments: number;
+    views?: number;
     isHot?: boolean;
 }
 

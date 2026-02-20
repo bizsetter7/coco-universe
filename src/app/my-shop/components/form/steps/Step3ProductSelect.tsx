@@ -10,10 +10,11 @@ interface Step3Props {
     setSelectedAdProduct: (v: string | null) => void;
     selectedAdPeriod: number;
     setSelectedAdPeriod: (v: number) => void;
+    isNewEntry?: boolean;
 }
 
 export const Step3ProductSelect: React.FC<Step3Props> = ({
-    brand, selectedAdProduct, setSelectedAdProduct, selectedAdPeriod, setSelectedAdPeriod
+    brand, selectedAdProduct, setSelectedAdProduct, selectedAdPeriod, setSelectedAdPeriod, isNewEntry
 }) => {
     // 그랜드부터 베이직까지만 필터링 (순서 보장)
     const mainProducts = DETAILED_PRICING.filter(p => p.isMain);
@@ -89,6 +90,10 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                                             key={days}
                                             type="button"
                                             onClick={() => {
+                                                if (isNewEntry === false) {
+                                                    alert('등록한 옵션은 변경이 불가합니다.\nstep1, step2의 영역만 수정가능.');
+                                                    return;
+                                                }
                                                 setSelectedAdProduct(p.id);
                                                 setSelectedAdPeriod(days);
                                             }}

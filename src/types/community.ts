@@ -9,7 +9,7 @@ export interface Post {
     comments: number;
     isHot?: boolean;
     created_at?: string;
-    view_count?: number;
+    views?: number;
     // [Added for Security & User Info]
     author_id?: string;
     author_nickname?: string;
