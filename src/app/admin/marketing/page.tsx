@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMarketingTargets, upsertMarketingTarget, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
-import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, CheckSquare, Square, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, BarChart3, Clock, AlertCircle, ExternalLink, X, Edit2 } from 'lucide-react';
+import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { REGION_DATA, INDUSTRY_DATA } from '@/constants/marketing-data';
 
@@ -45,7 +45,7 @@ export default function MarketingPage() {
 
     // --- Mutations ---
     const sendMutation = useMutation({
-        mutationFn: async (campaign: any) => {
+        mutationFn: async (campaign: { title: string; message_content: string; channel: string }) => {
             if (!data?.data || data.data.length === 0) throw new Error('No targets selected');
             return sendCampaignMessage(campaign, data.data);
         },
@@ -54,7 +54,7 @@ export default function MarketingPage() {
             setShowSendModal(false);
             queryClient.invalidateQueries({ queryKey: ['marketing-campaigns'] }); // If we had a campaign list
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
             toast.error(`발송 실패: ${err.message}`);
         }
     });
@@ -144,7 +144,7 @@ export default function MarketingPage() {
             setSelectedIds(prev => prev.filter(curr => curr !== id));
             refetch();
         } catch (error: any) {
-            toast.error(`삭제 실패: ${error.message}`);
+            toast.error(`삭제 실패: ${error instanceof Error ? error.message : '삭제 실패'}`);
         }
     };
 
@@ -448,7 +448,7 @@ export default function MarketingPage() {
 
                 <select
                     className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none"
-                    value={(filters as any).is_adult}
+                    value={filters.is_adult as string}
                     onChange={(e) => handleFilterChange('is_adult', e.target.value)}
                 >
                     <option value="">전체 회원</option>
@@ -776,7 +776,7 @@ export default function MarketingPage() {
                                                 name="channel"
                                                 value={ch}
                                                 checked={campaignForm.channel === ch}
-                                                onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value as any })}
+                                                onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value })}
                                             />
                                             {ch.toUpperCase()}
                                         </label>

@@ -63,7 +63,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                         <>
                             <img
                                 src={mediaUrl}
-                                alt=""
+                                alt={shop.name || 'Shop Image'}
                                 loading="lazy"
                                 decoding="async"
                                 onError={() => setImgError(true)}

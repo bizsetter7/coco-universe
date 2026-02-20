@@ -44,15 +44,18 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
     React.useEffect(() => {
         setIsMounted(true);
 
-        const handleOpenNote = (e: any) => {
-            const receiver = e.detail?.receiver;
+        const handleOpenNote = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const receiver = customEvent.detail?.receiver;
             if (receiver) setInitialReceiver(String(receiver));
             setShowMessageModal(true);
         };
 
-        const updateUnreadCount = () => {
-            const unread = NoteService.getUnread();
-            setUnreadCount(unread.length);
+        const updateUnreadCount = async () => {
+            if (user?.name) {
+                const unread = await NoteService.getUnread(user.name);
+                setUnreadCount(unread.length);
+            }
         };
 
         window.addEventListener('open-note-modal', handleOpenNote);

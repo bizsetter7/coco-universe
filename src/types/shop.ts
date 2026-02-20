@@ -70,7 +70,7 @@ export interface Shop {
     selectedHighlighter?: string | number;
     paySuffixes?: string[];
     payStatus?: string;
-    rejection_history?: any[];
+    rejection_history?: { reason: string; date: string; rejectedBy?: string }[];
     edit_count?: number;
     approved_at?: string;
     created_at?: string;
