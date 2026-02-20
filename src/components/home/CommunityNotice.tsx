@@ -2,18 +2,35 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, Bell } from 'lucide-react';
 import { useBrand } from '../BrandProvider';
+import { MOCK_POSTS } from '@/constants/community';
 
 export const CommunityNotice = () => {
     const brand = useBrand();
     const router = useRouter();
     const isDark = brand.theme === 'dark';
 
-    // Subtle colored backgrounds for the containers instead of plain white/gray
+    // Top 3 posts for preview
+    const recentPosts = MOCK_POSTS.slice(0, 3);
+
+    // [New] Category to Icon Mapper
+    const getCategoryIcon = (category: string) => {
+        if (category.includes('수다') || category.includes('썰')) return '🗣️';
+        if (category.includes('밤 문화')) return '🌙';
+        if (category.includes('뷰티')) return '💄';
+        if (category.includes('라운지')) return '💎';
+        if (category.includes('단짝')) return '👯‍♀️';
+        if (category.includes('중고')) return '📦';
+        if (category.includes('법률')) return '⚖️';
+        if (category.includes('수입')) return '💰';
+        return '✨';
+    };
+
+    // Style tokens
     const communityContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-pink-50/50 border-pink-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
     const noticeContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-blue-50/50 border-blue-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
 
-    const headerStyle = "flex flex-col xl:flex-row items-start xl:items-center justify-between mb-3 md:mb-4 gap-1"; // Adjusted for mobile title wrapping
-    const titleStyle = `text-base md:text-lg font-black flex items-center gap-2 whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-900'}`; // whitespace-nowrap fix
+    const headerStyle = "flex flex-col xl:flex-row items-start xl:items-center justify-between mb-3 md:mb-4 gap-1";
+    const titleStyle = `text-base md:text-lg font-black flex items-center gap-2 whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-900'}`;
     const listStyle = "flex flex-col gap-2 md:gap-3";
     const itemStyle = `text-[13px] md:text-sm font-medium truncate ${isDark ? 'text-gray-400' : 'text-gray-700'}`;
     const iconBoxStyle = (color: string) => `w-5 h-5 md:w-6 md:h-6 rounded flex items-center justify-center shrink-0 ${isDark ? 'bg-gray-700' : 'bg-white'} ${color}`;
@@ -30,14 +47,13 @@ export const CommunityNotice = () => {
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">자유게시판</span>
                 </div>
                 <div className={listStyle}>
-                    {['언니들 오늘 손님 진상 썰 푼다...ㅠㅠ', '강남 지역 같이 출근하실 분 구해요!', '이번에 새로 나온 립스틱 발색 대박임'].map((txt, i) => (
-                        <div key={i} className="flex items-center gap-2 md:gap-3">
-                            <span className={iconBoxStyle('text-pink-500')}>💭</span>
-                            <span className={itemStyle}>{txt}</span>
+                    {recentPosts.map((post) => (
+                        <div key={post.id} className="flex items-center gap-2 md:gap-3 group">
+                            <span className={iconBoxStyle('text-pink-500')}>{getCategoryIcon(post.category)}</span>
+                            <span className={`${itemStyle} group-hover:text-pink-600 transition-colors`}>{post.title}</span>
                         </div>
                     ))}
                 </div>
-                {/* Decorative Blob */}
                 <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-pink-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
 
@@ -73,7 +89,6 @@ export const CommunityNotice = () => {
                         </div>
                     ))}
                 </div>
-                {/* Decorative Blob */}
                 <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
         </div>

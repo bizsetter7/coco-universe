@@ -76,30 +76,29 @@ function CommunityContentInner() {
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.warn("[Community] Supabase fetch error, checking local backup:", error);
-                const localBackup = localStorage.getItem('community_posts_backup');
-                if (localBackup) {
-                    try {
-                        const parsed = JSON.parse(localBackup);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            setPosts(parsed);
-                            return;
-                        }
-                    } catch (e) {
-                        console.error("[Community] Local backup parse error:", e);
-                    }
-                }
-                return;
-            }
+            let finalPosts: Post[] = [];
 
             if (data && data.length > 0) {
-                setPosts(data as Post[]);
-                localStorage.setItem('community_posts_backup', JSON.stringify(data));
+                // [Persistence Logic] Merge DB posts with ALL MOCK_POSTS
+                // Mocks are used as base, DB posts override or add to the list
+                const postsMap = new Map<number, Post>();
+
+                // 1. Load Mocks first
+                MOCK_POSTS.forEach(p => postsMap.set(p.id, p));
+
+                // 2. Override/Add with DB data
+                data.forEach((p: any) => postsMap.set(p.id, p as Post));
+
+                // 3. Convert back to array and sort by created_at or ID desc
+                finalPosts = Array.from(postsMap.values()).sort((a, b) => b.id - a.id);
+
+                localStorage.setItem('community_posts_backup', JSON.stringify(finalPosts));
             } else {
-                setPosts(MOCK_POSTS);
+                finalPosts = MOCK_POSTS;
                 localStorage.removeItem('community_posts_backup');
             }
+
+            setPosts(finalPosts);
         } catch (err) {
             console.error('[Community] Critical error in fetchPosts:', err);
             setPosts(MOCK_POSTS);

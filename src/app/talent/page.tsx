@@ -8,7 +8,9 @@ import { Footer } from '@/components/layout/Footer';
 
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert, ChevronLeft, ChevronRight, Sparkles, X } from 'lucide-react';
+import { updatePoints } from '@/lib/points';
+import { supabase } from '@/lib/supabase';
 
 // Mock Data for Talent (Reused from HomeClient or similar)
 const MOCK_TALENTS = [
@@ -58,6 +60,45 @@ export default function TalentPage() {
         alert('면접 제안을 보냈습니다!');
     };
 
+    // Inside TalentPage component...
+    const [isResumeModalOpen, setIsResumeModalOpen] = React.useState(false);
+    const [isRegistering, setIsRegistering] = React.useState(false);
+
+    const handleResumeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!isLoggedIn) return alert('로그인이 필요합니다.');
+
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('name') as string;
+        const age = formData.get('age') as string;
+        const region = formData.get('region') as string;
+        const intro = formData.get('intro') as string;
+
+        setIsRegistering(true);
+        try {
+            const { error } = await supabase.from('resumes').insert([{
+                user_id: user.id,
+                name,
+                age,
+                region,
+                intro,
+                tags: []
+            }]);
+
+            if (error) throw error;
+
+            // [Gamification] Award points for resume registration
+            await updatePoints(user.id as string, 'RESUME_UPLOAD');
+            alert('이력서가 성공적으로 등록되었습니다! 5,000포인트가 적립되었습니다. ✨');
+            setIsResumeModalOpen(false);
+        } catch (err: any) {
+            console.error(err);
+            alert(`등록 실패: ${err.message}`);
+        } finally {
+            setIsRegistering(false);
+        }
+    };
+
     return (
         <div className={`h-auto min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
@@ -72,6 +113,33 @@ export default function TalentPage() {
             </div>
 
             <main className="container mx-auto px-4 py-8 pb-20 max-w-[1020px]">
+
+                {/* [New] Individual Member - Resume Registration CTA */}
+                {userType !== 'corporate' && (
+                    <div className="mb-8 p-6 rounded-[32px] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 shadow-xl shadow-purple-100 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-20 rotate-12">
+                            <Sparkles size={120} className="text-white" />
+                        </div>
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <h2 className="text-xl md:text-2xl font-black text-white mb-2 leading-tight">
+                                    이력서 등록하고 <br className="md:hidden" />
+                                    <span className="text-yellow-300">쇼핑 포인트 5,000P </span> 즉시 받기! 🛍️
+                                </h2>
+                                <p className="text-white/80 text-sm font-bold">
+                                    코코알바 파트너 매장에서 현금처럼 사용 가능 (지그재그, 에이블리 제휴 중)
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsResumeModalOpen(true)}
+                                className="px-8 py-4 bg-white text-purple-700 rounded-2xl font-black text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
+                            >
+                                내 이력서 등록하기
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Search & Filter */}
                 <div className="mb-8 space-y-4">
                     <div className="relative">
@@ -192,6 +260,65 @@ export default function TalentPage() {
                                 다음에 할게요
                             </button>
                         </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+            {/* 📝 Resume Registration Modal (Portal) */}
+            {isResumeModalOpen && createPortal(
+                <div className="fixed inset-0 z-[20001] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsResumeModalOpen(false)}></div>
+                    <div className={`relative z-10 w-full max-w-lg rounded-[40px] overflow-hidden shadow-2xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 text-white relative">
+                            <button onClick={() => setIsResumeModalOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-full transition-colors">
+                                <X size={20} />
+                            </button>
+                            <h3 className="text-2xl font-black mb-1">이력서 등록</h3>
+                            <p className="text-white/70 text-sm font-bold">5,000포인트를 즉시 적립해 드립니다! ✨</p>
+                        </div>
+
+                        <form onSubmit={handleResumeSubmit} className="p-8 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">이름</label>
+                                    <input
+                                        name="name" required placeholder="예: 김코코"
+                                        className={`w-full px-5 py-3.5 rounded-2xl border font-bold outline-none focus:ring-2 focus:ring-purple-500 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">나이</label>
+                                    <input
+                                        name="age" required placeholder="예: 25세"
+                                        className={`w-full px-5 py-3.5 rounded-2xl border font-bold outline-none focus:ring-2 focus:ring-purple-500 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">활동 가능 지역</label>
+                                <input
+                                    name="region" required placeholder="예: 서울 강남구 / 서초구"
+                                    className={`w-full px-5 py-3.5 rounded-2xl border font-bold outline-none focus:ring-2 focus:ring-purple-500 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">자기소개 (강점/경력 등)</label>
+                                <textarea
+                                    name="intro" required placeholder="사장님들께 어필할 수 있는 나만의 매력과 경력을 적어주세요!"
+                                    className={`w-full h-32 px-5 py-4 rounded-2xl border font-bold outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isRegistering}
+                                className="w-full py-5 bg-gray-900 text-white rounded-[24px] font-black text-lg shadow-xl hover:bg-black active:scale-[0.98] transition-all disabled:opacity-50"
+                            >
+                                {isRegistering ? '등록 중...' : '이력서 등록 완료 (5,000P 받기)'}
+                            </button>
+                        </form>
                     </div>
                 </div>,
                 document.body

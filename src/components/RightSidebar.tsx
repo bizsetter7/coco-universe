@@ -53,12 +53,16 @@ export default function RightSidebar() {
                 </div>
             </div>
 
-            {/* 2. Banner Area */}
-            <div className="rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative h-24 bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-center p-2">
-                <div>
-                    <h3 className="text-white font-black text-lg drop-shadow-md">트리거</h3>
-                    <p className="text-white/90 text-xs font-bold mt-1">바로 여깁니다.</p>
-                    <div className="mt-1 bg-white/20 backdrop-blur-sm text-white text-[9px] px-2 py-0.5 rounded-full inline-block">퀸알바 공식 프리미엄 광고</div>
+            {/* 2. Banner Area - 트리거 */}
+            <div className="group relative rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all h-24">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-700"></div>
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute -top-4 -right-4 w-16 h-16 bg-white rounded-full blur-xl" />
+                </div>
+                <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-3 text-white">
+                    <h3 className="font-black text-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] tracking-tight">트리거</h3>
+                    <div className="w-5 h-0.5 bg-white/40 my-1 rounded-full" />
+                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Premium Official</p>
                 </div>
             </div>
 
@@ -164,28 +168,46 @@ export default function RightSidebar() {
             </div>
 
             {/* 8. Right Side Vertical Ads */}
-            <div className="space-y-2">
-                <div className="w-full aspect-[3/4] bg-blue-100 rounded-xl border border-blue-200 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:opacity-90">
-                    <div className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded mb-2">동탄스카이</div>
-                    <h4 className="font-black text-blue-900 text-lg leading-tight">하이퍼블릭룸</h4>
-                    <p className="text-2xl font-black text-blue-600 my-1">60분</p>
-                    <div className="bg-yellow-400 text-black font-black px-2 py-1 rounded text-xs">TC 12만원</div>
-                    <p className="text-[10px] font-bold text-gray-600 mt-1">자유복장</p>
+            <div className="space-y-4">
+                {/* 동탄스카이 */}
+                <div className="group relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer shadow-md hover:scale-[1.02] transition-all border border-blue-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900"></div>
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 text-center">
+                        <div className="bg-white/10 backdrop-blur-md text-[10px] font-black text-blue-200 px-2 py-0.5 rounded mb-3 border border-white/10 uppercase">Dongtan Sky</div>
+                        <h4 className="font-black text-white text-lg leading-tight mb-1">하이퍼블릭룸</h4>
+                        <div className="w-6 h-0.5 bg-blue-400 mx-auto my-2" />
+                        <p className="text-3xl font-black text-white my-1 drop-shadow-lg tracking-tighter">60분</p>
+                        <div className="bg-amber-400 text-black font-black px-3 py-1 rounded-full text-[11px] mt-2 shadow-glow-amber">TC 12만원</div>
+                    </div>
                 </div>
-                <div className="w-full aspect-[3/4] bg-black rounded-xl border border-amber-500/50 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:opacity-90 relative overflow-hidden">
-                    <div className="absolute inset-0 border-2 border-amber-400 m-1 rounded-lg pointer-events-none"></div>
-                    <h4 className="font-black text-amber-500 text-lg">일프로</h4>
-                    <p className="text-2xl font-black text-white my-1">300만</p>
-                    <p className="text-amber-200 font-bold text-sm">보장</p>
-                    <div className="w-full h-px bg-amber-500/50 my-2"></div>
-                    <h4 className="font-black text-white text-md">텐카페</h4>
-                    <p className="text-xl font-black text-amber-400">200만</p>
-                    <p className="text-gray-300 font-bold text-xs">보장</p>
+
+                {/* 일프로 */}
+                <div className="group relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer shadow-md hover:scale-[1.02] transition-all border border-amber-500/30">
+                    <div className="absolute inset-0 bg-slate-950"></div>
+                    <div className="absolute inset-0 border-2 border-amber-500/40 m-1.5 rounded-lg pointer-events-none"></div>
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 text-center">
+                        <h4 className="font-black text-amber-500 text-xl tracking-widest mb-1">일프로</h4>
+                        <p className="text-3xl font-black text-white tracking-tighter">300<span className="text-sm font-bold ml-1 text-amber-200">만 보장</span></p>
+                        <div className="w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent my-3"></div>
+                        <h4 className="font-black text-white/80 text-sm mb-1 uppercase tracking-tighter">Ten Cafe</h4>
+                        <p className="text-2xl font-black text-amber-400">200<span className="text-xs font-bold ml-0.5 text-white/50">만 보장</span></p>
+                    </div>
                 </div>
-                <div className="w-full aspect-[3/5] bg-yellow-300 rounded-xl border border-yellow-400 flex flex-col items-center justify-center p-3 text-center cursor-pointer hover:opacity-90">
-                    <h4 className="font-black text-red-600 text-xl">OK OK</h4>
-                    <p className="text-4xl font-black text-red-500 my-2 leading-none">출<br />퇴</p>
-                    <div className="bg-black text-yellow-300 font-black px-2 py-1 rounded text-xs">자유 보장</div>
+
+                {/* OK OK */}
+                <div className="group relative w-full aspect-[3/5] rounded-xl overflow-hidden cursor-pointer shadow-md hover:scale-[1.02] transition-all border border-yellow-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-b from-yellow-300 via-yellow-400 to-orange-500"></div>
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 text-center">
+                        <h4 className="font-black text-red-700 text-2xl tracking-tighter drop-shadow-sm mb-4">OK OK</h4>
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="flex gap-2">
+                                <span className="bg-black text-white w-10 h-10 flex items-center justify-center rounded-lg text-xl font-black">출</span>
+                                <span className="bg-black text-white w-10 h-10 flex items-center justify-center rounded-lg text-xl font-black">퇴</span>
+                            </div>
+                            <p className="text-[10px] font-black text-red-800 bg-white/50 px-2 rounded-full mt-2 uppercase tracking-wide">Freestyle Working</p>
+                        </div>
+                        <div className="mt-6 bg-red-600 text-white font-black px-4 py-1.5 rounded text-xs shadow-lg uppercase">자유 출퇴근 보장</div>
+                    </div>
                 </div>
             </div>
 

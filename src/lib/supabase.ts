@@ -8,8 +8,20 @@ const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || FALLBACK_KEY;
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    console.warn('⚠️ using HARDCODED fallback credentials because process.env is missing.');
+// Only warn if absolutely no credentials are found (even fallbacks)
+if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('❌ Supabase credentials missing! Site will not function correctly.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+    },
+    // Disable Realtime to prevent WebSocket errors (since we don't use it yet)
+    realtime: {
+        params: {
+            eventsPerSecond: 1,
+        },
+    },
+});

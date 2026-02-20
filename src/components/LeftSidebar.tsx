@@ -245,11 +245,18 @@ export default function LeftSidebar({
                 </div>
             </div>
 
-            {/* 2. 광고 배너 슬롯 */}
-            <div className="h-[100px] rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">
-                <div className="text-center">
-                    <p className="text-lg font-black">하루 200보장</p>
-                    <p className="text-[10px] opacity-80">코코알바 프리미엄 배너</p>
+            {/* 2. 광고 배너 슬롯 1 - 하루 200보장 */}
+            <div className="group relative h-[100px] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all">
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-700"></div>
+                {/* Background Deco Patterns */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
+                    <div className="absolute -top-6 -left-6 w-20 h-20 bg-white rounded-full blur-xl animate-pulse" />
+                    <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-pink-400 rounded-full blur-xl animate-pulse" />
+                </div>
+                <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-3">
+                    <p className="text-xl font-black drop-shadow-lg tracking-tighter">하루 200보장</p>
+                    <div className="w-8 h-0.5 bg-white/30 my-1.5 rounded-full" />
+                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">CocoAlba Premium</p>
                 </div>
             </div>
 
@@ -405,26 +412,36 @@ export default function LeftSidebar({
             </div>
 
 
-            {/* 8. 광고 슬롯 1 */}
-            <div className="h-[200px] rounded-xl bg-gradient-to-b from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg overflow-hidden">
-                <div className="text-center p-4">
-                    <p className="text-2xl font-black mb-1">도파민</p>
-                    <p className="text-2xl font-black mb-2">마동석</p>
-                    <p className="text-sm font-bold opacity-90">대표</p>
-                    <p className="text-lg font-black mt-2">순수 테이블</p>
+            {/* 8. 광고 슬롯 2 - 코코알바 광고입전상담 */}
+            <div
+                onClick={() => router.push('/customer-center?tab=inquiry')}
+                className="group relative h-[180px] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all"
+            >
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-700"></div>
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
+                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" />
+                </div>
+                <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-4">
+                    <p className="text-xs font-black text-white/70 tracking-widest mb-1 uppercase">COCOALBA OFFICIAL</p>
+                    <h4 className="text-[24px] font-black mb-1 drop-shadow-md tracking-tighter">광고입점상담</h4>
+                    <div className="w-10 h-1 bg-white/40 rounded-full my-3" />
+                    <p className="text-[20px] font-black text-amber-300 drop-shadow-lg">{"<1:1문의>"}</p>
                 </div>
             </div>
 
-            {/* 9. 광고 슬롯 2 */}
-            <div className="h-[200px] rounded-xl bg-gradient-to-b from-pink-400 to-pink-600 flex items-center justify-center text-white shadow-lg overflow-hidden relative">
-                <div className="absolute top-2 right-2 text-2xl">🎉</div>
-                <div className="text-center p-4">
-                    <p className="text-sm font-bold text-pink-200">이태곤대표</p>
-                    <p className="text-xs text-pink-200 mb-2">(강남캐모)</p>
-                    <p className="text-xl font-black">010 5310 5882</p>
-                    <p className="text-lg font-bold mt-1">순수테이블</p>
-                    <p className="text-sm font-bold">2시간 40만원</p>
-                    <p className="text-xs mt-2 opacity-90">지원금 지원<br />당일지급<br />뮤초진행</p>
+            {/* 9. 광고 슬롯 3 - 코코알바 광고입점상담 (스타일 2) */}
+            <div
+                onClick={() => router.push('/customer-center?tab=inquiry')}
+                className="group relative h-[180px] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all border-2 border-white/10"
+            >
+                <div className="absolute inset-0 bg-slate-950"></div>
+                <div className="absolute top-3 right-3 text-xl opacity-30 animate-pulse">💎</div>
+                <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-4">
+                    <p className="text-[14px] font-bold text-gray-400 mb-2">프리미엄 입점 안내</p>
+                    <h4 className="text-[20px] font-black text-white mb-4 tracking-tighter">코코알바 광고상담</h4>
+                    <div className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-black shadow-[0_0_15px_rgba(219,39,119,0.5)] active:scale-95 transition-all">
+                        {"<1:1문의 바로가기>"}
+                    </div>
                 </div>
             </div>
 

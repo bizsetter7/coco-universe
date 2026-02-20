@@ -12,14 +12,19 @@ import JobDetailModal from './jobs/JobDetailModal';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
-    // 1. Image handling
-    const hasMedia = !!ad.options?.mediaUrl;
-    const [imgError, setImgError] = useState(false);
-
-    // Reset error state when URL changes
-    useEffect(() => {
-        setImgError(false);
-    }, [ad.options?.mediaUrl]);
+    // Premium Gradient Generator for Text Banners
+    const getPremiumGradient = (id: string) => {
+        const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const gradients = [
+            'from-slate-800 to-slate-900',
+            'from-indigo-800 to-purple-900',
+            'from-rose-800 to-red-900',
+            'from-blue-800 to-indigo-900',
+            'from-emerald-800 to-teal-900',
+            'from-amber-700 to-orange-800',
+        ];
+        return gradients[hash % gradients.length];
+    };
 
     // 2. Badge handling
     const getBadgeChar = () => {
@@ -35,25 +40,15 @@ const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Sh
             onClick={() => onSelect(ad)}
             className="group relative w-full h-[140px] bg-white rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all border border-gray-100 flex flex-col"
         >
-            {/* 1. Image Area */}
-            <div className={`relative w-full h-[85px] bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center ${!hasMedia || imgError ? 'animate-pulse' : ''}`}>
-                {hasMedia && !imgError ? (
-                    <img
-                        key={ad.options?.mediaUrl} // Force re-render on URL change
-                        src={ad.options?.mediaUrl}
-                        alt={ad.name}
-                        loading="eager" // [Optimization] Immediate load for banners
-                        onError={() => {
-                            // [Optimization] Silence network failures; UI shows fallback Crown icon
-                            setImgError(true);
-                        }}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 z-10 relative"
-                    />
-                ) : (
-                    <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-0">
-                        <Crown size={20} className="text-gray-200" />
-                    </div>
-                )}
+            {/* 1. Header: Premium Text Banner (No Image) */}
+            <div className={`relative w-full h-[85px] overflow-hidden shrink-0 flex items-center justify-center bg-gradient-to-br ${getPremiumGradient(ad.id)}`}>
+                <div className="relative z-10 px-2 text-center">
+                    <span className="text-[8px] font-bold text-white/50 uppercase tracking-widest mb-1 block leading-none">{ad.workType || 'JOB'}</span>
+                    <h4 className="text-white font-black text-[12px] leading-tight drop-shadow-md break-keep">
+                        {ad.title || ad.name}
+                    </h4>
+                    <div className="w-6 h-0.5 bg-white/20 mx-auto mt-1.5 rounded-full" />
+                </div>
             </div>
 
             {/* 2. Content Area */}
@@ -151,11 +146,11 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                     </div>
 
                     <div
-                        onClick={() => router.push('/customer-center?tab=ad')}
+                        onClick={() => router.push('/customer-center?tab=inquiry')}
                         className={`p-2 border rounded-[18px] shadow-md text-center mx-1 border-b-2 border-b-pink-500/20 active:scale-95 transition-transform cursor-pointer ${contactBoxClass}`}
                     >
-                        <p className="text-[8px] text-gray-400 font-black uppercase tracking-[0.2em] mb-0.5">광고문의</p>
-                        <p className={`text-[12px] font-black italic tracking-tighter ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>1544-5568</p>
+                        <p className="text-[10px] text-pink-600 font-extrabold mb-0.5">광고입점상담</p>
+                        <p className={`text-[13px] font-black tracking-tighter ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{"<1:1문의>"}</p>
                     </div>
                 </div>
             </div>

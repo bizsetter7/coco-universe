@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { updatePoints } from '@/lib/points';
 
 const CATEGORIES = [
     '그녀들의 수다',
@@ -90,12 +91,25 @@ export default function WritePostPage() {
                     created_at: new Date().toISOString()
                 }]);
 
+            // Inside WritePostPage component, update handleSubmit
             if (error) {
                 console.warn("DB Insert failed, trying local backup...", error.message);
-                throw error; // Let specific error handling occur or just alert
+                throw error;
             }
 
-            alert('게시글이 등록되었습니다!');
+            // [Gamification] Award points for posting
+            if (isLoggedIn && user?.id && !user.id.startsWith('mock_')) {
+                try {
+                    await updatePoints(user.id as string, 'COMMUNITY_POST');
+                    alert('게시글이 등록되었습니다! 200포인트가 적립되었습니다. ✨');
+                } catch (pErr) {
+                    console.error('Point award failed:', pErr);
+                    alert('게시글이 등록되었습니다!');
+                }
+            } else {
+                alert('게시글이 등록되었습니다!');
+            }
+
             router.back();
         } catch (err: any) {
             console.error(err);

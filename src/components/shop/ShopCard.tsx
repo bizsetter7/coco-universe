@@ -21,8 +21,23 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
     const isMobile = useMobile();
     const [imgError, setImgError] = React.useState(false);
 
-    // Determine image URL
-    const mediaUrl = shop.options?.mediaUrl || getShopDefaultImage(shop.workType);
+    // Determine media strategy
+    const hasCustomMedia = !!shop.options?.mediaUrl;
+    const mediaUrl = shop.options?.mediaUrl;
+
+    // Premium Gradient Generator for Text Banners
+    const getPremiumGradient = (id: string) => {
+        const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const gradients = [
+            'from-slate-800 to-slate-900',
+            'from-indigo-800 to-purple-900',
+            'from-rose-800 to-red-900',
+            'from-blue-800 to-indigo-900',
+            'from-emerald-800 to-teal-900',
+            'from-amber-700 to-orange-800',
+        ];
+        return gradients[hash % gradients.length];
+    };
 
     // 급구/추천 섹션은 이미지를 표시하지 않음 (텍스트 위주)
     const isUrgentType = tierId === 'urgent' || tierId === 'recommended';
@@ -56,34 +71,25 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                 </div>
             )}
 
-            {/* 1. 상단: 이미지 (꽉 채움, 하단 각진 모서리) - 급구 제외 */}
+            {/* 1. 상단: 프리미엄 텍스트 배너 (사진 완전 제거) - 급구 제외 */}
             {showImage && (
-                <div className={`relative w-full aspect-[4/3] bg-gray-50 border-b border-gray-100 overflow-hidden`}>
-                    {!imgError ? (
-                        <>
-                            <img
-                                src={mediaUrl}
-                                alt={shop.name || 'Shop Image'}
-                                loading="lazy"
-                                decoding="async"
-                                onError={() => setImgError(true)}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
+                <div className={`relative w-full aspect-[4/3] overflow-hidden bg-slate-900 border-b border-gray-100`}>
+                    {/* Main Premium Gradient Display */}
+                    <div className={`absolute inset-0 flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br ${getPremiumGradient(shop.id)}`}>
+                        {/* Banner Render */}
+                        <div className="relative z-10 w-full px-2">
+                            <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest mb-1.5 block leading-none">{shop.workType || 'JOB POST'}</span>
+                            <h4 className="text-white font-black text-[15px] leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] break-keep text-center">
+                                {cleanTitle}
+                            </h4>
+                            <div className="w-8 h-0.5 bg-white/20 mx-auto mt-2.5 rounded-full" />
+                        </div>
+                    </div>
 
-                            {/* Rank Badge (if used) */}
-                            {rank && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-10">
-                                    <span className="text-[10px] font-black text-black">{rank}</span>
-                                </div>
-                            )}
-
-                            <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-40" />
-                        </>
-                    ) : (
-                        // [Fix] 이미지 Fallback (깔끔한 플레이스홀더)
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 p-4">
-                            <span className="text-2xl mb-1">✨</span>
-                            <span className="text-[10px] font-bold text-slate-400">{shop.workType || 'HOT'}</span>
+                    {/* Rank Badge (if used) */}
+                    {rank && (
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-20">
+                            <span className="text-[10px] font-black text-black">{rank}</span>
                         </div>
                     )}
                 </div>
