@@ -71,8 +71,12 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                     .select('*')
                     .eq('post_id', postId);
 
-                if (commentData) setComments(commentData as Comment[]);
-                else setComments(MOCK_COMMENTS.filter(c => c.postId === postId) as Comment[]);
+                // DB에 실제 댓글이 있을 때만 사용, 없으면 Mock 댓글로 폴백
+                if (commentData && commentData.length > 0) {
+                    setComments(commentData as Comment[]);
+                } else {
+                    setComments(MOCK_COMMENTS.filter(c => c.postId === postId) as Comment[]);
+                }
 
             } catch (error) {
                 console.error('Error fetching detail:', error);
