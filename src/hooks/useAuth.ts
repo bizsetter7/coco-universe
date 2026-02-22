@@ -7,7 +7,7 @@ export interface UserSession {
     id: string;
     name: string;
     nickname: string;
-    points: number;
+    credit: number;
     referrer?: string;
     shopId?: string;
     isSimulated?: boolean;
@@ -25,7 +25,7 @@ export function useAuth() {
         id: 'guest',
         name: '게스트',
         nickname: '게스트',
-        points: 0
+        credit: 0
     });
 
     const isMounted = useRef(true);
@@ -70,7 +70,7 @@ export function useAuth() {
                         id: authUser.id,
                         name: profile.full_name || authUser.email?.split('@')[0] || '회원',
                         nickname: profile.nickname || profile.full_name || '닉네임',
-                        points: profile.points || 0,
+                        credit: profile.credit_balance || profile.points || 0,
                         isAdultVerified: !!profile.is_adult_verified, // [New] DB 성인인증 여부 반영
                         email: authUser.email
                     };
@@ -108,7 +108,7 @@ export function useAuth() {
         }
 
         // 3. 비로그인 상태 (완전한 게스트)
-        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0 });
         setIsLoggedIn(false);
         setIsLoading(false);
     };
@@ -172,7 +172,7 @@ export function useAuth() {
             id: id || `mock_${Math.random().toString(36).substr(2, 9)}`,
             name: name || (type === 'admin' ? '관리자' : '테스트회원'),
             nickname: nickname || (type === 'admin' ? '운영마스터' : '테스트닉네임'),
-            points: 1000,
+            credit: 1000,
             email: type === 'admin' ? 'admin_user@example.com' : 'test@example.com'
         };
 
@@ -199,7 +199,7 @@ export function useAuth() {
         }
 
         setIsLoggedIn(false);
-        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', points: 0 });
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0 });
 
         window.location.href = '/';
     };
@@ -246,7 +246,7 @@ export function useAuth() {
         userType: user.type,
         userName: user.name,
         userNickname: user.nickname,
-        userPoints: user.points,
+        userCredit: user.credit,
         userReferrer: user.referrer,
         isSimulated: user.isSimulated,
         isAdultVerified: user.isAdultVerified

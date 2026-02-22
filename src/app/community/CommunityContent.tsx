@@ -249,6 +249,37 @@ function CommunityContentInner() {
                                     </button>
                                 )}
                             </div>
+
+                            {/* [NEW] Community-native Partners Credit Banner */}
+                            <div
+                                onClick={() => window.open('https://partners-credit.vercel.app', '_blank')}
+                                className="mb-6 p-6 rounded-[32px] bg-slate-900 border-2 border-pink-500/50 cursor-pointer shadow-xl hover:scale-[1.01] transition-all group relative overflow-hidden"
+                            >
+                                <div className="absolute -right-4 -top-4 w-32 h-32 bg-yellow-400 opacity-5 blur-3xl group-hover:opacity-20 transition-opacity"></div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-3 rounded-2xl shadow-lg shadow-yellow-500/20">
+                                            <Sparkles size={28} className="text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-black text-yellow-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                                                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></span>
+                                                Exclusive Opportunity
+                                            </p>
+                                            <h4 className="text-white font-black text-lg md:text-xl leading-tight">
+                                                언니들의 <span className="text-yellow-400">리얼 수익 창출</span> 노하우!<br />
+                                                <span className="text-gray-400 text-sm font-bold">지금 파트너스 활동하고 출금까지 원스톱 💰</span>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div className="hidden md:flex flex-col items-end gap-2">
+                                        <div className="px-5 py-2.5 bg-yellow-500 text-slate-900 rounded-full font-black text-sm flex items-center gap-1.5 shadow-lg shadow-yellow-500/20 group-hover:bg-yellow-400">
+                                            참여하기 <ChevronRight size={16} strokeWidth={3} />
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 font-bold whitespace-nowrap">현재 1,248명 활동 중</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="grid grid-cols-1 gap-4">
                                 {paginatedPosts.map((post, idx) => {
                                     const isAdPos = (idx + 1) % 4 === 0;
@@ -362,97 +393,103 @@ function CommunityContentInner() {
 
             {/* Login Required Modal (z-200 -> z-20000) */}
             {/* Login Required Modal (z-200 -> z-20000) */}
-            {mounted && loginModalOpen && createPortal(
-                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
-                    {/* Backdrop */}
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
-                    <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
-                        <div className="flex flex-col items-center text-center">
-                            <div className="w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-pink-500 ring-8 ring-pink-50 shadow-inner">
-                                <Lock size={32} className="md:w-12 md:h-12" strokeWidth={2.5} />
-                            </div>
-                            <h3 className={`text-xl md:text-2xl font-black mb-3 md:mb-4 tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>그녀들만의 비밀 커뮤니티 🤫</h3>
-                            <p className={`mb-8 md:mb-12 leading-relaxed font-bold text-xs md:text-sm ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                                이곳은 <span className="text-pink-600 font-black underline underline-offset-4 decoration-4">인증된 여성 회원</span>들만<br />
-                                입장하실 수 있는 안전한 공간입니다.<br />
-                                <br />
-                                <span className={`px-4 py-2 rounded-2xl border text-[11px] md:text-xs ${brand.theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-100 text-gray-900 border-gray-200'}`}>로그인하고 실시간 핫이슈를 확인하세요! 🔥</span>
-                            </p>
-                            <div className="grid grid-cols-1 w-full gap-3">
-                                <button
-                                    onClick={() => router.push('/?page=signup')}
-                                    className="w-full py-4 md:py-5 bg-pink-600 text-white rounded-2xl md:rounded-3xl font-black text-base md:text-lg hover:bg-pink-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-pink-200 outline-none"
-                                >
-                                    지금 가입하고 확인하기
-                                </button>
-                                <button
-                                    onClick={() => setLoginModalOpen(false)}
-                                    className={`w-full py-4 font-black transition-colors ${brand.theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
-                                >
-                                    다음에 할게요
-                                </button>
+            {
+                mounted && loginModalOpen && createPortal(
+                    <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
+                        <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
+                            <div className="flex flex-col items-center text-center">
+                                <div className="w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-pink-500 ring-8 ring-pink-50 shadow-inner">
+                                    <Lock size={32} className="md:w-12 md:h-12" strokeWidth={2.5} />
+                                </div>
+                                <h3 className={`text-xl md:text-2xl font-black mb-3 md:mb-4 tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>그녀들만의 비밀 커뮤니티 🤫</h3>
+                                <p className={`mb-8 md:mb-12 leading-relaxed font-bold text-xs md:text-sm ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    이곳은 <span className="text-pink-600 font-black underline underline-offset-4 decoration-4">인증된 여성 회원</span>들만<br />
+                                    입장하실 수 있는 안전한 공간입니다.<br />
+                                    <br />
+                                    <span className={`px-4 py-2 rounded-2xl border text-[11px] md:text-xs ${brand.theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-100 text-gray-900 border-gray-200'}`}>로그인하고 실시간 핫이슈를 확인하세요! 🔥</span>
+                                </p>
+                                <div className="grid grid-cols-1 w-full gap-3">
+                                    <button
+                                        onClick={() => router.push('/?page=signup')}
+                                        className="w-full py-4 md:py-5 bg-pink-600 text-white rounded-2xl md:rounded-3xl font-black text-base md:text-lg hover:bg-pink-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-pink-200 outline-none"
+                                    >
+                                        지금 가입하고 확인하기
+                                    </button>
+                                    <button
+                                        onClick={() => setLoginModalOpen(false)}
+                                        className={`w-full py-4 font-black transition-colors ${brand.theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                                    >
+                                        다음에 할게요
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+                    </div>,
+                    document.body
+                )
+            }
 
             {/* 🔒 Corporate Access Denied Modal (Portal 적용으로 헤더 위로 띄움) */}
-            {mounted && isCorporateModalOpen && createPortal(
-                <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 overflow-hidden h-[100dvh]">
-                    {/* Backdrop: bg-black/60 with blur */}
-                    <div
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsCorporateModalOpen(false);
-                        }}
-                    ></div>
+            {
+                mounted && isCorporateModalOpen && createPortal(
+                    <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4 overflow-hidden h-[100dvh]">
+                        {/* Backdrop: bg-black/60 with blur */}
+                        <div
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsCorporateModalOpen(false);
+                            }}
+                        ></div>
 
-                    <div className={`
+                        <div className={`
                         rounded-[32px] md:rounded-[40px] w-[90%] md:w-full max-w-sm p-8 md:p-12
                         relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] border
                         animate-in slide-in-from-bottom-4 zoom-in-95 duration-300
                         ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}
                     `}>
-                        <div className="flex flex-col items-center text-center gap-6">
-                            <div className={`p-4 rounded-full ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-blue-50'}`}>
-                                <Info size={32} className="text-blue-500" />
-                            </div>
+                            <div className="flex flex-col items-center text-center gap-6">
+                                <div className={`p-4 rounded-full ${brand.theme === 'dark' ? 'bg-gray-700/50' : 'bg-blue-50'}`}>
+                                    <Info size={32} className="text-blue-500" />
+                                </div>
 
-                            <div className="space-y-3 max-w-[240px] mx-auto">
-                                <h3 className="text-[22px] font-black text-gray-900 tracking-tight">접근 권한 제한</h3>
-                                <p className="text-gray-600 text-[15px] font-medium leading-[1.6] break-keep">
-                                    사장님 회원은 구직자들의 소통 공간을 열람하실 수 없습니다. 🙏
-                                </p>
-                            </div>
+                                <div className="space-y-3 max-w-[240px] mx-auto">
+                                    <h3 className="text-[22px] font-black text-gray-900 tracking-tight">접근 권한 제한</h3>
+                                    <p className="text-gray-600 text-[15px] font-medium leading-[1.6] break-keep">
+                                        사장님 회원은 구직자들의 소통 공간을 열람하실 수 없습니다. 🙏
+                                    </p>
+                                </div>
 
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsCorporateModalOpen(false);
-                                }}
-                                className="w-full py-4 rounded-xl bg-gray-900 text-white font-bold text-lg active:scale-95 transition-transform cursor-pointer relative z-20"
-                            >
-                                확인했습니다
-                            </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsCorporateModalOpen(false);
+                                    }}
+                                    className="w-full py-4 rounded-xl bg-gray-900 text-white font-bold text-lg active:scale-95 transition-transform cursor-pointer relative z-20"
+                                >
+                                    확인했습니다
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+                    </div>,
+                    document.body
+                )
+            }
 
             {/* Floating Action Button (Always visible on mobile for better accessibility) */}
-            {userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
-                <button
-                    onClick={handleWriteClick}
-                    className="fixed bottom-24 right-5 md:right-10 bg-pink-600 text-white p-5 rounded-full shadow-2xl hover:bg-pink-700 active:scale-90 transition-all z-50 hover:shadow-pink-300/50"
-                >
-                    <PenLine size={28} />
-                </button>
-            )}
-        </div>
+            {
+                userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
+                    <button
+                        onClick={handleWriteClick}
+                        className="fixed bottom-24 right-5 md:right-10 bg-pink-600 text-white p-5 rounded-full shadow-2xl hover:bg-pink-700 active:scale-90 transition-all z-50 hover:shadow-pink-300/50"
+                    >
+                        <PenLine size={28} />
+                    </button>
+                )
+            }
+        </div >
     );
 }
 

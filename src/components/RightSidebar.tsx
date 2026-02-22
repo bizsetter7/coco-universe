@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from './BrandProvider';
 import { REGIONS_MAP } from '@/constants/regions'; // 경로 확인 필요
-import { ChevronRight, Settings } from 'lucide-react';
+import { ChevronRight, Settings, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 
@@ -12,7 +12,7 @@ export default function RightSidebar() {
     const isMobile = useMobile();
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn, userName, userType, userPoints, logout } = useAuth();
+    const { isLoggedIn, userName, userType, userCredit, logout } = useAuth();
 
     // [Optimization] Early return for mobile after all hooks
     if (isMobile) return null;
@@ -22,7 +22,7 @@ export default function RightSidebar() {
         name: userName || '게스트',
         level: userType === 'admin' ? 99 : 1,
         type: userType === 'admin' ? '최고 관리자' : (userType === 'corporate' ? '기업회원' : '일반회원'),
-        points: userPoints || 0,
+        credit: userCredit || 0,
     };
 
     const JOB_TYPES = ['룸싸롱', '나이트', '주점', '노래방', '바(Bar)', '카페', '일반음식점', 'PC방/오락실', '기타'];
@@ -30,6 +30,25 @@ export default function RightSidebar() {
 
     return (
         <aside className="w-[250px] shrink-0 hidden lg:block space-y-3 sticky top-20 h-fit pb-10">
+            {/* 0. Partners Credit Promotion Banner - REMOVED (Requested) */}
+            {/*
+            <div 
+                onClick={() => window.open('https://partners-credit-site.vercel.app', '_blank')}
+                className="group relative rounded-xl overflow-hidden cursor-pointer shadow-md hover:scale-[1.02] transition-all bg-slate-900 border border-yellow-500/30 p-4"
+            >
+                <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
+                    <Sparkles size={20} className="text-yellow-400" />
+                </div>
+                <p className="text-[10px] font-black text-yellow-500 uppercase tracking-tighter mb-1">Weekly Best Income</p>
+                <h4 className="text-white font-black text-sm leading-tight mb-2">
+                    이번 주 <span className="text-yellow-400">120만C</span><br />출금 완료! 😲
+                </h4>
+                <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-gray-400 font-bold">지금 수익 활동 시작하기</span>
+                    <ChevronRight size={12} className="text-yellow-500" />
+                </div>
+            </div>
+            */}
 
             {/* 1. User Info Section */}
             <div className={`rounded-xl border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
@@ -41,8 +60,8 @@ export default function RightSidebar() {
                 <div className="p-3">
                     <p className="text-xs text-center text-gray-500 mb-2">회원님은 <span className="font-bold text-blue-500">{user.type}</span>입니다.</p>
                     <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mb-3">
-                        <span className="text-xs font-bold text-gray-500">P 포인트</span>
-                        <span className="text-sm font-black text-gray-800">{user.points.toLocaleString()} P</span>
+                        <span className="text-xs font-bold text-gray-500">C 크레딧</span>
+                        <span className="text-sm font-black text-gray-800">{user.credit.toLocaleString()} C</span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-1 text-[10px] font-bold text-gray-600">

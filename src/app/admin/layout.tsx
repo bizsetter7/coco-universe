@@ -116,14 +116,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (isLoading) return <div className="min-h-screen flex items-center justify-center font-bold">로딩 중...</div>;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col md:flex-row relative">
+        <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row relative font-sans">
             {/* Mobile Header */}
-            <header className="md:hidden bg-slate-950 text-white p-4 flex justify-between items-center sticky top-0 z-[10002] shrink-0">
+            <header className="md:hidden bg-slate-950 text-white p-4 flex justify-between items-center sticky top-0 z-[10002] shrink-0 shadow-lg">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <ShieldCheck size={18} className="text-white" />
                     </div>
-                    <span className="font-black tracking-tighter italic">COCO ADMIN</span>
+                    <span className="font-black tracking-tighter italic text-lg">COCO ADMIN</span>
                 </div>
                 <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-slate-900 rounded-xl transition-colors">
                     <LayoutDashboard size={24} className="text-blue-400" />
@@ -144,11 +144,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 activeTab={activeTab}
                 counts={counts}
                 onNavigate={handleNavigate}
+                className="shadow-2xl shadow-slate-900/10"
             />
 
             {/* Main Content */}
-            <main className="flex-1 w-full">
-                {children}
+            <main className="flex-1 w-full p-4 md:p-8 lg:p-12 overflow-y-auto">
+                <div className="max-w-[1400px] mx-auto">
+                    {children}
+                </div>
             </main>
         </div>
     );

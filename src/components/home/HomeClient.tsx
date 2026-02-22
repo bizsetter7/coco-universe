@@ -14,6 +14,7 @@ import { CommunityNotice } from './CommunityNotice';
 import { QuickMenu } from './QuickMenu';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import JobListView from '@/components/jobs/JobListView';
+import { FloatingConversion } from './FloatingConversion';
 
 // --- Type Definitions ---
 interface HomeClientProps {
@@ -55,17 +56,15 @@ export default function HomeClient({ shops }: HomeClientProps) {
             <section className="mb-4">
                 <HeroSection />
 
-                {/* Visual Offset: Lift QuickMenu up */}
-                <div className="-mt-4 relative z-10">
-                    <QuickMenu />
-                </div>
+                {/* Visual Offset: Lift QuickMenu up built-in to the component now */}
+                <QuickMenu />
 
-                <div className="mt-2 px-4 xl:px-0">
+                <div className="mt-8 px-4 xl:px-0">
                     <CommunityNotice />
                 </div>
             </section>
 
-            <div className="w-full h-px bg-gray-100 dark:bg-gray-800 my-10" />
+            <div className="w-full h-px bg-slate-100 my-12 max-w-7xl mx-auto" />
 
             {/* 2. Ad Sections (Now Unified) */}
             <UnifiedAdGrid
@@ -74,7 +73,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
                 onSelectShop={setSelectedShop}
             />
 
-            <div className="w-full h-px bg-gray-100 dark:bg-gray-800 my-10" />
+            <div className="w-full h-px bg-slate-100 my-16 max-w-7xl mx-auto" />
 
             {/* 3. Job List (Table/Cards) */}
             <JobListView
@@ -88,6 +87,9 @@ export default function HomeClient({ shops }: HomeClientProps) {
                 onAdRegister={handleAdRegister}
                 onNativeAdRegister={handleAdRegister}
             />
+
+            {/* Floating Conversion Widgets */}
+            <FloatingConversion />
 
             {/* Payment Modal */}
             {showPaymentPopup && (
@@ -104,9 +106,11 @@ export default function HomeClient({ shops }: HomeClientProps) {
                     shop={selectedShop}
                     onClose={() => setSelectedShop(null)}
                     isFavorite={favorites.includes(selectedShop.id)}
-                    onToggleFavorite={(e, id) => toggleFavorite(e, id)}
+                    onToggleFavorite={(e: React.MouseEvent) => toggleFavorite(e, selectedShop.id)}
                 />
             )}
         </div>
     );
 }
+
+

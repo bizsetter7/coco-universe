@@ -67,35 +67,61 @@ export function AdminStatsOverview({ stats, userStats, adStats, setActiveTab }: 
 
 function StatCard({ title, value, trend, icon, color, onClick }: { title: string, value: string, trend: string, icon: React.ReactNode, color: 'blue' | 'pink' | 'slate' | 'indigo', onClick?: () => void }) {
     const colorStyles = {
-        blue: 'bg-blue-50 text-blue-600',
-        pink: 'bg-pink-50 text-pink-600',
-        slate: 'bg-slate-100 text-slate-600',
-        indigo: 'bg-indigo-50 text-indigo-600'
+        blue: 'from-blue-600/10 to-blue-600/5 text-blue-600 border-blue-100/50 shadow-blue-500/5',
+        pink: 'from-pink-600/10 to-pink-600/5 text-pink-600 border-pink-100/50 shadow-pink-500/5',
+        slate: 'from-slate-600/10 to-slate-600/5 text-slate-600 border-slate-200/50 shadow-slate-500/5',
+        indigo: 'from-indigo-600/10 to-indigo-600/5 text-indigo-600 border-indigo-100/50 shadow-indigo-500/5'
+    };
+
+    const iconBg = {
+        blue: 'bg-blue-600 text-white shadow-blue-500/30',
+        pink: 'bg-pink-600 text-white shadow-pink-500/30',
+        slate: 'bg-slate-800 text-white shadow-slate-500/30',
+        indigo: 'bg-indigo-600 text-white shadow-indigo-500/30'
     };
 
     return (
         <div
             onClick={onClick}
-            className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group relative overflow-hidden"
+            className={`
+                relative p-7 rounded-[32px] border bg-gradient-to-br transition-all cursor-pointer group overflow-hidden
+                hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] hover:-translate-y-2 active:scale-95
+                ${colorStyles[color]} backdrop-blur-sm
+            `}
         >
-            <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity`}>
-                <div className={`scale-150 transform translate-x-1/4 -translate-y-1/4 ${color === 'blue' ? 'text-blue-600' : color === 'pink' ? 'text-pink-600' : color === 'indigo' ? 'text-indigo-600' : 'text-slate-600'}`}>
-                    {icon}
+            {/* Background Accent */}
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 opacity-5 group-hover:opacity-10 transition-opacity">
+                {React.cloneElement(icon as React.ReactElement<any>, { size: 96 })}
+            </div>
+
+            <div className="relative z-10 space-y-4">
+                <div className="flex justify-between items-center">
+                    <div className={`p-3.5 rounded-2xl ${iconBg[color]} transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+                        {React.cloneElement(icon as React.ReactElement<any>, { size: 22 })}
+                    </div>
+                    <div className={`
+                        flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black
+                        ${trend.includes('+') ? 'bg-emerald-100/50 text-emerald-600' : 'bg-rose-100/50 text-rose-600'}
+                    `}>
+                        {trend.includes('+') ? '▲' : '▼'} {trend.replace('+', '').replace('-', '')}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                        {title}
+                    </h3>
+                    <div className="flex items-baseline gap-1">
+                        <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight transition-all group-hover:text-black">
+                            {value.split(' ')[0]}
+                        </p>
+                        <span className="text-xs font-bold text-slate-400">{value.split(' ')[1] || ''}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                    <div className={`p-3 rounded-2xl ${colorStyles[color]} ring-4 ring-white`}>
-                        {icon}
-                    </div>
-                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${trend.includes('+') ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600'}`}>
-                        {trend}
-                    </span>
-                </div>
-                <h3 className="text-slate-400 text-[11px] font-black uppercase tracking-wider mb-1">{title}</h3>
-                <p className="text-2xl font-black text-slate-900 tracking-tight">{value}</p>
-            </div>
+            {/* Subtle Bottom Glow on Hover */}
+            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-30 transition-opacity ${color === 'blue' ? 'text-blue-500' : color === 'pink' ? 'text-pink-500' : color === 'indigo' ? 'text-indigo-500' : 'text-slate-500'}`}></div>
         </div>
     );
 }

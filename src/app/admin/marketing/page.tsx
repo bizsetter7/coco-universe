@@ -1,11 +1,48 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, cloneElement } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMarketingTargets, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
-import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle } from 'lucide-react';
+import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle, Megaphone, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { REGION_DATA, INDUSTRY_DATA } from '@/constants/marketing-data';
+
+// --- Local Components ---
+const MarketingStatCard = ({ label, value, unit, icon, color }: { label: string, value: string | number, unit: string, icon: React.ReactNode, color: 'blue' | 'emerald' | 'indigo' | 'rose' }) => {
+    const colorMap = {
+        blue: 'from-blue-600/10 to-blue-600/5 text-blue-600 border-blue-100/50',
+        emerald: 'from-emerald-600/10 to-emerald-600/5 text-emerald-600 border-emerald-100/50',
+        indigo: 'from-indigo-600/10 to-indigo-600/5 text-indigo-600 border-indigo-100/50',
+        rose: 'from-rose-600/10 to-rose-600/5 text-rose-600 border-rose-100/50'
+    };
+
+    const iconBg = {
+        blue: 'bg-blue-600',
+        emerald: 'bg-emerald-600',
+        indigo: 'bg-indigo-600',
+        rose: 'bg-rose-600'
+    };
+
+    return (
+        <div className={`p-6 rounded-[32px] border bg-gradient-to-br ${colorMap[color]} backdrop-blur-sm shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative`}>
+            <div className="absolute -right-4 -bottom-4 w-20 h-20 opacity-5 group-hover:opacity-10 transition-opacity">
+                {cloneElement(icon as React.ReactElement<any>, { size: 80 })}
+            </div>
+            <div className="relative z-10 flex items-center gap-4">
+                <div className={`p-3 rounded-2xl ${iconBg[color]} text-white shadow-lg shadow-current/20 transition-transform group-hover:scale-110`}>
+                    {cloneElement(icon as React.ReactElement<any>, { size: 20 })}
+                </div>
+                <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest opacity-60 mb-0.5">{label}</p>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-black text-slate-900">{value.toLocaleString()}</span>
+                        <span className="text-xs font-bold text-slate-400">{unit}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default function MarketingPage() {
     const queryClient = useQueryClient();
@@ -278,23 +315,27 @@ export default function MarketingPage() {
         <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2">
-                        <MessageSquare className="text-red-500" />
-                        마케팅 자동화 관리
-                    </h1>
-                    <p className="text-gray-500 text-sm font-medium mt-1">
-                        크롤링된 잠재 고객 데이터를 관리하고 메시지를 발송합니다.
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-slate-200/60">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-rose-500 rounded-2xl shadow-lg shadow-rose-500/20">
+                            <Megaphone className="text-white" size={24} />
+                        </div>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                            마케팅 자동화 센터
+                        </h1>
+                    </div>
+                    <p className="text-slate-500 text-sm font-bold mt-1 ml-11">
+                        초정밀 타겟팅 기반 실시간 캠페인 관리 시스템
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-3 ml-11 md:ml-0">
                     <button
                         onClick={() => refetch()}
-                        className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
-                        title="새로고침"
+                        className="p-2.5 text-slate-400 hover:text-blue-600 rounded-xl hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
+                        title="데이터 동기화"
                     >
-                        <RefreshCw size={20} />
+                        <RefreshCw size={20} className={isLoading ? 'animate-spin text-blue-500' : ''} />
                     </button>
 
                     <input
@@ -304,564 +345,593 @@ export default function MarketingPage() {
                         accept=".xlsx, .xls, .csv"
                         className="hidden"
                     />
-                    <button
-                        onClick={handleDownloadTemplate}
-                        className="p-2 text-gray-400 hover:text-green-600 rounded-full hover:bg-gray-100 transition-colors"
-                        title="업로드 양식 다운로드"
-                    >
-                        <FileDown size={20} />
-                    </button>
-                    <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50"
-                    >
-                        {isUploading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
-                        {isUploading ? '업로드 중...' : '데이터 업로드'}
-                    </button>
+
+                    <div className="flex items-center bg-white rounded-2xl p-1 shadow-sm border border-slate-200">
+                        <button
+                            onClick={handleDownloadTemplate}
+                            className="p-2 text-slate-400 hover:text-emerald-600 rounded-xl hover:bg-emerald-50 transition-all"
+                            title="표준 양식 다운로드"
+                        >
+                            <FileDown size={20} />
+                        </button>
+                        <div className="w-[1px] h-6 bg-slate-100 mx-1"></div>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="flex items-center gap-2 px-5 py-2.5 text-slate-700 rounded-xl font-black text-sm hover:bg-slate-50 transition-all disabled:opacity-50"
+                        >
+                            {isUploading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={18} className="text-blue-500" />}
+                            데이터 벌크 업로드
+                        </button>
+                    </div>
 
                     <button
                         onClick={() => setShowSendModal(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition-colors shadow-lg shadow-gray-900/20"
+                        className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-black transition-all shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95"
                     >
-                        <Send size={16} />
-                        캠페인 발송
+                        <Send size={18} className="text-blue-400" />
+                        캠페인 통합 발송
                     </button>
                 </div>
             </div>
 
-            {/* Stats Cards (Mock) */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-400 font-bold uppercase">전체 타겟</p>
-                    <p className="text-2xl font-black text-gray-900">{data?.count || 0}</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-400 font-bold uppercase">전환 완료</p>
-                    <p className="text-2xl font-black text-green-600">0</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-400 font-bold uppercase">문자 발송</p>
-                    <p className="text-2xl font-black text-blue-600">0</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                    <p className="text-xs text-gray-400 font-bold uppercase">발송 실패</p>
-                    <p className="text-2xl font-black text-red-500">0</p>
-                </div>
+            {/* Smart Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <MarketingStatCard
+                    label="잠재 고객 타겟"
+                    value={data?.count || 0}
+                    unit="명"
+                    icon={<Users size={20} />}
+                    color="blue"
+                />
+                <MarketingStatCard
+                    label="실시간 전환율"
+                    value={0}
+                    unit="%"
+                    icon={<Zap size={20} />}
+                    color="emerald"
+                />
+                <MarketingStatCard
+                    label="발송 성공"
+                    value={0}
+                    unit="건"
+                    icon={<CheckSquare size={20} />}
+                    color="indigo"
+                />
+                <MarketingStatCard
+                    label="이슈 발생"
+                    value={0}
+                    unit="건"
+                    icon={<AlertCircle size={20} />}
+                    color="rose"
+                />
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-wrap gap-3 items-center">
-                <div className="flex items-center gap-2 text-gray-400 text-sm font-bold mr-2">
-                    <Filter size={16} /> 필터:
+            <div className="bg-white/80 backdrop-blur-md p-5 rounded-[32px] border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center relative z-20">
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-black uppercase tracking-wider mr-2">
+                    <Filter size={16} className="text-blue-500" /> Advanced Filters
                 </div>
-                {/* 1. Region Filter (City -> Gu) */}
-                <select
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none"
-                    value={filters.region_city}
-                    onChange={(e) => handleFilterChange('region_city', e.target.value)}
-                >
-                    <option value="">전체 시/도</option>
-                    {Object.keys(REGION_DATA).map(city => (
-                        <option key={city} value={city}>{city}</option>
-                    ))}
-                </select>
-                {filters.region_city && (
-                    <select
-                        className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none animate-in fade-in zoom-in-95 duration-200"
-                        value={filters.region_gu}
-                        onChange={(e) => handleFilterChange('region_gu', e.target.value)}
-                    >
-                        <option value="">전체 시/구/군</option>
-                        {REGION_DATA[filters.region_city]?.map(gu => (
-                            <option key={gu} value={gu}>{gu}</option>
-                        ))}
-                    </select>
-                )}
 
-                {/* 2. Industry Filter (Category -> Detail) */}
-                <select
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none"
-                    value={filters.industry}
-                    onChange={(e) => handleFilterChange('industry', e.target.value)}
-                >
-                    <option value="">전체 1차 업종</option>
-                    {Object.keys(INDUSTRY_DATA).map(ind => (
-                        <option key={ind} value={ind}>{ind}</option>
-                    ))}
-                </select>
-                {filters.industry && (
-                    <select
-                        className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none animate-in fade-in zoom-in-95 duration-200"
-                        value={filters.industry_detail}
-                        onChange={(e) => handleFilterChange('industry_detail', e.target.value)}
-                    >
-                        <option value="">전체 2차 업종</option>
-                        {INDUSTRY_DATA[filters.industry]?.map(detail => (
-                            <option key={detail} value={detail}>{detail}</option>
-                        ))}
-                    </select>
-                )}
-                <select
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none"
-                    value={filters.status}
-                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                >
-                    <option value="">전체 상태</option>
-                    <option value="new">신규</option>
-                    <option value="contacted">접촉</option>
-                    <option value="converted">전환</option>
-                </select>
+                <div className="flex flex-wrap gap-3 flex-1">
+                    {/* 1. Region Filter */}
+                    <div className="flex gap-2">
+                        <select
+                            className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all cursor-pointer"
+                            value={filters.region_city}
+                            onChange={(e) => handleFilterChange('region_city', e.target.value)}
+                        >
+                            <option value="">전체 시/도</option>
+                            {Object.keys(REGION_DATA).map(city => (
+                                <option key={city} value={city}>{city}</option>
+                            ))}
+                        </select>
+                        {filters.region_city && (
+                            <select
+                                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none animate-in fade-in zoom-in-95 duration-200 cursor-pointer"
+                                value={filters.region_gu}
+                                onChange={(e) => handleFilterChange('region_gu', e.target.value)}
+                            >
+                                <option value="">전체 시/구/군</option>
+                                {REGION_DATA[filters.region_city]?.map(gu => (
+                                    <option key={gu} value={gu}>{gu}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
 
-                <div className="flex items-center gap-1 group/batch">
+                    {/* 2. Industry Filter */}
+                    <div className="flex gap-2">
+                        <select
+                            className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none transition-all cursor-pointer"
+                            value={filters.industry}
+                            onChange={(e) => handleFilterChange('industry', e.target.value)}
+                        >
+                            <option value="">전체 1차 업종</option>
+                            {Object.keys(INDUSTRY_DATA).map(ind => (
+                                <option key={ind} value={ind}>{ind}</option>
+                            ))}
+                        </select>
+                        {filters.industry && (
+                            <select
+                                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none animate-in fade-in zoom-in-95 duration-200 cursor-pointer"
+                                value={filters.industry_detail}
+                                onChange={(e) => handleFilterChange('industry_detail', e.target.value)}
+                            >
+                                <option value="">전체 2차 업종</option>
+                                {INDUSTRY_DATA[filters.industry]?.map(detail => (
+                                    <option key={detail} value={detail}>{detail}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+
                     <select
-                        className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none max-w-[150px] transition-all"
-                        value={filters.batch_id}
-                        onChange={(e) => handleFilterChange('batch_id', e.target.value)}
+                        className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-slate-900 outline-none transition-all cursor-pointer"
+                        value={filters.status}
+                        onChange={(e) => handleFilterChange('status', e.target.value)}
                     >
-                        <option value="">전체 업로드 회차</option>
-                        {uploadHistory?.map((h: { id: string; created_at: string; filename: string; unique_count: number }) => (
-                            <option key={h.id} value={h.id}>
-                                {new Date(h.created_at).toLocaleDateString()} - {h.filename} ({h.unique_count}건)
-                            </option>
-                        ))}
+                        <option value="">전체 상태</option>
+                        <option value="new">신규 (NEW)</option>
+                        <option value="contacted">접촉 (CONTACT)</option>
+                        <option value="converted">전환 (DONE)</option>
                     </select>
-                    {filters.batch_id && (
-                        <>
-                            <button
-                                onClick={handleRenameBatch}
-                                className="p-1.5 bg-gray-100 text-gray-500 rounded-lg hover:bg-gray-200 transition-all opacity-0 group-hover/batch:opacity-100"
-                                title="이 회차 이름 변경"
-                            >
-                                <Edit2 size={14} />
-                            </button>
-                            <button
-                                onClick={handleDeleteBatch}
-                                className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-all opacity-0 group-hover/batch:opacity-100"
-                                title="이 회차 데이터 전체 삭제"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        </>
+
+                    <div className="flex items-center gap-1 group/batch">
+                        <select
+                            className="px-4 py-2 bg-slate-900 text-white border-none rounded-xl text-xs font-black focus:ring-4 focus:ring-slate-900/10 outline-none max-w-[180px] transition-all cursor-pointer"
+                            value={filters.batch_id}
+                            onChange={(e) => handleFilterChange('batch_id', e.target.value)}
+                        >
+                            <option value="">전체 업로드 회차</option>
+                            {uploadHistory?.map((h: { id: string; created_at: string; filename: string; unique_count: number }) => (
+                                <option key={h.id} value={h.id}>
+                                    {new Date(h.created_at).toLocaleDateString()} - {h.filename} ({h.unique_count}건)
+                                </option>
+                            ))}
+                        </select>
+                        {filters.batch_id && (
+                            <div className="flex gap-1 opacity-0 group-hover/batch:opacity-100 transition-opacity">
+                                <button
+                                    onClick={handleRenameBatch}
+                                    className="p-2 bg-white text-slate-500 rounded-xl border border-slate-200 hover:text-blue-600 transition-all shadow-sm"
+                                    title="이 회차 이름 변경"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                                <button
+                                    onClick={handleDeleteBatch}
+                                    className="p-2 bg-white text-rose-500 rounded-xl border border-slate-200 hover:bg-rose-50 transition-all shadow-sm"
+                                    title="이 회차 데이터 전체 삭제"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 ml-auto border-l border-slate-200 pl-4">
+                    {selectedIds.length > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            className="px-4 py-2 bg-rose-500 text-white rounded-xl text-xs font-black flex items-center gap-2 hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20 active:scale-95 border-none"
+                        >
+                            <Trash2 size={14} />
+                            선택 삭제 ({selectedIds.length})
+                        </button>
                     )}
-                </div>
 
-                <select
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none"
-                    value={filters.is_adult as string}
-                    onChange={(e) => handleFilterChange('is_adult', e.target.value)}
-                >
-                    <option value="">전체 회원</option>
-                    <option value="true">성인 인증 회원 (19+)</option>
-                    <option value="false">미인증 회원</option>
-                </select>
-
-                {selectedIds.length > 0 && (
-                    <button
-                        onClick={handleBulkDelete}
-                        className="ml-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-black flex items-center gap-1 hover:bg-red-100 transition-colors border border-red-100"
-                    >
-                        <Trash2 size={14} />
-                        선택 삭제 ({selectedIds.length})
-                    </button>
-                )}
-
-                <div className="ml-auto relative">
-                    <input
-                        type="text"
-                        placeholder="이름, 전화번호 검색..."
-                        className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold focus:border-red-500 outline-none w-48"
-                        value={filters.search}
-                        onChange={(e) => handleFilterChange('search', e.target.value)}
-                    />
-                    <Users size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="이름, 업체명 검색..."
+                            className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none w-56 transition-all"
+                            value={filters.search}
+                            onChange={(e) => handleFilterChange('search', e.target.value)}
+                        />
+                        <Users size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    </div>
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
-                <table className="w-full text-left border-collapse table-fixed">
-                    <thead className="bg-gray-50/50 text-xs font-black text-gray-500 uppercase tracking-wider text-center">
-                        <tr>
-                            <th className="p-4 border-b border-gray-100 w-[50px]">
-                                <input
-                                    type="checkbox"
-                                    className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer"
-                                    onChange={handleSelectAll}
-                                    checked={data?.data.length !== 0 && selectedIds.length === data?.data.length}
-                                />
-                            </th>
-                            <th className="p-4 border-b border-gray-100 w-[60px]">No.</th>
-                            <th className="p-4 border-b border-gray-100 w-[100px]">
-                                <button onClick={() => handleSort('status')} className="flex items-center justify-center gap-1 hover:text-gray-900 transition-colors mx-auto">
-                                    상태 {sortConfig.key === 'status' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
-                                </button>
-                            </th>
-                            <th className="p-4 border-b border-gray-100 text-left w-[180px]">
-                                <button onClick={() => handleSort('name')} className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-                                    이름 / 연락처 {sortConfig.key === 'name' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
-                                </button>
-                            </th>
-                            <th className="p-4 border-b border-gray-100 text-left w-[140px]">SNS (카톡/텔레)</th>
-                            <th className="p-4 border-b border-gray-100 text-left">
-                                <button onClick={() => handleSort('shop_name')} className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-                                    업체 정보 {sortConfig.key === 'shop_name' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
-                                </button>
-                            </th>
-                            <th className="p-4 border-b border-gray-100 text-left w-[150px]">지역</th>
-                            <th className="p-4 border-b border-gray-100 text-left w-[100px]">유입 경로</th>
-                            <th className="p-4 border-b border-gray-100 w-[120px]">
-                                <button onClick={() => handleSort('created_at')} className="flex items-center justify-center gap-1 hover:text-gray-900 transition-colors mx-auto">
-                                    등록일 {sortConfig.key === 'created_at' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
-                                </button>
-                            </th>
-                            <th className="p-4 border-b border-gray-100 w-[70px]">작업</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50 text-sm font-medium text-gray-700">
-                        {isLoading ? (
-                            <tr><td colSpan={10} className="p-8 text-center text-gray-400">데이터를 불러오는 중...</td></tr>
-                        ) : data?.data.length === 0 ? (
-                            <tr><td colSpan={10} className="p-8 text-center text-gray-400">검색 결과가 없습니다. 필터를 변경하거나 데이터를 추가하세요.</td></tr>
-                        ) : (
-                            data?.data.map((target: MarketingTarget, index: number) => (
-                                <tr key={target.id} className={`hover:bg-gray-50/50 transition-colors group text-center ${selectedIds.includes(target.id) ? 'bg-red-50/30' : ''}`}>
-                                    <td className="p-4">
+            {/* Table Area */}
+            <div className="bg-white rounded-[40px] border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden min-h-[500px] flex flex-col relative z-10 transition-all">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse table-fixed">
+                        <thead className="bg-slate-950 text-slate-400 text-[10px] font-black uppercase tracking-[0.1em] text-center border-b border-slate-900">
+                            <tr>
+                                <th className="p-5 w-[60px]">
+                                    <div className="flex justify-center">
                                         <input
                                             type="checkbox"
-                                            className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer"
-                                            checked={selectedIds.includes(target.id)}
-                                            onChange={() => handleSelectToggle(target.id)}
+                                            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-blue-500/20 cursor-pointer"
+                                            onChange={handleSelectAll}
+                                            checked={data?.data.length !== 0 && selectedIds.length === data?.data.length}
                                         />
-                                    </td>
-                                    <td className="p-4 text-xs font-mono text-gray-400">
-                                        {(page - 1) * 20 + index + 1}
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${target.status === 'new' ? 'bg-blue-50 text-blue-600' :
-                                            target.status === 'contacted' ? 'bg-yellow-50 text-yellow-600' :
-                                                target.status === 'converted' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'
-                                            }`}>
-                                            {target.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-left">
-                                        <div
-                                            className="font-bold text-gray-900 flex items-center gap-1 cursor-pointer hover:text-blue-600 group/field"
-                                            onClick={() => handleQuickEdit(target.id, 'name', '이름', target.name || '')}
-                                        >
-                                            {target.name && target.name !== 'Unknown' ? target.name : target.shop_name || 'Unknown'}
-                                            <Edit2 size={10} className="opacity-0 group-hover/field:opacity-100 transition-opacity" />
-                                            {target.is_adult && (
-                                                <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[9px] flex items-center justify-center font-black" title="Adult Verified">19</span>
-                                            )}
-                                        </div>
-                                        <div
-                                            className="text-xs text-gray-400 font-mono tracking-tight cursor-pointer hover:text-blue-600 flex items-center gap-1 group/p1"
-                                            onClick={() => handleQuickEdit(target.id, 'phone_number', '기본 연락처', target.phone_number || '')}
-                                        >
-                                            {target.phone_number}
-                                            <Edit2 size={8} className="opacity-0 group-hover/p1:opacity-100" />
-                                        </div>
-                                        {target.phone_number_2 && (
+                                    </div>
+                                </th>
+                                <th className="p-5 w-[70px]">No.</th>
+                                <th className="p-5 w-[110px]">
+                                    <button onClick={() => handleSort('status')} className="flex items-center justify-center gap-1.5 hover:text-white transition-colors mx-auto">
+                                        Status {sortConfig.key === 'status' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
+                                    </button>
+                                </th>
+                                <th className="p-5 text-left w-[220px]">
+                                    <button onClick={() => handleSort('name')} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                        Lead Info {sortConfig.key === 'name' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
+                                    </button>
+                                </th>
+                                <th className="p-5 text-left w-[160px]">Direct SNS</th>
+                                <th className="p-5 text-left">
+                                    <button onClick={() => handleSort('shop_name')} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                        Business Details {sortConfig.key === 'shop_name' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
+                                    </button>
+                                </th>
+                                <th className="p-5 text-left w-[160px]">Geography</th>
+                                <th className="p-5 text-left w-[140px]">Source</th>
+                                <th className="p-5 w-[130px]">
+                                    <button onClick={() => handleSort('created_at')} className="flex items-center justify-center gap-1.5 hover:text-white transition-colors mx-auto">
+                                        Acquired {sortConfig.key === 'created_at' ? (sortConfig.asc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : <ArrowUpDown size={12} />}
+                                    </button>
+                                </th>
+                                <th className="p-5 w-[80px]">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-sm font-bold text-slate-700">
+                            {isLoading ? (
+                                <tr><td colSpan={10} className="p-20 text-center">
+                                    <RefreshCw size={32} className="animate-spin text-blue-500 mx-auto mb-4 opacity-20" />
+                                    <p className="text-slate-400 font-black">데이터 인텔리전스 로드 중...</p>
+                                </td></tr>
+                            ) : data?.data.length === 0 ? (
+                                <tr><td colSpan={10} className="p-20 text-center">
+                                    <div className="bg-slate-50 w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                        <Users size={24} className="text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-400 font-black italic">매칭되는 잠재 고객 데이터가 없습니다.</p>
+                                </td></tr>
+                            ) : (
+                                data?.data.map((target: MarketingTarget, index: number) => (
+                                    <tr key={target.id} className={`hover:bg-blue-50/30 transition-all group text-center border-l-4 ${selectedIds.includes(target.id) ? 'bg-blue-50/50 border-blue-500' : 'border-transparent hover:border-blue-500/30'}`}>
+                                        <td className="p-5">
+                                            <input
+                                                type="checkbox"
+                                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600/20 cursor-pointer"
+                                                checked={selectedIds.includes(target.id)}
+                                                onChange={() => handleSelectToggle(target.id)}
+                                            />
+                                        </td>
+                                        <td className="p-5 text-[10px] font-black text-slate-400 font-mono italic">
+                                            {String((page - 1) * 20 + index + 1).padStart(3, '0')}
+                                        </td>
+                                        <td className="p-5">
+                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${target.status === 'new' ? 'bg-blue-100 text-blue-600' :
+                                                target.status === 'contacted' ? 'bg-amber-100 text-amber-600' :
+                                                    target.status === 'converted' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                                                }`}>
+                                                {target.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-5 text-left">
                                             <div
-                                                className="text-[10px] text-gray-400 font-mono tracking-tight cursor-pointer hover:text-blue-600 flex items-center gap-1 group/p2"
-                                                onClick={() => handleQuickEdit(target.id, 'phone_number_2', '추가 연락처', target.phone_number_2 || '')}
+                                                className="font-black text-slate-900 flex items-center gap-1.5 cursor-pointer hover:text-blue-600 group/field text-sm tracking-tight"
+                                                onClick={() => handleQuickEdit(target.id, 'name', '이름', target.name || '')}
                                             >
-                                                (2) {target.phone_number_2}
-                                                <Edit2 size={8} className="opacity-0 group-hover/p2:opacity-100" />
-                                            </div>
-                                        )}
-                                        {!target.phone_number_2 && (
-                                            <div
-                                                className="text-[9px] text-gray-300 cursor-pointer hover:text-blue-500 mt-0.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => handleQuickEdit(target.id, 'phone_number_2', '추가 연락처', '')}
-                                            >
-                                                <Plus size={8} /> 번호추가
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="p-4 text-left">
-                                        <div className="flex flex-col gap-1">
-                                            <div
-                                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit cursor-pointer group/field flex items-center gap-1 ${target.kakao_id ? 'text-yellow-600 bg-yellow-50' : 'text-gray-300 bg-gray-50 border border-dashed border-gray-200'}`}
-                                                onClick={() => handleQuickEdit(target.id, 'kakao_id', '카카오 ID', target.kakao_id || '')}
-                                            >
-                                                K: {target.kakao_id || '없음'}
-                                                <Edit2 size={8} className="opacity-0 group-hover/field:opacity-100" />
+                                                {target.name && target.name !== 'Unknown' ? target.name : target.shop_name || 'Anonymous Lead'}
+                                                <Edit2 size={12} className="opacity-0 group-hover/field:opacity-100 transition-opacity text-slate-300" />
+                                                {target.is_adult && (
+                                                    <span className="px-1.5 py-0.5 rounded-md bg-rose-500 text-white text-[9px] flex items-center justify-center font-black shadow-sm shadow-rose-500/20">19+</span>
+                                                )}
                                             </div>
                                             <div
-                                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded w-fit cursor-pointer group/field flex items-center gap-1 ${target.telegram_id ? 'text-blue-600 bg-blue-50' : 'text-gray-300 bg-gray-50 border border-dashed border-gray-200'}`}
-                                                onClick={() => handleQuickEdit(target.id, 'telegram_id', '텔레그램 ID', target.telegram_id || '')}
+                                                className="text-xs text-slate-400 font-black tracking-tighter cursor-pointer hover:text-blue-600 flex items-center gap-1 mt-1 group/p1"
+                                                onClick={() => handleQuickEdit(target.id, 'phone_number', '기본 연락처', target.phone_number || '')}
                                             >
-                                                T: {target.telegram_id || '없음'}
-                                                <Edit2 size={8} className="opacity-0 group-hover/field:opacity-100" />
+                                                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                {target.phone_number}
+                                                <Edit2 size={10} className="opacity-0 group-hover/p1:opacity-100 text-slate-300" />
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-4 text-left">
-                                        <div
-                                            className="font-bold max-w-[150px] truncate cursor-pointer hover:text-blue-600 group/field flex items-center gap-1"
-                                            title={target.shop_name || undefined}
-                                            onClick={() => handleQuickEdit(target.id, 'shop_name', '업체명', target.shop_name || '')}
-                                        >
-                                            {target.shop_name || '-'}
-                                            <Edit2 size={10} className="opacity-0 group-hover/field:opacity-100" />
-                                        </div>
-                                        <div
-                                            className="text-xs text-gray-400 truncate cursor-pointer hover:text-blue-600 group/field2 flex items-center gap-1"
-                                            onClick={() => handleQuickEdit(target.id, 'industry', '직종', target.industry || '')}
-                                        >
-                                            {target.industry || '-'}
-                                            <Edit2 size={8} className="opacity-0 group-hover/field2:opacity-100" />
-                                        </div>
-                                    </td>
-                                    <td className="p-4 text-xs text-left">
-                                        {target.region_city} {target.region_gu}
-                                    </td>
-                                    <td className="p-4 text-xs text-gray-400 text-left">
-                                        <div className="flex flex-wrap gap-1">
-                                            {target.source_urls && target.source_urls.length > 0 ? (
-                                                target.source_urls.map((url: string, i: number) => (
-                                                    <div key={i} className="group/link flex items-center gap-0 bg-gray-50 text-[10px] text-gray-500 rounded border border-gray-100 transition-colors hover:border-blue-200">
+                                        </td>
+                                        <td className="p-5 text-left">
+                                            <div className="flex flex-col gap-2">
+                                                <div
+                                                    className={`text-[10px] font-black px-2.5 py-1 rounded-xl w-fit cursor-pointer group/field flex items-center gap-1.5 transition-all ${target.kakao_id ? 'text-amber-700 bg-amber-50 border border-amber-100 shadow-sm' : 'text-slate-300 bg-slate-50/50 border border-dashed border-slate-200'}`}
+                                                    onClick={() => handleQuickEdit(target.id, 'kakao_id', '카카오 ID', target.kakao_id || '')}
+                                                >
+                                                    <span className="w-3.5 h-3.5 bg-amber-400 rounded-md text-[8px] flex items-center justify-center text-slate-900">K</span>
+                                                    {target.kakao_id || 'NOT LINKED'}
+                                                    <Edit2 size={10} className="opacity-0 group-hover/field:opacity-100" />
+                                                </div>
+                                                <div
+                                                    className={`text-[10px] font-black px-2.5 py-1 rounded-xl w-fit cursor-pointer group/field flex items-center gap-1.5 transition-all ${target.telegram_id ? 'text-blue-700 bg-blue-50 border border-blue-100 shadow-sm' : 'text-slate-300 bg-slate-50/50 border border-dashed border-slate-200'}`}
+                                                    onClick={() => handleQuickEdit(target.id, 'telegram_id', '텔레그램 ID', target.telegram_id || '')}
+                                                >
+                                                    <span className="w-3.5 h-3.5 bg-blue-500 rounded-md text-[8px] flex items-center justify-center text-white italic">T</span>
+                                                    {target.telegram_id || 'NOT LINKED'}
+                                                    <Edit2 size={10} className="opacity-0 group-hover/field:opacity-100" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-5 text-left">
+                                            <div
+                                                className="font-black text-slate-800 max-w-[180px] truncate cursor-pointer hover:text-blue-600 group/field flex items-center gap-1.5 text-sm tracking-tight"
+                                                title={target.shop_name || undefined}
+                                                onClick={() => handleQuickEdit(target.id, 'shop_name', '업체명', target.shop_name || '')}
+                                            >
+                                                {target.shop_name || '-'}
+                                                <Edit2 size={12} className="opacity-0 group-hover/field:opacity-100 text-slate-300" />
+                                            </div>
+                                            <div
+                                                className="text-[11px] text-slate-400 font-bold truncate cursor-pointer hover:text-blue-600 group/field2 flex items-center gap-1 mt-1 uppercase tracking-wider"
+                                                onClick={() => handleQuickEdit(target.id, 'industry', '직종', target.industry || '')}
+                                            >
+                                                {target.industry || 'General Industry'}
+                                                <Edit2 size={10} className="opacity-0 group-hover/field2:opacity-100 text-slate-300" />
+                                            </div>
+                                        </td>
+                                        <td className="p-5 text-[11px] font-black text-slate-600 text-left leading-relaxed">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
+                                                {target.region_city} {target.region_gu}
+                                            </div>
+                                        </td>
+                                        <td className="p-5 text-[10px] text-slate-400 text-left">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {target.source_urls && target.source_urls.length > 0 ? (
+                                                    target.source_urls.map((url: string, i: number) => (
+                                                        <div key={i} className="group/link flex items-center gap-0 bg-slate-50 text-[10px] text-slate-500 rounded-xl border border-slate-200 transition-all hover:border-blue-300 hover:bg-white shadow-sm overflow-hidden">
+                                                            <a
+                                                                href={url.startsWith('http') ? url : `https://${url}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-1 px-2.5 py-1 font-black hover:text-blue-600"
+                                                            >
+                                                                LINK{i + 1}
+                                                                <ExternalLink size={10} />
+                                                            </a>
+                                                            <button
+                                                                onClick={(e) => { e.preventDefault(); handleRemoveLink(target.id, url); }}
+                                                                className="px-2 py-1 border-l border-slate-200 text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                                                                title="수집 출처 삭제"
+                                                            >
+                                                                <X size={10} />
+                                                            </button>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    target.source_url ? (
                                                         <a
-                                                            href={url.startsWith('http') ? url : `https://${url}`}
+                                                            href={target.source_url.startsWith('http') ? target.source_url : `https://${target.source_url}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="flex items-center gap-0.5 px-1.5 py-0.5 hover:text-blue-600 hover:bg-blue-50/50 rounded-l"
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-[10px] text-slate-600 font-black hover:text-blue-600 hover:bg-white rounded-xl border border-slate-200 transition-all shadow-sm"
                                                         >
-                                                            링크{i + 1}
-                                                            <ExternalLink size={8} />
+                                                            DIRECT SOURCE
+                                                            <ExternalLink size={10} />
                                                         </a>
-                                                        <button
-                                                            onClick={(e) => { e.preventDefault(); handleRemoveLink(target.id, url); }}
-                                                            className="px-1 py-0.5 border-l border-gray-100 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-r transition-colors"
-                                                            title="링크 삭제"
-                                                        >
-                                                            <X size={8} />
-                                                        </button>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                target.source_url ? (
-                                                    <a
-                                                        href={target.source_url.startsWith('http') ? target.source_url : `https://${target.source_url}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-50 text-[10px] text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded border border-gray-100 transition-colors"
-                                                    >
-                                                        링크1
-                                                        <ExternalLink size={8} />
-                                                    </a>
-                                                ) : target.source_site || '-'
-                                            )}
+                                                    ) : <span className="text-[10px] font-bold text-slate-300 italic">SYSTEM SYNC</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="p-5 text-[11px] font-black text-slate-400 italic">
+                                            {new Date(target.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="p-5">
+                                            <button
+                                                onClick={() => handleDelete(target.id, target.name || target.shop_name || 'Lead')}
+                                                className="p-2.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-slate-50 hover:border-rose-100"
+                                                title="데이터 폐기"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+
+                    {/* Pagination */}
+                    <div className="bg-slate-50/50 px-8 py-6 flex items-center justify-between border-t border-slate-100">
+                        <div className="text-xs text-slate-400 font-black uppercase tracking-widest flex items-center gap-3">
+                            <span className="bg-slate-200 text-slate-500 px-2 py-0.5 rounded-md text-[9px]">TOTAL {data?.count || 0}</span>
+                            Showing {Math.min((page - 1) * 20 + 1, data?.count || 0)} - {Math.min(page * 20, data?.count || 0)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setPage(1)}
+                                disabled={page === 1}
+                                className="p-2.5 rounded-2xl border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                            >
+                                <ChevronsLeft size={18} />
+                            </button>
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="p-2.5 rounded-2xl border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+
+                            <div className="flex items-center gap-1.5 px-2">
+                                {(() => {
+                                    const totalPages = Math.ceil((data?.count || 0) / 20);
+                                    const maxVisible = 5;
+                                    let start = Math.max(1, page - Math.floor(maxVisible / 2));
+                                    const end = Math.min(totalPages, start + maxVisible - 1);
+
+                                    if (end - start + 1 < maxVisible) {
+                                        start = Math.max(1, end - maxVisible + 1);
+                                    }
+
+                                    return Array.from({ length: end - start + 1 }, (_, i) => {
+                                        const pageNum = start + i;
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setPage(pageNum)}
+                                                className={`w-10 h-10 rounded-2xl text-xs font-black transition-all ${page === pageNum
+                                                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30 ring-4 ring-blue-500/10'
+                                                    : 'bg-white text-slate-400 border border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    });
+                                })()}
+                            </div>
+
+                            <button
+                                onClick={() => setPage(p => Math.min(Math.ceil((data?.count || 0) / 20), p + 1))}
+                                disabled={page >= Math.ceil((data?.count || 0) / 20)}
+                                className="p-2.5 rounded-2xl border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                            <button
+                                onClick={() => setPage(Math.ceil((data?.count || 0) / 20))}
+                                disabled={page >= Math.ceil((data?.count || 0) / 20)}
+                                className="p-2.5 rounded-2xl border border-slate-200 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                            >
+                                <ChevronsRight size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Send Modal */}
+                {showSendModal && (
+                    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
+                        <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl p-8 space-y-8 animate-in fade-in zoom-in-95 duration-300 border border-slate-200">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20 text-white">
+                                        <Send size={20} />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">캠페인 통합 발송</h3>
+                                </div>
+                                <p className="text-slate-500 text-sm font-bold ml-11">
+                                    <span className="text-blue-600 font-black">{data?.count || 0}건</span>의 선택된 고객군에게 즉시 전송합니다.
+                                </p>
+                            </div>
+
+                            <form onSubmit={handleSendSubmit} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Campaign Title</label>
+                                    <input
+                                        required
+                                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300"
+                                        placeholder="예: 2024년 동절기 특별 프로모션"
+                                        value={campaignForm.title}
+                                        onChange={(e) => setCampaignForm({ ...campaignForm, title: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Delivery Channel</label>
+                                    <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-200">
+                                        {['SMS', 'LMS', 'Kakao', 'Telegram'].map(ch => (
+                                            <label key={ch} className={`flex-1 px-3 py-2.5 rounded-xl text-center text-[11px] font-black cursor-pointer transition-all ${campaignForm.channel.toLowerCase() === ch.toLowerCase()
+                                                ? 'bg-slate-950 text-white shadow-lg'
+                                                : 'text-slate-400 hover:text-slate-600 hover:bg-white'}`}>
+                                                <input
+                                                    type="radio" className="hidden"
+                                                    name="channel"
+                                                    value={ch.toLowerCase()}
+                                                    checked={campaignForm.channel.toLowerCase() === ch.toLowerCase()}
+                                                    onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value })}
+                                                />
+                                                {ch}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Message Content</label>
+                                    <div className="relative">
+                                        <textarea
+                                            required
+                                            rows={6}
+                                            className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none resize-none transition-all placeholder:text-slate-300"
+                                            placeholder="전달하고자 하는 핵심 전략을 입력하세요..."
+                                            value={campaignForm.message}
+                                            onChange={(e) => setCampaignForm({ ...campaignForm, message: e.target.value })}
+                                        />
+                                        <div className="absolute bottom-4 right-4 text-[10px] text-slate-400 font-bold bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm border border-slate-100">
+                                            {campaignForm.message.length} <span className="opacity-50">/ 2,000 chars</span>
                                         </div>
-                                    </td>
-                                    <td className="p-4 text-xs text-gray-400">
-                                        {new Date(target.created_at).toLocaleDateString()}
-                                    </td>
-                                    <td className="p-4">
-                                        <button
-                                            onClick={() => handleDelete(target.id, target.name || target.shop_name || '대상')}
-                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                            title="삭제"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                                    </div>
+                                </div>
 
-                {/* Pagination */}
-                <div className="bg-gray-50/30 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="text-xs text-gray-400 font-bold">
-                        전체 {data?.count || 0}개 데이터 중 {Math.min((page - 1) * 20 + 1, data?.count || 0)} - {Math.min(page * 20, data?.count || 0)} 표시
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <button
-                            onClick={() => setPage(1)}
-                            disabled={page === 1}
-                            className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                            title="첫 페이지"
-                        >
-                            <ChevronsLeft size={16} />
-                        </button>
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-
-                        {(() => {
-                            const totalPages = Math.ceil((data?.count || 0) / 20);
-                            const maxVisible = 5;
-                            let start = Math.max(1, page - Math.floor(maxVisible / 2));
-                            const end = Math.min(totalPages, start + maxVisible - 1);
-
-                            if (end - start + 1 < maxVisible) {
-                                start = Math.max(1, end - maxVisible + 1);
-                            }
-
-                            return Array.from({ length: end - start + 1 }, (_, i) => {
-                                const pageNum = start + i;
-                                return (
+                                <div className="grid grid-cols-2 gap-4 pt-4">
                                     <button
-                                        key={pageNum}
-                                        onClick={() => setPage(pageNum)}
-                                        className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === pageNum
-                                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                                            : 'bg-white text-gray-500 border border-gray-100 hover:border-gray-300'
-                                            }`}
+                                        type="button"
+                                        onClick={() => setShowSendModal(false)}
+                                        className="py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all active:scale-95"
                                     >
-                                        {pageNum}
+                                        취소
                                     </button>
-                                );
-                            });
-                        })()}
-
-                        <button
-                            onClick={() => setPage(p => Math.min(Math.ceil((data?.count || 0) / 20), p + 1))}
-                            disabled={page >= Math.ceil((data?.count || 0) / 20)}
-                            className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                        <button
-                            onClick={() => setPage(Math.ceil((data?.count || 0) / 20))}
-                            disabled={page >= Math.ceil((data?.count || 0) / 20)}
-                            className="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                            title="마지막 페이지"
-                        >
-                            <ChevronsRight size={16} />
-                        </button>
+                                    <button
+                                        type="submit"
+                                        disabled={sendMutation.isPending}
+                                        className="py-4 bg-slate-950 text-white rounded-2xl font-black text-sm hover:bg-black transition-all shadow-xl shadow-slate-950/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
+                                    >
+                                        {sendMutation.isPending ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} className="text-blue-400" />}
+                                        전략 캠페인 발송
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {/* Upload Result Modal */}
+                {uploadResult && (
+                    <div className="fixed inset-0 z-[10005] bg-slate-950/80 flex items-center justify-center p-4 backdrop-blur-md">
+                        <div className="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-10 text-center space-y-8 animate-in slide-in-from-bottom-8 duration-500 border border-slate-100">
+                            <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                                <CheckSquare size={40} />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Bulk Upload Success</h3>
+                                <p className="text-slate-400 text-xs font-bold leading-relaxed">잠재 고객 데이터 인텔리전스 분석이<br />성공적으로 완료되었습니다.</p>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="p-4 bg-slate-50 rounded-3xl border border-slate-100">
+                                    <p className="text-[9px] font-black text-slate-300 uppercase mb-1 tracking-widest">Total</p>
+                                    <p className="text-xl font-black text-slate-900">{uploadResult.total}</p>
+                                </div>
+                                <div className="p-4 bg-blue-50 rounded-3xl border border-blue-100/50">
+                                    <p className="text-[9px] font-black text-blue-400 uppercase mb-1 tracking-widest">New</p>
+                                    <p className="text-xl font-black text-blue-600">{uploadResult.count}</p>
+                                </div>
+                                <div className="p-4 bg-rose-50 rounded-3xl border border-rose-100/50">
+                                    <p className="text-[9px] font-black text-rose-400 uppercase mb-1 tracking-widest">Dup</p>
+                                    <p className="text-xl font-black text-rose-600">{uploadResult.duplicates}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-50 p-4 rounded-2xl flex items-start gap-3 text-left border border-slate-100">
+                                <AlertCircle size={18} className="text-slate-400 shrink-0 mt-0.5" />
+                                <p className="text-[10px] text-slate-400 font-bold leading-relaxed">
+                                    동일한 식별값(전화번호)을 가진 데이터는 최신 정보로 병합되었으며, 시스템 안정성을 위해 중복된 레코드는 제거되었습니다.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setUploadResult(null)}
+                                className="w-full py-5 bg-slate-950 text-white rounded-3xl font-black hover:bg-black transition-all shadow-2xl shadow-slate-950/30 active:scale-95"
+                            >
+                                대시보드로 돌아가기
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
-
-            {/* Send Modal */}
-            {showSendModal && (
-                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 space-y-6">
-                        <div className="space-y-1">
-                            <h3 className="text-xl font-black text-gray-900">캠페인 시작</h3>
-                            <p className="text-sm text-gray-500">
-                                <span className="text-red-600 font-bold">{data?.count || 0}</span>명의 선택된 잠재 고객에게 발송합니다.
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleSendSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">캠페인 제목</label>
-                                <input
-                                    required
-                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold focus:border-red-500 outline-none"
-                                    placeholder="예: 11월 특별 프로모션"
-                                    value={campaignForm.title}
-                                    onChange={(e) => setCampaignForm({ ...campaignForm, title: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">발송 채널</label>
-                                <div className="flex gap-2">
-                                    {['sms', 'lms', 'kakao', 'telegram'].map(ch => (
-                                        <label key={ch} className={`flex-1 px-3 py-2 border rounded-lg text-center text-xs font-black cursor-pointer transition-all ${campaignForm.channel === ch ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
-                                            }`}>
-                                            <input
-                                                type="radio" className="hidden"
-                                                name="channel"
-                                                value={ch}
-                                                checked={campaignForm.channel === ch}
-                                                onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value })}
-                                            />
-                                            {ch.toUpperCase()}
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">메시지 내용</label>
-                                <textarea
-                                    required
-                                    rows={5}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:border-red-500 outline-none resize-none"
-                                    placeholder="메시지 내용을 입력하세요..."
-                                    value={campaignForm.message}
-                                    onChange={(e) => setCampaignForm({ ...campaignForm, message: e.target.value })}
-                                />
-                                <div className="text-right text-[10px] text-gray-400 font-bold mt-1">
-                                    {campaignForm.message.length} 자
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowSendModal(false)}
-                                    className="py-3 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-colors"
-                                >
-                                    취소
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={sendMutation.isPending}
-                                    className="py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-600/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {sendMutation.isPending ? '발송 중...' : '발송하기'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Upload Result Modal */}
-            {uploadResult && (
-                <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4 backdrop-blur-md">
-                    <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-8 text-center space-y-6 animate-in slide-in-from-bottom-4 duration-300">
-                        <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto">
-                            <CheckSquare size={32} />
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="text-xl font-black text-gray-900">데이터 업로드 결과</h3>
-                            <p className="text-gray-500 text-sm font-medium">업로드된 파일 분석 결과입니다.</p>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2 py-4">
-                            <div className="p-3 bg-gray-50 rounded-2xl">
-                                <p className="text-[10px] font-black text-gray-400 uppercase mb-1">총 항목</p>
-                                <p className="text-lg font-black text-gray-900">{uploadResult.total}</p>
-                            </div>
-                            <div className="p-3 bg-blue-50 rounded-2xl">
-                                <p className="text-[10px] font-black text-blue-400 uppercase mb-1">신규/수정</p>
-                                <p className="text-lg font-black text-blue-600 text-[16px]">{uploadResult.count}</p>
-                            </div>
-                            <div className="p-3 bg-yellow-50 rounded-2xl">
-                                <p className="text-[10px] font-black text-yellow-500 uppercase mb-1">중복됨</p>
-                                <p className="text-lg font-black text-yellow-600 text-[16px]">{uploadResult.duplicates}</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-3 rounded-xl flex items-start gap-2 text-left">
-                            <AlertCircle size={16} className="text-gray-400 shrink-0 mt-0.5" />
-                            <p className="text-[10px] text-gray-400 font-bold leading-relaxed">
-                                동일한 전화번호의 데이터는 최신 정보로 업데이트되었으며, 파일 내 중복된 내용은 하나로 합쳐졌습니다.
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={() => setUploadResult(null)}
-                            className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black hover:bg-black transition-all shadow-xl shadow-gray-900/20"
-                        >
-                            확인 완료
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

@@ -74,20 +74,34 @@ export default function WritePostPage() {
         if (!password.trim() || password.length < 4) return alert('게시글 비밀번호를 4자리 이상 입력해주세요. (수정/삭제 시 필요)');
 
         setIsSubmitting(true);
+
+        // ─── 자동 SEO 키워드 생성 (유저에게 보이지 않음) ───────────
+        const BASE_SEO = ['코코알바', '코코판', '여성커뮤니티', '고소득알바', '연애고민', '언니들수다'];
+        const CATEGORY_SEO: Record<string, string[]> = {
+            '언니들의 수다(썰)': ['연애썰', '남친고민', '공감썰', '여자공감', '연애이야기'],
+            '프리미엄 라운지': ['프리미엄정보', '재테크', '고소득', '성공노하우'],
+            '밤 문화 Talk': ['밤알바', '유흥정보', '밤문화'],
+            '뷰티·패션·이벤트': ['뷰티꿀팁', '화장품후기', '패션정보'],
+        };
+        const titleKeywords = title.split(/[\s,!?~]+/).filter(w => w.length >= 2).slice(0, 6);
+        const seoKeywords = [...new Set([...BASE_SEO, ...(CATEGORY_SEO[category] || []), ...titleKeywords])].join(', ');
+        // ─────────────────────────────────────────────────────────────
+
         try {
             // Include password and is_secret in insert
             const { error } = await supabase
                 .from('community_posts')
                 .insert([{
                     author_id: (isLoggedIn && user?.id && !user.id.startsWith('mock_')) ? user.id : null,
-                    author_name: isLoggedIn ? user.name : '익명', // Fallback for anon
+                    author_name: isLoggedIn ? user.name : '익명',
                     author_nickname: isLoggedIn ? user.nickname : '익명',
                     category,
                     title,
                     content,
                     images,
-                    password, // [Security] Persist password
-                    is_secret: isSecret, // [Security] Secret flag
+                    password,
+                    is_secret: isSecret,
+                    seo_keywords: seoKeywords, // ← 자동 생성 SEO 키워드
                     created_at: new Date().toISOString()
                 }]);
 

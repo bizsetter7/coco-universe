@@ -2,84 +2,83 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Rocket, HelpCircle } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 
 
 export const HeroSection = () => {
     const router = useRouter();
-    const [bannerIndex, setBannerIndex] = useState(0);
 
-    const BANNERS = [
-        {
-            id: 1,
-            title: "사장님! 3개월 광고 무료",
-            subtitle: "지금 가입하면 유료 상품 300만원 상당이 0원!",
-            bg: "bg-gray-900",
-            buttonText: "무료로 광고 올리기",
-            onClick: () => router.push('/?page=payment')
-        },
-        {
-            id: 2,
-            title: "대한민국 No.1 통합 구인구직",
-            subtitle: "전국 어디서나 코코알바 하나면 끝",
-            bg: "bg-gradient-to-r from-blue-900 to-slate-900",
-            buttonText: "지역별 채용 보기",
-            onClick: () => router.push('/?page=region')
-        }
-    ];
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setBannerIndex(prev => (prev + 1) % 2); // BANNERS.length is 2
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const currentBanner = BANNERS[bannerIndex];
+    // Simplified static banner info for diet
+    const bannerInfo = {
+        title: "사장님! 1개월 광고 무료",
+        subtitle: "지금 가입하면 기본 광고 1개월 무료 지원!",
+        bg: "bg-gray-900"
+    };
 
 
 
     return (
-        <div className="relative w-full h-[260px] md:h-[320px] overflow-hidden bg-gray-900 text-white shadow-md">
-            {/* Background Image / Gradient */}
-            <div className={`absolute inset-0 ${currentBanner.bg} transition-colors duration-1000`}></div>
-            <div className="absolute inset-0 bg-black/40 z-0"></div>
+        <div className="relative w-full h-[360px] md:h-[340px] overflow-hidden bg-slate-950 text-white shadow-2xl">
+            {/* Background Layer with Animated Gradient Mesh */}
+            <div className={`absolute inset-0 transition-opacity duration-1000 ${bannerInfo.bg} opacity-80`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(219,39,119,0.1),transparent_70%)] animate-pulse" />
+            </div>
 
-            {/* Content */}
-            <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
-                <div className="bg-gradient-to-r from-pink-600 to-red-600 text-white text-[10px] md:text-xs font-black px-3 py-1 rounded-full mb-3 md:mb-5 animate-bounce shadow-xl border border-white/20">
-                    🔥 GRAND OPEN: 역대급 혜택
-                </div>
-                <h1 className="text-[26px] md:text-5xl font-black mb-3 md:mb-6 tracking-tighter drop-shadow-2xl text-center leading-[1.1]">
-                    사장님! <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500 drop-shadow-none">3개월 광고 무료</span> 지원
-                </h1>
-                <div className="flex flex-col items-center gap-1 mb-6 md:mb-10 text-center">
-                    <p className="text-[13px] md:text-xl text-gray-100 font-bold drop-shadow-md break-keep">
-                        지금 가입하면 유료 상품 <span className="text-white bg-white/20 px-2 py-0.5 rounded-lg border border-white/20">300만원 상당</span> 구성이
-                    </p>
-                    <p className="text-lg md:text-2xl font-black text-amber-400 drop-shadow-md">조건 없이 0원! 즉시 노출 혜택!</p>
-                </div>
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => router.push('/my-shop?view=form&new=true')}
-                        className="group relative bg-white text-black font-black py-3 px-8 md:py-4 md:px-12 rounded-2xl shadow-[0_8px_30px_rgb(255,255,255,0.4)] hover:shadow-[0_12px_40px_rgb(255,255,255,0.6)] hover:-translate-y-1 active:translate-y-0.5 transition-all text-sm md:text-lg overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        무료로 광고 올리기 🚀
-                    </button>
+            {/* Glassmorphism Grain Overlay */}
+            <div className="absolute inset-0 bg-slate-950/20 backdrop-brightness-75 z-0" />
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')] opacity-10 pointer-events-none" />
+
+            {/* Main Content Box - Stable Responsive Layout */}
+            <div className="relative z-10 h-full max-w-3xl mx-auto flex flex-col items-center justify-center px-6 text-center">
+                <div className="flex flex-col items-center -mt-4 md:-mt-6">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-2 bg-pink-600/10 backdrop-blur-xl px-4 py-1.5 rounded-full border border-pink-500/30 mb-3 md:mb-4 animate-in slide-in-from-top-4 duration-700">
+                        <span className="flex h-2 w-2 rounded-full bg-pink-500 animate-ping" />
+                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-pink-400">Grand Infrastructure Live</span>
+                    </div>
+
+                    {/* Title */}
+                    <h1 className="text-[28px] md:text-[52px] font-black mb-2 md:mb-4 tracking-tighter leading-[1.3] md:leading-[1.1] filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+                        <>사장님!<br className="md:hidden" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500">1개월 광고 무료</span> 지원</>
+                    </h1>
+
+                    {/* Subtitle */}
+                    <div className="flex flex-col items-center mb-5 md:mb-7">
+                        <p className="text-base md:text-xl font-bold text-slate-200 mb-2 tracking-tight drop-shadow-md">
+                            {bannerInfo.subtitle}
+                        </p>
+                        <div className="w-12 md:w-20 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent opacity-50" />
+                        <span className="text-[8px] md:text-[9px] font-black text-slate-400 mt-2 tracking-[0.3em] uppercase select-none">
+                            Coco Alba Premium System
+                        </span>
+                    </div>
+
+                    {/* Buttons */}
+                    {/* Buttons - Raised slightly on PC as requested */}
+                    <div className="flex flex-col sm:flex-row gap-2.5 items-center md:-mt-2 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+                        <Link
+                            href="/ad-apply"
+                            className="group relative inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-900 font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden whitespace-nowrap"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <span className="relative z-10">무료로 광고 올리기 🚀</span>
+                        </Link>
+                        <Link
+                            href="/guide"
+                            className="group inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-slate-900/40 backdrop-blur-md border border-white/20 text-white font-bold text-xs md:text-sm hover:bg-slate-900/60 transition-all duration-300 whitespace-nowrap"
+                        >
+                            서비스 가이드 보기
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Indicators */}
-            <div className="absolute bottom-6 w-full flex justify-center gap-2 z-20">
-                {BANNERS.map((_, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => setBannerIndex(idx)}
-                        className={`transition-all duration-300 rounded-full h-1.5 ${bannerIndex === idx ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'}`}
-                    />
-                ))}
-            </div>
+            {/* Side Accents */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-600/10 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-600/10 blur-[100px] rounded-full -ml-40 -mb-40 pointer-events-none" />
         </div>
     );
 };
+

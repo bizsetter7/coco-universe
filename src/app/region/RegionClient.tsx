@@ -25,7 +25,7 @@ interface RegionClientProps {
 export default function RegionClient({ shops, initialRegion = '전체' }: RegionClientProps) {
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn, userType, userName, userPoints } = useAuth();
+    const { isLoggedIn, userType, userName, userCredit } = useAuth();
 
     // -- State --
     const [selectedRegion, setSelectedRegion] = useState(initialRegion);
@@ -37,6 +37,20 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
 
     const [visibleCount, setVisibleCount] = useState(20);
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+
+    // Track viewed shops
+    const handleSetSelectedShop = React.useCallback((shop: Shop | null) => {
+        setSelectedShop(shop);
+        if (shop) {
+            const saved = localStorage.getItem('viewed_shops');
+            let viewed: Shop[] = saved ? JSON.parse(saved) : [];
+
+            // Remove duplication and add to top
+            viewed = [shop, ...viewed.filter(s => s.id !== shop.id)].slice(0, 50);
+            localStorage.setItem('viewed_shops', JSON.stringify(viewed));
+        }
+    }, []);
+
     const [favorites, setFavorites] = useState<string[]>([]);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [selectedTier, setSelectedTier] = useState('grand');
@@ -100,7 +114,7 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                         isLoggedIn={isLoggedIn}
                         userType={userType as any}
                         userName={userName}
-                        userPoints={userPoints}
+                        userCredit={userCredit}
                     />
                 }>
                     {/* Unified Listing Content with Ad Grid Injected */}
@@ -109,7 +123,7 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                         shops={filteredShops}
                         favorites={favorites}
                         toggleFavorite={toggleFavorite}
-                        setSelectedShop={setSelectedShop}
+                        setSelectedShop={handleSetSelectedShop}
                         visibleCount={visibleCount}
                         setVisibleCount={setVisibleCount}
                         onAdRegister={() => openPaymentPopup('basic')}
@@ -120,7 +134,7 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                             <UnifiedAdGrid
                                 shops={shops}
                                 onAdRegister={openPaymentPopup}
-                                onSelectShop={setSelectedShop as any}
+                                onSelectShop={handleSetSelectedShop as any}
                                 hasSidebar={true}
                             />
                         }

@@ -24,7 +24,7 @@ interface JobClientProps {
 export default function JobClient({ shops }: JobClientProps) {
     const brand = useBrand();
     const router = useRouter();
-    const { isLoggedIn, userType, userName, userPoints } = useAuth();
+    const { isLoggedIn, userType, userName, userCredit } = useAuth();
 
     // -- State --
     const [selectedRegion, setSelectedRegion] = useState('전체');
@@ -39,6 +39,19 @@ export default function JobClient({ shops }: JobClientProps) {
 
     // Modal & Menu State
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+
+    // Track viewed shops
+    const handleSetSelectedShop = React.useCallback((shop: Shop | null) => {
+        setSelectedShop(shop);
+        if (shop) {
+            const saved = localStorage.getItem('viewed_shops');
+            let viewed: Shop[] = saved ? JSON.parse(saved) : [];
+
+            // Remove duplication and add to top
+            viewed = [shop, ...viewed.filter(s => s.id !== shop.id)].slice(0, 50);
+            localStorage.setItem('viewed_shops', JSON.stringify(viewed));
+        }
+    }, []);
 
     // Favorites State
     const [favorites, setFavorites] = useState<string[]>([]);
@@ -113,7 +126,7 @@ export default function JobClient({ shops }: JobClientProps) {
                         isLoggedIn={isLoggedIn}
                         userType={userType === 'admin' || userType === 'guest' ? undefined : userType}
                         userName={userName}
-                        userPoints={userPoints}
+                        userCredit={userCredit}
                     />
                 }>
                     {/* Unified Listing Content with Ad Grid Injected */}
@@ -122,7 +135,7 @@ export default function JobClient({ shops }: JobClientProps) {
                         shops={filteredShops}
                         favorites={favorites}
                         toggleFavorite={toggleFavorite}
-                        setSelectedShop={setSelectedShop}
+                        setSelectedShop={handleSetSelectedShop}
                         visibleCount={visibleCount}
                         setVisibleCount={setVisibleCount}
                         onAdRegister={() => openPaymentPopup('basic')}
@@ -134,7 +147,7 @@ export default function JobClient({ shops }: JobClientProps) {
                                 <UnifiedAdGrid
                                     shops={shops}
                                     onAdRegister={openPaymentPopup}
-                                    onSelectShop={setSelectedShop}
+                                    onSelectShop={handleSetSelectedShop}
                                     hasSidebar={true}
                                 />
                             ), [shops, openPaymentPopup])

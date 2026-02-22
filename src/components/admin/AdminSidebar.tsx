@@ -120,7 +120,7 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     icon={<ShieldCheck size={20} className="text-emerald-500" />}
                     label="시스템 검증 센터"
                     active={activeTab === 'health'}
-                    onClick={() => handleNav('health')}
+                    onClick={() => router.push('/admin/system-verification')}
                 />
                 <NavItem
                     icon={<Settings size={20} />}
@@ -204,7 +204,7 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         icon={<ShieldCheck size={20} className="text-emerald-500" />}
                         label="시스템 검증 센터"
                         active={activeTab === 'health'}
-                        onClick={() => handleNav('health')}
+                        onClick={() => { router.push('/admin/system-verification'); onClose(); }}
                     />
                     <NavItem
                         icon={<Settings size={20} />}

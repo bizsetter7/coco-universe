@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useBrand } from '@/components/BrandProvider';
 import {
-    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText, ChevronDown
+    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText, ChevronDown, Coins
 } from 'lucide-react';
 
 interface LeftSidebarProps {
@@ -20,7 +20,7 @@ interface LeftSidebarProps {
     isLoggedIn?: boolean;
     userName?: string;
     userType?: 'corporate' | 'individual';
-    userPoints?: number;
+    userCredit?: number;
 }
 
 // 새로운 지역 목록 (17개)
@@ -57,7 +57,7 @@ export default function LeftSidebar({
     isLoggedIn: propIsLoggedIn,
     userName: propUserName,
     userType: propUserType,
-    userPoints: propUserPoints,
+    userCredit: propUserCredit,
 }: LeftSidebarProps) {
     const isMobile = useMobile();
     const brand = useBrand();
@@ -66,7 +66,7 @@ export default function LeftSidebar({
         isLoggedIn: authIsLoggedIn,
         userName: authUserName,
         userType: authUserType,
-        userPoints: authUserPoints,
+        userCredit: authUserCredit,
         logout,
         login: authLogin,
         signIn
@@ -89,7 +89,7 @@ export default function LeftSidebar({
     const isLoggedIn = propIsLoggedIn ?? authIsLoggedIn;
     const userName = propUserName ?? authUserName;
     const userType = propUserType ?? authUserType;
-    const userPoints = propUserPoints ?? authUserPoints;
+    const userCredit = propUserCredit ?? authUserCredit;
 
     const handleLogin = async () => {
         if (!loginId || !loginPw) {
@@ -157,6 +157,26 @@ export default function LeftSidebar({
 
     return (
         <div className="hidden lg:block w-full flex-shrink-0 space-y-2">
+            {/* 0. Partners Credit Funnel - REMOVED (Moved to Community Banner as requested) */}
+            {/* 
+            <div 
+                onClick={() => window.open('https://partners-credit-site.vercel.app', '_blank')}
+                className="mb-2 p-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 cursor-pointer shadow-md hover:scale-[1.02] transition-all border-b-4 border-orange-700 active:border-b-0 active:translate-y-1"
+            >
+                <div className="flex items-center gap-2">
+                    <div className="bg-white/30 p-1.5 rounded-lg">
+                        <Coins size={18} className="text-white" />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-orange-900/70 leading-none">수익형 커뮤니티</p>
+                        <h4 className="text-sm font-black text-white flex items-center gap-1">
+                            파트너스 활동 <ChevronRight size={12} strokeWidth={3} />
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            */}
+
             {/* 1. MEMBER LOGIN / 로그인 상태 박스 */}
             <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div
@@ -191,8 +211,8 @@ export default function LeftSidebar({
                                 </span> 입니다.
                             </p>
                             <div className={`flex items-center gap-1 mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                                <span className="text-[11px] text-gray-500">P</span>
-                                <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userPoints.toLocaleString()}</span>
+                                <span className="text-[11px] text-gray-500">C</span>
+                                <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userCredit.toLocaleString()}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-1">
                                 <button

@@ -65,6 +65,25 @@ export const UnifiedJobListing = ({
 }: UnifiedJobListingProps) => {
     const brand = useBrand();
     const router = useRouter();
+    const [activeTab, setActiveTab] = React.useState(title);
+    const [viewedShops, setViewedShops] = React.useState<Shop[]>([]);
+
+    // 탭 변경 시 viewed_shops 로드
+    React.useEffect(() => {
+        if (activeTab === '오늘본공고') {
+            const saved = localStorage.getItem('viewed_shops');
+            if (saved) {
+                try {
+                    setViewedShops(JSON.parse(saved));
+                } catch (e) {
+                    console.error('Failed to parse viewed_shops', e);
+                }
+            }
+        }
+    }, [activeTab]);
+
+    // Display Shops determination
+    const displayShops = activeTab === '오늘본공고' ? viewedShops : shops;
 
     // Filter Components Map
     const renderFilter = (type: FilterType) => {
@@ -172,17 +191,17 @@ export const UnifiedJobListing = ({
                     {title}
                 </h1>
 
-                {/* Center Tabs */}
                 <div className="flex justify-center mx-4 md:mx-0">
-                    <div className="flex gap-1 !bg-white !text-black p-1.5 rounded-2xl shadow-sm border border-gray-100 w-full">
+                    <div className="flex gap-1 !bg-white !text-black p-1.5 rounded-2xl shadow-sm border border-gray-100 w-full overflow-x-auto no-scrollbar">
                         {['업종별 채용', '지역별 채용', '오늘본공고'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => {
-                                    if (tab === '업종별 채용') router.push('/jobs');
-                                    else if (tab === '지역별 채용') router.push('/region');
+                                    if (tab === '업종별 채용' && title !== '업종별 채용') router.push('/jobs');
+                                    else if (tab === '지역별 채용' && title !== '지역별 채용') router.push('/region');
+                                    else setActiveTab(tab);
                                 }}
-                                className={`flex-1 py-2.5 text-sm font-black rounded-xl transition-all ${title === tab ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                className={`flex-1 py-2.5 px-4 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${activeTab === tab ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                             >
                                 {tab}
                             </button>
@@ -202,36 +221,38 @@ export const UnifiedJobListing = ({
                     <ChevronRight size={16} className="text-gray-300 shrink-0 group-hover/notice:text-gray-500 transition-colors" />
                 </div>
 
-                {/* Search Filter Box with Dropdowns */}
-                <div className="space-y-3 mx-4 md:mx-0">
-                    <div className={`p-6 rounded-[32px] border shadow-xl !bg-white !text-black border-gray-100 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 relative z-20`}>
-                        {/* Dynamic Filter Order */}
-                        {filterOrder.map((filterType) => renderFilter(filterType))}
+                {/* Search Filter Box with Dropdowns - Hidden on Today View */}
+                {activeTab !== '오늘본공고' && (
+                    <div className="space-y-3 mx-4 md:mx-0">
+                        <div className={`p-6 rounded-[32px] border shadow-xl !bg-white !text-black border-gray-100 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 relative z-20`}>
+                            {/* Dynamic Filter Order */}
+                            {filterOrder.map((filterType) => renderFilter(filterType))}
 
-                        {/* Keyword Input */}
-                        <div className="relative lg:col-span-1">
-                            <input
-                                type="text"
-                                placeholder="키워드 검색"
-                                className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-pink-300 transition-all font-black text-black"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        setActiveSearchQuery(searchQuery);
-                                    }
-                                }}
-                            />
+                            {/* Keyword Input */}
+                            <div className="relative lg:col-span-1">
+                                <input
+                                    type="text"
+                                    placeholder="키워드 검색"
+                                    className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-pink-300 transition-all font-black text-black"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            setActiveSearchQuery(searchQuery);
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <button
+                                onClick={() => setActiveSearchQuery(searchQuery)}
+                                className="h-12 bg-pink-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-pink-700 hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all"
+                            >
+                                <Search size={18} />
+                                검색
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setActiveSearchQuery(searchQuery)}
-                            className="h-12 bg-pink-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-pink-700 hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all"
-                        >
-                            <Search size={18} />
-                            검색
-                        </button>
                     </div>
-                </div>
+                )}
 
                 {/* Ad Grid Section (Injected) */}
                 {adGrid && (
@@ -265,18 +286,29 @@ export const UnifiedJobListing = ({
                 )}
 
                 {/* List View */}
-
-                <JobListView
-                    shops={shops}
-                    brand={brand}
-                    favorites={favorites}
-                    toggleFavorite={toggleFavorite}
-                    setSelectedShop={setSelectedShop}
-                    visibleCount={visibleCount}
-                    setVisibleCount={setVisibleCount}
-                    onAdRegister={onAdRegister}
-                    onNativeAdRegister={onNativeAdRegister}
-                />
+                {activeTab === '오늘본공고' && displayShops.length === 0 ? (
+                    <div className="py-20 text-center mx-4 md:mx-0">
+                        <p className="text-gray-400 font-bold mb-4">오늘 본 공고가 아직 없습니다. 😲</p>
+                        <button
+                            onClick={() => setActiveTab(title)}
+                            className="text-pink-600 font-black text-sm underline"
+                        >
+                            전체 공고 보러가기
+                        </button>
+                    </div>
+                ) : (
+                    <JobListView
+                        shops={displayShops}
+                        brand={brand}
+                        favorites={favorites}
+                        toggleFavorite={toggleFavorite}
+                        setSelectedShop={setSelectedShop}
+                        visibleCount={visibleCount}
+                        setVisibleCount={setVisibleCount}
+                        onAdRegister={onAdRegister}
+                        onNativeAdRegister={onNativeAdRegister}
+                    />
+                )}
             </div>
         </div>
     );

@@ -71,24 +71,37 @@ export default function AdminCharts({ }: AdminChartsProps) {
                 display: false,
             },
             tooltip: {
-                backgroundColor: '#1e293b',
-                titleFont: { size: 12, weight: 'bold' as const },
-                bodyFont: { size: 12 },
-                padding: 12,
-                cornerRadius: 12,
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { size: 14, weight: 'bold' as const, family: 'sans-serif' },
+                bodyFont: { size: 13, family: 'sans-serif' },
+                padding: 16,
+                cornerRadius: 20,
                 displayColors: false,
+                backdropBlur: 8,
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.1)',
+                callbacks: {
+                    label: (context: any) => ` ${context.dataset.label}: ${context.parsed.y.toLocaleString()}`
+                }
             },
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index' as const,
         },
         scales: {
             y: {
                 beginAtZero: true,
                 grid: {
                     display: true,
-                    color: '#f1f5f9',
+                    color: 'rgba(241, 245, 249, 0.5)',
+                    drawBorder: false,
                 },
                 ticks: {
-                    font: { size: 10, weight: 'bold' as const },
+                    font: { size: 11, weight: 'bold' as const },
                     color: '#94a3b8',
+                    padding: 10,
+                    callback: (value: any) => value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value
                 },
             },
             x: {
@@ -96,39 +109,54 @@ export default function AdminCharts({ }: AdminChartsProps) {
                     display: false,
                 },
                 ticks: {
-                    font: { size: 10, weight: 'bold' as const },
-                    color: '#94a3b8',
+                    font: { size: 11, weight: 'bold' as const },
+                    color: '#64748b',
+                    padding: 10
                 },
             },
         },
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* User Growth Chart */}
-            <div className="bg-white p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex justify-between items-center mb-6">
+            <div className="bg-white p-8 md:p-10 rounded-[40px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all animate-in fade-in slide-in-from-bottom-4 duration-500 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-2 h-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="flex justify-between items-start mb-10">
                     <div>
-                        <h4 className="text-lg font-black text-slate-900 tracking-tighter">가입자 성장 추이 📈</h4>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">User Growth Trends</p>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-xl font-black text-slate-900 tracking-tight">가입자 성장 지표</h4>
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.2em]">Real-time User Analytics</p>
                     </div>
-                    <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-full">+12.5%</span>
+                    <div className="flex flex-col items-end">
+                        <span className="text-[12px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-2xl shadow-sm border border-blue-100">+12.5%</span>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold">vs last week</p>
+                    </div>
                 </div>
-                <div className="h-[250px] w-full">
+                <div className="h-[280px] w-full">
                     <Line data={userData} options={options} />
                 </div>
             </div>
 
             {/* Revenue Chart */}
-            <div className="bg-white p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="flex justify-between items-center mb-6">
+            <div className="bg-white p-8 md:p-10 rounded-[40px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all animate-in fade-in slide-in-from-bottom-4 duration-700 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-2 h-full bg-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="flex justify-between items-start mb-10">
                     <div>
-                        <h4 className="text-lg font-black text-slate-900 tracking-tighter">월간 매출 현황 💰</h4>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">Monthly Revenue Stats</p>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-xl font-black text-slate-900 tracking-tight">수익 퍼포먼스</h4>
+                            <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse"></span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.2em]">Revenue Performance Matrix</p>
                     </div>
-                    <span className="text-[10px] font-black text-pink-600 bg-pink-50 px-2 py-1 rounded-full">+18.2%</span>
+                    <div className="flex flex-col items-end">
+                        <span className="text-[12px] font-black text-pink-600 bg-pink-50 px-3 py-1.5 rounded-2xl shadow-sm border border-pink-100">+18.2%</span>
+                        <p className="text-[10px] text-slate-400 mt-1 font-bold">monthly target</p>
+                    </div>
                 </div>
-                <div className="h-[250px] w-full">
+                <div className="h-[280px] w-full">
                     <Bar data={revenueData} options={options} />
                 </div>
             </div>

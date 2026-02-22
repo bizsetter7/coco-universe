@@ -23,31 +23,29 @@ export const QuickMenu = React.memo(() => {
     ];
 
     return (
-        <div className="w-full bg-white py-4 md:py-6 border-b border-gray-100">
-            <div className="max-w-[1020px] mx-auto px-4">
-                {/* Quick Icon Grid - Perfect 4x2 Alignment */}
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-3 md:gap-4 justify-items-center">
-                    {MENU_ITEMS.map((item, i) => (
-                        <Link
-                            key={i}
-                            href={item.link}
-                            prefetch={true}
-                            className="w-full aspect-[1/1] overflow-hidden flex flex-col items-center justify-center p-2 rounded-2xl cursor-pointer hover:scale-105 transition-transform border bg-white border-stone-100 shadow-sm"
-                        >
-                            <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-full mb-1 flex items-center justify-center ${item.bg} ${item.color}`}>
-                                <item.icon size={18} className="sm:w-6 sm:h-6" />
-                            </div>
-                            <span className="text-[10px] sm:text-xs font-bold text-center leading-snug text-gray-950">
-                                {item.label.split('\n').map((line, idx) => (
-                                    <React.Fragment key={idx}>
-                                        {line}
-                                        {idx < item.label.split('\n').length - 1 && <br />}
-                                    </React.Fragment>
-                                ))}
-                            </span>
-                        </Link>
-                    ))}
-                </div>
+        <div className="w-full relative z-20 -mt-8 md:-mt-12 px-4 max-w-[1020px] mx-auto">
+            {/* Perfectly Square Individual Cards - Matched with Capture 2 */}
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3 justify-items-center">
+                {MENU_ITEMS.map((item, i) => (
+                    <Link
+                        key={i}
+                        href={item.link}
+                        prefetch={true}
+                        className="w-full aspect-square flex flex-col items-center justify-center group cursor-pointer bg-white border border-slate-100 rounded-[14px] md:rounded-[21px] shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
+                    >
+                        <div className={`w-9 h-9 md:w-13 md:h-13 rounded-[18px] md:rounded-[24px] mb-1 md:mb-2 flex items-center justify-center ${item.bg} ${item.color} shadow-sm group-hover:scale-105 transition-transform duration-300`}>
+                            <item.icon size={16} className="md:w-6 md:h-6" />
+                        </div>
+                        <span className="text-[9px] md:text-[12px] font-black text-center leading-[1.35] text-slate-800 tracking-tighter opacity-90 group-hover:opacity-100 transition-all">
+                            {item.label.split('\n').map((line, idx) => (
+                                <React.Fragment key={idx}>
+                                    {line}
+                                    {idx < item.label.split('\n').length - 1 && <br />}
+                                </React.Fragment>
+                            ))}
+                        </span>
+                    </Link>
+                ))}
             </div>
         </div>
     );

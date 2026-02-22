@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
-import { House } from 'lucide-react';
+import { House, User } from 'lucide-react';
 
 export const Footer = () => {
     const brand = useBrand();
@@ -12,11 +12,14 @@ export const Footer = () => {
         <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
             <div className="container mx-auto px-4 text-center text-xs leading-relaxed">
                 {/* Branded Logo matching MainHeader exactly in style */}
-                <div className="mb-6 flex items-center justify-center gap-1.5 mt-1">
-                    <House size={22} strokeWidth={3} className="text-pink-500" />
-                    <span className="text-xl md:text-2xl font-black tracking-tighter text-pink-500">
-                        COCOALBA
-                    </span>
+                <div className="mb-6 flex items-center justify-center gap-2">
+                    <div className="flex flex-col items-center leading-none text-center">
+                        <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">여성전문 고소득 알바 No.1</span>
+                        <div className="flex items-center gap-0.5">
+                            <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">COCO</span>
+                            <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>ALBA</span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Links */}

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Calendar, Trash2, Briefcase, User, MapPin } from 'lucide-react';
+import { FileText, Calendar, Trash2, Briefcase, User, MapPin, Sparkles } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { supabase } from '@/lib/supabase';
+import { updatePoints, getUserPoints } from '@/lib/points';
 
 export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (v: any) => void, onShowDetail?: (resume: any) => void, authUser: any }) => {
     const brand = useBrand();
@@ -51,6 +52,41 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
         window.addEventListener('resume-updated', fetchResumes);
         return () => window.removeEventListener('resume-updated', fetchResumes);
     }, []);
+
+    const handleJump = async (resume: any) => {
+        if (!confirm('500 크레딧을 사용하여 이력서를 최상단으로 올리시겠습니까?')) return;
+
+        const userId = authUser?.id;
+        if (!userId || userId.startsWith('mock_')) return alert('로그인이 필요한 기능입니다.');
+
+        const currentCredit = await getUserPoints(userId);
+        if (currentCredit < 500) {
+            return alert('크레딧이 부족합니다. 파트너스 활동을 통해 크레딧을 충전해 주세요!');
+        }
+
+        try {
+            // 1. Credit Deduction
+            const res = await updatePoints(userId, 'RESUME_JUMP');
+            if (!res.success) throw new Error('Credit update failed');
+
+            // 2. Update resume created_at to now
+            const { error: jumpError } = await supabase
+                .from('resumes')
+                .update({ created_at: new Date().toISOString() })
+                .eq('id', resume.id);
+
+            if (jumpError) throw jumpError;
+
+            alert('이력서가 최상단으로 노출되었습니다! ✨');
+            fetchResumes();
+
+            // Refresh Header Credit (Global event)
+            window.dispatchEvent(new Event('credit-updated'));
+        } catch (err) {
+            console.error('Jump failed:', err);
+            alert('점프 처리 중 오류가 발생했습니다.');
+        }
+    };
 
     const handleDelete = async (id: any) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
@@ -149,6 +185,17 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleJump(resume);
+                                        }}
+                                        className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg text-[10px] font-black shadow-sm hover:scale-105 transition-all"
+                                        title="상단으로 점프 (500C)"
+                                    >
+                                        <Sparkles size={12} />
+                                        점프
+                                    </button>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
