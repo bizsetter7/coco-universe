@@ -6,6 +6,7 @@ import { Shop } from '@/types/shop';
 import { ShopCard } from '@/components/shop/ShopCard';
 import { useBrand } from '@/components/BrandProvider';
 import { AdBannerCard } from '@/components/shop/AdBannerCard';
+import { AD_TIER_STANDARDS } from '@/constants/standards';
 
 // ...
 interface AdSectionProps {

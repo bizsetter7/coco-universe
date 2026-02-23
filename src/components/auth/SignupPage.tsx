@@ -73,8 +73,8 @@ export const SignupPage = () => {
                         type="button"
                         onClick={() => setRole('individual')}
                         className={`py-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${role === 'individual'
-                                ? 'border-pink-500 bg-pink-50 text-pink-600'
-                                : 'border-gray-100 bg-white text-gray-400'
+                            ? 'border-pink-500 bg-pink-50 text-pink-600'
+                            : 'border-gray-100 bg-white text-gray-400'
                             }`}
                     >
                         <User size={20} />
@@ -84,8 +84,8 @@ export const SignupPage = () => {
                         type="button"
                         onClick={() => setRole('corporate')}
                         className={`py-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${role === 'corporate'
-                                ? 'border-blue-500 bg-blue-50 text-blue-600'
-                                : 'border-gray-100 bg-white text-gray-400'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600'
+                            : 'border-gray-100 bg-white text-gray-400'
                             }`}
                     >
                         <Building size={20} />
@@ -135,7 +135,7 @@ export const SignupPage = () => {
                         <input type="checkbox" id="terms" required className="mt-1 accent-pink-500" />
                         <label htmlFor="terms" className="text-[11px] text-gray-500 leading-tight cursor-pointer">
                             [필수] 이용약관 및 개인정보 처리방침에 동의합니다.
-                            코코알바는 안전한 구인구직 환경을 위해 본인인증을 필수로 합니다.
+                            {brand.name}는 건전하고 투명한 채용 환경을 지향합니다.
                         </label>
                     </div>
 

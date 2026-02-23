@@ -8,6 +8,7 @@ import { useBrand } from '@/components/BrandProvider';
 
 
 export const HeroSection = () => {
+    const brand = useBrand();
     const router = useRouter();
 
     // Simplified static banner info for diet
@@ -16,8 +17,6 @@ export const HeroSection = () => {
         subtitle: "지금 가입하면 기본 광고 1개월 무료 지원!",
         bg: "bg-gray-900"
     };
-
-
 
     return (
         <div className="relative w-full h-[360px] md:h-[340px] overflow-hidden bg-slate-950 text-white shadow-2xl">
@@ -51,7 +50,7 @@ export const HeroSection = () => {
                         </p>
                         <div className="w-12 md:w-20 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent opacity-50" />
                         <span className="text-[8px] md:text-[9px] font-black text-slate-400 mt-2 tracking-[0.3em] uppercase select-none">
-                            Coco Alba Premium System
+                            {brand.logoText} PREMIUM SYSTEM
                         </span>
                     </div>
 
@@ -63,7 +62,9 @@ export const HeroSection = () => {
                             className="group relative inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-900 font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden whitespace-nowrap"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <span className="relative z-10">무료로 광고 올리기 🚀</span>
+                            <span className="relative z-10">
+                                무료로 광고 올리기 🚀
+                            </span>
                         </Link>
                         <Link
                             href="/guide"

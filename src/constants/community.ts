@@ -13,8 +13,8 @@ export interface Post {
 
 export const CATEGORIES = [
     { id: 'all', name: '전체' },
-    { id: 'nightlife', name: '밤 문화 Talk' },
     { id: 'talk', name: '언니들의 수다(썰)' },
+    { id: 'nightlife', name: '밤 문화 Talk' },
     { id: 'partner', name: '같이일할단짝' },
     { id: 'market', name: '중고거래' },
     { id: 'legal', name: '무료법률상담' },
@@ -24,7 +24,7 @@ export const CATEGORIES = [
 
 export type CategoryId = typeof CATEGORIES[number]['id'];
 
-export const MOCK_POSTS: Post[] = [
+const RAW_MOCK_POSTS: Post[] = [
     {
         id: 40,
         category: '프리미엄 라운지',
@@ -348,7 +348,7 @@ export const MOCK_POSTS: Post[] = [
     },
 ];
 
-export const MOCK_COMMENTS = [
+const RAW_MOCK_COMMENTS = [
     // postId: 1 (노을)
     { id: 1001, postId: 1, author: '봄햇살', content: '맞아요 오늘 노을 진짜 예뻤어요 ㅠㅠ', time: '8분 전' },
     { id: 1002, postId: 1, author: '언니후기', content: '고생 많으셨어요! 내일도 파이팅 ㅎㅎ', time: '3분 전' },
@@ -502,3 +502,6 @@ export const MOCK_COMMENTS = [
     { id: 9503, postId: 95, author: '황당공감', content: '변명도 좀 그럴싸하게 해야지 ㅋㅋ 어이없네', time: '25분 전' },
     { id: 9504, postId: 95, author: '이런남자', content: '솔직하게 바빴다고 하면 될 걸 왜 저러는지 ㅠ', time: '38분 전' },
 ];
+
+export const MOCK_POSTS = RAW_MOCK_POSTS;
+export const MOCK_COMMENTS = RAW_MOCK_COMMENTS;

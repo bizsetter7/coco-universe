@@ -9,16 +9,38 @@ export const QuickMenu = React.memo(() => {
     const brand = useBrand();
 
     // 퀵메뉴 순서 및 라벨 (최종 테마 반영)
-    // 1. 업종별채용, 2. 지역별채용, 3. 인재정보, 4. 프리미엄라운지
-    // 5. 같이일할단짝, 6. 그녀들의 수다, 7. 무료법률상담, 8. 광고문의
     const MENU_ITEMS = [
         { icon: Briefcase, label: '업종별채용', bg: 'bg-indigo-50', color: 'text-indigo-600', link: '/jobs' },
         { icon: MapPin, label: '지역별채용', bg: 'bg-blue-50', color: 'text-blue-600', link: '/region' },
         { icon: Search, label: '인재정보', bg: 'bg-teal-50', color: 'text-teal-600', link: '/talent' },
-        { icon: Crown, label: '프리미엄\n라운지', bg: 'bg-purple-50', color: 'text-purple-600', link: '/community?category=프리미엄 라운지' },
-        { icon: Users, label: '같이일할단짝', bg: 'bg-pink-50', color: 'text-pink-600', link: '/community?category=같이일할단짝' },
-        { icon: Sparkles, label: '그녀들의\n수다', bg: 'bg-pink-50', color: 'text-pink-600', link: '/community' },
-        { icon: Scale, label: '무료\n법률상담', bg: 'bg-slate-50', color: 'text-slate-600', link: '/community?category=무료법률상담' },
+        {
+            icon: Crown,
+            label: '프리미엄\n라운지',
+            bg: 'bg-purple-50',
+            color: 'text-purple-600',
+            link: '/community?category=프리미엄 라운지'
+        },
+        {
+            icon: Users,
+            label: '같이일할단짝',
+            bg: 'bg-pink-50',
+            color: 'text-pink-600',
+            link: '/community?category=같이일할단짝'
+        },
+        {
+            icon: Sparkles,
+            label: '그녀들의\n수다',
+            bg: 'bg-pink-50',
+            color: 'text-pink-600',
+            link: '/community'
+        },
+        {
+            icon: Scale,
+            label: '무료\n법률상담',
+            bg: 'bg-slate-50',
+            color: 'text-slate-600',
+            link: '/community?category=무료법률상담'
+        },
         { icon: Megaphone, label: '광고문의', bg: 'bg-orange-50', color: 'text-orange-600', link: '/customer-center?tab=ad' },
     ];
 

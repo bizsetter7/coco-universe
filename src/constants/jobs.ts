@@ -12,6 +12,4 @@ export const JOB_CATEGORY_MAP: Record<string, string[]> = {
 };
 
 export const JOB_CATEGORIES = Object.keys(JOB_CATEGORY_MAP);
-
-// 모든 상세 직종을 하나의 배열로 추출 (기존 FLAT 리스트 호환용)
 export const ALL_JOB_TYPES = Object.values(JOB_CATEGORY_MAP).flat();

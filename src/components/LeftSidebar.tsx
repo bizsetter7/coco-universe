@@ -274,9 +274,13 @@ export default function LeftSidebar({
                     <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-pink-400 rounded-full blur-xl animate-pulse" />
                 </div>
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-3">
-                    <p className="text-xl font-black drop-shadow-lg tracking-tighter">하루 200보장</p>
+                    <p className="text-xl font-black drop-shadow-lg tracking-tighter">
+                        하루 200보장
+                    </p>
                     <div className="w-8 h-0.5 bg-white/30 my-1.5 rounded-full" />
-                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">CocoAlba Premium</p>
+                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">
+                        CocoAlba Premium
+                    </p>
                 </div>
             </div>
 
@@ -442,10 +446,16 @@ export default function LeftSidebar({
                     <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" />
                 </div>
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-4">
-                    <p className="text-xs font-black text-white/70 tracking-widest mb-1 uppercase">COCOALBA OFFICIAL</p>
-                    <h4 className="text-[24px] font-black mb-1 drop-shadow-md tracking-tighter">광고입점상담</h4>
+                    <p className="text-xs font-black text-white/70 tracking-widest mb-1 uppercase">
+                        COCOALBA OFFICIAL
+                    </p>
+                    <h4 className="text-[24px] font-black mb-1 drop-shadow-md tracking-tighter">
+                        광고입점상담
+                    </h4>
                     <div className="w-10 h-1 bg-white/40 rounded-full my-3" />
-                    <p className="text-[20px] font-black text-amber-300 drop-shadow-lg">{"<1:1문의>"}</p>
+                    <p className="text-[20px] font-black text-amber-300 drop-shadow-lg">
+                        {'<1:1문의>'}
+                    </p>
                 </div>
             </div>
 
@@ -457,10 +467,12 @@ export default function LeftSidebar({
                 <div className="absolute inset-0 bg-slate-950"></div>
                 <div className="absolute top-3 right-3 text-xl opacity-30 animate-pulse">💎</div>
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-4">
-                    <p className="text-[14px] font-bold text-gray-400 mb-2">프리미엄 입점 안내</p>
-                    <h4 className="text-[20px] font-black text-white mb-4 tracking-tighter">코코알바 광고상담</h4>
+                    <p className="text-[14px] font-bold text-gray-400 mb-2">프리미엄 채용 안내</p>
+                    <h4 className="text-[20px] font-black text-white mb-4 tracking-tighter">
+                        코코알바 광고상담
+                    </h4>
                     <div className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-black shadow-[0_0_15px_rgba(219,39,119,0.5)] active:scale-95 transition-all">
-                        {"<1:1문의 바로가기>"}
+                        {'<1:1문의 바로가기>'}
                     </div>
                 </div>
             </div>
@@ -484,7 +496,9 @@ export default function LeftSidebar({
                         TALK
                     </div>
                     <div>
-                        <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>CocoAlba</p>
+                        <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                            CocoAlba
+                        </p>
                         <p className="text-lg font-black text-purple-600">1544-5568</p>
                     </div>
                 </div>

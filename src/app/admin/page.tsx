@@ -78,7 +78,7 @@ function AdminContent() {
 
     // --- 4. Mock Users (Can be moved to DB later) ---
     const [mockUsers] = useState<any[]>([
-        { id: 'user_01', loginId: 'koko123', name: '김코코', nickname: '돌아온코코', birth: '1995-05-15', phone: '010-1234-5678', email: 'koko@gmail.com', type: 'individual', status: 'active', joinDate: '2026-02-01', referrer: '구글 검색', statusHistory: ['2026-02-01 가입'] },
+        { id: 'user_01', loginId: 'daesun123', name: '김대순', nickname: '마스터관리자', birth: '1975-05-15', phone: '010-1234-5678', email: 'bizsetter7@gmail.com', type: 'individual', status: 'active', joinDate: '2026-02-01', referrer: '직접 유입', statusHistory: ['2026-02-01 가입'] },
         { id: 'user_02', loginId: 'shop_master', name: '이사장', nickname: '강남구인구직', birth: '1988-11-22', phone: '010-9876-5432', email: 'ceo@shop.com', type: 'corporate', status: 'active', joinDate: '2026-01-15', referrer: '네이버', statusHistory: ['2026-01-15 기업회원 가입', '2026-02-10 광고 연장'] },
         { id: 'user_03', loginId: 'bad_boy', name: '박진상', nickname: '진상입니다', birth: '1992-03-03', phone: '010-4444-4444', email: 'bad@naver.com', type: 'individual', status: 'blocked', joinDate: '2026-02-12', referrer: '직접 유입', statusHistory: ['2026-02-12 가입', '2026-02-13 비매너 행위로 영구 정지'] },
     ]);

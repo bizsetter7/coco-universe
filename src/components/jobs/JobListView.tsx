@@ -167,10 +167,10 @@ JobRow.displayName = 'JobRow';
 const getTierBadge = (tier?: string) => {
     switch (tier) {
         case 'special': return { label: '스페셜', color: 'bg-emerald-500 text-white' };
-        case 'premium': return { label: '프리미엄', color: 'bg-purple-600 text-white' };
-        case 'grand': return { label: '그랜드', color: 'bg-amber-400 text-black' };
         case 'deluxe': return { label: '디럭스', color: 'bg-pink-600 text-white' };
         case 'urgent': return { label: '급구', color: 'bg-red-600 text-white' };
+        case 'grand': return { label: '그랜드', color: 'bg-amber-400 text-black' };
+        case 'premium': return { label: '프리미엄', color: 'bg-purple-600 text-white' };
         default: return null;
     }
 };
@@ -379,7 +379,9 @@ const JobListView: React.FC<JobListViewProps> = ({
                                                                         <Megaphone size={20} className="text-pink-600" />
                                                                         <span>사장님, 광고 한칸 어떠세요?</span>
                                                                     </h4>
-                                                                    <p className="text-gray-500 text-xs font-medium">최고의 노출 효과로 매출을 UP 시켜보세요!</p>
+                                                                    <p className="text-gray-500 text-xs font-medium">
+                                                                        최고의 노출 효과로 매출을 UP 시켜보세요!
+                                                                    </p>
                                                                 </div>
                                                                 <div className="relative z-10">
                                                                     <button

@@ -14,6 +14,7 @@ import { Shop } from '@/types/shop';
 import { AdultVerificationGate } from './common/AdultVerificationGate';
 
 import { useAuth } from '@/hooks/useAuth';
+import { AUDIT_MODE } from '@/lib/brand-config';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -46,6 +47,17 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     };
 
     const isAdminPage = pathname?.startsWith('/admin');
+
+    // [New] Audit Mode Handling - PG 심사 시 Sidebars/Header/Footer 전체 차단
+    if (AUDIT_MODE) {
+        return (
+            <div className="w-full min-h-screen bg-white">
+                <Suspense fallback={null}>
+                    {children}
+                </Suspense>
+            </div>
+        );
+    }
 
     // 로딩 중에는 아무것도 보여주지 않거나 스플래시 노출
     // [Optimization] Prevent white screen flash by showing a minimal loader or Skeleton

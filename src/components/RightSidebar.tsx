@@ -26,6 +26,7 @@ export default function RightSidebar() {
     };
 
     const JOB_TYPES = ['룸싸롱', '나이트', '주점', '노래방', '바(Bar)', '카페', '일반음식점', 'PC방/오락실', '기타'];
+
     const WORK_TYPES = ['낮알바', '밤알바', '파트타임', '주말알바', '풀타임', '단기알바', '숙식제공', '당일지급'];
 
     return (
@@ -192,11 +193,19 @@ export default function RightSidebar() {
                 <div className="group relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer shadow-md hover:scale-[1.02] transition-all border border-blue-500/20">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-900"></div>
                     <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 text-center">
-                        <div className="bg-white/10 backdrop-blur-md text-[10px] font-black text-blue-200 px-2 py-0.5 rounded mb-3 border border-white/10 uppercase">Dongtan Sky</div>
-                        <h4 className="font-black text-white text-lg leading-tight mb-1">하이퍼블릭룸</h4>
+                        <div className="bg-white/10 backdrop-blur-md text-[10px] font-black text-blue-200 px-2 py-0.5 rounded mb-3 border border-white/10 uppercase">
+                            Dongtan Sky
+                        </div>
+                        <h4 className="font-black text-white text-lg leading-tight mb-1">
+                            하이퍼블릭룸
+                        </h4>
                         <div className="w-6 h-0.5 bg-blue-400 mx-auto my-2" />
-                        <p className="text-3xl font-black text-white my-1 drop-shadow-lg tracking-tighter">60분</p>
-                        <div className="bg-amber-400 text-black font-black px-3 py-1 rounded-full text-[11px] mt-2 shadow-glow-amber">TC 12만원</div>
+                        <p className="text-3xl font-black text-white my-1 drop-shadow-lg tracking-tighter">
+                            60분
+                        </p>
+                        <div className="bg-amber-400 text-black font-black px-3 py-1 rounded-full text-[11px] mt-2 shadow-glow-amber">
+                            TC 12만원
+                        </div>
                     </div>
                 </div>
 
@@ -205,11 +214,25 @@ export default function RightSidebar() {
                     <div className="absolute inset-0 bg-slate-950"></div>
                     <div className="absolute inset-0 border-2 border-amber-500/40 m-1.5 rounded-lg pointer-events-none"></div>
                     <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 text-center">
-                        <h4 className="font-black text-amber-500 text-xl tracking-widest mb-1">일프로</h4>
-                        <p className="text-3xl font-black text-white tracking-tighter">300<span className="text-sm font-bold ml-1 text-amber-200">만 보장</span></p>
+                        <h4 className="font-black text-amber-500 text-xl tracking-widest mb-1">
+                            일프로
+                        </h4>
+                        <p className="text-2xl font-black text-white tracking-tighter">
+                            300
+                            <span className="text-sm font-bold ml-1 text-amber-200">
+                                만 보장
+                            </span>
+                        </p>
                         <div className="w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent my-3"></div>
-                        <h4 className="font-black text-white/80 text-sm mb-1 uppercase tracking-tighter">Ten Cafe</h4>
-                        <p className="text-2xl font-black text-amber-400">200<span className="text-xs font-bold ml-0.5 text-white/50">만 보장</span></p>
+                        <h4 className="font-black text-white/80 text-sm mb-1 uppercase tracking-tighter">
+                            Ten Cafe
+                        </h4>
+                        <p className="text-2xl font-black text-amber-400">
+                            200
+                            <span className="text-xs font-bold ml-0.5 text-white/50">
+                                만 보장
+                            </span>
+                        </p>
                     </div>
                 </div>
 
@@ -225,7 +248,9 @@ export default function RightSidebar() {
                             </div>
                             <p className="text-[10px] font-black text-red-800 bg-white/50 px-2 rounded-full mt-2 uppercase tracking-wide">Freestyle Working</p>
                         </div>
-                        <div className="mt-6 bg-red-600 text-white font-black px-4 py-1.5 rounded text-xs shadow-lg uppercase">자유 출퇴근 보장</div>
+                        <div className="mt-6 bg-red-600 text-white font-black px-4 py-1.5 rounded text-xs shadow-lg uppercase">
+                            자유 출퇴근 보장
+                        </div>
                     </div>
                 </div>
             </div>

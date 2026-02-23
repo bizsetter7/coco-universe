@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Shop } from '@/types/shop';
 import {
     AlertTriangle, CheckCircle, RefreshCcw, ExternalLink,
-    BookOpen, Database, Shield, Search, Layout, MessageSquare, Copy, CheckCheck, Lock
+    BookOpen, Database, Shield, ShieldCheck, Search, Layout, MessageSquare, Copy, CheckCheck, Lock
 } from 'lucide-react';
 
 // ─── Supabase RLS SQL ──────────────────────────────────────────
@@ -353,6 +353,29 @@ export default function SystemVerificationPage() {
                         ))}
                     </div>
 
+                    {/* 이중 관리 시스템 (Dual Management) */}
+                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl mb-6">
+                        <h3 className="font-black text-lg mb-4 flex items-center gap-2">
+                            <ShieldCheck size={20} className="text-white" /> 이중 무결성 수호 체계 (Dual-Integrity)
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all cursor-help" title="코코알바의 최상위 운영 원칙(v1.0 약속)을 담은 헌법 문서입니다.">
+                                <div className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">Principle 1. Artifact</div>
+                                <div className="font-black text-sm mb-1 italic underline decoration-indigo-300">우리의 약속 (Our_Promises.md)</div>
+                                <div className="text-[10px] text-white/70 leading-relaxed font-bold">
+                                    v1.0 데이터 약속, 계정 미러링, 자산 분리 원칙 등 AI와 개발자가 지켜야 할 절대적 헌법.
+                                </div>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all cursor-help" title="개발 단계에서 코드 정합성을 지키기 위한 기술적 지침서입니다.">
+                                <div className="text-[10px] font-black text-purple-200 uppercase tracking-widest mb-1">Principle 2. Codebase</div>
+                                <div className="font-black text-sm mb-1 italic underline decoration-purple-300">SYSTEM_INTEGRITY_MANIFEST.md</div>
+                                <div className="text-[10px] text-white/70 leading-relaxed font-bold">
+                                    장애 발생 시 복구 매뉴얼, DB 컬럼 규격, API 통신 무결성 등 실무 기술 지침.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* 파일 경로 가이드 */}
                     <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
                         <h3 className="font-black text-gray-900 mb-4 flex items-center gap-2">
@@ -360,11 +383,11 @@ export default function SystemVerificationPage() {
                         </h3>
                         <div className="space-y-2 font-mono text-xs">
                             {[
-                                { path: 'src/constants/community.ts', desc: '★ MOCK_POSTS · MOCK_COMMENTS · CATEGORIES 정의' },
+                                { path: 'src/constants/standards.ts', desc: '★ 통합 기술 표준 (Single Source of Truth)' },
+                                { path: 'SYSTEM_INTEGRITY_MANIFEST.md', desc: '시스템 무결성 수호 기술 매니페스트' },
+                                { path: 'src/app/admin/system-verification/page.tsx', desc: '현재 페이지 (시스템 검증 센터)' },
+                                { path: 'src/constants/community.ts', desc: 'MOCK_POSTS · MOCK_COMMENTS · CATEGORIES 정의' },
                                 { path: 'src/app/community/CommunityContent.tsx', desc: 'Mock+DB 병합 영속성 로직' },
-                                { path: 'src/app/community/[id]/page.tsx', desc: 'SEO 메타데이터 자동 생성' },
-                                { path: 'src/app/community/[id]/CommunityDetailClient.tsx', desc: '댓글 폴백 로직 (빈배열 체크)' },
-                                { path: 'src/app/community/write/page.tsx', desc: '글쓰기 + seo_keywords 자동 생성' },
                                 { path: 'src/app/sitemap.ts', desc: 'Mock+DB 게시글 사이트맵 (1h 갱신)' },
                             ].map(({ path, desc }) => (
                                 <div key={path} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">

@@ -91,10 +91,14 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
             return (
                 <div className="flex items-center gap-2 cursor-pointer group">
                     <div className="flex flex-col items-start leading-tight">
-                        <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">여성전문 고소득 알바 No.1</span>
+                        <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">
+                            여성전문 고소득 알바 No.1
+                        </span>
                         <div className="flex items-center gap-0.5">
                             <span className="text-xl md:text-2xl font-black tracking-tighter text-pink-600 group-hover:scale-105 transition-transform origin-left">COCO</span>
-                            <span className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'} group-hover:scale-105 transition-transform origin-left`}>ALBA</span>
+                            <span className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'} group-hover:scale-105 transition-transform origin-left`}>
+                                ALBA
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -138,7 +142,9 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
             return (
                 <div className="flex items-center gap-1.5">
                     <MessageCircle size={24} className="text-pink-600 fill-pink-600" />
-                    <span className="text-lg md:text-xl font-black text-pink-600 tracking-tight">그녀들의수다</span>
+                    <span className="text-lg md:text-xl font-black text-pink-600 tracking-tight">
+                        그녀들의수다
+                    </span>
                 </div>
             );
         }
@@ -168,10 +174,16 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         return (
             <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="flex flex-col items-start leading-tight">
-                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">여성전문 고소득 알바 No.1</span>
+                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">
+                        여성전문 고소득 알바 No.1
+                    </span>
                     <div className="flex items-center gap-0.5">
-                        <span className="text-lg md:text-xl font-black tracking-tighter text-pink-600">COCO</span>
-                        <span className={`text-lg md:text-xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>ALBA</span>
+                        <span className="text-lg md:text-xl font-black tracking-tighter text-pink-600">
+                            COCO
+                        </span>
+                        <span className={`text-lg md:text-xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                            ALBA
+                        </span>
                     </div>
                 </div>
             </div>

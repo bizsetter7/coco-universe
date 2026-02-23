@@ -14,10 +14,16 @@ export const Footer = () => {
                 {/* Branded Logo matching MainHeader exactly in style */}
                 <div className="mb-6 flex items-center justify-center gap-2">
                     <div className="flex flex-col items-center leading-none text-center">
-                        <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">여성전문 고소득 알바 No.1</span>
+                        <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">
+                            여성전문 고소득 알바 No.1
+                        </span>
                         <div className="flex items-center gap-0.5">
-                            <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">COCO</span>
-                            <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>ALBA</span>
+                            <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">
+                                COCO
+                            </span>
+                            <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                                ALBA
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -35,9 +41,11 @@ export const Footer = () => {
 
                 {/* Company Info */}
                 <div className="space-y-1 mb-6 text-gray-400 text-[11px] md:text-xs text-center">
-                    <p>COCOALBA | 대표: 김코코 | 사업자등록번호: 226-13-91078</p>
-                    <p>주소: 서울특별시 강남구 테헤란로 123, 4층</p>
-                    <p>직업정보제공사업 신고번호: 2024-서울강남-1234</p>
+                    <p>
+                        COCOALBA | 대표: 김대순 | 사업자등록번호: 226-13-91078
+                    </p>
+                    <p>주소: 경기도 평택시 지산로12번길 93, 2층</p>
+                    <p>통신판매업 신고번호: 2017-경기송탄-0029</p>
                     <p>고객센터: 1577-9879 (평일 09:00 ~ 18:00)</p>
                     <p>이메일: bizsetter7@gmail.com</p>
                 </div>

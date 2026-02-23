@@ -20,8 +20,12 @@ export const FloatingConversion = () => {
                     className="flex items-center gap-3 bg-slate-950 text-white pl-6 pr-4 py-4 rounded-full shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 border border-slate-800"
                 >
                     <div className="flex flex-col items-start leading-none">
-                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-1">Advertising</span>
-                        <span className="text-sm font-black tracking-tighter">광고 집행 문의</span>
+                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-1">
+                            Advertising
+                        </span>
+                        <span className="text-sm font-black tracking-tighter">
+                            광고 집행 문의
+                        </span>
                     </div>
                     <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
                         <Megaphone size={18} fill="white" />

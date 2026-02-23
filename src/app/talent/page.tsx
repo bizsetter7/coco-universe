@@ -282,7 +282,7 @@ export default function TalentPage() {
                                 <div className="space-y-2">
                                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">이름</label>
                                     <input
-                                        name="name" required placeholder="예: 김코코"
+                                        name="name" required placeholder="예: 김대순"
                                         className={`w-full px-5 py-3.5 rounded-2xl border font-bold outline-none focus:ring-2 focus:ring-purple-500 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-100 text-gray-900'}`}
                                     />
                                 </div>
