@@ -20,11 +20,6 @@ function HomeContent() {
   const page = searchParams.get('page');
   const { lat: userLat, lng: userLng, calculateDistance } = useLocation();
 
-  // PG Audit Mode: Always show static landing if enabled
-  if (AUDIT_MODE) {
-    return <AuditLanding />;
-  }
-
   const processedShops = useMemo(() => {
     let rawShops = (shopsData as Shop[]).map((shop, index) => {
       let tier: Shop['tier'] = shop.tier || 'common';
@@ -85,6 +80,11 @@ function HomeContent() {
 
     return rawShops;
   }, [userLat, userLng, calculateDistance]);
+
+  // PG Audit Mode: Always show static landing if enabled
+  if (AUDIT_MODE) {
+    return <AuditLanding />;
+  }
 
   if (page === 'login') {
     return <LoginPage />;
