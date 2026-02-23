@@ -307,7 +307,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, i
 
     return createPortal(
         <div
-            className="modal-overlay fixed inset-0 z-[99999] flex items-end md:items-center justify-center bg-black/90 md:bg-black/80 touch-none overscroll-contain"
+            className="modal-overlay fixed inset-0 z-[99999] flex items-end md:items-center justify-center bg-black/90 md:bg-black/80 backdrop-blur-sm touch-none overscroll-contain"
             onClick={onClose}
         >
             <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={onClose}>

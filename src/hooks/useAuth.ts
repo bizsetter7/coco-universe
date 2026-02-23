@@ -8,6 +8,7 @@ export interface UserSession {
     name: string;
     nickname: string;
     credit: number;
+    points: number; // [New] 코코알바 전용 포인트 (자산 분리 원칙)
     referrer?: string;
     shopId?: string;
     isSimulated?: boolean;
@@ -25,7 +26,8 @@ export function useAuth() {
         id: 'guest',
         name: '게스트',
         nickname: '게스트',
-        credit: 0
+        credit: 0,
+        points: 0
     });
 
     const isMounted = useRef(true);
@@ -70,7 +72,8 @@ export function useAuth() {
                         id: authUser.id,
                         name: profile.full_name || authUser.email?.split('@')[0] || '회원',
                         nickname: profile.nickname || profile.full_name || '닉네임',
-                        credit: profile.credit_balance || profile.points || 0,
+                        credit: profile.credit_balance || 0,
+                        points: profile.points || 0, // [Fix] 자산 독립 분리 (v1.0 약속 이행)
                         isAdultVerified: !!profile.is_adult_verified, // [New] DB 성인인증 여부 반영
                         email: authUser.email
                     };
@@ -108,7 +111,7 @@ export function useAuth() {
         }
 
         // 3. 비로그인 상태 (완전한 게스트)
-        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0 });
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0, points: 0 });
         setIsLoggedIn(false);
         setIsLoading(false);
     };
@@ -173,6 +176,7 @@ export function useAuth() {
             name: name || (type === 'admin' ? '관리자' : '테스트회원'),
             nickname: nickname || (type === 'admin' ? '운영마스터' : '테스트닉네임'),
             credit: 1000,
+            points: 500, // [New] Mock 포인트 추가
             email: type === 'admin' ? 'admin_user@example.com' : 'test@example.com'
         };
 
@@ -199,7 +203,7 @@ export function useAuth() {
         }
 
         setIsLoggedIn(false);
-        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0 });
+        setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0, points: 0 });
 
         window.location.href = '/';
     };
@@ -247,6 +251,7 @@ export function useAuth() {
         userName: user.name,
         userNickname: user.nickname,
         userCredit: user.credit,
+        userPoints: user.points, // [New] 코코 포인트 독립 반환
         userReferrer: user.referrer,
         isSimulated: user.isSimulated,
         isAdultVerified: user.isAdultVerified

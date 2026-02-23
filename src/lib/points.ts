@@ -18,31 +18,31 @@ export async function updatePoints(userId: string, reason: PointReason, customAm
     const amount = customAmount ?? POINT_AMOUNTS[reason];
 
     try {
-        // 1. Update Profile (Total Credit)
+        // 1. Update Profile (Total Points - Cocos side)
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('credit_balance')
+            .select('points') // [Fix] credit_balance가 아닌 points 컬럼 조회
             .eq('id', userId)
             .single();
 
         if (profileError) throw profileError;
 
-        const newTotal = (profile?.credit_balance || 0) + amount;
+        const newTotal = (profile?.points || 0) + amount;
 
         const { error: updateError } = await supabase
             .from('profiles')
-            .update({ credit_balance: newTotal, updated_at: new Date().toISOString() })
+            .update({ points: newTotal, updated_at: new Date().toISOString() }) // [Fix] points 컬럼 업데이트
             .eq('id', userId);
 
         if (updateError) throw updateError;
 
-        // 2. Log the transaction (Using credit_logs table for unification)
+        // 2. Log the transaction (Using point_logs for isolation)
         const { error: logError } = await supabase
-            .from('credit_logs')
+            .from('point_logs') // [Fix] credit_logs와 분리
             .insert({
                 user_id: userId,
                 amount,
-                action: 'admin_grant', // Temporary mapping, can be expanded in schema later
+                reason, // [New] 포인트 전용 컬럼
                 note: `[COCO] ${reason}`,
             });
 
@@ -61,10 +61,10 @@ export async function updatePoints(userId: string, reason: PointReason, customAm
 export async function getUserPoints(userId: string) {
     const { data, error } = await supabase
         .from('profiles')
-        .select('credit_balance')
+        .select('points') // [Fix] credit_balance가 아닌 points 컬럼 조회
         .eq('id', userId)
         .single();
 
     if (error) return 0;
-    return data?.credit_balance || 0;
+    return data?.points || 0;
 }

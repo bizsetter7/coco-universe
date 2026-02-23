@@ -57,7 +57,7 @@ export const HeroSection = () => {
 
                     {/* Buttons */}
                     {/* Buttons - Raised slightly on PC as requested */}
-                    <div className="flex flex-col sm:flex-row gap-2.5 items-center md:-mt-2 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
+                    <div className="flex flex-col sm:flex-row gap-2.5 items-center md:-mt-3 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
                         <Link
                             href="/ad-apply"
                             className="group relative inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-900 font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden whitespace-nowrap"

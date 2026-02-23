@@ -169,15 +169,15 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                         className="absolute inset-0 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-300"
                         onClick={() => setIsDetailModalOpen(false)}
                     />
-                    <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
-                        <div className="p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${selectedUser.status === 'blocked' ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-600'}`}>
+                    <div className="bg-white w-full max-w-lg rounded-[32px] md:rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                        <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center text-xl md:text-2xl ${selectedUser.status === 'blocked' ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-600'}`}>
                                     {selectedUser.status === 'blocked' ? '🚫' : '👤'}
                                 </div>
-                                <div>
-                                    <span className="bg-slate-900 text-white text-[9px] px-2 py-0.5 rounded-md font-black uppercase mb-1 inline-block">CRM Profile Detail</span>
-                                    <h3 className="text-xl font-black text-slate-950 tracking-tighter">{selectedUser.name || selectedUser.full_name || '이름없음'}</h3>
+                                <div className="min-w-0">
+                                    <span className="bg-slate-900 text-white text-[8px] md:text-[9px] px-2 py-0.5 rounded-md font-black uppercase mb-0.5 md:mb-1 inline-block">CRM Profile Detail</span>
+                                    <h3 className="text-lg md:text-xl font-black text-slate-950 tracking-tighter truncate">{selectedUser.name || selectedUser.full_name || '이름없음'}</h3>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
