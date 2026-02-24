@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
+import { AUDIT_MODE } from '@/lib/brand-config';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
@@ -31,6 +32,11 @@ const MOCK_USERS: Record<string, { type: 'corporate' | 'individual', name: strin
 };
 
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
+    // [New] Audit Mode Protection: Never show the gate during audit
+    if (AUDIT_MODE) {
+        return null;
+    }
+
     const brand = useBrand();
     const { login, signIn, user: authUser } = useAuth();
     const [loginType, setLoginType] = useState<'corporate' | 'individual'>('corporate');

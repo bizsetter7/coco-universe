@@ -12,6 +12,7 @@ import { Footer } from './layout/Footer';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
 import { AdultVerificationGate } from './common/AdultVerificationGate';
+import { AuditLanding } from './audit/AuditLanding';
 
 import { useAuth } from '@/hooks/useAuth';
 import { AUDIT_MODE } from '@/lib/brand-config';
@@ -48,12 +49,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     const isAdminPage = pathname?.startsWith('/admin');
 
-    // [New] Audit Mode Handling - PG 심사 시 Sidebars/Header/Footer 전체 차단
-    if (AUDIT_MODE) {
+    // [New] Audit Mode Handling - PG 심사 시 모든 경로에서 AuditLanding 강제 노출 (Admin 제외)
+    if (AUDIT_MODE && !isAdminPage) {
         return (
             <div className="w-full min-h-screen bg-white">
                 <Suspense fallback={null}>
-                    {children}
+                    <AuditLanding />
                 </Suspense>
             </div>
         );

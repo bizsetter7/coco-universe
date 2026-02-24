@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
+import { AUDIT_MODE } from '@/lib/brand-config';
 
 // Unified user session type
 export interface UserSession {
@@ -254,6 +255,6 @@ export function useAuth() {
         userPoints: user.points, // [New] 코코 포인트 독립 반환
         userReferrer: user.referrer,
         isSimulated: user.isSimulated,
-        isAdultVerified: user.isAdultVerified
+        isAdultVerified: AUDIT_MODE || user.isAdultVerified
     };
 }
