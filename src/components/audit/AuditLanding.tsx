@@ -1,9 +1,16 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, Users, TrendingUp, CheckCircle, Mail, Phone, Lock, User } from 'lucide-react';
+import { ShieldCheck, Users, TrendingUp, CheckCircle, Mail, Phone, Lock, User, Smartphone, X } from 'lucide-react';
 
 export const AuditLanding = () => {
+    const [showVerifyModal, setShowVerifyModal] = React.useState(false);
+    const [verifyStep, setVerifyStep] = React.useState<'select' | 'phone' | 'success'>('select');
+
+    const handleOpenVerify = () => {
+        setVerifyStep('select');
+        setShowVerifyModal(true);
+    };
     return (
         <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-700">
             {/* Simple Top Navigation */}
@@ -13,7 +20,7 @@ export const AuditLanding = () => {
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <ShieldCheck className="text-white" size={20} />
                         </div>
-                        <span className="text-lg font-black tracking-tight text-slate-900 uppercase">초코아이디어</span>
+                        <span className="text-lg font-black tracking-tight text-slate-900 uppercase">초코파트너스</span>
                     </div>
                     <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-500">
                         <a href="#about" className="hover:text-blue-600 transition-colors">서비스 소개</a>
@@ -116,6 +123,73 @@ export const AuditLanding = () => {
                 </div>
             </section>
 
+            {/* [New] Business Verification System Section */}
+            <section className="py-24 bg-white">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-black text-slate-900 mb-4">신뢰할 수 있는 파트너 시스템</h2>
+                        <p className="text-slate-500 font-medium">초코아이디어는 투명하고 안전한 비즈니스 환경을 위해 엄격한 본인 및 계좌 인증 시스템을 준수합니다.</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-6">
+                            {[
+                                {
+                                    icon: <Smartphone className="text-blue-600" />,
+                                    title: "실명 본인 확인",
+                                    desc: "국내 3대 통신사 및 사설 인증서를 통한 정확한 실명 확인 프로세스를 거칩니다."
+                                },
+                                {
+                                    icon: <ShieldCheck className="text-blue-600" />,
+                                    title: "개인정보 완벽 보호",
+                                    desc: "모든 인증 단계는 보안 프로토콜을 준수하며, 정보는 철저히 암호화되어 관리됩니다."
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex gap-5 p-6 rounded-2xl border border-slate-50 hover:border-blue-100 transition-all bg-slate-50/50">
+                                    <div className="shrink-0 w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                                        {item.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900 mb-1">{item.title}</h4>
+                                        <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                                    </div>
+                                </div>
+                            ))}
+                            <button
+                                onClick={handleOpenVerify}
+                                className="mt-4 px-8 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all"
+                            >
+                                인증 프로세스 미리보기
+                            </button>
+                        </div>
+                        <div className="relative">
+                            <div className="aspect-square bg-blue-600 rounded-[40px] rotate-3 relative overflow-hidden shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-700 p-10 flex flex-col justify-between text-white -rotate-3">
+                                    <div className="space-y-4">
+                                        <div className="w-12 h-8 bg-yellow-400/90 rounded-md" />
+                                        <div className="text-2xl font-mono tracking-widest uppercase">Business Partner</div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="h-4 w-48 bg-white/20 rounded" />
+                                        <div className="h-4 w-32 bg-white/20 rounded" />
+                                        <div className="text-xl font-bold mt-4">Safe & Secure Payment</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl border border-slate-100 max-w-[200px]">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                                        <CheckCircle size={16} />
+                                    </div>
+                                    <span className="text-sm font-bold">인증 완료</span>
+                                </div>
+                                <div className="text-[11px] text-slate-400 leading-tight font-medium">실명 및 계좌 점검이 성공적으로 완료되었습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Stats Section */}
             <section className="py-20 border-y border-slate-100">
                 <div className="max-w-7xl mx-auto px-6">
@@ -165,16 +239,87 @@ export const AuditLanding = () => {
                 <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-2 grayscale group-hover:grayscale-0 transition-all">
                         <ShieldCheck className="text-slate-400" size={20} />
-                        <span className="text-sm font-black text-slate-400 uppercase tracking-tighter">초코아이디어</span>
+                        <span className="text-sm font-black text-slate-400 uppercase tracking-tighter">초코파트너스</span>
                     </div>
                     <div className="text-xs text-slate-400 font-medium text-center md:text-right">
-                        <div>&copy; 2026 초코아이디어 Inc. All Rights Reserved.</div>
+                        <div>&copy; 2026 초코파트너스 Inc. All Rights Reserved.</div>
                         <div className="mt-1">
                             대표자: 김대순 | 사업장주소: 경기도 평택시 지산로12번길 93, 2층 | 통신판매번호: 2017-경기송탄-0029
                         </div>
                     </div>
                 </div>
             </footer>
+
+            {/* [New] Verification Simulation Modal */}
+            {showVerifyModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+                        {/* Modal Header */}
+                        <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+                            <h3 className="font-black text-slate-900">비즈니스 파트너 인증</h3>
+                            <button onClick={() => setShowVerifyModal(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                                <X size={20} className="text-slate-400" />
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-8">
+                            {verifyStep === 'select' && (
+                                <div className="space-y-4">
+                                    <p className="text-sm text-slate-500 font-medium mb-6">진행하실 인증 절차를 선택해주세요.</p>
+                                    <button
+                                        onClick={() => setVerifyStep('phone')}
+                                        className="w-full p-5 border-2 border-slate-50 bg-slate-50 hover:border-blue-600 hover:bg-blue-50 transition-all rounded-2xl flex items-center gap-4 group"
+                                    >
+                                        <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <Smartphone className="text-blue-600" />
+                                        </div>
+                                        <div className="text-left">
+                                            <div className="font-bold text-slate-900">휴대폰 실명 확인</div>
+                                            <div className="text-xs text-slate-400 mt-0.5">본인 명의의 휴대폰으로 실명 확인</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            )}
+
+                            {verifyStep === 'phone' && (
+                                <div className="space-y-6 text-center">
+                                    <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Smartphone size={40} />
+                                    </div>
+                                    <h4 className="text-xl font-bold">휴대폰 본인 확인</h4>
+                                    <p className="text-sm text-slate-500 leading-relaxed font-medium">통신사 인증을 통해 실명을 확인하고<br />보안 인증 과정을 진행합니다.</p>
+                                    <div className="pt-4 space-y-3">
+                                        <button onClick={() => setVerifyStep('success')} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                                            인증 요청 (시뮬레이션)
+                                        </button>
+                                        <button onClick={() => setVerifyStep('select')} className="w-full py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-200 transition-all">
+                                            뒤로가기
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+
+                            {verifyStep === 'success' && (
+                                <div className="space-y-6 text-center">
+                                    <div className="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <CheckCircle size={40} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-slate-900">검증 성공</h4>
+                                    <p className="text-sm text-slate-500 leading-relaxed font-medium">사용자의 실명 및 계좌 정보가<br />금융 결제망과 일치합니다.</p>
+                                    <button
+                                        onClick={() => setShowVerifyModal(false)}
+                                        className="w-full mt-6 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all"
+                                    >
+                                        확인 및 닫기
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

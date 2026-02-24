@@ -15,8 +15,8 @@ import { SEOInjection } from "@/components/common/seo/SEOInjection";
 import { AUDIT_MODE } from "@/lib/brand-config";
 
 export const metadata: Metadata = AUDIT_MODE ? {
-  title: "초코아이디어 - 귀하의 성장을 위한 완벽한 비즈니스 파트너",
-  description: "초코아이디어는 효율적인 인재 매칭과 전략적인 마케팅 솔루션을 제공하는 차세대 비즈니스 솔루션 플랫폼입니다.",
+  title: "초코파트너스 - 귀하의 성장을 위한 완벽한 비즈니스 파트너",
+  description: "초코파트너스는 효율적인 인재 매칭과 전략적인 마케팅 솔루션을 제공하는 차세대 비즈니스 솔루션 플랫폼입니다.",
   other: {
     google: "notranslate",
     "color-scheme": "light",
