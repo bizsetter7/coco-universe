@@ -14,14 +14,16 @@ interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
-// PortOne V2 SDK Type Definition
-declare global {
-    interface Window {
-        PortOne?: {
-            requestIdentityVerification: (data: any) => Promise<any>;
-        };
-    }
-}
+// ─────────────────────────────────────────────────────────────────
+// 나이스평가정보 화이트셀(White Cell) 본인인증 연동 포인트
+//
+// 연동 흐름:
+//   1. 서버에서 NICE 암호화 토큰(enc_data) 발급 (/api/auth/nice-token)
+//   2. 아래 handleNiceAuth() 에서 NICE 팝업 form POST 호출
+//   3. 인증 완료 후 success_url 콜백 → /api/auth/verify-adult 로 복호화 요청
+//
+// 참고: https://developers.niceid.co.kr/identity-verification
+// ─────────────────────────────────────────────────────────────────
 
 // Mock User Database for Validation (Updated to match useAuth & LoginPage)
 const MOCK_USERS: Record<string, { type: 'corporate' | 'individual', name: string }> = {
@@ -49,56 +51,37 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
     };
 
     const handleNonMemberAuth = async (type: string) => {
-        if (type !== '휴대폰') {
-            alert(`${type} 인증은 현재 준비 중입니다. 휴대폰 인증을 이용해 주세요.`);
+        if (type === '아이핀') {
+            alert('아이핀 인증은 현재 준비 중입니다. 휴대폰 인증을 이용해 주세요.');
             return;
         }
 
-        if (!window.PortOne) {
-            alert('인증 모듈이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
-            return;
-        }
+        // ── [NICE 화이트셀 연동 포인트] ──────────────────────────────
+        // TODO: 아래 순서로 구현하세요.
+        //
+        // 1. 서버에서 NICE 암호화 토큰 발급
+        //    const tokenRes = await fetch('/api/auth/nice-token');
+        //    const { enc_data, token_version_id, integrity_value } = await tokenRes.json();
+        //
+        // 2. NICE 팝업 form POST (숨겨진 form 동적 생성 후 submit)
+        //    const form = document.createElement('form');
+        //    form.method = 'POST';
+        //    form.action = 'https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb';
+        //    form.target = 'nice_popup';
+        //    // m, token_version_id, enc_data, integrity_value 필드 추가
+        //    document.body.appendChild(form);
+        //    window.open('', 'nice_popup', 'width=500,height=600');
+        //    form.submit();
+        //
+        // 3. 인증 완료 콜백(success_url)에서 /api/auth/verify-adult POST 호출
+        //    → 서버에서 복호화 후 만 19세 검증 및 Supabase 업데이트
+        //
+        // 4. 성공 응답 수신 시:
+        //    localStorage.setItem('adult_verified', 'true');
+        //    onVerify();
+        // ─────────────────────────────────────────────────────────────
 
-        setIsAuthenticating(true);
-        try {
-            // [PortOne V2] Identity Verification Request
-            const response = await window.PortOne.requestIdentityVerification({
-                storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID || "store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a",
-                identityVerificationId: `verif-${Date.now()}`,
-                channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY || "channel-key-45817f30-f654-4332-ac51-d717a78d0846",
-            });
-
-            if (response.code !== undefined) {
-                console.error('Verification Failed:', response.message);
-                alert(`인증 실패: ${response.message}`);
-                return;
-            }
-
-            // Success: Verify on server
-            const verifyResponse = await fetch('/api/auth/verify-adult', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    identityVerificationId: response.identityVerificationId,
-                    userId: authUser?.id !== 'guest' ? authUser.id : null
-                }),
-            });
-
-            const result = await verifyResponse.json();
-
-            if (result.success) {
-                alert('성인 인증이 완료되었습니다. 환영합니다!');
-                localStorage.setItem('adult_verified', 'true');
-                onVerify();
-            } else {
-                alert(`성인 인증 실패: ${result.message || '만 19세 미만은 이용할 수 없습니다.'}`);
-            }
-        } catch (error: any) {
-            console.error('PortOne Error:', error);
-            alert(`인증 과정 중 오류가 발생했습니다. (사유: ${error.message || '네트워크 오류'})`);
-        } finally {
-            setIsAuthenticating(false);
-        }
+        alert('나이스 본인인증 연동 준비 중입니다. 잠시만 기다려주세요.');
     };
 
     const handleLogin = async (e: React.FormEvent) => {

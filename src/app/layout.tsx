@@ -109,7 +109,7 @@ export default function RootLayout({
         />
         {/* End Google Tag Manager */}
 
-        <script src="https://cdn.portone.io/v2/browser-sdk.js" async></script>
+        {/* TODO: 나이스 화이트셀 연동 시 필요한 스크립트가 있다면 여기에 추가 */}
 
         {/* Meta Pixel Code */}
         <Script
