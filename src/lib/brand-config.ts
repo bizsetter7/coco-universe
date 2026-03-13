@@ -7,12 +7,21 @@
 export const AUDIT_MODE = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
 
 /**
- * 성인인증 게이트 비활성화 플래그
- * - 본인인증 서비스 정식 런칭 전까지 NEXT_PUBLIC_ADULT_GATE_DISABLED=true 유지
- * - true  → AdultVerificationGate 완전 비표시 (심사역 포함 모든 경로)
- * - false → 기존 성인인증 게이트 동작 (기본값)
+ * 성인인증 게이트 마스터 락 (Master Lock)
+ *
+ * ⚠️ 기본값 = true (비활성화) — 환경변수 미설정 시에도 게이트 차단
+ *
+ * 판정 규칙:
+ *   NEXT_PUBLIC_ADULT_GATE_DISABLED 미설정 → undefined !== 'false' = TRUE  → 게이트 차단 ✅
+ *   NEXT_PUBLIC_ADULT_GATE_DISABLED=true   → 'true'    !== 'false' = TRUE  → 게이트 차단 ✅
+ *   NEXT_PUBLIC_ADULT_GATE_DISABLED=false  → 'false'   !== 'false' = FALSE → 게이트 활성 (런칭 후 사용)
+ *
+ * 런칭 시 단계:
+ *   1) 본인인증 서비스 계약 완료
+ *   2) Vercel 환경변수: NEXT_PUBLIC_ADULT_GATE_DISABLED=false 설정
+ *   3) 재배포
  */
-export const ADULT_GATE_DISABLED = process.env.NEXT_PUBLIC_ADULT_GATE_DISABLED === 'true';
+export const ADULT_GATE_DISABLED = process.env.NEXT_PUBLIC_ADULT_GATE_DISABLED !== 'false';
 
 /**
  * 하위 호환성을 위해 유지 (곧 제거 예정)

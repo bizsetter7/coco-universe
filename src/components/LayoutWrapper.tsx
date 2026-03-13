@@ -49,7 +49,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     const isAdminPage = pathname?.startsWith('/admin');
 
-    // [New] Audit Mode Handling - PG 심사 시 모든 경로에서 AuditLanding 강제 노출 (Admin 제외)
+    // ── [1] Audit Mode: P4 심사용 B2B 랜딩 강제 노출 ────────────────────────────
     if (AUDIT_MODE && !isAdminPage) {
         return (
             <div className="w-full min-h-screen bg-white">
@@ -60,22 +60,31 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    // 로딩 중에는 아무것도 보여주지 않거나 스플래시 노출
-    // [Optimization] Prevent white screen flash by showing a minimal loader or Skeleton
-    if (isLoading || isVerified === null) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-white">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-        );
-    }
-
-    // 성인인증 게이트 비활성화 플래그 (본인인증 서비스 정식 런칭 전)
-    // NEXT_PUBLIC_ADULT_GATE_DISABLED=true → 심사역 포함 모든 접속자에게 게이트 미표시
-    const showGate = !isVerified && !ADULT_GATE_DISABLED;
-
-    if (showGate) {
-        return <AdultVerificationGate onVerify={handleVerify} />;
+    // ── [2] 성인인증 게이트 마스터 락 ───────────────────────────────────────────
+    // ADULT_GATE_DISABLED 기본값 = true (환경변수 미설정 포함)
+    // → AdultVerificationGate가 렌더링 파이프라인에 절대 진입 불가
+    // → isVerified 대기도 불필요 — auth 로딩만 완료되면 즉시 정상 렌더링
+    if (ADULT_GATE_DISABLED) {
+        if (isLoading) {
+            return (
+                <div className="flex items-center justify-center min-h-screen bg-white">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </div>
+            );
+        }
+        // 게이트 완전 패스 → 정상 레이아웃으로 바로 진행
+    } else {
+        // ── [3] 게이트 활성 모드 (NEXT_PUBLIC_ADULT_GATE_DISABLED=false 명시 설정 시) ──
+        if (isLoading || isVerified === null) {
+            return (
+                <div className="flex items-center justify-center min-h-screen bg-white">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </div>
+            );
+        }
+        if (!isVerified) {
+            return <AdultVerificationGate onVerify={handleVerify} />;
+        }
     }
 
     return (
