@@ -106,7 +106,7 @@ export default function CardNoticePage() {
                     >
                         <div className="flex items-center gap-2 mb-1">
                             <Phone size={20} fill="white" />
-                            <span className="text-xl md:text-2xl font-black">코코알바 고객센터 1577-9879</span>
+                            <span className="text-xl md:text-2xl font-black">코코알바 고객센터 1877-1442</span>
                         </div>
                         <p className="text-[10px] opacity-70 uppercase tracking-widest font-bold">
                             Copyright(c) 2026 COCOALBA All Rights Reserved.

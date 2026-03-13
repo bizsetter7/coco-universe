@@ -280,7 +280,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                 {/* 5. Footer */}
                 <div className="mt-auto bg-[#f82b60] text-white p-4 text-center space-y-2">
                     <p className="text-lg font-black tracking-tighter flex items-center justify-center gap-1">
-                        {brand.name || '코코알바'} 고객센터 <span className="text-2xl ml-1">1577-9879</span>
+                        {brand.name || '코코알바'} 고객센터 <span className="text-2xl ml-1">1877-1442</span>
                     </p>
                     <p className="text-[9px] opacity-70 uppercase font-medium tracking-widest leading-none">
                         COPYRIGHT(C) 2026 {brand.name || 'COCOALBA'} ALL RIGHTS RESERVED.
