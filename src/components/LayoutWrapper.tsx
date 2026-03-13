@@ -15,7 +15,7 @@ import { AdultVerificationGate } from './common/AdultVerificationGate';
 import { AuditLanding } from './audit/AuditLanding';
 
 import { useAuth } from '@/hooks/useAuth';
-import { AUDIT_MODE } from '@/lib/brand-config';
+import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -70,7 +70,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    const showGate = !isVerified;
+    // 성인인증 게이트 비활성화 플래그 (본인인증 서비스 정식 런칭 전)
+    // NEXT_PUBLIC_ADULT_GATE_DISABLED=true → 심사역 포함 모든 접속자에게 게이트 미표시
+    const showGate = !isVerified && !ADULT_GATE_DISABLED;
 
     if (showGate) {
         return <AdultVerificationGate onVerify={handleVerify} />;

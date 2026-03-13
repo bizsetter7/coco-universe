@@ -7,6 +7,14 @@
 export const AUDIT_MODE = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
 
 /**
+ * 성인인증 게이트 비활성화 플래그
+ * - 본인인증 서비스 정식 런칭 전까지 NEXT_PUBLIC_ADULT_GATE_DISABLED=true 유지
+ * - true  → AdultVerificationGate 완전 비표시 (심사역 포함 모든 경로)
+ * - false → 기존 성인인증 게이트 동작 (기본값)
+ */
+export const ADULT_GATE_DISABLED = process.env.NEXT_PUBLIC_ADULT_GATE_DISABLED === 'true';
+
+/**
  * 하위 호환성을 위해 유지 (곧 제거 예정)
  */
 export const IS_SAFE_MODE = false;
@@ -31,6 +39,21 @@ export const BRANDS: Record<string, BrandConfig> = {
         logoText: 'COCO',
         displayName: 'COCO 코코알바',
         tagline: '대한민국 1등 여성 고소득 알바 플랫폼',
+        theme: 'light',
+    },
+    /**
+     * P4 초코파트너스 / 파트너스크레딧
+     * - 도메인: partnerscredit.co.kr (실제 도메인 확정 시 업데이트)
+     * - Vercel 환경변수: NEXT_PUBLIC_DEFAULT_BRAND_ID=choco, NEXT_PUBLIC_AUDIT_MODE=true
+     */
+    choco: {
+        id: 'choco',
+        name: '초코파트너스',
+        domain: 'partnerscredit.co.kr',
+        primaryColor: '#1E3A8A',
+        logoText: 'CHOCO',
+        displayName: '초코파트너스',
+        tagline: '파트너스크레딧 — 검증된 파트너사와 함께하는 B2B 성장 플랫폼',
         theme: 'light',
     },
     bibi: {

@@ -40,8 +40,17 @@ const BrandSync = ({ setBrand }: { setBrand: (b: BrandConfig) => void }) => {
     return null;
 };
 
+/**
+ * 빌드 타임 브랜드 ID 오버라이드 (Vercel 환경변수)
+ * - P4: NEXT_PUBLIC_DEFAULT_BRAND_ID=choco → 초코파트너스 브랜드 강제 적용
+ * - P2: 미설정(default) → DEFAULT_BRAND(coco) 사용
+ */
+const ENV_DEFAULT_BRAND_ID = process.env.NEXT_PUBLIC_DEFAULT_BRAND_ID;
+const INITIAL_BRAND: BrandConfig =
+    (ENV_DEFAULT_BRAND_ID && BRANDS[ENV_DEFAULT_BRAND_ID]) ? BRANDS[ENV_DEFAULT_BRAND_ID] : DEFAULT_BRAND;
+
 export const BrandProvider = ({ children }: { children: React.ReactNode }) => {
-    const [brand, setBrand] = useState<BrandConfig>(DEFAULT_BRAND);
+    const [brand, setBrand] = useState<BrandConfig>(INITIAL_BRAND);
 
     // 3. Sync Dark Mode Class to HTML/Body
     useEffect(() => {

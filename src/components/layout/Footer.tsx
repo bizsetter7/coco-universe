@@ -3,29 +3,44 @@
 import React from 'react';
 import Link from 'next/link';
 import { useBrand } from '@/components/BrandProvider';
-import { House, User } from 'lucide-react';
 
 export const Footer = () => {
     const brand = useBrand();
 
+    const isChoco = brand.id === 'choco';
+
     return (
         <footer className={`py-12 border-t font-sans ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-gray-50 border-gray-100 text-gray-500'}`}>
             <div className="container mx-auto px-4 text-center text-xs leading-relaxed">
-                {/* Branded Logo matching MainHeader exactly in style */}
+
+                {/* Branded Logo — 도메인별 동적 렌더링 */}
                 <div className="mb-6 flex items-center justify-center gap-2">
-                    <div className="flex flex-col items-center leading-none text-center">
-                        <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">
-                            여성전문 고소득 알바 No.1
-                        </span>
-                        <div className="flex items-center gap-0.5">
-                            <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">
-                                COCO
+                    {isChoco ? (
+                        /* 초코파트너스 (P4 / partnerscredit.co.kr) */
+                        <div className="flex flex-col items-center leading-none text-center">
+                            <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">
+                                파트너스크레딧 공식 B2B 플랫폼
                             </span>
-                            <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                                ALBA
+                            <span className="text-2xl md:text-3xl font-black tracking-tighter text-blue-800">
+                                초코파트너스
                             </span>
                         </div>
-                    </div>
+                    ) : (
+                        /* 코코알바 (P2 / cocoalba.kr, 기본값) */
+                        <div className="flex flex-col items-center leading-none text-center">
+                            <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">
+                                여성전문 고소득 알바 No.1
+                            </span>
+                            <div className="flex items-center gap-0.5">
+                                <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">
+                                    COCO
+                                </span>
+                                <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                                    ALBA
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Links */}
@@ -39,7 +54,7 @@ export const Footer = () => {
                     <Link href="/customer-center?tab=inquiry" className="hover:text-gray-900 dark:hover:text-white transition-colors">광고/제휴문의</Link>
                 </div>
 
-                {/* Company Info */}
+                {/* Company Info — 사업자 정보 고정 (대표자: 김대순 외 1명 / 고객센터: 1877-1442) */}
                 <div className="space-y-1 mb-6 text-gray-400 text-[11px] md:text-xs text-center">
                     <p>상호: 초코아이디어 | 대표자명: 김대순 외 1명 | 사업자등록번호: 226-13-91078</p>
                     <p>주소: 경기도 평택시 지산로12번길 93, 2층(지산동)</p>
@@ -47,9 +62,9 @@ export const Footer = () => {
                     <p>고객센터: 1877-1442 (평일 09:00 ~ 18:00) | 이메일: bizsetter7@gmail.com</p>
                 </div>
 
-                {/* Copyright */}
+                {/* Copyright — 서비스명 브랜드별 동적 */}
                 <div className="text-gray-400/60 text-[10px] md:text-xs">
-                    <p className="mb-1">© 2026 COCOALBA. All Rights Reserved.</p>
+                    <p className="mb-1">© 2026 {isChoco ? '초코파트너스' : 'COCOALBA'}. All Rights Reserved.</p>
                     <p>본 사이트는 구인구직 정보의 중개 시스템으로, 정보의 정확성에 대한 책임은 등록자에게 있습니다.</p>
                 </div>
             </div>

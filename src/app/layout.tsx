@@ -13,20 +13,39 @@ import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
 
 import { getCurrentSEO } from "@/lib/metadata-config";
+import { AUDIT_MODE } from "@/lib/brand-config";
 
-const seoConfig = getCurrentSEO();
+/**
+ * generateMetadata — 도메인/브랜드별 타이틀 동적 분기
+ * - AUDIT_MODE=true (P4 초코파트너스) → 타이틀 "초코파트너스 - 파트너스크레딧 공식 B2B 플랫폼"
+ * - 기본 (P2 코코알바)               → getCurrentSEO() 기반 타이틀
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  if (AUDIT_MODE) {
+    return {
+      title: "초코파트너스 - 파트너스크레딧 공식 B2B 플랫폼",
+      description: "초코파트너스는 검증된 파트너사와 함께 성장하는 B2B 비즈니스 플랫폼입니다. 파트너스크레딧을 통해 합리적이고 투명한 비즈니스 솔루션을 경험하세요.",
+      other: {
+        google: "notranslate",
+        "color-scheme": "light",
+        "supported-color-schemes": "light",
+      },
+    };
+  }
 
-export const metadata: Metadata = {
-  title: seoConfig.metadata.title,
-  description: seoConfig.metadata.description,
-  keywords: seoConfig.metadata.keywords,
-  verification: seoConfig.metadata.verification,
-  other: {
-    google: "notranslate",
-    "color-scheme": seoConfig.theme.colorScheme,
-    "supported-color-schemes": seoConfig.theme.supportedColorSchemes,
-  },
-};
+  const seoConfig = getCurrentSEO();
+  return {
+    title: seoConfig.metadata.title,
+    description: seoConfig.metadata.description,
+    keywords: seoConfig.metadata.keywords,
+    verification: seoConfig.metadata.verification,
+    other: {
+      google: "notranslate",
+      "color-scheme": seoConfig.theme.colorScheme,
+      "supported-color-schemes": seoConfig.theme.supportedColorSchemes,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
