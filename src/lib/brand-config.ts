@@ -1,8 +1,10 @@
 /**
- * PG 심사 대응용 독립 랜딩 모드 플래그
- * true 설정 시: 루트 경로에서 AuditLanding 컴포넌트만 노출
+ * B2B 랜딩 모드 플래그
+ * 환경변수 NEXT_PUBLIC_AUDIT_MODE=true 일 때 AuditLanding 컴포넌트 노출
+ * - P2 (코코알바) Vercel 프로젝트: 미설정(default false) → 실제 P2 사이트 렌더링
+ * - P4 (초코파트너스) Vercel 프로젝트: NEXT_PUBLIC_AUDIT_MODE=true → AuditLanding 렌더링
  */
-export const AUDIT_MODE = true;
+export const AUDIT_MODE = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
 
 /**
  * 하위 호환성을 위해 유지 (곧 제거 예정)

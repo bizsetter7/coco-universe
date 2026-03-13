@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ShieldCheck, Users, TrendingUp, CheckCircle, Mail, Phone, Lock, User, Smartphone, X } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 export const AuditLanding = () => {
     const [showVerifyModal, setShowVerifyModal] = React.useState(false);
@@ -234,21 +235,8 @@ export const AuditLanding = () => {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="py-12 border-t border-slate-100">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-2 grayscale group-hover:grayscale-0 transition-all">
-                        <ShieldCheck className="text-slate-400" size={20} />
-                        <span className="text-sm font-black text-slate-400 uppercase tracking-tighter">초코파트너스</span>
-                    </div>
-                    <div className="text-xs text-slate-400 font-medium text-center md:text-right">
-                        <div>&copy; 2026 초코파트너스 Inc. All Rights Reserved.</div>
-                        <div className="mt-1">
-                            대표자: 김대순 | 사업장주소: 경기도 평택시 지산로12번길 93, 2층 | 통신판매번호: 2017-경기송탄-0029
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            {/* Footer - 공식 Footer.tsx 컴포넌트 사용 (사업자 정보 일원화) */}
+            <Footer />
 
             {/* [New] Verification Simulation Modal */}
             {showVerifyModal && (
