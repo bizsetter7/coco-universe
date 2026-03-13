@@ -41,7 +41,7 @@ export interface SEOConfig {
 const BASE_ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "초코파트너스",
+  "name": "COCOALBA (코코알바)",
   "url": "https://cocoalba.kr",
   "logo": "https://cocoalba.kr/logo.png",
   "sameAs": [
@@ -60,7 +60,7 @@ const BASE_ORGANIZATION_SCHEMA = {
 const CLEAN_LOCAL_BUSINESS_SCHEMA = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": "초코파트너스 지역 일자리 매칭",
+    "name": "코코알바(COCOALBA) 지역 일자리 매칭",
     "description": "지역 내 검증된 기업과 최적의 인재를 안전하게 연결하는 맞춤 채용 플랫폼입니다. 믿을 수 있는 지역 일자리 정보를 제공합니다.",
     "url": "https://cocoalba.kr",
     "image": "https://cocoalba.kr/logo.png"
@@ -72,8 +72,8 @@ const CLEAN_SEO: SEOConfig = {
     supportedColorSchemes: 'light',
   },
   metadata: {
-    title: "초코파트너스 - 지역 기반 맞춤 채용 매칭 플랫폼",
-    description: "초코파트너스는 지역 내 검증된 기업과 최적의 인재를 가장 빠르고 안전하게 연결하는 로컬 친화적 매칭 플랫폼입니다.",
+    title: "코코알바(COCOALBA) - 지역 기반 맞춤 채용 매칭 플랫폼",
+    description: "코코알바는 지역 내 검증된 기업과 최적의 인재를 가장 빠르고 안전하게 연결하는 로컬 친화적 매칭 플랫폼입니다.",
     keywords: ["구인구직", "지역일자리", "단기알바", "맞춤채용", "업종별일자리", "알바플랫폼", "파트너스"],
     verification: {
         google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
