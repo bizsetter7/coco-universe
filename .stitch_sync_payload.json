@@ -1,0 +1,4 @@
+{
+  "projectId": "8034868767551498692",
+  "prompt": "Create a dashboard screen to serve as our project's AI SOP and Status Sync. Display the following content clearly with good typography and layout:\n\n# 🚀 초코아이디어 통합 사령부 마스터 SOP (v1.3)\n\n## 🔐 핵심 가치: 보안 및 정예 정신\n1. **철저한 보안**: 모든 소스코드와 비즈니스 모델은 대외비다.\n2. **정예 요원 자발성**: 전문가로서 선제적으로 도구와 수익화 제안.\n3. **지속적 학습**: 패턴을 발견하고 시스템화.\n\n## 🌐 마스터 맵\n- P1(본사): C:\\My-site\\choco-idea\n- P2(코코알바): C:\\My-site\\통합사이트\\브랜드_통합_시스템 (본체: www.cocoalba.kr)\n- P3(랜딩): C:\\My-site\\코코 랜딩페이지 (73개 지역별 랜딩페이지)\n- P4(정산): C:\\My-site\\파트너스_사이트\n\n## ⚙️ 5단계 자동화 워크플로우\n1. [계획] Antigravity: 비즈니스 목표 분석\n2. [검증] Claude Chat: 로직/보안 교차 검증\n3. [실행] Claude Code: 최적화된 코드 구현\n4. [테스트] Testsprite: 전수 검사 (Auto QA)\n5. [기록] Stitch MCP: 맥락 동기화 (Sync)\n\n## 📍 P2 현재 진행 상황\n- 과제: P1~P4 전체 프로젝트 재점검 및 P2 코코알바 본인인증 로직 구현 시작."
+}

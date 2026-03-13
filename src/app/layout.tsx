@@ -12,29 +12,19 @@ const inter = Inter({ subsets: ["latin"] });
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
 
-import { AUDIT_MODE } from "@/lib/brand-config";
+import { getCurrentSEO } from "@/lib/metadata-config";
 
-export const metadata: Metadata = AUDIT_MODE ? {
-  title: "초코파트너스 - 귀하의 성장을 위한 완벽한 비즈니스 파트너",
-  description: "초코파트너스는 효율적인 인재 매칭과 전략적인 마케팅 솔루션을 제공하는 차세대 비즈니스 솔루션 플랫폼입니다.",
+const seoConfig = getCurrentSEO();
+
+export const metadata: Metadata = {
+  title: seoConfig.metadata.title,
+  description: seoConfig.metadata.description,
+  keywords: seoConfig.metadata.keywords,
+  verification: seoConfig.metadata.verification,
   other: {
     google: "notranslate",
-    "color-scheme": "light",
-    "supported-color-schemes": "light",
-  },
-} : {
-  title: "코코알바(COCOALBA) - No.1 고소득 여성알바 (여우알바, 퀸알바 공식 제휴 사이트)",
-  description: "대한민국 1등 여성 고소득 알바 플랫폼 코코알바. 여우알바, 퀸알바, 밤알바 구직 정보를 실시간으로 확인하고 가장 안전하고 빠른 매칭을 경험하세요. 일급 50만 이상, 당일지급 보장!",
-  verification: {
-    google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
-    other: {
-      'naver-site-verification': ['950201bcd2e28188884dfc9feeb6951a40c0887c'],
-    },
-  },
-  other: {
-    google: "notranslate",
-    "color-scheme": "light",
-    "supported-color-schemes": "light",
+    "color-scheme": seoConfig.theme.colorScheme,
+    "supported-color-schemes": seoConfig.theme.supportedColorSchemes,
   },
 };
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase as supabaseAdmin } from '@/lib/supabase';
-import { sendSMS } from '@/lib/sms';
+import { sendSMS, isSMSMock } from '@/lib/sms';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,70 +10,91 @@ export async function POST(request: Request) {
         const { campaignId, message, targets, channel } = body;
 
         if (!campaignId || !message || !targets || targets.length === 0) {
-            return NextResponse.json({ success: false, message: 'Invalid payload' }, { status: 400 });
+            return NextResponse.json(
+                { success: false, message: 'Invalid payload' },
+                { status: 400 }
+            );
         }
 
-        // 1. (Optional) Validate Admin Session here if not handled by middleware
-        // For now, we trust the caller (Admin UI) passing a valid session token or check via header if needed.
-        // Simplified for this context.
+        // ── Mock 모드 판단 ────────────────────────────────────────────────
+        // lib/sms.ts 의 isSMSMock(환경변수 누락 여부)를 단일 진실 공급원으로 사용.
+        // SOLAPI_* 참조 완전 제거 → ALIGO_* 기반으로 통일.
+        const isMock = isSMSMock;
 
-        // 2. Mock Mode Check (If keys are missing, lib/sms.ts handles it safely, 
-        // but we can also check here to provide explicit feedback)
-        const isMock = !process.env.SOLAPI_API_KEY || !process.env.SOLAPI_SENDER_NUMBER;
-
-        // 3. Send Messages
+        // ── 발송 ─────────────────────────────────────────────────────────
         let successCount = 0;
-        let failedCount = 0;
-        let errorMsg = '';
+        let failedCount  = 0;
+        let errorMsg     = '';
 
         try {
-            // Extract phone numbers
-            const phoneNumbers = targets.map((t: any) => t.phone_number).filter((p: any) => p);
+            const phoneNumbers: string[] = targets
+                .map((t: any) => t.phone_number as string)
+                .filter((p: string) => p?.trim());
 
-            // Only send if we have numbers
             if (phoneNumbers.length > 0) {
-                const result = await sendSMS(phoneNumbers, message);
+                const result = await sendSMS(phoneNumbers, message, {
+                    // LMS 채널이면 제목 주입 (90자 이하도 LMS 강제)
+                    title   : channel === 'lms' ? '[코코알바]' : undefined,
+                    // ALIGO_TEST_MODE=true 이면 testmode_yn=Y → 과금 없음
+                    testmode: process.env.ALIGO_TEST_MODE === 'true',
+                });
 
                 if (result.success) {
-                    if (result.type === 'mock') {
-                        // Mock success
-                        successCount = phoneNumbers.length;
-                    } else {
-                        // Real success
-                        successCount = result.successCount || (result.result ? 1 : 0);
-                        failedCount = result.failCount || 0;
+                    switch (result.type) {
+                        case 'mock':
+                        case 'aligo-test':
+                            // Mock 또는 알리고 테스트 모드: 전원 성공 처리
+                            successCount = phoneNumbers.length;
+                            break;
+                        default:
+                            // 실제 발송: 알리고 집계값 사용
+                            successCount = result.successCount ?? 0;
+                            failedCount  = result.failCount    ?? 0;
+                    }
+                    // 부분 실패 경고 (성공이지만 일부 오류)
+                    if (result.error) {
+                        console.warn('[API/marketing/send] 부분 실패:', result.error);
+                        errorMsg = result.error;
                     }
                 } else {
                     failedCount = phoneNumbers.length;
-                    errorMsg = result.error || 'Sending failed';
+                    errorMsg    = result.error || '알리고 발송 실패';
                 }
             }
         } catch (e: any) {
-            console.error('API Send Error:', e);
+            console.error('[API/marketing/send] 발송 예외:', e);
             failedCount = targets.length;
-            errorMsg = e.message;
+            errorMsg    = e.message;
         }
 
-        // 4. Update Database
+        // ── DB 업데이트 ──────────────────────────────────────────────────
         await supabaseAdmin
             .from('marketing_campaigns')
             .update({
-                status: 'completed',
+                status       : 'completed',
                 success_count: successCount,
-                failed_count: failedCount,
-                error_log: errorMsg ? errorMsg : null,
-                sent_at: new Date().toISOString()
+                failed_count : failedCount,
+                error_log    : errorMsg || null,
+                sent_at      : new Date().toISOString(),
             })
             .eq('id', campaignId);
 
         return NextResponse.json({
-            success: true,
+            success : true,
             isMock,
-            summary: { total: targets.length, success: successCount, failed: failedCount }
+            provider: 'aligo',
+            summary : {
+                total  : targets.length,
+                success: successCount,
+                failed : failedCount,
+            },
         });
 
     } catch (error: any) {
-        console.error('Server Internal Error:', error);
-        return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+        console.error('[API/marketing/send] Internal Error:', error);
+        return NextResponse.json(
+            { success: false, message: 'Internal Server Error' },
+            { status: 500 }
+        );
     }
 }
