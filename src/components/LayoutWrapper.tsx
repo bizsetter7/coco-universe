@@ -11,11 +11,11 @@ import { useBrand } from './BrandProvider';
 import { Footer } from './layout/Footer';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
-import { AdultVerificationGate } from './common/AdultVerificationGate';
+// import { AdultVerificationGate } from './common/AdultVerificationGate'; // [GATE_LOCKED] 런칭 전까지 비활성
 import { AuditLanding } from './audit/AuditLanding';
 
 import { useAuth } from '@/hooks/useAuth';
-import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
+import { AUDIT_MODE } from '@/lib/brand-config';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -25,27 +25,7 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
-    const { user: authUser, isLoggedIn, isLoading } = useAuth();
-    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
-
-    React.useEffect(() => {
-        if (isLoading) return;
-
-        // DB에서 인증된 회원인 경우
-        if (isLoggedIn && authUser.isAdultVerified) {
-            setIsVerified(true);
-            return;
-        }
-
-        // 비로그인 또는 DB 미인증 시 로컬 스토리지 확인
-        const localVerified = localStorage.getItem('adult_verified') === 'true';
-        setIsVerified(localVerified);
-    }, [isLoggedIn, authUser.isAdultVerified, isLoading]);
-
-    const handleVerify = () => {
-        localStorage.setItem('adult_verified', 'true');
-        setIsVerified(true);
-    };
+    const { isLoading } = useAuth();
 
     const isAdminPage = pathname?.startsWith('/admin');
 
@@ -60,31 +40,38 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    // ── [2] 성인인증 게이트 마스터 락 ───────────────────────────────────────────
-    // ADULT_GATE_DISABLED 기본값 = true (환경변수 미설정 포함)
-    // → AdultVerificationGate가 렌더링 파이프라인에 절대 진입 불가
-    // → isVerified 대기도 불필요 — auth 로딩만 완료되면 즉시 정상 렌더링
-    if (ADULT_GATE_DISABLED) {
-        if (isLoading) {
-            return (
-                <div className="flex items-center justify-center min-h-screen bg-white">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                </div>
-            );
-        }
-        // 게이트 완전 패스 → 정상 레이아웃으로 바로 진행
-    } else {
-        // ── [3] 게이트 활성 모드 (NEXT_PUBLIC_ADULT_GATE_DISABLED=false 명시 설정 시) ──
-        if (isLoading || isVerified === null) {
-            return (
-                <div className="flex items-center justify-center min-h-screen bg-white">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                </div>
-            );
-        }
-        if (!isVerified) {
-            return <AdultVerificationGate onVerify={handleVerify} />;
-        }
+    // ── [2] 성인인증 게이트 원천 봉쇄 ───────────────────────────────────────────
+    // ⚠️  컴포넌트 호출부 자체를 비활성화 — 환경변수 설정 실수조차 허용하지 않음
+    // ⚠️  AdultVerificationGate 임포트도 주석 처리됨 (위 import 라인 참조)
+    //
+    // 런칭 시 해제 순서:
+    //   1) 위 import 주석 해제
+    //   2) 아래 [GATE_LOCKED] 블록 주석 해제
+    //   3) 재배포
+    //
+    // ── [GATE_LOCKED: 아래 블록을 런칭 전까지 절대 해제 금지] ──────────────────
+    /*
+    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+    React.useEffect(() => {
+        if (isLoading) return;
+        if (authUser?.isAdultVerified) { setIsVerified(true); return; }
+        setIsVerified(localStorage.getItem('adult_verified') === 'true');
+    }, [isLoading]);
+    const handleVerify = () => {
+        localStorage.setItem('adult_verified', 'true');
+        setIsVerified(true);
+    };
+    if (isLoading || isVerified === null) return <LoadingSpinner />;
+    if (!isVerified) return <AdultVerificationGate onVerify={handleVerify} />;
+    */
+    // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+        );
     }
 
     return (
@@ -92,8 +79,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             {/* Global Header */}
             <MainHeader />
 
-            {/* 
-               [Golden Rule - Framework Reconstruction v2] 
+            {/*
+               [Golden Rule - Framework Reconstruction v2]
                1. Outer Wrapper: Max 1432px, Centered, Relative
                2. Main Grid: 160px Spacers + 1fr Content
                3. Sidebars: Now nested INSIDE spacers to contribute to height and ensure alignment
