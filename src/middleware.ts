@@ -146,18 +146,20 @@ export function middleware(request: NextRequest) {
 
     // 5. 보안 헤더 추가 (모든 응답에)
     const response = NextResponse.next();
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    
-    // [보안] 로컬 시뮬레이터 및 개발 환경 배려: AUDIT_MODE이거나 개발 환경일 때 X-Frame-Options 및 CSP 제한 해제
+
+    // [보안] 로컬 시뮬레이터 및 개발 환경 배려: AUDIT_MODE이거나 개발 환경일 때 보안 헤더 대폭 완화
     if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_AUDIT_MODE !== 'true') {
         response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+        response.headers.set('X-Content-Type-Options', 'nosniff');
+        response.headers.set('X-XSS-Protection', '1; mode=block');
     } else {
-        // 시뮬레이터 모니터링을 위해 iframe 사용 허용 및 CSP 완화
+        // 시뮬레이터 모니터링을 위해 모든 프레임 제한 해제
         response.headers.delete('X-Frame-Options');
-        response.headers.set('Content-Security-Policy', "frame-ancestors *");
+        response.headers.set('Content-Security-Policy', "frame-ancestors *;");
+        response.headers.set('Access-Control-Allow-Origin', '*');
+        response.headers.delete('X-Content-Type-Options');
     }
     
-    response.headers.set('X-XSS-Protection', '1; mode=block');
     response.headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
