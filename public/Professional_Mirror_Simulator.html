@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coco Pro - Command Simulator v8.1</title>
+    <title>Coco Pro - Command Simulator v8.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -61,14 +61,33 @@
             flex-direction: column;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100;
+            height: 100%;
+            overflow: hidden; /* Header/Footer fixed, content scrolls */
         }
         
+        .sidebar-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* Premium Blue Scrollbar */
+        .sidebar-scroll-area::-webkit-scrollbar { width: 6px; }
+        .sidebar-scroll-area::-webkit-scrollbar-track { background: #0f172a; }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb { 
+            background: #3b82f6; 
+            border-radius: 10px;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+
         /* Narrow Window Responsive */
         @media (max-width: 800px) {
             .control-sidebar {
                 position: absolute;
                 left: 0; top: 0; bottom: 0;
                 transform: translateX(-100%);
+                height: 100%;
             }
             .control-sidebar.open { transform: translateX(0); }
         }
@@ -110,6 +129,7 @@
             overflow: hidden;
             position: relative;
             background: #000;
+            mask-image: -webkit-radial-gradient(white, black); /* Standard property */
             -webkit-mask-image: -webkit-radial-gradient(white, black); /* Fix for rounded corners blur */
         }
 
@@ -146,12 +166,16 @@
         .accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1); /* Faster collapse */
             background: #0f172a;
         }
-        .accordion-header.active + .accordion-content {
-            max-height: 500px;
+        .accordion-content.open {
+            max-height: 1000px;
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0); /* Smooth expand */
             border-bottom: 1px solid #1e293b;
+        }
+        .accordion-inner {
+            padding: 20px 16px;
         }
 
         .checklist-row {
@@ -232,87 +256,119 @@
 
         <!-- 📑 Compact Control Panel -->
         <aside class="control-sidebar shrink-0" id="sidebar">
-            <!-- 📱 Device Control -->
-            <div class="accordion-header active" onclick="toggleAccordion(this)">
-                <span>Device Tuner</span>
-                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div class="accordion-content p-5 space-y-6">
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-[9px] text-slate-500 font-black uppercase">Standard Presets</label>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setDevice(450)" class="btn-action active text-[10px]" id="preset-450">S21 Master</button>
-                        <button onclick="setDevice(390)" class="btn-action text-[10px]" id="preset-390">iPhone 15</button>
+            <div class="sidebar-scroll-area">
+                <!-- 🌐 Production Projects (Vercel) -->
+                <div class="accordion-header active" onclick="toggleAccordion(this)">
+                    <span>Production (Vercel)</span>
+                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-inner space-y-2">
+                        <button onclick="loadRemote('https://chocoidea.vercel.app')" class="w-full btn-action flex justify-between items-center group py-3">
+                            <span class="text-[10px] text-white">P1. 초코아이디어 본사</span>
+                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </button>
+                        <button onclick="loadRemote('https://coco-universe.vercel.app')" class="w-full btn-action flex justify-between items-center group py-3">
+                            <span class="text-[10px] text-white">P2. 코코알바 통합</span>
+                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </button>
+                        <button onclick="loadRemote('https://coco-inky.vercel.app')" class="w-full btn-action flex justify-between items-center group py-3">
+                            <span class="text-[10px] text-white">P3. 73개 지역 랜딩</span>
+                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </button>
+                        <button onclick="loadRemote('https://partners-credit.vercel.app')" class="w-full btn-action flex justify-between items-center group py-3">
+                            <span class="text-[10px] text-white">P4. 파트너스크레딧</span>
+                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </button>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <label class="text-[9px] text-slate-500 font-black uppercase">Manual Width</label>
-                        <span id="width-label" class="text-[10px] text-blue-400 font-black">450px</span>
-                    </div>
-                    <input type="range" id="widthSlider" min="320" max="600" value="450" oninput="manualWidth(this.value)">
+                <!-- 📱 Device Control -->
+                <div class="accordion-header active" onclick="toggleAccordion(this)">
+                    <span>Device Tuner</span>
+                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-
-                <!-- Sharp Control in Sidebar too -->
-                <div class="pt-2 border-t border-slate-800">
-                    <label class="text-[9px] text-slate-500 font-black uppercase mb-3 block">Display Engine</label>
-                    <button onclick="toggleSharp()" class="w-full btn-action flex justify-between items-center group">
-                        <span>Anti-Aliasing Boost</span>
-                        <div id="sharpToggle" class="w-8 h-4 bg-blue-600 rounded-full relative transition-colors p-0.5">
-                            <div class="w-3 h-3 bg-white rounded-full transition-transform translate-x-4" id="sharpKnob"></div>
+                <div class="accordion-content">
+                    <div class="accordion-inner space-y-6">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[9px] text-slate-500 font-black uppercase">Standard Presets</label>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setDevice(450)" class="btn-action active text-[10px]" id="preset-450">S21 Master</button>
+                                <button onclick="setDevice(390)" class="btn-action text-[10px]" id="preset-390">iPhone 15</button>
+                            </div>
                         </div>
-                    </button>
-                </div>
-            </div>
 
-            <!-- 🤖 TestSprite Automation Accordion -->
-            <div class="accordion-header" onclick="toggleAccordion(this)">
-                <span>TestSprite E2E Control</span>
-                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div class="accordion-content p-5 space-y-4">
-                <button onclick="runFastAudit()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                    RUN FULL AUDIT
-                </button>
-                
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openDashboard()" class="btn-action flex flex-col items-center gap-1 py-3 group">
-                        <svg class="w-4 h-4 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span class="text-[8px]">DASHBOARD</span>
-                    </button>
-                    <button onclick="testLoginCycle()" class="btn-action flex flex-col items-center gap-1 py-3 group">
-                        <svg class="w-4 h-4 group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        <span class="text-[8px]">LOGIN TEST</span>
-                    </button>
-                </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[9px] text-slate-500 font-black uppercase">Manual Width</label>
+                                <span id="width-label" class="text-[10px] text-blue-400 font-black">450px</span>
+                            </div>
+                            <input type="range" id="widthSlider" min="320" max="600" value="450" oninput="manualWidth(this.value)">
+                        </div>
 
-                <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[8px] text-slate-500 font-bold uppercase">SaaS Status</span>
-                        <span class="text-[8px] text-green-500 font-black">ACTIVE</span>
-                    </div>
-                    <div class="text-[9px] text-slate-400 leading-tight">
-                        IntegrityManifest.json connected. Monitoring real-time data leaks.
+                        <!-- Sharp Control in Sidebar too -->
+                        <div class="pt-2 border-t border-slate-800">
+                            <label class="text-[9px] text-slate-500 font-black uppercase mb-3 block">Display Engine</label>
+                            <button onclick="toggleSharp()" class="w-full btn-action flex justify-between items-center group">
+                                <span>Anti-Aliasing Boost</span>
+                                <div id="sharpToggle" class="w-8 h-4 bg-blue-600 rounded-full relative transition-colors p-0.5">
+                                    <div class="w-3 h-3 bg-white rounded-full transition-transform translate-x-4" id="sharpKnob"></div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 🛡️ Audit Items Accordion -->
-            <div class="accordion-header" onclick="toggleAccordion(this)">
-                <span>Audit Checklist</span>
-                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div class="accordion-content">
-                <div id="audit-list" class="py-2">
-                    <!-- Controlled by JS -->
+                <!-- 🤖 TestSprite Automation Accordion -->
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>TestSprite E2E Control</span>
+                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-inner space-y-4">
+                        <button onclick="runFastAudit()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                            RUN FULL AUDIT
+                        </button>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="openDashboard()" class="btn-action flex flex-col items-center gap-1 py-3 group">
+                                <svg class="w-4 h-4 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                <span class="text-[8px]">DASHBOARD</span>
+                            </button>
+                            <button onclick="testLoginCycle()" class="btn-action flex flex-col items-center gap-1 py-3 group">
+                                <svg class="w-4 h-4 group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                <span class="text-[8px]">LOGIN TEST</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[8px] text-slate-500 font-bold uppercase">SaaS Status</span>
+                                <span class="text-[8px] text-green-500 font-black">ACTIVE</span>
+                            </div>
+                            <div class="text-[9px] text-slate-400 leading-tight">
+                                IntegrityManifest.json connected. Monitoring real-time data leaks.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🛡️ Audit Items Accordion -->
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>Audit Checklist</span>
+                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-inner py-2" id="audit-list">
+                        <!-- Controlled by JS -->
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-auto p-5 border-t border-slate-800">
+            <div class="p-5 border-t border-slate-800 shrink-0">
                 <div class="text-[9px] text-slate-500 font-bold leading-relaxed">
                     Designed for ultra-efficiency. Sidebar collapses to 0 on small viewports. Frame auto-centers and scales.
                 </div>
@@ -410,9 +466,11 @@
         }
 
         function toggleAccordion(el) {
-            el.classList.toggle('active');
             const content = el.nextElementSibling;
-            if (el.classList.contains('active')) {
+            el.classList.toggle('active');
+            content.classList.toggle('open');
+            
+            if (content.classList.contains('open')) {
                 content.style.maxHeight = content.scrollHeight + "px";
             } else {
                 content.style.maxHeight = "0px";
@@ -467,7 +525,7 @@
         }
 
         function updateMirror() {
-            let path = urlInput.value;
+            let path = urlInput.value.trim();
             const host = useIP ? '127.0.0.1' : 'localhost';
             
             if (path.startsWith('http')) {
@@ -475,6 +533,11 @@
             } else {
                 mirrorFrame.src = `http://${host}:${basePort}${path.startsWith('/') ? '' : '/'}${path}?t=${Date.now()}`;
             }
+        }
+
+        function loadRemote(url) {
+            urlInput.value = url;
+            updateMirror();
         }
 
         function setBasePort(port) {
