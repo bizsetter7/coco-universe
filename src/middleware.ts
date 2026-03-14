@@ -147,9 +147,17 @@ export function middleware(request: NextRequest) {
     // 5. 보안 헤더 추가 (모든 응답에)
     const response = NextResponse.next();
     response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    
+    // [보안] 로컬 시뮬레이터 및 개발 환경 배려: X-Frame-Options SAMEORIGIN 해제 (CSP frame-ancestors 권장)
+    if (process.env.NODE_ENV === 'production') {
+        response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    } else {
+        // 개발 중에는 시뮬레이터 등에서 iframe 사용이 가능하도록 허용
+        response.headers.delete('X-Frame-Options');
+    }
+    
     response.headers.set('X-XSS-Protection', '1; mode=block');
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
     return response;

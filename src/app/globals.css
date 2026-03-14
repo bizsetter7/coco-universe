@@ -24,6 +24,10 @@ body {
   font-family: "Pretendard", "Nanum Gothic", sans-serif;
   background-color: white !important;
   color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
 }
 
 body.modal-active,

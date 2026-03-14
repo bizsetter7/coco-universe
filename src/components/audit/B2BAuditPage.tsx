@@ -177,7 +177,7 @@ export default function B2BAuditPage() {
       {/* Modals */}
       {activeModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
+          <div className="absolute inset-0 bg-black/70" onClick={closeModal} />
           
           {/* Recovery Modal */}
           {activeModal === 'findAccount' && (

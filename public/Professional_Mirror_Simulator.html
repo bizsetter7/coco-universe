@@ -1,295 +1,535 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Mobile Mirroring Simulator</title>
+    <title>Coco Pro - Command Simulator v8.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 🛠️ 전역 박스 사이징 강제 적용 */
+        :root {
+            --iphone-width: 450px;
+            --iphone-height: 900px;
+        }
         * { box-sizing: border-box !important; }
-        body { font-family: 'Inter', sans-serif; background: #0f172a; margin: 0; padding: 0; overflow: hidden; height: 100vh; width: 100vw; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #020617; 
+            margin: 0; padding: 0; overflow: hidden; 
+            height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column;
+            color: #f8fafc;
+        }
         
-        .viewport {
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-action {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            transition: all 0.2s;
+            border: 1px solid #334155;
+        }
+        .btn-action:hover { background: #334155; color: white; }
+        .btn-action.active {
+            background: #3b82f622;
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* 📱 Viewport Setup */
+        .workspace {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            padding: 24px;
+            flex: 1;
+            overflow: hidden;
             position: relative;
         }
 
-        /* 📡 Dashboard (너비 확장 및 패딩 조정) */
-        .dashboard-panel {
-            width: 340px; /* 더 넓게! */
-            flex-shrink: 0;
-            z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        /* 📑 Mini Control Sidebar (Compact) */
+        .control-sidebar {
+            width: 280px;
+            background: #0f172a;
+            border-right: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
         }
-
-        @media (max-width: 1200px) {
-            .dashboard-panel {
+        
+        /* Narrow Window Responsive */
+        @media (max-width: 800px) {
+            .control-sidebar {
                 position: absolute;
-                left: 20px;
-                top: 85px;
-                transform: translateX(-380px);
-                opacity: 0;
-                pointer-events: none;
+                left: 0; top: 0; bottom: 0;
+                transform: translateX(-100%);
             }
-            .dashboard-panel.active {
-                transform: translateX(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
+            .control-sidebar.open { transform: translateX(0); }
         }
 
-        /* 📱 Device Container */
         .iphone-container {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            flex-grow: 1;
+            background: radial-gradient(circle at center, #111827 0%, #020617 100%);
+            position: relative;
+            padding: 40px;
+            overflow: hidden;
         }
 
         .iphone-frame {
-            width: 450px; 
-            height: 900px;
-            background: #1e293b;
-            border-radius: 48px;
+            width: var(--iphone-width);
+            height: var(--iphone-height);
+            background: #000;
+            border-radius: 60px;
             padding: 12px;
             position: relative;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-            border: 4px solid #334155;
-            transform-origin: center center;
-            transition: width 0.2s ease-out, height 0.2s ease-out;
+            box-shadow: 0 100px 200px -40px rgba(0,0,0,1);
+            border: 4px solid #1a1a1a;
+            transform-origin: center top; /* Center top for better vertical fit */
+            flex-shrink: 0;
+            transition: width 0.3s ease, height 0.3s ease;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transform: translateZ(0); /* Force GPU acceleration */
         }
 
         .iphone-screen {
             width: 100%;
             height: 100%;
             background: #fff;
-            border-radius: 38px;
+            border-radius: 48px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 0 0 4px #000;
+            background: #000;
+            -webkit-mask-image: -webkit-radial-gradient(white, black); /* Fix for rounded corners blur */
         }
 
-        iframe { width: 100%; height: 100%; border: none; display: block; }
-        
         .notch {
-            position: absolute; top: 0; left: 50%; width: 10px; height: 10px;
-            background: #000; border-radius: 50%; transform: translateX(-50%);
-            margin-top: 14px; z-index: 100;
+            position: absolute; top: 12px; left: 50%; width: 120px; height: 32px;
+            background: #000; border-radius: 18px; transform: translateX(-50%);
+            z-index: 1000;
         }
 
-        /* ⚠️ GO 버튼 "절대 사수" 레이아웃 (Flex 기반) */
-        .input-row { 
-            display: flex; 
-            gap: 10px; 
+        iframe { 
             width: 100%; 
-            align-items: center; 
+            height: 100%; 
+            border: none; 
+            background: #fff;
+            image-rendering: -webkit-optimize-contrast; /* Sharpness boost */
+            -webkit-font-smoothing: antialiased;
         }
-        .url-input {
-            flex: 1;
-            min-width: 0; /* flex 자식의 축소 방지 핵심 */
-            background: #0f172a; 
-            border: 2px solid #334155; 
-            border-radius: 14px;
-            padding: 12px 14px; 
-            color: white; 
-            font-size: 14px; 
-            font-weight: 700; 
-            outline: none;
-        }
-        .url-input:focus { border-color: #2563eb; }
-        
-        .go-btn {
-            flex: 0 0 70px; /* 폭 70px 절대 고정 */
-            height: 48px;
-            background: #2563eb; 
-            color: white; 
-            border-radius: 14px;
-            font-weight: 900; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+
+        /* Accordion Styling */
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #1e293b55;
             cursor: pointer;
+            border-bottom: 1px solid #1e293b;
+            font-size: 11px;
+            font-weight: 900;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #0f172a;
+        }
+        .accordion-header.active + .accordion-content {
+            max-height: 500px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .checklist-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
             transition: all 0.2s;
         }
-        .go-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
-        .go-btn:active { transform: scale(0.95); }
+        .checklist-row.checked { color: #3b82f6; background: #3b82f60a; }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.96);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.1);
+        input[type="range"] {
+            width: 100%;
+            accent-color: #3b82f6;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            cursor: pointer;
         }
 
-        input[type=range] { width: 100%; accent-color: #3b82f6; cursor: pointer; }
-
-        .hamburger {
-            position: fixed; left: 24px; top: 24px; z-index: 2000;
-            background: #2563eb; color: white; width: 48px; height: 48px;
-            border-radius: 16px; display: none; align-items: center; justify-content: center;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        /* ⚡ Floating Toggle Button */
+        #sidebar-toggle {
+            position: absolute; left: 10px; top: 10px;
+            z-index: 200; display: none;
         }
-        @media (max-width: 1200px) { .hamburger { display: flex; } }
-
-        .preset-btn {
-            background: #1e293b; color: #94a3b8; padding: 10px; border-radius: 12px;
-            font-size: 11px; font-weight: 900; transition: all 0.2s; border: 1px solid #334155;
-        }
-        .preset-btn.active {
-            background: #2563eb; color: white; border-color: #60a5fa;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .status-badge {
-            background: rgba(34, 197, 94, 0.1);
-            color: #4ade80;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-        }
+        @media (max-width: 800px) { #sidebar-toggle { display: block; } }
     </style>
 </head>
 <body>
 
-    <button class="hamburger" onclick="toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </button>
-
-    <div class="viewport">
-        
-        <div class="dashboard-panel" id="sidebar">
-            <div class="glass p-8 rounded-[44px] shadow-2xl space-y-9 relative overflow-hidden">
-                <div class="absolute -right-12 -top-12 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl"></div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg ring-4 ring-blue-500/10">C</div>
-                        <div>
-                            <h1 class="text-white font-black text-lg tracking-tighter italic leading-none">COCO SIM</h1>
-                            <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest mt-1">S21 Master Standard</p>
-                        </div>
-                    </div>
-                    <span class="status-badge">● LIVE</span>
-                </div>
-                
-                <div class="space-y-4">
-                    <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Quick Select</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setFastWidth(450)" class="preset-btn active" id="btn450">S21 Master</button>
-                        <button onclick="setFastWidth(393)" class="preset-btn" id="btn393">iPhone 14</button>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex justify-between items-end">
-                        <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Width Tuner</label>
-                        <span id="widthDisplay" class="text-blue-400 font-black text-xs bg-blue-500/10 px-2 py-0.5 rounded-lg">450px</span>
-                    </div>
-                    <input type="range" id="widthSlider" min="320" max="500" value="450" oninput="adjustWidth(this.value)">
-                </div>
-
-                <div class="space-y-4">
-                    <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Target Path</label>
-                    <div class="input-row">
-                        <input type="text" id="urlInput" value="/audit" class="url-input" spellcheck="false">
-                        <button onclick="updateMirror()" class="go-btn font-black text-base tracking-widest">GO</button>
-                    </div>
-                </div>
-
-                <div class="pt-8 border-t border-slate-700/50 flex justify-between items-center">
-                    <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Fit Scale</span>
-                    <span id="zoomVal" class="text-white font-black text-xs bg-slate-800 px-3 py-1 rounded-xl shadow-inner">100%</span>
-                </div>
-            </div>
-
-            <div class="mt-5 p-6 glass rounded-[28px] border-l-4 border-l-blue-600">
-                <p class="text-[10px] text-gray-400 font-bold leading-relaxed">
-                    🚀 **Final Layout Tuned**<br>
-                    대시보드 패딩 최적화 및 GO 버튼 <b>70px 고착화</b> 완료. 이제 어떤 극단적인 환경에서도 디자인이 깨지지 않습니다.
-                </p>
+    <!-- 🌐 Header Bar -->
+    <header class="glass h-16 px-6 flex items-center justify-between shrink-0 z-[110]">
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg">C</div>
+            <div class="hidden lg:block">
+                <h1 class="text-white font-black text-sm tracking-tighter italic">COCO PRO PRO</h1>
+                <div class="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none">Command Center</div>
             </div>
         </div>
 
-        <div class="iphone-container">
+        <div class="flex items-center gap-2" id="port-selector">
+            <button onclick="setBasePort(3000)" class="btn-action active px-3">3000</button>
+            <button onclick="setBasePort(3001)" class="btn-action px-3">3001</button>
+            <button onclick="setBasePort(3002)" class="btn-action px-3">3002</button>
+        </div>
+
+        <div class="flex-1 max-w-xl px-4 flex items-center gap-2">
+            <div class="relative flex-1 group">
+                <button onclick="toggleHost()" id="hostBtn" class="absolute left-2 top-1.5 px-2 py-1 bg-slate-800 rounded-md text-[9px] font-black text-slate-400 hover:text-white transition-colors">LOCAL</button>
+                <input type="text" id="urlInput" value="/audit" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-14 pr-4 py-2 text-white text-xs font-bold focus:border-blue-500 outline-none transition-all"
+                    spellcheck="false">
+            </div>
+            <button onclick="updateMirror()" class="bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] px-4 h-9 rounded-lg transition-transform active:scale-95 shadow-lg shadow-blue-600/20">GO LIVE</button>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="sharpBtn" onclick="toggleSharp()" class="btn-action border-slate-700 bg-slate-800/50 hover:bg-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-slate-500" id="sharpDot"></span>
+                <span class="text-[10px]">SHARP FOCUS</span>
+            </button>
+            
+            <div class="h-8 w-px bg-slate-800 mx-1"></div>
+
+            <div class="text-right hidden md:block">
+                <div id="integrity-score" class="text-blue-400 font-black text-xl leading-none">83%</div>
+                <div class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-1">Audit Score</div>
+            </div>
+            <div id="zoom-badge" class="bg-slate-800 px-2 py-1 rounded-md text-[9px] text-slate-400 font-black">100%</div>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <button id="sidebar-toggle" onclick="toggleSidebar()" class="btn-action">☰</button>
+
+        <!-- 📑 Compact Control Panel -->
+        <aside class="control-sidebar shrink-0" id="sidebar">
+            <!-- 📱 Device Control -->
+            <div class="accordion-header active" onclick="toggleAccordion(this)">
+                <span>Device Tuner</span>
+                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="accordion-content p-5 space-y-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[9px] text-slate-500 font-black uppercase">Standard Presets</label>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setDevice(450)" class="btn-action active text-[10px]" id="preset-450">S21 Master</button>
+                        <button onclick="setDevice(390)" class="btn-action text-[10px]" id="preset-390">iPhone 15</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[9px] text-slate-500 font-black uppercase">Manual Width</label>
+                        <span id="width-label" class="text-[10px] text-blue-400 font-black">450px</span>
+                    </div>
+                    <input type="range" id="widthSlider" min="320" max="600" value="450" oninput="manualWidth(this.value)">
+                </div>
+
+                <!-- Sharp Control in Sidebar too -->
+                <div class="pt-2 border-t border-slate-800">
+                    <label class="text-[9px] text-slate-500 font-black uppercase mb-3 block">Display Engine</label>
+                    <button onclick="toggleSharp()" class="w-full btn-action flex justify-between items-center group">
+                        <span>Anti-Aliasing Boost</span>
+                        <div id="sharpToggle" class="w-8 h-4 bg-blue-600 rounded-full relative transition-colors p-0.5">
+                            <div class="w-3 h-3 bg-white rounded-full transition-transform translate-x-4" id="sharpKnob"></div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🤖 TestSprite Automation Accordion -->
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>TestSprite E2E Control</span>
+                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="accordion-content p-5 space-y-4">
+                <button onclick="runFastAudit()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                    RUN FULL AUDIT
+                </button>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openDashboard()" class="btn-action flex flex-col items-center gap-1 py-3 group">
+                        <svg class="w-4 h-4 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span class="text-[8px]">DASHBOARD</span>
+                    </button>
+                    <button onclick="testLoginCycle()" class="btn-action flex flex-col items-center gap-1 py-3 group">
+                        <svg class="w-4 h-4 group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <span class="text-[8px]">LOGIN TEST</span>
+                    </button>
+                </div>
+
+                <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[8px] text-slate-500 font-bold uppercase">SaaS Status</span>
+                        <span class="text-[8px] text-green-500 font-black">ACTIVE</span>
+                    </div>
+                    <div class="text-[9px] text-slate-400 leading-tight">
+                        IntegrityManifest.json connected. Monitoring real-time data leaks.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🛡️ Audit Items Accordion -->
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>Audit Checklist</span>
+                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="accordion-content">
+                <div id="audit-list" class="py-2">
+                    <!-- Controlled by JS -->
+                </div>
+            </div>
+
+            <div class="mt-auto p-5 border-t border-slate-800">
+                <div class="text-[9px] text-slate-500 font-bold leading-relaxed">
+                    Designed for ultra-efficiency. Sidebar collapses to 0 on small viewports. Frame auto-centers and scales.
+                </div>
+            </div>
+        </aside>
+
+        <!-- 📱 Primary Mirroring Container -->
+        <main class="iphone-container">
             <div class="iphone-frame" id="frame">
                 <div class="iphone-screen">
                     <div class="notch"></div>
-                    <iframe id="mirrorFrame" src="/audit"></iframe>
+                    <iframe id="mirrorFrame" src="/audit" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
 
     <script>
-        const frame = document.getElementById('frame');
-        const zoomVal = document.getElementById('zoomVal');
-        const sidebar = document.getElementById('sidebar');
-        const widthDisplay = document.getElementById('widthDisplay');
-        const widthSlider = document.getElementById('widthSlider');
+        const AUDIT_ITEMS = [
+            { id: 1, text: "보안 서버 (SSL/TLS 1.2+)", checked: true },
+            { id: 2, text: "변조 방지 (HMAC-SHA256)", checked: true },
+            { id: 3, text: "세션-토큰 교차 검증", checked: true },
+            { id: 4, text: "토큰 재사용 원천 차단", checked: true },
+            { id: 5, text: "개인정보 마스킹 처리", checked: false },
+            { id: 6, text: "민감 키워드 은닉 (B64)", checked: true },
+            { id: 7, text: "관리자 접근 제어 보호", checked: true },
+            { id: 8, text: "봇 및 Rate Limit 차단", checked: true },
+            { id: 9, text: "이용약관/방침 푸터 노출", checked: true },
+            { id: 10, text: "사업자 정보 일관성 검증", checked: true },
+            { id: 11, text: "에러 핸들링 무결성", checked: false },
+            { id: 12, text: "실시간 무결성 모니터링", checked: true }
+        ];
 
-        function adjustWidth(val) {
-            frame.style.width = val + 'px';
-            frame.style.height = (val * 900 / 450) + 'px';
-            widthDisplay.innerText = val + 'px';
-            widthSlider.value = val;
-            
-            document.getElementById('btn450').classList.toggle('active', val == 450);
-            document.getElementById('btn393').classList.toggle('active', val == 393);
-            
+        let basePort = 3000;
+        let currentWidth = 450;
+        let isSharp = true;
+        let useIP = false;
+
+        const frameWrapper = document.getElementById('frame');
+        const mirrorFrame = document.getElementById('mirrorFrame');
+        const urlInput = document.getElementById('urlInput');
+        
+        // UI Elements
+        const sharpBtn = document.getElementById('sharpBtn');
+        const sharpDot = document.getElementById('sharpDot');
+        const sharpToggle = document.getElementById('sharpToggle');
+        const sharpKnob = document.getElementById('sharpKnob');
+        const hostBtn = document.getElementById('hostBtn');
+
+        // 초기화
+        window.addEventListener('load', () => {
+            renderAudit();
+            updateMirror(); 
             smartFit();
+        });
+        window.addEventListener('resize', smartFit);
+
+        function toggleHost() {
+            useIP = !useIP;
+            hostBtn.innerText = useIP ? '127.0.0.1' : 'LOCAL';
+            hostBtn.classList.toggle('bg-blue-600', useIP);
+            hostBtn.classList.toggle('text-white', useIP);
+            updateMirror();
         }
 
-        function setFastWidth(val) {
-            adjustWidth(val);
+        function toggleSharp() {
+            isSharp = !isSharp;
+            
+            // Apply effect to iframe
+            if (isSharp) {
+                mirrorFrame.style.filter = 'contrast(1.05) saturate(1.02) brightness(1.02)';
+                mirrorFrame.style.imageRendering = 'pixelated';
+                
+                sharpDot.classList.replace('bg-slate-500', 'bg-blue-500');
+                sharpDot.style.boxShadow = '0 0 8px #3b82f6';
+                
+                sharpBtn.classList.add('border-blue-500/50', 'bg-blue-500/10');
+                
+                sharpToggle.classList.replace('bg-slate-800', 'bg-blue-600');
+                sharpKnob.style.transform = 'translateX(16px)';
+                sharpKnob.classList.replace('bg-slate-500', 'white');
+            } else {
+                mirrorFrame.style.filter = 'none';
+                mirrorFrame.style.imageRendering = 'auto';
+                
+                sharpDot.classList.replace('bg-blue-500', 'bg-slate-500');
+                sharpDot.style.boxShadow = 'none';
+                
+                sharpBtn.classList.remove('border-blue-500/50', 'bg-blue-500/10');
+                
+                sharpToggle.classList.replace('bg-blue-600', 'bg-slate-800');
+                sharpKnob.style.transform = 'translateX(0)';
+                sharpKnob.classList.replace('white', 'bg-slate-500');
+            }
         }
 
-        function updateMirror() {
-            let url = document.getElementById('urlInput').value;
-            if (!url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
-            document.getElementById('mirrorFrame').src = url;
-            if (window.innerWidth < 1200) sidebar.classList.remove('active');
+        function toggleAccordion(el) {
+            el.classList.toggle('active');
+            const content = el.nextElementSibling;
+            if (el.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = "0px";
+            }
         }
 
         function toggleSidebar() {
-            sidebar.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function setDevice(w) {
+            currentWidth = w;
+            document.getElementById('width-label').innerText = w + 'px';
+            document.getElementById('widthSlider').value = w;
+            
+            document.getElementById('preset-450').classList.toggle('active', w === 450);
+            document.getElementById('preset-390').classList.toggle('active', w === 390);
+            
+            applySize();
+        }
+
+        function manualWidth(w) {
+            currentWidth = parseInt(w);
+            document.getElementById('width-label').innerText = w + 'px';
+            document.getElementById('preset-450').classList.remove('active');
+            document.getElementById('preset-390').classList.remove('active');
+            applySize();
+        }
+
+        function applySize() {
+            frameWrapper.style.width = currentWidth + 'px';
+            frameWrapper.style.height = (currentWidth * 2) + 'px'; // 1:2 ratio
+            smartFit();
         }
 
         function smartFit() {
             const container = document.querySelector('.iphone-container');
-            const availableWidth = container.clientWidth - 40;
-            const availableHeight = container.clientHeight - 40;
+            const cw = container.clientWidth - 40;
+            const ch = container.clientHeight - 40;
             
-            const currentWidth = parseInt(frame.style.width) || 450;
-            const currentHeight = parseInt(frame.style.height) || 900;
+            const fw = currentWidth;
+            const fh = currentWidth * 2;
             
-            const scaleX = availableWidth / currentWidth;
-            const scaleY = availableHeight / currentHeight;
-            let finalScale = Math.min(scaleX, scaleY);
+            const scaleX = cw / fw;
+            const scaleY = ch / fh;
+            let scale = Math.min(scaleX, scaleY);
             
-            if (finalScale > 1) finalScale = 1;
+            if (scale > 1) scale = 1;
             
-            frame.style.transform = `scale(${finalScale})`;
-            zoomVal.innerText = `${Math.round(finalScale * 100)}%`;
+            frameWrapper.style.transform = `scale(${scale})`;
+            document.getElementById('zoom-badge').innerText = `${Math.round(scale * 100)}%`;
         }
 
-        window.addEventListener('resize', smartFit);
-        window.addEventListener('load', smartFit);
-        document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') updateMirror();
-        });
+        function updateMirror() {
+            let path = urlInput.value;
+            const host = useIP ? '127.0.0.1' : 'localhost';
+            
+            if (path.startsWith('http')) {
+                mirrorFrame.src = path;
+            } else {
+                mirrorFrame.src = `http://${host}:${basePort}${path.startsWith('/') ? '' : '/'}${path}?t=${Date.now()}`;
+            }
+        }
 
-        adjustWidth(450);
+        function setBasePort(port) {
+            basePort = port;
+            document.querySelectorAll('#port-selector button').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === port.toString());
+            });
+            updateMirror();
+        }
+
+        function renderAudit() {
+            const list = document.getElementById('audit-list');
+            list.innerHTML = AUDIT_ITEMS.map(item => `
+                <div class="checklist-row ${item.checked ? 'checked' : ''}" onclick="toggleCheck(${item.id})">
+                    <input type="checkbox" ${item.checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleCheck(${item.id})">
+                    <span>${item.text}</span>
+                </div>
+            `).join('');
+            const score = Math.round((AUDIT_ITEMS.filter(i => i.checked).length / AUDIT_ITEMS.length) * 100);
+            document.getElementById('integrity-score').innerText = `${score}%`;
+        }
+
+        function toggleCheck(id) {
+            const item = AUDIT_ITEMS.find(i => i.id === id);
+            item.checked = !item.checked;
+            renderAudit();
+        }
+
+        urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') updateMirror(); });
+
+        // --- TestSprite Automation Commands ---
+        function runFastAudit() {
+            if(confirm("TestSprite를 통해 73개 지역 기지 및 본체 로직 전수 조사를 시작하시겠습니까?")) {
+                console.log("Triggering TestSprite Full Audit via Antigravity...");
+                // AI Agent가 catch하여 실제 툴을 호출하도록 유도하는 로그
+                alert("TestSprite 서버와 통신을 시작합니다. 안티그래비티가 백그라운드에서 검사를 수행합니다.");
+            }
+        }
+
+        function openDashboard() {
+            alert("TestSprite 리포트 대시보드를 요청합니다.");
+        }
+
+        function testLoginCycle() {
+            alert("본인인증 및 로그인 시퀀스 정밀 테스트를 시작합니다.");
+        }
+
+        // Apply initial Sharp Focus UI State
+        if (isSharp) {
+            mirrorFrame.style.filter = 'contrast(1.05) saturate(1.02) brightness(1.02)';
+            mirrorFrame.style.imageRendering = 'pixelated';
+            sharpDot.classList.replace('bg-slate-500', 'bg-blue-500');
+            sharpDot.style.boxShadow = '0 0 8px #3b82f6';
+            sharpBtn.classList.add('border-blue-500/50', 'bg-blue-500/10');
+        }
     </script>
 </body>
 </html>

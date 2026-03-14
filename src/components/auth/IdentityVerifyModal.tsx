@@ -122,7 +122,7 @@ export const IdentityVerifyModal = ({ onClose, onVerified }: IdentityVerifyModal
     };
 
     return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-900/60">
             <div className="bg-white w-full max-w-md rounded-[28px] overflow-hidden shadow-2xl">
 
                 {/* Header */}
