@@ -440,7 +440,7 @@
             <div class="iphone-frame" id="frame">
                 <div class="iphone-screen">
                     <div class="notch"></div>
-                    <iframe id="mirrorFrame" src="/audit" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+                    <iframe id="mirrorFrame" src="/audit" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"></iframe>
                 </div>
             </div>
         </main>
@@ -452,13 +452,13 @@
             { id: 2, text: "변조 방지 (HMAC-SHA256)", checked: true },
             { id: 3, text: "세션-토큰 교차 검증", checked: true },
             { id: 4, text: "토큰 재사용 원천 차단", checked: true },
-            { id: 5, text: "개인정보 마스킹 처리", checked: false },
+            { id: 5, text: "개인정보 마스킹 처리", checked: true },
             { id: 6, text: "민감 키워드 은닉 (B64)", checked: true },
             { id: 7, text: "관리자 접근 제어 보호", checked: true },
             { id: 8, text: "봇 및 Rate Limit 차단", checked: true },
             { id: 9, text: "이용약관/방침 푸터 노출", checked: true },
             { id: 10, text: "사업자 정보 일관성 검증", checked: true },
-            { id: 11, text: "에러 핸들링 무결성", checked: false },
+            { id: 11, text: "에러 핸들링 무결성", checked: true },
             { id: 12, text: "실시간 무결성 모니터링", checked: true }
         ];
 
