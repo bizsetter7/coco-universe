@@ -1,6 +1,14 @@
 import shadowSEO from '@/lib/data/Shadow_SEO_Master.json';
 import { isPreRelease } from '@/lib/config';
 
+const decodeB64 = (str: string) => {
+    try {
+        return Buffer.from(str, 'base64').toString('utf8');
+    } catch (e) {
+        return str;
+    }
+};
+
 export type SEOMode = 'CLEAN' | 'SHADOW';
 
 export const CURRENT_SEO_MODE: SEOMode = isPreRelease ? 'CLEAN' : 'SHADOW';
@@ -77,9 +85,9 @@ const getShadowSEO = (): SEOConfig => ({
     supportedColorSchemes: shadowSEO.themes.supportedColorSchemes,
   },
   metadata: {
-    title: shadowSEO.metadata.title,
-    description: shadowSEO.metadata.description,
-    keywords: shadowSEO.metadata.keywords,
+    title: decodeB64(shadowSEO.metadata.title),
+    description: decodeB64(shadowSEO.metadata.description),
+    keywords: shadowSEO.metadata.keywords.map(decodeB64),
     verification: shadowSEO.metadata.verification
   },
   schemas: [
@@ -87,7 +95,11 @@ const getShadowSEO = (): SEOConfig => ({
         ...BASE_ORGANIZATION_SCHEMA,
         name: "COCOALBA (코코알바)",
     }, 
-    ...shadowSEO.schemas
+    ...shadowSEO.schemas.map(s => ({
+        ...s,
+        title: s.title ? decodeB64(s.title) : undefined,
+        description: s.description ? decodeB64(s.description) : undefined,
+    }))
   ]
 });
 

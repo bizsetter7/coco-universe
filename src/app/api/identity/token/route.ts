@@ -41,9 +41,13 @@ export function isTokenUsed(token: string): boolean {
 }
 
 // ─── [항목 2/8] HMAC-SHA256 서명 생성/검증 ───────────────────────────────────
-const HMAC_SECRET = process.env.IDENTITY_HMAC_SECRET || 'coco-alba-identity-checksum-secret-2026';
+const HMAC_SECRET = process.env.IDENTITY_HMAC_SECRET;
+if (!HMAC_SECRET) {
+    console.error('❌ CRITICAL: IDENTITY_HMAC_SECRET environment variable is missing!');
+}
 
 export function generateHmac(payload: Record<string, unknown>): string {
+    if (!HMAC_SECRET) throw new Error('Security Error: HMAC Secret is not configured.');
     const normalized = JSON.stringify(payload, Object.keys(payload).sort());
     return crypto
         .createHmac('sha256', HMAC_SECRET)
