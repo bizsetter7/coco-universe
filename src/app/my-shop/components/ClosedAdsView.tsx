@@ -56,7 +56,7 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
                                                     <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>
                                                 )}
                                                 {(ad.options?.pay_suffixes || ad.options?.paySuffixes || ad.paySuffixes?.length > 0) && (
-                                                    <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
+                                                    <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
                                                 )}
                                             </div>
 
@@ -65,14 +65,14 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
 
                                         <h3
                                             onClick={() => onShowAdDetail?.(ad)}
-                                            className={`font-black text-[17px] md:text-[19px] leading-tight cursor-pointer hover:text-pink-500 transition line-clamp-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}
+                                            className={`font-black text-[17px] md:text-[19px] leading-tight cursor-pointer hover:text-blue-500 transition line-clamp-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}
                                         >
                                             {ad.title}
                                         </h3>
 
                                         {/* Info Area [Pure Reflection Mode] - No Shop Name */}
                                         <div className="text-[11px] font-bold text-gray-400 flex flex-wrap items-center gap-1.5">
-                                            <span className="text-pink-400/70 font-black uppercase">
+                                            <span className="text-blue-400/70 font-black uppercase">
                                                 {(() => {
                                                     const nick = ad.options?.nickname || ad.nickname || userName || '';
                                                     if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';

@@ -35,12 +35,12 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
         <div className="flex-1 min-w-0 pl-0 md:pl-6">
             {/* 1. Page Title & Tabs */}
             <div className="mb-6">
-                <h1 className={`text-2xl font-black mb-4 border-l-4 pl-3 ${isDark ? 'text-white border-pink-500' : 'text-gray-900 border-rose-500'}`}>
+                <h1 className={`text-2xl font-black mb-4 border-l-4 pl-3 ${isDark ? 'text-white border-blue-500' : 'text-gray-900 border-rose-500'}`}>
                     업종별 채용
                 </h1>
 
                 <div className="flex text-sm font-bold border-b border-gray-200 dark:border-gray-700">
-                    <button className="flex-1 py-3 text-white bg-pink-500 rounded-t-lg">업종별 채용</button>
+                    <button className="flex-1 py-3 text-white bg-blue-500 rounded-t-lg">업종별 채용</button>
                     <button className={`flex-1 py-3 ${isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-gray-50'}`}>지역별 채용</button>
                     <button className={`flex-1 py-3 ${isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-gray-50'}`}>오늘본공고</button>
                 </div>
@@ -48,7 +48,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
 
             {/* 2. Notice Box */}
             <div className={`flex items-center gap-3 p-3 rounded-lg mb-6 text-sm ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                <span className="px-2 py-0.5 bg-pink-500 text-white text-[10px] font-bold rounded">공지사항</span>
+                <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded">공지사항</span>
                 <span className={`flex-1 truncate ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                     [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
                 </span>
@@ -63,7 +63,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                     <select
                         value={selectedJobMain}
                         onChange={(e) => setSelectedJobMain(e.target.value)}
-                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-pink-500/20 ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
+                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
                     >
                         <option value="">업종선택</option>
                         {JOB_CATEGORIES.map(cat => (
@@ -79,7 +79,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                         value={selectedJobSub}
                         onChange={(e) => setSelectedJobSub(e.target.value)}
                         disabled={!selectedJobMain}
-                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-pink-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
+                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
                     >
                         <option value="">상세업종</option>
                         {selectedJobMain && JOB_CATEGORY_MAP[selectedJobMain]?.map(sub => (
@@ -94,7 +94,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                     <select
                         value={selectedRegionMain}
                         onChange={(e) => setSelectedRegionMain(e.target.value)}
-                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-pink-500/20 ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
+                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
                     >
                         <option value="">지역선택</option>
                         {REGION_LIST.map(reg => (
@@ -110,7 +110,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                         value={selectedRegionSub}
                         onChange={(e) => setSelectedRegionSub(e.target.value)}
                         disabled={!selectedRegionMain}
-                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-pink-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
+                        className={`appearance-none pl-4 pr-8 py-2 rounded-lg text-sm font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-600'}`}
                     >
                         <option value="">세부지역</option>
                         {selectedRegionMain && REGIONS_MAP[selectedRegionMain]?.map(sub => (
@@ -123,7 +123,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                 <div className={`flex-1 min-w-[150px] px-4 py-2 rounded-lg border flex items-center gap-2 ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
                     <input type="text" placeholder="키워드 검색" className="bg-transparent w-full text-sm focus:outline-none" />
                 </div>
-                <button className="px-6 py-2 bg-pink-500 text-white font-black rounded-lg hover:bg-pink-600 shadow-md flex items-center gap-2">
+                <button className="px-6 py-2 bg-blue-500 text-white font-black rounded-lg hover:bg-blue-600 shadow-md flex items-center gap-2">
                     <Search size={16} /> 검색
                 </button>
             </div>
@@ -135,7 +135,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                         <Crown className="text-amber-500" fill="currentColor" size={20} />
                         그랜드 오픈 / VIP 채용
                     </h2>
-                    <button className="px-2 py-1 rounded text-xs font-bold bg-pink-500 text-white hover:bg-pink-600">
+                    <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
                         광고신청
                     </button>
                 </div>
@@ -153,7 +153,7 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                         <Star className="text-purple-500" fill="currentColor" size={20} />
                         프리미엄 채용정보
                     </h2>
-                    <button className="px-2 py-1 rounded text-xs font-bold bg-pink-500 text-white hover:bg-pink-600">
+                    <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
                         광고신청
                     </button>
                 </div>

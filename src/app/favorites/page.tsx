@@ -124,7 +124,7 @@ export default function FavoritesPage() {
                                                             amount = payStr.replace('일', '').trim();
                                                         } else if (payStr.includes('주급')) {
                                                             badgeLabel = '주급';
-                                                            badgeColor = 'bg-pink-400';
+                                                            badgeColor = 'bg-blue-400';
                                                             amount = payStr.replace('주급', '').trim();
                                                         } else if (payStr.includes('월')) {
                                                             badgeLabel = '월급';
@@ -197,7 +197,7 @@ export default function FavoritesPage() {
                                                         amount = payStr.replace('일', '').trim();
                                                     } else if (payStr.includes('주급')) {
                                                         badgeLabel = '주';
-                                                        badgeColor = 'bg-pink-400';
+                                                        badgeColor = 'bg-blue-400';
                                                         amount = payStr.replace('주급', '').trim();
                                                     } else if (payStr.includes('월')) {
                                                         badgeLabel = '월';
@@ -235,7 +235,7 @@ export default function FavoritesPage() {
                             <Star size={32} />
                         </div>
                         <p className="text-gray-500 font-bold mb-6">보관된 공고가 없습니다.<br />마음에 드는 공고를 즐겨찾기 해보세요!</p>
-                        <Link href="/" className="px-6 py-3 bg-pink-500 text-white font-bold rounded-xl shadow-lg shadow-pink-100 active:scale-95 transition-transform">
+                        <Link href="/" className="px-6 py-3 bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-100 active:scale-95 transition-transform">
                             공고 전체 보러가기
                         </Link>
                     </div>

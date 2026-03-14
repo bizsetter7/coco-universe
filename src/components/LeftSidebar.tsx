@@ -27,7 +27,7 @@ interface LeftSidebarProps {
 const REGION_BUTTONS = ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 
 // 새로운 직종 목록 (10개)
-const JOB_TYPE_BUTTONS = ['룸알바', '노래주점', '텐프로/쩜오', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
+const JOB_TYPE_BUTTONS = ['프라이빗 매칭', '노래주점', 'VIP 파트너스/VIP 파트너스', '요정', '바(Bar)', '엔터', '다방', '카페', '마사지', '기타'];
 
 import { SIDEBAR_KEYWORDS } from '@/constants/job-options';
 
@@ -35,7 +35,7 @@ const CATEGORY_LINKS = [
     { icon: Crown, label: '그랜드', color: 'text-amber-500', tier: 'grand' },
     { icon: Star, label: '프리미엄', color: 'text-purple-500', tier: 'premium' },
     { icon: Zap, label: '디럭스', color: 'text-blue-500', tier: 'deluxe' },
-    { icon: Sparkles, label: '스페셜', color: 'text-pink-500', tier: 'special' },
+    { icon: Sparkles, label: '스페셜', color: 'text-blue-500', tier: 'special' },
     { icon: Flame, label: '급구', color: 'text-red-500', tier: 'urgent' },
     { icon: Gift, label: '추천', color: 'text-emerald-500', tier: 'urgent' },
     { icon: List, label: '리스트네이티브', color: 'text-cyan-500', tier: 'native' },
@@ -256,9 +256,9 @@ export default function LeftSidebar({
                                 </button>
                             </div>
                             <div className="flex justify-center gap-2 mt-3 text-[10px] text-gray-500">
-                                <button onClick={() => { setIsLoginOpen(false); router.push('/?page=signup'); }} className="hover:text-pink-600 transition">회원가입</button>
+                                <button onClick={() => { setIsLoginOpen(false); router.push('/?page=signup'); }} className="hover:text-blue-600 transition">회원가입</button>
                                 <span>|</span>
-                                <button onClick={() => setIsLoginOpen(false)} className="hover:text-pink-600 transition">아이디/패스워드 찾기</button>
+                                <button onClick={() => setIsLoginOpen(false)} className="hover:text-blue-600 transition">아이디/패스워드 찾기</button>
                             </div>
                         </>
                     )}
@@ -267,11 +267,11 @@ export default function LeftSidebar({
 
             {/* 2. 광고 배너 슬롯 1 - 하루 200보장 */}
             <div className="group relative h-[100px] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all">
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-700"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700"></div>
                 {/* Background Deco Patterns */}
                 <div className="absolute inset-0 opacity-20 pointer-events-none">
                     <div className="absolute -top-6 -left-6 w-20 h-20 bg-white rounded-full blur-xl animate-pulse" />
-                    <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-pink-400 rounded-full blur-xl animate-pulse" />
+                    <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-blue-400 rounded-full blur-xl animate-pulse" />
                 </div>
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center p-3">
                     <p className="text-xl font-black drop-shadow-lg tracking-tighter">
@@ -383,7 +383,7 @@ export default function LeftSidebar({
                                 key={kw}
                                 onClick={() => toggleKeyword(kw)}
                                 className={`px-2 py-1 rounded text-[9px] font-bold transition ${isSelected
-                                    ? 'bg-pink-500 text-white shadow-md'
+                                    ? 'bg-blue-500 text-white shadow-md'
                                     : brand.theme === 'dark'
                                         ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -426,7 +426,7 @@ export default function LeftSidebar({
                                     setIsAdProductOpen(false); // Can auto-close on click
                                     onPaymentClick(cat.tier);
                                 }}
-                                className="px-2 py-1 bg-gray-100 hover:bg-pink-100 text-gray-500 hover:text-pink-600 rounded text-[9px] font-bold transition"
+                                className="px-2 py-1 bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-600 rounded text-[9px] font-bold transition"
                             >
                                 광고신청
                             </button>
@@ -441,7 +441,7 @@ export default function LeftSidebar({
                 onClick={() => router.push('/customer-center?tab=inquiry')}
                 className="group relative h-[180px] rounded-xl overflow-hidden cursor-pointer shadow-lg hover:scale-[1.02] transition-all"
             >
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-700"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-700 via-purple-700 to-blue-700"></div>
                 <div className="absolute inset-0 opacity-20 pointer-events-none">
                     <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" />
                 </div>
@@ -471,7 +471,7 @@ export default function LeftSidebar({
                     <h4 className="text-[20px] font-black text-white mb-4 tracking-tighter">
                         코코알바 광고상담
                     </h4>
-                    <div className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-black shadow-[0_0_15px_rgba(219,39,119,0.5)] active:scale-95 transition-all">
+                    <div className="bg-blue-600 text-white px-5 py-2 rounded-full text-xs font-black shadow-[0_0_15px_rgba(219,39,119,0.5)] active:scale-95 transition-all">
                         {'<1:1문의 바로가기>'}
                     </div>
                 </div>

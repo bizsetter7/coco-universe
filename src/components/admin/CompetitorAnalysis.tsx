@@ -22,7 +22,7 @@ export const CompetitorAnalysis = () => {
         { id: 8, name: 'ChoiceAlba', domain: 'choicealba.co.kr', rank: 8, share: '3.8%', trend: 'minus', color: 'slate' },
         { id: 9, name: '꿀알바', domain: 'xn--9g3b5ay89a20c2sd.com', rank: 9, share: '3.2%', trend: 'up', color: 'blue' },
         { id: 10, name: 'BamFox', domain: 'bamfox.co.kr', rank: 10, share: '2.9%', trend: 'down', color: 'pink' },
-        { id: 11, name: '퀸알바.kr', domain: 'xn--9g3b5az35c.kr', rank: 11, share: '2.5%', trend: 'up', color: 'indigo' },
+        { id: 11, name: '전문 인재.kr', domain: 'xn--9g3b5az35c.kr', rank: 11, share: '2.5%', trend: 'up', color: 'indigo' },
         { id: 12, name: 'LoveAlba', domain: 'lovealba.co.kr', rank: 12, share: '2.1%', trend: 'minus', color: 'slate' },
         { id: 13, name: 'CherryAlba', domain: 'cherryalba-m.com', rank: 13, share: '1.8%', trend: 'up', color: 'blue' },
         { id: 14, name: 'Misooda', domain: 'misooda.in', rank: 14, share: '1.5%', trend: 'down', color: 'pink' },
@@ -60,7 +60,7 @@ export const CompetitorAnalysis = () => {
                                 <div className="absolute top-0 right-0 px-3 py-1 bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest">My Domain</div>
                             )}
                             <div className="flex justify-between items-start mb-4">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs ${comp.color === 'blue' ? 'bg-blue-100 text-blue-600' : comp.color === 'pink' ? 'bg-pink-100 text-pink-600' : comp.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-600'}`}>
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs ${comp.color === 'blue' ? 'bg-blue-100 text-blue-600' : comp.color === 'pink' ? 'bg-blue-100 text-blue-600' : comp.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-600'}`}>
                                     {comp.rank}
                                 </div>
                                 <div className={`${comp.trend === 'up' ? 'text-green-500' : comp.trend === 'down' ? 'text-red-500' : 'text-slate-300'}`}>
@@ -81,7 +81,7 @@ export const CompetitorAnalysis = () => {
                     <div className="space-y-4">
                         <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">Top Search Keywords Analysis</h5>
                         <div className="space-y-2">
-                            {['강남구인구직', '여성고수익알바', '밤알바', '사이트순위'].map((kw, i) => (
+                            {['강남구인구직', '여성엔터프라이즈알바', '엔터프라이즈 인재 솔루션', '사이트순위'].map((kw, i) => (
                                 <div key={i} className="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-50 hover:bg-white hover:border-blue-100 transition-all cursor-default">
                                     <div className="flex items-center gap-3">
                                         <Search size={14} className="text-slate-300" />

@@ -1,0 +1,47 @@
+{
+  "themes": {
+    "colorScheme": "light",
+    "supportedColorSchemes": "light"
+  },
+  "metadata": {
+    "title": "코코알바(COCOALBA) - No.1 하이엔드 여성알바 매칭",
+    "description": "대한민국 1등 여성 고소득알바 플랫폼 코코알바. 유흥알바, 밤알바, 텐프로 구직 정보를 실시간으로 확인하고 가장 안전하고 빠른 매칭을 경험하세요. 당일지급 보장!",
+    "keywords": ["코코알바", "여우알바", "퀸알바", "밤알바", "고소득알바", "여성알바", "유흥알바", "룸알바", "바알바", "텐프로"],
+    "verification": {
+      "google": "enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y",
+      "other": {
+        "naver-site-verification": ["950201bcd2e28188884dfc9feeb6951a40c0887c"]
+      }
+    }
+  },
+  "schemas": [
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "title": "전국 고수익 알바 채용 정보",
+      "description": "대한민국 No.1 여성 고수익 알바 플랫폼 코코알바. 가장 빠르고 안전한 매칭.",
+      "identifier": {
+          "@type": "PropertyValue",
+          "name": "COCOALBA",
+          "value": "MAIN_ADS"
+      },
+      "datePosted": "2026-01-01T00:00:00Z",
+      "validThrough": "2027-01-01T00:00:00Z",
+      "hiringOrganization": {
+          "@type": "Organization",
+          "name": "COCOALBA",
+          "sameAs": "https://cocoalba.kr"
+      },
+      "jobLocation": {
+          "@type": "Place",
+          "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Seoul",
+              "addressRegion": "KR",
+              "streetAddress": "Gangnam-gu",
+              "postalCode": "06000"
+          }
+      }
+    }
+  ]
+}

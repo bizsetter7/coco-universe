@@ -52,7 +52,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
 
     const getBorderClass = (opt: string) => {
         switch (opt) {
-            case 'color': return 'border-4 border-pink-500';
+            case 'color': return 'border-4 border-blue-500';
             case 'glow': return 'border-4 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.6)]';
             case 'sparkle': return 'border-4 border-yellow-400 shadow-[0_0_35px_rgba(250,204,21,0.8)] animate-pulse';
             case 'rainbow': return 'animate-rainbow-border shadow-lg';
@@ -110,7 +110,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     {/* Right: Keywords (Grid 3 cols) */}
                     <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
                         {formData.selectedKeywords?.slice(0, 6).map((kw: string, i: number) => (
-                            <span key={i} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                            <span key={i} className="px-1 py-1.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-lg border border-blue-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                 {kw}
                             </span>
                         ))}
@@ -123,7 +123,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                 {/* Recruiting Section (Moved Up) */}
                 <div>
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="w-1.5 h-6 bg-pink-500 rounded-full" />
+                        <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
                         <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
                     </div>
                     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
@@ -182,7 +182,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     <MessageCircle size={20} fill="currentColor" className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px]">카톡문의</span>
                 </button>
-                <button className="col-span-2 py-4 bg-pink-600 text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-pink-700 transition shadow-lg shadow-pink-600/30 group">
+                <button className="col-span-2 py-4 bg-blue-600 text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 group">
                     <div className="flex items-center gap-2">
                         <Phone size={18} fill="currentColor" className="group-hover:animate-bounce" />
                         <span className="text-[15px] font-black">전화/문자 지원하기</span>

@@ -133,7 +133,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-pulse font-black text-pink-500">게시글을 불러오는 중...</div>
+                <div className="animate-pulse font-black text-blue-500">게시글을 불러오는 중...</div>
             </div>
         );
     }
@@ -142,7 +142,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
                 <p className="text-gray-500 font-bold mb-4">존재하지 않는 게시글이거나 비밀글입니다.</p>
-                <button onClick={() => router.back()} className="text-pink-500 font-bold underline">뒤로 가기</button>
+                <button onClick={() => router.back()} className="text-blue-500 font-bold underline">뒤로 가기</button>
             </div>
         );
     }
@@ -181,7 +181,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
 
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-500 ring-2 ring-pink-50">
+                            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 ring-2 ring-blue-50">
                                 <User size={24} />
                             </div>
                             <div>
@@ -239,14 +239,14 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                     <div className="flex flex-col gap-4 mt-12 pb-8 border-b border-gray-100">
                         <button
                             onClick={() => router.push('/community')}
-                            className="w-full py-4 border-2 border-pink-500 text-pink-600 rounded-2xl font-black hover:bg-pink-50 transition-all flex items-center justify-center gap-2"
+                            className="w-full py-4 border-2 border-blue-500 text-blue-600 rounded-2xl font-black hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
                         >
                             목록으로 돌아가기
                         </button>
                     </div>
 
                     <div className="flex items-center gap-6 py-4 px-6 bg-gray-50 rounded-3xl w-fit">
-                        <button className="flex items-center gap-2 text-pink-500 font-black hover:scale-110 transition-transform">
+                        <button className="flex items-center gap-2 text-blue-500 font-black hover:scale-110 transition-transform">
                             <Heart size={20} className={post.likes > 10 ? 'fill-pink-500' : ''} />
                             {post.likes || 0}
                         </button>
@@ -260,7 +260,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                 {/* Comments Section */}
                 <section className="py-8">
                     <h4 className="font-black text-gray-900 mb-6 flex items-center gap-2">
-                        댓글 <span className="text-pink-500">{comments.length}</span>
+                        댓글 <span className="text-blue-500">{comments.length}</span>
                     </h4>
 
                     {comments.length > 0 ? (
@@ -294,9 +294,9 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                     <input
                         type="text"
                         placeholder="따뜻한 댓글을 남겨주세요."
-                        className="flex-1 bg-gray-100 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-pink-500 outline-none transition-shadow"
+                        className="flex-1 bg-gray-100 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-shadow"
                     />
-                    <button className="bg-pink-100 text-pink-600 font-black px-6 py-3.5 rounded-2xl hover:bg-pink-500 hover:text-white transition-all shadow-sm">
+                    <button className="bg-blue-100 text-blue-600 font-black px-6 py-3.5 rounded-2xl hover:bg-blue-500 hover:text-white transition-all shadow-sm">
                         등록
                     </button>
                 </div>
@@ -320,7 +320,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="비밀번호 입력"
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-500 transition-colors"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-colors"
                             />
                             <button
                                 onClick={() => setShowPassword(!showPassword)}
@@ -340,7 +340,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                             <button
                                 onClick={handlePasswordAction}
                                 disabled={isActionLoading}
-                                className={`flex-1 py-3 text-white font-bold rounded-xl transition-colors shadow-lg ${actionType === 'delete' ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-pink-500 hover:bg-pink-600 shadow-pink-200'}`}
+                                className={`flex-1 py-3 text-white font-bold rounded-xl transition-colors shadow-lg ${actionType === 'delete' ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-200'}`}
                             >
                                 {isActionLoading ? '확인 중...' : '확인'}
                             </button>

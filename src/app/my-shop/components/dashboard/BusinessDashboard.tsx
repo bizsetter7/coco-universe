@@ -66,7 +66,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                 <div className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4">
                         <div className="flex items-center gap-4">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-pink-600'} `}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-blue-600'} `}>
                                 <Store size={32} />
                             </div>
                             <div>
@@ -83,7 +83,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                             <button onClick={() => setShowDesignModal(true)} className={`flex-1 md:flex-none py-3 px-5 rounded-xl text-sm font-bold border transition ${brand.theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-200 text-gray-600 hover:bg-gray-50'} `}>
                                 디자인 의뢰
                             </button>
-                            <button onClick={() => handleAdClick(true)} className="flex-1 md:flex-none py-3 px-6 rounded-xl bg-pink-500 text-white text-sm font-black hover:bg-pink-600 shadow-lg shadow-pink-500/30 transition flex items-center justify-center gap-2 whitespace-nowrap">
+                            <button onClick={() => handleAdClick(true)} className="flex-1 md:flex-none py-3 px-6 rounded-xl bg-blue-500 text-white text-sm font-black hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition flex items-center justify-center gap-2 whitespace-nowrap">
                                 <PlusSquare size={18} /> 새 공고 등록
                             </button>
                         </div>
@@ -119,7 +119,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                             <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2 flex-1 min-w-0">
                                     <div className="flex gap-2 text-[11px] items-center font-black">
-                                        <span className={`${(ad.status === 'rejected' || ad.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-pink-100 text-pink-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
+                                        <span className={`${(ad.status === 'rejected' || ad.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
                                             {(ad.status === 'rejected' || ad.status === 'REJECTED') ? '반려' : (ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
                                         </span>
                                         <div className="flex flex-col text-gray-400">
@@ -161,7 +161,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                     <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>
                                                 )}
                                                 {(ad.options?.pay_suffixes || ad.options?.paySuffixes || ad.paySuffixes?.length > 0) && (
-                                                    <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
+                                                    <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
                                                 )}
                                             </div>
                                         </div>
@@ -169,7 +169,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         {/* Title Line (Under Badges) */}
                                         <h4
                                             onClick={() => onShowAdDetail?.(ad)}
-                                            className={`font-black text-[17px] md:text-[19px] cursor-pointer hover:text-pink-500 transition leading-tight block w-full ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
+                                            className={`font-black text-[17px] md:text-[19px] cursor-pointer hover:text-blue-500 transition leading-tight block w-full ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
                                             style={getHighlighterStyle(ad.options?.highlighter || ad.selectedHighlighter)}
                                         >
                                             {ad.title}
@@ -189,7 +189,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                     </div>
 
                                     <div className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} `}>
-                                        <span className="text-pink-600 font-extrabold uppercase">
+                                        <span className="text-blue-600 font-extrabold uppercase">
                                             {(() => {
                                                 const nick = ad.nickname || nickname || '';
                                                 if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
@@ -249,7 +249,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                     온라인 인재관리
                                 </button>
                                 <div className="flex gap-4 text-[13px] font-black">
-                                    <span className="flex items-center gap-1.5 text-pink-500 bg-pink-50 dark:bg-pink-500/10 px-3 py-1 rounded-full"><User size={14} /> 지원자 {ad.applicantCount || 0}</span>
+                                    <span className="flex items-center gap-1.5 text-blue-500 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-full"><User size={14} /> 지원자 {ad.applicantCount || 0}</span>
                                 </div>
                             </div>
                         </div>

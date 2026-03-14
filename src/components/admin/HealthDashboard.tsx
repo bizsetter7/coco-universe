@@ -78,7 +78,7 @@ export const HealthDashboard = () => {
 
     const labelMap: any = {
         supabase: 'Supabase DB 연결',
-        portone: '포트원 API 설정 (성인인증)',
+        portone: '포트원 API 설정 (기업전용인증)',
         env: 'Vercel 환경 변수 상태',
         normalization: '데이터 처리 엔진 (Normalization)'
     };
@@ -160,7 +160,7 @@ export const HealthDashboard = () => {
                                 <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[10px] font-black text-blue-500 bg-white px-1.5 py-0.5 rounded border border-blue-100">TIP</span>
-                                        <span className="text-[11px] font-bold text-slate-700">포트원 성인인증 연동 오류 해결 가이드</span>
+                                        <span className="text-[11px] font-bold text-slate-700">포트원 기업전용인증 연동 오류 해결 가이드</span>
                                     </div>
                                     <RefreshCw size={12} className="text-slate-300 group-hover:text-blue-500 transition-all" />
                                 </div>

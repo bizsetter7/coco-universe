@@ -45,7 +45,7 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
         telegram: '',
         region: '서울',
         regionGu: '강남구',
-        category: '룸알바',
+        category: '프라이빗 매칭',
         categorySub: '퍼블릭',
         tier: 'grand',
         payType: '시급',

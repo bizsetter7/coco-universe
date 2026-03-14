@@ -40,7 +40,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    // ── [2] 성인인증 게이트 원천 봉쇄 ───────────────────────────────────────────
+    // ── [2] 기업전용인증 게이트 원천 봉쇄 ───────────────────────────────────────────
     // ⚠️  컴포넌트 호출부 자체를 비활성화 — 환경변수 설정 실수조차 허용하지 않음
     // ⚠️  AdultVerificationGate 임포트도 주석 처리됨 (위 import 라인 참조)
     //
@@ -54,7 +54,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
     React.useEffect(() => {
         if (isLoading) return;
-        if (authUser?.isAdultVerified) { setIsVerified(true); return; }
+        if (authUser?.isVerifiedPartnerVerified) { setIsVerified(true); return; }
         setIsVerified(localStorage.getItem('adult_verified') === 'true');
     }, [isLoading]);
     const handleVerify = () => {

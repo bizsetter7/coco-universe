@@ -76,11 +76,11 @@ export default function WritePostPage() {
         setIsSubmitting(true);
 
         // ─── 자동 SEO 키워드 생성 (유저에게 보이지 않음) ───────────
-        const BASE_SEO = ['코코알바', '코코판', '여성커뮤니티', '고소득알바', '연애고민', '언니들수다'];
+        const BASE_SEO = ['코코알바', '코코판', '여성커뮤니티', '엔터프라이즈알바', '연애고민', '언니들수다'];
         const CATEGORY_SEO: Record<string, string[]> = {
-            '언니들의 수다(썰)': ['연애썰', '남친고민', '공감썰', '여자공감', '연애이야기'],
-            '프리미엄 라운지': ['프리미엄정보', '재테크', '고소득', '성공노하우'],
-            '밤 문화 Talk': ['밤알바', '유흥정보', '밤문화'],
+            '언니들의 수다(썰)': ['연애썰', '남친고민', '공감썰', '인재공감', '연애이야기'],
+            '프리미엄 라운지': ['프리미엄정보', '재테크', '엔터프라이즈', '성공노하우'],
+            '밤 문화 Talk': ['엔터프라이즈 인재 솔루션', '프리미엄정보', '밤문화'],
             '뷰티·패션·이벤트': ['뷰티꿀팁', '화장품후기', '패션정보'],
         };
         const titleKeywords = title.split(/[\s,!?~]+/).filter(w => w.length >= 2).slice(0, 6);
@@ -152,7 +152,7 @@ export default function WritePostPage() {
             <main className="max-w-4xl mx-auto pb-32">
                 {/* 1. Category Section */}
                 <section className="p-6 border-b border-gray-100 bg-white">
-                    <label className="block text-[11px] font-black text-pink-600 uppercase tracking-widest mb-4">카테고리 선택</label>
+                    <label className="block text-[11px] font-black text-blue-600 uppercase tracking-widest mb-4">카테고리 선택</label>
 
                     {/* Desktop: Buttons */}
                     <div className="hidden md:flex flex-wrap gap-2">
@@ -161,7 +161,7 @@ export default function WritePostPage() {
                                 key={cat}
                                 onClick={() => setCategory(cat)}
                                 className={`px-4 py-2.5 rounded-2xl text-[13px] font-black border transition-all ${category === cat
-                                    ? 'border-pink-500 bg-pink-500 text-white shadow-lg shadow-pink-100'
+                                    ? 'border-blue-500 bg-blue-500 text-white shadow-lg shadow-blue-100'
                                     : 'border-gray-100 text-gray-500 bg-gray-50 hover:bg-gray-100'
                                     }`}
                             >
@@ -175,7 +175,7 @@ export default function WritePostPage() {
                         <select
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-pink-500 transition-all appearance-none cursor-pointer"
+                            className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"
                         >
                             {CATEGORIES.map(cat => (
                                 <option key={cat} value={cat}>{cat}</option>
@@ -195,7 +195,7 @@ export default function WritePostPage() {
                                     checked={isSecret}
                                     onChange={(e) => setIsSecret(e.target.checked)}
                                 />
-                                <div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center transition-all peer-checked:bg-pink-500 peer-checked:border-pink-500 group-hover:border-pink-400 bg-white">
+                                <div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center transition-all peer-checked:bg-blue-500 peer-checked:border-blue-500 group-hover:border-blue-400 bg-white">
                                     {isSecret && <Sparkles size={14} className="text-white" />}
                                 </div>
                                 <span className="text-sm font-black text-gray-800">비밀글로 등록</span>
@@ -211,7 +211,7 @@ export default function WritePostPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="비밀번호 (4자리 이상)"
-                                    className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-12 py-3 text-sm font-black outline-none focus:border-pink-500 transition-all shadow-sm placeholder-gray-400"
+                                    className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-12 py-3 text-sm font-black outline-none focus:border-blue-500 transition-all shadow-sm placeholder-gray-400"
                                     maxLength={20}
                                 />
                                 <button
@@ -251,7 +251,7 @@ export default function WritePostPage() {
                 <section className="px-6 py-5 bg-gray-50/50">
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">사진 첨부 (최대 3장)</label>
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                        <label className="w-24 h-24 bg-white border-2 border-dashed border-gray-200 rounded-[28px] flex flex-col items-center justify-center text-gray-400 cursor-pointer shrink-0 hover:border-pink-200 hover:text-pink-400 transition-all active:scale-95 shadow-sm">
+                        <label className="w-24 h-24 bg-white border-2 border-dashed border-gray-200 rounded-[28px] flex flex-col items-center justify-center text-gray-400 cursor-pointer shrink-0 hover:border-blue-200 hover:text-blue-400 transition-all active:scale-95 shadow-sm">
                             <ImageIcon size={28} className="mb-1" />
                             <span className="text-[11px] font-black">{images.length}/3</span>
                             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -283,7 +283,7 @@ export default function WritePostPage() {
                     <div className="flex flex-col gap-1 max-w-full overflow-hidden">
                         <p className="whitespace-nowrap overflow-hidden text-ellipsis">• 부적절한 게시글은 관리자에 의해 제재를 받을 수 있습니다.</p>
                         <p className="whitespace-nowrap overflow-hidden text-ellipsis">• 타인의 권리를 침해하거나 명예를 훼손하는 내용은 금지됩니다.</p>
-                        <p className="text-pink-500 whitespace-nowrap md:whitespace-normal">
+                        <p className="text-blue-500 whitespace-nowrap md:whitespace-normal">
                             • 설정하신 비밀번호는 글 수정 및 삭제 시 본인확인을 위해 꼭 필요합니다.
                         </p>
                     </div>
@@ -301,7 +301,7 @@ export default function WritePostPage() {
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="flex-[2] py-4 bg-pink-600 text-white rounded-2xl font-black text-base shadow-xl shadow-pink-200 hover:bg-pink-700 transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
+                        className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-black text-base shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
                         disabled={isSubmitting || !title.trim() || !content.trim() || !password.trim()}
                     >
                         {isSubmitting ? '등록 중...' : '게시글 등록하기'}

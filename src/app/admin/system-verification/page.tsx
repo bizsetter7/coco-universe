@@ -126,7 +126,7 @@ const COMMUNITY_RULES = [
         title: '카테고리 구조',
         items: [
             '전체 (all) - 모든 게시글 표시',
-            '밤 문화 Talk (nightlife) - 일상·경험 공유',
+            '밤 문화 Talk (b2blife) - 일상·경험 공유',
             '언니들의 수다(썰) (talk) - 연애·공감 스토리 ★ 핵심',
             '같이일할단짝 (partner) - 파트너 모집',
             '중고거래 (market) - 물품 거래',
@@ -240,7 +240,7 @@ export default function SystemVerificationPage() {
                 </button>
                 <button
                     onClick={() => setActiveTab('community')}
-                    className={`flex items-center gap-2 px-5 py-2.5 font-black text-sm rounded-t-xl transition border-b-2 -mb-px ${activeTab === 'community' ? 'border-pink-500 text-pink-600 bg-white' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    className={`flex items-center gap-2 px-5 py-2.5 font-black text-sm rounded-t-xl transition border-b-2 -mb-px ${activeTab === 'community' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
                     <BookOpen size={16} /> 커뮤니티 운영 매뉴얼
                 </button>
@@ -301,7 +301,7 @@ export default function SystemVerificationPage() {
                                                         <div className={`text-[10px] font-mono font-bold ${isIssue ? 'text-red-500' : 'text-gray-400'}`}>Length: {title.length} / 26</div>
                                                     </td>
                                                     <td className="p-3">
-                                                        <a href={`/shop/${shop.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-pink-600 transition">
+                                                        <a href={`/shop/${shop.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition">
                                                             <ExternalLink size={14} /> 확인
                                                         </a>
                                                     </td>
@@ -325,9 +325,9 @@ export default function SystemVerificationPage() {
             {activeTab === 'community' && (
                 <div className="space-y-6">
                     {/* 개요 배너 */}
-                    <div className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-6 text-white">
+                    <div className="bg-gradient-to-r from-blue-500 to-rose-500 rounded-2xl p-6 text-white">
                         <h2 className="text-xl font-black mb-1">🌸 코코알바 커뮤니티 운영 완전 가이드</h2>
-                        <p className="text-pink-100 text-sm font-bold">이 문서는 커뮤니티 시스템을 복구·복제·재설정할 때 필요한 모든 정보를 담고 있습니다.</p>
+                        <p className="text-blue-100 text-sm font-bold">이 문서는 커뮤니티 시스템을 복구·복제·재설정할 때 필요한 모든 정보를 담고 있습니다.</p>
                         <div className="flex gap-3 mt-4 flex-wrap">
                             <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-black">Mock 게시글: {MOCK_POST_IDS.length}개</span>
                             <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-black">MOCK IDs: [{MOCK_POST_IDS.join(', ')}]</span>
@@ -344,7 +344,7 @@ export default function SystemVerificationPage() {
                                 <ul className="space-y-1.5">
                                     {rule.items.map((item, i) => (
                                         <li key={i} className="flex items-start gap-2 text-sm text-gray-700 font-medium">
-                                            <span className="text-pink-400 font-black mt-0.5">›</span>
+                                            <span className="text-blue-400 font-black mt-0.5">›</span>
                                             {item}
                                         </li>
                                     ))}

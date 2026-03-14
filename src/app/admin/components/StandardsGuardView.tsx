@@ -344,18 +344,18 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                 </div>
 
                                 {/* Section 2: Pay Badges */}
-                                <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:border-pink-100 transition-colors">
+                                <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:border-blue-100 transition-colors">
                                     <button
                                         onClick={() => setOpenSection(openSection === 'pay' ? null : 'pay')}
-                                        className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${openSection === 'pay' ? 'bg-pink-50/50' : 'bg-white hover:bg-slate-50'}`}
+                                        className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${openSection === 'pay' ? 'bg-blue-50/50' : 'bg-white hover:bg-slate-50'}`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${openSection === 'pay' ? 'bg-white shadow-sm text-pink-500' : 'bg-slate-50 text-slate-400'}`}>
+                                            <div className={`p-2 rounded-lg ${openSection === 'pay' ? 'bg-white shadow-sm text-blue-500' : 'bg-slate-50 text-slate-400'}`}>
                                                 <CreditCard size={14} />
                                             </div>
                                             <span className="text-xs font-black text-slate-800 tracking-tight">2. 급여 배지(Pay Badge) 약어 및 컬러 표준</span>
                                         </div>
-                                        {openSection === 'pay' ? <ChevronUp size={14} className="text-pink-500" /> : <ChevronDown size={14} className="text-slate-300" />}
+                                        {openSection === 'pay' ? <ChevronUp size={14} className="text-blue-500" /> : <ChevronDown size={14} className="text-slate-300" />}
                                     </button>
                                     {openSection === 'pay' && (
                                         <div className="p-6 bg-white border-t border-slate-50 animate-in slide-in-from-top-2 duration-300">
@@ -609,7 +609,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                         {/* 7. Ad Specs & Typography (Source of Truth) */}
                         <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100 space-y-6">
                             <h3 className="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
-                                <span className="w-1.5 h-6 bg-pink-500 rounded-full"></span>
+                                <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
                                 광고 UI 표준 (Ad Specs & Typography)
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -676,21 +676,21 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                 {/* 7.3 Popup View */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-2 h-2 rounded-full bg-pink-400"></div>
+                                        <div className="w-2 h-2 rounded-full bg-blue-400"></div>
                                         <h4 className="text-xs font-black text-slate-700">Popup (Detail)</h4>
                                     </div>
-                                    <div className="bg-pink-50 rounded-xl p-4 space-y-2 border border-pink-100">
+                                    <div className="bg-blue-50 rounded-xl p-4 space-y-2 border border-blue-100">
                                         <div className="flex justify-between text-[11px]">
                                             <span className="text-slate-500">Header Color</span>
                                             <span className="font-mono font-bold text-slate-700">Dynamic (7 Types)</span>
                                         </div>
-                                        <div className="flex flex-col gap-1 text-[11px] border-t border-pink-100 pt-2 mt-1">
+                                        <div className="flex flex-col gap-1 text-[11px] border-t border-blue-100 pt-2 mt-1">
                                             <span className="text-slate-500 font-bold mb-0.5">Header Layout (3-Row)</span>
                                             <div className="flex justify-between pl-2"><span className="text-slate-400">Row 1</span> <span className="font-mono font-bold text-slate-700">Region | Job Type</span></div>
                                             <div className="flex justify-between pl-2"><span className="text-slate-400">Row 2</span> <span className="font-mono font-bold text-slate-700">Icon+Highlighter+Title</span></div>
                                             <div className="flex justify-between pl-2"><span className="text-slate-400">Row 3</span> <span className="font-mono font-bold text-slate-700">Nickname (Step1 Input)</span></div>
                                         </div>
-                                        <div className="flex flex-col gap-1 text-[11px] border-t border-pink-100 pt-2 mt-1">
+                                        <div className="flex flex-col gap-1 text-[11px] border-t border-blue-100 pt-2 mt-1">
                                             <span className="text-slate-500 font-bold mb-0.5">Body Logic</span>
                                             <div className="flex justify-between pl-2"><span className="text-slate-400">Location</span> <span className="font-mono font-bold text-slate-700">Business Address (Sign-up)</span></div>
                                             <div className="flex justify-between pl-2"><span className="text-slate-400">Search</span> <span className="font-mono font-bold text-slate-700">Filter by Ad Region</span></div>

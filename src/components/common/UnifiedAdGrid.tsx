@@ -74,7 +74,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, ha
             {/* 4. Special */}
             <AdSection
                 title="스페셜 채용"
-                icon={<Star className="text-pink-500" fill="currentColor" />}
+                icon={<Star className="text-blue-500" fill="currentColor" />}
                 shops={specialShops}
                 tierId="special"
                 rowCountPC={2}

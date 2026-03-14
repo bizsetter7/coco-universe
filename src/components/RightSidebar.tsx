@@ -27,7 +27,7 @@ export default function RightSidebar() {
 
     const JOB_TYPES = ['룸싸롱', '나이트', '주점', '노래방', '바(Bar)', '카페', '일반음식점', 'PC방/오락실', '기타'];
 
-    const WORK_TYPES = ['낮알바', '밤알바', '파트타임', '주말알바', '풀타임', '단기알바', '숙식제공', '당일지급'];
+    const WORK_TYPES = ['낮알바', '엔터프라이즈 인재 솔루션', '파트타임', '주말알바', '풀타임', '단기알바', '숙식제공', '당일지급'];
 
     return (
         <aside className="w-[250px] shrink-0 hidden lg:block space-y-3 sticky top-20 h-fit pb-10">
@@ -157,7 +157,7 @@ export default function RightSidebar() {
                             <ChevronRight size={12} className="text-gray-400" />
                             {item.label}
                         </span>
-                        <span className="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-[10px] border border-gray-200 font-extrabold hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition-colors">
+                        <span className="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-[10px] border border-gray-200 font-extrabold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors">
                             {item.sub}
                         </span>
                     </div>

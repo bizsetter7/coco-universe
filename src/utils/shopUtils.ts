@@ -57,7 +57,7 @@ export const getShopDefaultImage = (workType?: string): string => {
         return 'https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&q=80&w=800'; // 공항/여행 이미지
     }
 
-    // 기본 리드 이미지 (Nightlife)
+    // 기본 리드 이미지 (b2blife)
     return 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&q=80&w=800';
 };
 /**
@@ -68,17 +68,17 @@ export const generateSEOKeywords = (region?: string): string[] => {
     const regionName = region?.replace(/[\[\]]/g, '') || '전국';
 
     return [
-        `${regionName}여자알바`,
+        `${regionName}인재알바`,
         `${regionName}여성알바`,
-        `${regionName}유흥알바`,
-        `${regionName}룸알바`,
-        `${regionName}밤알바`,
+        `${regionName}엔터프라이즈 인재 솔루션`,
+        `${regionName}프라이빗 매칭`,
+        `${regionName}엔터프라이즈 인재 솔루션`,
         `${regionName}당일알바`,
         `${regionName}20대알바`,
         `${regionName}30대알바`,
-        `${regionName}고수익`,
-        `${regionName}여우알바`,
-        `${regionName}퀸알바`,
+        `${regionName}엔터프라이즈`,
+        `${regionName}전문 인재`,
+        `${regionName}전문 인재`,
         `${regionName}레이디알바`,
         '코코알바'
     ];

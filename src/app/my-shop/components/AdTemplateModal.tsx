@@ -84,7 +84,7 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
         switch (type) {
             case 'main_title': return <Sparkles size={14} className="text-amber-500" />;
             case 'sub_title': return <MessageSquare size={14} className="text-blue-500" />;
-            case 'benefit': return <List size={14} className="text-pink-500" />;
+            case 'benefit': return <List size={14} className="text-blue-500" />;
             case 'salary': return <CreditCard size={14} className="text-green-500" />;
             case 'contact': return <Phone size={14} className="text-indigo-500" />;
             default: return <Type size={14} />;
@@ -106,7 +106,7 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                 {/* Header */}
                 <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100 shrink-0 bg-white/50 backdrop-blur-sm z-20">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-xl shadow-pink-500/20">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-rose-600 flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
                             <Sparkles size={28} />
                         </div>
                         <div>
@@ -129,13 +129,13 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                                         <button
                                             key={t.id}
                                             onClick={() => setSelectedTemplate(t)}
-                                            className={`relative group flex flex-col items-center gap-2 p-2 rounded-2xl border-2 transition-all ${selectedTemplate.id === t.id ? 'border-pink-500 bg-white shadow-lg' : 'border-transparent bg-gray-100/50 hover:bg-white'}`}
+                                            className={`relative group flex flex-col items-center gap-2 p-2 rounded-2xl border-2 transition-all ${selectedTemplate.id === t.id ? 'border-blue-500 bg-white shadow-lg' : 'border-transparent bg-gray-100/50 hover:bg-white'}`}
                                         >
                                             <div className="w-full aspect-square rounded-xl shadow-inner overflow-hidden flex items-center justify-center" style={{ background: t.themeColor }}>
                                                 {selectedTemplate.id === t.id && (
-                                                    <div className="absolute top-1 right-1 bg-pink-500 text-white rounded-full p-1 shadow-lg ring-4 ring-white"><Check size={10} strokeWidth={4} /></div>
+                                                    <div className="absolute top-1 right-1 bg-blue-500 text-white rounded-full p-1 shadow-lg ring-4 ring-white"><Check size={10} strokeWidth={4} /></div>
                                                 )}
-                                                <div className="text-xl">{t.id === 'luxury-purple' ? '✨' : t.id === 'gold-winner' ? '🏆' : t.id === 'sweet-pink' ? '🎀' : t.id === 'neon-night' ? '🕺' : t.id === 'red-impact' ? '🔴' : '☁️'}</div>
+                                                <div className="text-xl">{t.id === 'luxury-purple' ? '✨' : t.id === 'gold-winner' ? '🏆' : t.id === 'sweet-pink' ? '🎀' : t.id === 'neon-b2b' ? '🕺' : t.id === 'red-impact' ? '🔴' : '☁️'}</div>
                                             </div>
                                             <span className="text-[10px] font-black truncate w-full text-center">{t.name}</span>
                                         </button>
@@ -154,7 +154,7 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                                             <button
                                                 key={type}
                                                 onClick={() => handleAddBlock(type)}
-                                                className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-400 transition-all shadow-sm active:scale-90 ${canAddBlock(type) ? 'hover:text-pink-500 hover:border-pink-500' : 'opacity-30 cursor-not-allowed'}`}
+                                                className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-400 transition-all shadow-sm active:scale-90 ${canAddBlock(type) ? 'hover:text-blue-500 hover:border-blue-500' : 'opacity-30 cursor-not-allowed'}`}
                                                 title={canAddBlock(type) ? `${type} 추가` : '추가 제한 도달'}
                                                 disabled={!canAddBlock(type)}
                                             >
@@ -166,10 +166,10 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
 
                                 <div className="space-y-3">
                                     {blocks.map((block, index) => (
-                                        <div key={block.id} className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-pink-200 hover:shadow-md transition-all">
+                                        <div key={block.id} className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-blue-200 hover:shadow-md transition-all">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+                                                    <div className="p-1.5 rounded-lg bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
                                                         {getBlockIcon(block.type)}
                                                     </div>
                                                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -219,7 +219,7 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                                 {canAddBlock('benefit') && (
                                     <button
                                         onClick={() => handleAddBlock('benefit')}
-                                        className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-300 flex items-center justify-center gap-2 hover:border-pink-200 hover:text-pink-400 hover:bg-pink-50/30 transition-all font-black text-xs"
+                                        className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-300 flex items-center justify-center gap-2 hover:border-blue-200 hover:text-blue-400 hover:bg-blue-50/30 transition-all font-black text-xs"
                                     >
                                         <Plus size={16} /> 새로운 블록 추가하기
                                     </button>
@@ -264,7 +264,7 @@ export const AdTemplateModal: React.FC<AdTemplateModalProps> = ({ brand, onClose
                                 onApply(renderedHtml);
                                 onClose();
                             }}
-                            className="px-12 py-3.5 rounded-2xl text-sm font-black bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-2xl shadow-pink-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 group"
+                            className="px-12 py-3.5 rounded-2xl text-sm font-black bg-gradient-to-r from-blue-500 to-rose-600 text-white shadow-2xl shadow-blue-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 group"
                         >
                             <Sparkles size={18} className="group-hover:rotate-12 transition-transform" />
                             지금 바로 적용하기

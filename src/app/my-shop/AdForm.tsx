@@ -94,10 +94,10 @@ const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Do
                             onClick={() => scrollToStep(step.target)}
                             className="flex items-center gap-2 shrink-0 group transition-all"
                         >
-                            <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-[10px] md:text-sm font-black transition-all ${isActive ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30 scale-110' : isCompleted ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 text-gray-400'}`}>
+                            <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-[10px] md:text-sm font-black transition-all ${isActive ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 scale-110' : isCompleted ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 text-gray-400'}`}>
                                 {isCompleted ? <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg> : step.id}
                             </div>
-                            <span className={`text-[10px] md:text-sm font-black whitespace-nowrap transition-colors ${isActive ? 'text-pink-600' : isCompleted ? 'text-green-600' : 'text-gray-400'} group-hover:text-pink-500`}>
+                            <span className={`text-[10px] md:text-sm font-black whitespace-nowrap transition-colors ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-400'} group-hover:text-blue-500`}>
                                 {step.label}
                             </span>
                             {step.id < 4 && <div className={`hidden md:block w-4 h-px ${isCompleted ? 'bg-green-200' : 'bg-gray-100'}`} />}
@@ -106,7 +106,7 @@ const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Do
                 })}
             </div>
             <div className="hidden md:flex items-center gap-4 text-[11px] font-bold text-gray-400">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-pink-500"></span>진행중</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span>진행중</span>
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span>완료</span>
             </div>
         </div>
@@ -207,23 +207,23 @@ export default function AdForm(props: AdFormProps) {
             {/* Recruitment Registration Header (Capture 3) */}
             <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">
-                    <div className="w-1.5 h-6 md:w-2 md:h-8 bg-pink-500 rounded-full shrink-0"></div>
+                    <div className="w-1.5 h-6 md:w-2 md:h-8 bg-blue-500 rounded-full shrink-0"></div>
                     <h1 className={`text-xl md:text-3xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>채용공고등록</h1>
                 </div>
                 <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'} font-bold text-[11px] md:text-base ml-0 leading-tight md:leading-normal`}>
-                    <span className="mr-0.5 text-pink-500 font-extrabold">*</span> 표시 항목은 필수 입력입니다. 정확히 입력해주세요.
+                    <span className="mr-0.5 text-blue-500 font-extrabold">*</span> 표시 항목은 필수 입력입니다. 정확히 입력해주세요.
                 </p>
             </div>
 
             {/* [Onboarding] Welcome Alert for New Posters */}
             {props.isNewEntry && (
-                <div className="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="bg-gradient-to-r from-blue-50 to-rose-50 border border-blue-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
                     <div className="flex items-start gap-3 md:gap-4">
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-sm shrink-0">✨</div>
                         <div>
-                            <h3 className="text-sm md:text-lg font-black text-pink-600 mb-0.5 md:mb-1">사장님, 코코알바에 오신 것을 환영합니다!</h3>
-                            <p className="text-[11px] md:text-[13px] text-pink-800/70 font-bold leading-relaxed">
-                                지금 첫 공고를 등록하고 <span className="text-pink-600 font-black underline underline-offset-2">SNS 홍보 혜택</span>을 받아보세요. <br className="hidden md:block" />
+                            <h3 className="text-sm md:text-lg font-black text-blue-600 mb-0.5 md:mb-1">사장님, 코코알바에 오신 것을 환영합니다!</h3>
+                            <p className="text-[11px] md:text-[13px] text-blue-800/70 font-bold leading-relaxed">
+                                지금 첫 공고를 등록하고 <span className="text-blue-600 font-black underline underline-offset-2">SNS 홍보 혜택</span>을 받아보세요. <br className="hidden md:block" />
                                 작성이 어려우시면 언제든 우측 상단의 '예시 보기'를 참고해주세요!
                             </p>
                         </div>
@@ -283,7 +283,7 @@ export default function AdForm(props: AdFormProps) {
                     </button>
                     <button
                         onClick={() => props.onSave?.()}
-                        className="flex-[3] md:flex-1 py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-black text-xs md:text-lg rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-pink-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
+                        className="flex-[3] md:flex-1 py-4 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black text-xs md:text-lg rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
                     >
                         <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                         저장 및 심사 저장

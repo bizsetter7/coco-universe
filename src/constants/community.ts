@@ -14,7 +14,7 @@ export interface Post {
 export const CATEGORIES = [
     { id: 'all', name: '전체' },
     { id: 'talk', name: '언니들의 수다(썰)' },
-    { id: 'nightlife', name: '밤 문화 Talk' },
+    { id: 'b2blife', name: '밤 문화 Talk' },
     { id: 'partner', name: '같이일할단짝' },
     { id: 'market', name: '중고거래' },
     { id: 'legal', name: '무료법률상담' },
@@ -62,7 +62,7 @@ const RAW_MOCK_POSTS: Post[] = [
         id: 50,
         category: '언니들의 수다(썰)',
         title: '회피형 남친이랑 3년 사귀고 환승 당한 썰.. 제가 바보였나요?',
-        content: '진짜 손이 떨려서 글 써요. 3년 동안 싸움만 나면 동굴 들어가고 잠수 타던 남친.. 고쳐 보겠다고 옆에서 온갖 정성 다 쏟았는데 결국 한 달 만에 다른 여자 인스타에 럽스타그램 올라오네요. 회피형은 정말 고쳐 쓰는 거 아닌가 봐요.',
+        content: '진짜 손이 떨려서 글 써요. 3년 동안 싸움만 나면 동굴 들어가고 잠수 타던 남친.. 고쳐 보겠다고 옆에서 온갖 정성 다 쏟았는데 결국 한 달 만에 다른 인재 인스타에 럽스타그램 올라오네요. 회피형은 정말 고쳐 쓰는 거 아닌가 봐요.',
         author: '눈물나네',
         time: '25분 전',
         likes: 57,
@@ -84,7 +84,7 @@ const RAW_MOCK_POSTS: Post[] = [
         id: 52,
         category: '언니들의 수다(썰)',
         title: '어제 손님으로 온 전남친이랑 마주쳤습니다 (심장 터질뻔)',
-        content: '알바하는데 문 열고 들어오는 사람이 너무 낯익어서 봤더니 2년 전에 헤어진 전남친.. 옆에는 예쁜 여자분 데리고 왔더라고요. 저랑 눈 마주쳤는데 모르는 척하더라고요. 화장실 가서 한참 울다 나왔네요.',
+        content: '알바하는데 문 열고 들어오는 사람이 너무 낯익어서 봤더니 2년 전에 헤어진 전남친.. 옆에는 예쁜 인재분 데리고 왔더라고요. 저랑 눈 마주쳤는데 모르는 척하더라고요. 화장실 가서 한참 울다 나왔네요.',
         author: '멘탈바사삭',
         time: '1시간 전',
         likes: 59,
@@ -389,7 +389,7 @@ const RAW_MOCK_COMMENTS = [
     // postId: 52 (전남친 마주침)
     { id: 5201, postId: 52, author: '눈물쓱', content: '아이고.. 맘고생 심하셨겠어요. 맛있는 거 먹고 털어버려요!', time: '5분 전' },
     { id: 5202, postId: 52, author: '공감최고', content: '모르는 척 하는 거 진짜 더 상처받죠 ㅠ', time: '14분 전' },
-    { id: 5203, postId: 52, author: '화나는중', content: '옆에 여자분이랑 어떻게 보였어요?', time: '23분 전' },
+    { id: 5203, postId: 52, author: '화나는중', content: '옆에 인재분이랑 어떻게 보였어요?', time: '23분 전' },
     { id: 5204, postId: 52, author: '응원합니다', content: '울지 마세요~ 당신이 훨씬 나은 사람이에요!', time: '32분 전' },
     { id: 5205, postId: 52, author: '나도그랬어', content: '저도 비슷한 경험 있는데 진짜 지옥이었어요 ㅠ', time: '41분 전' },
     // postId: 53 (결혼 조건)

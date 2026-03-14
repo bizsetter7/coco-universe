@@ -30,7 +30,7 @@ export const PAID_OPTION_STANDARDS = [
     { name: '아이콘', abbr: '아', tw: 'bg-indigo-500', key: 'selectedIcon', dbKey: 'icon' },
     { name: '형광펜', abbr: '형', tw: 'bg-gray-600', key: 'selectedHighlighter', dbKey: 'highlighter' },
     { name: '테두리', abbr: '테', tw: 'bg-blue-500', key: 'borderOption', dbKey: 'border' },
-    { name: '급여수식어', abbr: '급', tw: 'bg-pink-500', key: 'paySuffixes', dbKey: 'pay_suffixes' },
+    { name: '급여수식어', abbr: '급', tw: 'bg-blue-500', key: 'paySuffixes', dbKey: 'pay_suffixes' },
 ];
 
 // 4. 데이터 정규화 표준 (Normalization Standards)

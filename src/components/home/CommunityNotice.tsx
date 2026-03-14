@@ -26,7 +26,7 @@ export const CommunityNotice = () => {
     };
 
     // Style tokens
-    const communityContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-pink-50/50 border-pink-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
+    const communityContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-blue-50/50 border-blue-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
     const noticeContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-blue-50/50 border-blue-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
 
     const headerStyle = "flex flex-col xl:flex-row items-start xl:items-center justify-between mb-3 md:mb-4 gap-1";
@@ -41,7 +41,7 @@ export const CommunityNotice = () => {
             <div className={communityContainerStyle} onClick={() => router.push('/community')}>
                 <div className={headerStyle}>
                     <h3 className={titleStyle}>
-                        <MessageCircle className="text-pink-500 shrink-0" fill="currentColor" size={18} />
+                        <MessageCircle className="text-blue-500 shrink-0" fill="currentColor" size={18} />
                         커뮤니티
                     </h3>
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">자유게시판</span>
@@ -49,12 +49,12 @@ export const CommunityNotice = () => {
                 <div className={listStyle}>
                     {recentPosts.map((post) => (
                         <div key={post.id} className="flex items-center gap-2 md:gap-3 group">
-                            <span className={iconBoxStyle('text-pink-500')}>{getCategoryIcon(post.category)}</span>
-                            <span className={`${itemStyle} group-hover:text-pink-600 transition-colors`}>{post.title}</span>
+                            <span className={iconBoxStyle('text-blue-500')}>{getCategoryIcon(post.category)}</span>
+                            <span className={`${itemStyle} group-hover:text-blue-600 transition-colors`}>{post.title}</span>
                         </div>
                     ))}
                 </div>
-                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-pink-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
 
             {/* Notice Section */}

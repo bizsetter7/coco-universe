@@ -94,7 +94,7 @@ export const UnifiedJobListing = ({
                         <select
                             value={selectedJobType}
                             onChange={(e) => { setSelectedJobType(e.target.value); setSelectedSubJobType('전체'); }}
-                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer"
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-blue-500 transition-colors text-black cursor-pointer"
                         >
                             <option value="전체">직종선택</option>
                             {JOB_CATEGORIES.map(job => (
@@ -111,7 +111,7 @@ export const UnifiedJobListing = ({
                             value={selectedSubJobType}
                             onChange={(e) => setSelectedSubJobType(e.target.value)}
                             disabled={selectedJobType === '전체'}
-                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-blue-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
                         >
                             <option value="전체">상세직종</option>
                             {selectedJobType !== '전체' && JOB_CATEGORY_MAP[selectedJobType]?.map(item => (
@@ -127,7 +127,7 @@ export const UnifiedJobListing = ({
                         <select
                             value={selectedRegion}
                             onChange={(e) => { setSelectedRegion(e.target.value); setSelectedSubRegion('전체'); }}
-                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer"
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black appearance-none pl-4 pr-10 focus:outline-none focus:border-blue-500 transition-colors text-black cursor-pointer"
                         >
                             <option value="전체">지역선택</option>
                             {REGION_LIST.map(reg => (
@@ -144,7 +144,7 @@ export const UnifiedJobListing = ({
                             value={selectedSubRegion}
                             onChange={(e) => setSelectedSubRegion(e.target.value)}
                             disabled={selectedRegion === '전체'}
-                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-pink-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                            className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium appearance-none pl-4 pr-10 focus:outline-none focus:border-blue-500 transition-colors text-black cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
                         >
                             <option value="전체">세부지역</option>
                             {selectedRegion !== '전체' && REGIONS_MAP[selectedRegion]?.map(sub => (
@@ -163,7 +163,7 @@ export const UnifiedJobListing = ({
         <div className="space-y-4 md:space-y-8">
             {/* Hero Section */}
             <div className="relative h-32 md:h-40 bg-gray-900 rounded-[24px] overflow-hidden group mx-4 md:mx-0">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-pink-900 flex items-center justify-center text-white">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-900 flex items-center justify-center text-white">
                     <div className="text-center">
                         <h2 className="text-xl md:text-2xl font-black mb-1">코코알바만의 특별한 혜택</h2>
                         <p className="text-sm opacity-80">지금 가입하고 무료 광고 혜택을 누리세요</p>
@@ -187,7 +187,7 @@ export const UnifiedJobListing = ({
             {/* Main Content Flow */}
             <div className="space-y-3 md:space-y-6">
                 <h1 className="text-3xl font-black flex items-center gap-2 mx-4 md:mx-0">
-                    <span className="w-1.5 h-8 bg-pink-500 rounded-full"></span>
+                    <span className="w-1.5 h-8 bg-blue-500 rounded-full"></span>
                     {title}
                 </h1>
 
@@ -201,7 +201,7 @@ export const UnifiedJobListing = ({
                                     else if (tab === '지역별 채용' && title !== '지역별 채용') router.push('/region');
                                     else setActiveTab(tab);
                                 }}
-                                className={`flex-1 py-2.5 px-4 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${activeTab === tab ? 'bg-pink-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                className={`flex-1 py-2.5 px-4 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                             >
                                 {tab}
                             </button>
@@ -215,7 +215,7 @@ export const UnifiedJobListing = ({
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5 mx-4 md:mx-0 group/notice`}
                 >
                     <div className="flex items-center gap-3 overflow-hidden">
-                        <span className="bg-pink-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm group-hover/notice:bg-pink-700 transition-colors">공지사항</span>
+                        <span className="bg-blue-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm group-hover/notice:bg-blue-700 transition-colors">공지사항</span>
                         <p className="text-[13px] font-bold text-gray-700 truncate group-hover/notice:text-black transition-colors">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
                     </div>
                     <ChevronRight size={16} className="text-gray-300 shrink-0 group-hover/notice:text-gray-500 transition-colors" />
@@ -233,7 +233,7 @@ export const UnifiedJobListing = ({
                                 <input
                                     type="text"
                                     placeholder="키워드 검색"
-                                    className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-pink-300 transition-all font-black text-black"
+                                    className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-blue-300 transition-all font-black text-black"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => {
@@ -245,7 +245,7 @@ export const UnifiedJobListing = ({
                             </div>
                             <button
                                 onClick={() => setActiveSearchQuery(searchQuery)}
-                                className="h-12 bg-pink-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-pink-700 hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all"
+                                className="h-12 bg-blue-600 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 transition-all"
                             >
                                 <Search size={18} />
                                 검색
@@ -291,7 +291,7 @@ export const UnifiedJobListing = ({
                         <p className="text-gray-400 font-bold mb-4">오늘 본 공고가 아직 없습니다. 😲</p>
                         <button
                             onClick={() => setActiveTab(title)}
-                            className="text-pink-600 font-black text-sm underline"
+                            className="text-blue-600 font-black text-sm underline"
                         >
                             전체 공고 보러가기
                         </button>

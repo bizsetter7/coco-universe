@@ -124,7 +124,7 @@ export default function MarketingPage() {
                 '전화번호': '010-1234-5678',
                 '전화번호2': '010-5678-1234',
                 '업체명': '강남스타일',
-                '업종': '룸알바',
+                '업종': '프라이빗 매칭',
                 '상세업종': '퍼블릭',
                 '시도': '서울',
                 '군구': '강남구',
@@ -443,7 +443,7 @@ export default function MarketingPage() {
                     {/* 2. Industry Filter */}
                     <div className="flex gap-2">
                         <select
-                            className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none transition-all cursor-pointer"
+                            className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all cursor-pointer"
                             value={filters.industry}
                             onChange={(e) => handleFilterChange('industry', e.target.value)}
                         >
@@ -454,7 +454,7 @@ export default function MarketingPage() {
                         </select>
                         {filters.industry && (
                             <select
-                                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-pink-500 focus:ring-4 focus:ring-pink-500/10 outline-none animate-in fade-in zoom-in-95 duration-200 cursor-pointer"
+                                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none animate-in fade-in zoom-in-95 duration-200 cursor-pointer"
                                 value={filters.industry_detail}
                                 onChange={(e) => handleFilterChange('industry_detail', e.target.value)}
                             >

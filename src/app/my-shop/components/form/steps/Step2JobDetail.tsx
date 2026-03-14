@@ -220,7 +220,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
             <div className="space-y-4">
                 {/* Basic Info Section */}
                 <div className={`p-2 md:p-4 rounded-2xl shadow-sm border ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-white border-gray-100'}`}>
-                    <h2 className="font-black text-gray-800 mb-2 md:mb-4 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>채용 공고 정보</h2>
+                    <h2 className="font-black text-gray-800 mb-2 md:mb-4 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>채용 공고 정보</h2>
                     <div className="space-y-4">
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
@@ -292,7 +292,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                             </div>
                             <div>
                                 <label className="block text-sm font-black mb-1.5"><span className="text-red-500 mr-1">*</span>급여액</label>
-                                <div className={`relative flex items-center border rounded-lg overflow-hidden transition-all focus-within:ring-2 focus-within:ring-pink-100 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 shadow-inner'}`}>
+                                <div className={`relative flex items-center border rounded-lg overflow-hidden transition-all focus-within:ring-2 focus-within:ring-blue-100 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 shadow-inner'}`}>
                                     <input
                                         type="text"
                                         placeholder="0"
@@ -318,7 +318,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                 상세내용 작성<br className="md:hidden" /> (에디터)
                             </h2>
                             <div className="flex items-center gap-1.5">
-                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowTemplateModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-full text-[10px] font-black border border-pink-100 transition shadow-sm hover:bg-pink-100 ring-2 ring-pink-500/20 animate-pulse">
+                                <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowTemplateModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100 ring-2 ring-blue-500/20 animate-pulse">
                                     <Sparkles size={12} /> Premium<br className="md:hidden" /> 템플릿 사용
                                 </button>
                                 <button onMouseDown={(e) => e.preventDefault()} onClick={() => setShowDesignModal(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black border border-blue-100 transition shadow-sm hover:bg-blue-100"><Laptop size={12} /> 디자인 의뢰</button>
@@ -329,20 +329,20 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                         <div id="editor-toolbar" className="sticky top-0 z-[60] p-0.5 md:p-1 border-2 border-b-0 rounded-t-2xl flex flex-col gap-1 bg-white border-gray-200 text-gray-900 shadow-sm">
                             <div className="flex items-center flex-wrap gap-1 md:gap-1.5 p-1 pb-0">
                                 <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('bold'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('italic'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('underline'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('bold'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('italic'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('underline'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
                                 </div>
                                 <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyLeft'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyCenter'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyRight'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-pink-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyLeft'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyCenter'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyRight'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
                                 </div>
 
                                 {/* Media Upload Moved Here */}
                                 <label className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0 h-[34px] md:h-[38px] w-[34px] md:w-[38px] relativeoverflow-hidden" title="이미지 업로드">
                                     {isUploading ? (
-                                        <div className="animate-spin text-pink-500"><svg className="w-5 h-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                        <div className="animate-spin text-blue-500"><svg className="w-5 h-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
                                     ) : (
                                         <ImageIcon size={18} />
                                     )}
@@ -362,7 +362,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
 
                             <div className="flex items-center flex-wrap gap-1 md:gap-1.5">
                                 <div className="relative font-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('font'); }} className="h-8 min-w-[110px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-pink-300">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('font'); }} className="h-8 min-w-[110px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
                                         <span className="truncate">{FONT_DISPLAY_NAMES[toolbarStatus.currentFont] || toolbarStatus.currentFont}</span>
                                         <ChevronDown size={14} className="shrink-0 text-gray-400" />
                                     </button>
@@ -375,7 +375,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     )}
                                 </div>
                                 <div className="relative size-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('fontSize'); }} className="h-8 min-w-[55px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-pink-300">
+                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('fontSize'); }} className="h-8 min-w-[55px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
                                         {toolbarStatus.currentFontSize.replace('px', '').replace('pt', '') || '16'}pt
                                         <ChevronDown size={14} className="shrink-0 text-gray-400" />
                                     </button>
@@ -432,8 +432,8 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                     {/* Preview Side (Desktop Only) */}
                     <div className="hidden lg:flex flex-col h-full">
                         <div className="flex items-center gap-2 mb-3">
-                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-pink-500 rounded-full"></span>실시간 미리보기</h2>
-                            <span className="px-2 py-0.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100">PREVIEW</span>
+                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>실시간 미리보기</h2>
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-full border border-blue-100">PREVIEW</span>
                         </div>
                         <div className={`flex-1 p-6 border-2 rounded-[24px] overflow-y-auto max-h-[600px] bg-white border-gray-100 shadow-inner relative ${brand.theme === 'dark' ? 'bg-gray-950/50 border-gray-800' : ''}`}>
                             <div className="mb-4 pb-4 border-b border-gray-100">

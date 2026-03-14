@@ -41,7 +41,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
             <div className="space-y-6">
                 <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
                     <div className="flex items-center gap-2 mb-6">
-                        <ArrowRight size={14} className="text-pink-500 shrink-0" />
+                        <ArrowRight size={14} className="text-blue-500 shrink-0" />
                         <span className={`font-black text-sm ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>유료 결제 내역 (최신순)</span>
                     </div>
 
@@ -112,11 +112,11 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                 {p.adObject?.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아</span>}
                                                                 {p.adObject?.options?.highlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형</span>}
                                                                 {(p.adObject?.options?.border && p.adObject?.options?.border !== 'none') && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>}
-                                                                {(p.adObject?.options?.pay_suffixes && p.adObject?.options?.pay_suffixes.length > 0) && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>}
+                                                                {(p.adObject?.options?.pay_suffixes && p.adObject?.options?.pay_suffixes.length > 0) && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>}
                                                             </div>
                                                             <span
                                                                 onClick={(e) => { e.stopPropagation(); onShowAdDetail?.(p.adObject || p); }}
-                                                                className={`font-black text-[14px] hover:text-pink-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                                className={`font-black text-[14px] hover:text-blue-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                                                                 style={getHighlighterStyle(p.adObject?.selectedHighlighter || p.adObject?.options?.highlighter)}
                                                             >
                                                                 {p.adTitle || p.adObject?.title || '공고 제목 없음'}
@@ -131,7 +131,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="py-5 px-2 font-black text-pink-500">{displayPrice}</td>
+                                                    <td className="py-5 px-2 font-black text-blue-500">{displayPrice}</td>
                                                     <td className="py-5 px-2 text-[11px] font-bold text-gray-400">
                                                         {p.method === 'bank_transfer' ? '무통장입금' : p.method}
                                                     </td>
@@ -233,24 +233,24 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                             <div className="flex justify-between items-start gap-2">
                                                 <div className="space-y-1 overflow-hidden">
                                                     <div className="flex flex-wrap gap-1">
-                                                        <span className={`${brand.theme === 'dark' ? 'bg-pink-500' : 'bg-gray-900'} text-white text-[9.5px] px-2 py-0.5 rounded-sm font-black uppercase whitespace-nowrap tracking-tighter`}>
+                                                        <span className={`${brand.theme === 'dark' ? 'bg-blue-500' : 'bg-gray-900'} text-white text-[9.5px] px-2 py-0.5 rounded-sm font-black uppercase whitespace-nowrap tracking-tighter`}>
                                                             {typeCode}
                                                         </span>
                                                         {p.adObject?.selectedIcon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
                                                         {p.adObject?.selectedHighlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">형</span>}
                                                         {p.adObject?.borderOption && p.adObject?.borderOption !== 'none' && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">테</span>}
-                                                        {p.adObject?.paySuffixes && p.adObject?.paySuffixes.length > 0 && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
+                                                        {p.adObject?.paySuffixes && p.adObject?.paySuffixes.length > 0 && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
                                                     </div>
                                                     <h3
                                                         onClick={(e) => { e.stopPropagation(); onShowAdDetail?.(p.adObject || p); }}
-                                                        className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-pink-500`}
+                                                        className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-blue-500`}
                                                         style={getHighlighterStyle(p.adObject?.selectedHighlighter || p.adObject?.options?.highlighter)}
                                                     >
                                                         {p.adTitle || p.adObject?.title || '공고 제목 없음'}
                                                     </h3>
                                                     {/* [Sync] Nickname & Edit Counter in Mobile Payment History */}
                                                     <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 px-1">
-                                                        <span className="text-[10px] text-pink-500 font-black">
+                                                        <span className="text-[10px] text-blue-500 font-black">
                                                             {p.adObject?.nickname || p.nickname || userName}
                                                         </span>
                                                         <span className="w-px h-2 bg-gray-200"></span>
@@ -322,7 +322,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[9px] text-gray-400">결제 금액</p>
-                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-pink-600'}`}>{displayPrice}</p>
+                                                    <p className={`text-sm font-black ${brand.theme === 'dark' ? 'text-white' : 'text-blue-600'}`}>{displayPrice}</p>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[9px] text-gray-400">결제 방식</p>
@@ -340,7 +340,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
 
                             <div className="flex justify-center items-center gap-1 mt-10">
                                 <button className={`w-8 h-8 rounded-full border flex items-center justify-center text-[10px] ${brand.theme === 'dark' ? 'border-gray-800 text-gray-600' : 'border-gray-200 text-gray-400'}`}>&lt;</button>
-                                <span className="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center text-[11px] font-black shadow-lg shadow-pink-500/30">1</span>
+                                <span className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-[11px] font-black shadow-lg shadow-blue-500/30">1</span>
                                 <button className={`w-8 h-8 rounded-full border flex items-center justify-center text-[10px] ${brand.theme === 'dark' ? 'border-gray-800 text-gray-600' : 'border-gray-200 text-gray-400'}`}>&gt;</button>
                             </div>
                         </>

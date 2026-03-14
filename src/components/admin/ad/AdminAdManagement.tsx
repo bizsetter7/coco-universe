@@ -179,7 +179,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                     >
                                                         <div className="text-sm font-black text-slate-900 leading-tight mb-0.5">{ad.name || ad.shopName}</div>
                                                         <div className="text-[10px] font-bold text-slate-400">ID: {(ad as any).user_id || ad.ownerId}</div>
-                                                        <div className="text-[10px] font-bold text-pink-600 mt-0.5 bg-pink-50 px-1.5 py-0.5 rounded-sm w-fit">
+                                                        <div className="text-[10px] font-bold text-blue-600 mt-0.5 bg-blue-50 px-1.5 py-0.5 rounded-sm w-fit">
                                                             {ad.region} - {ad.work_region_sub || (ad as any).regionGu || ad.region?.split(' ')[1] || ad.region}
                                                         </div>
                                                     </div>
@@ -213,7 +213,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                             {(ad.options?.border && ad.options?.border !== 'none') && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm h-fit">테</span>}
                                                             {((ad as any).options?.paySuffixes || (ad as any).options?.pay_suffixes || (ad as any).paySuffixes || (ad as any).pay_suffixes) && (
                                                                 (((ad as any).options?.paySuffixes || (ad as any).options?.pay_suffixes || (ad as any).paySuffixes || (ad as any).pay_suffixes).length > 0) &&
-                                                                <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm h-fit">급</span>
+                                                                <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm h-fit">급</span>
                                                             )}
                                                         </div>
                                                         <h4
@@ -463,12 +463,12 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                     <div className="flex items-center gap-2 md:gap-3">
                                         <h3 className="text-2xl font-black text-slate-950 tracking-tighter line-clamp-2 max-w-[400px]">{selectedAdForModal.title}</h3>
                                         {/* [규정] 결제 금액(Price)만 제목 옆에 노출 */}
-                                        <div className="bg-pink-50 border border-pink-100 px-3 py-1.5 rounded-xl flex items-baseline gap-1 animate-in slide-in-from-left-2">
-                                            <span className="text-[10px] font-black text-pink-400 uppercase leading-none">Price</span>
-                                            <span className="text-lg font-black text-pink-600 leading-none">
+                                        <div className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl flex items-baseline gap-1 animate-in slide-in-from-left-2">
+                                            <span className="text-[10px] font-black text-blue-400 uppercase leading-none">Price</span>
+                                            <span className="text-lg font-black text-blue-600 leading-none">
                                                 {(Number(selectedAdForModal?.ad_price) || Number((selectedAdForModal as any)?.price) || Number((selectedAdForModal?.options as any)?.ad_price) || 0).toLocaleString()}
                                             </span>
-                                            <span className="text-[10px] text-pink-400 font-bold">원</span>
+                                            <span className="text-[10px] text-blue-400 font-bold">원</span>
                                         </div>
                                     </div>
                                 </div>

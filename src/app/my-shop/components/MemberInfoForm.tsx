@@ -5,7 +5,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
     <div className={`max-w-4xl mx-auto p-3 md:p-10 rounded-[24px] md:rounded-[32px] shadow-xl border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
 
         <h2 className={`text-lg md:text-2xl font-black mb-3 md:mb-10 pb-3 md:pb-5 border-b flex items-center gap-2 md:gap-3 ${brand.theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-950 border-gray-100'}`}>
-            <span className="w-2 h-8 bg-pink-500 rounded-full hidden md:block"></span>
+            <span className="w-2 h-8 bg-blue-500 rounded-full hidden md:block"></span>
             회원 정보 수정
         </h2>
 
@@ -19,7 +19,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
                 <div>
                     <label className={`block text-xs font-bold mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>비밀번호 변경</label>
                     <div className="flex flex-col sm:flex-row gap-2">
-                        <input type="password" placeholder="변경할 비밀번호 입력" className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`} />
+                        <input type="password" placeholder="변경할 비밀번호 입력" className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-900 focus:border-blue-500'}`} />
                         <button className={`w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700' : 'bg-gray-950 text-white border border-gray-950 hover:bg-black transition'}`}>변경</button>
                     </div>
                 </div>
@@ -36,10 +36,10 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
                         value={nickname}
                         maxLength={10}
                         onChange={(e) => setNickname(e.target.value)}
-                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-900 focus:border-blue-500'}`}
                     />
-                    <p className="text-[10px] text-pink-500 mt-1.5 font-bold flex items-center gap-1">
-                        <span className="w-1 h-1 bg-pink-500 rounded-full"></span>
+                    <p className="text-[10px] text-blue-500 mt-1.5 font-bold flex items-center gap-1">
+                        <span className="w-1 h-1 bg-blue-500 rounded-full"></span>
                         최대 10자 (공백 포함) / 구인 리스트에 노출됩니다.
                     </p>
                 </div>
@@ -69,7 +69,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-900 focus:border-pink-500'}`}
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-900 focus:border-blue-500'}`}
                     />
                 </div>
                 <div>
@@ -94,7 +94,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
             <div className={`p-4 rounded-xl border flex items-center gap-3 ${brand.theme === 'dark' ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                 <div
                     onClick={() => setSmsConsent(!smsConsent)}
-                    className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition ${smsConsent ? 'bg-pink-500 border-pink-500 text-white' : 'bg-white border-gray-300'}`}
+                    className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition ${smsConsent ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-gray-300'}`}
                 >
                     {smsConsent && <Check size={16} />}
                 </div>
@@ -108,7 +108,7 @@ export const MemberInfoForm = ({ nickname, setNickname, shopName, email, setEmai
                 <button onClick={() => setView('dashboard')} className={`order-2 sm:order-1 px-8 py-4 rounded-2xl font-black transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                     취소
                 </button>
-                <button onClick={() => { alert('회원 정보가 수정되었습니다.'); setView('dashboard'); }} className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-pink-500 text-white font-black hover:bg-pink-600 shadow-xl shadow-pink-500/20 transition active:scale-95">
+                <button onClick={() => { alert('회원 정보가 수정되었습니다.'); setView('dashboard'); }} className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-blue-500 text-white font-black hover:bg-blue-600 shadow-xl shadow-blue-500/20 transition active:scale-95">
                     회원정보 수정하기
                 </button>
             </div>

@@ -3,14 +3,16 @@ import { Shop } from '@/types/shop';
 import JobDetailModal, { JobDetailContent } from '@/components/jobs/JobDetailModal';
 import { Metadata } from 'next';
 import { slugify } from '@/utils/shopUtils';
+import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 
 interface Props {
     params: Promise<{ region: string; id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { id } = await params;
+    const { id, region } = await params;
     const decodedId = decodeURIComponent(id);
+    const decodedRegionSlug = decodeURIComponent(region);
     const shop = (shopsData as Shop[]).find((s) => s.id === decodedId);
 
     if (!shop) {
@@ -19,8 +21,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         };
     }
 
-    const title = `${shop.name} - ${shop.region} ${shop.category || ''} 구인정보 | 코코알바`;
-    const description = `${shop.region} ${shop.name}에서 함께할 가족을 찾습니다. ${shop.payType || ''} ${shop.pay} 이상. ${shop.title || ''}. 지금 바로 확인하세요.`;
+    // [SEO 무결성] 지역 데이터에서 강제로 Shadow SEO(하이엔드) 키워드 추출
+    const shadowRegionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug) || {
+        mainRegion: decodedRegionSlug.replace(/-/g, ' '),
+        keywords: [`${decodedRegionSlug.replace(/-/g, ' ')} 여성알바`, '고수익알바', '유흥알바']
+    };
+
+    const title = `${shop.name} - ${shadowRegionData.mainRegion} 최고의 ${shadowRegionData.keywords[0]} | 코코알바`;
+    const description = `${shadowRegionData.mainRegion} ${shop.name}에서 함께할 가족을 찾습니다. ${shop.payType || ''} ${shop.pay} 이상. 확실한 고수익과 안전을 보장합니다. 지금 바로 확인하세요.`;
 
     return {
         title,
@@ -46,14 +54,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             ],
             type: 'website',
         },
-        keywords: [shop.name || '', `${shop.region || ''} 알바`, shop.category || '', '여성알바', '고소득알바'],
+        keywords: [shop.name || '', ...shadowRegionData.keywords, '여성알바', '고수익알바', '당일지급', '밤알바', '텐프로'],
     };
 }
 
 export async function generateStaticParams() {
-    // For SEO, we want to pre-render at least premium/hot shops
-    // For now, mapping all for max coverage
-    // Use slugified region for safe URL segments
     return (shopsData as Shop[]).map((shop) => ({
         region: slugify(shop.region || '전체'),
         id: shop.id.toString(),
@@ -61,8 +66,9 @@ export async function generateStaticParams() {
 }
 
 export default async function ShopDetailPage({ params }: Props) {
-    const { id } = await params;
+    const { id, region } = await params;
     const decodedId = decodeURIComponent(id);
+    const decodedRegionSlug = decodeURIComponent(region);
     const shop = (shopsData as Shop[]).find((s) => s.id === decodedId);
 
     if (!shop) {
@@ -73,9 +79,49 @@ export default async function ShopDetailPage({ params }: Props) {
         );
     }
 
-    // Use JobDetailContent directly for SEO (no portal)
+    // [JSON-LD 매핑] 잡포스팅(JobPosting) 스키마에 정화되지 않은 하이엔드 키워드 주입
+    const shadowRegionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug);
+    const mainKeyword = shadowRegionData ? shadowRegionData.keywords[0] : '여성알바';
+
+    const jsonLd = {
+        "@context": "https://schema.org/",
+        "@type": "JobPosting",
+        "title": `${shop.name} - ${mainKeyword} 모집`,
+        "description": `${shop.name}에서 ${mainKeyword}를 모집합니다. 최고의 대우와 확실한 수익을 보장합니다.`,
+        "hiringOrganization": {
+            "@type": "Organization",
+            "name": shop.name,
+            "sameAs": `https://cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`
+        },
+        "employmentType": "FULL_TIME",
+        "datePosted": new Date().toISOString().split('T')[0],
+        "validThrough": new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+        "jobLocation": {
+            "@type": "Place",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": shop.region,
+                "addressRegion": "KR",
+                "addressCountry": "KR"
+            }
+        },
+        "baseSalary": {
+            "@type": "MonetaryAmount",
+            "currency": "KRW",
+            "value": {
+                "@type": "QuantitativeValue",
+                "value": shop.pay ? shop.pay.replace(/[^0-9]/g, '') || '50000' : '50000',
+                "unitText": shop.payType === '시급' ? 'HOUR' : shop.payType === '일급' ? 'DAY' : 'MONTH'
+            }
+        }
+    };
+
     return (
         <div className="max-w-[800px] mx-auto min-h-screen bg-white shadow-lg">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <JobDetailContent shop={shop} />
         </div>
     );

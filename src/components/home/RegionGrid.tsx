@@ -20,7 +20,7 @@ export const RegionGrid = ({ onRegionSelect }: RegionGridProps) => {
         <div className="w-full bg-white dark:bg-gray-900 py-10 border-b dark:border-gray-800">
             <div className="max-w-[1020px] mx-auto px-4">
                 <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="text-pink-500" size={24} />
+                    <MapPin className="text-blue-500" size={24} />
                     <h2 className="text-xl font-black text-gray-900 dark:text-white">지역별 채용정보</h2>
                 </div>
 
@@ -29,7 +29,7 @@ export const RegionGrid = ({ onRegionSelect }: RegionGridProps) => {
                         <button
                             key={region}
                             onClick={() => onRegionSelect(region)}
-                            className="bg-gray-50 dark:bg-gray-800 hover:bg-pink-50 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 hover:border-pink-200 rounded-xl py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-all shadow-sm"
+                            className="bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700 hover:border-blue-200 rounded-xl py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-all shadow-sm"
                         >
                             {region}
                         </button>

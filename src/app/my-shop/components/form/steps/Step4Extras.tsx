@@ -150,20 +150,20 @@ export const Step4Extras: React.FC<Step4Props> = ({
                     type="button"
                     onClick={() => setter(p)}
                     className={`flex flex-col items-center justify-center py-1.5 md:py-2 rounded-lg border transition-all ${current === p
-                        ? 'bg-pink-50 text-pink-600 border-pink-400 ring-1 ring-pink-400'
-                        : 'bg-white border-gray-100 text-gray-400 hover:border-pink-200'
+                        ? 'bg-blue-50 text-blue-600 border-blue-400 ring-1 ring-blue-400'
+                        : 'bg-white border-gray-100 text-gray-400 hover:border-blue-200'
                         }`}
                 >
                     {p === 0 ? (
                         <div className="flex flex-col items-center">
-                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === 0 ? 'border-pink-500 bg-pink-500' : 'border-gray-200'}`}>
+                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === 0 ? 'border-blue-500 bg-blue-500' : 'border-gray-200'}`}>
                                 {current === 0 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </div>
                             <span className="text-[10px] md:text-[12px] font-black">{noneLabel}</span>
                         </div>
                     ) : (
                         <>
-                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === p ? 'border-pink-500 bg-pink-500' : 'border-gray-200'}`}>
+                            <div className={`w-3 h-3 rounded-full border-2 mb-1 flex items-center justify-center ${current === p ? 'border-blue-500 bg-blue-500' : 'border-gray-200'}`}>
                                 {current === p && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </div>
                             <span className="text-[10px] md:text-[12px] font-black">{p}일</span>
@@ -176,7 +176,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
     );
 
     return (
-        <section id="myshop-step-4" className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-rose-950 via-gray-900 to-gray-950 border-rose-900/50' : 'bg-gradient-to-br from-rose-50 via-white to-pink-50 border-rose-200'}`}>
+        <section id="myshop-step-4" className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-rose-950 via-gray-900 to-gray-950 border-rose-900/50' : 'bg-gradient-to-br from-rose-50 via-white to-blue-50 border-rose-200'}`}>
             <div className="bg-gradient-to-r from-[#9333ea] via-[#a855f7] to-[#ec4899] text-white p-5 md:p-7 rounded-[24px] mb-6 md:mb-8 shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -208,12 +208,12 @@ export const Step4Extras: React.FC<Step4Props> = ({
                     <div className="animate-in fade-in slide-in-from-top-4 duration-500">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="text-[13px] md:text-[16px] font-black text-gray-700 flex items-center gap-2">
-                                <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600"><PlusCircle size={14} fill="currentColor" /></div>
+                                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><PlusCircle size={14} fill="currentColor" /></div>
                                 카드 광고 메인 이미지
                             </h3>
-                            <span className="text-[10px] md:text-[11px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">필수</span>
+                            <span className="text-[10px] md:text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">필수</span>
                         </div>
-                        <div className={`p-4 md:p-6 rounded-3xl border-2 border-dashed transition-all ${mediaUrl ? 'bg-pink-50/30 border-pink-200' : 'bg-gray-50 border-gray-200 shadow-inner'}`}>
+                        <div className={`p-4 md:p-6 rounded-3xl border-2 border-dashed transition-all ${mediaUrl ? 'bg-blue-50/30 border-blue-200' : 'bg-gray-50 border-gray-200 shadow-inner'}`}>
                             <div className="flex flex-col md:flex-row gap-6 items-center">
                                 <div className="w-full md:w-64 h-40 md:h-44 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative group">
                                     {mediaUrl ? (
@@ -238,7 +238,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                 </div>
                                 <div className="flex-1 space-y-3 w-full">
                                     <p className="text-[11px] md:text-[13px] text-gray-500 font-bold leading-relaxed">
-                                        그랜드~스페셜 광고는 리스트 상단 카드 영역에 <span className="text-pink-600 font-black">대표 이미지</span>가 노출됩니다. <br />
+                                        그랜드~스페셜 광고는 리스트 상단 카드 영역에 <span className="text-blue-600 font-black">대표 이미지</span>가 노출됩니다. <br />
                                         업소를 가장 잘 나타내는 사진을 올리거나 인터넷 주소(URL)를 입력해주세요.
                                     </p>
                                     <div className="flex gap-1.5 md:gap-2">
@@ -250,7 +250,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                                 setMediaUrl(e.target.value);
                                             }}
                                             placeholder="예: https://mysite.com/image.jpg"
-                                            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 bg-white border border-gray-200 rounded-2xl text-[10px] md:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                                            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 bg-white border border-gray-200 rounded-2xl text-[10px] md:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                             disabled={isUploading}
                                         />
                                         <label className={`px-3 py-2.5 md:px-4 md:py-3 bg-gray-900 text-white rounded-2xl text-[10px] md:text-sm font-black hover:bg-black transition active:scale-95 shadow-lg whitespace-nowrap cursor-pointer flex items-center gap-1.5 md:gap-2 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -285,7 +285,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                 <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600"><Zap size={14} fill="currentColor" /></div>
                                 급여 추가 옵션
                             </h3>
-                            <span className="text-[10px] md:text-[11px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-100">+5,000원</span>
+                            <span className="text-[10px] md:text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">+5,000원</span>
                             <span className="text-[9px] md:text-[12px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded-full md:w-auto">기본 1개 제공(무료), 추가 5개까지 선택가능(유료)</span>
                         </div>
                         <button
@@ -304,7 +304,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             const isSelected = paySuffixes.includes(s);
                             const count = paySuffixes.length;
                             // 1개 선택시 핑크색, 2개부터는 보라색
-                            const activeClass = count >= 2 ? 'bg-purple-600 border-purple-600' : 'bg-pink-500 border-pink-500';
+                            const activeClass = count >= 2 ? 'bg-purple-600 border-purple-600' : 'bg-blue-500 border-blue-500';
 
                             return (
                                 <button
@@ -330,7 +330,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             </h3>
                             <span className="text-[10px] md:text-[11px] font-bold text-cyan-500 bg-cyan-50 px-2 py-0.5 rounded-full border border-cyan-100">무료</span>
                         </div>
-                        <span className="text-[12px] md:text-[14px] font-black text-pink-500">{selectedKeywords.length}/10</span>
+                        <span className="text-[12px] md:text-[14px] font-black text-blue-500">{selectedKeywords.length}/10</span>
                     </div>
                     <div className={`p-2 md:p-5 rounded-2xl border-2 border-dashed ${brand.theme === 'dark' ? 'bg-gray-900/40 border-gray-800' : 'bg-white/40 border-gray-100 shadow-inner'}`}>
                         <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-1.5 md:gap-2">
@@ -383,7 +383,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                             if (!checkStep3()) return;
                                             setSelectedIcon(selectedIcon === item.id ? null : item.id);
                                         }}
-                                        className={`flex flex-col items-center justify-center py-2 md:py-3 rounded-lg transition-all border-2 ${selectedIcon === item.id ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
+                                        className={`flex flex-col items-center justify-center py-2 md:py-3 rounded-lg transition-all border-2 ${selectedIcon === item.id ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
                                     >
                                         {/* [New] Custom Badge for 'NEW' in Selection List */}
                                         {item.icon === 'NEW' ? (
@@ -393,7 +393,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                         ) : (
                                             <span className="text-lg md:text-2xl mb-1 animate-seesaw inline-block origin-bottom">{item.icon}</span>
                                         )}
-                                        <span className={`text-[8px] md:text-[11px] font-black ${selectedIcon === item.id ? 'text-pink-600' : 'text-gray-400'}`}>{item.name}</span>
+                                        <span className={`text-[8px] md:text-[11px] font-black ${selectedIcon === item.id ? 'text-blue-600' : 'text-gray-400'}`}>{item.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -430,7 +430,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                             if (!checkStep3()) return;
                                             setSelectedHighlighter(selectedHighlighter === item.id ? null : item.id);
                                         }}
-                                        className={`py-1.5 md:py-2 px-1 rounded-lg transition-all border-2 flex items-center justify-center ${selectedHighlighter === item.id ? 'border-pink-500 bg-pink-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
+                                        className={`py-1.5 md:py-2 px-1 rounded-lg transition-all border-2 flex items-center justify-center ${selectedHighlighter === item.id ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-transparent bg-gray-50/30 hover:bg-gray-50'}`}
                                     >
                                         <span
                                             className="w-full py-1 rounded text-[9px] md:text-[12px] font-black"
@@ -507,7 +507,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                             <div className="pt-4 border-t border-gray-100">
                                 <h4 className="text-[12px] md:text-[14px] font-black text-gray-500 font-black mb-3">프리미엄 미리보기</h4>
                                 <div className={`h-24 md:h-28 rounded-xl border-2 flex items-center justify-center transition-all duration-300 bg-gray-50/50 ${borderOption === 'color'
-                                    ? 'border-pink-500 border-4 shadow-sm'
+                                    ? 'border-blue-500 border-4 shadow-sm'
                                     : borderOption === 'glow'
                                         ? 'border-cyan-400 border-4 shadow-[0_0_20px_rgba(34,211,238,0.4)]'
                                         : borderOption === 'sparkle'
@@ -517,7 +517,7 @@ export const Step4Extras: React.FC<Step4Props> = ({
                                                 : 'border-gray-200 border-dashed'
                                     }`}>
                                     <div className="text-center group">
-                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : borderOption === 'rainbow' ? 'text-purple-500' : 'text-pink-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />
+                                        <Palette size={20} className={`mx-auto mb-1.5 transition-colors ${borderOption !== 'none' ? (borderOption === 'sparkle' ? 'text-yellow-500' : borderOption === 'rainbow' ? 'text-purple-500' : 'text-blue-500') : 'text-gray-300'} ${borderOption === 'sparkle' ? 'animate-bounce' : ''}`} />
                                         <span className={`text-[11px] md:text-[13px] font-black transition-colors ${borderOption !== 'none' ? 'text-gray-900' : 'text-gray-400'}`}>실제 노출 효과 예시</span>
                                     </div>
                                 </div>

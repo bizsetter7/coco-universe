@@ -10,7 +10,7 @@ export const LAYOUT = {
 
 export const GRADIENTS = {
     grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
-    premium: 'bg-gradient-to-r from-purple-600 to-pink-500',
+    premium: 'bg-gradient-to-r from-purple-600 to-blue-500',
     deluxe: 'bg-gradient-to-r from-blue-500 to-cyan-400',
     special: 'bg-gradient-to-r from-emerald-500 to-teal-400',
     urgent: 'bg-gradient-to-r from-rose-500 to-orange-400',

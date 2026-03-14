@@ -141,7 +141,7 @@ export const SignupPage = () => {
                         type="button"
                         onClick={() => setRole('individual')}
                         className={`py-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${role === 'individual'
-                            ? 'border-pink-500 bg-pink-50 text-pink-600'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600'
                             : 'border-gray-100 bg-white text-gray-400'
                             }`}
                     >

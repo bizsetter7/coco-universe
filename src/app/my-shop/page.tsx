@@ -851,8 +851,8 @@ function MyShopContent() {
                         className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border mb-5 mt-2 md:mt-4 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
                         <div className="flex justify-between items-center">
-                            <h1 onClick={() => setView('dashboard')} className="text-xl md:text-2xl font-black flex items-center gap-3 cursor-pointer hover:text-pink-500 transition">
-                                <span className="w-2 h-8 bg-pink-500 rounded-full"></span>
+                            <h1 onClick={() => setView('dashboard')} className="text-xl md:text-2xl font-black flex items-center gap-3 cursor-pointer hover:text-blue-500 transition">
+                                <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
                                 마이페이지
                             </h1>
                             <div className="text-xs font-bold text-gray-400">MY DASHBOARD</div>

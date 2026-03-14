@@ -107,7 +107,7 @@ export function NotificationBell() {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-1.5 text-gray-500 hover:text-pink-500 relative transition-colors"
+                className="p-1.5 text-gray-500 hover:text-blue-500 relative transition-colors"
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -122,7 +122,7 @@ export function NotificationBell() {
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllRead}
-                                className="text-[10px] text-pink-500 font-bold hover:underline"
+                                className="text-[10px] text-blue-500 font-bold hover:underline"
                             >
                                 모두 읽음
                             </button>
@@ -136,11 +136,11 @@ export function NotificationBell() {
                                     <li
                                         key={n.id}
                                         onClick={() => handleRead(n)}
-                                        className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors ${!n.read ? 'bg-pink-50/10' : ''
+                                        className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors ${!n.read ? 'bg-blue-50/10' : ''
                                             }`}
                                     >
                                         <div className="flex gap-3">
-                                            <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${!n.read ? 'bg-pink-500' : 'bg-gray-300'}`} />
+                                            <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${!n.read ? 'bg-blue-500' : 'bg-gray-300'}`} />
                                             <div className="flex-1 space-y-1">
                                                 <p className={`text-xs ${!n.read ? 'font-black text-gray-900 dark:text-white' : 'font-medium text-gray-500'}`}>
                                                     {n.title}

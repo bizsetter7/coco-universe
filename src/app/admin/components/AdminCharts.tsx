@@ -142,17 +142,17 @@ export default function AdminCharts({ }: AdminChartsProps) {
 
             {/* Revenue Chart */}
             <div className="bg-white p-8 md:p-10 rounded-[40px] border border-slate-100/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all animate-in fade-in slide-in-from-bottom-4 duration-700 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-2 h-full bg-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute top-0 left-0 w-2 h-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="flex justify-between items-start mb-10">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-xl font-black text-slate-900 tracking-tight">수익 퍼포먼스</h4>
-                            <span className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse"></span>
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
                         </div>
                         <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.2em]">Revenue Performance Matrix</p>
                     </div>
                     <div className="flex flex-col items-end">
-                        <span className="text-[12px] font-black text-pink-600 bg-pink-50 px-3 py-1.5 rounded-2xl shadow-sm border border-pink-100">+18.2%</span>
+                        <span className="text-[12px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-2xl shadow-sm border border-blue-100">+18.2%</span>
                         <p className="text-[10px] text-slate-400 mt-1 font-bold">monthly target</p>
                     </div>
                 </div>

@@ -76,7 +76,7 @@ export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister,
                 </div>
                 <button
                     onClick={() => onAdRegister(tierId)}
-                    className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold bg-pink-600 hover:bg-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-1"
+                    className="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-1"
                 >
                     <span>광고신청</span>
                     <ChevronRight size={14} />

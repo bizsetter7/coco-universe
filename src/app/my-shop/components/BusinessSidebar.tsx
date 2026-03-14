@@ -35,15 +35,15 @@ export const BusinessSidebar = ({
         { id: 'member-info', label: '회원정보 수정', icon: Settings, borderTop: true },
     ];
 
-    const activeItemStyle = "bg-pink-50 text-pink-500 rounded-xl";
-    const inactiveItemStyle = "hover:bg-pink-50 hover:text-pink-500 rounded-xl transition";
+    const activeItemStyle = "bg-blue-50 text-blue-500 rounded-xl";
+    const inactiveItemStyle = "hover:bg-blue-50 hover:text-blue-500 rounded-xl transition";
 
     return (
         <aside className="hidden md:block col-span-1 space-y-4">
             <div className={`p-6 rounded-2xl border shadow-sm text-center flex flex-col justify-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div
                     onClick={() => fileInputRef.current?.click()}
-                    className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 cursor-pointer group relative ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-pink-100'} `}
+                    className={`w-20 h-20 rounded-full mx-auto mb-4 overflow-hidden border-2 cursor-pointer group relative ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-200 border-blue-100'} `}
                 >
                     {profileImage ? (
                         <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />

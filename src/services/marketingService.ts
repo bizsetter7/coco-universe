@@ -105,8 +105,8 @@ export const getMarketingTargets = async (filters?: {
 
     // Apply is_adult filter in memory (since it's mocked)
     if (filters?.is_adult) {
-        const isAdultBool = filters.is_adult === 'true';
-        targets = targets.filter(t => t.is_adult === isAdultBool);
+        const isVerifiedPartnerBool = filters.is_adult === 'true';
+        targets = targets.filter(t => t.is_adult === isVerifiedPartnerBool);
     }
 
     // Recalculate count if filtered in memory (Approximate for mock)

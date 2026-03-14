@@ -92,10 +92,10 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                 <div className="flex items-center gap-2 cursor-pointer group">
                     <div className="flex flex-col items-start leading-tight">
                         <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">
-                            여성전문 고소득 알바 No.1
+                            여성전문 엔터프라이즈 알바 No.1
                         </span>
                         <div className="flex items-center gap-0.5">
-                            <span className="text-xl md:text-2xl font-black tracking-tighter text-pink-600 group-hover:scale-105 transition-transform origin-left">COCO</span>
+                            <span className="text-xl md:text-2xl font-black tracking-tighter text-blue-600 group-hover:scale-105 transition-transform origin-left">COCO</span>
                             <span className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'} group-hover:scale-105 transition-transform origin-left`}>
                                 ALBA
                             </span>
@@ -141,8 +141,8 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         if (pathname?.startsWith('/community')) {
             return (
                 <div className="flex items-center gap-1.5">
-                    <MessageCircle size={24} className="text-pink-600 fill-pink-600" />
-                    <span className="text-lg md:text-xl font-black text-pink-600 tracking-tight">
+                    <MessageCircle size={24} className="text-blue-600 fill-pink-600" />
+                    <span className="text-lg md:text-xl font-black text-blue-600 tracking-tight">
                         그녀들의수다
                     </span>
                 </div>
@@ -161,7 +161,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         if (pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') {
             return (
                 <div className="flex items-center gap-1.5">
-                    <div className="w-7 h-7 bg-pink-600 rounded-lg flex items-center justify-center">
+                    <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                         <span className="text-white text-[10px] font-black leading-none">CS</span>
                     </div>
                     <span className={`text-lg md:text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -175,10 +175,10 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
             <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="flex flex-col items-start leading-tight">
                     <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">
-                        여성전문 고소득 알바 No.1
+                        여성전문 엔터프라이즈 알바 No.1
                     </span>
                     <div className="flex items-center gap-0.5">
-                        <span className="text-lg md:text-xl font-black tracking-tighter text-pink-600">
+                        <span className="text-lg md:text-xl font-black tracking-tighter text-blue-600">
                             COCO
                         </span>
                         <span className={`text-lg md:text-xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
@@ -216,12 +216,12 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                             {isMounted && !isLoading ? (
                                 <>
                                     {!isLoggedIn ? (
-                                        <span onClick={() => router.push('/?page=login')} className="cursor-pointer text-xs font-bold text-gray-500 hover:text-pink-500 flex items-center gap-1">
+                                        <span onClick={() => router.push('/?page=login')} className="cursor-pointer text-xs font-bold text-gray-500 hover:text-blue-500 flex items-center gap-1">
                                             <User size={14} /> 로그인 / 회원가입
                                         </span>
                                     ) : (
                                         <div className="flex items-center gap-3">
-                                            <button onClick={() => setShowMessageModal(true)} className="p-1.5 text-gray-500 hover:text-pink-500 relative">
+                                            <button onClick={() => setShowMessageModal(true)} className="p-1.5 text-gray-500 hover:text-blue-500 relative">
                                                 <MessageCircle size={20} />
                                                 {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />}
                                             </button>
@@ -262,8 +262,8 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                             )}
 
                                             {userRole === 'individual' && (
-                                                <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-pink-50 border border-transparent hover:border-pink-100 transition-all group">
-                                                    <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center border border-pink-100 group-hover:scale-105 transition-transform">
+                                                <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all group">
+                                                    <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
                                                         <span className="text-[10px] font-black">P</span>
                                                     </div>
                                                     <span className="text-xs font-black text-gray-900">개인회원</span>
@@ -276,7 +276,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                     )}
                                 </>
                             ) : isMounted && (
-                                <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+                                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                             )}
                         </div>
 
@@ -327,7 +327,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 router.push(`/community?${params.toString()}`);
                                                 setShowMobileMenu(false);
                                             }}
-                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat.name || (!searchParams.get('category') && cat.name === '전체') ? 'bg-pink-50 text-pink-600' : 'text-gray-600'}`}
+                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat.name || (!searchParams.get('category') && cat.name === '전체') ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
                                         >
                                             {cat.name}
                                         </button>
@@ -353,7 +353,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 router.push(tabUrl);
                                                 setShowMobileMenu(false);
                                             }}
-                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${(searchParams.get('tab') === item.id || (page === 'support' && item.id === 'notice') || page === item.id) ? 'bg-pink-50 text-pink-600' : 'text-gray-600'}`}
+                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${(searchParams.get('tab') === item.id || (page === 'support' && item.id === 'notice') || page === item.id) ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
                                         >
                                             {item.label}
                                         </button>
@@ -377,14 +377,14 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                         <div className="flex items-center justify-between w-full">
                                                             <div onClick={() => { router.push(userRole === 'admin' ? '/admin' : '/my-shop'); setShowMobileMenu(false); }} className="flex items-center gap-2 cursor-pointer">
                                                                 {userRole === 'admin' ? <ShieldCheck size={14} className="text-blue-400" /> : <User size={14} className="text-purple-500" />}
-                                                                <span className="text-sm font-black">{userRole === 'admin' ? '관리자' : (user?.name || '내 정보')} <span className="text-[10px] text-pink-500 font-bold">(메인)</span></span>
+                                                                <span className="text-sm font-black">{userRole === 'admin' ? '관리자' : (user?.name || '내 정보')} <span className="text-[10px] text-blue-500 font-bold">(메인)</span></span>
                                                             </div>
                                                             <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500"><LogOut size={16} /></button>
                                                         </div>
                                                     )}
                                                 </>
                                             ) : isMounted && (
-                                                <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+                                                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                                             )}
                                         </div>
                                     </div>
@@ -404,7 +404,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 <button
                                                     key={item.id}
                                                     onClick={() => { router.push(`/my-shop?view=${item.id}`); setShowMobileMenu(false); }}
-                                                    className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('view') === item.id ? 'bg-pink-50 text-pink-600' : 'text-gray-600'}`}
+                                                    className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('view') === item.id ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
                                                 >
                                                     {item.label}
                                                 </button>

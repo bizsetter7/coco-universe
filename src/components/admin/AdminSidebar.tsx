@@ -46,7 +46,7 @@ const NavItem = ({ icon, label, active, badge, onClick }: { icon: React.ReactNod
                 <span>{label}</span>
             </div>
             {badge !== undefined && badge > 0 && (
-                <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-black ${active ? 'bg-white text-blue-600' : 'bg-pink-500 text-white'}`}>
+                <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-black ${active ? 'bg-white text-blue-600' : 'bg-blue-500 text-white'}`}>
                     {badge}
                 </span>
             )}

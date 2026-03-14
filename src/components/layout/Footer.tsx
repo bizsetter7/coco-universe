@@ -29,10 +29,10 @@ export const Footer = () => {
                         /* 코코알바 (P2 / cocoalba.kr, 기본값) */
                         <div className="flex flex-col items-center leading-none text-center">
                             <span className="text-[10px] md:text-[11px] font-black text-slate-400 tracking-tighter mb-1 uppercase select-none">
-                                여성전문 고소득 알바 No.1
+                                여성전문 엔터프라이즈 알바 No.1
                             </span>
                             <div className="flex items-center gap-0.5">
-                                <span className="text-2xl md:text-3xl font-black tracking-tighter text-pink-600">
+                                <span className="text-2xl md:text-3xl font-black tracking-tighter text-blue-600">
                                     COCO
                                 </span>
                                 <span className={`text-2xl md:text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>

@@ -305,7 +305,7 @@ function AdminContent() {
                                 router.push('/my-shop?simulate=corporate');
                             }}
                             title="기업 회원 시뮬레이션 (광고 등록/관리)"
-                            className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-pink-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-pink-600 shadow-sm z-30 cursor-pointer hover:scale-110 hover:z-40 transition-all"
+                            className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[9px] md:text-[10px] font-black text-blue-600 shadow-sm z-30 cursor-pointer hover:scale-110 hover:z-40 transition-all"
                         >
                             AD
                         </div>
@@ -363,7 +363,7 @@ function AdminContent() {
                         >
                             <Bell size={20} />
                             {totalNotifications > 0 && (
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full border-2 border-white animate-pulse"></span>
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full border-2 border-white animate-pulse"></span>
                             )}
                         </button>
 
@@ -371,7 +371,7 @@ function AdminContent() {
                             <div className="absolute top-14 right-0 w-72 md:w-80 bg-white border border-slate-100 rounded-3xl shadow-2xl z-[10010] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                                     <p className="text-xs font-black text-slate-900">실시간 알림</p>
-                                    <span className="text-[10px] bg-pink-500 text-white px-1.5 py-0.5 rounded-full font-black">
+                                    <span className="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-black">
                                         {totalNotifications}
                                     </span>
                                 </div>
@@ -404,7 +404,7 @@ function AdminContent() {
                                     {payments.filter(p => p.status !== 'completed').map(pay => (
                                         <div key={pay.id} className="p-4 hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setActiveTab('payments'); setIsNotificationOpen(false); }}>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <CreditCard size={12} className="text-pink-500" />
+                                                <CreditCard size={12} className="text-blue-500" />
                                                 <p className="text-[11px] font-black text-slate-900">미결제 내역 확인</p>
                                             </div>
                                             <p className="text-[10px] text-slate-400 font-bold leading-tight">
@@ -515,10 +515,10 @@ function AdminContent() {
                                             </div>
                                         </div>
                                         <h3 className="text-[18px] text-[#1a0dab] hover:underline cursor-pointer leading-tight font-medium">
-                                            강남구 여우알바 | 밤알바 1위 코코알바 - 고수익 보장 & 당일지급
+                                            강남구 전문 인재 | 엔터프라이즈 인재 솔루션 1위 코코알바 - 엔터프라이즈 보장 & 당일지급
                                         </h3>
                                         <p className="text-[13px] text-[#4d5156] leading-relaxed">
-                                            강남구 전지역 여우알바, 밤알바 정보를 한눈에! 2026년 최신 공고 1,200건 보유. {brand.name}(코코알바)는 가장 빠르고 정확한 구인구직 정보를 제공합니다.
+                                            강남구 전지역 전문 인재, 엔터프라이즈 인재 솔루션 정보를 한눈에! 2026년 최신 공고 1,200건 보유. {brand.name}(코코알바)는 가장 빠르고 정확한 구인구직 정보를 제공합니다.
                                         </p>
                                     </div>
                                 </div>
@@ -533,7 +533,7 @@ function AdminContent() {
                                         {[
                                             { name: '서울/강남', reach: 98, color: 'bg-blue-500' },
                                             { name: '부산/해운대', reach: 85, color: 'bg-indigo-500' },
-                                            { name: '경기/수원', reach: 72, color: 'bg-pink-500' },
+                                            { name: '경기/수원', reach: 72, color: 'bg-blue-500' },
                                             { name: '인천/송도', reach: 64, color: 'bg-slate-500' }
                                         ].map((reg, idx) => (
                                             <div key={idx} className="space-y-1.5">

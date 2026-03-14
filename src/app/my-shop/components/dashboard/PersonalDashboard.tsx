@@ -59,10 +59,10 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
 
     return (
         <aside className="hidden md:block md:col-span-1 space-y-4">
-            <div className={`p-6 rounded-[32px] border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
+            <div className={`p-6 rounded-[32px] border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`}>
                 <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-20 h-20 bg-pink-50 rounded-full mx-auto mb-4 flex items-center justify-center text-pink-500 border-2 border-pink-100 overflow-hidden cursor-pointer group relative"
+                    className="w-20 h-20 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center text-blue-500 border-2 border-blue-100 overflow-hidden cursor-pointer group relative"
                 >
                     {profileImage ? (
                         <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
@@ -78,14 +78,14 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-4 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-full border border-pink-100 hover:bg-pink-100 transition active:scale-95 flex items-center gap-1"
+                        className="px-4 py-1.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-full border border-blue-100 hover:bg-blue-100 transition active:scale-95 flex items-center gap-1"
                     >
                         사진 등록/수정
                     </button>
                     <button
                         onClick={() => setView('member-edit')}
                         className={`w-full py-2.5 mt-2 flex items-center justify-center gap-2 text-xs font-black rounded-2xl transition-all ${typeof view === 'string' && view === 'member-edit'
-                            ? 'bg-pink-500 text-white shadow-lg shadow-pink-100'
+                            ? 'bg-blue-500 text-white shadow-lg shadow-blue-100'
                             : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                             }`}
                     >
@@ -102,7 +102,7 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                             key={item.id}
                             onClick={() => setView(item.id)}
                             className={`w-full flex items-center gap-3 p-3.5 rounded-2xl text-sm font-black transition-all ${isItemActive(item.id)
-                                ? 'bg-pink-500 text-white shadow-lg shadow-pink-100'
+                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-100'
                                 : 'text-gray-500 hover:bg-gray-50'
                                 }`}
                         >
@@ -132,7 +132,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                 {[
                     { label: '스크랩한 공고', val: '0', icon: <Star className="text-yellow-400" /> },
                     { label: '열람한 기업', val: '0', icon: <Home className="text-blue-400" /> },
-                    { label: '지원한 내역', val: '0', icon: <FileText className="text-pink-400" /> }
+                    { label: '지원한 내역', val: '0', icon: <FileText className="text-blue-400" /> }
                 ].map((item, idx) => (
                     <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                         <div className="flex items-center gap-3 mb-4">
@@ -159,14 +159,14 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">이력서 등록수</div>
-                        <div className="text-3xl md:text-5xl font-black text-pink-500 flex items-baseline justify-center gap-1">
+                        <div className="text-3xl md:text-5xl font-black text-blue-500 flex items-baseline justify-center gap-1">
                             {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">공개중인 이력서</div>
-                        <div className="text-3xl md:text-5xl font-black text-pink-500 flex items-baseline justify-center gap-1">
+                        <div className="text-3xl md:text-5xl font-black text-blue-500 flex items-baseline justify-center gap-1">
                             {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
@@ -174,10 +174,10 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
             </div>
 
             {/* 3. 하단 배너 섹션 (기존 상단 섹션 이동 + 버튼 텍스트 수정) */}
-            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
+            <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`}>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-pink-200">
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-blue-200">
                             <User size={32} className="md:w-10 md:h-10" />
                         </div>
                         <div>
@@ -185,7 +185,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                             <p className="text-sm text-gray-500 font-bold">회원님만을 위한 맞춤 취업 정보를 제공합니다.</p>
                         </div>
                     </div>
-                    <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-10 bg-pink-500 text-white rounded-2xl font-black hover:bg-pink-600 shadow-xl shadow-pink-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-10 bg-blue-500 text-white rounded-2xl font-black hover:bg-blue-600 shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95">
                         <span className="text-lg">+</span> 이력서 등록하기
                     </button>
                 </div>

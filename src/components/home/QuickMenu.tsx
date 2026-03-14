@@ -23,15 +23,15 @@ export const QuickMenu = React.memo(() => {
         {
             icon: Users,
             label: '같이일할단짝',
-            bg: 'bg-pink-50',
-            color: 'text-pink-600',
+            bg: 'bg-blue-50',
+            color: 'text-blue-600',
             link: '/community?category=같이일할단짝'
         },
         {
             icon: Sparkles,
             label: '그녀들의\n수다',
-            bg: 'bg-pink-50',
-            color: 'text-pink-600',
+            bg: 'bg-blue-50',
+            color: 'text-blue-600',
             link: '/community'
         },
         {

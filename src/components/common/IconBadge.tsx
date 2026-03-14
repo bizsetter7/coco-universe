@@ -47,7 +47,7 @@ export const IconBadge: React.FC<IconBadgeProps> = ({ iconId, className = "text-
 
     if (textOnly) {
         return (
-            <span className="inline-flex items-center justify-center px-1.5 py-0.5 bg-pink-50 text-pink-600 rounded-[4px] border border-pink-100 text-[10px] font-black tracking-tighter shrink-0 align-middle mr-1 h-[18px]">
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-[4px] border border-blue-100 text-[10px] font-black tracking-tighter shrink-0 align-middle mr-1 h-[18px]">
                 {iconObj.name}
             </span>
         );
@@ -55,7 +55,7 @@ export const IconBadge: React.FC<IconBadgeProps> = ({ iconId, className = "text-
 
     if (showName) {
         return (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-600 rounded-xl border border-pink-100 shadow-sm shrink-0">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shadow-sm shrink-0">
                 <span className="text-lg animate-seesaw inline-block origin-bottom">{iconObj.icon}</span>
                 <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
             </div>

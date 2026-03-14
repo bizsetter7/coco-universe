@@ -190,7 +190,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                 <div className={`p-6 sm:rounded-[32px] shadow-sm border relative mt-0 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <h2 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-950'}`}>
-                            <span className="w-2 h-8 bg-pink-500 rounded-full hidden md:block"></span>
+                            <span className="w-2 h-8 bg-blue-500 rounded-full hidden md:block"></span>
                             이력서 등록
                         </h2>
                         <div className="text-xs font-bold text-gray-400">MY PERSONAL HISTORY</div>
@@ -231,7 +231,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                                     maxLength={10}
                                     onChange={(e) => setUserName(e.target.value)}
                                     placeholder="10자 이내 입력"
-                                    className={`flex-1 border rounded p-1.5 text-xs font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:border-pink-500 min-w-0`}
+                                    className={`flex-1 border rounded p-1.5 text-xs font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:border-blue-500 min-w-0`}
                                 />
                             </div>
                         </div>
@@ -278,7 +278,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                                         value={contactValue}
                                         onChange={(e) => setContactValue(e.target.value)}
                                         placeholder={`${contactMethod === 'kakao' ? '카카오톡' : contactMethod === 'line' ? '라인' : '텔레그램'} ID를 입력해주세요`}
-                                        className={`w-full border rounded p-1.5 text-[11px] font-bold outline-none focus:border-pink-500 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                        className={`w-full border rounded p-1.5 text-[11px] font-bold outline-none focus:border-blue-500 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                     />
                                 )}
 
@@ -297,7 +297,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                 <div className="space-y-6">
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-red-400 rounded-full"></span> 이력서 제목 <span className="text-red-500">*</span></label>
-                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500" />
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목을 입력하세요" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-blue-500" />
                     </div>
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-blue-400 rounded-full"></span> 희망 급여</label>
@@ -316,7 +316,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                                     type="text"
                                     value={payAmount}
                                     onChange={handlePayAmountChange}
-                                    className="w-full bg-white border border-gray-200 rounded-lg p-2.5 pr-8 text-sm font-bold outline-none focus:border-pink-500"
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2.5 pr-8 text-sm font-bold outline-none focus:border-blue-500"
                                     placeholder="금액 입력"
                                 />
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">원</span>
@@ -383,14 +383,14 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                     </div>
                     <div>
                         <label className="block text-xs font-black mb-2 flex items-center gap-1"><span className="w-1.5 h-3 bg-orange-400 rounded-full"></span> 자기소개 <span className="text-red-500">*</span></label>
-                        <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-48 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-pink-500 resize-none" placeholder="내용을 입력하세요"></textarea>
+                        <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-48 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold outline-none focus:border-blue-500 resize-none" placeholder="내용을 입력하세요"></textarea>
                     </div>
                 </div>
 
                 {/* Form Actions */}
                 <div className="mt-8 flex justify-center gap-3">
                     <button onClick={() => setView('dashboard')} className="px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">취소</button>
-                    <button onClick={handleSaveResume} className="px-8 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 text-white font-black hover:brightness-110 transition shadow-lg active:scale-95">이력서 등록완료</button>
+                    <button onClick={handleSaveResume} className="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black hover:brightness-110 transition shadow-lg active:scale-95">이력서 등록완료</button>
                 </div>
             </div>
         </div>

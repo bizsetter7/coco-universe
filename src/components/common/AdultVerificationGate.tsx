@@ -157,7 +157,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
 
                 <div className="py-2 text-center">
                     <p className="text-sm font-black text-gray-800 tracking-tight">
-                        서비스 이용을 위해 <span className="text-red-500 underline underline-offset-2">로그인</span> 또는 <span className="text-red-500 underline underline-offset-2">성인인증</span>이 필요합니다.
+                        서비스 이용을 위해 <span className="text-red-500 underline underline-offset-2">로그인</span> 또는 <span className="text-red-500 underline underline-offset-2">기업전용인증</span>이 필요합니다.
                     </p>
                 </div>
 
@@ -289,7 +289,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                         onClick={handleExit}
                         className="inline-block mt-1 px-8 py-1.5 border border-white/30 rounded-full text-[11px] font-black hover:bg-white hover:text-red-500 transition-all active:scale-95 shadow-lg"
                     >
-                        성인인증 없이 나가기
+                        기업전용인증 없이 나가기
                     </button>
                 </div>
             </div>

@@ -131,7 +131,7 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
                     </div>
                     <button
                         onClick={() => setView('resume-form')}
-                        className="bg-pink-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-pink-600 transition"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-blue-600 transition"
                     >
                         + 새 이력서 작성
                     </button>
@@ -150,16 +150,16 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
                             <div
                                 key={idx}
                                 onClick={() => onShowDetail?.(resume)}
-                                className="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm flex items-center justify-around group hover:border-pink-200 transition cursor-pointer"
+                                className="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm flex items-center justify-around group hover:border-blue-200 transition cursor-pointer"
                             >
                                 <div className="flex-1 space-y-1">
-                                    <h3 className="text-sm md:text-base font-black text-gray-900 group-hover:text-pink-500 transition line-clamp-1">{resume.title}</h3>
+                                    <h3 className="text-sm md:text-base font-black text-gray-900 group-hover:text-blue-500 transition line-clamp-1">{resume.title}</h3>
                                     <div className="flex flex-col gap-2 mb-4">
                                         <div className="flex items-center gap-2">
                                             <div className={`px-2 h-6 flex items-center justify-center rounded-md text-[13px] font-black shadow-sm shrink-0 ${getPayColor(resume.pay_type || '협의')}`}>
                                                 {getPayAbbreviation(resume.pay_type || '협의')}
                                             </div>
-                                            <span className="text-pink-600 font-black text-sm">
+                                            <span className="text-blue-600 font-black text-sm">
                                                 {(resume.pay_amount && Number(resume.pay_amount) > 0) ? `${Number(resume.pay_amount).toLocaleString()}원` : '급여협의'}
                                             </span>
                                         </div>
@@ -171,7 +171,7 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
                                     </div>
                                     <div className="flex flex-col gap-1 text-[11px] font-bold text-gray-400">
                                         <div className="flex items-center gap-1 text-gray-500">
-                                            <Calendar size={12} className="text-pink-400" />
+                                            <Calendar size={12} className="text-blue-400" />
                                             <span>{new Date(resume.created_at).toLocaleDateString()}</span>
                                         </div>
                                         <div className="flex items-center gap-1 text-blue-500">
@@ -201,7 +201,7 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
                                             e.stopPropagation();
                                             setView({ id: 'resume-form', data: resume });
                                         }}
-                                        className="p-2 text-gray-400 hover:text-pink-500 font-bold text-xs"
+                                        className="p-2 text-gray-400 hover:text-blue-500 font-bold text-xs"
                                     >
                                         수정
                                     </button>

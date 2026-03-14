@@ -50,7 +50,7 @@ const getPayBadgeInfo = (shop: Shop) => {
         badgeColor = 'bg-blue-500';
     } else if (typeToCheck.includes('주급')) {
         badgeLabel = '주';
-        badgeColor = 'bg-pink-500';
+        badgeColor = 'bg-blue-500';
     } else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) {
         badgeLabel = '월';
         badgeColor = 'bg-purple-500';
@@ -167,7 +167,7 @@ JobRow.displayName = 'JobRow';
 const getTierBadge = (tier?: string) => {
     switch (tier) {
         case 'special': return { label: '스페셜', color: 'bg-emerald-500 text-white' };
-        case 'deluxe': return { label: '디럭스', color: 'bg-pink-600 text-white' };
+        case 'deluxe': return { label: '디럭스', color: 'bg-blue-600 text-white' };
         case 'urgent': return { label: '급구', color: 'bg-red-600 text-white' };
         case 'grand': return { label: '그랜드', color: 'bg-amber-400 text-black' };
         case 'premium': return { label: '프리미엄', color: 'bg-purple-600 text-white' };
@@ -263,15 +263,15 @@ const MobileNativeAd = React.memo(({
     onRegister?: (tier?: string) => void,
     onNavigate: () => void
 }) => (
-    <div className="p-3 bg-pink-50">
-        <div className="bg-white/90 rounded-xl p-3 border border-pink-100 flex items-center justify-between">
+    <div className="p-3 bg-blue-50">
+        <div className="bg-white/90 rounded-xl p-3 border border-blue-100 flex items-center justify-between">
             <div>
-                <p className="text-[10px] text-pink-600 font-black mb-0.5">PREMIUM AD</p>
+                <p className="text-[10px] text-blue-600 font-black mb-0.5">PREMIUM AD</p>
                 <p className="text-[13px] font-bold text-gray-800">사장님, 여기보세요!</p>
             </div>
             <button
                 onClick={() => onRegister ? onRegister('mobile_list') : onNavigate()}
-                className="px-3 py-1.5 bg-pink-600 text-white text-[11px] font-bold rounded-lg shadow-sm"
+                className="px-3 py-1.5 bg-blue-600 text-white text-[11px] font-bold rounded-lg shadow-sm"
             >
                 광고등록
             </button>
@@ -314,9 +314,9 @@ const JobListView: React.FC<JobListViewProps> = ({
         <div id="latest-job-info-region" className="w-full clear-both mt-0 px-4 md:px-0">
             <div className="flex items-center justify-between mb-5 w-full">
                 <h2 className={`text-xl md:text-2xl font-black flex items-center gap-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
-                    <Flame size={24} className="text-pink-600 animate-pulse" />
+                    <Flame size={24} className="text-blue-600 animate-pulse" />
                     <span>최신 구인정보</span>
-                    <span className="bg-pink-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse uppercase font-sans shadow-md">LIVE</span>
+                    <span className="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse uppercase font-sans shadow-md">LIVE</span>
                 </h2>
                 <div className="flex items-center gap-2">
                     <button
@@ -331,7 +331,7 @@ const JobListView: React.FC<JobListViewProps> = ({
                     </button>
                     <button
                         onClick={() => onAdRegister ? onAdRegister('basic') : router.push('/?page=payment')}
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-pink-600 text-white hover:bg-pink-700 transition shadow-md hover:shadow-lg active:scale-95"
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-md hover:shadow-lg active:scale-95"
                     >
                         광고신청
                     </button>
@@ -373,10 +373,10 @@ const JobListView: React.FC<JobListViewProps> = ({
                                                 {isAdRow && (
                                                     <tr>
                                                         <td colSpan={6} className="p-4">
-                                                            <div className="w-full bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-100 flex items-center justify-between relative overflow-hidden group cursor-pointer shadow-sm hover:shadow-md transition-all">
+                                                            <div className="w-full bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100 flex items-center justify-between relative overflow-hidden group cursor-pointer shadow-sm hover:shadow-md transition-all">
                                                                 <div className="relative z-10">
                                                                     <h4 className="text-[17px] font-black text-gray-900 mb-1 flex items-center gap-2">
-                                                                        <Megaphone size={20} className="text-pink-600" />
+                                                                        <Megaphone size={20} className="text-blue-600" />
                                                                         <span>사장님, 광고 한칸 어떠세요?</span>
                                                                     </h4>
                                                                     <p className="text-gray-500 text-xs font-medium">
@@ -386,13 +386,13 @@ const JobListView: React.FC<JobListViewProps> = ({
                                                                 <div className="relative z-10">
                                                                     <button
                                                                         onClick={(e) => { e.stopPropagation(); onNativeAdRegister ? onNativeAdRegister('native') : (onAdRegister ? onAdRegister('native') : router.push('/?page=payment')); }}
-                                                                        className="bg-pink-600 hover:bg-pink-700 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-1.5"
+                                                                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-1.5"
                                                                     >
                                                                         <PlusCircle size={16} /> 광고신청
                                                                     </button>
                                                                 </div>
                                                                 {/* Optimized Decor elements (Removed heavy blur) */}
-                                                                <div className="absolute right-0 top-0 w-32 h-32 bg-pink-100/30 rounded-full -translate-y-1/2 translate-x-1/2" />
+                                                                <div className="absolute right-0 top-0 w-32 h-32 bg-blue-100/30 rounded-full -translate-y-1/2 translate-x-1/2" />
                                                             </div>
                                                         </td>
                                                     </tr>

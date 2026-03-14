@@ -181,7 +181,7 @@ function CommunityContentInner() {
                             router.push(`${pathname}?${params.toString()}`, { scroll: false });
                         }
                     }}
-                    className={`text-xl font-black text-pink-600 transition-all duration-300 ${activeTab === '프리미엄 라운지' && searchParams.get('lounge') ? 'cursor-pointer active:scale-95' : ''}`}
+                    className={`text-xl font-black text-blue-600 transition-all duration-300 ${activeTab === '프리미엄 라운지' && searchParams.get('lounge') ? 'cursor-pointer active:scale-95' : ''}`}
                 >
                     {activeTab}
                 </h2>
@@ -189,7 +189,7 @@ function CommunityContentInner() {
 
             {/* '비밀스러운 대화' 배너 - 프리미엄 라운지가 아닐 때만 표시 */}
             {activeTab !== '프리미엄 라운지' && (
-                <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6 text-white relative overflow-hidden shadow-xl">
+                <div className="bg-gradient-to-r from-blue-500 to-rose-500 p-6 text-white relative overflow-hidden shadow-xl">
                     <div className="max-w-[1200px] mx-auto relative z-10">
                         <div className="absolute top-0 right-0 p-4 opacity-20">
                             <ShieldAlert size={120} />
@@ -200,7 +200,7 @@ function CommunityContentInner() {
                                 익명이 보장되는 안전한 공간에서<br />
                                 더 깊은 이야기를 나누고 싶다면 커뮤니티 게시판을 이용하세요.
                             </p>
-                            <button onClick={() => handleTabChange('전체')} className="bg-white text-pink-600 px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-pink-900/20 active:scale-95 transition-all outline-none">
+                            <button onClick={() => handleTabChange('전체')} className="bg-white text-blue-600 px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-blue-900/20 active:scale-95 transition-all outline-none">
                                 수다 떨러 가기
                             </button>
                         </div>
@@ -216,7 +216,7 @@ function CommunityContentInner() {
                             key={cat.id}
                             onClick={() => handleTabChange(cat.name)}
                             className={`px-3 py-2 text-sm font-bold border-b-2 transition-all duration-200 flex items-center whitespace-nowrap ${activeTab === cat.name
-                                ? 'border-pink-500 text-pink-500'
+                                ? 'border-blue-500 text-blue-500'
                                 : 'border-transparent text-gray-500 hover:text-gray-900'
                                 }`}
                         >
@@ -243,7 +243,7 @@ function CommunityContentInner() {
                                 {userType !== 'corporate' && (
                                     <button
                                         onClick={handleWriteClick}
-                                        className="bg-pink-600 text-white px-5 py-2.5 rounded-2xl font-black text-sm shadow-lg shadow-pink-200 hover:bg-pink-700 active:scale-95 transition-all flex items-center gap-2"
+                                        className="bg-blue-600 text-white px-5 py-2.5 rounded-2xl font-black text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-2"
                                     >
                                         <PenLine size={18} /> 글쓰기
                                     </button>
@@ -253,7 +253,7 @@ function CommunityContentInner() {
                             {/* [NEW] Community-native Partners Credit Banner */}
                             <div
                                 onClick={() => window.open('https://partners-credit.vercel.app', '_blank')}
-                                className="mb-6 p-6 rounded-[32px] bg-slate-900 border-2 border-pink-500/50 cursor-pointer shadow-xl hover:scale-[1.01] transition-all group relative overflow-hidden"
+                                className="mb-6 p-6 rounded-[32px] bg-slate-900 border-2 border-blue-500/50 cursor-pointer shadow-xl hover:scale-[1.01] transition-all group relative overflow-hidden"
                             >
                                 <div className="absolute -right-4 -top-4 w-32 h-32 bg-yellow-400 opacity-5 blur-3xl group-hover:opacity-20 transition-opacity"></div>
                                 <div className="flex items-center justify-between gap-4">
@@ -288,10 +288,10 @@ function CommunityContentInner() {
                                         <React.Fragment key={post.id}>
                                             <div
                                                 onClick={() => handlePostClick(post.id)}
-                                                className={`p-6 sm:rounded-[32px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-pink-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                                                className={`p-6 sm:rounded-[32px] shadow-sm border active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200 group ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                                             >
                                                 <div className="flex justify-between items-start mb-3">
-                                                    <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors">
+                                                    <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[11px] font-black group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
                                                         {post.category}
                                                     </span>
                                                     <span className="text-[11px] text-gray-500 font-bold">{post.time}</span>
@@ -310,13 +310,13 @@ function CommunityContentInner() {
 
                                                 <div className="flex items-center justify-between text-xs border-t border-gray-50 pt-5">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
+                                                        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 shadow-inner">
                                                             <User size={16} />
                                                         </div>
                                                         <span className={`font-black ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>{post.author}</span>
                                                     </div>
                                                     <div className="flex gap-5">
-                                                        <span className="flex items-center gap-1.5 text-pink-600 font-black">
+                                                        <span className="flex items-center gap-1.5 text-blue-600 font-black">
                                                             <Heart size={16} className="fill-current" /> {post.likes}
                                                         </span>
                                                         <span className="flex items-center gap-1.5 text-blue-600 font-black">
@@ -358,7 +358,7 @@ function CommunityContentInner() {
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
                                         disabled={currentPage === 1}
-                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === 1 ? 'text-gray-300' : 'text-pink-600 hover:bg-pink-50'}`}
+                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === 1 ? 'text-gray-300' : 'text-blue-600 hover:bg-blue-50'}`}
                                     >
                                         이전
                                     </button>
@@ -369,7 +369,7 @@ function CommunityContentInner() {
                                                 setCurrentPage(i + 1);
                                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
-                                            className={`w-10 h-10 rounded-xl font-black transition-all ${currentPage === i + 1 ? 'bg-pink-600 text-white shadow-lg shadow-pink-200' : 'text-gray-400 hover:bg-gray-100'}`}
+                                            className={`w-10 h-10 rounded-xl font-black transition-all ${currentPage === i + 1 ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-400 hover:bg-gray-100'}`}
                                         >
                                             {i + 1}
                                         </button>
@@ -380,7 +380,7 @@ function CommunityContentInner() {
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
                                         disabled={currentPage === totalPages}
-                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === totalPages ? 'text-gray-300' : 'text-pink-600 hover:bg-pink-50'}`}
+                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === totalPages ? 'text-gray-300' : 'text-blue-600 hover:bg-blue-50'}`}
                                     >
                                         다음
                                     </button>
@@ -400,12 +400,12 @@ function CommunityContentInner() {
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm md:backdrop-blur-lg" onClick={() => setLoginModalOpen(false)}></div>
                         <div className={`rounded-[32px] md:rounded-[45px] w-[90%] md:w-full max-w-sm p-8 md:p-12 relative z-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/20'}`}>
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 md:w-24 md:h-24 bg-pink-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-pink-500 ring-8 ring-pink-50 shadow-inner">
+                                <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6 md:mb-10 text-blue-500 ring-8 ring-blue-50 shadow-inner">
                                     <Lock size={32} className="md:w-12 md:h-12" strokeWidth={2.5} />
                                 </div>
                                 <h3 className={`text-xl md:text-2xl font-black mb-3 md:mb-4 tracking-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>그녀들만의 비밀 커뮤니티 🤫</h3>
                                 <p className={`mb-8 md:mb-12 leading-relaxed font-bold text-xs md:text-sm ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    이곳은 <span className="text-pink-600 font-black underline underline-offset-4 decoration-4">인증된 여성 회원</span>들만<br />
+                                    이곳은 <span className="text-blue-600 font-black underline underline-offset-4 decoration-4">인증된 여성 회원</span>들만<br />
                                     입장하실 수 있는 안전한 공간입니다.<br />
                                     <br />
                                     <span className={`px-4 py-2 rounded-2xl border text-[11px] md:text-xs ${brand.theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-100 text-gray-900 border-gray-200'}`}>로그인하고 실시간 핫이슈를 확인하세요! 🔥</span>
@@ -413,7 +413,7 @@ function CommunityContentInner() {
                                 <div className="grid grid-cols-1 w-full gap-3">
                                     <button
                                         onClick={() => router.push('/?page=signup')}
-                                        className="w-full py-4 md:py-5 bg-pink-600 text-white rounded-2xl md:rounded-3xl font-black text-base md:text-lg hover:bg-pink-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-pink-200 outline-none"
+                                        className="w-full py-4 md:py-5 bg-blue-600 text-white rounded-2xl md:rounded-3xl font-black text-base md:text-lg hover:bg-blue-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-blue-200 outline-none"
                                     >
                                         지금 가입하고 확인하기
                                     </button>
@@ -483,7 +483,7 @@ function CommunityContentInner() {
                 userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
                     <button
                         onClick={handleWriteClick}
-                        className="fixed bottom-24 right-5 md:right-10 bg-pink-600 text-white p-5 rounded-full shadow-2xl hover:bg-pink-700 active:scale-90 transition-all z-50 hover:shadow-pink-300/50"
+                        className="fixed bottom-24 right-5 md:right-10 bg-blue-600 text-white p-5 rounded-full shadow-2xl hover:bg-blue-700 active:scale-90 transition-all z-50 hover:shadow-blue-300/50"
                     >
                         <PenLine size={28} />
                     </button>

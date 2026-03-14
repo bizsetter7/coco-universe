@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const keywords = generateSEOKeywords(shop.region).join(', ');
 
     return {
-        title: `${shop.name} - ${simpleRegion} ${shop.category || '유흥'}알바 채용정보 | 코코알바`,
+        title: `${shop.name} - ${simpleRegion} ${shop.category || '프리미엄'}알바 채용정보 | 코코알바`,
         description: `${simpleRegion} ${shop.name} 채용정보. ${shop.title || '최고의 대우로 모십니다.'} 급여: ${shop.pay || '협의'}`,
         keywords: keywords,
         openGraph: {

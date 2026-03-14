@@ -7,7 +7,7 @@
 export const AUDIT_MODE = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
 
 /**
- * 성인인증 게이트 마스터 락 (Master Lock)
+ * 기업전용인증 게이트 마스터 락 (Master Lock)
  *
  * ⚠️ 기본값 = true (비활성화) — 환경변수 미설정 시에도 게이트 차단
  *
@@ -47,7 +47,7 @@ export const BRANDS: Record<string, BrandConfig> = {
         primaryColor: '#D4AF37',
         logoText: 'COCO',
         displayName: 'COCO 코코알바',
-        tagline: '대한민국 1등 여성 고소득 알바 플랫폼',
+        tagline: '대한민국 1등 여성 엔터프라이즈 알바 플랫폼',
         theme: 'light',
     },
     /**

@@ -36,10 +36,10 @@ export const SEOIndexingControl = () => {
     return (
         <div className="space-y-6">
             {/* Header Area */}
-            <div className={`p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-pink-100'}`}>
+            <div className={`p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`}>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-pink-200">
+                        <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
                             <Search size={28} />
                         </div>
                         <div>
@@ -50,7 +50,7 @@ export const SEOIndexingControl = () => {
                     <button
                         onClick={handleIndexingRequest}
                         disabled={isRequesting}
-                        className={`w-full md:w-auto py-4 px-8 bg-pink-500 text-white rounded-2xl font-black hover:bg-pink-600 shadow-xl shadow-pink-200 transition-all flex items-center justify-center gap-2 active:scale-95 ${isRequesting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-full md:w-auto py-4 px-8 bg-blue-500 text-white rounded-2xl font-black hover:bg-blue-600 shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95 ${isRequesting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isRequesting ? '요청 처리 중...' : '실시간 색인 요청하기'}
                         {!isRequesting && <Globe size={18} />}
@@ -84,7 +84,7 @@ export const SEOIndexingControl = () => {
                 {/* API Request Log */}
                 <div className={`p-6 rounded-[32px] border flex flex-col ${brand.theme === 'dark' ? 'bg-black border-gray-800' : 'bg-gray-950 border-gray-800 shadow-xl'}`}>
                     <h3 className="text-md font-black mb-4 text-white flex items-center gap-2">
-                        <Terminal size={18} className="text-pink-400" />
+                        <Terminal size={18} className="text-blue-400" />
                         시스템 로그 (Indexing API)
                     </h3>
                     <div className="flex-1 min-h-[150px] font-mono text-[11px] space-y-2 overflow-y-auto">

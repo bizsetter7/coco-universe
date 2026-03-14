@@ -9,9 +9,9 @@ export default function NotFound() {
         <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
             {/* Animated Icon Container */}
             <div className="relative mb-8">
-                <div className="absolute inset-0 bg-pink-100 rounded-full blur-3xl opacity-50 animate-pulse" />
-                <div className="relative bg-white p-8 rounded-[40px] border-2 border-pink-50 shadow-2xl">
-                    <AlertCircle size={80} className="text-pink-500" strokeWidth={1.5} />
+                <div className="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-50 animate-pulse" />
+                <div className="relative bg-white p-8 rounded-[40px] border-2 border-blue-50 shadow-2xl">
+                    <AlertCircle size={80} className="text-blue-500" strokeWidth={1.5} />
                 </div>
             </div>
 

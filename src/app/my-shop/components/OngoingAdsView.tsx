@@ -58,7 +58,7 @@ export const OngoingAdsView = ({
             <div className="relative p-1 rounded-[24px] md:rounded-[32px] shadow-sm border bg-white border-gray-100">
                 <div className="bg-white rounded-[20px] md:rounded-[28px] p-4 md:p-5 relative shadow-sm border border-gray-100">
                     <div className="flex items-center gap-3 md:gap-4 pr-10 md:pr-0">
-                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-white bg-pink-600`}>
+                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-white bg-blue-600`}>
                             <List size={20} className="md:w-6 md:h-6" />
                         </div>
                         <div>
@@ -78,7 +78,7 @@ export const OngoingAdsView = ({
                             {ads.filter(ad => ad.status !== 'CLOSED' && ad.status !== 'closed').map((ad) => (
                                 <div
                                     key={ad.id}
-                                    className={`group relative p-5 md:p-6 rounded-[28px] border transition-all duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100 hover:shadow-xl hover:border-pink-100'}`}
+                                    className={`group relative p-5 md:p-6 rounded-[28px] border transition-all duration-300 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100 hover:shadow-xl hover:border-blue-100'}`}
                                     style={{ pointerEvents: 'auto' }}
                                 >
                                     <div className="flex flex-col md:flex-row justify-between gap-5">
@@ -87,7 +87,7 @@ export const OngoingAdsView = ({
                                             <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                 <span className={`${ad.status === 'rejected' || ad.status === 'REJECTED' ? 'bg-red-100 text-red-500' :
                                                     ad.status === 'PENDING_REVIEW' || ad.status === 'pending' ? 'bg-orange-100 text-orange-500' :
-                                                        'bg-pink-100 text-pink-500'
+                                                        'bg-blue-100 text-blue-500'
                                                     } px-2 py-0.5 rounded text-[10px] font-black shrink-0 uppercase tracking-tighter shadow-sm`}>
                                                     {ad.status === 'rejected' || ad.status === 'REJECTED' ? '반려' :
                                                         ad.status === 'PENDING_REVIEW' || ad.status === 'pending' ? '심사중' :
@@ -107,11 +107,11 @@ export const OngoingAdsView = ({
                                                     {ad.selectedIcon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
                                                     {ad.selectedHighlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">형</span>}
                                                     {ad.borderOption && ad.borderOption !== 'none' && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">테</span>}
-                                                    {ad.paySuffixes && ad.paySuffixes.length > 0 && <span className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
+                                                    {ad.paySuffixes && ad.paySuffixes.length > 0 && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
                                                 </div>
                                                 <h3
                                                     onClick={() => onShowAdDetail?.(ad)}
-                                                    className={`text-[17px] md:text-[19px] font-black leading-tight cursor-pointer hover:text-pink-500 transition-colors line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                    className={`text-[17px] md:text-[19px] font-black leading-tight cursor-pointer hover:text-blue-500 transition-colors line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                                                     style={getHighlighterStyle(ad.selectedHighlighter)}
                                                 >
                                                     {ad.title}
@@ -130,7 +130,7 @@ export const OngoingAdsView = ({
                                                 )}
 
                                                 <div className={`flex flex-wrap items-center gap-2 text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    <span className="text-pink-600 font-extrabold text-[13px]">
+                                                    <span className="text-blue-600 font-extrabold text-[13px]">
                                                         {(() => {
                                                             const nick = ad.nickname || '';
                                                             if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
@@ -209,7 +209,7 @@ export const OngoingAdsView = ({
                                             온라인 인재관리
                                         </button>
                                         <div className="flex gap-4 text-[13px] font-black">
-                                            <span className="flex items-center gap-1.5 text-pink-500 bg-pink-50 dark:bg-pink-500/10 px-3 py-1 rounded-full">
+                                            <span className="flex items-center gap-1.5 text-blue-500 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-full">
                                                 <User size={14} /> 지원자 {ad.applicantCount || 0}
                                             </span>
                                         </div>

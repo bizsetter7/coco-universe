@@ -13,7 +13,7 @@ export interface UserSession {
     referrer?: string;
     shopId?: string;
     isSimulated?: boolean;
-    isAdultVerified?: boolean; // [New] 성인인증 여부 (DB 연동)
+    isVerifiedPartnerVerified?: boolean; // [New] 기업전용인증 여부 (DB 연동)
     email?: string; // [New] 이메일 필드 추가
 }
 
@@ -75,7 +75,7 @@ export function useAuth() {
                         nickname: profile.nickname || profile.full_name || '닉네임',
                         credit: profile.credit_balance || 0,
                         points: profile.points || 0, // [Fix] 자산 독립 분리 (v1.0 약속 이행)
-                        isAdultVerified: !!profile.is_adult_verified, // [New] DB 성인인증 여부 반영
+                        isVerifiedPartnerVerified: !!profile.is_adult_verified, // [New] DB 기업전용인증 여부 반영
                         email: authUser.email
                     };
 
@@ -255,6 +255,6 @@ export function useAuth() {
         userPoints: user.points, // [New] 코코 포인트 독립 반환
         userReferrer: user.referrer,
         isSimulated: user.isSimulated,
-        isAdultVerified: AUDIT_MODE || user.isAdultVerified
+        isVerifiedPartnerVerified: AUDIT_MODE || user.isVerifiedPartnerVerified
     };
 }

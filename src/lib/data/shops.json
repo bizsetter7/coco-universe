@@ -98,7 +98,7 @@
     "is_placeholder": false,
     "is_premium": true,
     "is_verified": true,
-    "title": "(캐나다알바)❤️❤️캐나다 VIP 비지니스 벤쿠버 꿀단지  고수익 가능!❤️❤️",
+    "title": "(캐나다알바)❤️❤️캐나다 VIP 비지니스 벤쿠버 꿀단지  엔터프라이즈 가능!❤️❤️",
     "tier": "grand",
     "updatedAt": "2026-01-28T09:55:00.000Z",
     "options": {
@@ -134,7 +134,7 @@
       "blink": false,
       "effect": "neon",
       "bold": true,
-      "color": "text-pink-300",
+      "color": "text-blue-300",
       "icons": [
         "경력우대"
       ],
@@ -159,7 +159,7 @@
     "is_placeholder": false,
     "is_premium": true,
     "is_verified": true,
-    "title": "❣️❣️❣️(해운대 밤알바) ♥♥해운대♥퀄리티♥룸빠♥1번♥♥❣️❣️❣️",
+    "title": "❣️❣️❣️(해운대 엔터프라이즈 인재 솔루션) ♥♥해운대♥퀄리티♥룸빠♥1번♥♥❣️❣️❣️",
     "tier": "grand",
     "updatedAt": "2026-01-28T09:45:00.000Z",
     "options": {
@@ -168,7 +168,7 @@
       "bold": true,
       "color": "text-purple-600",
       "icons": [
-        "고수익",
+        "엔터프라이즈",
         "럭셔리"
       ],
       "paySuffixes": [
@@ -205,7 +205,7 @@
     },
     "payType": "시급",
     "adNo": 1007,
-    "title": "여성대출상담 ❤️여성전용 대출 대출고래❤️"
+    "title": "여성대출상담 ❤️특화 직무 대출 대출고래❤️"
   },
   {
     "name": "다다테라피",
@@ -231,7 +231,7 @@
       "effect": "neon",
       "icons": [
         "인천넘버원",
-        "고수익알바"
+        "엔터프라이즈알바"
       ],
       "paySuffixes": [
         "+ α"
@@ -386,10 +386,10 @@
     "options": {
       "blink": false,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "강남정식",
-        "고수익"
+        "엔터프라이즈"
       ],
       "paySuffixes": [
         "+ 보너스"
@@ -573,7 +573,7 @@
     "options": {
       "blink": false,
       "bold": true,
-      "color": "text-pink-400",
+      "color": "text-blue-400",
       "icons": [
         "신림1등",
         "당일"
@@ -646,7 +646,7 @@
     },
     "payType": "시급",
     "adNo": 1021,
-    "title": "(강남 룸알바) ✅새롭게 오픈한 하이퍼블릭 드라마 입니다!!!✅"
+    "title": "(강남 프라이빗 매칭) ✅새롭게 오픈한 하이퍼블릭 드라마 입니다!!!✅"
   },
   {
     "name": "고구려",
@@ -755,7 +755,7 @@
       "color": "text-red-500",
       "icons": [
         "삼성단지",
-        "최고수익"
+        "최엔터프라이즈"
       ],
       "paySuffixes": [
         "보장"
@@ -795,7 +795,7 @@
     },
     "payType": "시급",
     "adNo": 1026,
-    "title": "❤️❤️❤️❤️❤️누구나 고수익❤️❤️❤️❤️❤️"
+    "title": "❤️❤️❤️❤️❤️누구나 엔터프라이즈❤️❤️❤️❤️❤️"
   },
   {
     "name": "⭐퍼스트⭐",
@@ -934,7 +934,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-600",
+      "color": "text-blue-600",
       "icons": [
         "상위1%",
         "숙소"
@@ -1059,7 +1059,7 @@
     "region": "[탐색 대기]",
     "phone": "010-5856-8745",
     "kakao": "young8746",
-    "pay": "고수익 보장",
+    "pay": "엔터프라이즈 보장",
     "workType": "마사지",
     "url": "https://foxalba.com/8",
     "site": "foxalba",
@@ -1258,7 +1258,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "청라명소",
         "숙소"
@@ -1296,7 +1296,7 @@
     "adNo": 1044
   },
   {
-    "name": "(챗gpt) 요즘 유흥업소 아가씨 구",
+    "name": "(챗gpt) 요즘 프리미엄업소 아가씨 구",
     "region": "[탐색 대기]",
     "phone": "010-7174-2272",
     "kakao": "is-dg",
@@ -1418,7 +1418,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "전주TOP",
         "당일지급"
@@ -1517,7 +1517,7 @@
       "color": "text-red-600",
       "icons": [
         "당일지급",
-        "고수익",
+        "엔터프라이즈",
         "급구"
       ]
     },
@@ -1723,7 +1723,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-600",
+      "color": "text-blue-600",
       "icons": [
         "해운대명품"
       ],
@@ -1993,7 +1993,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "상무메이저"
       ]
@@ -2284,7 +2284,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "둔산동1등"
       ]
@@ -2401,7 +2401,7 @@
     "name": "별노래바",
     "region": "[탐색 대기]",
     "phone": "010-5152-1530",
-    "kakao": "spacenight5152",
+    "kakao": "spaceb2b5152",
     "pay": "600000",
     "workType": "룸싸롱",
     "url": "https://ladyalba.co.kr/50",
@@ -2442,7 +2442,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "부평1등"
       ]
@@ -2600,7 +2600,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "인계동1등"
       ]
@@ -2758,7 +2758,7 @@
     "options": {
       "blink": true,
       "bold": true,
-      "color": "text-pink-500",
+      "color": "text-blue-500",
       "icons": [
         "고덕1등"
       ]
@@ -3910,7 +3910,7 @@
     "kakao": "miszla22",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202205021503415342",
     "site": "foxalba",
     "id": "b2ea34e9-1b10-4647-bd15-96c02c904b9f",
@@ -5152,7 +5152,7 @@
     "kakao": "ddddd8888",
     "telegram": "-bbbb5857",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1586",
     "site": "all_final",
     "id": "10378bb4-0107-4d08-b6e4-aa40d532ca08",
@@ -6019,7 +6019,7 @@
     "adNo": 1187
   },
   {
-    "name": "텐프로",
+    "name": "VIP 파트너스",
     "region": "[탐색 대기]",
     "phone": "010-7581-2630",
     "kakao": "lgu1004",
@@ -6316,7 +6316,7 @@
     "kakao": "goldmoney16",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=35209",
     "site": "all_final",
     "id": "6398ba8f-a67b-4c9e-85cd-4649a90c3501",
@@ -8666,7 +8666,7 @@
     "adNo": 1261
   },
   {
-    "name": "✅❤️청주유흥대장❤️✅",
+    "name": "✅❤️청주프리미엄대장❤️✅",
     "region": "[충북] 청주시",
     "phone": "010-2892-6974",
     "kakao": "CP12180",
@@ -9093,7 +9093,7 @@
     "adNo": 1273
   },
   {
-    "name": "거북이유흥주점",
+    "name": "거북이프리미엄주점",
     "region": "[서울] 송파구",
     "phone": "010-8933-3880",
     "kakao": "demo3880",
@@ -13733,7 +13733,7 @@
     "kakao": "pppp9988",
     "telegram": "-aaaa4454",
     "pay": "200000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1469",
     "site": "all_final",
     "id": "f78b52b4-d9ab-47a7-9fd1-f91ebe951c16",
@@ -15751,7 +15751,7 @@
     "kakao": "redox21",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202511300332002060",
     "site": "foxalba",
     "id": "0148a122-c3e2-4071-96da-09146c9e388b",
@@ -15811,7 +15811,7 @@
     "adNo": 1466
   },
   {
-    "name": "♥헤라♥룸알바",
+    "name": "♥헤라♥프라이빗 매칭",
     "region": "[경기] 부천시",
     "phone": "010-8024-3269",
     "kakao": "no1326",
@@ -16248,7 +16248,7 @@
     "adNo": 1478
   },
   {
-    "name": "텐프로가요장",
+    "name": "VIP 파트너스가요장",
     "region": "[경기] 구리시",
     "phone": "010-5316-2141",
     "kakao": "letsgo158",
@@ -16792,7 +16792,7 @@
     "kakao": "kimsclub86",
     "telegram": "",
     "pay": "160000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=36651",
     "site": "all_final",
     "id": "08696427-3184-4758-8df9-619d13520025",
@@ -17462,7 +17462,7 @@
     "kakao": "yygg999",
     "telegram": "",
     "pay": "140000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=28033",
     "site": "all_final",
     "id": "f486649d-cabc-4eff-b1b4-8f506c04f76c",
@@ -17499,7 +17499,7 @@
     "kakao": "qwer1987",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=201912191102071435",
     "site": "foxalba",
     "id": "9019dc23-2ec9-460d-8f79-749fc70489d3",
@@ -18287,13 +18287,13 @@
     "adNo": 1537
   },
   {
-    "name": "⭐쩜오도깨비강현⭐개인이벤트",
+    "name": "⭐VIP 파트너스도깨비강현⭐개인이벤트",
     "region": "[서울] 강남구",
     "phone": "010-5000-9824",
     "kakao": "kh5000",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=33081",
     "site": "all_final",
     "id": "cbdbcd2d-5407-4e2c-ada6-e42b97548ad9",
@@ -18330,7 +18330,7 @@
     "kakao": "ckw9977",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202601062357400569",
     "site": "foxalba",
     "id": "40575830-a1b4-4eee-b899-a08b0c4f3b66",
@@ -19279,13 +19279,13 @@
     "adNo": 1566
   },
   {
-    "name": "웸블리 텐카페 텐프로 쩜오 퍼블릭하퍼",
+    "name": "웸블리 텐카페 VIP 파트너스 VIP 파트너스 퍼블릭하퍼",
     "region": "[서울] 강남구",
     "phone": "010-5330-7949",
     "kakao": "Leeready2",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=35888",
     "site": "all_final",
     "id": "dd35315b-89fa-4da5-bd1a-09a12e6ebce1",
@@ -19563,7 +19563,7 @@
     "adNo": 1574
   },
   {
-    "name": "♥ 고수익알바♥갯수1등♥",
+    "name": "♥ 엔터프라이즈알바♥갯수1등♥",
     "region": "[서울] 송파구",
     "phone": "010-2229-6222",
     "kakao": "FOX911",
@@ -20651,7 +20651,7 @@
     "kakao": "garamweb",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202210181506225405",
     "site": "foxalba",
     "id": "97e56d07-ed54-4d7d-9339-815bc69c9156",
@@ -20785,13 +20785,13 @@
     "adNo": 1609
   },
   {
-    "name": "강남쩜오❤️이태곤대표❤️",
+    "name": "강남VIP 파트너스❤️이태곤대표❤️",
     "region": "[서울] 강남구",
     "phone": "010-5310-5882",
     "kakao": "v5882v",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=28495",
     "site": "all_final",
     "id": "addec95f-fa5d-475c-bb34-20f6f7b91b19",
@@ -21702,7 +21702,7 @@
     "kakao": "nono2684",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202511202223431364",
     "site": "foxalba",
     "id": "e84bb6ee-cc46-4677-ab3b-00efe33ff602",
@@ -21912,7 +21912,7 @@
     "kakao": "thefirst88",
     "telegram": "",
     "pay": "500000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=31036",
     "site": "all_final",
     "id": "8929af33-a6a6-4801-8b76-ae213ef19a99",
@@ -21949,7 +21949,7 @@
     "kakao": "woojeong123",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202209051856167038",
     "site": "foxalba",
     "id": "3280385f-a109-4ea6-9bb7-e3474805430f",
@@ -21982,7 +21982,7 @@
     "kakao": "71223322",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=21591",
     "site": "all_final",
     "id": "bebb9f68-f2cf-4d11-8597-e694aa8847ef",
@@ -22189,7 +22189,7 @@
     "kakao": "1proom",
     "telegram": "",
     "pay": "190000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=28248",
     "site": "all_final",
     "id": "9884275d-7121-44b9-ab09-1bafe022df54",
@@ -22465,13 +22465,13 @@
     "adNo": 1658
   },
   {
-    "name": "★강남쩜오 보장제★",
+    "name": "★강남VIP 파트너스 보장제★",
     "region": "[서울] 강남구",
     "phone": "010-9481-8666",
     "kakao": "gogo_8666",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=20110918200923",
     "site": "foxalba",
     "id": "ab556011-b8cf-4e34-8e0d-61d765ebeb1a",
@@ -22854,7 +22854,7 @@
     "kakao": "kk0104353",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=36962",
     "site": "all_final",
     "id": "2e0ecb68-8900-484d-8fba-8a2084c3c601",
@@ -24076,7 +24076,7 @@
     "adNo": 1705
   },
   {
-    "name": "부천상동 룸알바",
+    "name": "부천상동 프라이빗 매칭",
     "region": "[경기] 부천시",
     "phone": "010-9892-1177",
     "kakao": "sjs771216",
@@ -24903,13 +24903,13 @@
     "adNo": 1729
   },
   {
-    "name": "일프로 텐프로",
+    "name": "일프로 VIP 파트너스",
     "region": "[서울] 강남구",
     "phone": "010-8445-3000",
     "kakao": "hope3000",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=4585",
     "site": "all_final",
     "id": "d50c2ba5-ca66-4aac-a0c6-1f21499bcc15",
@@ -25178,7 +25178,7 @@
     "kakao": "a2115a6825",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=36559",
     "site": "all_final",
     "id": "d2712538-4f54-4ba1-9dd3-6a3234ef02eb",
@@ -25283,7 +25283,7 @@
     "kakao": "ejw94",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202601121041583250",
     "site": "foxalba",
     "id": "87a480fc-9094-4076-981f-94fcd1eb291d",
@@ -27291,7 +27291,7 @@
     "adNo": 1800
   },
   {
-    "name": "코끼리유흥주점",
+    "name": "코끼리프리미엄주점",
     "region": "[전북] 전주시",
     "phone": "010-7325-3253",
     "kakao": "whdtlr2990",
@@ -28390,7 +28390,7 @@
     "kakao": "Leews001",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512222222389254",
     "site": "foxalba",
     "id": "410e2bbe-07c9-4103-ae4b-0974d4854909",
@@ -28694,7 +28694,7 @@
     "kakao": "peng7788",
     "telegram": "pppp7877",
     "pay": "20000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1267",
     "site": "all_final",
     "id": "a6c5ad6d-7386-402a-801c-e37a46617939",
@@ -28901,7 +28901,7 @@
     "adNo": 1847
   },
   {
-    "name": "이수사당출퇴지원고수익",
+    "name": "이수사당출퇴지원엔터프라이즈",
     "region": "[서울] 동작구",
     "phone": "010-2117-4357",
     "kakao": "kjb1357",
@@ -29839,7 +29839,7 @@
     "kakao": "miszla22",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=25073",
     "site": "all_final",
     "id": "19d8275c-2ddd-416b-bbd9-e746013da60e",
@@ -30735,7 +30735,7 @@
     "adNo": 1900
   },
   {
-    "name": "썸유흥주점",
+    "name": "썸프리미엄주점",
     "region": "[광주] 서구",
     "phone": "010-2716-7970",
     "kakao": "skrnfma123",
@@ -32770,7 +32770,7 @@
     "adNo": 1959
   },
   {
-    "name": "룸알바",
+    "name": "프라이빗 매칭",
     "region": "[서울] 강남구",
     "phone": "010-4147-4754",
     "kakao": "gogo4754",
@@ -32936,13 +32936,13 @@
     "adNo": 1964
   },
   {
-    "name": "텐프로 메이비",
+    "name": "VIP 파트너스 메이비",
     "region": "[서울] 강남구",
     "phone": "010-9823-4415",
     "kakao": "kkkk8889",
     "telegram": "pppp7877",
     "pay": "20000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1266",
     "site": "all_final",
     "id": "cf853329-903e-42b2-b9af-8329cc521406",
@@ -33420,7 +33420,7 @@
     "adNo": 1978
   },
   {
-    "name": "여자친구노래방",
+    "name": "인재친구노래방",
     "region": "[인천] 서구",
     "phone": "010-8489-0128",
     "kakao": "zvc3518",
@@ -33875,7 +33875,7 @@
     "kakao": "geo9025",
     "telegram": "",
     "pay": "100000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=37249",
     "site": "all_final",
     "id": "905f23ad-5a03-4ff7-a3d3-6808f8cd21d7",
@@ -34413,7 +34413,7 @@
     "adNo": 2007
   },
   {
-    "name": "＃수유1번＃꿀알바＃고소득",
+    "name": "＃수유1번＃꿀알바＃엔터프라이즈",
     "region": "[서울] 강북구",
     "phone": "010-4011-7497",
     "kakao": "hcigood",
@@ -34630,7 +34630,7 @@
     "kakao": "sharp6477",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202307120139344999",
     "site": "foxalba",
     "id": "b2f9d06f-f7de-4e49-ac47-3b4b4ee0259b",
@@ -34827,7 +34827,7 @@
     "adNo": 2019
   },
   {
-    "name": "★젤쉬운룸알바★",
+    "name": "★젤쉬운프라이빗 매칭★",
     "region": "[서울] 강남구",
     "phone": "010-7186-6634",
     "kakao": "manager0529",
@@ -35384,7 +35384,7 @@
     "kakao": "cloud-9",
     "telegram": "",
     "pay": "10000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=29691",
     "site": "all_final",
     "id": "a6d91a15-e983-4f6f-a22f-e2abc5ee5116",
@@ -35624,7 +35624,7 @@
     "kakao": "jeongpyo92",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202502170220248563",
     "site": "foxalba",
     "id": "a6356409-903f-40ee-8de9-8c8e1d8429f8",
@@ -36634,7 +36634,7 @@
     "adNo": 2072
   },
   {
-    "name": "고수익 보장 얼릉 보세요",
+    "name": "엔터프라이즈 보장 얼릉 보세요",
     "region": "[서울] 은평구",
     "phone": "010-9696-9659",
     "kakao": "yykhu",
@@ -36840,7 +36840,7 @@
     "adNo": 2078
   },
   {
-    "name": "피카소유흥주점",
+    "name": "피카소프리미엄주점",
     "region": "[전남] 영광군",
     "phone": "010-9277-2221",
     "kakao": "kj2221kj",
@@ -36939,7 +36939,7 @@
     "adNo": 2081
   },
   {
-    "name": "도깨비(구스테이) 쩜오",
+    "name": "도깨비(구스테이) VIP 파트너스",
     "region": "[서울] 강남구",
     "phone": "010-2428-0093",
     "kakao": "0093th",
@@ -38204,7 +38204,7 @@
     "adNo": 2118
   },
   {
-    "name": "용인TOP룸알바",
+    "name": "용인TOP프라이빗 매칭",
     "region": "[경기] 용인시",
     "phone": "010-2157-9973",
     "kakao": "jhkkkk",
@@ -38661,7 +38661,7 @@
     "kakao": "nobang0825",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=37040",
     "site": "all_final",
     "id": "8bbd11bf-8c77-4d43-ac55-f3feeb9de587",
@@ -40305,7 +40305,7 @@
     "kakao": "mostyoon",
     "telegram": "",
     "pay": "15000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=34062",
     "site": "all_final",
     "id": "1487509d-82cf-44aa-bc01-6eb8028a989b",
@@ -40369,7 +40369,7 @@
     "adNo": 2181
   },
   {
-    "name": "김해유흥1등윤대표",
+    "name": "김해프리미엄1등윤대표",
     "region": "[경남] 김해시",
     "phone": "010-3518-8230",
     "kakao": "hanminzzang",
@@ -40509,7 +40509,7 @@
     "adNo": 2185
   },
   {
-    "name": "빠담빠담유흥주점",
+    "name": "빠담빠담프리미엄주점",
     "region": "[경기] 시흥시",
     "phone": "010-8500-9857",
     "kakao": "nicgood",
@@ -40844,13 +40844,13 @@
     "adNo": 2195
   },
   {
-    "name": "강남역 쩜오❤❤",
+    "name": "강남역 VIP 파트너스❤❤",
     "region": "[서울] 강남구",
     "phone": "010-4012-0395",
     "kakao": "someday118",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202508131632127533",
     "site": "foxalba_final_db_2026",
     "id": "64513384-03b6-4abd-8ed6-90f0b87c978a",
@@ -42363,7 +42363,7 @@
     "kakao": "actorhoya82",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202407081733366731",
     "site": "foxalba",
     "id": "b5179e05-531d-4f98-a8e9-a5a4b45106da",
@@ -42754,7 +42754,7 @@
     "adNo": 2252
   },
   {
-    "name": "여의도룸알바",
+    "name": "여의도프라이빗 매칭",
     "region": "[서울] 영등포구",
     "phone": "010-9496-5999",
     "kakao": "admin",
@@ -44851,7 +44851,7 @@
     "adNo": 2314
   },
   {
-    "name": "양재 TOP 클래스 ROSE 고수익 꿀 늦은출근 투잡대환영",
+    "name": "양재 TOP 클래스 ROSE 엔터프라이즈 꿀 늦은출근 투잡대환영",
     "region": "[서울] 서초구",
     "phone": "010-9127-4004",
     "kakao": "bm4004",
@@ -45402,7 +45402,7 @@
     "kakao": "kks998",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512240132343166",
     "site": "foxalba",
     "id": "68244d7e-0e1c-4241-b51e-9c251dd20254",
@@ -49217,7 +49217,7 @@
     "adNo": 2443
   },
   {
-    "name": "타임유흥주점",
+    "name": "타임프리미엄주점",
     "region": "[대구] 달성군",
     "phone": "010-3120-4800",
     "kakao": "baboboss76",
@@ -50512,7 +50512,7 @@
     "kakao": "baanngg",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202410281024305958",
     "site": "foxalba",
     "id": "b17c8074-9189-491f-a758-f9710e521de0",
@@ -51151,7 +51151,7 @@
     "kakao": "ranma33",
     "telegram": "",
     "pay": "20000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=23169",
     "site": "all_final",
     "id": "224a05a8-7882-46b8-9564-f893fc0bd0b1",
@@ -51473,7 +51473,7 @@
     "kakao": "goodlove12",
     "telegram": "",
     "pay": "500000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=28298",
     "site": "all_final",
     "id": "38412c09-076e-44d8-a5b6-9eacf1cb5015",
@@ -53750,7 +53750,7 @@
     "adNo": 2577
   },
   {
-    "name": "강릉유흥",
+    "name": "강릉프리미엄",
     "region": "[강원] 강릉시",
     "phone": "010-8792-1991",
     "kakao": "wjdrl1991",
@@ -55928,7 +55928,7 @@
     "adNo": 2642
   },
   {
-    "name": "대구⭐여자실장상담",
+    "name": "대구⭐인재실장상담",
     "region": "[대구] 수성구",
     "phone": "010-7787-7227",
     "kakao": "luckygirl",
@@ -56271,7 +56271,7 @@
     "kakao": "sil1101",
     "telegram": "",
     "pay": "500000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=37064",
     "site": "all_final",
     "id": "33b9faca-acea-4bed-a92c-5eeb590dcb40",
@@ -57488,7 +57488,7 @@
     "kakao": "hsien0195",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512261517160625",
     "site": "foxalba",
     "id": "5aa94f9c-31df-44a2-9dae-5cf442f70b9b",
@@ -57686,7 +57686,7 @@
     "kakao": "ddddd8888",
     "telegram": "",
     "pay": "20000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1588",
     "site": "all_final",
     "id": "7e86925e-c357-4569-b357-d803d454959b",
@@ -57852,7 +57852,7 @@
     "adNo": 2699
   },
   {
-    "name": "153유흥주점",
+    "name": "153프리미엄주점",
     "region": "[경북] 구미시",
     "phone": "010-4270-7225",
     "kakao": "elwjxm0547",
@@ -58264,7 +58264,7 @@
     "kakao": "isaacmizrahi_",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202511050932219540",
     "site": "foxalba",
     "id": "c9be9fae-e7e9-4c09-a047-856c8fae7801",
@@ -59666,7 +59666,7 @@
     "kakao": "heartone1234",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202306071723408966",
     "site": "foxalba",
     "id": "7257b99a-2046-424f-aa5a-e8469b918744",
@@ -60063,7 +60063,7 @@
     "adNo": 2765
   },
   {
-    "name": "루루유흥주점",
+    "name": "루루프리미엄주점",
     "region": "[서울] 중랑구",
     "phone": "010-9218-9212",
     "kakao": "best4739",
@@ -60292,7 +60292,7 @@
     "adNo": 2772
   },
   {
-    "name": "서초일반퍼블릭6T이상편안한룸알바90분",
+    "name": "서초일반퍼블릭6T이상편안한프라이빗 매칭90분",
     "region": "[서울] 서초구",
     "phone": "010-9333-4060",
     "kakao": "dasom2nd",
@@ -60799,7 +60799,7 @@
     "kakao": "soso1746",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2617",
     "site": "all_final",
     "id": "d0e31991-a26e-455f-b409-0ec2bf50f993",
@@ -61109,7 +61109,7 @@
     "kakao": "XJWAKY",
     "telegram": "",
     "pay": "140000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=257",
     "site": "all_final",
     "id": "3d53ea3b-6507-485b-ade9-06f5e59e6663",
@@ -61956,7 +61956,7 @@
     "kakao": "tong8888",
     "telegram": "",
     "pay": "20000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1587",
     "site": "all_final",
     "id": "8aa985c3-da9c-42e2-9aaa-473cc50b5f05",
@@ -62330,7 +62330,7 @@
     "adNo": 2832
   },
   {
-    "name": "텐프로",
+    "name": "VIP 파트너스",
     "region": "[강원] 원주시",
     "phone": "010-9065-0255",
     "kakao": "ten1",
@@ -63371,7 +63371,7 @@
     "adNo": 2863
   },
   {
-    "name": "▶룸알바💜갤러리◀",
+    "name": "▶프라이빗 매칭💜갤러리◀",
     "region": "[부산] 부산진구",
     "phone": "010-5134-5149",
     "kakao": "kkj735",
@@ -64687,7 +64687,7 @@
     "kakao": "k1599",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=34240",
     "site": "all_final",
     "id": "ef13a621-decc-495d-9a66-061e6530e88e",
@@ -64985,7 +64985,7 @@
     "adNo": 2910
   },
   {
-    "name": "밀라노유흥주점(구ㅡ애플주인)",
+    "name": "밀라노프리미엄주점(구ㅡ애플주인)",
     "region": "영광군",
     "phone": "010-4113-5499",
     "kakao": "정보 없음",
@@ -65609,7 +65609,7 @@
     "adNo": 2928
   },
   {
-    "name": "일산행신찐고수익노래주점 신입경력 모두 환영",
+    "name": "일산행신찐엔터프라이즈노래주점 신입경력 모두 환영",
     "region": "고양시",
     "phone": "010-9142-3320",
     "kakao": "정보 없음",
@@ -66918,7 +66918,7 @@
     "kakao": "정보 없음",
     "telegram": "",
     "pay": "190000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=36857",
     "site": "all_final",
     "id": "de49a733-938a-4845-ad92-35367d3c0992",
@@ -67808,7 +67808,7 @@
     "adNo": 2993
   },
   {
-    "name": "여자친구 구합니다",
+    "name": "인재친구 구합니다",
     "region": "북구",
     "phone": "010-8443-8554",
     "kakao": "정보 없음",
@@ -68608,7 +68608,7 @@
     "adNo": 3017
   },
   {
-    "name": "평택 유흥 콜 일번 술강요X",
+    "name": "평택 프리미엄 콜 일번 술강요X",
     "region": "평택시",
     "phone": "010-4049-7452",
     "kakao": "정보 없음",
@@ -68972,7 +68972,7 @@
     "adNo": 3028
   },
   {
-    "name": "남양 20 45 일반 유흥 TOP",
+    "name": "남양 20 45 일반 프리미엄 TOP",
     "region": "화성시",
     "phone": "010-7272-9974",
     "kakao": "정보 없음",
@@ -69011,7 +69011,7 @@
     "kakao": "qwer5803",
     "telegram": "",
     "pay": "140000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=4267",
     "site": "all_final",
     "id": "4cb84cf7-77e9-4d87-bc30-8ee6579928e7",
@@ -69242,7 +69242,7 @@
     "adNo": 3036
   },
   {
-    "name": "홀릭에서뉴페고소득대우",
+    "name": "홀릭에서뉴페엔터프라이즈대우",
     "region": "광산구",
     "phone": "010-9771-6331",
     "kakao": "정보 없음",
@@ -69673,7 +69673,7 @@
     "adNo": 3049
   },
   {
-    "name": "수원 (병점 오다 1순위) 업계 유흥페이 노레빠",
+    "name": "수원 (병점 오다 1순위) 업계 프리미엄페이 노레빠",
     "region": "수원시",
     "phone": "010-6270-2025",
     "kakao": "정보 없음",
@@ -70406,7 +70406,7 @@
     "name": "♥대구1등복지♥",
     "region": "남구",
     "phone": "010-9660-6849",
-    "kakao": "onenight19",
+    "kakao": "oneb2b19",
     "telegram": "",
     "pay": "면접후결정",
     "workType": "마사지",
@@ -70782,7 +70782,7 @@
     "kakao": "정보 없음",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512241716258334",
     "site": "foxalba",
     "id": "8381b88b-8759-46c8-b5ee-36951999e503",
@@ -71045,7 +71045,7 @@
     "name": "♥대구최고페이♥",
     "region": "전지역",
     "phone": "010-4353-7372",
-    "kakao": "onenight19",
+    "kakao": "oneb2b19",
     "telegram": "",
     "pay": "면접후결정",
     "workType": "마사지",
@@ -71407,7 +71407,7 @@
     "adNo": 3101
   },
   {
-    "name": "★의정부쩜오★",
+    "name": "★의정부VIP 파트너스★",
     "region": "의정부시",
     "phone": "010-9082-7086",
     "kakao": "hsk7086",
@@ -72235,7 +72235,7 @@
     "kakao": "정보 없음",
     "telegram": "",
     "pay": "100000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=37183",
     "site": "all_final",
     "id": "dd727a33-c194-461d-a35e-33c1cdb320ca",
@@ -72977,7 +72977,7 @@
     "adNo": 3148
   },
   {
-    "name": "룸빠 직원 구합니다 고수익보장",
+    "name": "룸빠 직원 구합니다 엔터프라이즈보장",
     "region": "남구",
     "phone": "010-7464-0058",
     "kakao": "정보 없음",
@@ -74669,7 +74669,7 @@
     "kakao": "azaz0909",
     "telegram": "",
     "pay": "15000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://queenalba.net/guin_detail.php?num=28382",
     "site": "all_final",
     "id": "3b679f9c-70bb-4809-a8c5-22203e61d68c",
@@ -74904,7 +74904,7 @@
     "kakao": "정보 없음",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512241737014547",
     "site": "foxalba",
     "id": "4733b03d-e3a5-4bb8-bce6-0bb323a7cf9b",
@@ -75165,7 +75165,7 @@
     "adNo": 3214
   },
   {
-    "name": "확실히 고소득 보장 경기도 화성",
+    "name": "확실히 엔터프라이즈 보장 경기도 화성",
     "region": "화성시",
     "phone": "010-7121-8028",
     "kakao": "정보 없음",
@@ -75500,7 +75500,7 @@
     "kakao": "jpsk1111",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202512262204100607",
     "site": "foxalba",
     "id": "6f8e7a0b-f60f-494f-b3bd-c8e83dd58e49",
@@ -77292,7 +77292,7 @@
     "kakao": "wavezerg",
     "telegram": "",
     "pay": "900000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5527",
     "site": "all_final",
     "id": "12d9c003-e635-43a2-a38b-c9b897cbd814",
@@ -78175,7 +78175,7 @@
     "kakao": "love02love02",
     "telegram": "",
     "pay": "130000",
-    "workType": "룸알바-정보없음",
+    "workType": "프라이빗 매칭-정보없음",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5928",
     "site": "all_final",
     "id": "a2ed44f0-d159-46d4-adff-329ef7de220b",
@@ -78416,7 +78416,7 @@
     "kakao": "",
     "telegram": "",
     "pay": "120000",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "",
     "site": "all_final",
     "id": "f3a06a3b-286f-4122-9a6e-58ac427513b1",
@@ -78952,7 +78952,7 @@
     "kakao": "dnjstlr8895",
     "telegram": "qwer8280",
     "pay": "20000",
-    "workType": "룸알바-클럽",
+    "workType": "프라이빗 매칭-클럽",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2950",
     "site": "all_final",
     "id": "15da97d4-2a03-4f98-bb68-05370d843f90",
@@ -79398,7 +79398,7 @@
     "kakao": "gimm1",
     "telegram": "",
     "pay": "700000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5990",
     "site": "all_final",
     "id": "096544b7-1164-4de0-baf6-d0c5afbf64cf",
@@ -79603,7 +79603,7 @@
     "kakao": "soho8112",
     "telegram": "",
     "pay": "500000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1554",
     "site": "all_final",
     "id": "6444eaba-729b-4e34-aa87-71e59661547b",
@@ -79672,7 +79672,7 @@
     "kakao": "wjsaudwls",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸알바-정보없음",
+    "workType": "프라이빗 매칭-정보없음",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5931",
     "site": "all_final",
     "id": "16febaae-0434-49e6-89a9-dc032bedc7a9",
@@ -79980,7 +79980,7 @@
     "kakao": "Lee33",
     "telegram": "",
     "pay": "15000",
-    "workType": "텐프로/쩜오-쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스-VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2612",
     "site": "all_final",
     "id": "b4550568-1deb-400b-802d-fc4f51e4013b",
@@ -80014,7 +80014,7 @@
     "kakao": "hw2461",
     "telegram": "",
     "pay": "50000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5909",
     "site": "all_final",
     "id": "70b358bc-4d6b-4a87-87f6-0a530ed54116",
@@ -80048,7 +80048,7 @@
     "kakao": "kissme6508",
     "telegram": "",
     "pay": "150000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2875",
     "site": "all_final",
     "id": "2964242f-b7e5-48df-89fd-9c018cf9a07d",
@@ -80119,7 +80119,7 @@
     "kakao": "tlswlgnsdla4",
     "telegram": "",
     "pay": "200000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2168",
     "site": "all_final",
     "id": "e62d64db-342c-4094-b126-1e04261931ed",
@@ -80634,7 +80634,7 @@
     "kakao": "tlsgustlra",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=4775",
     "site": "all_final",
     "id": "b4fb9163-0a38-4458-b2fa-11244f2d8ea2",
@@ -80695,13 +80695,13 @@
     "adNo": 3376
   },
   {
-    "name": "쩜오 구구단 텐프로 텐카페 일프로",
+    "name": "VIP 파트너스 구구단 VIP 파트너스 텐카페 일프로",
     "region": "서울",
     "phone": "010-8999-9635",
     "kakao": "joonm0921",
     "telegram": "",
     "pay": "500000",
-    "workType": "텐프로/쩜오-쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스-VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5444",
     "site": "all_final",
     "id": "e2bef79e-02df-49ce-8dd3-aad4df53f8ec",
@@ -80779,7 +80779,7 @@
     "kakao": "cornrqhgl",
     "telegram": "",
     "pay": "130000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=736",
     "site": "all_final",
     "id": "a43920eb-0a85-4f9a-8809-e541db17fefe",
@@ -80813,7 +80813,7 @@
     "kakao": "wndrnjs0101",
     "telegram": "",
     "pay": "140000",
-    "workType": "룸알바-가라오케",
+    "workType": "프라이빗 매칭-가라오케",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1202",
     "site": "all_final",
     "id": "7e7f78c1-37b7-4fa1-a67a-26ae1df05b53",
@@ -80954,7 +80954,7 @@
     "kakao": "leecgil1",
     "telegram": "",
     "pay": "110000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5899",
     "site": "all_final",
     "id": "a9129c6c-d118-4e35-bc61-54e38f31c2ac",
@@ -81084,13 +81084,13 @@
     "adNo": 3387
   },
   {
-    "name": "대구 1등 룸알바",
+    "name": "대구 1등 프라이빗 매칭",
     "region": "대구",
     "phone": "010-2245-7213",
     "kakao": "ryboy3501",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=4282",
     "site": "all_final",
     "id": "833f3511-c2f2-40b9-ad41-7ed39425ac87",
@@ -81224,7 +81224,7 @@
     "kakao": "newlovesend",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5321",
     "site": "all_final",
     "id": "104cb019-b49d-4c31-a917-e1e460a45c5a",
@@ -81436,7 +81436,7 @@
     "kakao": "opshuiwon",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오-텐카페",
+    "workType": "VIP 파트너스/VIP 파트너스-텐카페",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5966",
     "site": "all_final",
     "id": "c49c26a7-c7d1-4975-9fd6-d7c9bf4bb954",
@@ -81505,7 +81505,7 @@
     "kakao": "win",
     "telegram": "",
     "pay": "130000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5883",
     "site": "all_final",
     "id": "86cad87c-92c3-41ec-b27b-85589929d1ba",
@@ -81533,7 +81533,7 @@
     "adNo": 3400
   },
   {
-    "name": "고수익알바",
+    "name": "엔터프라이즈알바",
     "region": "대구",
     "phone": "010-2195-7469",
     "kakao": "asdkuue",
@@ -81713,7 +81713,7 @@
     "kakao": "rladbwjd",
     "telegram": "",
     "pay": "140000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5908",
     "site": "all_final",
     "id": "018ff80c-c5cf-4b8c-9ff7-0e2d3b7f2fbe",
@@ -81749,7 +81749,7 @@
     "kakao": "gangjengsil",
     "telegram": "",
     "pay": "200000",
-    "workType": "텐프로/쩜오-텐카페",
+    "workType": "VIP 파트너스/VIP 파트너스-텐카페",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1392",
     "site": "all_final",
     "id": "f6908574-1641-4292-8c4b-15d80a10094b",
@@ -81817,7 +81817,7 @@
     "kakao": "kkh37290",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5960",
     "site": "all_final",
     "id": "8846e797-a040-4902-a75a-0df337ae2d20",
@@ -82056,7 +82056,7 @@
     "kakao": "altjr0716",
     "telegram": "",
     "pay": "60000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5492",
     "site": "all_final",
     "id": "c7ec074b-9ea6-46e0-9620-6af86d5a6237",
@@ -82090,7 +82090,7 @@
     "kakao": "wall1092",
     "telegram": "",
     "pay": "140000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=4421",
     "site": "all_final",
     "id": "979139a8-60a3-4e74-81ea-b7a795cc6b70",
@@ -82294,7 +82294,7 @@
     "kakao": "masaeng",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3141",
     "site": "all_final",
     "id": "0b848064-8f98-43e5-8416-0f9ca2be3bf3",
@@ -82394,7 +82394,7 @@
     "kakao": "bigbrogyu",
     "telegram": "janusrich",
     "pay": "20000",
-    "workType": "텐프로/쩜오-쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스-VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5997",
     "site": "all_final",
     "id": "baf9e582-35a1-4f02-8d30-9cfc6870ae55",
@@ -82422,7 +82422,7 @@
     "adNo": 3426
   },
   {
-    "name": "왕의여자",
+    "name": "왕의인재",
     "region": "경기",
     "phone": "010-4484-5256",
     "kakao": "smje444",
@@ -82670,7 +82670,7 @@
     "kakao": "wjdgusdpd",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5910",
     "site": "all_final",
     "id": "b756b8a2-d7b6-45c9-bc2d-8e85c32c388b",
@@ -82703,7 +82703,7 @@
     "kakao": "style1144",
     "telegram": "",
     "pay": "110000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5529",
     "site": "all_final",
     "id": "802baeb6-cc58-45d2-922b-9314ed7c6125",
@@ -82738,7 +82738,7 @@
     "kakao": "maloo9573",
     "telegram": "",
     "pay": "700000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5914",
     "site": "all_final",
     "id": "1cf7dd0b-84c9-4103-afe7-2aab20a32e4c",
@@ -82772,7 +82772,7 @@
     "kakao": "akqmffld",
     "telegram": "gogogo3175",
     "pay": "15000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=2103",
     "site": "all_final",
     "id": "699beb09-da46-4f22-a1be-847df87ff425",
@@ -82837,7 +82837,7 @@
     "adNo": 3438
   },
   {
-    "name": "⭐️퀸알바 추천⭐️",
+    "name": "⭐️전문 인재 추천⭐️",
     "region": "인천",
     "phone": "010-9632-9865",
     "kakao": "eonhak99",
@@ -82915,7 +82915,7 @@
     "kakao": "upso38",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸알바-정보없음",
+    "workType": "프라이빗 매칭-정보없음",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5077",
     "site": "all_final",
     "id": "6dc22807-7137-4d0a-9c2b-a64b1737599b",
@@ -83463,7 +83463,7 @@
     "kakao": "masaeng",
     "telegram": "",
     "pay": "15000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3140",
     "site": "all_final",
     "id": "f1673dc8-1585-4806-addc-64c795966efe",
@@ -83632,7 +83632,7 @@
     "kakao": "ryboy3501",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-클럽",
+    "workType": "프라이빗 매칭-클럽",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3878",
     "site": "all_final",
     "id": "ad570c0a-9231-4529-880f-bb881ec834f2",
@@ -83698,7 +83698,7 @@
     "kakao": "rlaxodud",
     "telegram": "",
     "pay": "50000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5919",
     "site": "all_final",
     "id": "36d422b8-cdbb-4412-b1c6-20c293f62219",
@@ -83733,7 +83733,7 @@
     "kakao": "gusxo20011",
     "telegram": "",
     "pay": "500000",
-    "workType": "룸알바-퍼블릭",
+    "workType": "프라이빗 매칭-퍼블릭",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5320",
     "site": "all_final",
     "id": "fe451a53-c730-4351-a49f-66151de631e4",
@@ -83834,7 +83834,7 @@
     "kakao": "ladylady00",
     "telegram": "",
     "pay": "10000",
-    "workType": "룸알바-클럽",
+    "workType": "프라이빗 매칭-클럽",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=1664",
     "site": "all_final",
     "id": "8a9aa68f-3ede-4ce1-8931-d9e4dd30c5ad",
@@ -83868,7 +83868,7 @@
     "kakao": "dakqn35",
     "telegram": "",
     "pay": "15000",
-    "workType": "룸알바-정보없음",
+    "workType": "프라이빗 매칭-정보없음",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3556",
     "site": "all_final",
     "id": "957ab086-cdcb-4e12-a77c-3035d324e3fc",
@@ -84009,7 +84009,7 @@
     "kakao": "Hj112a",
     "telegram": "",
     "pay": "150000",
-    "workType": "텐프로/쩜오-쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스-VIP 파트너스",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5975",
     "site": "all_final",
     "id": "34f03819-bdd1-49aa-87d3-9e2001a0df72",
@@ -84146,7 +84146,7 @@
     "kakao": "qlsjtm5000",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5367",
     "site": "all_final",
     "id": "a0c644d1-add8-468a-8968-5735826a2216",
@@ -84215,7 +84215,7 @@
     "kakao": "ichoco",
     "telegram": "",
     "pay": "140000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5890",
     "site": "all_final",
     "id": "2f98c9f7-25e2-42e9-beb8-5ac611090cd7",
@@ -84318,7 +84318,7 @@
     "kakao": "정보없음",
     "telegram": "",
     "pay": "60000",
-    "workType": "룸알바-정보없음",
+    "workType": "프라이빗 매칭-정보없음",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3779",
     "site": "all_final",
     "id": "5b8341ad-3388-4db8-adda-2435f2f933bc",
@@ -84352,7 +84352,7 @@
     "kakao": "oasislove88",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5729",
     "site": "all_final",
     "id": "34e122ff-d228-46b3-8fef-9362a2afcef2",
@@ -84385,7 +84385,7 @@
     "kakao": "Whdndgml830",
     "telegram": "chan1505",
     "pay": "15000",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=3674",
     "site": "all_final",
     "id": "1785b460-8ad0-4291-a238-1bf98d8f577a",
@@ -84489,7 +84489,7 @@
     "kakao": "dldbcjf22",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "룸알바-룸싸롱",
+    "workType": "프라이빗 매칭-룸싸롱",
     "url": "https://ladyalba.co.kr/guin_detail.php?num=5776",
     "site": "all_final",
     "id": "5705e998-1729-406a-bbb4-87c9f25fee00",
@@ -84720,7 +84720,7 @@
     "adNo": 3493
   },
   {
-    "name": "유흥 헌터스",
+    "name": "프리미엄 헌터스",
     "region": "서울- 전체",
     "phone": "010-5791-6974",
     "kakao": "alstjr100",
@@ -86173,7 +86173,7 @@
     "kakao": "jyh6580",
     "telegram": "",
     "pay": "100000",
-    "workType": "룸싸롱텐프로/쩜오노래/단란주점BAR",
+    "workType": "룸싸롱VIP 파트너스/VIP 파트너스노래/단란주점BAR",
     "url": "https://queenalba.net/guin_detail.php?num=36360",
     "site": "all_final",
     "id": "7cfafb3c-7c3d-44cc-88f7-1898622f2f8a",
@@ -86340,7 +86340,7 @@
     "adNo": 3540
   },
   {
-    "name": "강남 유흥1위업소",
+    "name": "강남 프리미엄1위업소",
     "region": "서울- 강남구",
     "phone": "010-8209-6155",
     "kakao": "sillu1212",
@@ -88149,7 +88149,7 @@
     "adNo": 3593
   },
   {
-    "name": "❤️쩜오레이블 밀빵전문 손님1등팀❤️",
+    "name": "❤️VIP 파트너스레이블 밀빵전문 손님1등팀❤️",
     "region": "서울- 강남구",
     "phone": "010-8282-6922",
     "kakao": "Ten8282",
@@ -90292,7 +90292,7 @@
     "adNo": 3656
   },
   {
-    "name": "유흥왕",
+    "name": "프리미엄왕",
     "region": "경기- 고양시",
     "phone": "010-2447-7424",
     "kakao": "a000777z",
@@ -90946,7 +90946,7 @@
     "adNo": 3675
   },
   {
-    "name": "유흥과함께춤을",
+    "name": "프리미엄과함께춤을",
     "region": "서울- 전체",
     "phone": "010-8224-9415",
     "kakao": "shwlsrn007",
@@ -91560,7 +91560,7 @@
     "adNo": 3693
   },
   {
-    "name": "대구1등 고수익",
+    "name": "대구1등 엔터프라이즈",
     "region": "대구- 수성구",
     "phone": "010-7713-3006",
     "kakao": "htr77",
@@ -93976,7 +93976,7 @@
     "adNo": 3764
   },
   {
-    "name": "쩜오썸데이승준",
+    "name": "VIP 파트너스썸데이승준",
     "region": "서울- 강남구",
     "phone": "010-2435-9492",
     "kakao": "k24359492",
@@ -94928,7 +94928,7 @@
     "adNo": 3792
   },
   {
-    "name": "✅강남호빠보스턴해태✅강남플러팅강남어게인호빠쩜오기타우대",
+    "name": "✅강남호빠보스턴해태✅강남플러팅강남어게인호빠VIP 파트너스기타우대",
     "region": "서울- 강남구",
     "phone": "010-8079-2432",
     "kakao": "rrene8079",
@@ -95574,7 +95574,7 @@
     "adNo": 3811
   },
   {
-    "name": "┏▶퀸알바 인증 BEST 남실장",
+    "name": "┏▶전문 인재 인증 BEST 남실장",
     "region": "서울- 강남구",
     "phone": "010-3920-4693",
     "kakao": "DOREMISODA",
@@ -96191,7 +96191,7 @@
     "kakao": "shin7997",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "노래/단란주점룸싸롱텐프로/쩜오BAR",
+    "workType": "노래/단란주점룸싸롱VIP 파트너스/VIP 파트너스BAR",
     "url": "https://www.badalba.com/job2/biz_view.htm?idx=167954",
     "site": "all_final",
     "id": "f51ebb93-fa6d-46e2-a8ae-4628ebb24530",
@@ -96225,7 +96225,7 @@
     "kakao": "",
     "telegram": "songe1004",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.badalba.com/job2/biz_view.htm?idx=127968",
     "site": "all_final",
     "id": "bd5640ad-7012-40c2-9da5-68b4b1e06f28",
@@ -96360,7 +96360,7 @@
     "kakao": "",
     "telegram": "ccl2536",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.badalba.com/job2/biz_view.htm?idx=127967",
     "site": "all_final",
     "id": "d9c87969-f0c6-4995-9b23-eba9544cf67b",
@@ -96393,7 +96393,7 @@
     "kakao": "a7495a5362",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오룸싸롱노래/단란주점BAR",
+    "workType": "VIP 파트너스/VIP 파트너스룸싸롱노래/단란주점BAR",
     "url": "https://www.badalba.com/job2/biz_view.htm?idx=155916",
     "site": "all_final",
     "id": "9b02cd5b-b9e1-4af4-afdc-43a07ff0ab77",
@@ -96600,7 +96600,7 @@
     "kakao": "tong8888",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=201604011438235542",
     "site": "foxalba",
     "id": "40b61157-db56-4f38-95db-1ac5439ef74a",
@@ -100404,7 +100404,7 @@
     "adNo": 3958
   },
   {
-    "name": "서초일반퍼블릭6T이상편안한룸알바90분",
+    "name": "서초일반퍼블릭6T이상편안한프라이빗 매칭90분",
     "region": "서초구",
     "phone": "016-5720-1093",
     "kakao": "dasom2nd",
@@ -100929,7 +100929,7 @@
     "kakao": "geo9025",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=202511171338054413",
     "site": "foxalba",
     "id": "03472836-4c6a-4a36-8a67-618edff0f866",
@@ -101083,7 +101083,7 @@
     "adNo": 3979
   },
   {
-    "name": "여자실장 기본10개",
+    "name": "인재실장 기본10개",
     "region": "송파구",
     "phone": "010-1418-0104",
     "kakao": "MYME4444",
@@ -102372,7 +102372,7 @@
     "kakao": "ddddd8888",
     "telegram": "",
     "pay": "면접후결정",
-    "workType": "텐프로/쩜오",
+    "workType": "VIP 파트너스/VIP 파트너스",
     "url": "https://www.foxalba.com/offer/offer_content.asp?idx=201601312154130150",
     "site": "foxalba",
     "id": "b9420ecc-6d66-435e-ace5-54c5a0605699",

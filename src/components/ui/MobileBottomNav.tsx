@@ -133,7 +133,7 @@ const MobileBottomNavContent = () => {
                                         onClick={handleMainBtnClick}
                                         className="relative -top-5 flex flex-col items-center justify-center cursor-pointer"
                                     >
-                                        <div className="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 shadow-lg shadow-pink-500/30 flex items-center justify-center hover:scale-105 transition-transform">
+                                        <div className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-rose-500 shadow-lg shadow-blue-500/30 flex items-center justify-center hover:scale-105 transition-transform">
                                             {item.icon}
                                         </div>
                                         <span className={`text-[10px] font-bold mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -174,7 +174,7 @@ const MobileBottomNavContent = () => {
                                     href={item.href}
                                     className={`flex flex-col items-center justify-center gap-1 py-1 ${isActive ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-500' : 'text-gray-400')}`}
                                 >
-                                    <div className={isActive ? 'text-pink-500' : ''}>
+                                    <div className={isActive ? 'text-blue-500' : ''}>
                                         {item.icon}
                                     </div>
                                     <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>

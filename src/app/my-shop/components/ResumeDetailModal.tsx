@@ -33,7 +33,7 @@ export const ResumeDetailModal = ({ resume, onClose }: { resume: any, onClose: (
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 md:p-8 bg-gradient-to-r from-pink-500 to-rose-600 relative text-white">
+                <div className="p-6 md:p-8 bg-gradient-to-r from-blue-500 to-rose-600 relative text-white">
                     <button onClick={onClose} className="absolute top-5 right-6 p-2 hover:bg-white/20 rounded-full transition">
                         <X size={24} />
                     </button>
@@ -74,7 +74,7 @@ export const ResumeDetailModal = ({ resume, onClose }: { resume: any, onClose: (
                                 <div className="text-[10px] font-black text-gray-400 mb-0.5 flex items-center gap-1">
                                     희망 급여
                                 </div>
-                                <div className={`text-sm font-black ${resume.pay_amount > 0 ? 'text-pink-600' : 'text-gray-400'}`}>
+                                <div className={`text-sm font-black ${resume.pay_amount > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
                                     {(resume.pay_amount && Number(resume.pay_amount) > 0)
                                         ? `${Number(resume.pay_amount).toLocaleString()}원`
                                         : '급여협의'}
@@ -94,7 +94,7 @@ export const ResumeDetailModal = ({ resume, onClose }: { resume: any, onClose: (
                     {/* Self Intro */}
                     <div className="space-y-3">
                         <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
-                            <span className="w-1 h-4 bg-pink-500 rounded-full"></span>
+                            <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
                             자기소개
                         </h3>
                         <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 text-gray-700 text-sm font-medium leading-relaxed whitespace-pre-wrap min-h-[150px]">
@@ -119,7 +119,7 @@ export const ResumeDetailModal = ({ resume, onClose }: { resume: any, onClose: (
                                     alert(`${resume.contact_method} 정보: ${resume.contact_value}`);
                                 }
                             }}
-                            className="flex-[2] bg-pink-600 text-white py-3 rounded-xl font-black text-[11px] shadow-lg shadow-pink-200 hover:bg-pink-700 transition"
+                            className="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-black text-[11px] shadow-lg shadow-blue-200 hover:bg-blue-700 transition"
                         >
                             {resume.contact_method === 'phone' ? '전화 걸기' : `${resume.contact_method} 연락하기`}
                         </button>

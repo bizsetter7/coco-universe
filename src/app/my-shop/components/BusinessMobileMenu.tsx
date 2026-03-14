@@ -21,8 +21,8 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
             <div className="absolute inset-0 bg-black/50" onClick={onClose} />
             <div className={`relative w-72 h-full shadow-2xl p-6 transform animate-in slide-in-from-right duration-300 ${brand.theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
                 <div className="flex justify-between items-center mb-6">
-                    <span className="text-[11px] font-black text-pink-500 uppercase tracking-widest">Menu</span>
-                    <button onClick={onClose} className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} hover:text-pink-500`}>
+                    <span className="text-[11px] font-black text-blue-500 uppercase tracking-widest">Menu</span>
+                    <button onClick={onClose} className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} hover:text-blue-500`}>
                         닫기
                     </button>
                 </div>
@@ -38,34 +38,34 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                 <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     {userType === 'individual' ? (
                         <>
-                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer text-pink-500 bg-pink-50/20">
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer text-blue-500 bg-blue-50/20">
                                 <Home size={18} /> 마이 대시보드
                             </div>
-                            <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 이력서 리스트
                             </div>
-                            <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 채용정보 스크랩
                             </div>
-                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Settings size={18} /> 회원 정보 수정
                             </div>
                         </>
                     ) : (
                         <>
-                            <div onClick={() => { setView('ongoing-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('ongoing-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 진행중인 공고
                             </div>
-                            <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <LogOut size={18} /> 마감된 공고
                             </div>
-                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <CreditCard size={18} /> 유료 결제 내역
                             </div>
-                            <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <User size={18} /> 지원자 관리
                             </div>
-                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-pink-50 hover:text-pink-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Settings size={18} /> 회원 정보 수정
                             </div>
                         </>

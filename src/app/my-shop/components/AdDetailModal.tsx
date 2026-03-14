@@ -156,7 +156,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         {/* Right: Keywords (Grid 3 cols) */}
                         <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
                             {norm.paySuffixes.slice(0, 6).map((kw: string, idx: number) => (
-                                <span key={idx} className="px-1 py-1.5 bg-pink-50 text-pink-500 text-[10px] font-black rounded-lg border border-pink-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
+                                <span key={idx} className="px-1 py-1.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-lg border border-blue-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                     {kw}
                                 </span>
                             ))}
@@ -169,7 +169,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                     {/* 상세 모집내용 */}
                     <div className="space-y-3">
                         <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
-                            <span className="w-1 h-4 bg-pink-500 rounded-full"></span>
+                            <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
                             상세 모집내용
                         </h3>
                         {/* Using dangeroulsySetHtml for editor content compatibility */}
@@ -250,7 +250,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                                     alert('등록된 연락처가 없습니다.');
                                 }
                             }}
-                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition active:scale-[0.98] shadow-lg shadow-pink-200"
+                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition active:scale-[0.98] shadow-lg shadow-blue-200"
                         >
                             <Phone size={20} className="fill-white/20 stroke-current" />
                             <span className="text-xs font-black">전화/문자 지원하기</span>

@@ -68,14 +68,14 @@ export function AdminStatsOverview({ stats, userStats, adStats, setActiveTab }: 
 function StatCard({ title, value, trend, icon, color, onClick }: { title: string, value: string, trend: string, icon: React.ReactNode, color: 'blue' | 'pink' | 'slate' | 'indigo', onClick?: () => void }) {
     const colorStyles = {
         blue: 'from-blue-600/10 to-blue-600/5 text-blue-600 border-blue-100/50 shadow-blue-500/5',
-        pink: 'from-pink-600/10 to-pink-600/5 text-pink-600 border-pink-100/50 shadow-pink-500/5',
+        pink: 'from-blue-600/10 to-blue-600/5 text-blue-600 border-blue-100/50 shadow-blue-500/5',
         slate: 'from-slate-600/10 to-slate-600/5 text-slate-600 border-slate-200/50 shadow-slate-500/5',
         indigo: 'from-indigo-600/10 to-indigo-600/5 text-indigo-600 border-indigo-100/50 shadow-indigo-500/5'
     };
 
     const iconBg = {
         blue: 'bg-blue-600 text-white shadow-blue-500/30',
-        pink: 'bg-pink-600 text-white shadow-pink-500/30',
+        pink: 'bg-blue-600 text-white shadow-blue-500/30',
         slate: 'bg-slate-800 text-white shadow-slate-500/30',
         indigo: 'bg-indigo-600 text-white shadow-indigo-500/30'
     };
@@ -121,7 +121,7 @@ function StatCard({ title, value, trend, icon, color, onClick }: { title: string
             </div>
 
             {/* Subtle Bottom Glow on Hover */}
-            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-30 transition-opacity ${color === 'blue' ? 'text-blue-500' : color === 'pink' ? 'text-pink-500' : color === 'indigo' ? 'text-indigo-500' : 'text-slate-500'}`}></div>
+            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-30 transition-opacity ${color === 'blue' ? 'text-blue-500' : color === 'pink' ? 'text-blue-500' : color === 'indigo' ? 'text-indigo-500' : 'text-slate-500'}`}></div>
         </div>
     );
 }

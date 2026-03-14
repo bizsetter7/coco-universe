@@ -30,7 +30,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
     return (
         <div className={`max-w-4xl mx-auto p-3 md:p-10 rounded-[24px] md:rounded-[32px] shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
             <h2 className={`text-lg md:text-2xl font-black mb-3 md:mb-10 pb-3 md:pb-5 border-b flex items-center gap-2 md:gap-3 ${brand.theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-950 border-gray-100'}`}>
-                <span className="w-2 h-8 bg-pink-500 rounded-full hidden md:block"></span>
+                <span className="w-2 h-8 bg-blue-500 rounded-full hidden md:block"></span>
                 개인 회원 정보 수정
             </h2>
 
@@ -55,7 +55,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                             type="text"
                             value={formData.nickname}
                             onChange={(e) => handleChange('nickname', e.target.value)}
-                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-950 focus:border-pink-500'}`}
+                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-950 focus:border-blue-500'}`}
                         />
                     </div>
                     <div>
@@ -64,7 +64,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                             type="email"
                             value={formData.email}
                             onChange={(e) => handleChange('email', e.target.value)}
-                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-pink-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-pink-500' : 'bg-white border-gray-200 text-gray-950 focus:border-pink-500'}`}
+                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-950 focus:border-blue-500'}`}
                         />
                     </div>
                 </div>
@@ -98,7 +98,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                     <button onClick={() => setView('dashboard')} className={`order-2 sm:order-1 px-8 py-4 rounded-2xl font-black transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                         취소
                     </button>
-                    <button onClick={handleSave} className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-pink-500 text-white font-black hover:bg-pink-600 shadow-xl shadow-pink-500/20 transition active:scale-95">
+                    <button onClick={handleSave} className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-blue-500 text-white font-black hover:bg-blue-600 shadow-xl shadow-blue-500/20 transition active:scale-95">
                         정보 수정하기
                     </button>
                 </div>

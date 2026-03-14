@@ -30,7 +30,7 @@ export default function CardNoticePage() {
                     {/* Visual Banner Part */}
                     <div className="p-8 pb-4 text-center">
                         <div
-                            className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-6"
+                            className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6"
                             style={{ color: pinkColor }}
                         >
                             <CreditCard size={40} strokeWidth={1.5} />
@@ -84,7 +84,7 @@ export default function CardNoticePage() {
                                 </p>
                                 <p className="flex gap-2">
                                     <span className="shrink-0">📌</span>
-                                    <span>카드사 측 유흥 업종 카드 결제 등록 정책에 따른 조치이오니 사장님들의 넓은 양해 부탁드립니다.</span>
+                                    <span>카드사 측 프리미엄 업종 카드 결제 등록 정책에 따른 조치이오니 사장님들의 넓은 양해 부탁드립니다.</span>
                                 </p>
                                 <p className="flex gap-2">
                                     <span className="shrink-0">📌</span>

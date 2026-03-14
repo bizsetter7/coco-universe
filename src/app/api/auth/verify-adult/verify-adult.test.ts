@@ -36,7 +36,7 @@ describe('Adult Verification API (Logic Check)', () => {
                 status: 'VERIFIED',
                 verifiedCustomer: {
                     birthDate: '1990-05-20',
-                    name: '김성인'
+                    name: '김기업전용'
                 }
             })
         });
