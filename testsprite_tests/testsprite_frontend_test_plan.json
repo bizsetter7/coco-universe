@@ -1,316 +1,243 @@
 [
   {
     "id": "TC001",
-    "title": "Submit inquiry successfully from header contact button",
-    "description": "Verifies the contact modal opens from the header/hero and a fully completed form can be submitted to show a success message.",
-    "category": "B2B Inquiry / Contact Modal",
+    "title": "Submit inquiry form successfully from /audit",
+    "description": "Verifies the inquiry modal opens from the /audit landing page and can be submitted with all required fields to show the success message.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"홍길동\" into the \"name\" field"
+        "description": "Type \"홍길동\" into the name field"
       },
       {
         "type": "action",
-        "description": "Type \"테스트상사\" into the \"company\" field"
+        "description": "Type \"테스트컴퍼니\" into the company field"
       },
       {
         "type": "action",
-        "description": "Type \"qa.contact@example.com\" into the \"email\" field"
+        "description": "Type \"010-1234-5678\" into the contact field"
       },
       {
         "type": "action",
-        "description": "Type \"도입 관련 문의드립니다.\" into the \"message\" field"
+        "description": "Type \"문의 드립니다. 데모 및 도입 절차를 알고 싶습니다.\" into the message field"
       },
       {
         "type": "action",
-        "description": "Click the \"Submit\" button"
+        "description": "Click \"Submit\" on the inquiry form"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"내용 확인 완료\" is visible"
+        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Submit inquiry successfully and verify alternate success message is acceptable",
-    "description": "Verifies that after successful submission the UI may show an alternate acceptable success message indicating follow-up.",
-    "category": "B2B Inquiry / Contact Modal",
-    "priority": "Medium",
+    "title": "Contact field required validation then successful submit",
+    "description": "Verifies submitting the inquiry form with missing contact shows a validation error, then succeeds after entering contact info.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"김테스터\" into the \"name\" field"
+        "description": "Type \"홍길동\" into the name field"
       },
       {
         "type": "action",
-        "description": "Type \"B2B감사팀\" into the \"company\" field"
+        "description": "Type \"테스트컴퍼니\" into the company field"
       },
       {
         "type": "action",
-        "description": "Type \"tester.b2b@example.com\" into the \"email\" field"
+        "description": "Type \"문의 내용입니다.\" into the message field"
       },
       {
         "type": "action",
-        "description": "Type \"파트너 연동 및 심사 대응 관련 상세 안내 요청\" into the \"message\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Submit\" button"
+        "description": "Click \"Submit\" on the inquiry form"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정\" is visible"
+        "description": "Verify text \"contact\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"010-0000-0000\" into the contact field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Submit\" on the inquiry form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
       }
     ]
   },
   {
     "id": "TC003",
-    "title": "Email required validation: blank email shows error then success after correction",
-    "description": "Verifies required-email validation triggers on submit and can be resolved by providing a valid email to complete submission.",
-    "category": "B2B Inquiry / Contact Modal",
-    "priority": "High",
+    "title": "Close inquiry modal without submitting",
+    "description": "Verifies the inquiry modal can be dismissed and the landing page remains usable without submitting the form.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"이메일누락\" into the \"name\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"누락테스트주식회사\" into the \"company\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"문의 메시지입니다.\" into the \"message\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Submit\" button"
+        "description": "Click \"Close\" on the inquiry modal"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"email\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"valid.user@example.com\" into the \"email\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Submit\" button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"내용 확인 완료\" is visible"
+        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is not visible"
       }
     ]
   },
   {
     "id": "TC004",
-    "title": "Email format validation: invalid email shows error then success after correction",
-    "description": "Verifies invalid email format is rejected and the form can be submitted after providing a correctly formatted email.",
-    "category": "B2B Inquiry / Contact Modal",
-    "priority": "High",
+    "title": "Cancel/escape out of inquiry modal (keyboard)",
+    "description": "Verifies the inquiry modal can be closed via keyboard escape without completing the form.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
+    "priority": "Low",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"형식테스트\" into the \"name\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"형식검증회사\" into the \"company\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"invalid-email\" into the \"email\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"이메일 형식 검증 테스트\" into the \"message\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Submit\" button"
+        "description": "Press \"Escape\""
       },
       {
         "type": "assertion",
-        "description": "Verify text \"invalid\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"format.ok@example.com\" into the \"email\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Submit\" button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"내용 확인 완료\" is visible"
+        "description": "Verify text \"도입 문의하기\" is not visible"
       }
     ]
   },
   {
     "id": "TC005",
-    "title": "Close contact modal without submitting",
-    "description": "Verifies the modal can be closed via its Close control and no success state is shown afterward.",
-    "category": "B2B Inquiry / Contact Modal",
+    "title": "Prevent submission when multiple required fields are empty",
+    "description": "Verifies the inquiry form does not submit and shows visible validation feedback when multiple required fields are missing.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Click the \"Close\" button on the modal"
+        "description": "Click \"Submit\" on the inquiry form"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is not visible"
+        "description": "Verify text \"required\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"내용 확인 완료\" is not visible"
+        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is not visible"
       }
     ]
   },
   {
     "id": "TC006",
-    "title": "Open modal, partially fill, then close and confirm it is dismissed",
-    "description": "Verifies the modal dismisses correctly even after the user has started entering data.",
-    "category": "B2B Inquiry / Contact Modal",
-    "priority": "Low",
+    "title": "Inquiry form accepts email-style contact and submits",
+    "description": "Verifies the contact field accepts an email-format value and the form can still submit successfully.",
+    "category": "B2B Landing Interaction (Inquiry Form)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to \"/audit\""
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
+        "description": "Click \"도입 문의하기\""
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
+        "description": "Verify text \"도입 문의하기\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"부분입력\" into the \"name\" field"
+        "description": "Type \"김테스트\" into the name field"
       },
       {
         "type": "action",
-        "description": "Type \"partial@example.com\" into the \"email\" field"
+        "description": "Type \"Example B2B\" into the company field"
       },
       {
         "type": "action",
-        "description": "Click the \"Close\" button on the modal"
+        "description": "Type \"test.user@example.com\" into the contact field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"이메일로 연락 부탁드립니다.\" into the message field"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Submit\" on the inquiry form"
       },
       {
         "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is not visible"
+        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Reopen modal after closing and verify it opens again normally",
-    "description": "Verifies the contact modal can be opened, closed, and opened again without getting stuck.",
-    "category": "B2B Inquiry / Contact Modal",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click the \"Close\" button on the modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is not visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\" in the header/hero area"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Contact/Inquiry modal\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC008",
-    "title": "Fallback path when Partner Login button shows no visible response",
-    "description": "Verifies that when the header Partner Login button produces no modal, the user can still open the contact modal via the fallback CTA.",
-    "category": "Partner Login (header button)",
+    "title": "Partner Login button is visible on the /audit header",
+    "description": "Verifies the Partner Login (파트너 로그인) affordance is present and visible on the audit landing page header.",
+    "category": "Partner Login (Header)",
     "priority": "High",
     "steps": [
       {
@@ -322,8 +249,302 @@
         "description": "Verify text \"파트너 로그인\" is visible"
       },
       {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Clicking Partner Login does not show a login modal (known limitation behavior)",
+    "description": "Verifies that clicking the Partner Login button does not render a login modal UI and no visible login fields appear.",
+    "category": "Partner Login (Header)",
+    "priority": "High",
+    "steps": [
+      {
         "type": "action",
-        "description": "Click on \"파트너 로그인\""
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "action",
+        "description": "Click \"파트너 로그인\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Email\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Password\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Repeated clicks on Partner Login do not change visible UI state",
+    "description": "Verifies repeated interaction with the Partner Login button does not produce any visible modal, message, or navigation change.",
+    "category": "Partner Login (Header)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "action",
+        "description": "Click \"파트너 로그인\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"파트너 로그인\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"파트너 로그인\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "No partner login form fields are present on initial page load",
+    "description": "Verifies the audit page does not show partner login email/password fields by default before any interaction.",
+    "category": "Partner Login (Header)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Email\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Password\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "No success/redirect indicators occur after clicking Partner Login",
+    "description": "Verifies there is no visible success message or redirect to a partner area after clicking Partner Login (since modal does not exist).",
+    "category": "Partner Login (Header)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "action",
+        "description": "Click \"파트너 로그인\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Success\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"로그인\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Placeholder header navigation link does not change URL",
+    "description": "Verifies that clicking a placeholder header navigation link on /audit does not navigate away from the page.",
+    "category": "Navigation Links (Placeholders)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "action",
+        "description": "Click a header navigation link (for example, a top navigation item in the header)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"Audit\""
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Placeholder navigation click provides predictable no-op feedback (if any)",
+    "description": "Verifies that clicking a placeholder header navigation link results in either a visible placeholder notice or no visible change while staying on /audit.",
+    "category": "Navigation Links (Placeholders)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/audit\""
+      },
+      {
+        "type": "action",
+        "description": "Click a header navigation link (choose a different link than the previous test, if multiple are visible)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Placeholder\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"B2B Audit\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Repeated clicks on placeholder navigation link remain stable",
+    "description": "Verifies that repeated clicking on a placeholder link does not cause navigation or visible errors.",
+    "category": "Navigation Links (Placeholders)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"header\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click a header navigation link (placeholder)"
+      },
+      {
+        "type": "action",
+        "description": "Click the same header navigation link (placeholder) again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Not Found\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Different placeholder navigation links all behave as no-ops",
+    "description": "Verifies that multiple header navigation links (if present) do not navigate away from /audit when clicked.",
+    "category": "Navigation Links (Placeholders)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/audit\""
+      },
+      {
+        "type": "action",
+        "description": "Click the first visible header navigation link (placeholder)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "action",
+        "description": "Click a second visible header navigation link (placeholder)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"B2B Audit\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Attempted navigation expectation is unmet and should be identifiable as placeholder behavior",
+    "description": "Verifies that after clicking a placeholder link, the user can clearly tell no navigation happened (URL unchanged and audit content still visible).",
+    "category": "Navigation Links (Placeholders)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"B2B Audit\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click a header navigation link that appears intended to navigate (placeholder)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"B2B Audit\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Loading\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Audit page loads and shows audit landing UI shell",
+    "description": "Verifies the /audit route loads and key audit landing content is visible to the user.",
+    "category": "Audit Mode Cloaking & Brand Switch",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"Audit\""
       },
       {
         "type": "assertion",
@@ -331,7 +552,20 @@
       },
       {
         "type": "assertion",
-        "description": "Verify text \"email\" is not visible"
+        "description": "Verify text \"Partner Login\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Inquiry modal opens from '도입 문의하기' and can be closed",
+    "description": "Verifies the inquiry modal can be opened from the audit page and dismissed by the user.",
+    "category": "Audit Mode Cloaking & Brand Switch",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
       },
       {
         "type": "action",
@@ -339,15 +573,60 @@
       },
       {
         "type": "assertion",
-        "description": "Verify element \"contact modal\" is visible"
+        "description": "Verify element \"Inquiry\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Press \"Escape\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Inquiry\" is not visible"
       }
     ]
   },
   {
-    "id": "TC009",
-    "title": "Repeated clicks on Partner Login still do not open a modal (known broken behavior)",
-    "description": "Validates the current broken behavior: clicking Partner Login multiple times does not display a login modal.",
-    "category": "Partner Login (header button)",
+    "id": "TC019",
+    "title": "Submit inquiry in modal and see simulated success message",
+    "description": "Verifies submitting the inquiry form shows a simulated success confirmation on the UI.",
+    "category": "Audit Mode Cloaking & Brand Switch",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"도입 문의하기\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Test Company\" into the \"Company\" field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"tester@example.com\" into the \"Email\" field"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Submit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Success\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"문의\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Inquiry form validation: attempt submit with required fields empty",
+    "description": "Verifies the inquiry form prevents submission and shows a visible validation message when required fields are missing.",
+    "category": "Audit Mode Cloaking & Brand Switch",
     "priority": "Medium",
     "steps": [
       {
@@ -356,85 +635,60 @@
       },
       {
         "type": "action",
-        "description": "Click on \"파트너 로그인\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"email\" is not visible"
+        "description": "Click on \"도입 문의하기\""
       },
       {
         "type": "action",
-        "description": "Click on \"파트너 로그인\""
+        "description": "Click on \"Submit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Inquiry\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Audit-mode sanitization: page does not display sensitive keywords (UI check)",
+    "description": "Verifies visible UI copy on /audit does not expose common sensitive keywords during audit-mode presentation.",
+    "category": "Audit Mode Cloaking & Brand Switch",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /audit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/audit\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"API Key\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"SECRET\" is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"token\" is not visible"
       },
       {
         "type": "assertion",
         "description": "Verify text \"password\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"partner login modal\" is not visible"
       }
     ]
   },
   {
-    "id": "TC010",
-    "title": "Fallback still works after multiple failed Partner Login attempts",
-    "description": "Ensures the contact inquiry modal can be opened even after multiple Partner Login clicks with no visible UI.",
-    "category": "Partner Login (header button)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"파트너 로그인\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"파트너 로그인\""
-      },
-      {
-        "type": "action",
-        "description": "Scroll to \"도입 문의하기\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"contact modal\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC011",
-    "title": "Partner Login button is visible on initial load of /audit",
-    "description": "Confirms the header contains the Partner Login entry point for auditors to attempt authentication.",
-    "category": "Partner Login (header button)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"파트너 로그인\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"header\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC012",
-    "title": "Partner Login click does not navigate away from /audit",
-    "description": "Verifies that clicking Partner Login does not trigger a route change (no navigation links should be relied on).",
-    "category": "Partner Login (header button)",
+    "id": "TC022",
+    "title": "Changing mirror profiles updates the mirrored width label and keeps content visible",
+    "description": "Validates that switching between mirror profiles updates the displayed width/status and does not hide the GO CTA.",
+    "category": "Mobile 1:1 Mirroring Simulator (QA)",
     "priority": "Medium",
     "steps": [
       {
@@ -442,181 +696,24 @@
         "description": "Navigate to /audit"
       },
       {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "type": "action",
+        "description": "Click on \"Open mirroring simulator\" control"
       },
       {
         "type": "action",
-        "description": "Click on \"파트너 로그인\""
+        "description": "Select \"S21 450px\" from the device/profile dropdown"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"partner login modal\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC013",
-    "title": "Audit page loads and header navigation links are visible",
-    "description": "Verifies the /audit landing page renders and header navigation links are present to interact with.",
-    "category": "Header Navigation Links (placeholders)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"the page header\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"a header navigation link\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC014",
-    "title": "Clicking a header navigation link does not navigate away (placeholder behavior)",
-    "description": "Verifies a header navigation link click does not change route when the link is a placeholder.",
-    "category": "Header Navigation Links (placeholders)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify text \"450px\" is visible in the mirroring simulator status/label"
       },
       {
         "type": "action",
-        "description": "Click on a header navigation link (for example, the first link in the header navigation)"
+        "description": "Select \"S21 450px\" from the device/profile dropdown"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"the audit page main content area\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC015",
-    "title": "Repeated clicks on header navigation links do not change UI state unexpectedly",
-    "description": "Verifies placeholder links do not trigger visible navigation, page reload, or unexpected UI changes after multiple interactions.",
-    "category": "Header Navigation Links (placeholders)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click on a header navigation link (for example, the first link in the header navigation)"
-      },
-      {
-        "type": "action",
-        "description": "Click on the same header navigation link again"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"the page header\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"the audit page main content area\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC016",
-    "title": "Clicking different header navigation links still keeps the user on /audit",
-    "description": "Verifies each placeholder header link behaves consistently and does not navigate away from the audit page.",
-    "category": "Header Navigation Links (placeholders)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click on a header navigation link (choose one link)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click on a different header navigation link (choose another link)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"the audit page main content area\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC017",
-    "title": "Header navigation click does not show an inline placeholder message (current behavior)",
-    "description": "Verifies that clicking a placeholder navigation link does not display a visible fallback/placeholder message (until implemented).",
-    "category": "Header Navigation Links (placeholders)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click on a header navigation link (for example, the first link in the header navigation)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Coming soon\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Not available\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Placeholder\" is not visible"
+        "description": "Verify element \"GO\" button is visible"
       }
     ]
   }

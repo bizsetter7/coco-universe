@@ -4,15 +4,13 @@
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
   "executionArgs": {
-    "projectName": "브랜드_통합_시스템",
+    "projectName": "coco-universe",
     "projectPath": "C:\\My-site\\통합사이트\\브랜드_통합_시스템",
     "testIds": [],
-    "additionalInstruction": "Since rate limiting was previously blocking the tests on the /audit path, please re-run all tests. The middleware has been updated to whitelist /audit. Verify that all buttons, modals, and navigation links on the B2BAuditPage work as intended according to the previous fixes.",
+    "additionalInstruction": "회원가입 모달 내 '전체 약관 동의' 체크 시 개별 항목들이 모두 체크되는지, 그리고 필수 항목이 모두 채워졌을 때만 '다음 단계' 버튼이 활성화되는지 집중적으로 검증해줘. 또한 푸터 색상이 #0f1115(검은색)인지 확인해.",
     "serverMode": "development",
     "envs": {
       "API_KEY": "sk-user-FN1CKVvN9x2yXCF4iXuP00xkwGsXtJ48mvryeCImogMTMpyghBdNgcLVk1rqUbo19BW6ZKbpLuYht_GNUm3EAWiu0WL2oy0UKidafPIU5EY-PbrOqK6z7Xx8XdF8qbGi4zw"
     }
-  },
-  "serverPort": 62793,
-  "proxy": "http://80147941-872d-4811-a33e-4be83f22aa14:lhjsrzJUjkkiDoFbroQfIRejKfgh1yji@tun.testsprite.com:8080"
+  }
 }

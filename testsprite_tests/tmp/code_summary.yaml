@@ -1,31 +1,52 @@
 version: "2"
 type: frontend
 tech_stack:
+  - React (Next.js 15)
   - TypeScript
-  - Next.js (App Router)
   - Tailwind CSS
-  - Lucide React (Icons)
+  - Lucide React
 routes:
   - path: /audit
     file: src/components/audit/B2BAuditPage.tsx
     auth_required: false
-    description: B2B Audit/Cloaking landing page for inspectors
+    description: B2B Audit Landing and Auth Page
 features:
-  - name: B2B Landing Interaction
-    description: Main landing page with interactive modals for B2B inquiries and logins
+  - name: Member Login
+    description: Login functionality for B2B members with ID and Password
     files:
       - src/components/audit/B2BAuditPage.tsx
     entry_route: /audit
     user_interactions:
-      - Click "도입 문의하기" in header/hero
-      - Click "파트너 로그인" in header (broken)
-      - Fill inquiry form in contact modal
-      - Submit inquiry form to see success message
+      - Fill ID field
+      - Fill Password field
+      - Click Login button
+    api_calls: []
+    auth_required: false
+  - name: 3-Step Member Signup
+    description: Secure signup process with Terms Agreement (Step 1), Info Entry (Step 2), and Completion (Step 3)
+    files:
+      - src/components/audit/B2BAuditPage.tsx
+    entry_route: /audit
+    user_interactions:
+      - Click Signup link
+      - Toggle All-Agree checkbox (syncs individual terms)
+      - Select Member Type (Personal/Business)
+      - Click Next step button (active only when conditions met)
+      - Fill member info
+      - Submit signup
+    api_calls: []
+    auth_required: false
+  - name: Identity Verification Simulation
+    description: Simulation of mobile phone identity verification for audits
+    files:
+      - src/components/audit/B2BAuditPage.tsx
+    entry_route: /audit
+    user_interactions:
+      - Click Identity Auth button
+      - See "Service Maintenance" alert
+    api_calls: []
     auth_required: false
 known_limitations:
-  - issue: Header "Partner Login" button triggers a state but no modal UI exists
-    location: src/components/audit/B2BAuditPage.tsx (Line 48)
-    impact: Users click but nothing happens on screen
-  - issue: Navigation links are placeholders
-    location: src/components/audit/B2BAuditPage.tsx (Lines 42-44)
-    impact: No navigation possible
+  - issue: Backend APIs are mocked for the audit simulation
+    location: src/components/audit/B2BAuditPage.tsx
+    impact: Data is not persisted to a real database
