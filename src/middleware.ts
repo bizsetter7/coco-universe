@@ -148,12 +148,13 @@ export function middleware(request: NextRequest) {
     const response = NextResponse.next();
     response.headers.set('X-Content-Type-Options', 'nosniff');
     
-    // [보안] 로컬 시뮬레이터 및 개발 환경 배려: AUDIT_MODE이거나 개발 환경일 때 X-Frame-Options 해제
+    // [보안] 로컬 시뮬레이터 및 개발 환경 배려: AUDIT_MODE이거나 개발 환경일 때 X-Frame-Options 및 CSP 제한 해제
     if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_AUDIT_MODE !== 'true') {
         response.headers.set('X-Frame-Options', 'SAMEORIGIN');
     } else {
-        // 시뮬레이터 모니터링을 위해 iframe 사용 허용
+        // 시뮬레이터 모니터링을 위해 iframe 사용 허용 및 CSP 완화
         response.headers.delete('X-Frame-Options');
+        response.headers.set('Content-Security-Policy', "frame-ancestors *");
     }
     
     response.headers.set('X-XSS-Protection', '1; mode=block');
