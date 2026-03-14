@@ -286,19 +286,52 @@ export default function B2BAuditPage() {
 
                 {(activeModal === 'terms' || activeModal === 'privacy') && (
                     <div className="p-10">
-                        <h3 className="text-2xl font-black mb-6">{activeModal === 'terms' ? '서비스 이용약관' : '개인정보처리방침'}</h3>
-                        <div className="h-80 overflow-y-auto bg-gray-50 rounded-3xl p-6 text-sm text-gray-600 leading-relaxed font-medium thin-scrollbar">
-                            <p className="font-bold text-gray-900 mb-4">[제 1조 목적]</p>
-                            <p className="mb-6">본 약관은 초코아이디어(이하 "회사")가 운영하는 "코코알바 B2B" 플랫폼 및 관련 제반 서비스의 이용과 관련하여 회사와 이용자 사이의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-                            
-                            <p className="font-bold text-gray-900 mb-4">[제 2조 서비스의 제공]</p>
-                            <p className="mb-6">회사는 파트너사에게 다음과 같은 서비스를 제공합니다: <br />1. 채용 매칭 솔루션<br />2. 통합 정산 대여 관리 시스템<br />3. 데이터 기반 전략 리포트</p>
-                            
-                            <p className="font-bold text-gray-900 mb-4">[제 3조 보안 및 개인정보 고지]</p>
-                            <p>회사는 이용자의 개인정보를 소중히 다루며, 관련 법령 및 본 정책에 따라 안전하게 보호합니다. 모든 인증 데이터는 SSL 암호화 통신을 통해 처리되며, 본인확인 정보는 해당 기관의 전문 보안 모듈을 거쳐 처리됩니다.</p>
+                        <h3 className="text-2xl font-black mb-6 text-gray-900 border-b pb-4">{activeModal === 'terms' ? '서비스 이용약관' : '개인정보처리방침'}</h3>
+                        <div className="h-80 overflow-y-auto bg-gray-50 rounded-3xl p-6 text-[11px] text-gray-500 leading-6 font-medium thin-scrollbar">
+                             {activeModal === 'terms' ? (
+                               <>
+                                 <p className="font-bold text-gray-900 mb-2">[제 1조 목적]</p>
+                                 <p className="mb-4 text-[10.5px]">본 약관은 초코아이디어(이하 "회사")가 운영하는 "코코알바 B2B" 플랫폼 및 관련 제반 서비스(이하 "서비스")의 이용과 관련하여 회사와 파트너사(이하 "이용자") 사이의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[제 2조 서비스의 정의 및 제공]</p>
+                                 <p className="mb-4 text-[10.5px]">회사는 비즈니스 파트너에게 다음과 같은 전문 솔루션을 제공합니다:<br />1. 데이터 기반 지능형 인재 매칭 엔진<br />2. 실시간 근태 관리 및 자동 정산 대행 시스템<br />3. 보안 인증 기반 기업 전용 통합 대시보드</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[제 3조 이용계약의 성립 및 승인]</p>
+                                 <p className="mb-4 text-[10.5px]">1. 이용계약은 이용자가 회사가 정한 등록 양식에 따라 정보를 기입하고 본 약관에 동의한 후 신청함으로써 성립됩니다.<br />2. 회사는 전문적인 서비스 품질 유지를 위해 신청 기업의 실재성 및 업종 적합성을 검토한 후 최종 승인합니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[제 4조 개인정보의 보호 및 보안 모듈]</p>
+                                 <p className="mb-4 text-[10.5px]">회사는 서비스 제공과 관련하여 수집한 이용자의 정보를 본인의 승낙 없이 제3자에게 누설하거나 배포하지 않습니다. 모든 통신 구간은 고도화된 SSL 암호화 기술이 적용된 보안 모듈을 통해 처리되며, 본인확인 정보는 독립된 공인 인증 기관의 인프라를 거쳐 안전하게 관리됩니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[제 5조 파트너사의 의무]</p>
+                                 <p className="mb-4 text-[10.5px]">1. 파트너사는 서비스 이용 시 관계 법령 및 본 약관의 규정, 회사가 통지하는 서비스 이용 안내를 준수해야 합니다.<br />2. 공공질서 및 미풍양속을 해치는 행위나 허위 구인 정보를 등록하는 행위는 계약 해지 사유가 됩니다.</p>
+
+                                 <p className="font-bold text-gray-900 mb-2">[제 6조 대금의 정산 및 지급]</p>
+                                 <p className="mb-4 text-[10.5px]">솔루션 이용에 따른 비용 청구는 파트너사가 사전에 등록한 결제 수단 또는 지정된 에스크로 가상계좌를 통해 이루어지며, 정산 데이터의 오류가 발생한 경우 영업일 기준 3일 이내에 정정 요청을 할 수 있습니다.</p>
+
+                                 <p className="font-bold text-gray-900 mb-2">[제 7조 손해배상 및 관할 법원]</p>
+                                 <p className="mb-4 text-[10.5px]">회사의 고의 또는 중대한 과실로 인하여 이용자에게 손해가 발생한 경우 관계 법령에 따라 배상하며, 서비스 이용과 관련하여 발생한 분쟁의 관할은 회사의 소재지 관할 법원으로 합니다.</p>
+                               </>
+                             ) : (
+                               <>
+                                 <p className="font-bold text-gray-900 mb-2">[개인정보 처리 목적]</p>
+                                 <p className="mb-4 text-[10.5px]">수집된 정보는 기업 가입 의사 확인, 본인 확인 절차, 고객 상담 및 유료 서비스 이용에 따른 정산 처리를 위해서만 활용됩니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[수집 항목 및 방법]</p>
+                                 <p className="mb-4 text-[10.5px]">1. 수집 항목: (필수) 대표자명, 상호명, 주소, 사업자번호, 연락처, 이메일 주소 / (선택) 서비스 이용 로그, 접속 IP.<br />2. 수집 방법: 서비스 신청 홈페이지 내 입력 폼 및 인증 모듈 연동.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[보유 및 이용 기간]</p>
+                                 <p className="mb-4 text-[10.5px]">수집된 개인정보는 동의를 얻은 날로부터 서비스 탈퇴 시까지 보유하며, 법령상 보존 의무(국세기본법 등)가 있는 경우 해당 법령이 정한 기간까지 안전하게 보관합니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[개인정보 파기 절차]</p>
+                                 <p className="mb-4 text-[10.5px]">보유 기간이 경과한 개인정보는 복구가 불가능한 기술적 방법을 사용하여 즉시 파기합니다.</p>
+                                 
+                                 <p className="font-bold text-gray-900 mb-2">[보호 책임자 및 연락처]</p>
+                                 <p className="text-[10.5px]">개인정보 관리 책임자: 시스템 관리팀 | 센터 : 1877-1442</p>
+                               </>
+                             )}
                         </div>
-                        <button onClick={closeModal} className="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-2xl mt-6 transition-colors">
-                            내용 확인 완료
+                        <button onClick={closeModal} className="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl mt-8 hover:bg-black transition-all shadow-lg active:scale-95">
+                            위 내용에 동의하며 본문 확인 완료
                         </button>
                     </div>
                 )}
