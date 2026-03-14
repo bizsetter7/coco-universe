@@ -42,10 +42,13 @@ export default function B2BAuditPage() {
               </div>
               <span className="text-2xl font-black tracking-tight text-gray-900">코코알바</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">솔루션 안내</a>
-              <a href="#process" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">도입 절차</a>
-              <button onClick={() => openModal('contact')} className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">고객 지원</button>
+            <nav className="hidden lg:flex items-center gap-8">
+              <a href="#home" className="text-sm font-bold text-blue-600 transition-colors">홈</a>
+              <a href="#features" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">솔루션 개요</a>
+              <a href="#process" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">도입 절차</a>
+              <a href="#cases" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">성공 사례</a>
+              <a href="#stats" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">시장 지표</a>
+              <button onClick={() => openModal('contact')} className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">고객 지원</button>
             </nav>
             <div className="flex items-center gap-4">
               <button 
@@ -265,20 +268,37 @@ export default function B2BAuditPage() {
                             </div>
                             <h3 className="text-2xl font-black">솔루션 도입 문의</h3>
                         </div>
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100">
-                                <p className="text-xs font-bold text-gray-400 mb-2">공식 고객센터</p>
-                                <p className="text-2xl font-black text-gray-900">1877-1442</p>
-                                <p className="text-[11px] text-gray-500 mt-1 font-bold">평일 09:00 - 18:00 (전화 상담 가능)</p>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center">
+                                <p className="text-[10px] font-black text-blue-400 mb-1 tracking-widest uppercase">Business Hotline</p>
+                                <p className="text-3xl font-black text-blue-600">1877-1442</p>
+                                <p className="text-[10px] text-gray-400 mt-1 font-bold">평일 09:00 - 18:00 (전화 상담 가능)</p>
                             </div>
-                            <textarea 
-                                placeholder="기업 상황에 맞는 커스터마이징 문의나 궁금하신 점을 자유롭게 남겨주세요." 
-                                className="w-full h-32 px-5 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium resize-none" 
-                                required 
-                            />
-                            <button type="submit" disabled={loading} className="w-full py-4.5 bg-gray-900 text-white font-black rounded-2xl text-lg shadow-xl flex items-center justify-center gap-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Company</label>
+                                    <input type="text" placeholder="기업명" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Name</label>
+                                    <input type="text" placeholder="담당자명" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Contact</label>
+                                <input type="text" placeholder="연락처 (휴대폰)" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Message</label>
+                                <textarea 
+                                    placeholder="문의 내용을 입력해주세요." 
+                                    className="w-full h-32 px-5 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium resize-none text-sm" 
+                                    required 
+                                />
+                            </div>
+                            <button type="submit" disabled={loading} className="w-full py-4.5 bg-gray-900 text-white font-black rounded-2xl text-lg shadow-xl flex items-center justify-center gap-2 mt-2 hover:bg-black transition-all active:scale-95">
                                 {loading && <Loader2 className="animate-spin" size={20} />}
-                                문의 접수하기
+                                상담 신청하기
                             </button>
                         </form>
                     </div>
