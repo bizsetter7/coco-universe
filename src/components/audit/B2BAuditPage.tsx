@@ -157,7 +157,8 @@ export default function B2BAuditPage() {
             </div>
             <div className="text-[12px] font-bold leading-6">
               상호: 초코아이디어 | 사업자번호: 226-13-91078 | 대표: 김대순<br />
-              주소: 경기도 평택시 지산로12번길 93, 2층(지산동)
+              주소: 경기도 평택시 지산로12번길 93, 2층(지산동)<br />
+              통신판매업신고번호: 제 2017-경기송탄-0029호
             </div>
             <div className="flex gap-6 text-[12px] font-bold">
               <span onClick={() => openModal('contact', '이용약관 안내')} className="hover:text-white cursor-pointer underline underline-offset-4">이용약관</span>
