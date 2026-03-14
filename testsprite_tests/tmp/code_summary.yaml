@@ -1,0 +1,31 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js (App Router)
+  - Tailwind CSS
+  - Lucide React (Icons)
+routes:
+  - path: /audit
+    file: src/components/audit/B2BAuditPage.tsx
+    auth_required: false
+    description: B2B Audit/Cloaking landing page for inspectors
+features:
+  - name: B2B Landing Interaction
+    description: Main landing page with interactive modals for B2B inquiries and logins
+    files:
+      - src/components/audit/B2BAuditPage.tsx
+    entry_route: /audit
+    user_interactions:
+      - Click "도입 문의하기" in header/hero
+      - Click "파트너 로그인" in header (broken)
+      - Fill inquiry form in contact modal
+      - Submit inquiry form to see success message
+    auth_required: false
+known_limitations:
+  - issue: Header "Partner Login" button triggers a state but no modal UI exists
+    location: src/components/audit/B2BAuditPage.tsx (Line 48)
+    impact: Users click but nothing happens on screen
+  - issue: Navigation links are placeholders
+    location: src/components/audit/B2BAuditPage.tsx (Lines 42-44)
+    impact: No navigation possible

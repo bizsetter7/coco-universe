@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>iPhone 14 Pro Simulator - Live Mirroring</title>
+    <style>
+        :root {
+            --iphone-width: 390px;
+            --iphone-height: 844px;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, system-ui, sans-serif;
+        }
+
+        /* 맥 스타일 시뮬레이터 윈도우 바 */
+        .simulator-window {
+            background: #333;
+            border-radius: 12px;
+            padding-top: 35px;
+            position: relative;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .window-title {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #999;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* 아이폰 하드웨어 */
+        .iphone-frame {
+            width: var(--iphone-width);
+            height: var(--iphone-height);
+            background: #000;
+            margin: 10px 20px 20px 20px;
+            border-radius: 55px;
+            position: relative;
+            padding: 12px;
+            border: 4px solid #1a1a1a;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 43px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 실시간 미러링 iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .home-bar {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 5px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="simulator-window">
+        <div class="window-controls">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+        </div>
+        <div class="window-title">iPhone 14 Pro - iOS 17.0</div>
+        
+        <div class="iphone-frame">
+            <div class="dynamic-island"></div>
+            <div class="screen">
+                <iframe src="http://localhost:3000" id="mirror-frame"></iframe>
+                <div class="home-bar"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

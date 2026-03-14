@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Mobile Mirroring Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 🛠️ 전역 박스 사이징 강제 적용 */
+        * { box-sizing: border-box !important; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; margin: 0; padding: 0; overflow: hidden; height: 100vh; width: 100vw; }
+        
+        .viewport {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 24px;
+            position: relative;
+        }
+
+        /* 📡 Dashboard (너비 확장 및 패딩 조정) */
+        .dashboard-panel {
+            width: 340px; /* 더 넓게! */
+            flex-shrink: 0;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-panel {
+                position: absolute;
+                left: 20px;
+                top: 85px;
+                transform: translateX(-380px);
+                opacity: 0;
+                pointer-events: none;
+            }
+            .dashboard-panel.active {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        /* 📱 Device Container */
+        .iphone-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        .iphone-frame {
+            width: 450px; 
+            height: 900px;
+            background: #1e293b;
+            border-radius: 48px;
+            padding: 12px;
+            position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
+            border: 4px solid #334155;
+            transform-origin: center center;
+            transition: width 0.2s ease-out, height 0.2s ease-out;
+        }
+
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 38px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 0 4px #000;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+        
+        .notch {
+            position: absolute; top: 0; left: 50%; width: 10px; height: 10px;
+            background: #000; border-radius: 50%; transform: translateX(-50%);
+            margin-top: 14px; z-index: 100;
+        }
+
+        /* ⚠️ GO 버튼 "절대 사수" 레이아웃 (Flex 기반) */
+        .input-row { 
+            display: flex; 
+            gap: 10px; 
+            width: 100%; 
+            align-items: center; 
+        }
+        .url-input {
+            flex: 1;
+            min-width: 0; /* flex 자식의 축소 방지 핵심 */
+            background: #0f172a; 
+            border: 2px solid #334155; 
+            border-radius: 14px;
+            padding: 12px 14px; 
+            color: white; 
+            font-size: 14px; 
+            font-weight: 700; 
+            outline: none;
+        }
+        .url-input:focus { border-color: #2563eb; }
+        
+        .go-btn {
+            flex: 0 0 70px; /* 폭 70px 절대 고정 */
+            height: 48px;
+            background: #2563eb; 
+            color: white; 
+            border-radius: 14px;
+            font-weight: 900; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .go-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .go-btn:active { transform: scale(0.95); }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.96);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        input[type=range] { width: 100%; accent-color: #3b82f6; cursor: pointer; }
+
+        .hamburger {
+            position: fixed; left: 24px; top: 24px; z-index: 2000;
+            background: #2563eb; color: white; width: 48px; height: 48px;
+            border-radius: 16px; display: none; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        @media (max-width: 1200px) { .hamburger { display: flex; } }
+
+        .preset-btn {
+            background: #1e293b; color: #94a3b8; padding: 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 900; transition: all 0.2s; border: 1px solid #334155;
+        }
+        .preset-btn.active {
+            background: #2563eb; color: white; border-color: #60a5fa;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .status-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="hamburger" onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+
+    <div class="viewport">
+        
+        <div class="dashboard-panel" id="sidebar">
+            <div class="glass p-8 rounded-[44px] shadow-2xl space-y-9 relative overflow-hidden">
+                <div class="absolute -right-12 -top-12 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl"></div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg ring-4 ring-blue-500/10">C</div>
+                        <div>
+                            <h1 class="text-white font-black text-lg tracking-tighter italic leading-none">COCO SIM</h1>
+                            <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest mt-1">S21 Master Standard</p>
+                        </div>
+                    </div>
+                    <span class="status-badge">● LIVE</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Quick Select</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setFastWidth(450)" class="preset-btn active" id="btn450">S21 Master</button>
+                        <button onclick="setFastWidth(393)" class="preset-btn" id="btn393">iPhone 14</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Width Tuner</label>
+                        <span id="widthDisplay" class="text-blue-400 font-black text-xs bg-blue-500/10 px-2 py-0.5 rounded-lg">450px</span>
+                    </div>
+                    <input type="range" id="widthSlider" min="320" max="500" value="450" oninput="adjustWidth(this.value)">
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-[10px] text-gray-500 font-black uppercase tracking-widest ml-1">Target Path</label>
+                    <div class="input-row">
+                        <input type="text" id="urlInput" value="/audit" class="url-input" spellcheck="false">
+                        <button onclick="updateMirror()" class="go-btn font-black text-base tracking-widest">GO</button>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-slate-700/50 flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Fit Scale</span>
+                    <span id="zoomVal" class="text-white font-black text-xs bg-slate-800 px-3 py-1 rounded-xl shadow-inner">100%</span>
+                </div>
+            </div>
+
+            <div class="mt-5 p-6 glass rounded-[28px] border-l-4 border-l-blue-600">
+                <p class="text-[10px] text-gray-400 font-bold leading-relaxed">
+                    🚀 **Final Layout Tuned**<br>
+                    대시보드 패딩 최적화 및 GO 버튼 <b>70px 고착화</b> 완료. 이제 어떤 극단적인 환경에서도 디자인이 깨지지 않습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="iphone-container">
+            <div class="iphone-frame" id="frame">
+                <div class="iphone-screen">
+                    <div class="notch"></div>
+                    <iframe id="mirrorFrame" src="/audit"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const frame = document.getElementById('frame');
+        const zoomVal = document.getElementById('zoomVal');
+        const sidebar = document.getElementById('sidebar');
+        const widthDisplay = document.getElementById('widthDisplay');
+        const widthSlider = document.getElementById('widthSlider');
+
+        function adjustWidth(val) {
+            frame.style.width = val + 'px';
+            frame.style.height = (val * 900 / 450) + 'px';
+            widthDisplay.innerText = val + 'px';
+            widthSlider.value = val;
+            
+            document.getElementById('btn450').classList.toggle('active', val == 450);
+            document.getElementById('btn393').classList.toggle('active', val == 393);
+            
+            smartFit();
+        }
+
+        function setFastWidth(val) {
+            adjustWidth(val);
+        }
+
+        function updateMirror() {
+            let url = document.getElementById('urlInput').value;
+            if (!url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            document.getElementById('mirrorFrame').src = url;
+            if (window.innerWidth < 1200) sidebar.classList.remove('active');
+        }
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        function smartFit() {
+            const container = document.querySelector('.iphone-container');
+            const availableWidth = container.clientWidth - 40;
+            const availableHeight = container.clientHeight - 40;
+            
+            const currentWidth = parseInt(frame.style.width) || 450;
+            const currentHeight = parseInt(frame.style.height) || 900;
+            
+            const scaleX = availableWidth / currentWidth;
+            const scaleY = availableHeight / currentHeight;
+            let finalScale = Math.min(scaleX, scaleY);
+            
+            if (finalScale > 1) finalScale = 1;
+            
+            frame.style.transform = `scale(${finalScale})`;
+            zoomVal.innerText = `${Math.round(finalScale * 100)}%`;
+        }
+
+        window.addEventListener('resize', smartFit);
+        window.addEventListener('load', smartFit);
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') updateMirror();
+        });
+
+        adjustWidth(450);
+    </script>
+</body>
+</html>

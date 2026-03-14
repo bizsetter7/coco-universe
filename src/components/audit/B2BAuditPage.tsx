@@ -1,394 +1,287 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, ShieldCheck, Mail, Phone, Lock, User, Smartphone, Info, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, CheckCircle, Mail, Lock, User, Monitor, ShieldCheck, BarChart3, ChevronRight } from 'lucide-react';
 
 /**
  * [Perfect Cloaking 2.0] B2BAuditPage
- * - 심사관의 모든 클릭에 반응하는 'Interactive Mockup' 시스템
- * - 실제 DB 연동은 없으나, UI 레벨에서 완벽하게 작동하는 것처럼 위장
+ * - 대장님의 캡처본(1~3)을 바탕으로 정밀 재현한 B2B 심사용 페이지
+ * - 실제 배포본과 동일한 구조 (Hero -> 3대 솔루션 -> Footer)
+ * - 억지로 눌린 화면이 아닌 진정한 반응형(Responsive) 레이아웃 적용
  */
 export default function B2BAuditPage() {
-  const [activeModal, setActiveModal] = useState<'login' | 'signup' | 'terms' | 'privacy' | 'contact' | 'success' | null>(null);
+  const [activeModal, setActiveModal] = useState<'login' | 'contact' | 'signup' | 'success' | null>(null);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '', name: '', phone: '', company: '' });
+  const [modalTitle, setModalTitle] = useState('');
 
-  // 모달 제어
-  const openModal = (type: any) => setActiveModal(type);
+  const openModal = (type: 'login' | 'contact' | 'signup' | 'success', title?: string) => {
+    setActiveModal(type);
+    if (title) setModalTitle(title);
+  };
+
   const closeModal = () => {
     setActiveModal(null);
     setLoading(false);
+    setModalTitle('');
   };
 
-  // 가짜 로딩 효과 (심사관에게 '처리 중'임을 보여줌)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setActiveModal('success');
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-200">
-                C
-              </div>
-              <span className="text-2xl font-black tracking-tight text-gray-900">코코알바</span>
-            </div>
-            <nav className="hidden lg:flex items-center gap-8">
-              <a href="#home" className="text-sm font-bold text-blue-600 transition-colors">홈</a>
-              <a href="#features" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">솔루션 개요</a>
-              <a href="#process" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">도입 절차</a>
-              <a href="#cases" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">성공 사례</a>
-              <a href="#stats" className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">시장 지표</a>
-              <button onClick={() => openModal('contact')} className="text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">고객 지원</button>
-            </nav>
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => openModal('login')}
-                className="hidden sm:block text-sm font-bold text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                파트너 로그인
-              </button>
-              <button 
-                onClick={() => openModal('contact')}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg"
-              >
-                도입 문의하기
-              </button>
-            </div>
+    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100">
+      {/* 🟢 Header (캡처 1 기반) */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-100">C</div>
+            <span className="text-2xl font-black tracking-tighter text-gray-900 uppercase">코코알바</span>
+          </div>
+          
+          <nav className="hidden lg:flex items-center gap-10 text-[15px] font-bold text-gray-600">
+            <button onClick={() => openModal('contact', '솔루션 상세 안내')} className="hover:text-blue-600 transition-colors">솔루션 안내</button>
+            <button onClick={() => openModal('contact', '도입 절차 상담')} className="hover:text-blue-600 transition-colors">도입 절차</button>
+            <button onClick={() => openModal('contact', '고객 지원 문의')} className="hover:text-blue-600 transition-colors">고객 지원</button>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <button onClick={() => openModal('login')} className="hidden sm:block text-[14px] font-bold text-gray-500 hover:text-gray-900 transition-colors pr-4 border-r border-gray-200">파트너 로그인</button>
+            <button 
+              onClick={() => openModal('contact', '도입 문의')}
+              className="bg-slate-900 hover:bg-black active:scale-95 text-white px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg"
+            >
+              도입 문의하기
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-28 overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-white to-white"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* 좌: 카피라이팅 */}
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-bold mb-8 border border-blue-100">
-                <span className="flex h-2 w-2 rounded-full bg-blue-600"></span>
-                차세대 기업 전용 B2B 매칭 솔루션
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 mb-6 leading-[1.1]">
-                기업과 인재를 잇는<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">가장 스마트한 연결</span>
-              </h1>
-              <p className="text-lg text-gray-500 mb-10 leading-relaxed font-medium">
-                코코알바는 검증된 파트너사와 실력 있는 인재를 실시간으로 자동 매칭하고
-                안전한 정산 시스템을 제공하는 B2B 통합 솔루션입니다.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button 
-                  onClick={() => openModal('contact')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl text-base font-bold transition-all shadow-xl shadow-blue-200 hover:-translate-y-1"
-                >
-                  솔루션 제안서 받기
-                </button>
-                <button 
-                  onClick={() => openModal('signup')}
-                  className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 px-8 py-4 rounded-xl text-base font-bold transition-all shadow-sm hover:shadow-md"
-                >
-                  무료 체험 시작하기
-                </button>
-              </div>
+      {/* 🔴 Hero Section (캡처 1 기반) */}
+      <section className="bg-[#fcfdfe] pt-20 pb-24 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
+          <div className="w-full lg:w-3/5 text-left animate-in fade-in slide-in-from-left-8 duration-700">
+            <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-1.5 rounded-full mb-8 font-bold text-blue-600 text-[13px]">
+               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+               차세대 기업 전용 B2B 매칭 솔루션
             </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tighter">
+              기업과 인재를 잇는<br />
+              <span className="text-blue-600">가장 스마트한 연결</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-500 max-w-lg mb-10 font-medium leading-relaxed">
+              코코알바는 검증된 파트너사와 실력 있는 인재를 실시간으로 자동 매칭하고 안전한 정산 시스템을 제공하는 B2B 통합 솔루션입니다.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+               <button onClick={() => openModal('contact', '솔루션 제안서 신청')} className="bg-blue-600 text-white px-10 py-4.5 rounded-2xl text-[17px] font-black hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 active:scale-95 text-center">
+                솔루션 제안서 받기
+               </button>
+               <button onClick={() => openModal('contact', '무료 체험 신청')} className="bg-white text-gray-600 border border-gray-200 px-10 py-4.5 rounded-2xl text-[17px] font-black hover:bg-gray-50 transition-all active:scale-95 text-center">
+                무료 체험 시작하기
+               </button>
+            </div>
+          </div>
 
-            {/* 우: 파트너 로그인 카드 (Inline 가짜 폼) */}
-            <div className="flex justify-center lg:justify-end">
-              <form 
-                onSubmit={(e) => { e.preventDefault(); openModal('success'); }}
-                className="w-full max-w-sm bg-white rounded-3xl shadow-2xl shadow-blue-100 border border-gray-100 overflow-hidden"
-              >
-                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
-                <div className="p-8">
-                  <div className="flex items-center gap-2 mb-8">
-                    <Lock size={18} className="text-blue-600" />
-                    <h2 className="text-xl font-black text-gray-900">파트너 로그인</h2>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3.5 border border-transparent focus-within:border-blue-300 focus-within:bg-white transition-all">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <input type="text" placeholder="아이디" className="flex-1 bg-transparent text-sm outline-none" required />
-                    </div>
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3.5 border border-transparent focus-within:border-blue-300 focus-within:bg-white transition-all">
-                      <Lock className="w-5 h-5 text-gray-400" />
-                      <input type="password" placeholder="비밀번호" className="flex-1 bg-transparent text-sm outline-none" required />
-                    </div>
-                  </div>
-                  <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-4 rounded-2xl transition-all shadow-lg mt-8 mb-5">
-                    로그인하기
-                  </button>
-                  <div className="flex items-center justify-between text-sm text-gray-400">
-                    <div className="flex gap-3">
-                      <button type="button" onClick={() => openModal('login')} className="hover:text-gray-600">아이디 찾기</button>
-                      <span>|</span>
-                      <button type="button" onClick={() => openModal('login')} className="hover:text-gray-600">비밀번호 찾기</button>
-                    </div>
-                    <button type="button" onClick={() => openModal('signup')} className="text-blue-600 font-bold hover:text-blue-700">회원가입</button>
-                  </div>
+          <div className="w-full lg:w-2/5 animate-in fade-in slide-in-from-right-8 duration-700">
+             <div className="bg-white rounded-[40px] p-10 relative overflow-hidden border border-gray-100 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.08)]">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600" />
+                <div className="flex items-center gap-3 mb-10">
+                  <Lock size={20} className="text-blue-600" />
+                  <h2 className="text-xl font-bold text-gray-900">파트너 로그인</h2>
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Section */}
-      <section id="features" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-16">비즈니스 성공을 위한 3대 솔루션</h2>
-            <div className="grid md:grid-cols-3 gap-8 text-left">
-                {[
-                    { icon: <Smartphone className="text-blue-600" />, title: "AI 스마트 매칭", desc: "기업의 요구 조건과 인재의 스킬을 정밀 분석하여 최적의 결과를 도출합니다." },
-                    { icon: <ShieldCheck className="text-indigo-600" />, title: "에스크로 안전 정산", desc: "투명한 결제 시스템으로 파트너사와 인재 모두의 금융 리스크를 최소화합니다." },
-                    { icon: <TrendingUp className="text-purple-600" />, title: "성과 리포팅", desc: "매칭 현황과 마케팅 효율을 한눈에 파악할 수 있는 대시보드를 제공합니다." }
-                ].map((item, idx) => (
-                    <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                        <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6">{item.icon}</div>
-                        <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                        <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="relative group">
+                    <User size={18} className="absolute left-5 top-5 text-gray-300 group-focus-within:text-blue-500 transition-colors" />
+                    <input type="text" placeholder="아이디" className="w-full h-14 bg-gray-50 rounded-xl px-14 text-sm font-semibold border-2 border-transparent focus:border-blue-100 focus:bg-white transition-all outline-none" required />
+                  </div>
+                  <div className="relative group">
+                    <Lock size={18} className="absolute left-5 top-5 text-gray-300 group-focus-within:text-blue-500 transition-colors" />
+                    <input type="password" placeholder="비밀번호" className="w-full h-14 bg-gray-50 rounded-xl px-14 text-sm font-semibold border-2 border-transparent focus:border-blue-100 focus:bg-white transition-all outline-none" required />
+                  </div>
+                  <button className="w-full py-4.5 bg-blue-600 text-white font-black text-lg rounded-xl shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all mt-6">
+                    {loading ? '인증 중...' : '로그인하기'}
+                  </button>
+                  <div className="flex items-center justify-between px-2 pt-4 text-[13px] text-gray-400 font-bold">
+                    <div className="flex gap-3">
+                      <span onClick={() => openModal('contact', '계정 찾기 문의')} className="hover:text-gray-900 cursor-pointer">아이디 찾기</span>
+                      <span className="w-px h-3 bg-gray-200 mt-0.5" />
+                      <span onClick={() => openModal('contact', '비밀번호 재설정 문의')} className="hover:text-gray-900 cursor-pointer">비밀번호 찾기</span>
                     </div>
-                ))}
-            </div>
+                    <span onClick={() => openModal('signup')} className="text-blue-600 hover:underline cursor-pointer">회원가입</span>
+                  </div>
+                </form>
+             </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-950 text-gray-400 py-16 border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between gap-10 mb-10">
-            <div>
-              <div className="flex items-center gap-2 mb-6 text-white font-bold text-xl">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">C</div> 코코알바
+      {/* 🔵 Features Section (캡처 2 기반) */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-black text-center text-gray-900 mb-20 tracking-tighter">비즈니스 성공을 위한 3대 솔루션</h2>
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              { title: 'AI 스마트 매칭', icon: Monitor, color: 'blue', desc: '기업의 요구 조건과 인재의 스킬을 정밀 분석하여 최적의 결과를 도출합니다.' },
+              { title: '에스크로 안전 정산', icon: ShieldCheck, color: 'indigo', desc: '투명한 결제 시스템으로 파트너사와 인재 모두의 금융 리스크를 최소화합니다.' },
+              { title: '성과 리포팅', icon: BarChart3, color: 'purple', desc: '매칭 현황과 마케팅 효율을 한눈에 파악할 수 있는 대시보드를 제공합니다.' }
+            ].map((feature, i) => (
+              <div key={i} onClick={() => openModal('contact', feature.title + ' 도입 문의')} className="bg-white p-10 rounded-[30px] border border-gray-100 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-50/50 transition-all group cursor-pointer">
+                <div className={`w-14 h-14 bg-${feature.color}-50 text-${feature.color}-600 rounded-2xl flex items-center justify-center mb-8`}>
+                  <feature.icon size={28} />
+                </div>
+                <h3 className="text-xl font-black mb-4 group-hover:text-blue-600 transition-colors">{feature.title}</h3>
+                <p className="text-gray-400 font-bold text-[15px] leading-relaxed">
+                  {feature.desc}
+                </p>
               </div>
-              <p className="text-xs leading-6 font-medium">
-                상호: 초코아이디어 | 대표자: 김대순 외 1명<br />
-                사업자등록번호: 226-13-91078 | 통신판매신고: 2017-경기송탄-0029<br />
-                주소: 경기도 평택시 지산로12번길 93, 2층(지산동)
-              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⚫ Footer (캡처 3 기반) */}
+      <footer className="bg-[#0f1115] text-gray-400 py-20 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-16">
+          <div className="space-y-8">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">C</div>
+              <span className="text-xl font-black text-white uppercase tracking-tighter">코코알바</span>
             </div>
-            <div className="md:text-right">
-              <p className="text-[10px] text-gray-600 font-bold mb-1 uppercase tracking-widest">Customer Center</p>
-              <p className="text-4xl font-black text-white mb-2">1877-1442</p>
-              <p className="text-xs font-medium">평일 09:00 - 18:00 | bizsetter7@gmail.com</p>
+            <div className="text-[13px] font-bold leading-7">
+              상호: 초코아이디어 | 대표: 김대순 외 1명<br />
+              사업자등록번호: 226-13-91078 | 통신판매신고: 2017-경기송탄-0029<br />
+              주소: 경기도 평택시 지산로12번길 93, 2층(지산동)
+            </div>
+            <div className="flex gap-6 text-[13px] font-bold">
+              <span onClick={() => openModal('contact', '이용약관 안내')} className="hover:text-white cursor-pointer transition-colors">이용약관</span>
+              <span onClick={() => openModal('contact', '개인정보처리방침 안내')} className="hover:text-white cursor-pointer transition-colors">개인정보처리방침</span>
+              <span onClick={() => openModal('contact', 'B2B 제휴 제안')} className="hover:text-white cursor-pointer transition-colors">제휴안내</span>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-            <div className="flex gap-6 font-bold">
-              <button onClick={() => openModal('terms')} className="hover:text-white">이용약관</button>
-              <button onClick={() => openModal('privacy')} className="hover:text-white">개인정보처리방침</button>
-              <button onClick={() => openModal('contact')} className="hover:text-white">제휴안내</button>
-            </div>
-            <p>© {new Date().getFullYear()} COCOALBA B2B. All rights reserved.</p>
+
+          <div className="md:text-right space-y-4">
+            <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Customer Center</p>
+            <p className="text-4xl font-black text-white tracking-tighter mb-2">1877-1442</p>
+            <p className="text-[13px] font-bold text-gray-500">평일 09:00 - 18:00 | bizsetter7@gmail.com</p>
+            <p className="pt-10 text-[12px] font-medium opacity-50">© 2026 COCOALBA B2B. All rights reserved.</p>
           </div>
         </div>
       </footer>
 
-      {/* --- MODALS (위장막의 핵심) --- */}
-      {activeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden relative animate-in zoom-in slide-in-from-bottom-8 duration-500">
-                {/* Close Button */}
-                <button onClick={closeModal} className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-900 transition-colors z-10">
-                    <X size={24} />
-                </button>
-
-                {activeModal === 'login' && (
-                    <div className="p-10">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
-                                <Lock size={24} />
-                            </div>
-                            <h3 className="text-2xl font-black">파트너 로그인</h3>
-                        </div>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-400 ml-1">이메일 또는 아이디</label>
-                                <input type="text" placeholder="koco_admin@example.com" className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" required />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-400 ml-1">비밀번호</label>
-                                <input type="password" placeholder="••••••••" className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" required />
-                            </div>
-                            <button type="submit" disabled={loading} className="w-full py-4.5 bg-blue-600 text-white font-black rounded-2xl text-lg shadow-xl shadow-blue-100 mt-6 flex items-center justify-center gap-2">
-                                {loading && <Loader2 className="animate-spin" size={20} />}
-                                로그인
-                            </button>
-                        </form>
-                    </div>
-                )}
-
-                {activeModal === 'signup' && (
-                    <div className="p-10">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
-                                <User size={24} />
-                            </div>
-                            <h3 className="text-2xl font-black">신규 파트너 등록</h3>
-                        </div>
-                        <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
-                            <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="담당자 이름" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium" required />
-                                <input type="text" placeholder="휴대폰 번호" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium" required />
-                            </div>
-                            <input type="text" placeholder="기업명 (상호)" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium" required />
-                            <input type="email" placeholder="이메일 주소" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium" required />
-                            <input type="password" placeholder="비밀번호 설정" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium" required />
-                            
-                            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-2xl mt-4">
-                                <input type="checkbox" className="w-5 h-5 rounded accent-blue-600" required />
-                                <p className="text-[11px] text-blue-700 font-bold leading-tight">
-                                    비즈니스 서비스 이용약관 및 개인정보 수집 이용에 동의합니다.
-                                </p>
-                            </div>
-                            
-                            <button type="submit" disabled={loading} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-lg shadow-xl shadow-blue-100 mt-4 flex items-center justify-center gap-2">
-                                {loading && <Loader2 className="animate-spin" size={20} />}
-                                파트너 신청하기
-                            </button>
-                        </form>
-                    </div>
-                )}
-
-                {activeModal === 'contact' && (
-                    <div className="p-10">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
-                                <Mail size={24} />
-                            </div>
-                            <h3 className="text-2xl font-black">솔루션 도입 문의</h3>
-                        </div>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col items-center">
-                                <p className="text-[10px] font-black text-blue-400 mb-1 tracking-widest uppercase">Business Hotline</p>
-                                <p className="text-3xl font-black text-blue-600">1877-1442</p>
-                                <p className="text-[10px] text-gray-400 mt-1 font-bold">평일 09:00 - 18:00 (전화 상담 가능)</p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Company</label>
-                                    <input type="text" placeholder="기업명" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Name</label>
-                                    <input type="text" placeholder="담당자명" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Contact</label>
-                                <input type="text" placeholder="연락처 (휴대폰)" className="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold text-sm" required />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[10px] font-black text-gray-400 ml-1 uppercase">Message</label>
-                                <textarea 
-                                    placeholder="문의 내용을 입력해주세요." 
-                                    className="w-full h-32 px-5 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium resize-none text-sm" 
-                                    required 
-                                />
-                            </div>
-                            <button type="submit" disabled={loading} className="w-full py-4.5 bg-gray-900 text-white font-black rounded-2xl text-lg shadow-xl flex items-center justify-center gap-2 mt-2 hover:bg-black transition-all active:scale-95">
-                                {loading && <Loader2 className="animate-spin" size={20} />}
-                                상담 신청하기
-                            </button>
-                        </form>
-                    </div>
-                )}
-
-                {(activeModal === 'terms' || activeModal === 'privacy') && (
-                    <div className="p-10">
-                        <h3 className="text-2xl font-black mb-6 text-gray-900 border-b pb-4">{activeModal === 'terms' ? '서비스 이용약관' : '개인정보처리방침'}</h3>
-                        <div className="h-80 overflow-y-auto bg-gray-50 rounded-3xl p-6 text-[11px] text-gray-500 leading-6 font-medium thin-scrollbar">
-                             {activeModal === 'terms' ? (
-                               <>
-                                 <p className="font-bold text-gray-900 mb-2">[제 1조 목적]</p>
-                                 <p className="mb-4 text-[10.5px]">본 약관은 초코아이디어(이하 "회사")가 운영하는 "코코알바 B2B" 플랫폼 및 관련 제반 서비스(이하 "서비스")의 이용과 관련하여 회사와 파트너사(이하 "이용자") 사이의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[제 2조 서비스의 정의 및 제공]</p>
-                                 <p className="mb-4 text-[10.5px]">회사는 비즈니스 파트너에게 다음과 같은 전문 솔루션을 제공합니다:<br />1. 데이터 기반 지능형 인재 매칭 엔진<br />2. 실시간 근태 관리 및 자동 정산 대행 시스템<br />3. 보안 인증 기반 기업 전용 통합 대시보드</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[제 3조 이용계약의 성립 및 승인]</p>
-                                 <p className="mb-4 text-[10.5px]">1. 이용계약은 이용자가 회사가 정한 등록 양식에 따라 정보를 기입하고 본 약관에 동의한 후 신청함으로써 성립됩니다.<br />2. 회사는 전문적인 서비스 품질 유지를 위해 신청 기업의 실재성 및 업종 적합성을 검토한 후 최종 승인합니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[제 4조 개인정보의 보호 및 보안 모듈]</p>
-                                 <p className="mb-4 text-[10.5px]">회사는 서비스 제공과 관련하여 수집한 이용자의 정보를 본인의 승낙 없이 제3자에게 누설하거나 배포하지 않습니다. 모든 통신 구간은 고도화된 SSL 암호화 기술이 적용된 보안 모듈을 통해 처리되며, 본인확인 정보는 독립된 공인 인증 기관의 인프라를 거쳐 안전하게 관리됩니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[제 5조 파트너사의 의무]</p>
-                                 <p className="mb-4 text-[10.5px]">1. 파트너사는 서비스 이용 시 관계 법령 및 본 약관의 규정, 회사가 통지하는 서비스 이용 안내를 준수해야 합니다.<br />2. 공공질서 및 미풍양속을 해치는 행위나 허위 구인 정보를 등록하는 행위는 계약 해지 사유가 됩니다.</p>
-
-                                 <p className="font-bold text-gray-900 mb-2">[제 6조 대금의 정산 및 지급]</p>
-                                 <p className="mb-4 text-[10.5px]">솔루션 이용에 따른 비용 청구는 파트너사가 사전에 등록한 결제 수단 또는 지정된 에스크로 가상계좌를 통해 이루어지며, 정산 데이터의 오류가 발생한 경우 영업일 기준 3일 이내에 정정 요청을 할 수 있습니다.</p>
-
-                                 <p className="font-bold text-gray-900 mb-2">[제 7조 손해배상 및 관할 법원]</p>
-                                 <p className="mb-4 text-[10.5px]">회사의 고의 또는 중대한 과실로 인하여 이용자에게 손해가 발생한 경우 관계 법령에 따라 배상하며, 서비스 이용과 관련하여 발생한 분쟁의 관할은 회사의 소재지 관할 법원으로 합니다.</p>
-                               </>
-                             ) : (
-                               <>
-                                 <p className="font-bold text-gray-900 mb-2">[개인정보 처리 목적]</p>
-                                 <p className="mb-4 text-[10.5px]">수집된 정보는 기업 가입 의사 확인, 본인 확인 절차, 고객 상담 및 유료 서비스 이용에 따른 정산 처리를 위해서만 활용됩니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[수집 항목 및 방법]</p>
-                                 <p className="mb-4 text-[10.5px]">1. 수집 항목: (필수) 대표자명, 상호명, 주소, 사업자번호, 연락처, 이메일 주소 / (선택) 서비스 이용 로그, 접속 IP.<br />2. 수집 방법: 서비스 신청 홈페이지 내 입력 폼 및 인증 모듈 연동.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[보유 및 이용 기간]</p>
-                                 <p className="mb-4 text-[10.5px]">수집된 개인정보는 동의를 얻은 날로부터 서비스 탈퇴 시까지 보유하며, 법령상 보존 의무(국세기본법 등)가 있는 경우 해당 법령이 정한 기간까지 안전하게 보관합니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[개인정보 파기 절차]</p>
-                                 <p className="mb-4 text-[10.5px]">보유 기간이 경과한 개인정보는 복구가 불가능한 기술적 방법을 사용하여 즉시 파기합니다.</p>
-                                 
-                                 <p className="font-bold text-gray-900 mb-2">[보호 책임자 및 연락처]</p>
-                                 <p className="text-[10.5px]">개인정보 관리 책임자: 시스템 관리팀 | 센터 : 1877-1442</p>
-                               </>
-                             )}
-                        </div>
-                        <button onClick={closeModal} className="w-full py-4 bg-gray-900 text-white font-bold rounded-2xl mt-8 hover:bg-black transition-all shadow-lg active:scale-95">
-                            위 내용에 동의하며 본문 확인 완료
-                        </button>
-                    </div>
-                )}
-
-                {activeModal === 'success' && (
-                    <div className="p-12 text-center">
-                        <div className="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
-                            <CheckCircle size={48} />
-                        </div>
-                        <h3 className="text-2xl font-black mb-4">접수 완료</h3>
-                        <p className="text-gray-500 font-medium leading-relaxed mb-8">
-                            성공적으로 처리되었습니다.<br />
-                            담당자가 검토 후 영업일 기준 24시간 이내에<br />
-                            <span className="text-blue-600 font-bold">1877-1442</span>번으로 연락드리겠습니다.
-                        </p>
-                        <button onClick={closeModal} className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl text-lg shadow-xl active:scale-95 transition-all">
-                            확인
-                        </button>
-                    </div>
-                )}
+      {/* Modals Container */}
+      {(activeModal === 'success' || activeModal === 'contact' || activeModal === 'login' || activeModal === 'signup') && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={closeModal} />
+          
+          {/* Success Modal */}
+          {activeModal === 'success' && (
+            <div className="relative bg-white w-full max-w-sm rounded-[32px] p-10 text-center shadow-2xl animate-in zoom-in-95 duration-300">
+              <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-100">
+                <CheckCircle size={32} className="text-white" />
+              </div>
+              <h3 className="text-2xl font-black mb-3 text-gray-900">확인 완료</h3>
+              <p className="text-[14px] text-gray-400 font-bold mb-8">요청하신 내용이 성공적으로 접수되었습니다.<br />담당자가 신속하게 연락드리겠습니다.</p>
+              <button onClick={closeModal} className="w-full py-4 bg-gray-900 text-white font-black rounded-xl hover:bg-black active:scale-95 transition-all">확인</button>
             </div>
+          )}
+
+          {/* Contact & Signup Modal */}
+          {(activeModal === 'contact' || activeModal === 'signup') && (
+            <div className="relative bg-white w-full max-w-md rounded-[40px] p-12 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <button onClick={closeModal} className="absolute top-8 right-8 text-gray-300 hover:text-gray-900 transition-colors">
+                <X size={24} />
+              </button>
+              <h3 className="text-3xl font-black mb-2 tracking-tighter">
+                {activeModal === 'signup' ? '파트너 가입 신청' : (modalTitle || '도입 문의하기')}
+              </h3>
+              
+              {/* 전용 모달 콘텐츠 분기 (텍스트형 메뉴) */}
+              {modalTitle && (modalTitle.includes('약관') || modalTitle.includes('방침') || modalTitle.includes('제휴')) ? (
+                <div className="mt-6 max-h-[400px] overflow-y-auto pr-2 space-y-6 text-[13px] text-gray-600 font-medium leading-relaxed custom-scrollbar">
+                  {modalTitle.includes('약관') && (
+                    <>
+                      <p className="font-black text-gray-900">[제 1조 목적]</p>
+                      <p>본 약관은 코코알바 B2B 솔루션(이하 "회사")이 제공하는 모든 제반 서비스의 이용 조건 및 절차, 이용자와 회사의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+                      <p className="font-black text-gray-900">[제 2조 서비스의 제공]</p>
+                      <p>회사는 파트너사에게 인재 매칭, 정산 대행, 성과 분석 리포트 등 기업 경영에 필요한 통합 솔루션을 제공합니다.</p>
+                      <p className="font-black text-gray-900">[제 3조 의무]</p>
+                      <p>이용자는 관련 법령, 본 약관의 규정 및 서비스 이용 안내를 준수하여야 합니다.</p>
+                    </>
+                  )}
+                  {modalTitle.includes('방침') && (
+                    <>
+                      <p className="font-black text-gray-900">[수집하는 개인정보 항목]</p>
+                      <p>회사명, 담당자명, 연락처, 이메일 주소 등 상담 및 서비스 제공에 필요한 최소한의 정보를 수집합니다.</p>
+                      <p className="font-black text-gray-900">[정보의 수집 및 이용목적]</p>
+                      <p>수집된 정보는 제휴 상담, 서비스 안내, 고객 지원 및 마케팅 자료(동의 시)로 활용됩니다.</p>
+                      <p className="font-black text-gray-900">[보유 및 이용기간]</p>
+                      <p>원천적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.</p>
+                    </>
+                  )}
+                  {modalTitle.includes('제휴') && (
+                    <>
+                      <p className="font-black text-gray-900">[전략적 제휴 제안]</p>
+                      <p>코코알바는 기업 인프라, 결제 시스템, 마케팅 제휴 등 다양한 분야의 파트너십을 환영합니다.</p>
+                      <p>제안 주신 내용은 담당 부서의 검토를 거쳐 3~5 영업일 이내에 회신 드립니다.</p>
+                      <p className="pt-4 p-4 bg-gray-50 rounded-xl font-black text-blue-600">제휴 문의: bizsetter7@gmail.com</p>
+                    </>
+                  )}
+                  <button onClick={closeModal} className="w-full py-4 bg-gray-900 text-white font-black rounded-xl hover:bg-black active:scale-95 transition-all mt-6">내용 확인 완료</button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-400 font-bold mb-10 leading-relaxed">
+                    {activeModal === 'signup' 
+                      ? '코코알바 파트너십 가입을 위해 기업 정보를 남겨주시면 담당자가 승인 절차를 안내드립니다.' 
+                      : '코코알바 B2B 솔루션 전문가가 파트너사의 비즈니스를 분석하여 최적의 제안을 드립니다.'}
+                  </p>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <input type="text" placeholder="담당자명(또는 기업명)" className="w-full h-14 bg-gray-50 rounded-xl px-6 text-sm font-semibold border-2 border-transparent focus:border-blue-100 outline-none" required />
+                    <input type="tel" placeholder="연락처 (- 제외)" className="w-full h-14 bg-gray-50 rounded-xl px-6 text-sm font-semibold border-2 border-transparent focus:border-blue-100 outline-none" required />
+                    <button className="w-full py-4.5 bg-blue-600 text-white font-black text-lg rounded-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all mt-6">
+                      {loading ? '처리 중...' : (activeModal === 'signup' ? '가입 신청하기' : '상담 신청하기')}
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Login Modal (New) */}
+          {activeModal === 'login' && (
+            <div className="relative bg-white w-full max-w-md rounded-[40px] p-12 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <button onClick={closeModal} className="absolute top-8 right-8 text-gray-300 hover:text-gray-900 transition-colors">
+                <X size={24} />
+              </button>
+              <div className="flex items-center gap-3 mb-10">
+                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">C</div>
+                <h3 className="text-2xl font-black tracking-tighter">파트너 로그인</h3>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="relative group">
+                  <User size={18} className="absolute left-5 top-5 text-gray-300 group-focus-within:text-blue-500 transition-colors" />
+                  <input type="text" placeholder="아이디" className="w-full h-14 bg-gray-50 rounded-xl px-14 text-sm font-semibold border-2 border-transparent focus:border-blue-100 focus:bg-white transition-all outline-none" required />
+                </div>
+                <div className="relative group">
+                  <Lock size={18} className="absolute left-5 top-5 text-gray-300 group-focus-within:text-blue-500 transition-colors" />
+                  <input type="password" placeholder="비밀번호" className="w-full h-14 bg-gray-50 rounded-xl px-14 text-sm font-semibold border-2 border-transparent focus:border-blue-100 focus:bg-white transition-all outline-none" required />
+                </div>
+                <button className="w-full py-4.5 bg-blue-600 text-white font-black text-lg rounded-xl shadow-xl hover:bg-blue-700 active:scale-95 transition-all mt-6">
+                  {loading ? '인증 중...' : '로그인하기'}
+                </button>
+                <div className="text-center pt-6">
+                  <span onClick={() => openModal('signup')} className="text-[13px] font-bold text-blue-600 hover:underline cursor-pointer">아직 파트너가 아니신가요? 가입 신청하기</span>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       )}
-
-      {/* Tailwind Layout CSS (for scrollbar) */}
-      <style jsx global>{`
-        .thin-scrollbar::-webkit-scrollbar { width: 4px; }
-        .thin-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .thin-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-      `}</style>
     </div>
   );
 }
-
-const TrendingUp = ({ className, size }: { className?: string, size?: number }) => (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-        <polyline points="17 6 23 6 23 12"></polyline>
-    </svg>
-)

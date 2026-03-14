@@ -117,20 +117,23 @@ export function middleware(request: NextRequest) {
     }
 
 
+    // [성역] /audit 경로는 봇 체크 및 Rate Limit 제외 (심사 및 테스트용)
+    const isAuditPath = pathname.startsWith('/audit');
+
     // 2. 봇 User-Agent 차단
-    const isBot = BLOCKED_BOTS.some(bot => ua.includes(bot));
-    if (isBot) {
+    const isBot = BLOCKED_BOTS.some(bot => ua.includes(bot.toLowerCase()));
+    if (isBot && !isAuditPath) {
         console.warn(`[BOT BLOCKED] IP: ${ip} | UA: ${ua.substring(0, 80)}`);
         return blocked('자동화된 접근이 차단되었습니다.', 403);
     }
 
     // 3. User-Agent 없는 요청 차단 (빈 UA는 거의 100% 봇)
-    if (!ua || ua.length < 10) {
+    if ((!ua || ua.length < 10) && !isAuditPath) {
         return blocked('올바른 브라우저로 접속해주세요.', 403);
     }
 
-    // 4. Rate Limiting — 1분에 60회 초과 시 차단
-    if (isRateLimited(ip)) {
+    // 4. Rate Limiting — 1분에 60회 초과 시 차단 (다만 /audit 경로는 제외)
+    if (isRateLimited(ip) && !isAuditPath) {
         console.warn(`[RATE LIMITED] IP: ${ip} | Path: ${pathname}`);
         return new NextResponse('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.', {
             status: 429,
