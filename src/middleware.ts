@@ -153,9 +153,9 @@ export function middleware(request: NextRequest) {
         response.headers.set('X-Content-Type-Options', 'nosniff');
         response.headers.set('X-XSS-Protection', '1; mode=block');
     } else {
-        // 시뮬레이터 모니터링을 위해 모든 프레임 제한 해제
+        // 시뮬레이터 모니터링을 위해 모든 프레임 제한 해제 (file:// 환경 포함)
         response.headers.delete('X-Frame-Options');
-        response.headers.set('Content-Security-Policy', "frame-ancestors *;");
+        response.headers.delete('Content-Security-Policy');
         response.headers.set('Access-Control-Allow-Origin', '*');
         response.headers.delete('X-Content-Type-Options');
     }
