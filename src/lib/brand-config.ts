@@ -4,7 +4,8 @@
  * - P2 (코코알바) Vercel 프로젝트: 미설정(default false) → 실제 P2 사이트 렌더링
  * - P4 (초코파트너스) Vercel 프로젝트: NEXT_PUBLIC_AUDIT_MODE=true → AuditLanding 렌더링
  */
-export const AUDIT_MODE = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
+const rawAuditMode = String(process.env.NEXT_PUBLIC_AUDIT_MODE || '').trim().toLowerCase();
+export const AUDIT_MODE = rawAuditMode === 'true' || process.env.NEXT_PUBLIC_SERVICE_PHASE === 'PRE_RELEASE' || !process.env.NEXT_PUBLIC_SERVICE_PHASE;
 
 /**
  * 기업전용인증 게이트 마스터 락 (Master Lock)

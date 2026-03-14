@@ -22,7 +22,7 @@ import { AUDIT_MODE } from "@/lib/brand-config";
  * - 기본 (P2 코코알바)               → getCurrentSEO() 기반 타이틀
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const isAuditMode = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
+  const isAuditMode = AUDIT_MODE;
 
   if (isAuditMode) {
     return {
@@ -72,6 +72,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('[RootLayout] AUDIT_MODE:', AUDIT_MODE);
   // [Optimization] Server-side data prep for sidebars
   const grandAds = (shopsData as Shop[]).filter(s => s.tier === 'grand');
   const premiumAds = (shopsData as Shop[]).filter(s => s.tier === 'premium' || s.is_premium);
@@ -160,7 +161,7 @@ export default function RootLayout({
           }}
         />
         
-        {process.env.NEXT_PUBLIC_AUDIT_MODE === 'true' ? (
+        {AUDIT_MODE ? (
           // [Perfect Cloaking] 완전한 B2B 솔루션 화면만 렌더링 (코코알바 테마/사이드바 등 일절 없음)
           <B2BAuditPage />
         ) : (
