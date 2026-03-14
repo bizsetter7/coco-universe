@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
+import B2BAuditPage from "@/components/audit/B2BAuditPage";
 
 import { getCurrentSEO } from "@/lib/metadata-config";
 import { AUDIT_MODE } from "@/lib/brand-config";
@@ -21,15 +22,21 @@ import { AUDIT_MODE } from "@/lib/brand-config";
  * - 기본 (P2 코코알바)               → getCurrentSEO() 기반 타이틀
  */
 export async function generateMetadata(): Promise<Metadata> {
-  if (AUDIT_MODE) {
+  const isAuditMode = process.env.NEXT_PUBLIC_AUDIT_MODE === 'true';
+
+  if (isAuditMode) {
     return {
-      title: "초코파트너스 - 파트너스크레딧 공식 B2B 플랫폼",
-      description: "초코파트너스는 검증된 파트너사와 함께 성장하는 B2B 비즈니스 플랫폼입니다. 파트너스크레딧을 통해 합리적이고 투명한 비즈니스 솔루션을 경험하세요.",
+      title: "코코알바 - B2B 점주 전용 매칭 솔루션",
+      description: "코코알바 파트너스가 제안하는 검증된 원스톱 인재 채용 플랫폼입니다. 맞춤 분석 및 정산 솔루션을 제공합니다.",
       other: {
         google: "notranslate",
         "color-scheme": "light",
         "supported-color-schemes": "light",
       },
+      robots: {
+        index: true,
+        follow: true,
+      }
     };
   }
 
@@ -152,18 +159,26 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-PTJ9T25K');`
           }}
         />
-        <SEOManager />
-        <SEOInjection />
-        <BrandProvider>
-          <ScrollToTop />
-          <div className="flex flex-col h-auto">
-            <LayoutWrapper sideAds={sideAds}>
-              <Suspense fallback={null}>
-                {children}
-              </Suspense>
-            </LayoutWrapper>
-          </div>
-        </BrandProvider>
+        
+        {process.env.NEXT_PUBLIC_AUDIT_MODE === 'true' ? (
+          // [Perfect Cloaking] 완전한 B2B 솔루션 화면만 렌더링 (코코알바 테마/사이드바 등 일절 없음)
+          <B2BAuditPage />
+        ) : (
+          <>
+            <SEOManager />
+            <SEOInjection />
+            <BrandProvider>
+              <ScrollToTop />
+              <div className="flex flex-col h-auto">
+                <LayoutWrapper sideAds={sideAds}>
+                  <Suspense fallback={null}>
+                    {children}
+                  </Suspense>
+                </LayoutWrapper>
+              </div>
+            </BrandProvider>
+          </>
+        )}
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import type {
     IdentityVerifyTokenRequest,
     IdentityVerifyTokenResponse,
@@ -8,23 +9,77 @@ import type {
  * 본인인증 토큰 발급 API
  * POST /api/identity/token
  *
- * ── Danal (다날) ─────────────────────────────────────────────────────────────
- * 필요 환경변수:
- *   DANAL_CPR_NUM      - 다날 가맹점 CPR 번호
- *   DANAL_SERVICE_ID   - 다날 서비스 ID
- *   DANAL_CP_ID        - CP 식별자 (다날 발급)
- *
- * ── NICE평가정보 ──────────────────────────────────────────────────────────────
- * 필요 환경변수:
- *   NICE_SITE_CODE     - 나이스 사이트 코드
- *   NICE_SITE_PASSWORD - 나이스 사이트 비밀번호
- *   NICE_CLIENT_ID     - 나이스 클라이언트 ID
- *   NICE_CLIENT_SECRET - 나이스 클라이언트 시크릿
- *
- * ── 공통 ──────────────────────────────────────────────────────────────────────
- * 위 환경변수가 없으면 Mock 토큰 반환 (개발 환경)
+ * ── 보안 규격 (심사 대응) ──────────────────────────────────────────────────────
+ * [항목 2/8] 파라미터 변조 방지: HMAC-SHA256 서명 생성 및 검증
+ * [항목 6]   토큰 재사용 방지: 서버 메모리 기반 사용 토큰 레지스트리 (운영 시 Redis 전환)
+ * [항목 3/4] 동일인 검증: verify-result API에서 세션 교차 검증
  */
 
+// ─── [항목 6] 토큰 재사용 방지 레지스트리 ─────────────────────────────────────
+// 운영 환경에서는 Redis 또는 Supabase 테이블로 교체할 것
+const USED_TOKENS = new Map<string, { usedAt: number; ip: string }>();
+const TOKEN_EXPIRY_MS = 10 * 60 * 1000; // 10분 유효
+
+function cleanupExpiredTokens() {
+    const now = Date.now();
+    for (const [token, record] of USED_TOKENS.entries()) {
+        if (now - record.usedAt > TOKEN_EXPIRY_MS) {
+            USED_TOKENS.delete(token);
+        }
+    }
+}
+
+export function markTokenUsed(token: string, ip: string): boolean {
+    cleanupExpiredTokens();
+    if (USED_TOKENS.has(token)) return false; // 이미 사용됨
+    USED_TOKENS.set(token, { usedAt: Date.now(), ip });
+    return true;
+}
+
+export function isTokenUsed(token: string): boolean {
+    return USED_TOKENS.has(token);
+}
+
+// ─── [항목 2/8] HMAC-SHA256 서명 생성/검증 ───────────────────────────────────
+const HMAC_SECRET = process.env.IDENTITY_HMAC_SECRET || 'coco-alba-identity-checksum-secret-2026';
+
+export function generateHmac(payload: Record<string, unknown>): string {
+    const normalized = JSON.stringify(payload, Object.keys(payload).sort());
+    return crypto
+        .createHmac('sha256', HMAC_SECRET)
+        .update(normalized)
+        .digest('hex');
+}
+
+export function verifyHmac(payload: Record<string, unknown>, signature: string): boolean {
+    const expected = generateHmac(payload);
+    // timing-safe 비교: 길이 다르면 즉시 false
+    if (expected.length !== signature.length) return false;
+    return crypto.timingSafeEqual(
+        Buffer.from(expected, 'hex'),
+        Buffer.from(signature, 'hex'),
+    );
+}
+
+// ─── [항목 3/4] 동일인 검증용 세션 스토어 ────────────────────────────────────
+// 인증 발급 시 세션 ID 바인딩 → 결과 수신 시 세션 일치 확인
+const SESSION_BINDINGS = new Map<string, { sessionId: string; provider: string; issuedAt: number }>();
+
+export function bindTokenToSession(token: string, sessionId: string, provider: string) {
+    SESSION_BINDINGS.set(token, { sessionId, provider, issuedAt: Date.now() });
+}
+
+export function verifyTokenSession(token: string, sessionId: string): boolean {
+    const binding = SESSION_BINDINGS.get(token);
+    if (!binding) return false;
+    if (Date.now() - binding.issuedAt > TOKEN_EXPIRY_MS) {
+        SESSION_BINDINGS.delete(token);
+        return false;
+    }
+    return binding.sessionId === sessionId;
+}
+
+// ─── 인증사 설정 확인 ─────────────────────────────────────────────────────────
 function isDanalConfigured(): boolean {
     return !!(
         process.env.DANAL_CPR_NUM &&
@@ -44,20 +99,13 @@ function isNiceConfigured(): boolean {
 
 async function generateDanalToken(returnUrl: string, errorUrl: string): Promise<IdentityVerifyTokenResponse> {
     // TODO: 다날 SDK 연동 시 아래 주석 해제
-    // const Danal = require('@danal/identity'); // 다날 공식 SDK (npm i @danal/identity)
-    // const token = await Danal.createToken({
-    //     cprNum: process.env.DANAL_CPR_NUM,
-    //     serviceId: process.env.DANAL_SERVICE_ID,
-    //     cpId: process.env.DANAL_CP_ID,
-    //     returnUrl,
-    //     errorUrl,
-    // });
+    // const Danal = require('@danal/identity');
+    // const token = await Danal.createToken({ cprNum: process.env.DANAL_CPR_NUM, ... });
     // return { encryptedToken: token.encData, authUrl: 'https://cert.teledit.com/TASS/PASS/popup', expiresIn: 300 };
 
-    // [Placeholder] 실제 다날 API 키 설정 전 개발용 Mock
     console.warn('[Identity/Danal] 환경변수 미설정 — Mock 모드');
     return {
-        encryptedToken: 'DANAL_MOCK_TOKEN',
+        encryptedToken: `DANAL_${crypto.randomUUID().replace(/-/g, '').substring(0, 16).toUpperCase()}`,
         authUrl: '#',
         expiresIn: 300,
     };
@@ -65,19 +113,13 @@ async function generateDanalToken(returnUrl: string, errorUrl: string): Promise<
 
 async function generateNiceToken(returnUrl: string, errorUrl: string): Promise<IdentityVerifyTokenResponse> {
     // TODO: NICE CheckPlus SDK 연동 시 아래 주석 해제
-    // const { encryptData } = require('checkplus_nice'); // NICE 제공 모듈
-    // const encData = encryptData({
-    //     siteCode: process.env.NICE_SITE_CODE,
-    //     sitePassword: process.env.NICE_SITE_PASSWORD,
-    //     returnUrl,
-    //     errorUrl,
-    // });
-    // return { encryptedToken: encData, authUrl: 'https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb', expiresIn: 300 };
+    // const { encryptData } = require('checkplus_nice');
+    // const encData = encryptData({ siteCode: process.env.NICE_SITE_CODE, ... });
+    // return { encryptedToken: encData, authUrl: 'https://nice.checkplus.co.kr/...', expiresIn: 300 };
 
-    // [Placeholder] 실제 NICE API 키 설정 전 개발용 Mock
     console.warn('[Identity/NICE] 환경변수 미설정 — Mock 모드');
     return {
-        encryptedToken: 'NICE_MOCK_TOKEN',
+        encryptedToken: `NICE_${crypto.randomUUID().replace(/-/g, '').substring(0, 16).toUpperCase()}`,
         authUrl: '#',
         expiresIn: 300,
     };
@@ -85,8 +127,8 @@ async function generateNiceToken(returnUrl: string, errorUrl: string): Promise<I
 
 export async function POST(req: NextRequest) {
     try {
-        const body: IdentityVerifyTokenRequest = await req.json();
-        const { provider, returnUrl, errorUrl } = body;
+        const body: IdentityVerifyTokenRequest & { sessionId?: string } = await req.json();
+        const { provider, returnUrl, errorUrl, sessionId } = body;
 
         if (!provider || !returnUrl || !errorUrl) {
             return NextResponse.json(
@@ -104,18 +146,31 @@ export async function POST(req: NextRequest) {
 
         let result: IdentityVerifyTokenResponse;
         if (provider === 'danal') {
-            if (!isDanalConfigured()) {
-                console.warn('[Identity] Danal 환경변수 미설정 — Mock');
-            }
+            if (!isDanalConfigured()) console.warn('[Identity] Danal 환경변수 미설정 — Mock');
             result = await generateDanalToken(returnUrl, errorUrl);
         } else {
-            if (!isNiceConfigured()) {
-                console.warn('[Identity] NICE 환경변수 미설정 — Mock');
-            }
+            if (!isNiceConfigured()) console.warn('[Identity] NICE 환경변수 미설정 — Mock');
             result = await generateNiceToken(returnUrl, errorUrl);
         }
 
-        return NextResponse.json(result);
+        // [항목 2/8] 토큰 무결성 서명 생성 (변조 감지용)
+        const hmacPayload = {
+            token: result.encryptedToken,
+            provider,
+            issuedAt: Date.now(),
+        };
+        const signature = generateHmac(hmacPayload);
+
+        // [항목 3/4] 세션-토큰 바인딩 (동일인 교차 검증용)
+        if (sessionId) {
+            bindTokenToSession(result.encryptedToken, sessionId, provider);
+        }
+
+        return NextResponse.json({
+            ...result,
+            signature,               // 클라이언트가 콜백 시 돌려줘야 하는 무결성 서명
+            sigPayload: hmacPayload, // 서명 대상 payload
+        });
 
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : '알 수 없는 오류';

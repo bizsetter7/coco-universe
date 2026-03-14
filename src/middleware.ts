@@ -87,12 +87,35 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
-    // 1. 관리자 페이지 — 내부 네트워크 전용 (추후 IP 화이트리스트 적용 가능)
+    // 1. 관리자 페이지 — Supabase 세션 필수 (미인증 접근 즉시 차단)
     if (pathname.startsWith('/admin')) {
-        const referer = request.headers.get('referer') || '';
-        // 관리자 페이지는 일단 통과 (추후 IP 기반 제한 추가 가능)
-        // return blocked('관리자 전용 페이지입니다.', 403);
+        // Supabase 세션 쿠키 확인 (프로젝트 ref: ronqwailyistjuyolmyh)
+        const sessionCookie =
+            request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
+            request.cookies.get('sb-access-token') ||
+            request.cookies.get('supabase-auth-token');
+
+        if (!sessionCookie) {
+            // 미인증 상태 → 홈 로그인 페이지로 리다이렉트 (URL 히스토리 대체)
+            return NextResponse.redirect(new URL('/?page=login', request.url));
+        }
+        // 세션 있음 → 통과 (클라이언트에서 역할 재검증)
     }
+
+    // [항목 11] 주요 보호 페이지 — 로그인 세션 필수
+    const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard', '/favorites', '/talent'];
+    const needsAuth = PROTECTED_AUTH_PATHS.some(p => pathname.startsWith(p));
+    if (needsAuth) {
+        const sessionCookie =
+            request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
+            request.cookies.get('sb-access-token') ||
+            request.cookies.get('supabase-auth-token');
+
+        if (!sessionCookie) {
+            return NextResponse.redirect(new URL('/?page=login', request.url));
+        }
+    }
+
 
     // 2. 봇 User-Agent 차단
     const isBot = BLOCKED_BOTS.some(bot => ua.includes(bot));
