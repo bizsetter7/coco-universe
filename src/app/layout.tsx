@@ -23,6 +23,23 @@ import { AUDIT_MODE } from "@/lib/brand-config";
  */
 export async function generateMetadata(): Promise<Metadata> {
   const isAuditMode = AUDIT_MODE;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cocoalba.kr';
+  const isCloneSite = siteUrl.includes('d386') || (siteUrl.includes('vercel.app') && !siteUrl.includes('cocoalba'));
+
+  // d386 복제사이트: 구글 색인 원천 차단 + 본 사이트로 canonical 지정
+  if (isCloneSite) {
+    return {
+      title: '코코알바',
+      robots: {
+        index: false,
+        follow: false,
+        googleBot: { index: false, follow: false },
+      },
+      alternates: {
+        canonical: 'https://www.cocoalba.kr',
+      },
+    };
+  }
 
   if (isAuditMode) {
     return {
