@@ -56,7 +56,7 @@ export const Footer = () => {
                     </div>
 
                     {/* 2열: 운영시간 + 이메일 */}
-                    <div className="shrink-0 px-6 text-xs space-y-1 self-end pb-0.5">
+                    <div className="shrink-0 px-6 text-xs space-y-1 self-start pt-0.5">
                         <p>
                             <span className="font-black mr-2" style={{ color: HOT_PINK }}>평일</span>
                             10:00 ~ 18:00 (주말·공휴일 휴무)
@@ -109,10 +109,10 @@ export const Footer = () => {
                     {/* 4열: 무통장입금 (우측정렬) */}
                     <div className="shrink-0 pl-6 border-l border-gray-200 text-xs text-right space-y-1">
                         <p className="font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
-                        <p className="font-black text-gray-900">토스</p>
-                        <p className="text-2xl font-black text-gray-900 tracking-tight leading-tight">
-                            1002-4683-1712
-                        </p>
+                        <div className="flex items-baseline justify-end gap-2">
+                            <span className="font-black text-gray-900">토스</span>
+                            <span className="text-2xl font-black text-gray-900 tracking-tight leading-tight">1002-4683-1712</span>
+                        </div>
                         <p>예금주 : 고남우(초코아이디어)</p>
                     </div>
 
