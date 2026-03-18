@@ -27,10 +27,10 @@ const WageBadge = () => (
         target="_blank"
         rel="noopener noreferrer"
         title="임금체불사업주 명단 확인"
-        className="shrink-0 flex flex-col items-center justify-center w-[76px] h-[76px] rounded-full hover:opacity-80 transition-opacity select-none"
+        className="shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-xl hover:opacity-80 transition-opacity select-none"
         style={{
             background: 'radial-gradient(circle at 38% 32%, #f87171, #b91c1c)',
-            boxShadow: '0 3px 12px rgba(185,28,28,0.45)',
+            boxShadow: '0 3px 12px rgba(185,28,28,0.40)',
         }}
     >
         <span className="text-white font-black text-xl leading-none mb-0.5">₩</span>
@@ -41,68 +41,88 @@ const WageBadge = () => (
 
 export const Footer = () => {
     return (
-        <footer className="border-t border-gray-100 bg-gray-50 font-sans text-gray-500">
-            <div className="w-full max-w-5xl mx-auto px-6 md:px-8">
+        <footer className="border-t border-gray-200 bg-gray-50 font-sans text-gray-500">
+            <div className="w-full max-w-5xl mx-auto px-6">
 
-                {/* ── PC: 3열 정보 그리드 ─────────────────────────────── */}
-                <div className="hidden md:grid md:grid-cols-3 gap-0 py-10 border-b border-gray-200">
+                {/* ── PC: LADYALBA 스타일 flex 5열 ─────────────────────── */}
+                <div className="hidden md:flex items-start gap-0 py-8 border-b border-gray-200">
 
-                    {/* 고객센터 */}
-                    <div className="space-y-2 pr-12">
-                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>고객센터</p>
-                        <p className="text-4xl font-black text-gray-900 tracking-tight">1877-1442</p>
-                        <p className="text-sm text-gray-500">평일 10:00 ~ 18:00 (주말·공휴일 휴무)</p>
-                        <p className="text-sm text-gray-500">점심 12:00 ~ 13:00</p>
-                        <p className="text-sm text-gray-500 mt-1">
-                            E-mail&nbsp;
-                            <a href="mailto:bizsetter7@gmail.com" className="font-semibold hover:underline">
+                    {/* 1열: 고객센터 + 전화번호 */}
+                    <div className="shrink-0 pr-6 border-r border-gray-200">
+                        <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>고객센터</p>
+                        <p className="text-[2.2rem] font-black text-gray-900 tracking-tight leading-none">
+                            1877-1442
+                        </p>
+                    </div>
+
+                    {/* 2열: 운영시간 + 이메일 */}
+                    <div className="shrink-0 px-6 text-xs space-y-1 self-end pb-0.5">
+                        <p>
+                            <span className="font-black mr-2" style={{ color: HOT_PINK }}>평일</span>
+                            10:00 ~ 18:00 (주말·공휴일 휴무)
+                        </p>
+                        <p>
+                            <span className="font-black mr-2" style={{ color: HOT_PINK }}>점심</span>
+                            12:00 ~ 13:00
+                        </p>
+                        <p>
+                            <span className="font-black mr-2">E-mail</span>
+                            <a href="mailto:bizsetter7@gmail.com" className="hover:underline">
                                 bizsetter7@gmail.com
                             </a>
                         </p>
                     </div>
 
-                    {/* 최저임금 */}
-                    <div className="space-y-2 px-12 border-x border-gray-200">
-                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>
+                    {/* 스페이서 */}
+                    <div className="flex-1" />
+
+                    {/* 3열: 최저임금 */}
+                    <div className="shrink-0 px-6 border-l border-gray-200 text-xs space-y-1">
+                        <p className="font-black mb-2" style={{ color: HOT_PINK }}>
                             {MIN_WAGE_YEAR}년 최저임금
                         </p>
-                        <div className="flex items-baseline gap-3">
-                            <p className="text-3xl font-black text-gray-900">
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-black text-gray-900">
                                 {MIN_WAGE_AMOUNT}원
-                            </p>
+                            </span>
                             <a
                                 href="https://www.minimumwage.go.kr"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm font-bold hover:underline"
+                                className="font-bold hover:underline text-xs"
                                 style={{ color: HOT_PINK }}
                             >
                                 더보기 &gt;
                             </a>
                         </div>
-                        <div className="pt-1">
-                            <a
-                                href="https://www.moel.go.kr/info/defaulter/defaulterList.do"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm font-bold hover:underline"
-                                style={{ color: HOT_PINK }}
-                            >
-                                임금체불사업주 명단 확인하기 &gt;
-                            </a>
-                        </div>
+                        <a
+                            href="https://www.moel.go.kr/info/defaulter/defaulterList.do"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-bold hover:underline block"
+                            style={{ color: HOT_PINK }}
+                        >
+                            임금체불사업주 명단 확인하기 &gt;
+                        </a>
                     </div>
 
-                    {/* 무통장입금 — 우측정렬 */}
-                    <div className="space-y-2 pl-12 text-right">
-                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>무통장입금안내</p>
-                        <p className="text-sm font-black text-gray-900">토스</p>
-                        <p className="text-3xl font-black text-gray-900 tracking-tight">1002-4683-1712</p>
-                        <p className="text-sm text-gray-500">예금주 : 고남우(초코아이디어)</p>
+                    {/* 4열: 무통장입금 (우측정렬) */}
+                    <div className="shrink-0 pl-6 border-l border-gray-200 text-xs text-right space-y-1">
+                        <p className="font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
+                        <p className="font-black text-gray-900">토스</p>
+                        <p className="text-2xl font-black text-gray-900 tracking-tight leading-tight">
+                            1002-4683-1712
+                        </p>
+                        <p>예금주 : 고남우(초코아이디어)</p>
+                    </div>
+
+                    {/* 5열: 배지 */}
+                    <div className="shrink-0 pl-4 self-center">
+                        <WageBadge />
                     </div>
                 </div>
 
-                {/* ── 모바일: 세로 쌓기 ────────────────────────────────── */}
+                {/* ── 모바일: 세로 쌓기 (변경 없음) ────────────────────── */}
                 <div className="md:hidden py-5 space-y-5 border-b border-gray-200 text-xs">
                     <div>
                         <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>고객센터</p>
@@ -131,7 +151,7 @@ export const Footer = () => {
                 </div>
 
                 {/* ── 네비 링크 ───────────────────────────────────────── */}
-                <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 py-5 border-b border-gray-200 text-[10px] md:text-sm font-medium">
+                <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 py-4 border-b border-gray-200 text-[10px] md:text-sm font-medium">
                     {NAV_LINKS.map(({ label, href }, i) => (
                         <React.Fragment key={label}>
                             <Link
@@ -148,10 +168,14 @@ export const Footer = () => {
                     ))}
                 </div>
 
-                {/* ── 사업자 정보 + 배지 ──────────────────────────────── */}
-                <div className="py-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
-                    <WageBadge />
-                    <div className="text-[10px] md:text-xs text-gray-400 space-y-1 leading-relaxed">
+                {/* ── 사업자 정보 ──────────────────────────────────────── */}
+                <div className="py-5 flex items-start gap-4">
+                    {/* 모바일용 배지 */}
+                    <div className="md:hidden shrink-0">
+                        <WageBadge />
+                    </div>
+
+                    <div className="text-[10px] md:text-[11px] text-gray-400 space-y-1 leading-relaxed">
                         <p>
                             주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어
                         </p>
@@ -160,10 +184,13 @@ export const Footer = () => {
                             통신판매업신고번호 : 제 2017-경기송탄-0029호&nbsp;&nbsp;|&nbsp;&nbsp;
                             직업정보제공사업신고번호 : J1806020260001
                         </p>
-                        <p>유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
-                        <p className="text-gray-400/60 pt-0.5">
-                            COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
+                        {/* PC: 한 줄 */}
+                        <p className="hidden md:block">
+                            유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보&nbsp;&nbsp;·&nbsp;&nbsp;COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
                         </p>
+                        {/* 모바일: 두 줄 */}
+                        <p className="md:hidden">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
+                        <p className="md:hidden text-gray-400/60">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                     </div>
                 </div>
 
