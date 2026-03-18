@@ -151,7 +151,7 @@ export const Footer = () => {
                 </div>
 
                 {/* ── 네비 링크 ───────────────────────────────────────── */}
-                <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 py-4 border-b border-gray-200 text-[10px] md:text-sm font-medium">
+                <div className="flex flex-wrap justify-center md:justify-between items-center gap-x-3 md:gap-x-0 gap-y-1.5 py-4 border-b border-gray-200 text-[10px] md:text-sm font-medium">
                     {NAV_LINKS.map(({ label, href }, i) => (
                         <React.Fragment key={label}>
                             <Link
