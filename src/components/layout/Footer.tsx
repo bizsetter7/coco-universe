@@ -42,7 +42,7 @@ const WageBadge = () => (
 export const Footer = () => {
     return (
         <footer className="border-t border-gray-100 bg-gray-50 font-sans text-gray-500">
-            <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
+            <div className="w-full max-w-5xl mx-auto px-6 md:px-8">
 
                 {/* ── PC: 3열 정보 그리드 ─────────────────────────────── */}
                 <div className="hidden md:grid md:grid-cols-3 gap-0 py-10 border-b border-gray-200">
@@ -93,8 +93,8 @@ export const Footer = () => {
                         </div>
                     </div>
 
-                    {/* 무통장입금 */}
-                    <div className="space-y-2 pl-12">
+                    {/* 무통장입금 — 우측정렬 */}
+                    <div className="space-y-2 pl-12 text-right">
                         <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>무통장입금안내</p>
                         <p className="text-sm font-black text-gray-900">토스</p>
                         <p className="text-3xl font-black text-gray-900 tracking-tight">1002-4683-1712</p>

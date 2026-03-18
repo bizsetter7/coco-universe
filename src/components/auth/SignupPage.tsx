@@ -329,7 +329,7 @@ export const SignupPage = () => {
 
     // ══════════════════════════════════════════════════════════════════════
     return (
-        <div className="min-h-screen bg-gray-950 py-8 px-4">
+        <div className="min-h-screen bg-transparent py-8 px-4">
             <div className="max-w-md mx-auto">
                 <StepIndicator current={step} primary={primary} />
 

@@ -87,6 +87,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     // ── [Public Page Check] ───────────────────────────────────────────────────
     const currentQueryPage = searchParams?.get('page');
     const isPublicPage = ['signup', 'find-id', 'find-pw', 'support', 'faq', 'inquiry'].includes(currentQueryPage || '');
+    // 로그인 전 인증 관련 페이지 — 사이드 배너 미노출
+    const isAuthPage = ['login', 'signup', 'find-id', 'find-pw', 'guest'].includes(currentQueryPage || '');
 
     // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지는 제외)
     if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isPublicPage) {
@@ -115,9 +117,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             */}
             <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
 
-                <div className={isMobile || isAdminPage ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
-                    {/* Left Sidebar Spacer + Component - [Optimization] PC Only */}
-                    {(!isMobile && !isAdminPage) && (
+                <div className={(isMobile || isAdminPage || isAuthPage) ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
+                    {/* Left Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
+                    {(!isMobile && !isAdminPage && !isAuthPage) && (
                         <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                             <StickyWrapper offsetTop={56} zIndex={10001}>
                                 <BannerSidebar side="left" shops={sideAds} />
@@ -130,8 +132,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                         {children}
                     </main>
 
-                    {/* Right Sidebar Spacer + Component - [Optimization] PC Only */}
-                    {(!isMobile && !isAdminPage) && (
+                    {/* Right Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
+                    {(!isMobile && !isAdminPage && !isAuthPage) && (
                         <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                             <StickyWrapper offsetTop={56} zIndex={10001}>
                                 <BannerSidebar side="right" shops={sideAds} />
