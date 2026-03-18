@@ -1,10 +1,10 @@
 /**
  * 본인인증 공통 인터페이스
- * 지원 제공업체: Danal (다날), NICE (나이스평가정보)
+ * 지원 제공업체: Danal (다날)
  * 연동 방식: 팝업/리다이렉트 방식 공통 추상화
  */
 
-export type IdentityVerifyProvider = 'danal' | 'nice';
+export type IdentityVerifyProvider = 'danal';
 
 export interface IdentityVerifyRequest {
     /** 인증 제공업체 */
@@ -30,6 +30,10 @@ export interface IdentityVerifyResult {
     gender?: string;
     /** 내/외국인 구분 (local/foreign) */
     nationality?: 'local' | 'foreign';
+    /** 개인 식별 고유값 (상점간 불변) */
+    ci?: string;
+    /** 상점별 식별 고유값 (상점마다 다름) */
+    di?: string;
     /** 오류 코드 (실패 시) */
     errorCode?: string;
     errorMessage?: string;

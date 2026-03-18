@@ -5,7 +5,7 @@
  * - P4 (초코파트너스) Vercel 프로젝트: NEXT_PUBLIC_AUDIT_MODE=true → AuditLanding 렌더링
  */
 const rawAuditMode = String(process.env.NEXT_PUBLIC_AUDIT_MODE || '').trim().toLowerCase();
-export const AUDIT_MODE = rawAuditMode === 'true' || process.env.NEXT_PUBLIC_SERVICE_PHASE === 'PRE_RELEASE' || !process.env.NEXT_PUBLIC_SERVICE_PHASE;
+export const AUDIT_MODE = rawAuditMode === 'true';
 
 /**
  * 기업전용인증 게이트 마스터 락 (Master Lock)
@@ -22,7 +22,7 @@ export const AUDIT_MODE = rawAuditMode === 'true' || process.env.NEXT_PUBLIC_SER
  *   2) Vercel 환경변수: NEXT_PUBLIC_ADULT_GATE_DISABLED=false 설정
  *   3) 재배포
  */
-export const ADULT_GATE_DISABLED = process.env.NEXT_PUBLIC_ADULT_GATE_DISABLED !== 'false';
+export const ADULT_GATE_DISABLED = process.env.NEXT_PUBLIC_ADULT_GATE_DISABLED === 'true';
 
 /**
  * 하위 호환성을 위해 유지 (곧 제거 예정)

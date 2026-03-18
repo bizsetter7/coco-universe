@@ -26,12 +26,6 @@ export const IdentityVerifyModal = ({ onClose, onVerified }: IdentityVerifyModal
             desc: 'SKT·KT·LGU+ 통신사 PASS 앱 본인확인',
             color: 'blue',
         },
-        {
-            id: 'nice',
-            label: 'NICE 본인확인',
-            desc: '나이스평가정보 휴대폰 본인인증',
-            color: 'green',
-        },
     ];
 
     const handleVerify = async (provider: IdentityVerifyProvider) => {
@@ -39,80 +33,40 @@ export const IdentityVerifyModal = ({ onClose, onVerified }: IdentityVerifyModal
         setStep('loading');
         setError('');
 
+        if (typeof (window as any).PortOne === 'undefined') {
+            setError('인증 라이브러리를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+            setStep('select');
+            return;
+        }
+
         try {
-            // 1. 서버에서 암호화 토큰 생성
-            const tokenRes = await fetch('/api/identity/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    provider,
-                    returnUrl: `${window.location.origin}/api/identity/callback`,
-                    errorUrl: `${window.location.origin}/api/identity/callback?error=true`,
-                }),
+            // 1. 포트원 V2 인증 요청
+            const response = await (window as any).PortOne.requestIdentityVerification({
+                storeId: 'store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a',
+                channelKey: 'channel-key-4d5d9730-3097-467b-9e86-21bb1fad82c0',
+                identityVerificationId: `signup-${Date.now()}`, // [필수] 고유 식별번호 주입
             });
 
-            const tokenData = await tokenRes.json();
-
-            if (!tokenRes.ok || !tokenData.encryptedToken) {
-                throw new Error(tokenData.error || '토큰 생성 실패');
-            }
-
-            // 2. Mock 모드 감지 (실제 키 미설정 시)
-            const isMock = tokenData.encryptedToken.includes('MOCK') || tokenData.authUrl === '#';
-
-            if (isMock) {
-                // 개발 환경: 2초 딜레이 후 Mock 성공 반환
-                await new Promise((r) => setTimeout(r, 1500));
-                setStep('done');
-                onVerified({
-                    success: true,
-                    provider,
-                    name: '홍길동 (Mock)',
-                    birthdate: '199001**',
-                    phone: '010-****-1234',
-                    gender: 'M',
-                    nationality: 'local',
-                });
+            if (response.code != null) {
+                setError(`인증 실패: ${response.message}`);
+                setStep('select');
                 return;
             }
 
-            // 3. 실제 인증 팝업 열기
-            const popupWidth = 500;
-            const popupHeight = 650;
-            const left = window.screenX + (window.outerWidth - popupWidth) / 2;
-            const top = window.screenY + (window.outerHeight - popupHeight) / 2;
+            // 2. 서버사이드 최종 검증
+            const verifyRes = await fetch('/api/identity/verify-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identityVerificationId: response.identityVerificationId })
+            });
 
-            // 팝업 방식: 제공업체 URL에 폼 POST
-            const popup = window.open('', 'identity_verify', `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`);
-            if (!popup) throw new Error('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.');
-
-            // 팝업에 폼 POST 제출 (다날/NICE 공통 패턴)
-            const formHtml = `
-                <html><body>
-                <form id="f" method="POST" action="${tokenData.authUrl}">
-                    <input type="hidden" name="EncodeData" value="${tokenData.encryptedToken}" />
-                </form>
-                <script>document.getElementById('f').submit();</script>
-                </body></html>
-            `;
-            popup.document.write(formHtml);
-
-            // 팝업 결과 대기 (postMessage 기반)
-            const handleMessage = (event: MessageEvent) => {
-                if (event.origin !== window.location.origin) return;
-                if (event.data?.type === 'IDENTITY_VERIFY_RESULT') {
-                    window.removeEventListener('message', handleMessage);
-                    popup.close();
-                    if (event.data.success) {
-                        setStep('done');
-                        onVerified(event.data.result as IdentityVerifyResult);
-                    } else {
-                        setError(event.data.message || '인증에 실패했습니다. 다시 시도해주세요.');
-                        setStep('select');
-                    }
-                }
-            };
-            window.addEventListener('message', handleMessage);
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success) {
+                setStep('done');
+                onVerified(verifyData.result as IdentityVerifyResult);
+            } else {
+                throw new Error(verifyData.message || '인증 정보를 확인할 수 없습니다.');
+            }
 
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : '인증 오류가 발생했습니다.';

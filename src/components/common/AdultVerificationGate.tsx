@@ -8,289 +8,232 @@ import {
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import { AUDIT_MODE } from '@/lib/brand-config';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// 나이스평가정보 화이트셀(White Cell) 본인인증 연동 포인트
-//
-// 연동 흐름:
-//   1. 서버에서 NICE 암호화 토큰(enc_data) 발급 (/api/auth/nice-token)
-//   2. 아래 handleNiceAuth() 에서 NICE 팝업 form POST 호출
-//   3. 인증 완료 후 success_url 콜백 → /api/auth/verify-adult 로 복호화 요청
-//
-// 참고: https://developers.niceid.co.kr/identity-verification
-// ─────────────────────────────────────────────────────────────────
-
-// Mock User Database for Validation (Updated to match useAuth & LoginPage)
 const MOCK_USERS: Record<string, { type: 'corporate' | 'individual', name: string }> = {
-    'admin_shop': { type: 'corporate', name: '최고관리자' },
     'admin_user': { type: 'individual', name: '마스터관리자' },
     'test_shop': { type: 'corporate', name: '테스트 사장님' },
     'test_user': { type: 'individual', name: '테스트 회원' }
 };
 
+const VerificationBadge = () => (
+    <div className="py-2 flex items-center justify-center gap-3">
+        <div className="shrink-0 w-11 h-11 rounded-full border-[3px] border-red-600 flex items-center justify-center bg-white shadow-sm">
+            <span className="text-lg font-black text-gray-900 leading-none">19</span>
+        </div>
+        <div className="text-left">
+            <p className="text-[11.5px] font-black leading-tight text-gray-600">
+                본 정보내용은 청소년 유해매체물로서<br />
+                <span className="text-red-600">만 19세 미만 청소년은 이용할 수 없습니다.</span>
+            </p>
+        </div>
+    </div>
+);
+
+interface LoginFormProps {
+    id: string; setId: (v: string) => void;
+    pw: string; setPw: (v: string) => void;
+    loginType: 'corporate' | 'individual'; setLoginType: (v: any) => void;
+    handleLogin: (e: React.FormEvent) => void;
+    primaryColor?: string;
+    onNav: (page: string) => void;
+}
+
+const LoginForm = ({ id, setId, pw, setPw, loginType, setLoginType, handleLogin, primaryColor, onNav }: LoginFormProps) => (
+    <div className="space-y-2">
+        <div className="flex items-center justify-between">
+            <h3 className="text-[11px] font-black text-gray-900 flex items-center gap-1">
+                <span className="text-red-500 font-bold">→</span> 회원로그인
+            </h3>
+            <div className="flex items-center gap-2 text-[10px] font-black">
+                {['corporate', 'individual'].map((type) => (
+                    <label key={type} className="flex items-center gap-1 cursor-pointer">
+                        <input type="radio" value={type} checked={loginType === type} onChange={() => setLoginType(type as any)} className="w-3 h-3 accent-red-500" />
+                        <span className={loginType === type ? 'text-red-600' : 'text-gray-400'}>
+                            {type === 'corporate' ? '기업회원' : '개인회원'}
+                        </span>
+                    </label>
+                ))}
+            </div>
+        </div>
+
+        <form onSubmit={handleLogin} className="flex gap-1.5 h-20">
+            <div className="flex-1 flex flex-col gap-1.5">
+                <input type="text" placeholder="아이디" value={id} onChange={(e) => setId(e.target.value)} className="w-full h-1/2 px-3 border-2 border-gray-100 text-[12px] font-bold focus:border-red-500 outline-none rounded-md bg-gray-50/20" />
+                <input type="password" placeholder="비밀번호" value={pw} onChange={(e) => setPw(e.target.value)} className="w-full h-1/2 px-3 border-2 border-gray-100 text-[12px] font-bold focus:border-red-500 outline-none rounded-md bg-gray-50/20" />
+            </div>
+            <button type="submit" style={{ backgroundColor: primaryColor || '#f82b60' }} className="w-20 h-full text-white font-black text-xs hover:brightness-105 active:scale-95 transition-all rounded-md shadow-sm">로그인</button>
+        </form>
+
+        <div className="flex gap-4 px-1 text-[11px] font-bold text-gray-400">
+            <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" className="w-3.5 h-3.5 accent-red-500 rounded" defaultChecked /> 아이디저장</label>
+            <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" className="w-3.5 h-3.5 accent-red-500 rounded" defaultChecked /> 자동로그인</label>
+        </div>
+
+        <div className="grid grid-cols-3 gap-1.5">
+            <button onClick={() => onNav('find-id')} className="bg-gray-100 text-gray-600 text-[10.5px] font-black py-2.5 rounded-md hover:bg-gray-200 transition-colors">아이디찾기</button>
+            <button onClick={() => onNav('find-pw')} className="bg-gray-100 text-gray-600 text-[10.5px] font-black py-2.5 rounded-md hover:bg-gray-200 transition-colors">비번찾기</button>
+            <button onClick={() => onNav('signup')} className="bg-gray-900 text-white text-[10.5px] font-black py-2.5 rounded-md hover:brightness-110 transition-all">회원가입</button>
+        </div>
+    </div>
+);
+
 export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
-    // [New] Audit Mode Protection: Never show the gate during audit
-    if (AUDIT_MODE) {
-        return null;
-    }
+    if (AUDIT_MODE) return null;
 
     const brand = useBrand();
-    const { login, signIn, user: authUser } = useAuth();
+    const router = useRouter();
+    const { login, signIn } = useAuth();
     const [loginType, setLoginType] = useState<'corporate' | 'individual'>('corporate');
     const [id, setId] = useState('');
     const [pw, setPw] = useState('');
     const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-    const handleExit = () => {
-        window.location.href = 'https://www.google.com';
-    };
-
+    const handleExit = () => { window.location.href = 'https://www.google.com'; };
+    
     const handleNonMemberAuth = async (type: string) => {
-        if (type === '아이핀') {
-            alert('아이핀 인증은 현재 준비 중입니다. 휴대폰 인증을 이용해 주세요.');
+        if (typeof (window as any).PortOne === 'undefined') {
+            alert('인증 라이브러리를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
             return;
         }
 
-        // ── [NICE 화이트셀 연동 포인트] ──────────────────────────────
-        // TODO: 아래 순서로 구현하세요.
-        //
-        // 1. 서버에서 NICE 암호화 토큰 발급
-        //    const tokenRes = await fetch('/api/auth/nice-token');
-        //    const { enc_data, token_version_id, integrity_value } = await tokenRes.json();
-        //
-        // 2. NICE 팝업 form POST (숨겨진 form 동적 생성 후 submit)
-        //    const form = document.createElement('form');
-        //    form.method = 'POST';
-        //    form.action = 'https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb';
-        //    form.target = 'nice_popup';
-        //    // m, token_version_id, enc_data, integrity_value 필드 추가
-        //    document.body.appendChild(form);
-        //    window.open('', 'nice_popup', 'width=500,height=600');
-        //    form.submit();
-        //
-        // 3. 인증 완료 콜백(success_url)에서 /api/auth/verify-adult POST 호출
-        //    → 서버에서 복호화 후 만 19세 검증 및 Supabase 업데이트
-        //
-        // 4. 성공 응답 수신 시:
-        //    localStorage.setItem('adult_verified', 'true');
-        //    onVerify();
-        // ─────────────────────────────────────────────────────────────
+        try {
+            setIsAuthenticating(true);
+            const response = await (window as any).PortOne.requestIdentityVerification({
+                storeId: 'store-6e7eb5d5-d11e-4f26-bdd4-da8d9a743c0a',
+                channelKey: 'channel-key-4d5d9730-3097-467b-9e86-21bb1fad82c0',
+                identityVerificationId: `verify-${Date.now()}`, // [필수] 고유 식별번호 주입
+            });
 
-        alert('나이스 본인인증 연동 준비 중입니다. 잠시만 기다려주세요.');
+            if (response.code != null) {
+                alert(`인증 실패: ${response.message}`);
+                setIsAuthenticating(false);
+                return;
+            }
+
+            // 성공 시 identityVerificationId를 백엔드로 전달하여 검증
+            const verifyRes = await fetch('/api/identity/verify-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identityVerificationId: response.identityVerificationId })
+            });
+
+            const data = await verifyRes.json();
+            if (verifyRes.ok && data.success) {
+                onVerify(); // 게이트 해제
+            } else {
+                alert(`검증 실패: ${data.message || '인증 정보를 확인할 수 없습니다.'}`);
+            }
+        } catch (error: any) {
+            console.error('본인인증 오류:', error);
+            alert(`오류가 발생했습니다: ${error.message}`);
+        } finally {
+            setIsAuthenticating(false);
+        }
     };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         const targetId = id.trim().toLowerCase();
-        if (!targetId || !pw) {
-            alert('아이디와 비밀번호를 입력해주세요.');
-            return;
-        }
+        if (!targetId || !pw) { alert('아이디와 비밀번호를 입력해주세요.'); return; }
 
         setIsAuthenticating(true);
         try {
-            // 1. Check for Test/Mock IDs first
             const foundMockUser = MOCK_USERS[targetId];
             if (foundMockUser) {
                 const isAdmin = targetId.startsWith('admin_');
                 if (!isAdmin && foundMockUser.type !== loginType) {
-                    const typeText = loginType === 'corporate' ? '기업회원' : '개인회원';
-                    alert(`등록되지 않은 ID이거나,\n${typeText} 선택이 올바르지 않습니다.`);
+                    alert('회원 구분을 확인해주세요.');
                     setIsAuthenticating(false);
                     return;
                 }
                 const sessionType = isAdmin ? 'admin' : (foundMockUser.type === 'corporate' ? 'shop' : 'personal');
-                login(sessionType as any, targetId, foundMockUser.name, targetId === 'admin_user' ? '전권대행' : (targetId === 'admin_shop' ? '슈퍼어드민' : foundMockUser.name));
+                login(sessionType as any, targetId, foundMockUser.name, foundMockUser.name);
                 onVerify();
                 return;
             }
 
-            // 2. Try Actual Supabase Auth for real customers
-            // If targetId has '@', assume it's a real email
             if (targetId.includes('@')) {
                 await signIn(targetId, pw);
-                // Success will trigger syncUserSession in useAuth, and LayoutWrapper will handle the gate
-                // But we still call onVerify to close the gate immediately if successful
-                alert('로그인되었습니다.');
                 onVerify();
             } else {
-                alert('등록되지 않은 아이디입니다.\n(이메일 형식으로 입력하거나 테스트 아이디를 사용하세요)');
+                alert('등록되지 않은 아이디입니다.');
             }
         } catch (err: any) {
-            console.error('Login Error:', err);
-            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+            alert(`로그인 실패: ${err.message}`);
         } finally {
             setIsAuthenticating(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-[99999] bg-white overflow-y-auto overscroll-behavior-contain">
-            <div className="flex flex-col min-h-full w-full max-w-[420px] mx-auto bg-white relative">
-
-                {/* 1. Logo Section */}
-                <div className="pt-6 pb-2 flex flex-col items-center">
-                    <h1 className="text-2xl font-black text-gray-900 tracking-tighter flex items-center gap-2">
-                        <div className="w-7 h-7 bg-gray-900 rounded-full flex items-center justify-center">
-                            <User className="text-white" size={16} />
-                        </div>
-                        {brand.name || 'COCO ALBA'}
-                    </h1>
-                </div>
-
-                {/* 2. 19 Badge + Warning */}
-                <div className="px-5 py-3 flex items-center gap-4 border-y border-gray-100 bg-gray-50/20">
-                    <div className="shrink-0 w-14 h-14 rounded-full border-[3px] border-red-600 flex items-center justify-center bg-white shadow-md">
-                        <span className="text-2xl font-black text-gray-900 italic tracking-tighter">19</span>
-                    </div>
-                    <p className="text-[11px] font-bold leading-tight text-gray-600">
-                        본 정보내용은 청소년 유해매체물로서<br />
-                        관련 법령 및 <span className="text-red-600 font-extrabold">청소년보호법 규정에 의하여</span><br />
-                        <span className="text-red-600 font-black text-[13px]">만 19세 미만 청소년은 이용할 수 없습니다.</span>
-                    </p>
-                </div>
-
-                <div className="py-2 text-center">
-                    <p className="text-sm font-black text-gray-800 tracking-tight">
-                        서비스 이용을 위해 <span className="text-red-500 underline underline-offset-2">로그인</span> 또는 <span className="text-red-500 underline underline-offset-2">기업전용인증</span>이 필요합니다.
-                    </p>
-                </div>
-
-                {/* 3. Login Box */}
-                <div className="mx-5 p-3.5 border border-gray-100 rounded-sm space-y-2.5 shadow-sm">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-black text-gray-900 flex items-center gap-1.5">
-                            <span className="text-red-500 font-bold">→</span> 회원로그인
-                        </h3>
-                        <div className="flex items-center gap-3 text-[10px] font-black">
-                            <label className="flex items-center gap-1 cursor-pointer group">
-                                <input
-                                    type="radio" name="loginType" value="corporate"
-                                    checked={loginType === 'corporate'}
-                                    onChange={() => setLoginType('corporate')}
-                                    className="w-3 h-3 accent-red-500"
-                                />
-                                <span className={loginType === 'corporate' ? 'text-red-600' : 'text-gray-400'}>기업회원</span>
-                            </label>
-                            <label className="flex items-center gap-1 cursor-pointer group">
-                                <input
-                                    type="radio" name="loginType" value="individual"
-                                    checked={loginType === 'individual'}
-                                    onChange={() => setLoginType('individual')}
-                                    className="w-3 h-3 accent-red-500"
-                                />
-                                <span className={loginType === 'individual' ? 'text-red-600' : 'text-gray-400'}>개인회원</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <form onSubmit={handleLogin} className="flex gap-2 h-[72px]">
-                        <div className="flex-1 flex flex-col gap-1.5">
-                            <input
-                                type="text" placeholder="아이디" value={id} onChange={(e) => setId(e.target.value)}
-                                className="w-full h-1/2 px-3 border border-gray-200 text-xs font-bold focus:border-red-500 outline-none"
-                            />
-                            <input
-                                type="password" placeholder="비밀번호" value={pw} onChange={(e) => setPw(e.target.value)}
-                                className="w-full h-1/2 px-3 border border-gray-200 text-xs font-bold focus:border-red-500 outline-none"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            style={{ backgroundColor: brand.primaryColor || '#f82b60' }}
-                            className="w-24 h-full text-white font-black text-sm hover:brightness-105 active:scale-95 transition-all rounded-sm shadow-sm"
-                        >
-                            로그인
-                        </button>
-                    </form>
-
-                    <div className="flex items-center gap-5 text-[10px] text-gray-400 font-bold">
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" defaultChecked /> 아이디저장
-                        </label>
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" className="w-3.5 h-3.5 accent-red-500" defaultChecked /> 자동로그인
-                        </label>
-                    </div>
-
-                    {/* [Quick Pass] Added for Manager Convenience - Only visible in Development */}
-                    {process.env.NODE_ENV !== 'production' && (
-                        <div className="pt-2 mt-2 border-t border-gray-50 grid grid-cols-3 gap-1.5">
-                            <button
-                                onClick={() => { setId('admin_user'); setPw('password123'); }}
-                                className="bg-gray-900 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
-                            >
-                                마스터퀵
-                            </button>
-                            <button
-                                onClick={() => { setId('test_shop'); setPw('password123'); setLoginType('corporate'); }}
-                                className="bg-red-500 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
-                            >
-                                기업퀵
-                            </button>
-                            <button
-                                onClick={() => { setId('test_user'); setPw('password123'); setLoginType('individual'); }}
-                                className="bg-slate-400 text-white text-[9px] font-black py-2 rounded-sm active:scale-95 transition-all"
-                            >
-                                개인퀵
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* 4. Auth Box */}
-                <div className="mx-5 my-2 p-3.5 border border-gray-100 rounded-sm">
-                    <div className="grid grid-cols-2 gap-4 divide-x divide-gray-100">
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
-                                <ShieldCheck size={20} className="text-gray-300" />
+        <div className="fixed inset-0 z-[11000] overflow-hidden bg-white antialiased">
+            <div className="flex flex-col items-center justify-start h-full w-full">
+                <div className="flex flex-col w-full h-full bg-white relative overflow-hidden animate-in fade-in duration-300" style={{ maxWidth: '400px', textRendering: 'optimizeLegibility' }}>
+                    
+                    <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden custom-scrollbar min-h-0">
+                        <div className="flex-1 flex flex-col pt-8 pb-3 px-5 space-y-3 min-h-0">
+                            <div className="flex flex-col items-center mb-2 shrink-0">
+                                <h1 className="text-lg font-black text-gray-900 tracking-tighter flex items-center gap-1.5">
+                                    <div className="w-7 h-7 bg-gray-900 rounded-full flex items-center justify-center">
+                                        <User className="text-white w-2/3 h-2/3" />
+                                    </div>
+                                    {brand.name || 'COCO ALBA'}
+                                </h1>
                             </div>
-                            <p className="text-[11px] font-black text-gray-700">아이핀인증</p>
-                            <button
-                                onClick={() => handleNonMemberAuth('아이핀')}
-                                className="px-5 py-1.5 border border-gray-200 text-[10px] font-black text-gray-500 hover:bg-gray-50 transition-colors rounded-sm"
-                            >
-                                인증하기
-                            </button>
-                        </div>
-                        <div className="flex flex-col items-center gap-2 pl-4">
-                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
-                                <Smartphone size={20} className="text-gray-300" />
+
+                            <VerificationBadge />
+
+                            <div className="text-center pb-1">
+                                <p className="text-[13px] font-black text-gray-800 tracking-tight leading-snug">
+                                    서비스 이용을 위해 <span className="text-red-500 underline underline-offset-4 decoration-2">로그인</span> 또는 <span className="text-red-500 underline underline-offset-4 decoration-2">성인인증</span>이 필요합니다.
+                                </p>
                             </div>
-                            <p className="text-[11px] font-black text-gray-700">휴대폰인증</p>
-                            <button
-                                onClick={() => handleNonMemberAuth('휴대폰')}
-                                className="px-5 py-1.5 border border-gray-200 text-[10px] font-black text-gray-500 hover:bg-gray-50 transition-colors rounded-sm"
-                            >
-                                인증하기
-                            </button>
+
+                            <LoginForm 
+                                id={id} setId={setId} pw={pw} setPw={setPw} 
+                                loginType={loginType} setLoginType={setLoginType} 
+                                handleLogin={handleLogin} primaryColor={brand.primaryColor}
+                                onNav={(page) => router.push(`/?page=${page}`)}
+                            />
+
+                            {/* 4. Non-Member Verification Area */}
+                            <div className="space-y-2">
+                                <h3 className="text-[11px] font-black text-gray-900 flex items-center gap-1">
+                                    <span className="text-red-500 font-bold">→</span> 비회원 본인인증
+                                </h3>
+                                <div className="grid grid-cols-2 gap-2 h-20">
+                                    <button onClick={() => handleNonMemberAuth('아이핀')} className="flex flex-col items-center justify-center gap-2 border-2 border-gray-100 rounded-lg group hover:border-red-200 hover:bg-red-50/20 transition-all">
+                                        <ShieldCheck className="text-gray-300 group-hover:text-red-500 w-1/3 h-1/3" />
+                                        <span className="text-[10.5px] font-black text-gray-600 group-hover:text-red-700">아이핀인증</span>
+                                    </button>
+                                    <button onClick={() => handleNonMemberAuth('휴대폰')} className="flex flex-col items-center justify-center gap-2 border-2 border-gray-100 rounded-lg group hover:border-red-200 hover:bg-red-50/20 transition-all">
+                                        <Smartphone className="text-gray-300 group-hover:text-red-500 w-1/3 h-1/3" />
+                                        <span className="text-[10.5px] font-black text-gray-600 group-hover:text-red-700">휴대폰인증</span>
+                                    </button>
+                                </div>
+                                <div className="text-center py-1 space-y-2.5">
+                                    <p className="text-[10.5px] font-black text-gray-500 leading-tight">인증 시 정보를 저장하지 않으며,<br /><span className="text-red-400">1회성 인증</span>으로 즉시 이용 가능합니다.</p>
+                                    <button onClick={handleExit} className="w-full py-2.5 border-2 border-gray-900 text-gray-900 font-black text-[13px] rounded-lg hover:bg-gray-900 hover:text-white transition-all shadow-sm">성인인증없이 나가기</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="px-5 text-center pb-2">
-                    <p className="text-[10px] font-black text-red-500 underline underline-offset-2">인증 시 어떤 형태로도 정보를 저장하지 않습니다.</p>
-                </div>
-
-                {/* 5. Footer */}
-                <div className="mt-auto bg-[#f82b60] text-white p-4 text-center space-y-2">
-                    <p className="text-lg font-black tracking-tighter flex items-center justify-center gap-1">
-                        {brand.name || '코코알바'} 고객센터 <span className="text-2xl ml-1">1877-1442</span>
-                    </p>
-                    <p className="text-[9px] opacity-70 uppercase font-medium tracking-widest leading-none">
-                        COPYRIGHT(C) 2026 {brand.name || 'COCOALBA'} ALL RIGHTS RESERVED.
-                    </p>
-                    <button
-                        onClick={handleExit}
-                        className="inline-block mt-1 px-8 py-1.5 border border-white/30 rounded-full text-[11px] font-black hover:bg-white hover:text-red-500 transition-all active:scale-95 shadow-lg"
-                    >
-                        기업전용인증 없이 나가기
-                    </button>
+                    {/* 5. Footer */}
+                    <div className="shrink-0 bg-[#f82b60] text-white py-5 px-4 text-center select-none">
+                        <p className="text-[14px] font-black leading-tight mb-1 opacity-90">
+                            {brand.name || '코코알바'} 고객센터
+                        </p>
+                        <p className="text-[28px] font-black tracking-tight leading-none">
+                            1877-1442
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

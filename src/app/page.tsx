@@ -10,7 +10,8 @@ import { SignupPage } from '@/components/auth/SignupPage';
 import { CustomerCenterContent } from '@/app/customer-center/page';
 import { useLocation } from '@/hooks/useLocation';
 import { isPreRelease } from '@/lib/config';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // B2B Landing (Removed because Audit Mode is handled in layout.tsx)
 
@@ -18,6 +19,7 @@ import { ShieldCheck } from 'lucide-react';
 const SEOUL_COORDS = { lat: 37.5665, lng: 126.9780 };
 
 const HomeContent = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const page = searchParams.get('page');
   const { lat: userLat, lng: userLng, calculateDistance } = useLocation();
@@ -82,6 +84,17 @@ const HomeContent = () => {
 
   if (page === 'signup') {
     return <SignupPage />;
+  }
+
+  if (page === 'find-id' || page === 'find-pw') {
+    return <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-white">
+      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+        <User className="text-gray-400" size={32} />
+      </div>
+      <h2 className="text-xl font-black mb-2">{page === 'find-id' ? '아이디 찾기' : '비밀번호 찾기'}</h2>
+      <p className="text-sm text-gray-500 font-bold mb-6">해당 기능은 준비 중입니다.<br/>고객센터(1877-1442)로 문의해주세요.</p>
+      <button onClick={() => router.push('/?page=login')} className="px-8 py-3 bg-gray-900 text-white font-black rounded-xl text-sm transition-all active:scale-95 shadow-lg">로그인으로 돌아가기</button>
+    </div>;
   }
 
   if (page === 'support' || page === 'faq' || page === 'inquiry') {

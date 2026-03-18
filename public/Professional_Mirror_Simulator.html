@@ -11,14 +11,33 @@
             --iphone-width: 450px;
             --iphone-height: 900px;
         }
-        * { box-sizing: border-box !important; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: #020617; 
-            margin: 0; padding: 0; overflow: hidden; 
-            height: 100dvh; width: 100vw;
-            display: flex; flex-direction: column;
-            color: #f8fafc;
+        * {
+            box-sizing: border-box; /* 패딩/보더 계산 오차 방지닝! */
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: #020617;
+            color: #e2e8f0;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            height: 64px;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .main-wrapper {
+            display: flex;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+            width: 100%;
         }
         
         .glass {
@@ -104,45 +123,49 @@
             justify-content: center;
             background: radial-gradient(circle at center, #111827 0%, #020617 100%);
             position: relative;
-            padding: 40px;
+            padding: 0;
             overflow: hidden;
+            min-height: 0; /* Flex 내에서 높이 계산 오류 방지닝! */
         }
 
         .iphone-frame {
             width: var(--iphone-width);
             height: var(--iphone-height);
-            background: #000;
-            border-radius: 60px;
-            padding: 12px;
+            background: #111;
+            border-radius: 54px;
+            padding: 10px;
             position: relative;
-            box-shadow: 0 100px 200px -40px rgba(0,0,0,1);
-            border: 4px solid #1a1a1a;
-            transform-origin: center center; /* Standard centering for all browsers */
+            box-shadow: 
+                0 0 0 1px #2a2a2a,
+                0 0 0 4px #0f0f0f,
+                0 40px 100px rgba(0,0,0,0.8),
+                0 100px 200px -40px rgba(0,0,0,0.9);
+            transform-origin: center center;
             flex-shrink: 0;
-            transition: width 0.3s ease, height 0.3s ease;
-            margin-top: 2vh; /* Slight nudge down for aesthetics */
+            transition: transform 0.1s ease-out; /* 즉각적인 반응성 확보닝 */
             backface-visibility: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transform: translateZ(0); /* Force GPU acceleration */
+            transform: translateZ(0); 
         }
 
         .iphone-screen {
             width: 100%;
             height: 100%;
             background: #fff;
-            border-radius: 48px;
+            border-radius: 44px;
             overflow: hidden;
             position: relative;
             background: #000;
-            mask-image: -webkit-radial-gradient(white, black); /* Standard property */
-            -webkit-mask-image: -webkit-radial-gradient(white, black); /* Fix for rounded corners blur */
+            box-shadow: inset 0 0 4px rgba(255,255,255,0.05); 
+            mask-image: -webkit-radial-gradient(white, black);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
 
         .notch {
-            position: absolute; top: 12px; left: 50%; width: 120px; height: 32px;
-            background: #000; border-radius: 18px; transform: translateX(-50%);
+            position: absolute; top: 18px; left: 50%; width: 100px; height: 30px;
+            background: #000; border-radius: 20px; transform: translateX(-50%);
             z-index: 1000;
+            box-shadow: inset 0 0 4px rgba(255,255,255,0.1);
         }
 
         iframe { 
@@ -150,7 +173,7 @@
             height: 100%; 
             border: none; 
             background: #fff;
-            image-rendering: -webkit-optimize-contrast; /* Sharpness boost */
+            image-rendering: -webkit-optimize-contrast; 
             -webkit-font-smoothing: antialiased;
         }
 
@@ -216,48 +239,45 @@
 <body>
 
     <!-- 🌐 Header Bar -->
-    <header class="glass h-16 px-6 flex items-center justify-between shrink-0 z-[110]">
-        <div class="flex items-center gap-4">
-            <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg">C</div>
-            <div class="hidden lg:block">
-                <h1 class="text-white font-black text-sm tracking-tighter italic">COCO PRO PRO</h1>
-                <div class="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none">Command Center</div>
+    <header class="glass flex items-center justify-between shrink-0 z-[110]">
+        <div class="flex items-center gap-4 px-6">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-500/20">C</div>
+            <div>
+                <h1 class="font-black text-sm tracking-tighter leading-none">COCO PRO PRO</h1>
+                <p class="text-[8px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Command Center</p>
+            </div>
+            
+            <div class="h-8 w-px bg-slate-800 mx-1"></div>
+            
+            <div class="flex gap-1" id="port-selector">
+                <button onclick="setBasePort(3000)" class="btn-action active px-3">3000</button>
+                <button onclick="setBasePort(3001)" class="btn-action px-3">3001</button>
+                <button onclick="setBasePort(3002)" class="btn-action px-3">3002</button>
             </div>
         </div>
 
-        <div class="flex items-center gap-2" id="port-selector">
-            <button onclick="setBasePort(3000)" class="btn-action active px-3">3000</button>
-            <button onclick="setBasePort(3001)" class="btn-action px-3">3001</button>
-            <button onclick="setBasePort(3002)" class="btn-action px-3">3002</button>
-        </div>
-
-        <div class="flex-1 max-w-xl px-4 flex items-center gap-2">
-            <div class="relative flex-1 group">
-                <button onclick="toggleHost()" id="hostBtn" class="absolute left-2 top-1.5 px-2 py-1 bg-slate-800 rounded-md text-[9px] font-black text-slate-400 hover:text-white transition-colors">LOCAL</button>
-                <input type="text" id="urlInput" value="/audit" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-14 pr-4 py-2 text-white text-xs font-bold focus:border-blue-500 outline-none transition-all"
-                    spellcheck="false">
+        <div class="flex-1 max-w-2xl mx-12">
+            <div class="relative flex items-center">
+                <div class="absolute left-4 text-slate-500 font-bold text-[9px] py-1 px-2 bg-slate-900 rounded border border-slate-800">LOCAL</div>
+                <input type="text" id="url-input" value="/audit" 
+                    class="w-full bg-slate-900 border border-slate-800 rounded-full py-2 pl-16 pr-24 text-xs font-mono focus:outline-none focus:border-blue-500/50 transition-all text-slate-300">
+                <button onclick="updateMirror()" class="absolute right-1 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-[10px] font-black transition-all shadow-lg shadow-blue-500/20">GO LIVE</button>
             </div>
-            <button onclick="updateMirror()" class="bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] px-4 h-9 rounded-lg transition-transform active:scale-95 shadow-lg shadow-blue-600/20">GO LIVE</button>
         </div>
 
-        <div class="flex items-center gap-3">
-            <button id="sharpBtn" onclick="toggleSharp()" class="btn-action border-slate-700 bg-slate-800/50 hover:bg-slate-700 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-slate-500" id="sharpDot"></span>
-                <span class="text-[10px]">SHARP FOCUS</span>
+        <div class="flex items-center gap-3 px-6">
+            <button class="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400 hover:bg-blue-500/20 transition-all">
+                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <span class="text-[10px] font-black tracking-widest uppercase">Sharp Focus</span>
             </button>
             
             <div class="h-8 w-px bg-slate-800 mx-1"></div>
-
-            <div class="text-right hidden md:block">
-                <div id="integrity-score" class="text-blue-400 font-black text-xl leading-none">83%</div>
-                <div class="text-[8px] text-slate-500 font-bold uppercase tracking-widest mt-1">Audit Score</div>
-            </div>
+            <button onclick="smartFit()" class="btn-action border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/20 text-blue-400 text-[9px] px-2 py-1 uppercase font-bold">Force Re-Fit</button>
             <div id="zoom-badge" class="bg-slate-800 px-2 py-1 rounded-md text-[9px] text-slate-400 font-black">100%</div>
         </div>
     </header>
 
-    <div class="workspace">
+    <div class="main-wrapper">
         <button id="sidebar-toggle" onclick="toggleSidebar()" class="btn-action">☰</button>
 
         <!-- 📑 Compact Control Panel -->
@@ -352,20 +372,31 @@
                     <div class="accordion-inner space-y-6">
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
-                                <label class="text-[9px] text-slate-500 font-black uppercase">Standard Presets</label>
+                                <label class="text-[9px] text-slate-500 font-black uppercase">Standard Viewports (Real Area)</label>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
-                                <button onclick="setDevice(450)" class="btn-action active text-[10px]" id="preset-450">S21 Master</button>
-                                <button onclick="setDevice(390)" class="btn-action text-[10px]" id="preset-390">iPhone 15</button>
+                                <button onclick="setDevice(412, 780)" class="btn-action text-[10px]" id="preset-s21-ultra">S21/S24 Ultra</button>
+                                <button onclick="setDevice(360, 720)" class="btn-action text-[10px]" id="preset-s21">S21 (Safe Area)</button>
+                                <button onclick="setDevice(360, 668)" class="btn-action active text-[10px]" id="preset-s21-real">S21 (Real: 668px)</button>
+                                <button onclick="setDevice(393, 740)" class="btn-action text-[10px]" id="preset-i15">iPhone 15 Pro</button>
+                                <button onclick="setDevice(375, 548)" class="btn-action text-[10px]" id="preset-ise">iPhone SE</button>
                             </div>
                         </div>
 
-                        <div class="space-y-3">
+                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
-                                <label class="text-[9px] text-slate-500 font-black uppercase">Manual Width</label>
-                                <span id="width-label" class="text-[10px] text-blue-400 font-black">450px</span>
+                                <label class="text-[9px] text-slate-500 font-black uppercase">Viewport Width</label>
+                                <span id="width-label" class="text-[10px] text-blue-400 font-black">360px</span>
                             </div>
-                            <input type="range" id="widthSlider" min="320" max="600" value="450" oninput="manualWidth(this.value)">
+                            <input type="range" id="widthSlider" min="300" max="800" value="360" oninput="manualWidth(this.value)">
+                        </div>
+
+                        <div class="space-y-3 pb-2 border-b border-white/5">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[9px] text-slate-500 font-black uppercase">Viewport Height</label>
+                                <span id="height-label" class="text-[10px] text-emerald-400 font-black">668px</span>
+                            </div>
+                            <input type="range" id="heightSlider" min="400" max="1200" value="668" oninput="manualHeight(this.value)">
                         </div>
 
                         <!-- Sharp Control in Sidebar too -->
@@ -418,7 +449,10 @@
 
                 <!-- 🛡️ Audit Items Accordion -->
                 <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span>Audit Checklist</span>
+                    <div class="flex items-center gap-2">
+                        <span>Audit Checklist</span>
+                        <span id="integrity-score" class="text-[10px] text-blue-500 font-bold">0%</span>
+                    </div>
                     <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
                 <div class="accordion-content">
@@ -462,14 +496,16 @@
             { id: 12, text: "실시간 무결성 모니터링", checked: true }
         ];
 
+        const FRAME_OFFSET = 32; // padding(12*2) + border(4*2)
         let basePort = 3000;
-        let currentWidth = 450;
+        let currentWidth = 360;
+        let currentHeight = 668;
         let isSharp = true;
         let useIP = false;
 
         const frameWrapper = document.getElementById('frame');
         const mirrorFrame = document.getElementById('mirrorFrame');
-        const urlInput = document.getElementById('urlInput');
+        const urlInput = document.getElementById('url-input'); // 📍 ID 불일치 수정닝!
         
         // UI Elements
         const sharpBtn = document.getElementById('sharpBtn');
@@ -492,18 +528,9 @@
             'yeongdeungpo', 'yeongdeungpo-yeouido', 'yeouido', 'yongin', 'yongin-cheoin', 'yongin-giheung', 'yongin-suji'
         ].sort();
 
-        // 초기화
-        window.addEventListener('load', () => {
-            renderAudit();
-            renderRegions();
-            initTaskPad();
-            updateMirror(); 
-            smartFit();
-        });
-        window.addEventListener('resize', smartFit);
-
         function initTaskPad() {
             const pad = document.getElementById('taskPad');
+            if (!pad) return;
             pad.value = localStorage.getItem('coco_tasks') || '';
             pad.addEventListener('input', () => {
                 localStorage.setItem('coco_tasks', pad.value);
@@ -586,13 +613,20 @@
             document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function setDevice(w) {
+        function setDevice(w, h) {
             currentWidth = w;
+            currentHeight = h;
             document.getElementById('width-label').innerText = w + 'px';
+            document.getElementById('height-label').innerText = h + 'px';
             document.getElementById('widthSlider').value = w;
+            document.getElementById('heightSlider').value = h;
             
-            document.getElementById('preset-450').classList.toggle('active', w === 450);
-            document.getElementById('preset-390').classList.toggle('active', w === 390);
+            document.querySelectorAll('.btn-action[id^="preset-"]').forEach(btn => btn.classList.remove('active'));
+            if (w === 412 && h === 780) document.getElementById('preset-s21-ultra').classList.add('active');
+            if (w === 360 && h === 720) document.getElementById('preset-s21').classList.add('active');
+            if (w === 360 && h === 668) document.getElementById('preset-s21-real').classList.add('active');
+            if (w === 393 && h === 740) document.getElementById('preset-i15').classList.add('active');
+            if (w === 375 && h === 548) document.getElementById('preset-ise').classList.add('active');
             
             applySize();
         }
@@ -600,34 +634,81 @@
         function manualWidth(w) {
             currentWidth = parseInt(w);
             document.getElementById('width-label').innerText = w + 'px';
-            document.getElementById('preset-450').classList.remove('active');
-            document.getElementById('preset-390').classList.remove('active');
+            document.querySelectorAll('.btn-action[id^="preset-"]').forEach(btn => btn.classList.remove('active'));
+            applySize();
+        }
+
+        function manualHeight(h) {
+            currentHeight = parseInt(h);
+            document.getElementById('height-label').innerText = h + 'px';
+            document.querySelectorAll('.btn-action[id^="preset-"]').forEach(btn => btn.classList.remove('active'));
             applySize();
         }
 
         function applySize() {
-            frameWrapper.style.width = currentWidth + 'px';
-            frameWrapper.style.height = (currentWidth * 2) + 'px'; // 1:2 ratio
-            smartFit();
+            const fw = currentWidth + FRAME_OFFSET;
+            const fh = currentHeight + FRAME_OFFSET;
+            frameWrapper.style.width = fw + 'px';
+            frameWrapper.style.height = fh + 'px';
+            smartFit(); // 인자 없이 호출하여 내부 실측 로직 작동 유도닝!
         }
 
         function smartFit() {
             const container = document.querySelector('.iphone-container');
-            const cw = container.clientWidth - 80;
-            const ch = container.clientHeight - 80;
+            const frame = document.getElementById('frame');
+            if (!container || !frame) return;
+
+            // 🛡️ 강제 리플로우를 통해 브라우저가 최신 레이아웃을 계산하도록 유도닝!
+            void container.offsetHeight; 
+
+            const rect = container.getBoundingClientRect();
+            const vw = rect.width;
+            const vh = rect.height;
             
-            const fw = currentWidth;
-            const fh = currentWidth * 2;
+            if (vw <= 0 || vh <= 0) return;
+
+            const targetVW = vw * 0.92;
+            const targetVH = vh * 0.92;
+
+            const baseW = frame.offsetWidth;
+            const baseH = frame.offsetHeight;
+
+            if (baseW <= 0 || baseH <= 0) return;
+
+            let scale = Math.min(targetVW / baseW, targetVH / baseH);
             
-            const scaleX = cw / fw;
-            const scaleY = ch / fh;
-            let scale = Math.min(scaleX, scaleY);
+            if (isNaN(scale) || !isFinite(scale)) scale = 1.0;
+            if (scale > 1.0) scale = 1.0; 
+            if (scale < 0.1) scale = 0.1;
             
-            if (scale > 1) scale = 1;
+            frame.style.transformOrigin = 'center center';
+            frame.style.transform = `scale(${scale.toFixed(4)})`; // translate3d 불필요 제거닝
             
-            frameWrapper.style.transform = `scale(${scale})`;
-            document.getElementById('zoom-badge').innerText = `${Math.round(scale * 100)}%`;
+            const badge = document.getElementById('zoom-badge');
+            if (badge) badge.innerText = `${Math.round(scale * 100)}%`;
+
+            console.log(`[smartFit] Final Scale: ${scale.toFixed(4)} | Container: ${vw.toFixed(0)}x${vh.toFixed(0)} | Frame: ${baseW}x${baseH}`);
         }
+
+        // 🛡️ 무결성 초기화 시퀀스닝!
+        window.addEventListener('load', () => {
+            renderAudit();
+            renderRegions();
+            initTaskPad();
+            updateMirror(); 
+            applySize(); 
+            
+            // 📍 정예화: 레이아웃 안착을 기다리는 단일 최적화 호출닝!
+            requestAnimationFrame(() => {
+                smartFit();
+            });
+
+            const observer = new ResizeObserver(() => {
+                smartFit();
+            });
+            const container = document.querySelector('.iphone-container');
+            if (container) observer.observe(container);
+        });
 
         function updateMirror() {
             let path = urlInput.value.trim();
@@ -661,7 +742,9 @@
                     <span>${item.text}</span>
                 </div>
             `).join('');
-            const score = Math.round((AUDIT_ITEMS.filter(i => i.checked).length / AUDIT_ITEMS.length) * 100);
+            const total = AUDIT_ITEMS.length;
+            const checked = AUDIT_ITEMS.filter(i => i.checked).length;
+            const score = total > 0 ? Math.round((checked / total) * 100) : 0;
             document.getElementById('integrity-score').innerText = `${score}%`;
         }
 

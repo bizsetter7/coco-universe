@@ -14,7 +14,7 @@ import { SEOInjection } from "@/components/common/seo/SEOInjection";
 import B2BAuditPage from "@/components/audit/B2BAuditPage";
 
 import { getCurrentSEO } from "@/lib/metadata-config";
-import { AUDIT_MODE } from "@/lib/brand-config";
+import { AUDIT_MODE, ADULT_GATE_DISABLED } from "@/lib/brand-config";
 
 /**
  * generateMetadata — 도메인/브랜드별 타이틀 동적 분기
@@ -89,7 +89,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log('[RootLayout] AUDIT_MODE:', AUDIT_MODE);
+  console.log('[RootLayout] Status:', { AUDIT_MODE, ADULT_GATE_DISABLED });
   // [Optimization] Server-side data prep for sidebars
   const grandAds = (shopsData as Shop[]).filter(s => s.tier === 'grand');
   const premiumAds = (shopsData as Shop[]).filter(s => s.tier === 'premium' || s.is_premium);
@@ -177,6 +177,8 @@ export default function RootLayout({
                 })(window,document,'script','dataLayer','GTM-PTJ9T25K');`
               }}
             />
+            {/* PortOne V2 SDK */}
+            <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="afterInteractive" />
           </>
         )}
         

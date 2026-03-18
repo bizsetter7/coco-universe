@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 import { BannerSidebar } from './BannerSidebar';
 import { StickyWrapper } from './ui/StickyWrapper';
@@ -11,11 +11,11 @@ import { useBrand } from './BrandProvider';
 import { Footer } from './layout/Footer';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
-// import { AdultVerificationGate } from './common/AdultVerificationGate'; // [GATE_LOCKED] 런칭 전까지 비활성
+import { AdultVerificationGate } from './common/AdultVerificationGate';
 import { AuditLanding } from './audit/AuditLanding';
 
 import { useAuth } from '@/hooks/useAuth';
-import { AUDIT_MODE } from '@/lib/brand-config';
+import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -25,7 +25,8 @@ interface LayoutWrapperProps {
 export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
-    const { isLoading } = useAuth();
+    const searchParams = useSearchParams();
+    const { user: authUser, isLoading } = useAuth();
 
     const isAdminPage = pathname?.startsWith('/admin');
 
@@ -40,30 +41,57 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    // ── [2] 기업전용인증 게이트 원천 봉쇄 ───────────────────────────────────────────
-    // ⚠️  컴포넌트 호출부 자체를 비활성화 — 환경변수 설정 실수조차 허용하지 않음
-    // ⚠️  AdultVerificationGate 임포트도 주석 처리됨 (위 import 라인 참조)
-    //
-    // 런칭 시 해제 순서:
-    //   1) 위 import 주석 해제
-    //   2) 아래 [GATE_LOCKED] 블록 주석 해제
-    //   3) 재배포
-    //
-    // ── [GATE_LOCKED: 아래 블록을 런칭 전까지 절대 해제 금지] ──────────────────
-    /*
+    // ── [2] 성인인증 게이트 (Adult Verification Gate) ──────────────────────────────
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+
     React.useEffect(() => {
         if (isLoading) return;
-        if (authUser?.isVerifiedPartnerVerified) { setIsVerified(true); return; }
-        setIsVerified(localStorage.getItem('adult_verified') === 'true');
-    }, [isLoading]);
+        
+        // 게이트가 비활성화(DISABLED=true) 되어있으면 즉시 통과
+        if (ADULT_GATE_DISABLED) {
+            setIsVerified(true);
+            return;
+        }
+
+        // 로그인된 유저가 인증된 파트너이거나, 로컬 스토리지에 기록이 있으면 통과
+        if (authUser && authUser.id !== 'guest' && authUser.isVerifiedPartnerVerified) { 
+            console.log('[LayoutWrapper] User is verified partner:', authUser.name);
+            setIsVerified(true); 
+            return; 
+        }
+        
+        const localVerified = localStorage.getItem('adult_verified') === 'true';
+        console.log('[LayoutWrapper] Status Check:', {
+            user: authUser?.name,
+            isLoggedIn: authUser?.id !== 'guest',
+            ADULT_GATE_DISABLED,
+            localVerified,
+            pathname
+        });
+        setIsVerified(localVerified);
+    }, [isLoading, authUser, pathname]);
+
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
         setIsVerified(true);
     };
-    if (isLoading || isVerified === null) return <LoadingSpinner />;
-    if (!isVerified) return <AdultVerificationGate onVerify={handleVerify} />;
-    */
+
+    if (isLoading || isVerified === null) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+        );
+    }
+
+    // ── [Public Page Check] ───────────────────────────────────────────────────
+    const currentQueryPage = searchParams?.get('page');
+    const isPublicPage = ['signup', 'find-id', 'find-pw', 'support', 'faq', 'inquiry'].includes(currentQueryPage || '');
+
+    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지는 제외)
+    if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isPublicPage) {
+        return <AdultVerificationGate onVerify={handleVerify} />;
+    }
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 
     if (isLoading) {

@@ -92,39 +92,27 @@ function isDanalConfigured(): boolean {
     );
 }
 
-function isNiceConfigured(): boolean {
-    return !!(
-        process.env.NICE_SITE_CODE &&
-        process.env.NICE_SITE_PASSWORD &&
-        process.env.NICE_CLIENT_ID &&
-        process.env.NICE_CLIENT_SECRET
-    );
-}
+// NICE 관련 설정 및 토큰 생성 로직 삭제됨 (대장님 명령)
 
 async function generateDanalToken(returnUrl: string, errorUrl: string): Promise<IdentityVerifyTokenResponse> {
-    // TODO: 다날 SDK 연동 시 아래 주석 해제
-    // const Danal = require('@danal/identity');
-    // const token = await Danal.createToken({ cprNum: process.env.DANAL_CPR_NUM, ... });
-    // return { encryptedToken: token.encData, authUrl: 'https://cert.teledit.com/TASS/PASS/popup', expiresIn: 300 };
+    const cprNum = process.env.DANAL_CPR_NUM;
+    const serviceId = process.env.DANAL_SERVICE_ID;
+    
+    if (!cprNum || !serviceId) {
+        console.warn('[Identity/Danal] 필수 환경변수 미설정 — Mock 모드');
+        return {
+            encryptedToken: `DANAL_MOCK_${crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase()}`,
+            authUrl: '#',
+            expiresIn: 300,
+        };
+    }
 
-    console.warn('[Identity/Danal] 환경변수 미설정 — Mock 모드');
+    // TODO: 다날 CPCGI 호출 (실제 운영 시 구현)
+    // const res = await fetch('https://cert.teledit.com/TASS/PASS/popup_req', { ... });
+    
     return {
-        encryptedToken: `DANAL_${crypto.randomUUID().replace(/-/g, '').substring(0, 16).toUpperCase()}`,
-        authUrl: '#',
-        expiresIn: 300,
-    };
-}
-
-async function generateNiceToken(returnUrl: string, errorUrl: string): Promise<IdentityVerifyTokenResponse> {
-    // TODO: NICE CheckPlus SDK 연동 시 아래 주석 해제
-    // const { encryptData } = require('checkplus_nice');
-    // const encData = encryptData({ siteCode: process.env.NICE_SITE_CODE, ... });
-    // return { encryptedToken: encData, authUrl: 'https://nice.checkplus.co.kr/...', expiresIn: 300 };
-
-    console.warn('[Identity/NICE] 환경변수 미설정 — Mock 모드');
-    return {
-        encryptedToken: `NICE_${crypto.randomUUID().replace(/-/g, '').substring(0, 16).toUpperCase()}`,
-        authUrl: '#',
+        encryptedToken: `DANAL_REAL_REQ_${crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase()}`, // 실제 연동 시 발급받은 데이터
+        authUrl: 'https://cert.teledit.com/TASS/PASS/popup',
         expiresIn: 300,
     };
 }
@@ -141,21 +129,16 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        if (provider !== 'danal' && provider !== 'nice') {
+        if (provider !== 'danal') {
             return NextResponse.json(
-                { error: '지원하지 않는 제공업체입니다. danal 또는 nice를 선택하세요.' },
+                { error: '지원하지 않는 제공업체입니다. danal을 선택하세요.' },
                 { status: 400 }
             );
         }
 
         let result: IdentityVerifyTokenResponse;
-        if (provider === 'danal') {
-            if (!isDanalConfigured()) console.warn('[Identity] Danal 환경변수 미설정 — Mock');
-            result = await generateDanalToken(returnUrl, errorUrl);
-        } else {
-            if (!isNiceConfigured()) console.warn('[Identity] NICE 환경변수 미설정 — Mock');
-            result = await generateNiceToken(returnUrl, errorUrl);
-        }
+        if (!isDanalConfigured()) console.warn('[Identity] Danal 환경변수 미설정 — Mock');
+        result = await generateDanalToken(returnUrl, errorUrl);
 
         // [항목 2/8] 토큰 무결성 서명 생성 (변조 감지용)
         const hmacPayload = {

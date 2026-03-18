@@ -69,9 +69,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
     }, [pathname]);
 
     const handleLogout = async () => {
-        if (confirm('로그아웃 하시겠습니까?')) {
-            await logout();
-        }
+        await logout();
     };
 
     const isHome = pathname === '/' && !searchParams.get('page');
