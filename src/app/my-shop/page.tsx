@@ -276,6 +276,11 @@ function MyShopContent() {
         const simulate = searchParams.get('simulate');
         const viewParam = searchParams.get('view');
         if (authUserType) {
+            // [Auth Guard] 비로그인(guest) 접근 차단 → 로그인 페이지로
+            if (authUserType === 'guest') {
+                router.replace('/?page=login');
+                return;
+            }
             if (authUserType === 'admin' && !simulate) {
                 // [Security] Only redirect if absolutely NO view context exists
                 if (!viewParam && !searchParams.has('view') && searchParams.toString() === '') {

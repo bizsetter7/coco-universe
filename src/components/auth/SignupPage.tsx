@@ -1,358 +1,677 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { ShieldCheck, User, Building, ArrowLeft, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import {
+    User, Building2, CheckCircle2, Loader2, Smartphone,
+    ChevronDown, ChevronUp
+} from 'lucide-react';
 import { IdentityVerifyModal } from './IdentityVerifyModal';
 import type { IdentityVerifyResult } from '@/types/identity-verify';
 
-type BizStatus = '정상' | '휴업' | '폐업' | '유효하지 않음' | null;
+type Role = 'individual' | 'corporate';
 
+// ─── 약관 텍스트 ──────────────────────────────────────────────────────────────
+const TERMS_TEXT = `제 1 조 (목적)
+본 약관은 코코알바(이하 "회사"라 한다)가 제공하는 구인구직 관련 제반 서비스(이하 "서비스"라 함)의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+
+제 2 조 (용어의 정의)
+1. "회원"이라 함은 "회사"의 "서비스"에 접속하여 이 약관에 따라 "회사"와 이용계약을 체결하고 "회사"가 제공하는 "서비스"를 이용하는 고객을 말합니다.
+2. "아이디(ID)"라 함은 회원의 식별과 서비스 이용을 위하여 회원이 정하고 회사가 승인하는 문자와 숫자의 조합을 말합니다.
+3. "비밀번호"라 함은 회원이 부여받은 "아이디"와 일치되는 회원임을 확인하고 비밀보호를 위해 회원 자신이 정한 문자 또는 숫자의 조합을 말합니다.
+
+제 3 조 (약관의 게시와 개정)
+1. "회사"는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 초기 화면에 게시합니다.
+2. "회사"는 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.
+
+제 4 조 (이용계약 체결)
+이용계약은 회원이 되고자 하는 자가 약관의 내용에 동의한 다음 회원가입신청을 하고 회사가 이러한 신청에 대하여 승낙함으로써 체결됩니다.`;
+
+const PRIVACY_TEXT = `1. 개인정보의 수집 및 이용 목적
+회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
+- 회원 가입 의사 확인, 회원제 서비스 제공에 따른 본인 식별/인증, 회원자격 유지/관리, 서비스 부정이용 방지
+
+2. 수집하는 개인정보의 항목
+- 필수항목: 아이디, 비밀번호, 이름, 휴대전화번호
+- 선택항목: 이메일, 생년월일, 성별
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지 (단, 관계 법령 위반에 따른 수사·조사 등이 진행 중인 경우에는 해당 수사·조사 종료 시까지)
+
+4. 동의 거부 권리 및 불이익
+정보주체는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 필수항목에 대한 동의를 거부할 경우 회원가입 및 서비스 이용이 제한될 수 있습니다.`;
+
+// ─── 스텝 인디케이터 ──────────────────────────────────────────────────────────
+const StepIndicator = ({ current, primary }: { current: 1 | 2 | 3; primary: string }) => {
+    const steps = ['약관동의', '회원정보 입력', '가입완료'];
+    return (
+        <div className="flex items-center justify-center gap-0 mb-6">
+            {steps.map((label, i) => {
+                const n = i + 1;
+                const done = n < current;
+                const active = n === current;
+                return (
+                    <React.Fragment key={n}>
+                        <div className="flex flex-col items-center">
+                            <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow"
+                                style={{
+                                    backgroundColor: done || active ? primary : '#374151',
+                                    color: done || active ? '#fff' : '#9ca3af',
+                                }}
+                            >
+                                {done ? <CheckCircle2 size={16} /> : n}
+                            </div>
+                            <span
+                                className="text-[10px] mt-1 font-bold whitespace-nowrap"
+                                style={{ color: active || done ? primary : '#6b7280' }}
+                            >
+                                {label}
+                            </span>
+                        </div>
+                        {i < 2 && (
+                            <div
+                                className="h-px w-10 mx-1 mb-4"
+                                style={{ backgroundColor: n < current ? primary : '#374151' }}
+                            />
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </div>
+    );
+};
+
+// ─── 약관 아이템 (접기/펼치기 + 체크박스) ────────────────────────────────────
+const AgreementItem = ({
+    id, label, checked, onChange, required, children
+}: {
+    id: string; label: string; checked: boolean; onChange: (v: boolean) => void;
+    required?: boolean; children?: React.ReactNode;
+}) => {
+    const [open, setOpen] = useState(false);
+    return (
+        <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+            <div className="flex items-center gap-3 p-3">
+                <input
+                    type="checkbox" id={id} checked={checked}
+                    onChange={(e) => onChange(e.target.checked)}
+                    className="w-4 h-4 rounded shrink-0"
+                    style={{ accentColor: 'var(--brand-primary)' }}
+                />
+                <label htmlFor={id} className="flex-1 text-sm font-bold text-gray-200 cursor-pointer">
+                    {required && <span className="text-yellow-400 mr-1">[필수]</span>}
+                    {label}
+                </label>
+                {children && (
+                    <button type="button" onClick={() => setOpen(!open)} className="text-gray-400 hover:text-gray-200 transition p-1">
+                        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                )}
+            </div>
+            {open && children && (
+                <div className="px-3 pb-3">
+                    <div className="h-28 overflow-y-auto bg-gray-900 rounded-lg p-3 text-[11px] text-gray-400 leading-relaxed whitespace-pre-line">
+                        {children}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ─── 성별 버튼 ────────────────────────────────────────────────────────────────
+const GenderSelect = ({
+    value, onChange, primary, disabled
+}: { value: string; onChange: (v: string) => void; primary: string; disabled?: boolean }) => (
+    <div className="flex gap-2">
+        {['남성', '여성'].map((g) => (
+            <button
+                key={g} type="button"
+                disabled={disabled}
+                onClick={() => !disabled && onChange(g)}
+                className="flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all disabled:opacity-60"
+                style={{
+                    borderColor: value === g ? primary : '#374151',
+                    backgroundColor: value === g ? `${primary}22` : 'transparent',
+                    color: value === g ? primary : '#9ca3af',
+                }}
+            >
+                {g}
+            </button>
+        ))}
+    </div>
+);
+
+// ─── 폼 필드 래퍼 ─────────────────────────────────────────────────────────────
+const Field = ({
+    label, required, hint, children
+}: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) => (
+    <div className="space-y-1.5">
+        <label className="text-xs font-black text-gray-400">
+            {label} {required && <span className="text-red-400">*</span>}
+            {hint && <span className="text-gray-500 font-medium ml-1">({hint})</span>}
+        </label>
+        {children}
+    </div>
+);
+
+const Input = ({ className = '', ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input
+        {...props}
+        className={`w-full p-3.5 rounded-xl border border-gray-700 bg-gray-800 text-gray-100 text-sm font-medium placeholder:text-gray-600 focus:outline-none focus:border-gray-500 disabled:opacity-60 disabled:bg-gray-900 ${className}`}
+    />
+);
+
+// ─── 본인인증 버튼 블록 ───────────────────────────────────────────────────────
+const VerifyBlock = ({
+    verified, verifyResult, onOpen, primary
+}: {
+    verified: boolean; verifyResult: IdentityVerifyResult | null;
+    onOpen: () => void; primary: string;
+}) => (
+    <div className="border-2 border-dashed rounded-xl p-4 space-y-3"
+        style={{ borderColor: verified ? '#22c55e' : '#374151' }}>
+        {verified && verifyResult ? (
+            <div className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-green-400 shrink-0" />
+                <span className="text-xs font-bold text-green-400">
+                    {verifyResult.name}님 본인인증 완료
+                </span>
+            </div>
+        ) : (
+            <p className="text-xs text-gray-400 font-medium">
+                아래 버튼을 눌러 본인인증을 완료해주세요.
+            </p>
+        )}
+        <button
+            type="button" onClick={onOpen}
+            className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 text-white font-black text-sm shadow-lg active:scale-[0.98] transition-all"
+            style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}
+        >
+            <Smartphone size={18} />
+            휴대폰 인증
+        </button>
+    </div>
+);
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 export const SignupPage = () => {
     const brand = useBrand();
     const router = useRouter();
     const { signUp } = useAuth();
+    const primary = brand.primaryColor;
 
-    const [role, setRole] = useState<'individual' | 'corporate'>('individual');
-    const [step, setStep] = useState<'role' | 'identity' | 'form'>('role');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
-    const [nickname, setNickname] = useState('');
+    // ── 공통 상태 ──
+    const [step, setStep] = useState<1 | 2 | 3>(1);
+    const [role, setRole] = useState<Role>('individual');
+
+    // ── STEP1 약관 ──
+    const [agreeAll, setAgreeAll] = useState(false);
+    const [agreeTerms, setAgreeTerms] = useState(false);
+    const [agreePrivacy, setAgreePrivacy] = useState(false);
+    const [agreeAge, setAgreeAge] = useState(false);
+
+    const syncAll = (v: boolean) => {
+        setAgreeAll(v); setAgreeTerms(v); setAgreePrivacy(v); setAgreeAge(v);
+    };
+    const recomputeAll = (terms: boolean, privacy: boolean, age: boolean) => {
+        setAgreeAll(terms && privacy && age);
+    };
+
+    // ── 본인인증 ──
+    const [showModal, setShowModal] = useState(false);
+    const [verifyResult, setVerifyResult] = useState<IdentityVerifyResult | null>(null);
+    const verified = !!verifyResult?.success;
+
+    // ── 개인회원 폼 ──
+    const [iId, setIId] = useState('');
+    const [iIdChecked, setIIdChecked] = useState(false);
+    const [iPw, setIPw] = useState('');
+    const [iPwConfirm, setIPwConfirm] = useState('');
+    const [iName, setIName] = useState('');
+    const [iBirth, setIBirth] = useState('');
+    const [iGender, setIGender] = useState('');
+    const [iNickname, setINickname] = useState('');
+    const [iPhone, setIPhone] = useState('');
+    const [iSms, setISms] = useState(false);
+
+    // ── 업체회원 폼 ──
+    const [cId, setCId] = useState('');
+    const [cIdChecked, setCIdChecked] = useState(false);
+    const [cPw, setCPw] = useState('');
+    const [cPwConfirm, setCPwConfirm] = useState('');
+    const [cManager, setCManager] = useState('');
+    const [cBirth, setCBirth] = useState('');
+    const [cGender, setCGender] = useState('');
+    const [cPhone, setCPhone] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
 
-    // 기업회원 전용
-    const [bizNumber, setBizNumber] = useState('');
-    const [bizStatus, setBizStatus] = useState<BizStatus>(null);
-    const [bizChecking, setBizChecking] = useState(false);
-    const [bizMessage, setBizMessage] = useState('');
-
-    // 본인인증 전용
-    const [showIdentityModal, setShowIdentityModal] = useState(false);
-    const [identityResult, setIdentityResult] = useState<IdentityVerifyResult | null>(null);
-
-    const formatBizNumber = (v: string) => {
-        const d = v.replace(/[^0-9]/g, '').slice(0, 10);
-        if (d.length <= 3) return d;
-        if (d.length <= 5) return `${d.slice(0, 3)}-${d.slice(3)}`;
-        return `${d.slice(0, 3)}-${d.slice(3, 5)}-${d.slice(5)}`;
+    // ── 본인인증 완료 처리 ──
+    const handleVerified = (result: IdentityVerifyResult) => {
+        setVerifyResult(result);
+        setShowModal(false);
+        if (result.name) {
+            role === 'individual' ? setIName(result.name) : setCManager(result.name);
+        }
+        if (result.birthdate) {
+            const b = result.birthdate.replace(/\D/g, '').slice(0, 8);
+            const fmt = b.length === 8
+                ? `${b.slice(0, 4)}-${b.slice(4, 6)}-${b.slice(6)}`
+                : result.birthdate;
+            role === 'individual' ? setIBirth(fmt) : setCBirth(fmt);
+        }
+        if (result.gender) {
+            const g = result.gender === 'M' ? '남성' : '여성';
+            role === 'individual' ? setIGender(g) : setCGender(g);
+        }
+        if (result.phone) {
+            role === 'individual' ? setIPhone(result.phone) : setCPhone(result.phone);
+        }
     };
 
-    const handleBizNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setBizNumber(formatBizNumber(e.target.value));
-        setBizStatus(null);
-        setBizMessage('');
+    // ── STEP1 → STEP2 ──
+    const goStep2 = () => {
+        if (!agreeTerms || !agreePrivacy || !agreeAge) {
+            alert('필수 약관에 모두 동의해주세요.');
+            return;
+        }
+        setStep(2);
     };
 
-    const verifyBizNumber = useCallback(async () => {
-        const raw = bizNumber.replace(/[^0-9]/g, '');
-        if (raw.length !== 10) {
-            setBizMessage('10자리 사업자번호를 입력해주세요.');
-            return;
-        }
-        setBizChecking(true);
-        setBizStatus(null);
-        setBizMessage('');
-        try {
-            const res = await fetch('/api/nts/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ businessNumber: raw }),
-            });
-            const data = await res.json();
-            setBizStatus(data.status as BizStatus);
-            if (data.status === '정상') {
-                setBizMessage('사업자 등록 상태가 정상입니다.');
-            } else {
-                setBizMessage(data.message || `조회 결과: ${data.status}`);
-            }
-        } catch {
-            setBizStatus('유효하지 않음');
-            setBizMessage('조회 중 오류가 발생했습니다. 다시 시도해주세요.');
-        } finally {
-            setBizChecking(false);
-        }
-    }, [bizNumber]);
+    // ── 아이디 중복확인 (시뮬레이션) ──
+    const checkId = (id: string, setChecked: (v: boolean) => void) => {
+        if (!id.trim()) { alert('아이디를 입력해주세요.'); return; }
+        if (id.length < 4) { alert('아이디는 4자 이상이어야 합니다.'); return; }
+        alert(`"${id}" 는 사용 가능한 아이디입니다.`);
+        setChecked(true);
+    };
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (step === 'role') {
-            setStep('identity');
-            return;
-        }
-
-        if (step === 'identity' && !identityResult?.success) {
-            alert('본인인증을 먼저 완료해주세요.');
-            return;
-        }
-
-        if (!email || !password || !name || !nickname) {
-            alert('모든 정보를 입력해주세요.');
-            return;
-        }
-
-        if (role === 'corporate' && bizStatus !== '정상') {
-            alert('사업자등록번호 상태가 정상이어야 합니다.');
-            return;
-        }
-
-        if (password.length < 6) {
-            alert('비밀번호는 최소 6자 이상이어야 합니다.');
-            return;
+    // ── 최종 가입 제출 ──
+    const handleSubmit = async () => {
+        if (role === 'individual') {
+            if (!verified) { alert('본인인증을 먼저 완료해주세요.'); return; }
+            if (!iIdChecked) { alert('아이디 중복확인을 완료해주세요.'); return; }
+            if (!iId || !iPw || !iPwConfirm) { alert('필수 항목을 모두 입력해주세요.'); return; }
+            if (iPw !== iPwConfirm) { alert('비밀번호가 일치하지 않습니다.'); return; }
+            if (iPw.length < 6) { alert('비밀번호는 6자 이상이어야 합니다.'); return; }
+            if (!iNickname) { alert('닉네임을 입력해주세요.'); return; }
+        } else {
+            if (!cIdChecked) { alert('아이디 중복확인을 완료해주세요.'); return; }
+            if (!cId || !cPw || !cPwConfirm) { alert('필수 항목을 모두 입력해주세요.'); return; }
+            if (cPw !== cPwConfirm) { alert('비밀번호가 일치하지 않습니다.'); return; }
+            if (!verified) { alert('담당자 본인인증을 먼저 완료해주세요.'); return; }
         }
 
         setIsLoading(true);
         try {
-            await signUp(email, password, {
-                name,
-                nickname,
+            const emailId = role === 'individual' ? iId : cId;
+            const pw = role === 'individual' ? iPw : cPw;
+            await signUp(`${emailId}@cocoalba.kr`, pw, {
+                name: role === 'individual' ? iName : cManager,
+                nickname: role === 'individual' ? iNickname : undefined,
                 role,
-                identity_ci: identityResult?.ci, // CI 값 전달 (암호화 처리는 서버/DB에서 수행)
-                biz_number: role === 'corporate' ? bizNumber.replace(/[^0-9]/g, '') : undefined
+                identity_ci: verifyResult?.ci,
             });
-
-            alert('회원가입 신청이 완료되었습니다!\n이메일로 발송된 인증 링크를 확인해주세요.');
-            router.push('/?page=login');
+            setStep(3);
         } catch (err: any) {
-            console.error('Signup error:', err);
             alert(`회원가입 실패: ${err.message || '다시 시도해주세요.'}`);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const primaryStyle = { color: brand.primaryColor };
-    const primaryBgStyle = { backgroundColor: brand.primaryColor };
+    const gradStyle = { background: `linear-gradient(135deg, ${primary} 0%, ${primary}bb 100%)` };
 
+    // ══════════════════════════════════════════════════════════════════════
     return (
-        <div className="max-w-md mx-auto px-4 py-8 min-h-[700px] flex flex-col justify-center">
-            <button
-                onClick={() => {
-                    if (step === 'form') setStep('identity');
-                    else if (step === 'identity') setStep('role');
-                    else router.push('/?page=login');
-                }}
-                className="flex items-center gap-1 text-gray-500 hover:text-gray-800 mb-6 text-sm font-bold transition"
-            >
-                <ArrowLeft size={16} /> {step === 'role' ? '로그인으로 돌아가기' : '이전 단계'}
-            </button>
+        <div className="min-h-screen bg-gray-950 py-8 px-4">
+            <div className="max-w-md mx-auto">
+                <StepIndicator current={step} primary={primary} />
 
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-black mb-2" style={primaryStyle}>회원가입</h2>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    {[1, 2, 3].map((s) => (
-                        <div key={s} className={`h-1.5 rounded-full transition-all ${
-                            (s === 1 && step === 'role') || (s === 2 && step === 'identity') || (s === 3 && step === 'form') 
-                            ? 'w-8 bg-blue-600' : 'w-4 bg-gray-200'
-                        }`} />
-                    ))}
-                </div>
-                <p className="text-gray-500 font-bold">
-                    {step === 'role' ? 'STEP 1. 회원 유형 선택' :
-                     step === 'identity' ? 'STEP 2. 다날 본인확인 필수' :
-                     'STEP 3. 상세 정보 입력'}
-                </p>
-            </div>
-
-            <form onSubmit={handleSignup} className="space-y-4">
-                {/* STEP 1: Role Selection */}
-                {step === 'role' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="grid grid-cols-2 gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setRole('individual')}
-                                className={`py-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${role === 'individual'
-                                    ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-md'
-                                    : 'border-gray-100 bg-white text-gray-400'
-                                    }`}
-                            >
-                                <div className={`p-3 rounded-full ${role === 'individual' ? 'bg-blue-200' : 'bg-gray-50'}`}>
-                                    <User size={32} />
-                                </div>
-                                <span className="text-sm font-black text-gray-800">개인회원 (구직자)</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setRole('corporate')}
-                                className={`py-6 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ${role === 'corporate'
-                                    ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-md'
-                                    : 'border-gray-100 bg-white text-gray-400'
-                                    }`}
-                            >
-                                <div className={`p-3 rounded-full ${role === 'corporate' ? 'bg-blue-200' : 'bg-gray-50'}`}>
-                                    <Building size={32} />
-                                </div>
-                                <span className="text-sm font-black text-gray-800">기업회원 (사장님)</span>
-                            </button>
+                {/* ───────────────── STEP 1: 약관동의 ───────────────── */}
+                {step === 1 && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="rounded-2xl p-5 text-center text-white font-black text-lg" style={gradStyle}>
+                            회원가입 약관 동의
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => setStep('identity')}
-                            style={primaryBgStyle}
-                            className="w-full text-white font-black py-4 rounded-xl shadow-lg hover:opacity-90 transition mt-4"
+
+                        {/* 전체동의 */}
+                        <div className="bg-gray-800 rounded-xl p-3 border border-gray-700">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox" checked={agreeAll}
+                                    onChange={(e) => syncAll(e.target.checked)}
+                                    className="w-4 h-4 rounded"
+                                    style={{ accentColor: primary }}
+                                />
+                                <span className="text-sm font-black text-white">정책 약관에 동의합니다</span>
+                            </label>
+                        </div>
+
+                        <AgreementItem
+                            id="terms" label="이용약관 동의" required
+                            checked={agreeTerms}
+                            onChange={(v) => { setAgreeTerms(v); recomputeAll(v, agreePrivacy, agreeAge); }}
                         >
-                            다음 단계로
+                            {TERMS_TEXT}
+                        </AgreementItem>
+
+                        <AgreementItem
+                            id="privacy" label="개인정보 처리방침 동의" required
+                            checked={agreePrivacy}
+                            onChange={(v) => { setAgreePrivacy(v); recomputeAll(agreeTerms, v, agreeAge); }}
+                        >
+                            {PRIVACY_TEXT}
+                        </AgreementItem>
+
+                        <AgreementItem
+                            id="age" label="만 19세 이상입니다" required
+                            checked={agreeAge}
+                            onChange={(v) => { setAgreeAge(v); recomputeAll(agreeTerms, agreePrivacy, v); }}
+                        />
+
+                        {/* 회원 유형 선택 */}
+                        <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700 space-y-3">
+                            <p className="text-sm font-black text-gray-300 text-center">회원 유형을 선택해주세요</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button" onClick={() => setRole('individual')}
+                                    className="py-5 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all"
+                                    style={{
+                                        borderColor: role === 'individual' ? primary : '#374151',
+                                        backgroundColor: role === 'individual' ? `${primary}22` : 'transparent',
+                                    }}
+                                >
+                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                        style={{ backgroundColor: role === 'individual' ? `${primary}33` : '#374151' }}>
+                                        <User size={24} style={{ color: role === 'individual' ? primary : '#6b7280' }} />
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-xs font-black text-white">개인(구직)회원</p>
+                                        <p className="text-[10px] text-gray-400 mt-0.5">이력서 등록가능</p>
+                                    </div>
+                                </button>
+                                <button
+                                    type="button" onClick={() => setRole('corporate')}
+                                    className="py-5 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all"
+                                    style={{
+                                        borderColor: role === 'corporate' ? primary : '#374151',
+                                        backgroundColor: role === 'corporate' ? `${primary}22` : 'transparent',
+                                    }}
+                                >
+                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                        style={{ backgroundColor: role === 'corporate' ? `${primary}33` : '#374151' }}>
+                                        <Building2 size={24} style={{ color: role === 'corporate' ? primary : '#6b7280' }} />
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-xs font-black text-white">업체(구인)회원</p>
+                                        <p className="text-[10px] text-gray-400 mt-0.5">채용공고 등록가능</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button" onClick={goStep2}
+                            disabled={!agreeTerms || !agreePrivacy || !agreeAge}
+                            className="w-full py-4 rounded-2xl text-white font-black text-sm shadow-xl active:scale-[0.98] transition-all disabled:opacity-40"
+                            style={{ backgroundColor: agreeTerms && agreePrivacy && agreeAge ? primary : '#6b7280' }}
+                        >
+                            다음 단계
                         </button>
                     </div>
                 )}
 
-                {/* STEP 2: Identity Verification */}
-                {step === 'identity' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-center">
-                            <ShieldCheck size={48} className="mx-auto text-blue-600 mb-4" />
-                            <h3 className="font-black text-lg mb-2 text-gray-800">신뢰할 수 있는 소통을 위해</h3>
-                            <p className="text-gray-500 text-xs leading-relaxed font-bold">
-                                {brand.name}는 1인 1계정 및 클린 채용 환경을 위해<br/>
-                                다날(Danal)을 통한 본인인증을 필수로 진행합니다.
+                {/* ───────────────── STEP 2: 개인(구직)회원 ───────────────── */}
+                {step === 2 && role === 'individual' && (
+                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="rounded-2xl p-5 text-center text-white" style={gradStyle}>
+                            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <User size={24} />
+                            </div>
+                            <p className="font-black text-base">개인회원 가입</p>
+                            <p className="text-xs text-white/70 mt-0.5">일자리를 찾는 구직자</p>
+                        </div>
+
+                        {/* 본인인증 */}
+                        <VerifyBlock verified={verified} verifyResult={verifyResult}
+                            onOpen={() => setShowModal(true)} primary={primary} />
+
+                        {/* 아이디 */}
+                        <Field label="아이디" required>
+                            <div className="flex gap-2">
+                                <Input placeholder="4~20자의 영문/숫자" value={iId}
+                                    onChange={(e) => { setIId(e.target.value); setIIdChecked(false); }} />
+                                <button type="button" onClick={() => checkId(iId, setIIdChecked)}
+                                    className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap"
+                                    style={{ backgroundColor: iIdChecked ? '#22c55e' : primary }}>
+                                    {iIdChecked ? '확인됨' : '중복확인'}
+                                </button>
+                            </div>
+                        </Field>
+
+                        <Field label="비밀번호" required>
+                            <Input type="password" placeholder="6자 이상, 영문/숫자/특수기호 조합 포함"
+                                value={iPw} onChange={(e) => setIPw(e.target.value)} />
+                        </Field>
+
+                        <Field label="비밀번호 확인" required>
+                            <Input type="password" placeholder="비밀번호를 다시 입력하세요"
+                                value={iPwConfirm} onChange={(e) => setIPwConfirm(e.target.value)} />
+                            {iPwConfirm && iPw !== iPwConfirm && (
+                                <p className="text-[11px] text-red-400 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
+                            )}
+                        </Field>
+
+                        {/* 자동입력 안내 */}
+                        <div className="p-3 rounded-xl border"
+                            style={{ borderColor: `${primary}55`, backgroundColor: `${primary}15` }}>
+                            <p className="text-[11px] font-bold text-center"
+                                style={{ color: primary }}>
+                                본인인증 완료 시 아래 정보가 자동으로 입력됩니다.
                             </p>
                         </div>
 
-                        {identityResult?.success ? (
-                            <div className="bg-green-50 p-6 rounded-2xl border border-green-100 flex flex-col items-center gap-3">
-                                <CheckCircle2 size={32} className="text-green-600" />
-                                <div className="text-center">
-                                    <p className="font-black text-green-800">{identityResult.name}님 인증 완료</p>
-                                    <p className="text-[10px] text-green-600 font-bold mt-1">인증된 정보를 바탕으로 가입을 진행합니다.</p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => setStep('form')}
-                                    className="w-full py-4 bg-green-600 text-white font-black rounded-xl text-sm mt-2"
-                                >
-                                    가입 정보 입력하기
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                onClick={() => setShowIdentityModal(true)}
-                                className="w-full py-5 bg-blue-600 text-white font-black rounded-xl text-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-3 shadow-xl"
-                            >
-                                <ShieldCheck size={24} />
-                                다날 PASS 본인인증 시작
+                        <Field label="이름" required>
+                            <Input placeholder="인증 후 자동 입력" value={iName}
+                                disabled={verified} onChange={(e) => setIName(e.target.value)} />
+                        </Field>
+
+                        <Field label="생년월일" required hint="예: 1990-01-01">
+                            <Input placeholder="인증 후 자동 입력" value={iBirth}
+                                disabled={verified} onChange={(e) => setIBirth(e.target.value)} />
+                        </Field>
+
+                        <Field label="성별" required>
+                            <GenderSelect value={iGender} onChange={setIGender} primary={primary}
+                                disabled={verified && !!iGender} />
+                        </Field>
+
+                        <Field label="닉네임" required hint="닉네임은 1일 1회만 수정됩니다">
+                            <Input placeholder="2~10자의 닉네임 입력" value={iNickname}
+                                onChange={(e) => setINickname(e.target.value)} />
+                        </Field>
+
+                        <Field label="휴대폰 번호" required>
+                            <Input placeholder="인증 후 자동 입력" value={iPhone}
+                                disabled={verified} onChange={(e) => setIPhone(e.target.value)} />
+                            {verified && <p className="text-[10px] text-gray-500 mt-1">본인인증으로 확인된 번호입니다.</p>}
+                        </Field>
+
+                        {/* SMS 수신 동의 */}
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-800 border border-gray-700">
+                            <input type="checkbox" checked={iSms} onChange={(e) => setISms(e.target.checked)}
+                                className="w-4 h-4 mt-0.5 shrink-0" style={{ accentColor: primary }} />
+                            <span className="text-xs text-gray-300 font-medium leading-relaxed">
+                                <span className="font-bold">SMS수신을 동의합니다.</span><br />
+                                <span className="text-gray-500">수신체크 시 보다 이용이 편리해집니다.</span>
+                            </span>
+                        </label>
+
+                        <div className="flex gap-3 pt-2">
+                            <button type="button" onClick={() => setStep(1)}
+                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                이전
                             </button>
-                        )}
-                        <p className="text-[10px] text-gray-400 text-center font-medium">
-                            인증된 정보는 가맹점 정보(CI/DI)로 관리되어 중복 가입 방지에 사용됩니다.
-                        </p>
+                            <button type="button" onClick={handleSubmit} disabled={isLoading}
+                                className="flex-[2] py-4 rounded-2xl text-white font-black text-sm shadow-xl active:scale-[0.98] transition-all disabled:opacity-50"
+                                style={{ backgroundColor: primary }}>
+                                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : '본인인증 후 가입 진행'}
+                            </button>
+                            <button type="button" onClick={() => router.push('/?page=login')}
+                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                취소
+                            </button>
+                        </div>
                     </div>
                 )}
 
-                {/* STEP 3: Detail Form */}
-                {step === 'form' && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                        {/* 기업회원 전용: 사업자등록번호 조회 */}
-                        {role === 'corporate' && (
-                            <div className="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <label className="block text-xs font-bold mb-2 text-gray-500">
-                                    기업 정보 인증 <span className="text-red-500">*</span>
-                                </label>
+                {/* ───────────────── STEP 2: 업체(구인)회원 ───────────────── */}
+                {step === 2 && role === 'corporate' && (
+                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="rounded-2xl p-5 text-center text-white" style={gradStyle}>
+                            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <Building2 size={24} />
+                            </div>
+                            <p className="font-black text-base">업소회원 가입</p>
+                            <p className="text-xs text-white/70 mt-0.5">직원을 구하는 사장님</p>
+                        </div>
+
+                        {/* ── 계정 정보 ── */}
+                        <div className="bg-gray-900 rounded-2xl p-4 space-y-4 border border-gray-700">
+                            <p className="text-xs font-black text-gray-400 flex items-center gap-2">
+                                <span className="w-1 h-4 rounded-full inline-block" style={{ backgroundColor: primary }} />
+                                계정 정보
+                            </p>
+                            <Field label="회원 아이디" required>
                                 <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="000-00-00000"
-                                        value={bizNumber}
-                                        onChange={handleBizNumberChange}
-                                        maxLength={12}
-                                        className={`flex-1 p-4 rounded-xl border font-bold ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={verifyBizNumber}
-                                        disabled={bizChecking || bizNumber.replace(/[^0-9]/g, '').length !== 10}
-                                        className="px-4 py-3 rounded-xl font-bold text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40"
-                                    >
-                                        {bizChecking ? <Loader2 size={14} className="animate-spin" /> : '조회'}
+                                    <Input placeholder="4~20자의 영문/숫자" value={cId}
+                                        onChange={(e) => { setCId(e.target.value); setCIdChecked(false); }} />
+                                    <button type="button" onClick={() => checkId(cId, setCIdChecked)}
+                                        className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap"
+                                        style={{ backgroundColor: cIdChecked ? '#22c55e' : primary }}>
+                                        {cIdChecked ? '확인됨' : '중복확인'}
                                     </button>
                                 </div>
-                                {bizStatus && (
-                                    <div className={`mt-2 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg ${
-                                        bizStatus === '정상' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                                    }`}>
-                                        {bizStatus === '정상' ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                                        [{bizStatus}] {bizMessage}
-                                    </div>
+                            </Field>
+                            <Field label="회원 비밀번호" required>
+                                <Input type="password" placeholder="6자 이상, 영문/숫자/특수기호 조합 포함"
+                                    value={cPw} onChange={(e) => setCPw(e.target.value)} />
+                            </Field>
+                            <Field label="비밀번호 확인" required>
+                                <Input type="password" placeholder="비밀번호를 다시 입력하세요"
+                                    value={cPwConfirm} onChange={(e) => setCPwConfirm(e.target.value)} />
+                                {cPwConfirm && cPw !== cPwConfirm && (
+                                    <p className="text-[11px] text-red-400 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
                                 )}
-                            </div>
-                        )}
-
-                        <div className="space-y-3">
-                            <div className="flex gap-2">
-                                <div className="flex-1">
-                                    <label className="text-[10px] font-bold text-gray-400 ml-1">성명 (인증됨)</label>
-                                    <input
-                                        type="text"
-                                        value={name || identityResult?.name || ''}
-                                        disabled
-                                        className="w-full p-4 rounded-xl border bg-gray-50 text-gray-500 font-bold"
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="text-[10px] font-bold text-gray-400 ml-1">닉네임</label>
-                                    <input
-                                        type="text"
-                                        placeholder="닉네임"
-                                        value={nickname}
-                                        onChange={(e) => setNickname(e.target.value)}
-                                        className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            
-                            <input
-                                type="email"
-                                placeholder="이메일 (ID)"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                                required
-                            />
-                            <input
-                                type="password"
-                                placeholder="비밀번호 (6자 이상)"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className={`w-full p-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                                required
-                            />
+                            </Field>
                         </div>
 
-                        <div className="pt-4">
-                            <div className="flex items-start gap-2 mb-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                                <input type="checkbox" id="terms" required className="mt-1 accent-blue-600" />
-                                <label htmlFor="terms" className="text-[11px] text-gray-500 font-bold leading-tight cursor-pointer">
-                                    [필수] 이용약관 및 개인정보 처리방침에 동의합니다.<br/>
-                                    전달된 휴대폰 정보는 본인확인 및 중복가입 방지용으로만 사용됩니다.
-                                </label>
-                            </div>
+                        {/* ── 담당자 정보 ── */}
+                        <div className="bg-gray-900 rounded-2xl p-4 space-y-4 border border-gray-700">
+                            <p className="text-xs font-black text-gray-400 flex items-center gap-2">
+                                <span className="w-1 h-4 rounded-full inline-block" style={{ backgroundColor: primary }} />
+                                담당자 정보
+                            </p>
+                            <VerifyBlock verified={verified} verifyResult={verifyResult}
+                                onOpen={() => setShowModal(true)} primary={primary} />
 
-                            <button
-                                type="submit"
-                                disabled={isLoading || (role === 'corporate' && bizStatus !== '정상')}
-                                style={primaryBgStyle}
-                                className="w-full text-white font-black py-5 rounded-xl shadow-xl hover:opacity-90 transition active:scale-[0.98] disabled:opacity-50"
-                            >
-                                {isLoading ? <Loader2 className="animate-spin mx-auto" /> : '회원가입 완료'}
+                            <Field label="담당자" required>
+                                <Input placeholder="인증 후 자동 입력" value={cManager}
+                                    disabled={verified} onChange={(e) => setCManager(e.target.value)} />
+                            </Field>
+                            <Field label="생년월일" required hint="예: 1990-01-01">
+                                <Input placeholder="인증 후 자동 입력" value={cBirth}
+                                    disabled={verified} onChange={(e) => setCBirth(e.target.value)} />
+                            </Field>
+                            <Field label="성별">
+                                <GenderSelect value={cGender} onChange={setCGender} primary={primary}
+                                    disabled={verified && !!cGender} />
+                            </Field>
+                            <Field label="핸드폰" required>
+                                <Input placeholder="인증 후 자동 입력" value={cPhone}
+                                    disabled={verified} onChange={(e) => setCPhone(e.target.value)} />
+                            </Field>
+                        </div>
+
+                        {/* ── 사업자 인증 안내 ── */}
+                        <div className="rounded-2xl p-4 border"
+                            style={{ borderColor: `${primary}44`, backgroundColor: `${primary}10` }}>
+                            <p className="text-xs font-black text-center" style={{ color: primary }}>
+                                사업자정보인증은 공고등록 시 인증/등록
+                            </p>
+                        </div>
+
+                        {/* SMS 수신 동의 */}
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-800 border border-gray-700">
+                            <input type="checkbox" className="w-4 h-4 mt-0.5 accent-pink-500 shrink-0" />
+                            <span className="text-xs text-gray-300 font-medium leading-relaxed">
+                                <span className="font-bold">SMS수신을 동의합니다.</span><br />
+                                <span className="text-gray-500">수신체크 시 보다 이용이 편리해집니다.</span>
+                            </span>
+                        </label>
+
+                        {/* 안내 */}
+                        <div className="p-3 rounded-xl border space-y-1"
+                            style={{ borderColor: `${primary}55`, backgroundColor: `${primary}15` }}>
+                            <p className="text-[11px] font-black" style={{ color: primary }}>※ 안내</p>
+                            <p className="text-[11px] leading-relaxed" style={{ color: `${primary}cc` }}>
+                                사업자등록증 확인 후 담당자가 승인 시 필요하실 수 있습니다.<br />
+                                광고 등록 시 제공 정보로만 서비스가 이용됩니다.
+                            </p>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                            <button type="button" onClick={() => setStep(1)}
+                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                이전
+                            </button>
+                            <button type="button" onClick={handleSubmit} disabled={isLoading}
+                                className="flex-[2] py-4 rounded-2xl text-white font-black text-sm shadow-xl active:scale-[0.98] transition-all disabled:opacity-50"
+                                style={{ backgroundColor: primary }}>
+                                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : '본인인증 후 가입 진행'}
+                            </button>
+                            <button type="button" onClick={() => router.push('/?page=login')}
+                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                취소
                             </button>
                         </div>
                     </div>
                 )}
-            </form>
 
-            {/* 본인인증 모달 */}
-            {showIdentityModal && (
+                {/* ───────────────── STEP 3: 가입완료 ───────────────── */}
+                {step === 3 && (
+                    <div className="text-center py-16 space-y-6 animate-in zoom-in duration-500">
+                        <div className="w-20 h-20 bg-green-950 rounded-full flex items-center justify-center mx-auto">
+                            <CheckCircle2 size={40} className="text-green-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-white mb-2">회원가입 완료!</h2>
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                                {brand.displayName}의 회원이 되신 것을 환영합니다.<br />
+                                {role === 'corporate'
+                                    ? '관리자 승인 후 서비스 이용이 가능합니다. (최대 24시간)'
+                                    : '이제부터 다양한 서비스를 이용하실 수 있습니다.'}
+                            </p>
+                        </div>
+                        <button onClick={() => router.push('/?page=login')}
+                            className="w-full py-4 rounded-2xl text-white font-black text-sm shadow-xl active:scale-[0.98] transition-all"
+                            style={{ backgroundColor: primary }}>
+                            로그인하러 가기
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {showModal && (
                 <IdentityVerifyModal
-                    onClose={() => setShowIdentityModal(false)}
-                    onVerified={(result) => {
-                        setIdentityResult(result);
-                        setShowIdentityModal(false);
-                    }}
+                    onClose={() => setShowModal(false)}
+                    onVerified={handleVerified}
                 />
             )}
         </div>

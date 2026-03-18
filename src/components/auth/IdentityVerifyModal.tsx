@@ -95,11 +95,6 @@ export const IdentityVerifyModal = ({ onClose, onVerified }: IdentityVerifyModal
 
                     {step === 'select' && (
                         <div className="space-y-3">
-                            <p className="text-sm text-slate-500 font-medium mb-5">
-                                사업자 인증이 완료되었습니다.<br />
-                                대표자 본인인증 방법을 선택해주세요.
-                            </p>
-
                             {error && (
                                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-600">
                                     {error}

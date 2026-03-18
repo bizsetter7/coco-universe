@@ -168,6 +168,30 @@ const MobileBottomNavContent = () => {
                             }
 
 
+                            // MY 버튼: 비로그인(guest) 시 로그인 페이지로 이동
+                            if (item.href === '/my-shop') {
+                                return (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            if (!mounted || !userType || userType === 'guest') {
+                                                router.push('/?page=login');
+                                            } else {
+                                                router.push('/my-shop');
+                                            }
+                                        }}
+                                        className={`flex flex-col items-center justify-center gap-1 py-1 ${isActive ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-500' : 'text-gray-400')}`}
+                                    >
+                                        <div className={isActive ? 'text-blue-500' : ''}>
+                                            {item.icon}
+                                        </div>
+                                        <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>
+                                            {item.label}
+                                        </span>
+                                    </button>
+                                );
+                            }
+
                             return (
                                 <Link
                                     key={index}

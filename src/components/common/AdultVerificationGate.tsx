@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-    Smartphone,
-    ShieldCheck,
-    User
-} from 'lucide-react';
+import { Smartphone, User } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -126,6 +122,7 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
             const data = await verifyRes.json();
             if (verifyRes.ok && data.success) {
                 onVerify(); // 게이트 해제
+                router.push('/'); // 비회원 인증 완료 후 메인페이지로 이동
             } else {
                 alert(`검증 실패: ${data.message || '인증 정보를 확인할 수 없습니다.'}`);
             }
@@ -207,12 +204,8 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
                                 <h3 className="text-[11px] font-black text-gray-900 flex items-center gap-1">
                                     <span className="text-red-500 font-bold">→</span> 비회원 본인인증
                                 </h3>
-                                <div className="grid grid-cols-2 gap-2 h-20">
-                                    <button onClick={() => handleNonMemberAuth('아이핀')} className="flex flex-col items-center justify-center gap-2 border-2 border-gray-100 rounded-lg group hover:border-red-200 hover:bg-red-50/20 transition-all">
-                                        <ShieldCheck className="text-gray-300 group-hover:text-red-500 w-1/3 h-1/3" />
-                                        <span className="text-[10.5px] font-black text-gray-600 group-hover:text-red-700">아이핀인증</span>
-                                    </button>
-                                    <button onClick={() => handleNonMemberAuth('휴대폰')} className="flex flex-col items-center justify-center gap-2 border-2 border-gray-100 rounded-lg group hover:border-red-200 hover:bg-red-50/20 transition-all">
+                                <div className="h-20">
+                                    <button onClick={() => handleNonMemberAuth('휴대폰')} className="w-full h-full flex flex-col items-center justify-center gap-2 border-2 border-gray-100 rounded-lg group hover:border-red-200 hover:bg-red-50/20 transition-all">
                                         <Smartphone className="text-gray-300 group-hover:text-red-500 w-1/3 h-1/3" />
                                         <span className="text-[10.5px] font-black text-gray-600 group-hover:text-red-700">휴대폰인증</span>
                                     </button>

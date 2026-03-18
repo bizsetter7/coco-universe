@@ -100,9 +100,9 @@ export const LoginPage = () => {
                     로그인
                 </button>
                 <div className="flex justify-center items-center text-[13px] text-gray-400 mt-4 whitespace-nowrap gap-2 sm:gap-4">
-                    <span className="cursor-pointer hover:text-gray-600">아이디 찾기</span>
+                    <button className="cursor-pointer hover:text-gray-600 transition" onClick={() => router.push('/?page=find-id')}>아이디 찾기</button>
                     <span className="w-px h-3 bg-gray-200"></span>
-                    <span className="cursor-pointer hover:text-gray-600">비밀번호 찾기</span>
+                    <button className="cursor-pointer hover:text-gray-600 transition" onClick={() => router.push('/?page=find-pw')}>비밀번호 찾기</button>
                     <span className="w-px h-3 bg-gray-200"></span>
                     <button className="text-gray-600 font-bold hover:underline" onClick={() => router.push('/?page=signup')}>회원가입</button>
                 </div>

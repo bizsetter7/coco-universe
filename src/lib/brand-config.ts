@@ -45,7 +45,7 @@ export const BRANDS: Record<string, BrandConfig> = {
         id: 'coco',
         name: '코코알바',
         domain: 'cocoalba.kr',
-        primaryColor: '#D4AF37',
+        primaryColor: '#f82b60',
         logoText: 'COCO',
         displayName: 'COCO 코코알바',
         tagline: '대한민국 1등 여성 엔터프라이즈 알바 플랫폼',

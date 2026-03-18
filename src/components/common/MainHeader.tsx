@@ -93,7 +93,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                             여성전문 엔터프라이즈 알바 No.1
                         </span>
                         <div className="flex items-center gap-0.5">
-                            <span className="text-xl md:text-2xl font-black tracking-tighter text-blue-600 group-hover:scale-105 transition-transform origin-left">COCO</span>
+                            <span className="text-xl md:text-2xl font-black tracking-tighter group-hover:scale-105 transition-transform origin-left" style={{ color: '#f82b60' }}>COCO</span>
                             <span className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'} group-hover:scale-105 transition-transform origin-left`}>
                                 ALBA
                             </span>
@@ -176,7 +176,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                         여성전문 엔터프라이즈 알바 No.1
                     </span>
                     <div className="flex items-center gap-0.5">
-                        <span className="text-lg md:text-xl font-black tracking-tighter text-blue-600">
+                        <span className="text-lg md:text-xl font-black tracking-tighter" style={{ color: '#f82b60' }}>
                             COCO
                         </span>
                         <span className={`text-lg md:text-xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>

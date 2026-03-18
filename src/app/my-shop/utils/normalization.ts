@@ -83,7 +83,7 @@ export const normalizeAd = (ad: any) => {
         tier: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
         ad_type: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
 
-        selectedIcon: opt.icon || ad.icon || null,
+        selectedIcon: opt.icon || ad.selectedIcon || ad.icon || null,
         selectedHighlighter: opt.highlighter || ad.selectedHighlighter || ad.highlighter || null,
         borderOption: opt.border || ad.borderOption || ad.border || 'none',
         // [Critical Fix] Ensure both camelCase and snake_case are handled
@@ -147,7 +147,11 @@ export const normalizePayment = (p: any, defaultUserName: string = '관리자') 
     return {
         id: p.id,
         amount: p.amount || 0,
-        price: p.price || p.amount,
+        price: (() => {
+            const val = p.price ?? p.amount;
+            if (val === undefined || val === null) return '0원';
+            return `${Number(val).toLocaleString()}원`;
+        })(),
         method: p.method,
         status: p.status,
         date: new Date(p.created_at || Date.now()).toLocaleString(),

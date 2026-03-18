@@ -106,6 +106,39 @@ Record: 작업 결과 및 패턴을 AI_SOP.md에 업데이트하고 스티치를
 - **원칙:** SOP Rule 6(사업자 인증 후 본인인증 노출)을 엄격히 준수하며, 다날 SDK의 보안 규격을 충족하는 HMAC 기반 무결성 검증 아키텍처 적용.
 - **진행 상황:** NICE 관련 의존성(Type, API, UI) 삭제 및 다날 전용 토큰 발급/콜백 검증 스켈레톤 구축 완료.
 
+### [2026-03-18] P2/P4 본인인증 게이트 최종 검수 (AI_SOP v1.9.5 이후 상태)
+
+**검수 수행자:** Claude (Sonnet 4.6) | **의뢰자:** 안티그래비티 이후 인계
+
+#### P2 (코코알바) — 정상 (채널키 불일치 버그 발견)
+- **구조적 무결성:** PortOne V2 SDK `identityVerificationId` → `/api/identity/verify-result` → PortOne REST API 검증 흐름 ✅
+- **응답 구조 일치율:** 100% (`{ success, code, message, result }`)
+- **Mock/실운용 스위칭:** `PORTONE_API_SECRET` 유무로 자동 전환 ✅
+- **⚠️ 버그:** `AdultVerificationGate.tsx:109` 채널키 하드코딩(`channel-key-4d5d9730...`)이 `.env.local`의 `NEXT_PUBLIC_PORTONE_CHANNEL_KEY`(`channel-key-45817f30...`)와 불일치. PortOne 콘솔에서 활성 채널 확인 및 코드에서 `process.env` 참조로 교체 권장.
+
+#### P4 (초코파트너스) — Critical: 프론트 ↔ 백엔드 구조 단절
+- **❌ 파라미터 불일치:** 프론트엔드(`AdultVerificationGate.tsx`)는 `{ identityVerificationId }` 전송, 백엔드(`verify-result/route.ts`)는 `{ token, signature, sigPayload, sessionId }` 기대 → 항상 **400 MISSING_PARAMS** 에러 발생
+- **원인:** P4 백엔드는 다날/NICE HMAC 토큰 흐름 설계, 프론트는 P2 방식(PortOne SDK 직접)으로 이식된 구조 충돌
+- **HMAC 무결성 로직 자체:** `crypto.timingSafeEqual` 기반 완벽 구현 ✅ — 단 프론트에서 호출되지 않는 데드코드 상태
+- **해결 방향:** P4 `verify-result/route.ts`를 P2 방식(PortOne REST API 조회)으로 교체 권장 (Option A)
+
+#### 환경변수 체크 결과
+| 키 | P2 | P4 |
+|--|--|--|
+| `PORTONE_API_SECRET` | ✅ 실값 | ❌ 없음 |
+| `NEXT_PUBLIC_PORTONE_STORE_ID` | ✅ | ❌ 없음 |
+| `NEXT_PUBLIC_PORTONE_CHANNEL_KEY` | ✅ (코드서 미사용) | ❌ 없음 |
+| `IDENTITY_HMAC_SECRET` | ✅ | ⚠️ placeholder 교체 필요 |
+| `DANAL_SERVICE_ID` 등 | ⚠️ 미계약 | ⚠️ 미계약 |
+
+#### 다음 단계
+1. P2: `AdultVerificationGate.tsx:109` 채널키를 `process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY` 참조로 수정
+2. P4: `verify-result/route.ts`를 P2 방식으로 통일 또는 프론트에 HMAC 토큰 흐름 추가
+3. P4 `.env.local`에 PortOne 관련 3개 키 추가 후 재테스트
+4. 다날/NICE 계약 완료 후 해당 환경변수 입력 및 실인증 최종 검증
+
+---
+
 ### [2026-03-17] P1 UI Intelligence Lab 고도화 및 CMS 마스터 시스템 구축
 - **배경:** 대장님의 지시에 따라 위시웹 벤치마킹을 통한 자체 콘텐츠 관리 기능 도입 및 코워커웹의 하이엔드 시각 효과 주입.
 - **주요 업데이트 사양:**
