@@ -42,18 +42,18 @@ const WageBadge = () => (
 export const Footer = () => {
     return (
         <footer className="border-t border-gray-100 bg-gray-50 font-sans text-gray-500">
-            <div className="max-w-5xl mx-auto px-4">
+            <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
 
                 {/* ── PC: 3열 정보 그리드 ─────────────────────────────── */}
-                <div className="hidden md:grid md:grid-cols-3 gap-0 py-8 border-b border-gray-200">
+                <div className="hidden md:grid md:grid-cols-3 gap-0 py-10 border-b border-gray-200">
 
                     {/* 고객센터 */}
-                    <div className="space-y-1 text-xs pr-6">
-                        <p className="text-[11px] font-black mb-2" style={{ color: HOT_PINK }}>고객센터</p>
-                        <p className="text-2xl font-black text-gray-900 tracking-tight">1877-1442</p>
-                        <p>평일 10:00 ~ 18:00 (주말·공휴일 휴무)</p>
-                        <p>점심 12:00 ~ 13:00</p>
-                        <p className="mt-1">
+                    <div className="space-y-2 pr-12">
+                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>고객센터</p>
+                        <p className="text-4xl font-black text-gray-900 tracking-tight">1877-1442</p>
+                        <p className="text-sm text-gray-500">평일 10:00 ~ 18:00 (주말·공휴일 휴무)</p>
+                        <p className="text-sm text-gray-500">점심 12:00 ~ 13:00</p>
+                        <p className="text-sm text-gray-500 mt-1">
                             E-mail&nbsp;
                             <a href="mailto:bizsetter7@gmail.com" className="font-semibold hover:underline">
                                 bizsetter7@gmail.com
@@ -62,28 +62,30 @@ export const Footer = () => {
                     </div>
 
                     {/* 최저임금 */}
-                    <div className="space-y-1 text-xs px-6 border-x border-gray-200">
-                        <p className="text-[11px] font-black mb-2" style={{ color: HOT_PINK }}>
+                    <div className="space-y-2 px-12 border-x border-gray-200">
+                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>
                             {MIN_WAGE_YEAR}년 최저임금
                         </p>
-                        <p className="text-xl font-black text-gray-900">
-                            {MIN_WAGE_AMOUNT}원
-                        </p>
-                        <a
-                            href="https://www.minimumwage.go.kr"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block text-[10px] font-bold hover:underline"
-                            style={{ color: HOT_PINK }}
-                        >
-                            더보기 &gt;
-                        </a>
-                        <div className="pt-2">
+                        <div className="flex items-baseline gap-3">
+                            <p className="text-3xl font-black text-gray-900">
+                                {MIN_WAGE_AMOUNT}원
+                            </p>
+                            <a
+                                href="https://www.minimumwage.go.kr"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm font-bold hover:underline"
+                                style={{ color: HOT_PINK }}
+                            >
+                                더보기 &gt;
+                            </a>
+                        </div>
+                        <div className="pt-1">
                             <a
                                 href="https://www.moel.go.kr/info/defaulter/defaulterList.do"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-block text-[10px] font-bold hover:underline"
+                                className="text-sm font-bold hover:underline"
                                 style={{ color: HOT_PINK }}
                             >
                                 임금체불사업주 명단 확인하기 &gt;
@@ -92,11 +94,11 @@ export const Footer = () => {
                     </div>
 
                     {/* 무통장입금 */}
-                    <div className="space-y-1 text-xs pl-6">
-                        <p className="text-[11px] font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
-                        <p className="font-black text-gray-900">토스</p>
-                        <p className="text-lg font-black text-gray-900 tracking-tight">1002-4683-1712</p>
-                        <p className="text-[10px]">예금주 : 고남우(초코아이디어)</p>
+                    <div className="space-y-2 pl-12">
+                        <p className="text-sm font-black mb-3" style={{ color: HOT_PINK }}>무통장입금안내</p>
+                        <p className="text-sm font-black text-gray-900">토스</p>
+                        <p className="text-3xl font-black text-gray-900 tracking-tight">1002-4683-1712</p>
+                        <p className="text-sm text-gray-500">예금주 : 고남우(초코아이디어)</p>
                     </div>
                 </div>
 
@@ -129,7 +131,7 @@ export const Footer = () => {
                 </div>
 
                 {/* ── 네비 링크 ───────────────────────────────────────── */}
-                <div className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1.5 py-4 border-b border-gray-200 text-[10px] md:text-[11px] font-medium">
+                <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 py-5 border-b border-gray-200 text-[10px] md:text-sm font-medium">
                     {NAV_LINKS.map(({ label, href }, i) => (
                         <React.Fragment key={label}>
                             <Link
@@ -147,9 +149,9 @@ export const Footer = () => {
                 </div>
 
                 {/* ── 사업자 정보 + 배지 ──────────────────────────────── */}
-                <div className="py-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+                <div className="py-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
                     <WageBadge />
-                    <div className="text-[10px] md:text-[11px] text-gray-400 space-y-1 leading-relaxed">
+                    <div className="text-[10px] md:text-xs text-gray-400 space-y-1 leading-relaxed">
                         <p>
                             주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어
                         </p>
