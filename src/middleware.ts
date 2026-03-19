@@ -89,17 +89,18 @@ export function middleware(request: NextRequest) {
 
     // 1. 관리자 페이지 — Supabase 세션 필수 (미인증 접근 즉시 차단)
     if (pathname.startsWith('/admin')) {
-        // Supabase 세션 쿠키 확인 (프로젝트 ref: ronqwailyistjuyolmyh)
-        const sessionCookie =
-            request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
-            request.cookies.get('sb-access-token') ||
-            request.cookies.get('supabase-auth-token');
+        // 개발 환경에서는 mock 로그인(localStorage) 허용 — 클라이언트에서 역할 재검증
+        if (process.env.NODE_ENV !== 'development') {
+            const sessionCookie =
+                request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
+                request.cookies.get('sb-access-token') ||
+                request.cookies.get('supabase-auth-token');
 
-        if (!sessionCookie) {
-            // 미인증 상태 → 홈 로그인 페이지로 리다이렉트 (URL 히스토리 대체)
-            return NextResponse.redirect(new URL('/?page=login', request.url));
+            if (!sessionCookie) {
+                return NextResponse.redirect(new URL('/?page=login', request.url));
+            }
         }
-        // 세션 있음 → 통과 (클라이언트에서 역할 재검증)
+        // 세션 있음(또는 개발 환경) → 통과 (클라이언트에서 역할 재검증)
     }
 
     // [항목 11] 주요 보호 페이지 — 로그인 세션 필수
