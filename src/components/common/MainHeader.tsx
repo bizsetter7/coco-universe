@@ -139,8 +139,8 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         if (pathname?.startsWith('/community')) {
             return (
                 <div className="flex items-center gap-1.5">
-                    <MessageCircle size={24} className="text-blue-600 fill-pink-600" />
-                    <span className="text-lg md:text-xl font-black text-blue-600 tracking-tight">
+                    <MessageCircle size={24} className="text-[#f82b60] fill-[#f82b60]" />
+                    <span className="text-lg md:text-xl font-black text-[#f82b60] tracking-tight">
                         그녀들의수다
                     </span>
                 </div>
@@ -159,7 +159,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         if (pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') {
             return (
                 <div className="flex items-center gap-1.5">
-                    <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <div className="w-7 h-7 bg-[#f82b60] rounded-lg flex items-center justify-center">
                         <span className="text-white text-[10px] font-black leading-none">CS</span>
                     </div>
                     <span className={`text-lg md:text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -351,7 +351,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 router.push(tabUrl);
                                                 setShowMobileMenu(false);
                                             }}
-                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${(searchParams.get('tab') === item.id || (page === 'support' && item.id === 'notice') || page === item.id) ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
+                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${(searchParams.get('tab') === item.id || (page === 'support' && item.id === 'notice') || page === item.id) ? 'bg-rose-50 text-[#f82b60]' : 'text-gray-600'}`}
                                         >
                                             {item.label}
                                         </button>

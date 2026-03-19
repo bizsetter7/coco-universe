@@ -499,10 +499,10 @@ export default function LeftSidebar({
                         <p className={`text-xs font-black ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                             CocoAlba
                         </p>
-                        <p className="text-lg font-black text-purple-600">1544-5568</p>
+                        <p className="text-lg font-black text-purple-600">1877-1442</p>
                     </div>
                 </div>
-                <p className="text-[9px] text-gray-500 mb-2">평일 09:30~19:00 점심 12:00~13:30<br />*공휴일 토,일은 근무하지 않습니다.</p>
+                <p className="text-[9px] text-gray-500 mb-2">평일 10:00~18:00 점심 12:00~13:00<br />*공휴일 토,일은 근무하지 않습니다.</p>
                 <div className="flex gap-2 text-[10px]">
                     <button
                         onClick={() => router.push('/?page=faq')}

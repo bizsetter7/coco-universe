@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Rocket, HelpCircle } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
+import { PaymentPopup } from '@/components/home/PaymentPopup';
 
 
 export const HeroSection = () => {
     const brand = useBrand();
-    const router = useRouter();
+    const [isPaymentPopupOpen, setIsPaymentPopupOpen] = useState(false);
 
     // Simplified static banner info for diet
     const bannerInfo = {
@@ -57,15 +56,15 @@ export const HeroSection = () => {
                     {/* Buttons */}
                     {/* Buttons - Raised slightly on PC as requested */}
                     <div className="flex flex-col sm:flex-row gap-2.5 items-center md:-mt-3 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-                        <Link
-                            href="/ad-apply"
+                        <button
+                            onClick={() => setIsPaymentPopupOpen(true)}
                             className="group relative inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-900 font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden whitespace-nowrap"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-rose-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-rose-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <span className="relative z-10">
                                 무료로 광고 올리기 🚀
                             </span>
-                        </Link>
+                        </button>
                         <Link
                             href="/guide"
                             className="group inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-slate-900/40 backdrop-blur-md border border-white/20 text-white font-bold text-xs md:text-sm hover:bg-slate-900/60 transition-all duration-300 whitespace-nowrap"
@@ -79,6 +78,12 @@ export const HeroSection = () => {
             {/* Side Accents */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-600/10 blur-[100px] rounded-full -ml-40 -mb-40 pointer-events-none" />
+
+            <PaymentPopup
+                isOpen={isPaymentPopupOpen}
+                onClose={() => setIsPaymentPopupOpen(false)}
+                initialTier="grand"
+            />
         </div>
     );
 };

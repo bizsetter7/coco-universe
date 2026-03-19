@@ -26,8 +26,8 @@ export const CommunityNotice = () => {
     };
 
     // Style tokens
-    const communityContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-blue-50/50 border-blue-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
-    const noticeContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-blue-50/50 border-blue-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
+    const communityContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-rose-50/50 border-rose-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
+    const noticeContainerStyle = `flex-1 rounded-2xl p-3 md:p-5 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-rose-50/50 border-rose-100'} shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]`;
 
     const headerStyle = "flex flex-col xl:flex-row items-start xl:items-center justify-between mb-3 md:mb-4 gap-1";
     const titleStyle = `text-base md:text-lg font-black flex items-center gap-2 whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-900'}`;
@@ -41,7 +41,7 @@ export const CommunityNotice = () => {
             <div className={communityContainerStyle} onClick={() => router.push('/community')}>
                 <div className={headerStyle}>
                     <h3 className={titleStyle}>
-                        <MessageCircle className="text-blue-500 shrink-0" fill="currentColor" size={18} />
+                        <MessageCircle className="text-[#f82b60] shrink-0" fill="currentColor" size={18} />
                         커뮤니티
                     </h3>
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">자유게시판</span>
@@ -49,19 +49,19 @@ export const CommunityNotice = () => {
                 <div className={listStyle}>
                     {recentPosts.map((post) => (
                         <div key={post.id} className="flex items-center gap-2 md:gap-3 group">
-                            <span className={iconBoxStyle('text-blue-500')}>{getCategoryIcon(post.category)}</span>
-                            <span className={`${itemStyle} group-hover:text-blue-600 transition-colors`}>{post.title}</span>
+                            <span className={iconBoxStyle('text-[#f82b60]')}>{getCategoryIcon(post.category)}</span>
+                            <span className={`${itemStyle} group-hover:text-[#f82b60] transition-colors`}>{post.title}</span>
                         </div>
                     ))}
                 </div>
-                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
 
             {/* Notice Section */}
             <div className={noticeContainerStyle} onClick={() => router.push('/customer-center?tab=notice')}>
                 <div className={headerStyle}>
                     <h3 className={titleStyle}>
-                        <Bell className="text-blue-500 shrink-0" fill="currentColor" size={18} />
+                        <Bell className="text-[#f82b60] shrink-0" fill="currentColor" size={18} />
                         공지사항
                     </h3>
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">업데이트</span>
@@ -80,7 +80,7 @@ export const CommunityNotice = () => {
                                 router.push(item.url);
                             }}
                         >
-                            <span className={iconBoxStyle('text-blue-500')}>
+                            <span className={iconBoxStyle('text-[#f82b60]')}>
                                 {item.important ? '🚨' : '📢'}
                             </span>
                             <span className={`${itemStyle} group-hover:underline ${item.important ? 'font-bold text-red-500 dark:text-red-400' : ''}`}>
@@ -89,7 +89,7 @@ export const CommunityNotice = () => {
                         </div>
                     ))}
                 </div>
-                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
             </div>
         </div>
     );

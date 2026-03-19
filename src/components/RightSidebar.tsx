@@ -173,11 +173,11 @@ export default function RightSidebar() {
                     <div className="w-8 h-8 rounded-full bg-yellow-400 text-white flex items-center justify-center font-black text-xs">TALK</div>
                     <div>
                         <p className="font-extrabold text-[10px] text-gray-400">Queenalba</p>
-                        <p className={`font-black text-lg leading-none ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>1544-5568</p>
+                        <p className={`font-black text-lg leading-none ${brand.theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>1877-1442</p>
                     </div>
                 </div>
                 <p className="text-[10px] text-gray-400 leading-tight">
-                    평일 09:30~19:00 점심 12:00~13:30<br />
+                    평일 10:00~18:00 점심 12:00~13:00<br />
                     <span className="text-gray-300">*공휴일 토, 일은 근무하지 않습니다.</span>
                 </p>
                 <div className="mt-3 text-[10px] flex gap-1 text-gray-400">

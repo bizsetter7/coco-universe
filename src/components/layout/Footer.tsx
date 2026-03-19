@@ -12,13 +12,12 @@ const MIN_WAGE_AMOUNT = '10,320';
 // ────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-    { label: '광고등록안내', href: '/guide' },
+    { label: '광고등록안내', href: '/customer-center?tab=ad' },
     { label: '광고/제휴문의', href: '/customer-center?tab=inquiry' },
     { label: '이용약관', href: '/customer-center?tab=policy' },
     { label: '개인정보처리방침', href: '/customer-center?tab=policy' },
     { label: '청소년보호정책', href: '/customer-center?tab=policy' },
     { label: '커뮤니티', href: '/community' },
-    { label: '관리자쪽지', href: '#' },
 ] as const;
 
 export const Footer = () => {
@@ -136,11 +135,15 @@ export const Footer = () => {
                                 >
                                     {label}
                                 </Link>
-                                {i < NAV_LINKS.length - 1 && (
-                                    <span className="text-gray-300 select-none">|</span>
-                                )}
+                                <span className="text-gray-300 select-none">|</span>
                             </React.Fragment>
                         ))}
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-note-modal', { detail: { receiver: 'admin' } }))}
+                            className="hover:text-gray-900 transition-colors whitespace-nowrap"
+                        >
+                            관리자쪽지
+                        </button>
                     </div>
 
                     {/* ── 사업자 정보 ──────────────────────────────────────── */}

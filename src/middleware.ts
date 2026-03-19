@@ -104,7 +104,7 @@ export function middleware(request: NextRequest) {
     }
 
     // [항목 11] 주요 보호 페이지 — 로그인 세션 필수
-    const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard', '/favorites', '/talent'];
+    const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard', '/favorites'];
     const needsAuth = PROTECTED_AUTH_PATHS.some(p => pathname.startsWith(p));
     if (needsAuth) {
         const sessionCookie =
