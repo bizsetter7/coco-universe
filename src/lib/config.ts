@@ -1,4 +1,4 @@
-export const isPreRelease = process.env.NEXT_PUBLIC_SERVICE_PHASE === 'PRE_RELEASE';
+export const isPreRelease = false; // [화이트셀 해제] 실전 PRODUCTION 모드 상시 활성화
 
 export const SERVICE_INFO = {
   TITLE: isPreRelease ? '코코알바 B2B | 맞춤형 인재 매칭 솔루션' : '코코알바 | 여성전문 고소득 알바 No.1',

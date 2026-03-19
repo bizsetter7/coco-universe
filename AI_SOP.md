@@ -207,6 +207,12 @@ Record: 작업 결과 및 패턴을 AI_SOP.md에 업데이트하고 스티치를
 
 **현재 상태:** `/public/Professional_Mirror_Simulator.html` 파일로 관리되며, 모든 프로젝트의 무결성 검증을 위한 표준 도구로 채택 완료.
 
+### [2026-03-15] P2/P3 SEO 스키마 정밀 고도화 및 화이트셀 공식 해제
+- GSC 누락 필드(baseSalary, employmentType, addressCountry) P2/P3 전 프로젝트 적용 완료.
+- P2 `config.ts` 화이트셀(PRE_RELEASE) 영구 해제 및 실전 `PRODUCTION` 모드 전환.
+- P3 `grand_reboot.py` 지능형 주소 매핑 로직 주입 및 73개 지역 전수 재생성 완료.
+- [정밀 타격 원칙] 지시하지 않은 로직 및 스타일(Padding, Color 등) 100% 보존 확인 완료. (v1.3 규격 준수) 🫡🔥📈🔍
+
 ### [2026-03-15] P3 랜딩페이지 최적화 및 템플릿 동기화 (Perfect Light Mode)
 - **대상:** P3(랜딩) - 메인 인덱스 페이지(`index.html`)
 - **배경:** P3 메인 페이지의 라이트 버전이 세부 지역 템플릿(강남, 용인수지 등)과 시각적으로 단절되어 있었으며, 모바일 가독성이 저하되는 문제 인식.
