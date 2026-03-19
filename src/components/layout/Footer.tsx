@@ -31,7 +31,6 @@ export const Footer = () => {
                     {/* ── PC: LADYALBA 스타일 4열 ─────────────────────── */}
                     <div className="hidden md:flex items-start justify-between gap-0 py-8 border-b border-gray-200">
 
-                        {/* 1열: 고객센터 + 전화번호 */}
                         <div className="shrink-0 pr-6 border-r border-gray-200">
                             <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>고객센터</p>
                             <p className="text-[2.8rem] font-black text-gray-900 tracking-tight leading-none">
@@ -39,7 +38,6 @@ export const Footer = () => {
                             </p>
                         </div>
 
-                        {/* 2열: 운영시간 + 이메일 */}
                         <div className="shrink-0 px-6 text-xs space-y-2.5 self-start pt-0.5">
                             <p>
                                 <span className="font-black mr-2" style={{ color: HOT_PINK }}>평일</span>
@@ -96,32 +94,34 @@ export const Footer = () => {
 
                     </div>
 
-                    {/* ── 모바일: 2열 (고객센터 | 무통장입금) — LADYALBA 스타일 박스 ── */}
-                    <div className="md:hidden my-4">
-                        <div className="flex border border-gray-300">
+                    {/* ── 모바일: 2열 (고객센터 | 무통장입금) ─────────────────────── */}
+                    <div className="md:hidden my-4 -mx-5">
+                        <div className="flex border-y border-gray-100 bg-white">
                             {/* 좌측: 고객센터 */}
-                            <div className="w-[52%] py-4 px-4 border-r border-gray-300">
-                                <p className="text-[11px] text-gray-500 font-medium mb-1">고객센터</p>
-                                <p className="font-black leading-none tracking-tight" style={{ color: HOT_PINK, fontSize: '2.5rem' }}>
-                                    1877-1442
-                                </p>
-                                <p className="mt-2 text-[10px] text-gray-500 leading-[1.7]">
-                                    평일 10:00 ~ 18:00<br />
-                                    (점심시간 12:00 ~ 13:00)<br />
-                                    토/일/공휴일은 휴무로<br />
-                                    게시판을 이용해주세요.
-                                </p>
+                            <div className="w-1/2 py-[25px] px-3 border-r border-gray-100 flex justify-center bg-white">
+                                <div className="flex flex-col items-start w-fit">
+                                    <p className="text-[11px] text-gray-900 font-bold mb-1 ml-[1px]">고객지원센터</p>
+                                    <p className="font-[900] leading-none whitespace-nowrap mb-2.5" style={{ color: HOT_PINK, fontSize: '1.82rem', letterSpacing: '-0.09em' }}>
+                                        1877-1442
+                                    </p>
+                                    <div className="text-[10.2px] text-gray-500 leading-tight font-medium tracking-tight whitespace-nowrap ml-[1px]">
+                                        <p>평일 10:00-18:00 (점심 12:00-13:00)</p>
+                                        <p>주말/공휴일은 휴무</p>
+                                    </div>
+                                </div>
                             </div>
                             {/* 우측: 무통장입금 */}
-                            <div className="w-[48%] py-4 px-3 flex flex-col justify-start">
-                                <p className="text-[11px] text-gray-500 font-medium mb-1">무통장 입금안내</p>
-                                <p className="text-[11px] text-gray-400 mb-1">토스뱅크</p>
-                                <p className="font-black text-gray-900 leading-snug tracking-tight" style={{ fontSize: '1.1rem' }}>
-                                    1002-4683-1712
-                                </p>
-                                <p className="mt-2 text-[10px] text-gray-400 leading-relaxed">
-                                    예금주&nbsp;&nbsp;고남우<br />(초코아이디어)
-                                </p>
+                            <div className="w-1/2 py-[25px] px-3 flex justify-center bg-white">
+                                <div className="flex flex-col items-start w-fit">
+                                    <p className="text-[11px] text-gray-900 font-bold mb-1 ml-[1px]">무통장 입금안내</p>
+                                    <p className="text-[10px] text-gray-400 font-medium leading-none mb-1 ml-[1px]">토스뱅크</p>
+                                    <p className="font-[900] text-gray-900 leading-none tracking-tight mb-2.5 whitespace-nowrap" style={{ fontSize: '1.2rem', letterSpacing: '-0.02em' }}>
+                                        1002-4683-1712
+                                    </p>
+                                    <p className="text-[10.2px] text-gray-500 leading-tight font-medium tracking-tight ml-[1px]">
+                                        예금주 : 고남우(초코아이디어)
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -166,17 +166,17 @@ export const Footer = () => {
                     {/* ── 사업자 정보 (PC) ─────────────────────────────────── */}
                     <div className="hidden md:flex py-5 items-start gap-6">
                         {/* 3가지 링크 (좌측 컬럼) */}
-                        <div className="shrink-0 border-r border-gray-200 pr-6 text-[11px] text-gray-500 space-y-2 min-w-[110px]">
+                        <div className="shrink-0 border-r border-gray-200 pr-6 text-[11px] text-gray-500 min-w-[110px]">
                             <button
                                 onClick={() => setReportOpen(true)}
-                                className="flex items-center justify-between w-full hover:text-gray-900 font-medium transition-colors text-left"
+                                className="flex items-center justify-between w-full h-6 hover:text-gray-900 font-medium transition-colors text-left"
                             >
                                 <span>허위광고 신고</span>
                                 <span className="ml-2 text-gray-400">&gt;</span>
                             </button>
                             <Link
                                 href="/notice/job-scam"
-                                className="flex items-center justify-between w-full hover:text-gray-900 font-medium transition-colors"
+                                className="flex items-center justify-between w-full h-6 hover:text-gray-900 font-medium transition-colors"
                             >
                                 <span>취업사기 주의</span>
                                 <span className="ml-2 text-gray-400">&gt;</span>
@@ -185,36 +185,35 @@ export const Footer = () => {
                                 href="https://www.moel.go.kr/info/defaulter/list.do"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-between w-full hover:text-gray-900 font-medium transition-colors"
+                                className="flex items-center justify-between w-full h-6 hover:text-gray-900 font-medium transition-colors"
                             >
                                 <span>체불사업자 명단</span>
                                 <span className="ml-2 text-gray-400">&gt;</span>
                             </a>
                         </div>
                         {/* 사업자 정보 텍스트 */}
-                        <div className="text-[11px] text-gray-400 space-y-1 leading-relaxed">
-                            <p>주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
-                            <p>
+                        <div className="text-[11px] text-gray-400">
+                            <p className="h-6 flex items-center">주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
+                            <p className="h-6 flex items-center">
                                 사업자등록번호: 226-13-91078&nbsp;&nbsp;|&nbsp;&nbsp;
                                 통신판매업신고번호 : 제 2017-경기송탄-0029호&nbsp;&nbsp;|&nbsp;&nbsp;
                                 직업정보제공사업신고번호 : J1806020260001
                             </p>
-                            <p>개인정보 및 이용관리 : bizsetter7@gmail.com</p>
-                            <p>
+                            <p className="h-6 flex items-center">
                                 유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보&nbsp;&nbsp;·&nbsp;&nbsp;COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
                             </p>
                         </div>
                     </div>
 
                     {/* ── 사업자 정보 (모바일) ─────────────────────────────── */}
-                    <div className="md:hidden py-3 text-center text-[9px] text-gray-400 space-y-0.5 leading-[1.5]">
+                    <div className="md:hidden py-4 text-center text-[10.5px] text-gray-400 space-y-1 leading-[1.6]">
                         <p>경기도 평택시 지산로12번길 93, 2층(지산동)</p>
-                        <p>사업자등록번호 : 226-13-91078&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
+                        <p>사업자등록번호: 226-13-91078 | 초코아이디어</p>
                         <p>통신판매업신고번호 : 제 2017-경기송탄-0029호</p>
                         <p>직업정보제공사업신고번호 : J1806020260001</p>
-                        <p>개인정보 및 이용관리 : bizsetter7@gmail.com</p>
-                        <p className="pt-1.5 text-gray-400/70">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
-                        <p className="text-gray-400/50">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
+                        <p>개인정보 및 이용관리 bizsetter7@gmail.com</p>
+                        <p className="pt-2 text-gray-400/70 text-[9.5px]">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
+                        <p className="text-gray-400/50 text-[9px]">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                     </div>
 
                 </div>
