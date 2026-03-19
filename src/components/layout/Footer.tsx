@@ -96,37 +96,30 @@ export const Footer = () => {
 
                     </div>
 
-                    {/* ── 모바일: 세로 쌓기 (변경 없음) ────────────────────── */}
-                    <div className="md:hidden py-5 space-y-5 border-b border-gray-200 text-xs">
-                        <div>
-                            <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>고객센터</p>
-                            <p className="text-xl font-black text-gray-900">1877-1442</p>
-                            <p>평일 10:00~18:00 · 점심 12:00~13:00</p>
-                            <p>bizsetter7@gmail.com</p>
-                        </div>
-                        <div className="flex gap-8">
-                            <div>
-                                <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>{MIN_WAGE_YEAR}년 최저임금</p>
-                                <p className="text-base font-black text-gray-900">{MIN_WAGE_AMOUNT}원</p>
-                                <a
-                                    href="https://www.moel.go.kr/info/defaulter/defaulterList.do"
-                                    target="_blank" rel="noopener noreferrer"
-                                    className="text-[9px] font-bold" style={{ color: HOT_PINK }}
-                                >
-                                    임금체불사업주 확인 &gt;
-                                </a>
+                    {/* ── 모바일: 2열 (고객센터 | 무통장입금) ──────────────── */}
+                    <div className="md:hidden py-5 border-b border-gray-200 text-xs">
+                        <div className="flex items-start gap-0">
+                            {/* 좌측: 고객센터 */}
+                            <div className="flex-1 pr-4 border-r border-gray-200">
+                                <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>고객센터</p>
+                                <p className="text-[1.6rem] font-black text-gray-900 leading-none tracking-tight">1877-1442</p>
+                                <p className="mt-1.5 text-[10px] text-gray-500 leading-relaxed">
+                                    평일 10:00~18:00<br />(점심 12:00~13:00)<br />주말/공휴일은 휴무<br />게시판 이용바랍니다.
+                                </p>
                             </div>
-                            <div>
+                            {/* 우측: 무통장입금 */}
+                            <div className="flex-1 pl-4">
                                 <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>무통장입금</p>
-                                <p className="font-black text-gray-900">1002-4683-1712</p>
-                                <p className="text-[9px]">예금주 : 고남우(초코아이디어)</p>
+                                <p className="text-[10px] font-black text-gray-500 mb-0.5">토스뱅크</p>
+                                <p className="text-sm font-black text-gray-900 leading-snug">1002-4683-1712</p>
+                                <p className="mt-1 text-[10px] text-gray-400">예금주 : 고남우(초코아이디어)</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* ── 네비 링크 ───────────────────────────────────────── */}
-                    <div className="flex flex-wrap justify-center md:justify-between items-center gap-x-3 md:gap-x-0 gap-y-1.5 py-4 border-b border-gray-200 text-[10px] md:text-sm font-medium">
-                        {NAV_LINKS.map(({ label, href }, i) => (
+                    {/* ── 네비 링크 (PC) ──────────────────────────────────── */}
+                    <div className="hidden md:flex flex-wrap justify-between items-center gap-x-0 gap-y-1.5 py-4 border-b border-gray-200 text-sm font-medium">
+                        {NAV_LINKS.map(({ label, href }) => (
                             <React.Fragment key={label}>
                                 <Link
                                     href={href}
@@ -146,9 +139,23 @@ export const Footer = () => {
                         </button>
                     </div>
 
-                    {/* ── 사업자 정보 ──────────────────────────────────────── */}
-                    <div className="py-5 flex items-start gap-6">
+                    {/* ── 네비 링크 (모바일) — 3개만 표시 ─────────────────── */}
+                    <div className="md:hidden flex justify-center items-center gap-x-3 py-3 border-b border-gray-200 text-[11px] font-medium">
+                        <Link href="/customer-center?tab=policy" className="hover:text-gray-900 transition-colors whitespace-nowrap font-bold text-gray-700">
+                            개인정보처리방침
+                        </Link>
+                        <span className="text-gray-300 select-none">|</span>
+                        <Link href="/customer-center?tab=policy" className="hover:text-gray-900 transition-colors whitespace-nowrap">
+                            이용약관
+                        </Link>
+                        <span className="text-gray-300 select-none">|</span>
+                        <Link href="/customer-center?tab=policy" className="hover:text-gray-900 transition-colors whitespace-nowrap">
+                            청소년보호정책
+                        </Link>
+                    </div>
 
+                    {/* ── 사업자 정보 (PC) ─────────────────────────────────── */}
+                    <div className="hidden md:flex py-5 items-start gap-6">
                         {/* 3가지 링크 (좌측 컬럼) */}
                         <div className="shrink-0 border-r border-gray-200 pr-6 text-[11px] text-gray-500 space-y-2 min-w-[110px]">
                             <button
@@ -175,25 +182,30 @@ export const Footer = () => {
                                 <span className="ml-2 text-gray-400">&gt;</span>
                             </a>
                         </div>
-
                         {/* 사업자 정보 텍스트 */}
-                        <div className="text-[10px] md:text-[11px] text-gray-400 space-y-1 leading-relaxed">
-                            <p>
-                                주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어
-                            </p>
+                        <div className="text-[11px] text-gray-400 space-y-1 leading-relaxed">
+                            <p>주소: 경기도 평택시 지산로12번길 93, 2층(지산동)&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
                             <p>
                                 사업자등록번호: 226-13-91078&nbsp;&nbsp;|&nbsp;&nbsp;
                                 통신판매업신고번호 : 제 2017-경기송탄-0029호&nbsp;&nbsp;|&nbsp;&nbsp;
                                 직업정보제공사업신고번호 : J1806020260001
                             </p>
-                            {/* PC: 한 줄 */}
-                            <p className="hidden md:block">
+                            <p>개인정보 및 이용관리 : bizsetter7@gmail.com</p>
+                            <p>
                                 유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보&nbsp;&nbsp;·&nbsp;&nbsp;COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
                             </p>
-                            {/* 모바일: 두 줄 */}
-                            <p className="md:hidden">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
-                            <p className="md:hidden text-gray-400/60">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                         </div>
+                    </div>
+
+                    {/* ── 사업자 정보 (모바일) ─────────────────────────────── */}
+                    <div className="md:hidden py-4 text-center text-[10px] text-gray-400 space-y-1.5 leading-relaxed">
+                        <p>경기도 평택시 지산로12번길 93, 2층(지산동)</p>
+                        <p>사업자등록번호 : 226-13-91078&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
+                        <p>통신판매업신고번호 : 제 2017-경기송탄-0029호</p>
+                        <p>직업정보제공사업신고번호 : J1806020260001</p>
+                        <p>개인정보 및 이용관리 : bizsetter7@gmail.com</p>
+                        <p className="pt-1">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
+                        <p className="text-gray-400/60">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                     </div>
 
                 </div>
