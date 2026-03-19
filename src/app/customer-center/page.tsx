@@ -52,6 +52,14 @@ import { useAuth } from '@/hooks/useAuth';
 // --- Mock Data ---
 const NOTICES = [
     {
+        id: 10,
+        title: '[필독] 취업사기 주의 — 피해 예방 가이드',
+        date: '2026-03-19',
+        isNew: true,
+        category: '필독',
+        type: 'job-scam',
+    },
+    {
         id: 9,
         title: '[필독] 광고 등록 시 금칙어 규정 및 게시물 운영 정책 안내',
         date: '2026-02-13',
@@ -1065,6 +1073,17 @@ export function CustomerCenterContent() {
                                                     <ResumeNoticeDetail />
                                                 ) : notice.type === 'card-payment-end' ? (
                                                     <CardPaymentNoticeDetail />
+                                                ) : notice.type === 'job-scam' ? (
+                                                    <div className="text-center py-4">
+                                                        <p className="text-sm text-gray-500 mb-4">취업사기 피해 예방 가이드 전문을 확인하세요.</p>
+                                                        <a
+                                                            href="/notice/job-scam"
+                                                            className="inline-block px-6 py-2.5 rounded-xl text-white font-bold text-sm transition-opacity hover:opacity-80"
+                                                            style={{ backgroundColor: '#f82b60' }}
+                                                        >
+                                                            전문 보기 →
+                                                        </a>
+                                                    </div>
                                                 ) : (
                                                     notice.content
                                                 )}

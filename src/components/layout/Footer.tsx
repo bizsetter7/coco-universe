@@ -155,15 +155,13 @@ export const Footer = () => {
                                 <span>허위광고 신고</span>
                                 <span className="ml-2 text-gray-400">&gt;</span>
                             </button>
-                            <a
-                                href="https://bubblealba.com/support/notice/job-scam?referer=1m0mdwNpShkhXxx32AT"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <Link
+                                href="/notice/job-scam"
                                 className="flex items-center justify-between w-full hover:text-gray-900 font-medium transition-colors"
                             >
                                 <span>취업사기 주의</span>
                                 <span className="ml-2 text-gray-400">&gt;</span>
-                            </a>
+                            </Link>
                             <a
                                 href="https://www.moel.go.kr/info/defaulter/list.do"
                                 target="_blank"
