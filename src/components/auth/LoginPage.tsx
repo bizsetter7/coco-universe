@@ -25,17 +25,17 @@ export const LoginPage = () => {
         setIsLoading(true);
         try {
             // 1. Check for Test/Mock IDs
-            if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
+            if ((id === 'admin_shop' || id === 'admin_user') && pw === 'Coco#2025!') {
                 login('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
                 alert('마스터 관리자로 로그인되었습니다.');
                 window.location.href = '/admin';
                 return;
-            } else if (id === 'test_shop' && pw === 'password123') {
+            } else if (id === 'test_shop' && pw === 'Coco#2025!') {
                 login('shop', id, '테스트 사장님', '번창하는조사장');
                 alert('기업 회원으로 로그인되었습니다.');
                 window.location.href = '/';
                 return;
-            } else if (id === 'test_user' && pw === 'password123') {
+            } else if (id === 'test_user' && pw === 'Coco#2025!') {
                 login('personal', id, '테스트 회원', '밤의요정');
                 alert('일반 회원으로 로그인되었습니다.');
                 window.location.href = '/';

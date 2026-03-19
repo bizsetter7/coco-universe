@@ -87,7 +87,7 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
-    // 1. 관리자 페이지 — Supabase 세션 필수 (미인증 접근 즉시 차단)
+    // 1. 관리자 페이지 — Supabase 세션 또는 mock admin 쿠키 필수
     if (pathname.startsWith('/admin')) {
         // 개발 환경에서는 mock 로그인(localStorage) 허용 — 클라이언트에서 역할 재검증
         if (process.env.NODE_ENV !== 'development') {
@@ -96,7 +96,10 @@ export function middleware(request: NextRequest) {
                 request.cookies.get('sb-access-token') ||
                 request.cookies.get('supabase-auth-token');
 
-            if (!sessionCookie) {
+            // mock admin 로그인 쿠키 (테스트 계정용 — 클라이언트에서 역할 재검증)
+            const mockAdminCookie = request.cookies.get('coco_admin_mock');
+
+            if (!sessionCookie && !mockAdminCookie) {
                 return NextResponse.redirect(new URL('/?page=login', request.url));
             }
         }

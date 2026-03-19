@@ -111,7 +111,22 @@ export function useAuth() {
             return;
         }
 
-        // 3. 비로그인 상태 (완전한 게스트)
+        // 3. 비로그인 상태 (완전한 게스트) — mock 세션이 없을 때만 게스트로 전환
+        // (이중 방어: SIGNED_OUT 타이밍 레이스 컨디션 방지)
+        const finalMockCheck = typeof window !== 'undefined'
+            ? localStorage.getItem('coco_mock_session')
+            : null;
+        if (finalMockCheck) {
+            try {
+                const recovered = JSON.parse(finalMockCheck);
+                if (recovered?.type) {
+                    setUser(recovered);
+                    setIsLoggedIn(true);
+                    setIsLoading(false);
+                    return;
+                }
+            } catch (e) { }
+        }
         setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0, points: 0 });
         setIsLoggedIn(false);
         setIsLoading(false);
@@ -147,6 +162,14 @@ export function useAuth() {
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            // Mock 세션이 살아있는 동안 Supabase SIGNED_OUT 이벤트로 강제 로그아웃 방지
+            // (실제 로그아웃은 반드시 logout() 함수를 통해서만 수행)
+            if (_event === 'SIGNED_OUT') {
+                const hasMock = typeof window !== 'undefined'
+                    ? localStorage.getItem('coco_mock_session')
+                    : null;
+                if (hasMock) return;
+            }
             if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
                 syncUserSession(session).catch(() => { });
             }
@@ -183,6 +206,11 @@ export function useAuth() {
 
         if (typeof window !== 'undefined') {
             localStorage.setItem('coco_mock_session', JSON.stringify(mockUser));
+            // admin mock 로그인 시 미들웨어가 읽을 수 있는 쿠키 설정
+            // (localStorage는 서버사이드 미들웨어에서 접근 불가)
+            if (type === 'admin') {
+                document.cookie = 'coco_admin_mock=1; path=/; max-age=86400; SameSite=Lax';
+            }
         }
         setUser(mockUser);
         setIsLoggedIn(true);
@@ -195,6 +223,8 @@ export function useAuth() {
             localStorage.removeItem('coco_mock_session');
             localStorage.removeItem('adult_verified');
             localStorage.removeItem('coco_sim_mode');
+            // admin mock 쿠키 제거
+            document.cookie = 'coco_admin_mock=; path=/; max-age=0';
         }
 
         try {
