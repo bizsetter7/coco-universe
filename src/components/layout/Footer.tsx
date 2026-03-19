@@ -97,22 +97,24 @@ export const Footer = () => {
                     </div>
 
                     {/* ── 모바일: 2열 (고객센터 | 무통장입금) ──────────────── */}
-                    <div className="md:hidden py-5 border-b border-gray-200 text-xs">
-                        <div className="flex items-start gap-0">
+                    <div className="md:hidden py-4 border-b border-gray-200">
+                        <div className="flex items-stretch gap-0">
                             {/* 좌측: 고객센터 */}
                             <div className="flex-1 pr-4 border-r border-gray-200">
-                                <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>고객센터</p>
-                                <p className="text-[1.6rem] font-black text-gray-900 leading-none tracking-tight">1877-1442</p>
-                                <p className="mt-1.5 text-[10px] text-gray-500 leading-relaxed">
-                                    평일 10:00~18:00<br />(점심 12:00~13:00)<br />주말/공휴일은 휴무<br />게시판 이용바랍니다.
+                                <p className="text-[9px] font-black tracking-wide uppercase mb-1" style={{ color: HOT_PINK }}>고객센터</p>
+                                <p className="text-[1.75rem] font-black leading-none tracking-tight" style={{ color: HOT_PINK }}>1877-1442</p>
+                                <p className="mt-2 text-[9px] text-gray-400 leading-[1.6]">
+                                    평일 10:00 ~ 18:00 (점심 12:00~13:00)<br />
+                                    토/일/공휴일은 휴무<br />
+                                    게시판을 이용해주세요.
                                 </p>
                             </div>
                             {/* 우측: 무통장입금 */}
-                            <div className="flex-1 pl-4">
-                                <p className="text-[10px] font-black mb-1" style={{ color: HOT_PINK }}>무통장입금</p>
-                                <p className="text-[10px] font-black text-gray-500 mb-0.5">토스뱅크</p>
-                                <p className="text-sm font-black text-gray-900 leading-snug">1002-4683-1712</p>
-                                <p className="mt-1 text-[10px] text-gray-400">예금주 : 고남우(초코아이디어)</p>
+                            <div className="flex-1 pl-4 flex flex-col justify-center">
+                                <p className="text-[9px] font-black tracking-wide uppercase mb-1" style={{ color: HOT_PINK }}>무통장 입금안내</p>
+                                <p className="text-[10px] font-bold text-gray-500 mb-0.5">토스뱅크</p>
+                                <p className="text-base font-black text-gray-900 leading-tight tracking-tight">1002-4683-1712</p>
+                                <p className="mt-1.5 text-[9px] text-gray-400">예금주 : 고남우(초코아이디어)</p>
                             </div>
                         </div>
                     </div>
@@ -198,14 +200,14 @@ export const Footer = () => {
                     </div>
 
                     {/* ── 사업자 정보 (모바일) ─────────────────────────────── */}
-                    <div className="md:hidden py-4 text-center text-[10px] text-gray-400 space-y-1.5 leading-relaxed">
+                    <div className="md:hidden py-3 text-center text-[9px] text-gray-400 space-y-0.5 leading-[1.5]">
                         <p>경기도 평택시 지산로12번길 93, 2층(지산동)</p>
                         <p>사업자등록번호 : 226-13-91078&nbsp;&nbsp;|&nbsp;&nbsp;초코아이디어</p>
                         <p>통신판매업신고번호 : 제 2017-경기송탄-0029호</p>
                         <p>직업정보제공사업신고번호 : J1806020260001</p>
                         <p>개인정보 및 이용관리 : bizsetter7@gmail.com</p>
-                        <p className="pt-1">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
-                        <p className="text-gray-400/60">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
+                        <p className="pt-1.5 text-gray-400/70">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
+                        <p className="text-gray-400/50">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                     </div>
 
                 </div>
