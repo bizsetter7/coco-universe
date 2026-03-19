@@ -716,5 +716,556 @@
         "description": "Verify element \"GO\" button is visible"
       }
     ]
+  },
+  {
+    "id": "TC023",
+    "title": "Mock login as test_shop (업체회원) and verify session persists",
+    "description": "업체회원 테스트 계정(test_shop / Coco#2025!)으로 로그인 후 세션이 유지되고 메인 페이지로 이동하는지 검증. 로그인 직후 세션이 풀리는 버그 재발 방지.",
+    "category": "인증 & 세션 (Auth & Session)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"로그인\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"test_shop\" into the 아이디 input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the 로그인 button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify alert text contains \"기업 회원으로 로그인되었습니다\""
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL is \"/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"로그인\" is not visible in the header (로그인 버튼 사라짐 확인)"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Mock login as admin_user and access /admin page",
+    "description": "관리자 테스트 계정(admin_user / Coco#2025!)으로 로그인 후 /admin 페이지 접근 가능한지 검증. admin 로그인 루프 버그 재발 방지.",
+    "category": "인증 & 세션 (Auth & Session)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"admin_user\" into the 아이디 input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the 로그인 button"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"어드민\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Session does not reset after Supabase SIGNED_OUT event (mock session protection)",
+    "description": "Mock 로그인 후 페이지를 새로고침해도 세션이 유지되는지 검증. Supabase SIGNED_OUT 이벤트가 mock 세션을 덮어쓰는 버그 재발 방지.",
+    "category": "인증 & 세션 (Auth & Session)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"test_user\" into the 아이디 input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the 로그인 button"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Reload the page (F5 / navigate to \"/\")"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL is \"/\" (로그인 페이지로 리다이렉트되지 않음)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify 로그인 버튼 is not visible in the header"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "MY button navigates to /my-shop when logged in (not login page)",
+    "description": "업체회원으로 로그인 후 하단 네비게이션 MY 버튼 클릭 시 로그인 페이지가 아닌 마이페이지로 이동하는지 검증. MobileBottomNav 플리커링 버그 재발 방지.",
+    "category": "하단 네비게이션 (MobileBottomNav)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"test_shop\" into the 아이디 input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the 로그인 button"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the MY button in the bottom navigation bar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/my-shop\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL does not contain \"page=login\""
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "MY button navigates to login page when not logged in",
+    "description": "비로그인 상태에서 하단 네비게이션 MY 버튼 클릭 시 로그인 페이지로 이동하는지 검증.",
+    "category": "하단 네비게이션 (MobileBottomNav)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\" (logged out state)"
+      },
+      {
+        "type": "action",
+        "description": "Click the MY button in the bottom navigation bar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"page=login\""
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "MY button does not flicker between /my-shop and login page on repeated clicks",
+    "description": "업체회원으로 로그인 후 MY 버튼을 3번 연속 클릭해도 항상 마이페이지로 이동하고 로그인 페이지로 튀지 않는지 검증. 플리커링 버그 재발 방지.",
+    "category": "하단 네비게이션 (MobileBottomNav)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the login alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the MY button in the bottom navigation bar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/my-shop\""
+      },
+      {
+        "type": "action",
+        "description": "Navigate back to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Click the MY button in the bottom navigation bar again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/my-shop\" (로그인 페이지로 가지 않음)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL does not contain \"page=login\""
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "MessageModal shows correct userName from mock session (not '회원')",
+    "description": "Mock 로그인 후 쪽지함을 열면 좌측 인사말에 '회원'이 아닌 실제 닉네임(번창하는조사장 등)이 표시되는지 검증. coco_mock_session 미탐색 버그 재발 방지.",
+    "category": "쪽지함 (MessageModal)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the login alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지함 button in the bottom navigation bar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"회원\" is not visible as the greeting name (should be nickname, not generic '회원')"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"님\" is visible (닉네임+님 형태의 인사말)"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "MessageModal inbox and sent tabs show different content",
+    "description": "쪽지함의 받은쪽지함과 보낸쪽지함이 서로 다른 내용을 보여주는지 검증. 동일 userName('회원')으로 양쪽을 조회하던 버그 재발 방지.",
+    "category": "쪽지함 (MessageModal)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the login alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지함 button to open MessageModal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"받은쪽지함\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the 보낸쪽지함 tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"보낸쪽지함\" tab is active"
+      },
+      {
+        "type": "action",
+        "description": "Click the 받은쪽지함 tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"받은쪽지함\" tab is active"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify both tabs are independently queryable without showing identical data (받은/보낸 분리 확인)"
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "MessageModal send message with correct sender name",
+    "description": "쪽지 보내기 시 발신자가 '회원'이 아닌 실제 닉네임으로 전송되는지 검증.",
+    "category": "쪽지함 (MessageModal)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지함 button to open MessageModal"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지보내기 tab"
+      },
+      {
+        "type": "action",
+        "description": "Type \"[관리자]\" into the 받는사람 field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"테스트 쪽지입니다.\" into the textarea"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지보내기 button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify alert text contains \"[관리자]님께 쪽지를 보냈습니다\""
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Admin user sees logout button in mobile hamburger menu",
+    "description": "관리자 로그인 후 모바일 햄버거 메뉴를 열면 로그아웃 버튼이 보이는지 검증. admin 모바일 로그아웃 버튼 미존재 버그 재발 방지.",
+    "category": "관리자 (Admin UX)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as admin_user with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the hamburger menu button in the header"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"로그아웃\" is visible in the mobile menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"어드민 센터 이동\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Admin logout from mobile hamburger menu works correctly",
+    "description": "관리자 모바일 메뉴의 로그아웃 버튼 클릭 시 실제로 로그아웃되고 홈으로 이동하는지 검증.",
+    "category": "관리자 (Admin UX)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as admin_user with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the hamburger menu button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Click the 로그아웃 button in the mobile menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL is \"/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is logged out (로그인 버튼이 다시 보임)"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Scroll is functional after clicking an ad (job detail modal close)",
+    "description": "메인 페이지에서 광고(구인공고)를 클릭 후 모달을 닫았을 때 페이지 스크롤이 정상 동작하는지 검증. useBodyScrollLock 미해제 버그 재발 방지.",
+    "category": "스크롤 & 모달 (Scroll Lock)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/\""
+      },
+      {
+        "type": "action",
+        "description": "Click any job/ad card to open the detail modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the job detail modal is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the close (X) button on the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the modal is not visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify document.body.style.overflow is not 'hidden' (스크롤 해제 확인)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify document.body.style.touchAction is not 'none' (모바일 스크롤 해제 확인)"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "Scroll is functional after selecting community category in hamburger menu",
+    "description": "커뮤니티 페이지에서 햄버거 메뉴의 카테고리를 선택한 후 스크롤이 정상 동작하는지 검증. 메뉴 닫기 전 라우팅 버그 재발 방지.",
+    "category": "스크롤 & 모달 (Scroll Lock)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/community\""
+      },
+      {
+        "type": "action",
+        "description": "Click the hamburger menu button to open the mobile category menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the category menu is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click any category item in the menu (e.g., '그녀들의수다')"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the category menu is not visible (메뉴가 닫힘)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify document.body.style.overflow is not 'hidden'"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page scroll is functional after category selection"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Community page uses hotpink brand color (no blue colors)",
+    "description": "커뮤니티 관련 페이지(목록/상세/글쓰기)에서 블루 계열 색상 없이 핫핑크(#f82b60) 브랜드 컬러가 올바르게 적용되었는지 검증.",
+    "category": "브랜드 컬러 (Brand Color)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/community\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active tab underline or indicator color is hotpink (#f82b60), not blue"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 글쓰기 button uses hotpink background color"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to \"/community/write\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 등록 button uses hotpink background (#f82b60)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no blue-600 or blue-500 colors are visible on the page"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "MessageModal uses hotpink brand color (no blue colors)",
+    "description": "쪽지함 모달에서 블루 계열 색상 없이 핫핑크(#f82b60) 브랜드 컬러가 적용되었는지 검증.",
+    "category": "브랜드 컬러 (Brand Color)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to \"/?page=login\" and login as test_user with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지함 button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active tab has hotpink (#f82b60) underline indicator"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 쪽지보내기 tab is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the 쪽지보내기 tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 쪽지보내기 button has hotpink (#f82b60) background color"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no blue-600 colors are visible in the modal"
+      }
+    ]
   }
 ]
