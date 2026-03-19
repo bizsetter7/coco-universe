@@ -92,14 +92,12 @@ export const Footer = () => {
                         </div>
 
                         {/* 4열: 무통장입금 (좌측 정렬) */}
-                        <div className="shrink-0 pl-6 border-l border-gray-200 text-xs space-y-1">
-                            <p className="font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
-                            <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
-                                <span className="font-black text-gray-900">토스</span>
-                                <span className="font-black text-gray-900 text-lg tracking-tight leading-tight">1002-4683-1712</span>
-                                <span className="text-gray-400">예금주</span>
-                                <span className="text-gray-400">고남우(초코아이디어)</span>
-                            </div>
+                        <div className="shrink-0 pl-6 border-l border-gray-200 space-y-1">
+                            <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
+                            <p className="text-base font-black text-gray-900 tracking-tight leading-tight">
+                                토스&nbsp;&nbsp;1002-4683-1712
+                            </p>
+                            <p className="text-xs text-gray-400">예금주&nbsp;&nbsp;고남우(초코아이디어)</p>
                         </div>
 
                     </div>
