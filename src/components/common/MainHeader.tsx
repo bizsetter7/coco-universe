@@ -285,7 +285,14 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                     {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />}
                                 </button>
                             )}
-                            {(pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page || isSimulated) && !pathname?.startsWith('/admin') && (
+                            {/* 관리자: 모든 페이지에서 햄버거 메뉴 표시 */}
+                            {isMounted && userRole === 'admin' && isLoggedIn && !isLoading && (
+                                <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(true)} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                                    <Menu size={24} />
+                                </Button>
+                            )}
+                            {/* 일반 사용자: 특정 페이지에서만 햄버거 메뉴 표시 */}
+                            {userRole !== 'admin' && (pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page || isSimulated) && (
                                 <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(true)} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}>
                                     <Menu size={24} />
                                 </Button>
@@ -306,14 +313,39 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                     <div className="fixed inset-y-0 right-0 w-[280px] bg-white dark:bg-gray-900 shadow-xl p-6 flex flex-col gap-6 overflow-y-auto">
                         <div className="flex justify-between items-center">
                             <span className="font-bold text-lg dark:text-white">
-                                {pathname?.startsWith('/community') ? '커뮤니티 메뉴' :
-                                    (pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') ? '고객센터 메뉴' :
-                                        pathname?.startsWith('/my-shop') ? '마이메뉴' : '메뉴'}
+                                {userRole === 'admin' ? '관리자 메뉴' :
+                                    pathname?.startsWith('/community') ? '커뮤니티 메뉴' :
+                                        (pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') ? '고객센터 메뉴' :
+                                            pathname?.startsWith('/my-shop') ? '마이메뉴' : '메뉴'}
                             </span>
                             <button onClick={() => setShowMobileMenu(false)} className="p-1 text-gray-500"><ChevronLeft size={24} className="rotate-180" /></button>
                         </div>
 
                         <div className="flex flex-col gap-2">
+                            {/* 관리자 전용 섹션 — 어떤 페이지에서든 항상 표시 */}
+                            {userRole === 'admin' && (
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between px-4 py-3 bg-slate-50 rounded-xl">
+                                        <div className="flex items-center gap-2">
+                                            <ShieldCheck size={16} className="text-slate-500" />
+                                            <span className="text-sm font-black text-slate-700">{user?.name || '관리자'}</span>
+                                        </div>
+                                        <button
+                                            onClick={async () => { setShowMobileMenu(false); await handleLogout(); }}
+                                            className="flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
+                                        >
+                                            <LogOut size={14} /> 로그아웃
+                                        </button>
+                                    </div>
+                                    <button onClick={() => { router.push('/admin'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-black text-[#f82b60] bg-rose-50/50 flex items-center gap-2">
+                                        <ShieldCheck size={16} /> 어드민 센터 이동
+                                    </button>
+                                    <button onClick={() => { router.push('/admin?tab=ads'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600">광고 심사 관리</button>
+                                    <button onClick={() => { router.push('/admin?tab=users'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600">전체 회원 관리</button>
+                                    <div className="h-px bg-gray-100 my-2" />
+                                </div>
+                            )}
+
                             {pathname?.startsWith('/community') && (
                                 <div className="space-y-1">
                                     {CATEGORIES.map((cat) => (
@@ -421,15 +453,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                         </div>
                                     )}
 
-                                    {userRole === 'admin' && (
-                                        <div className="space-y-1">
-                                            <button onClick={() => { router.push('/admin'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-black text-blue-600 bg-blue-50/50 flex items-center gap-2">
-                                                <ShieldCheck size={16} /> 어드민 센터 이동
-                                            </button>
-                                            <button onClick={() => { router.push('/admin?tab=ads'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600">광고 심사 관리</button>
-                                            <button onClick={() => { router.push('/admin?tab=users'); setShowMobileMenu(false); }} className="w-full text-left py-3 px-4 rounded-xl font-bold text-slate-600">전체 회원 관리</button>
-                                        </div>
-                                    )}
+                                    {/* admin 메뉴는 상단 공통 섹션에서 처리 */}
 
                                     <div className="h-px bg-gray-100 my-2" />
                                 </div>
