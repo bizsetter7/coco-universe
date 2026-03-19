@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getHighlighterStyle } from '@/utils/highlighter';
@@ -273,7 +272,6 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
 };
 
 export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, isFavorite, onToggleFavorite }) => {
-    useBodyScrollLock(true);
     const [mounted, setMounted] = useState(false);
     const [publisherAddress, setPublisherAddress] = useState<string | null>(null);
 

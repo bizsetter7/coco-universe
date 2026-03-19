@@ -320,12 +320,12 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                         <button
                                             key={cat.id}
                                             onClick={() => {
+                                                setShowMobileMenu(false);
                                                 const params = new URLSearchParams();
                                                 if (cat.name !== '전체') params.set('category', cat.name);
                                                 router.push(`/community?${params.toString()}`);
-                                                setShowMobileMenu(false);
                                             }}
-                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat.name || (!searchParams.get('category') && cat.name === '전체') ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}`}
+                                            className={`w-full text-left py-3 px-4 rounded-xl font-bold ${searchParams.get('category') === cat.name || (!searchParams.get('category') && cat.name === '전체') ? 'bg-rose-50 text-[#f82b60]' : 'text-gray-600'}`}
                                         >
                                             {cat.name}
                                         </button>

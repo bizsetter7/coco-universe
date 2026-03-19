@@ -59,6 +59,8 @@ export const useBodyScrollLock = (isOpen: boolean) => {
                     if (window.__scrollLockCount === 0) {
                         document.body.style.overflow = '';
                         document.body.style.paddingRight = '';
+                        document.body.style.touchAction = '';
+                        document.body.style.overscrollBehavior = '';
                         document.body.classList.remove('modal-open');
                     }
                 }
