@@ -192,11 +192,13 @@ export default function RootLayout({
             <BrandProvider>
               <ScrollToTop />
               <div className="flex flex-col h-auto">
-                <LayoutWrapper sideAds={sideAds}>
-                  <Suspense fallback={null}>
-                    {children}
-                  </Suspense>
-                </LayoutWrapper>
+                <Suspense fallback={<div className="min-h-screen bg-white" />}>
+                  <LayoutWrapper sideAds={sideAds}>
+                    <Suspense fallback={null}>
+                      {children}
+                    </Suspense>
+                  </LayoutWrapper>
+                </Suspense>
               </div>
             </BrandProvider>
           </>
