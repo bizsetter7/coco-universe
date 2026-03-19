@@ -30,18 +30,18 @@ export const Footer = () => {
                 <div className="w-full max-w-5xl mx-auto px-6">
 
                     {/* ── PC: LADYALBA 스타일 4열 ─────────────────────── */}
-                    <div className="hidden md:flex items-start gap-0 py-8 border-b border-gray-200">
+                    <div className="hidden md:flex items-start justify-between gap-0 py-8 border-b border-gray-200">
 
                         {/* 1열: 고객센터 + 전화번호 */}
                         <div className="shrink-0 pr-6 border-r border-gray-200">
                             <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>고객센터</p>
-                            <p className="text-[2.2rem] font-black text-gray-900 tracking-tight leading-none">
+                            <p className="text-[2.8rem] font-black text-gray-900 tracking-tight leading-none">
                                 1877-1442
                             </p>
                         </div>
 
                         {/* 2열: 운영시간 + 이메일 */}
-                        <div className="shrink-0 px-6 text-xs space-y-1 self-start pt-0.5">
+                        <div className="shrink-0 px-6 text-xs space-y-2.5 self-start pt-0.5">
                             <p>
                                 <span className="font-black mr-2" style={{ color: HOT_PINK }}>평일</span>
                                 10:00 ~ 18:00 (주말·공휴일 휴무)
@@ -57,9 +57,6 @@ export const Footer = () => {
                                 </a>
                             </p>
                         </div>
-
-                        {/* 스페이서 */}
-                        <div className="flex-1" />
 
                         {/* 3열: 최저임금 */}
                         <div className="shrink-0 px-6 border-l border-gray-200 text-xs space-y-1">
@@ -91,13 +88,11 @@ export const Footer = () => {
                             </a>
                         </div>
 
-                        {/* 4열: 무통장입금 (좌측 정렬) */}
-                        <div className="shrink-0 pl-6 border-l border-gray-200 space-y-1">
-                            <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>무통장입금안내</p>
-                            <p className="text-base font-black text-gray-900 tracking-tight leading-tight">
-                                토스&nbsp;&nbsp;1002-4683-1712
-                            </p>
-                            <p className="text-xs text-gray-400">예금주&nbsp;&nbsp;고남우(초코아이디어)</p>
+                        {/* 4열: 무통장입금 */}
+                        <div className="shrink-0 pl-6 border-l border-gray-200">
+                            <p className="text-sm font-black mb-1.5 whitespace-nowrap" style={{ color: HOT_PINK }}>무통장입금안내</p>
+                            <p className="text-lg font-black text-gray-900 tracking-tight leading-snug whitespace-nowrap">토스&nbsp;&nbsp;1002-4683-1712</p>
+                            <p className="text-sm text-gray-400 mt-1 whitespace-nowrap">예금주 : 고남우(초코아이디어)</p>
                         </div>
 
                     </div>
