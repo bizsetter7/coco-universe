@@ -22,26 +22,35 @@ const MobileBottomNavContent = () => {
     const brand = useBrand();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { userType, isLoggedIn, isLoading } = useAuth();
+    const { userType, isLoggedIn, isLoading, user } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
 
     const [unreadCount, setUnreadCount] = useState(0);
 
+    // mounted 플래그 (SSR 안전)
     useEffect(() => {
         setMounted(true);
+    }, []);
 
-        const updateUnreadCount = () => {
-            const unread = NoteService.getUnread();
-            setUnreadCount(unread.length);
+    // 안읽은 쪽지 카운트 — user.name 필요, 없으면 스킵
+    useEffect(() => {
+        const updateUnreadCount = async () => {
+            if (!user?.name) return;
+            try {
+                const unread = await NoteService.getUnread(user.name);
+                setUnreadCount(unread.length);
+            } catch {
+                // 쪽지 배지는 비중요 기능 — 오류 시 무시
+            }
         };
 
         window.addEventListener('notes-updated', updateUnreadCount);
         updateUnreadCount();
 
         return () => window.removeEventListener('notes-updated', updateUnreadCount);
-    }, []);
+    }, [user?.name]);
 
     const navItems = userType === 'admin' ? [
         { label: '홈', icon: <Home size={24} />, href: '/' },
