@@ -96,16 +96,16 @@ export const Footer = () => {
 
                     </div>
 
-                    {/* ── 모바일: 2열 (고객센터 | 무통장입금) ──────────────── */}
-                    <div className="md:hidden border-b border-gray-200">
-                        <div className="flex items-stretch">
+                    {/* ── 모바일: 2열 (고객센터 | 무통장입금) — LADYALBA 스타일 박스 ── */}
+                    <div className="md:hidden my-4">
+                        <div className="flex border border-gray-300">
                             {/* 좌측: 고객센터 */}
-                            <div className="w-[52%] py-4 pr-3 border-r border-gray-200">
+                            <div className="w-[52%] py-4 px-4 border-r border-gray-300">
                                 <p className="text-[11px] text-gray-500 font-medium mb-1">고객센터</p>
-                                <p className="font-black leading-none tracking-tight" style={{ color: HOT_PINK, fontSize: '2.4rem' }}>
+                                <p className="font-black leading-none tracking-tight" style={{ color: HOT_PINK, fontSize: '2.5rem' }}>
                                     1877-1442
                                 </p>
-                                <p className="mt-2 text-[10px] text-gray-500 leading-[1.65]">
+                                <p className="mt-2 text-[10px] text-gray-500 leading-[1.7]">
                                     평일 10:00 ~ 18:00<br />
                                     (점심시간 12:00 ~ 13:00)<br />
                                     토/일/공휴일은 휴무로<br />
@@ -113,13 +113,15 @@ export const Footer = () => {
                                 </p>
                             </div>
                             {/* 우측: 무통장입금 */}
-                            <div className="w-[48%] py-4 pl-3 flex flex-col justify-start">
+                            <div className="w-[48%] py-4 px-3 flex flex-col justify-start">
                                 <p className="text-[11px] text-gray-500 font-medium mb-1">무통장 입금안내</p>
-                                <p className="text-[11px] font-bold text-gray-400 mb-0.5">토스뱅크</p>
-                                <p className="font-black text-gray-900 leading-snug tracking-tight" style={{ fontSize: '1.15rem' }}>
+                                <p className="text-[11px] text-gray-400 mb-1">토스뱅크</p>
+                                <p className="font-black text-gray-900 leading-snug tracking-tight" style={{ fontSize: '1.1rem' }}>
                                     1002-4683-1712
                                 </p>
-                                <p className="mt-2 text-[10px] text-gray-400">예금주&nbsp;&nbsp;고남우 (초코아이디어)</p>
+                                <p className="mt-2 text-[10px] text-gray-400 leading-relaxed">
+                                    예금주&nbsp;&nbsp;고남우<br />(초코아이디어)
+                                </p>
                             </div>
                         </div>
                     </div>
