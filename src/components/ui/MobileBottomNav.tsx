@@ -22,7 +22,7 @@ const MobileBottomNavContent = () => {
     const brand = useBrand();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { userType } = useAuth();
+    const { userType, isLoggedIn, isLoading } = useAuth();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -174,7 +174,8 @@ const MobileBottomNavContent = () => {
                                     <button
                                         key={index}
                                         onClick={() => {
-                                            if (!mounted || !userType || userType === 'guest') {
+                                            if (isLoading) return; // 아직 세션 로딩 중이면 무시
+                                            if (!isLoggedIn || !userType || userType === 'guest') {
                                                 router.push('/?page=login');
                                             } else {
                                                 router.push('/my-shop');
