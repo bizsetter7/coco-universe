@@ -8,6 +8,8 @@ import { PersonalMemberEdit } from '../PersonalMemberEdit';
 import { ResumeForm } from '../ResumeForm';
 import { ResumeListView } from '../ResumeListView';
 import { ComingSoonView } from '../ComingSoonView';
+import { MyPostsView } from '../MyPostsView';
+import { BlockSettingsView } from '../BlockSettingsView';
 import shopsData from '@/lib/data/shops.json';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS } from '@/utils/favorites';
@@ -337,8 +339,8 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}
                 {view === 'excluded-shops' && <ComingSoonView title="열람불가 업소설정" />}
                 {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}
-                {view === 'my-posts' && <ComingSoonView title="내가 작성한 게시글" />}
-                {view === 'block-settings' && <ComingSoonView title="회원 차단 설정" />}
+                {view === 'my-posts' && <MyPostsView setView={setView} />}
+                {view === 'block-settings' && <BlockSettingsView />}
             </main>
         </div>
     );
