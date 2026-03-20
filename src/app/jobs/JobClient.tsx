@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Components
@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
+import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
 
 interface JobClientProps {
     shops: Shop[];
@@ -54,22 +55,11 @@ export default function JobClient({ shops }: JobClientProps) {
     }, []);
 
     // Favorites State
-    const [favorites, setFavorites] = useState<string[]>([]);
-
-    useEffect(() => {
-        const saved = localStorage.getItem('favorites');
-        if (saved) setFavorites(JSON.parse(saved));
-    }, []);
+    const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
 
     const toggleFavorite = React.useCallback((e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        setFavorites(prev => {
-            const newFavs = prev.includes(id)
-                ? prev.filter(fid => fid !== id)
-                : [...prev, id];
-            localStorage.setItem('favorites', JSON.stringify(newFavs));
-            return newFavs;
-        });
+        setFavorites(prev => toggleFav(id, prev));
     }, []);
 
     // Payment Popup State

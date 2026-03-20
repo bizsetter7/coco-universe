@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Components
@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
+import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
 
 interface RegionClientProps {
     shops: Shop[];
@@ -51,24 +52,13 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
         }
     }, []);
 
-    const [favorites, setFavorites] = useState<string[]>([]);
+    const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
     const [selectedTier, setSelectedTier] = useState('grand');
 
-    useEffect(() => {
-        const saved = localStorage.getItem('favorites');
-        if (saved) setFavorites(JSON.parse(saved));
-    }, []);
-
     const toggleFavorite = React.useCallback((e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        setFavorites(prev => {
-            const newFavs = prev.includes(id)
-                ? prev.filter(fid => fid !== id)
-                : [...prev, id];
-            localStorage.setItem('favorites', JSON.stringify(newFavs));
-            return newFavs;
-        });
+        setFavorites(prev => toggleFav(id, prev));
     }, []);
 
     // Data Filtering
