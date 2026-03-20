@@ -15,7 +15,8 @@ import {
     ShieldCheck,
     MessageCircle,
     Paperclip,
-    Lock
+    Lock,
+    ChevronLeft
 } from 'lucide-react';
 
 interface TabInquiryProps {
