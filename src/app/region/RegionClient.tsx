@@ -13,6 +13,7 @@ import { PaymentPopup } from '@/components/home/PaymentPopup';
 import { Shop } from '@/types/shop';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
+import { REGION_BRACKET_MAP } from '@/constants/regions';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
@@ -65,7 +66,11 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
     const filteredShops = useMemo(() => {
         if (!shops) return [];
         return shops.filter(shop => {
-            if (selectedRegion !== '전체' && !(shop.region?.includes(selectedRegion))) return false;
+            // Region Filter (전체명 → shops.json 약칭 변환 후 substring 검색)
+            if (selectedRegion !== '전체') {
+                const bracketKey = REGION_BRACKET_MAP[selectedRegion] || selectedRegion;
+                if (!(shop.region?.includes(bracketKey))) return false;
+            }
             if (selectedSubRegion !== '전체' && !(shop.region?.includes(selectedSubRegion))) return false;
             if (selectedJobType !== '전체' && !(shop.workType?.includes(selectedJobType))) return false;
             if (selectedSubJobType !== '전체' && !(shop.workType?.includes(selectedSubJobType))) return false;
