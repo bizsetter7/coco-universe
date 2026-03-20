@@ -1,108 +1,322 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { IdentityVerifyModal } from '@/components/auth/IdentityVerifyModal';
+import type { IdentityVerifyResult } from '@/types/identity-verify';
 
 export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) => void, onOpenMenu?: () => void }) => {
     const brand = useBrand();
+    const { user } = useAuth();
+    const [showIdentityModal, setShowIdentityModal] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-    // Form Data
+    // 닉네임 1일 1회 수정 제한
+    const [nicknameLastUpdated, setNicknameLastUpdated] = useState<string | null>(null);
+    const [originalNickname, setOriginalNickname] = useState('');
+
     const [formData, setFormData] = useState({
-        id: 'admin_user',
-        password: '',
-        passwordConfirm: '',
-        realName: '김여우',
-        nickname: '회원님',
-        birthdate: '1998-08-13',
-        gender: '여성', // Default
-        email: 'user@example.com',
-        phone: '010-0000-0000',
-        smsConsent: true
+        nickname: '',
+        email: '',
+        phone: '',
+        newPassword: '',
+        newPasswordConfirm: '',
+        smsConsent: true,
     });
+
+    // 닉네임 수정 가능 여부 (1일 1회 제한)
+    const canEditNickname = (() => {
+        if (!nicknameLastUpdated) return true;
+        const last = new Date(nicknameLastUpdated).getTime();
+        const now = Date.now();
+        return (now - last) >= 24 * 60 * 60 * 1000; // 24시간 경과 여부
+    })();
+
+    // 다음 수정 가능 시간 표시
+    const nextEditableTime = (() => {
+        if (!nicknameLastUpdated || canEditNickname) return null;
+        const next = new Date(new Date(nicknameLastUpdated).getTime() + 24 * 60 * 60 * 1000);
+        return next.toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    })();
+
+    // supabase profiles 실제 데이터 로드
+    useEffect(() => {
+        if (!user?.id || user.id === 'guest' || user.id.startsWith('mock_')) {
+            setFormData(prev => ({
+                ...prev,
+                nickname: user?.nickname || '',
+                email: user?.email || '',
+            }));
+            setOriginalNickname(user?.nickname || '');
+            setIsLoaded(true);
+            return;
+        }
+
+        const loadProfile = async () => {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('nickname, phone, sms_consent, nickname_updated_at')
+                .eq('id', user.id)
+                .single();
+
+            const nick = profile?.nickname || user?.nickname || '';
+            setFormData(prev => ({
+                ...prev,
+                nickname: nick,
+                email: user?.email || '',
+                phone: profile?.phone || '',
+                smsConsent: profile?.sms_consent ?? true,
+            }));
+            setOriginalNickname(nick);
+            setNicknameLastUpdated(profile?.nickname_updated_at || null);
+            setIsLoaded(true);
+        };
+
+        loadProfile();
+    }, [user?.id]);
 
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleSave = () => {
-        alert('개인 정보가 수정되었습니다.');
-        setView('dashboard');
+    // 본인인증 완료 → 휴대폰 번호 업데이트
+    const handleVerified = (result: IdentityVerifyResult) => {
+        setShowIdentityModal(false);
+        if (result.phone) {
+            setFormData(prev => ({ ...prev, phone: result.phone || prev.phone }));
+        }
     };
 
+    const handleSave = async () => {
+        if (!user?.id || user.id === 'guest') {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
+        if (formData.newPassword && formData.newPassword !== formData.newPasswordConfirm) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        if (formData.newPassword && formData.newPassword.length < 6) {
+            alert('비밀번호는 6자 이상이어야 합니다.');
+            return;
+        }
+
+        // 닉네임 변경 시 1일 1회 제한 검증
+        const isNicknameChanged = formData.nickname !== originalNickname;
+        if (isNicknameChanged && !canEditNickname) {
+            alert(`닉네임은 1일 1회만 수정할 수 있습니다.\n다음 수정 가능 시간: ${nextEditableTime}`);
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            if (!user.id.startsWith('mock_')) {
+                // profiles 업데이트
+                const updatePayload: any = {
+                    nickname: formData.nickname,
+                    phone: formData.phone,
+                    sms_consent: formData.smsConsent,
+                };
+
+                // 닉네임이 변경된 경우 nickname_updated_at 갱신
+                if (isNicknameChanged) {
+                    updatePayload.nickname_updated_at = new Date().toISOString();
+                }
+
+                const { error } = await supabase
+                    .from('profiles')
+                    .update(updatePayload)
+                    .eq('id', user.id);
+
+                if (error) throw error;
+
+                // auth user_metadata 동기화 → 닉네임을 모든 컴포넌트에서 일관되게 사용
+                // (커뮤니티, 1:1문의, 이력서 등에서 user_metadata.nickname 참조)
+                const { error: metaError } = await supabase.auth.updateUser({
+                    data: { nickname: formData.nickname }
+                });
+                if (metaError) {
+                    // 메타데이터 업데이트 실패는 경고만 (치명적 오류 아님)
+                    console.warn('auth metadata 업데이트 실패:', metaError.message);
+                }
+
+                // 비밀번호 변경 (입력한 경우만)
+                if (formData.newPassword) {
+                    const { error: pwError } = await supabase.auth.updateUser({
+                        password: formData.newPassword
+                    });
+                    if (pwError) throw pwError;
+                }
+
+                // 닉네임 변경 후 로컬 상태 업데이트
+                if (isNicknameChanged) {
+                    setOriginalNickname(formData.nickname);
+                    setNicknameLastUpdated(new Date().toISOString());
+                }
+            }
+
+            alert('정보가 수정되었습니다.');
+            setView('dashboard');
+        } catch (e: any) {
+            alert('수정 중 오류가 발생했습니다: ' + (e.message || '잠시 후 다시 시도해주세요.'));
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const isDark = brand.theme === 'dark';
+
+    if (!isLoaded) {
+        return (
+            <div className={`max-w-4xl mx-auto p-10 rounded-[32px] border text-center ${isDark ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-white border-gray-100 text-gray-400'}`}>
+                정보를 불러오는 중...
+            </div>
+        );
+    }
+
     return (
-        <div className={`max-w-4xl mx-auto p-3 md:p-10 rounded-[24px] md:rounded-[32px] shadow-xl border ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-            <h2 className={`text-lg md:text-2xl font-black mb-3 md:mb-10 pb-3 md:pb-5 border-b flex items-center gap-2 md:gap-3 ${brand.theme === 'dark' ? 'text-white border-gray-800' : 'text-gray-950 border-gray-100'}`}>
-                <span className="w-2 h-8 bg-blue-500 rounded-full hidden md:block"></span>
-                개인 회원 정보 수정
-            </h2>
+        <>
+            <div className={`max-w-4xl mx-auto p-3 md:p-10 rounded-[24px] md:rounded-[32px] shadow-xl border ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                <h2 className={`text-lg md:text-2xl font-black mb-3 md:mb-10 pb-3 md:pb-5 border-b flex items-center gap-2 md:gap-3 ${isDark ? 'text-white border-gray-800' : 'text-gray-950 border-gray-100'}`}>
+                    <span className="w-2 h-8 bg-[#f82b60] rounded-full hidden md:block"></span>
+                    개인 회원 정보 수정
+                </h2>
 
-            <div className="space-y-6 md:space-y-8">
-                {/* ID / Real Name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>아이디</label>
-                        <input type="text" value={formData.id} disabled className={`w-full p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`} />
-                    </div>
-                    <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>성명 (고정)</label>
-                        <input type="text" value={formData.realName} disabled className={`w-full p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`} />
-                    </div>
-                </div>
+                <div className="space-y-6 md:space-y-8">
 
-                {/* Nickname & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* 아이디 / 이메일 (고정) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>아이디 (고정)</label>
+                            <input
+                                type="text"
+                                value={user?.name || ''}
+                                disabled
+                                className={`w-full p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                            />
+                        </div>
+                        <div>
+                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>이메일 (고정)</label>
+                            <input
+                                type="email"
+                                value={formData.email}
+                                disabled
+                                className={`w-full p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* 닉네임 */}
                     <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>닉네임</label>
+                        <div className="flex items-center gap-2 mb-2">
+                            <label className={`text-xs font-black ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>닉네임</label>
+                            <span className="text-[10px] font-bold text-[#f82b60]">*1일 1회 수정가능</span>
+                        </div>
                         <input
                             type="text"
                             value={formData.nickname}
-                            onChange={(e) => handleChange('nickname', e.target.value)}
-                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-950 focus:border-blue-500'}`}
+                            onChange={(e) => canEditNickname && handleChange('nickname', e.target.value)}
+                            readOnly={!canEditNickname}
+                            maxLength={10}
+                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition outline-none ${
+                                canEditNickname
+                                    ? `focus:ring-2 focus:ring-rose-500/20 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-rose-500' : 'bg-white border-gray-200 text-gray-950 focus:border-rose-500'}`
+                                    : `cursor-not-allowed ${isDark ? 'bg-gray-800 border-gray-700 text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-400'}`
+                            }`}
                         />
+                        {!canEditNickname && nextEditableTime && (
+                            <p className={`text-xs mt-1.5 font-bold ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                                다음 수정 가능: {nextEditableTime}
+                            </p>
+                        )}
                     </div>
-                    <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>이메일</label>
-                        <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => handleChange('email', e.target.value)}
-                            className={`w-full p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-950 focus:border-blue-500'}`}
-                        />
-                    </div>
-                </div>
 
-                {/* Birthday & Phone */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* 휴대폰 번호 + 재인증 */}
                     <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>생년월일</label>
-                        <input type="date" value={formData.birthdate} readOnly className={`w-full p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`} />
-                    </div>
-                    <div>
-                        <label className={`block text-xs font-black mb-2 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>휴대폰 번호</label>
+                        <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            휴대폰 번호
+                            <span className={`ml-1 font-normal ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>(재인증으로만 변경 가능)</span>
+                        </label>
                         <div className="flex items-center gap-2">
-                            <input type="text" value={formData.phone} readOnly className={`flex-1 min-w-0 p-3 md:p-4 rounded-xl font-bold border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`} />
-                            <button className="px-4 py-3 md:py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-black shrink-0 transition shadow-lg shadow-indigo-500/20 active:scale-95">재인증</button>
+                            <input
+                                type="text"
+                                value={formData.phone || '미등록'}
+                                readOnly
+                                className={`flex-1 min-w-0 p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`}
+                            />
+                            <button
+                                onClick={() => setShowIdentityModal(true)}
+                                className="px-4 py-3 md:py-4 bg-[#f82b60] hover:bg-[#db2456] text-white rounded-xl text-xs font-black shrink-0 transition shadow-lg shadow-rose-500/20 active:scale-95"
+                            >
+                                재인증
+                            </button>
                         </div>
                     </div>
-                </div>
 
-                {/* Password Change Section */}
-                <div className={`p-6 md:p-8 rounded-3xl border border-dashed ${brand.theme === 'dark' ? 'bg-black/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <h3 className={`text-sm font-black mb-4 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>비밀번호 변경</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="password" placeholder="새 비밀번호 입력" className={`w-full p-3 md:p-4 rounded-xl font-bold border outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-950'}`} />
-                        <input type="password" placeholder="비밀번호 확인" className={`w-full p-3 md:p-4 rounded-xl font-bold border outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-950'}`} />
+                    {/* 비밀번호 변경 */}
+                    <div className={`p-5 md:p-8 rounded-3xl border border-dashed ${isDark ? 'bg-black/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <h3 className={`text-sm font-black mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>비밀번호 변경</h3>
+                        <p className={`text-xs mb-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>변경하지 않으려면 비워두세요.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                type="password"
+                                placeholder="새 비밀번호 (6자 이상)"
+                                value={formData.newPassword}
+                                onChange={(e) => handleChange('newPassword', e.target.value)}
+                                className={`w-full p-3 md:p-4 rounded-xl font-bold border outline-none focus:ring-2 focus:ring-rose-500/20 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-950'}`}
+                            />
+                            <input
+                                type="password"
+                                placeholder="비밀번호 확인"
+                                value={formData.newPasswordConfirm}
+                                onChange={(e) => handleChange('newPasswordConfirm', e.target.value)}
+                                className={`w-full p-3 md:p-4 rounded-xl font-bold border outline-none focus:ring-2 focus:ring-rose-500/20 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-950'}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* SMS 수신 동의 */}
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={formData.smsConsent}
+                            onChange={(e) => handleChange('smsConsent', e.target.checked)}
+                            className="w-4 h-4 accent-[#f82b60]"
+                        />
+                        <span className={`text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>SMS 수신 동의</span>
+                    </label>
+
+                    {/* 하단 버튼 */}
+                    <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-gray-100 dark:border-gray-800">
+                        <button
+                            onClick={() => setView('dashboard')}
+                            className={`order-2 sm:order-1 px-8 py-4 rounded-2xl font-black transition ${isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                        >
+                            취소
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-[#f82b60] text-white font-black hover:bg-[#db2456] shadow-xl shadow-rose-500/20 transition active:scale-95 disabled:opacity-60"
+                        >
+                            {isSaving ? '저장 중...' : '정보 수정하기'}
+                        </button>
                     </div>
                 </div>
-
-                {/* Footer Buttons */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-gray-100 dark:border-gray-800">
-                    <button onClick={() => setView('dashboard')} className={`order-2 sm:order-1 px-8 py-4 rounded-2xl font-black transition ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
-                        취소
-                    </button>
-                    <button onClick={handleSave} className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-blue-500 text-white font-black hover:bg-blue-600 shadow-xl shadow-blue-500/20 transition active:scale-95">
-                        정보 수정하기
-                    </button>
-                </div>
             </div>
-        </div>
+
+            {/* 본인인증 모달 */}
+            {showIdentityModal && (
+                <IdentityVerifyModal
+                    onClose={() => setShowIdentityModal(false)}
+                    onVerified={handleVerified}
+                />
+            )}
+        </>
     );
 };

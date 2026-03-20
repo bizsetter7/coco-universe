@@ -170,7 +170,8 @@ export function useAuth() {
                     : null;
                 if (hasMock) return;
             }
-            if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
+            // USER_UPDATED 이벤트 추가: 닉네임 등 프로필 수정 후 즉시 세션 재동기화
+            if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT' || _event === 'USER_UPDATED') {
                 syncUserSession(session).catch(() => { });
             }
         });
