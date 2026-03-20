@@ -17,10 +17,13 @@
   - **구조:** 총 73개 지역별 랜딩페이지 (`BaseURL/{지역명}` 형식)
   - **참조:** 지역 리스트는 프로젝트 내 위치 설정 파일 참고.
 
-- **P4(정산/바이럴마케팅):** `C:\My-site\p4. 파트너스_사이트` / GitHub: `partners-credit` / `partners-credit.vercel.app`
+- **P4(정산):** `C:\My-site\파트너스_사이트` / GitHub: `partners-credit` / `partners-credit.vercel.app`
   - **목적:** 자발적 유저 마케터 양성 및 오가닉 트래픽 펌핑 (조회수/공유 크레딧 보상 시스템)
   - **피봇 구조:** `AUDIT_MODE = true` (공식 B2B 마케팅 대행 솔루션 '초코파트너스'로 사업 피봇 및 PG 심사 대응 중)
   - **상세 기획/설명:** 프로젝트 루트의 `P4_마스터플랜.md` 문서 참조.
+
+- **P6(방송):** `C:\My-site\p6. Broadcaster` / 최저가 알림/가격비교/AI 예측 비서 플랫폼
+  - **전략:** 제로 마찰 자동화, AI 가격 예측, 소셜 FOMO UX, B2B 대기 수요 데이터 비즈니스.
 
 - **P6(ASMR):** `C:\My-site\p6. Broadcaster` / YouTube: `@NaturesHeartbeat AI` / 24/7 무한 힐링 송출 기지
 
@@ -207,11 +210,14 @@ Record: 작업 결과 및 패턴을 AI_SOP.md에 업데이트하고 스티치를
 
 **현재 상태:** `/public/Professional_Mirror_Simulator.html` 파일로 관리되며, 모든 프로젝트의 무결성 검증을 위한 표준 도구로 채택 완료.
 
-### [2026-03-15] P2/P3 SEO 스키마 정밀 고도화 및 화이트셀 공식 해제
-- GSC 누락 필드(baseSalary, employmentType, addressCountry) P2/P3 전 프로젝트 적용 완료.
-- P2 `config.ts` 화이트셀(PRE_RELEASE) 영구 해제 및 실전 `PRODUCTION` 모드 전환.
-- P3 `grand_reboot.py` 지능형 주소 매핑 로직 주입 및 73개 지역 전수 재생성 완료.
-- [정밀 타격 원칙] 지시하지 않은 로직 및 스타일(Padding, Color 등) 100% 보존 확인 완료. (v1.3 규격 준수) 🫡🔥📈🔍
+### [2026-03-20] P6 Broadcaster '초격차 틈새 타격' 통합 전략 수립
+- **배경:** 폴센트(Polcent)의 수동적 UX와 데이터 한계를 극복하기 위한 차세대 쇼핑 비서 기획.
+- **핵심전략 (4 Pillars):**
+  1. **Zero-Friction**: 클립보드 스나이핑 및 세미 오토 장바구니 자동화.
+  2. **AI Prediction**: 과거가 아닌 '미래'의 가격 하락 확률을 예측하여 고지.
+  3. **Social UX**: P5의 스와이프 UI를 접목한 게임화(Gamification) 및 군중 지성 데이터 노출.
+  4. **B2B Pivot**: 구매 대기 유저 데이터를 활용한 브랜드 대상 '시크릿 타임세일' 비즈니스.
+- **다음단계:** 애플 심사 회피를 위한 '프레이밍(AI 개인비서)' 기획 및 크롤링 분산 아키텍처 설계 착수. 🫡🔥🛒🚀🔍📈
 
 ### [2026-03-15] P3 랜딩페이지 최적화 및 템플릿 동기화 (Perfect Light Mode)
 - **대상:** P3(랜딩) - 메인 인덱스 페이지(`index.html`)
