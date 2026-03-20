@@ -32,7 +32,7 @@ export default function FavoritesPage() {
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
 
     useEffect(() => {
-        const saved = localStorage.getItem('coco-favorites');
+        const saved = localStorage.getItem('favorites');
         if (saved) setFavorites(JSON.parse(saved));
     }, []);
 
@@ -40,7 +40,7 @@ export default function FavoritesPage() {
         e.stopPropagation();
         const newFavorites = favorites.filter(fav => fav !== id);
         setFavorites(newFavorites);
-        localStorage.setItem('coco-favorites', JSON.stringify(newFavorites));
+        localStorage.setItem('favorites', JSON.stringify(newFavorites));
     };
 
     const favoriteShops = (shopsData as Shop[]).filter(shop => favorites.includes(shop.id));

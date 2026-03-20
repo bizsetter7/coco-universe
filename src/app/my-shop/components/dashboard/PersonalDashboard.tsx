@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings, LayoutDashboard } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
+import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
 import { ResumeForm } from '../ResumeForm';
 import { ResumeListView } from '../ResumeListView';
@@ -13,14 +14,13 @@ import { ComingSoonView } from '../ComingSoonView';
 
 export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any) => void }) {
     const brand = useBrand();
-    const [userName, setUserName] = useState('회원님');
+    const { user } = useAuth();
+    // useAuth 우선, 없으면 localStorage 폴백
+    const displayName = user?.nickname || user?.name || localStorage.getItem('user_name') || '회원';
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [profileImage, setProfileImage] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedName = localStorage.getItem('user_name');
-        if (storedName) setUserName(storedName);
-
         const savedImg = localStorage.getItem('personal_profile_image');
         if (savedImg) setProfileImage(savedImg);
     }, []);
@@ -73,19 +73,19 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                         <Settings size={16} className="text-white" />
                     </div>
                 </div>
-                <h2 className="font-black text-xl mb-1">{userName}</h2>
+                <h2 className="font-black text-xl mb-1">{displayName}</h2>
                 <div className="flex flex-col items-center gap-2 mb-4">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-4 py-1.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-full border border-blue-100 hover:bg-blue-100 transition active:scale-95 flex items-center gap-1"
+                        className="px-4 py-1.5 bg-rose-50 text-[#f82b60] text-[10px] font-black rounded-full border border-rose-100 hover:bg-rose-100 transition active:scale-95 flex items-center gap-1"
                     >
                         사진 등록/수정
                     </button>
                     <button
                         onClick={() => setView('member-edit')}
                         className={`w-full py-2.5 mt-2 flex items-center justify-center gap-2 text-xs font-black rounded-2xl transition-all ${typeof view === 'string' && view === 'member-edit'
-                            ? 'bg-blue-500 text-white shadow-lg shadow-blue-100'
+                            ? 'bg-[#f82b60] text-white shadow-lg shadow-rose-100'
                             : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                             }`}
                     >
@@ -102,7 +102,7 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                             key={item.id}
                             onClick={() => setView(item.id)}
                             className={`w-full flex items-center gap-3 p-3.5 rounded-2xl text-sm font-black transition-all ${isItemActive(item.id)
-                                ? 'bg-blue-500 text-white shadow-lg shadow-blue-100'
+                                ? 'bg-[#f82b60] text-white shadow-lg shadow-rose-100'
                                 : 'text-gray-500 hover:bg-gray-50'
                                 }`}
                         >
@@ -118,23 +118,45 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
 
 export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (v: any) => void, resumeCount?: number }) {
     const brand = useBrand();
-    const [userName, setUserName] = useState('회원님');
+    const { user } = useAuth();
+    // useAuth 우선, 없으면 localStorage 폴백. '님' 접미어 제거
+    const rawName = user?.nickname || user?.name || localStorage.getItem('user_name') || '회원';
+    const displayName = rawName.endsWith('님') ? rawName.slice(0, -1) : rawName;
+
+    // 실제 스크랩/열람 카운트 읽기
+    const [scrapCount, setScrapCount] = useState(0);
+    const [viewedCount, setViewedCount] = useState(0);
 
     useEffect(() => {
-        const storedName = localStorage.getItem('user_name');
-        if (storedName) setUserName(storedName);
+        try {
+            // 스크랩 — 'favorites' 키 (HomeClient/JobClient/RegionClient에서 저장)
+            const favs = localStorage.getItem('favorites');
+            setScrapCount(favs ? JSON.parse(favs).length : 0);
+        } catch { setScrapCount(0); }
+
+        try {
+            // 열람한 기업 — 'viewed_shops' 키
+            const viewed = localStorage.getItem('viewed_shops');
+            setViewedCount(viewed ? JSON.parse(viewed).length : 0);
+        } catch { setViewedCount(0); }
     }, []);
+
+    const stats = [
+        { label: '스크랩한 공고', val: scrapCount, icon: <Star className="text-yellow-400" />, onClick: () => setView('scrap-jobs') },
+        { label: '열람한 기업', val: viewedCount, icon: <Home className="text-[#f82b60]" />, onClick: undefined },
+        { label: '지원한 내역', val: 0, icon: <FileText className="text-[#f82b60]" />, onClick: undefined },
+    ];
 
     return (
         <div className="space-y-6">
             {/* 1. 기존 통계 그리드 섹션 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { label: '스크랩한 공고', val: '0', icon: <Star className="text-yellow-400" /> },
-                    { label: '열람한 기업', val: '0', icon: <Home className="text-blue-400" /> },
-                    { label: '지원한 내역', val: '0', icon: <FileText className="text-blue-400" /> }
-                ].map((item, idx) => (
-                    <div key={idx} className={`p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                {stats.map((item, idx) => (
+                    <div
+                        key={idx}
+                        onClick={item.onClick}
+                        className={`p-6 rounded-[32px] border shadow-sm transition-all ${item.onClick ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : ''} ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                    >
                         <div className="flex items-center gap-3 mb-4">
                             <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
                             <span className="text-sm font-black">{item.label}</span>
@@ -150,7 +172,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                     <div className="w-8 h-8 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400">
                         <FileText size={18} />
                     </div>
-                    <h3 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-[#334155]'}`}>{userName} 님의 구직활동</h3>
+                    <h3 className={`text-lg font-black ${brand.theme === 'dark' ? 'text-white' : 'text-[#334155]'}`}>{displayName}님의 구직활동</h3>
                 </div>
 
                 <div className="flex items-center justify-around py-4 relative">
@@ -159,14 +181,14 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">이력서 등록수</div>
-                        <div className="text-3xl md:text-5xl font-black text-blue-500 flex items-baseline justify-center gap-1">
+                        <div className="text-3xl md:text-5xl font-black text-[#f82b60] flex items-baseline justify-center gap-1">
                             {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
 
                     <div className="text-center space-y-2">
                         <div className="text-xs md:text-sm font-black text-gray-500">공개중인 이력서</div>
-                        <div className="text-3xl md:text-5xl font-black text-blue-500 flex items-baseline justify-center gap-1">
+                        <div className="text-3xl md:text-5xl font-black text-[#f82b60] flex items-baseline justify-center gap-1">
                             {resumeCount}<span className="text-sm md:text-lg text-gray-400 font-bold">개</span>
                         </div>
                     </div>
@@ -185,7 +207,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                             <p className="text-sm text-gray-500 font-bold">회원님만을 위한 맞춤 취업 정보를 제공합니다.</p>
                         </div>
                     </div>
-                    <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-10 bg-blue-500 text-white rounded-2xl font-black hover:bg-blue-600 shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <button onClick={() => setView('resume-form')} className="w-full md:w-auto py-4 px-10 bg-[#f82b60] text-white rounded-2xl font-black hover:bg-[#db2456] shadow-xl shadow-rose-200 transition-all flex items-center justify-center gap-2 active:scale-95">
                         <span className="text-lg">+</span> 이력서 등록하기
                     </button>
                 </div>

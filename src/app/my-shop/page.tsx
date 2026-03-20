@@ -199,12 +199,14 @@ function MyShopContent() {
     };
 
     useEffect(() => {
-        if (authUser?.id && authUser.id !== 'guest') {
-            fetchRegisteredAds();
-            fetchPaymentHistory();
-            fetchResumeCount();
-        }
-    }, [authUser?.id, fetchRegisteredAds, fetchPaymentHistory, fetchResumeCount]);
+        if (!authUser?.id || authUser.id === 'guest') return;
+        fetchRegisteredAds();
+        fetchPaymentHistory();
+        fetchResumeCount();
+        // fetchResumeCount는 의존성에서 제외 — 함수 참조 변경으로 인한 무한루프 방지
+        // authUser.id가 변경될 때만 재실행
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authUser?.id]);
 
     useEffect(() => {
         const handleUpdate = () => fetchResumeCount();
