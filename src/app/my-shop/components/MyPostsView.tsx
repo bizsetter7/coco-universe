@@ -198,12 +198,6 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
                         <div className={`p-12 rounded-[32px] border text-center ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                             <FileText size={40} className="mx-auto mb-4 text-gray-200" />
                             <p className={`font-black text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>작성한 커뮤니티 게시글이 없습니다.</p>
-                            <button
-                                onClick={() => window.open('/community/write', '_blank')}
-                                className="mt-5 px-6 py-2.5 bg-[#f82b60] text-white rounded-xl text-sm font-black hover:bg-[#db2456] transition-all"
-                            >
-                                글쓰기
-                            </button>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-3">
@@ -249,12 +243,6 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
                         <div className={`p-12 rounded-[32px] border text-center ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                             <MessageSquare size={40} className="mx-auto mb-4 text-gray-200" />
                             <p className={`font-black text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>접수한 1:1 문의가 없습니다.</p>
-                            <button
-                                onClick={() => window.open('/customer-center', '_blank')}
-                                className="mt-5 px-6 py-2.5 bg-[#f82b60] text-white rounded-xl text-sm font-black hover:bg-[#db2456] transition-all"
-                            >
-                                문의하기
-                            </button>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-3">

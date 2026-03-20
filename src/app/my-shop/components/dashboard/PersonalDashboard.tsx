@@ -28,6 +28,13 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
     useEffect(() => {
         const savedImg = localStorage.getItem('personal_profile_image');
         if (savedImg) setProfileImage(savedImg);
+        // 모바일에서 이미지 업로드 시 PC 사이드바도 업데이트
+        const handler = () => {
+            const saved = localStorage.getItem('personal_profile_image');
+            setProfileImage(saved || null);
+        };
+        window.addEventListener('profile-image-updated', handler);
+        return () => window.removeEventListener('profile-image-updated', handler);
     }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +45,7 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                 const base64String = reader.result as string;
                 setProfileImage(base64String);
                 localStorage.setItem('personal_profile_image', base64String);
+                window.dispatchEvent(new CustomEvent('profile-image-updated'));
             };
             reader.readAsDataURL(file);
         }
@@ -224,9 +232,10 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
     const rawName = user?.nickname || user?.name || localStorage.getItem('user_name') || '회원';
     const displayName = rawName.endsWith('님') ? rawName.slice(0, -1) : rawName;
 
-    // 실제 스크랩/열람 카운트 읽기
+    // 실제 스크랩/열람/지원 카운트 읽기
     const [scrapCount, setScrapCount] = useState(0);
     const [viewedCount, setViewedCount] = useState(0);
+    const [applyCount, setApplyCount] = useState(0);
 
     useEffect(() => {
         try {
@@ -236,33 +245,48 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
         } catch { setScrapCount(0); }
 
         try {
-            // 열람한 기업 — 'viewed_shops' 키
+            // 열람한 공고 — 'viewed_shops' 키 (공고 클릭 시 저장)
             const viewed = localStorage.getItem('viewed_shops');
             setViewedCount(viewed ? JSON.parse(viewed).length : 0);
         } catch { setViewedCount(0); }
+
+        try {
+            // 지원한 내역 — 'coco_applications' 키
+            const apps = localStorage.getItem('coco_applications');
+            setApplyCount(apps ? JSON.parse(apps).length : 0);
+        } catch { setApplyCount(0); }
     }, []);
 
     const stats = [
         { label: '스크랩한 공고', val: scrapCount, icon: <Star className="text-yellow-400" />, onClick: () => setView('scrap-jobs') },
-        { label: '열람한 기업', val: viewedCount, icon: <Home className="text-[#f82b60]" />, onClick: undefined },
-        { label: '지원한 내역', val: 0, icon: <FileText className="text-[#f82b60]" />, onClick: undefined },
+        { label: '열람한 공고', val: viewedCount, icon: <Home className="text-[#f82b60]" />, onClick: undefined },
+        { label: '지원한 내역', val: applyCount, icon: <FileText className="text-[#f82b60]" />, onClick: undefined },
     ];
 
     return (
         <div className="space-y-6">
-            {/* 1. 기존 통계 그리드 섹션 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 1. 통계 그리드 섹션 — 모바일: 건수를 텍스트 옆에 / PC: 대형 숫자 아래에 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 {stats.map((item, idx) => (
                     <div
                         key={idx}
                         onClick={item.onClick}
-                        className={`p-6 rounded-[32px] border shadow-sm transition-all ${item.onClick ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : ''} ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                        className={`rounded-[28px] border shadow-sm transition-all ${item.onClick ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : ''} ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
-                            <span className="text-sm font-black">{item.label}</span>
+                        {/* 모바일 레이아웃 (md 미만): 아이콘 + 텍스트 + 건수 한 줄 */}
+                        <div className="flex items-center gap-3 p-5 md:hidden">
+                            <span className="p-2 bg-gray-50 rounded-xl shrink-0">{item.icon}</span>
+                            <span className="text-sm font-black flex-1">{item.label}</span>
+                            <span className="font-black text-lg text-[#f82b60]">{item.val}<span className="text-xs text-gray-400 ml-0.5">건</span></span>
                         </div>
-                        <div className="text-3xl font-black">{item.val}<span className="text-sm text-gray-400 ml-1">건</span></div>
+                        {/* PC 레이아웃 (md 이상): 기존 스타일 유지 */}
+                        <div className="hidden md:block p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="p-2 bg-gray-50 rounded-xl dark:bg-gray-800">{item.icon}</span>
+                                <span className="text-sm font-black">{item.label}</span>
+                            </div>
+                            <div className="text-3xl font-black">{item.val}<span className="text-sm text-gray-400 ml-1">건</span></div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -296,12 +320,12 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                 </div>
             </div>
 
-            {/* 3. 하단 배너 섹션 (기존 상단 섹션 이동 + 버튼 텍스트 수정) */}
+            {/* 3. 하단 배너 섹션 */}
             <div className={`p-6 md:p-8 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`}>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-blue-200">
-                            <User size={32} className="md:w-10 md:h-10" />
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-blue-200 shrink-0">
+                            <User size={32} />
                         </div>
                         <div>
                             <h2 className="text-lg md:text-3xl font-black mb-1 whitespace-nowrap">관심 공고를 확인하세요!</h2>
@@ -317,6 +341,93 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
     );
 }
 
+/** 모바일 전용 프로필 헤더 (사진 + 이름 + 사진등록 + 내정보수정) */
+function MobileProfileHeader({ view, setView }: { view: any, setView: (v: any) => void }) {
+    const brand = useBrand();
+    const { user } = useAuth();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const rawName = user?.nickname || user?.name || localStorage.getItem('user_name') || '회원';
+    const displayName = rawName.endsWith('님') ? rawName.slice(0, -1) : rawName;
+
+    useEffect(() => {
+        const saved = localStorage.getItem('personal_profile_image');
+        if (saved) setProfileImage(saved);
+    }, []);
+
+    // 프로필 이미지 업데이트 이벤트 수신
+    useEffect(() => {
+        const handler = () => {
+            const saved = localStorage.getItem('personal_profile_image');
+            setProfileImage(saved || null);
+        };
+        window.addEventListener('profile-image-updated', handler);
+        return () => window.removeEventListener('profile-image-updated', handler);
+    }, []);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64 = reader.result as string;
+                setProfileImage(base64);
+                localStorage.setItem('personal_profile_image', base64);
+                window.dispatchEvent(new CustomEvent('profile-image-updated'));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const currentViewId = typeof view === 'object' ? view.id : view;
+    const isDashboard = currentViewId === 'dashboard' || currentViewId === 'member-info';
+
+    return (
+        <div className={`md:hidden mb-4 p-4 rounded-[24px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+            <div className="flex items-center gap-4">
+                {/* 프로필 사진 */}
+                <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-16 h-16 rounded-full overflow-hidden border-2 border-rose-100 bg-rose-50 flex items-center justify-center shrink-0 cursor-pointer relative group"
+                >
+                    {profileImage ? (
+                        <img src={profileImage} alt="프로필" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={28} className="text-[#f82b60]" />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-full transition">
+                        <Settings size={14} className="text-white" />
+                    </div>
+                </div>
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+
+                {/* 이름 + 버튼들 */}
+                <div className="flex-1 min-w-0">
+                    <p className="font-black text-base truncate">{displayName}님</p>
+                    <div className="flex gap-2 mt-2">
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-1.5 text-[10px] font-black rounded-full bg-rose-50 text-[#f82b60] border border-rose-100 hover:bg-rose-100 transition"
+                        >
+                            사진 등록/수정
+                        </button>
+                        <button
+                            onClick={() => setView('member-edit')}
+                            className={`px-3 py-1.5 text-[10px] font-black rounded-full border transition ${
+                                currentViewId === 'member-edit'
+                                    ? 'bg-[#f82b60] text-white border-[#f82b60]'
+                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                            }`}
+                        >
+                            내 정보수정
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function PersonalDashboard({ view, setView, resumeCount = 0, onShowResumeDetail, authUser }: { view: string, setView: (v: any) => void, resumeCount?: number, onShowResumeDetail?: (r: any) => void, authUser: any }) {
     const brand = useBrand();
 
@@ -324,6 +435,8 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
         <div className="max-w-6xl mx-auto p-3 md:py-0 grid grid-cols-1 md:grid-cols-4 gap-6">
             <PersonalSidebar view={view} setView={setView} />
             <main className="col-span-1 md:col-span-3">
+                {/* 모바일 전용 프로필 헤더 */}
+                <MobileProfileHeader view={view} setView={setView} />
                 {((view as any) === 'member-info' || (view as any) === 'dashboard') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
                 {(view as any) === 'member-edit' && <PersonalMemberEdit setView={setView} />}
                 {((view as any) === 'resume-form' || (typeof view === 'object' && (view as any).id === 'resume-form')) && (

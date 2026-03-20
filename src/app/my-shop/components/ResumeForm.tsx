@@ -9,9 +9,14 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
     const brand = useBrand();
     const router = useRouter();
 
-    // User Info State
+    // User Info State — 닉네임은 읽기 전용 (내 정보수정에서 변경)
     const [userName, setUserName] = useState(editData?.nickname || authUser?.nickname || authUser?.name || '회원님');
     const [userId, setUserId] = useState(authUser?.id || '');
+    // 프로필 사진 — localStorage 'personal_profile_image' 연동
+    const [profileImage, setProfileImage] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('personal_profile_image');
+        return null;
+    });
 
     // Form States
     const [title, setTitle] = useState(editData?.title || '');
@@ -34,11 +39,20 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
     useEffect(() => {
         if (authUser) {
             setUserId(authUser.id);
-            if (!userName || userName === '회원님') {
-                setUserName(editData?.nickname || authUser.nickname || authUser.name || '회원님');
-            }
+            // 닉네임은 항상 authUser에서 가져옴 (직접 수정 불가)
+            setUserName(authUser.nickname || authUser.name || '회원님');
         }
     }, [authUser]);
+
+    // 프로필 이미지 업데이트 이벤트 수신 (사이드바에서 변경 시 동기화)
+    useEffect(() => {
+        const handler = () => {
+            const saved = localStorage.getItem('personal_profile_image');
+            setProfileImage(saved || null);
+        };
+        window.addEventListener('profile-image-updated', handler);
+        return () => window.removeEventListener('profile-image-updated', handler);
+    }, []);
 
     const handleSaveResume = async () => {
         if (!title.trim()) { alert('이력서 제목을 입력해주세요.'); return; }
@@ -209,11 +223,18 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
-                    {/* Photo Area */}
+                    {/* Photo Area — 마이페이지에서 업로드한 프로필 사진 반영 */}
                     <div className="md:col-span-3 flex flex-col items-center sm:items-stretch gap-2">
                         <div className="w-28 sm:w-full aspect-square sm:aspect-[3/4] rounded-lg border-2 border-dashed flex items-center justify-center bg-gray-50 text-gray-300 overflow-hidden">
-                            <User size={32} className="opacity-20" />
+                            {profileImage ? (
+                                <img src={profileImage} alt="프로필 사진" className="w-full h-full object-cover" />
+                            ) : (
+                                <User size={32} className="opacity-20" />
+                            )}
                         </div>
+                        <p className="text-[10px] text-gray-400 text-center leading-tight">
+                            마이페이지 &gt; 사진 등록/수정에서<br/>변경할 수 있습니다.
+                        </p>
                     </div>
 
                     {/* Basic Info Fields */}
@@ -223,16 +244,12 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                             <div className="sm:col-span-9 text-sm font-bold truncate w-full">{userId || 'guest'}</div>
                         </div>
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
-                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">이름(닉네임) <span className="text-red-500">*</span></label>
-                            <div className="sm:col-span-9 flex gap-2 w-full">
-                                <input
-                                    type="text"
-                                    value={userName}
-                                    maxLength={10}
-                                    onChange={(e) => setUserName(e.target.value)}
-                                    placeholder="10자 이내 입력"
-                                    className={`flex-1 border rounded p-1.5 text-xs font-bold outline-none ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:border-blue-500 min-w-0`}
-                                />
+                            <label className="sm:col-span-3 text-xs font-bold text-gray-500">이름(닉네임)</label>
+                            <div className="sm:col-span-9 flex items-center gap-2 w-full">
+                                <div className={`flex-1 border rounded p-1.5 text-xs font-bold min-w-0 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                                    {userName}
+                                </div>
+                                <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">내 정보수정에서 변경</span>
                             </div>
                         </div>
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
