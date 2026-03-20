@@ -274,6 +274,13 @@ function MyShopContent() {
     useBodyScrollLock(!!selectedAdForModal || !!selectedResumeForModal || showDesignModal || showMobileMenu || showExampleModal);
     usePreventLeave(formState.isDirty && view === 'form');
 
+    // [Security] 개인회원이 URL로 직접 view=form 접근 시 dashboard로 자동 전환
+    useEffect(() => {
+        if (userType === 'individual' && view === 'form') {
+            setView('dashboard');
+        }
+    }, [view, userType]);
+
     useEffect(() => {
         // [Critical Fix] 세션 로딩 중에는 아무것도 하지 않음
         // authLoading이 true인 동안 authUserType은 'guest' 초기값 → 리다이렉트 금지
@@ -914,7 +921,15 @@ function MyShopContent() {
                 </div>
             )}
 
-            {view === 'form' && (
+            {view === 'form' && userType === 'individual' && (
+                <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+                    <p className="text-gray-500 font-bold text-lg mb-2">업체회원만 접근할 수 있는 페이지입니다.</p>
+                    <p className="text-gray-400 text-sm mb-6">공고등록은 업체회원 계정으로 이용해 주세요.</p>
+                    <button onClick={() => setView('dashboard')} className="px-8 py-3 bg-[#f82b60] text-white rounded-2xl font-black hover:bg-[#db2456] transition-all">마이홈으로 이동</button>
+                </div>
+            )}
+
+            {view === 'form' && (userType === 'corporate' || userType === 'admin') && (
                 <div className="w-full">
                     <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} setShowTemplateModal={setShowTemplateModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
                 </div>
