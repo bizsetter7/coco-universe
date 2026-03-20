@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings, LayoutDashboard, Phone, MessageCircle, X } from 'lucide-react';
+import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
@@ -315,44 +315,6 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
     );
 }
 
-// 모바일 전용 수평 스크롤 메뉴
-function PersonalMobileMenu({ view, setView }: { view: any, setView: (v: any) => void }) {
-    const mobileMenuItems = [
-        { id: 'dashboard', icon: LayoutDashboard, label: '마이홈' },
-        { id: 'member-edit', icon: User, label: '정보수정' },
-        { id: 'resume-list', icon: FileText, label: '이력서' },
-        { id: 'scrap-jobs', icon: Star, label: '스크랩' },
-        { id: 'payment-history', icon: CreditCard, label: '결제내역' },
-        { id: 'my-posts', icon: FileText, label: '내게시글' },
-        { id: 'custom-jobs', icon: Briefcase, label: '맞춤공고' },
-    ];
-    const currentViewId = typeof view === 'object' ? view.id : view;
-    const isActive = (id: string) => {
-        if (id === 'resume-list') return currentViewId === 'resume-list' || currentViewId === 'resume-form';
-        return currentViewId === id;
-    };
-    return (
-        <div className="md:hidden w-full overflow-x-auto pb-2 mb-4 -mx-3 px-3">
-            <div className="flex gap-2 w-max">
-                {mobileMenuItems.map(item => (
-                    <button
-                        key={item.id}
-                        onClick={() => setView(item.id)}
-                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all shrink-0 ${
-                            isActive(item.id)
-                                ? 'bg-[#f82b60] text-white shadow-md shadow-rose-100'
-                                : 'bg-white text-gray-500 border border-gray-100'
-                        }`}
-                    >
-                        <item.icon size={13} />
-                        {item.label}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-}
-
 export default function PersonalDashboard({ view, setView, resumeCount = 0, onShowResumeDetail, authUser }: { view: string, setView: (v: any) => void, resumeCount?: number, onShowResumeDetail?: (r: any) => void, authUser: any }) {
     const brand = useBrand();
 
@@ -360,8 +322,6 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
         <div className="max-w-6xl mx-auto p-3 md:py-0 grid grid-cols-1 md:grid-cols-4 gap-6">
             <PersonalSidebar view={view} setView={setView} />
             <main className="col-span-1 md:col-span-3">
-                {/* 모바일 전용 수평 탭 메뉴 */}
-                <PersonalMobileMenu view={view} setView={setView} />
                 {((view as any) === 'member-info' || (view as any) === 'dashboard') && <PersonalDashboardHome setView={setView} resumeCount={resumeCount} />}
                 {(view as any) === 'member-edit' && <PersonalMemberEdit setView={setView} />}
                 {((view as any) === 'resume-form' || (typeof view === 'object' && (view as any).id === 'resume-form')) && (
