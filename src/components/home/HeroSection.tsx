@@ -2,13 +2,31 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
+import { useAuth } from '@/hooks/useAuth';
 
 
 export const HeroSection = () => {
     const brand = useBrand();
+    const router = useRouter();
+    const { isLoggedIn, userType, isLoading } = useAuth();
     const [isPaymentPopupOpen, setIsPaymentPopupOpen] = useState(false);
+
+    const handleAdClick = () => {
+        if (isLoading) return;
+        if (!isLoggedIn) {
+            router.push('/?page=login');
+            return;
+        }
+        if (userType === 'individual') {
+            alert('업체회원만 이용 가능한 서비스입니다.');
+            return;
+        }
+        // corporate or admin → 결제 팝업 열기
+        setIsPaymentPopupOpen(true);
+    };
 
     // Simplified static banner info for diet
     const bannerInfo = {
@@ -57,7 +75,7 @@ export const HeroSection = () => {
                     {/* Buttons - Raised slightly on PC as requested */}
                     <div className="flex flex-col sm:flex-row gap-2.5 items-center md:-mt-3 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
                         <button
-                            onClick={() => setIsPaymentPopupOpen(true)}
+                            onClick={handleAdClick}
                             className="group relative inline-flex items-center justify-center px-8 py-2.5 md:px-10 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-900 font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden whitespace-nowrap"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-rose-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

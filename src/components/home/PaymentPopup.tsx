@@ -6,6 +6,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { X, CheckCircle2, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PaymentPopupProps {
     isOpen: boolean;
@@ -116,6 +117,7 @@ const PACKAGES = [
 export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, initialTier = 'grand' }) => {
     const brand = useBrand();
     const router = useRouter();
+    const { isLoggedIn, userType } = useAuth();
     const [selectedTier, setSelectedTier] = useState(initialTier);
     const [mounted, setMounted] = useState(false);
 
@@ -131,16 +133,19 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     if (!mounted || !isOpen) return null;
 
     const handleApply = () => {
-        // Mock Login Check
-        const isLoggedIn = !!localStorage.getItem('user_session');
-
+        // useAuth 훅 기반 인증 체크 (mock 세션 포함)
         if (!isLoggedIn) {
             if (confirm('광고를 신청하려면 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?')) {
+                onClose();
                 router.push('/?page=login');
             }
             return;
         }
-
+        if (userType === 'individual') {
+            alert('업체회원만 이용 가능한 서비스입니다.');
+            return;
+        }
+        // corporate 또는 admin → 광고 신청 진행
         router.push(`/my-shop?view=form&tier=${selectedTier}`);
         onClose();
     };
