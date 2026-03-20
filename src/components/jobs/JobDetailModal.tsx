@@ -259,7 +259,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                 </button>
                 <a
                     href={`tel:${shop.phone}`}
-                    className="col-span-2 py-4 bg-blue-600 text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 group"
+                    className="col-span-2 py-4 bg-[#f82b60] text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
                 >
                     <div className="flex items-center gap-2">
                         <Phone size={18} fill="currentColor" className="group-hover:animate-bounce" />

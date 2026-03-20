@@ -87,6 +87,22 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const isMobile = useMobile();
     const isVisible = useBannerControl(); // Global + Manual Control
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
+    const [favorites, setFavorites] = useState<string[]>(() => {
+        if (typeof window === 'undefined') return [];
+        try {
+            const saved = localStorage.getItem('favorites');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+
+    const toggleFavorite = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        const newFavs = favorites.includes(id)
+            ? favorites.filter(fid => fid !== id)
+            : [...favorites, id];
+        setFavorites(newFavs);
+        localStorage.setItem('favorites', JSON.stringify(newFavs));
+    };
 
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';
@@ -159,8 +175,8 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                 <JobDetailModal
                     shop={selectedAd}
                     onClose={() => setSelectedAd(null)}
-                    isFavorite={false}
-                    onToggleFavorite={(e) => { e.stopPropagation(); }}
+                    isFavorite={favorites.includes(selectedAd.id)}
+                    onToggleFavorite={(e) => toggleFavorite(e, selectedAd.id)}
                 />
             )}
         </>

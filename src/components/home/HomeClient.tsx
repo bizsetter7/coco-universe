@@ -30,7 +30,13 @@ export default function HomeClient({ shops }: HomeClientProps) {
     const [selectedShop, setSelectedShop] = React.useState<Shop | null>(null);
     const [showPaymentPopup, setShowPaymentPopup] = React.useState(false);
     const [selectedTier, setSelectedTier] = React.useState('grand');
-    const [favorites, setFavorites] = React.useState<string[]>([]);
+    const [favorites, setFavorites] = React.useState<string[]>(() => {
+        if (typeof window === 'undefined') return [];
+        try {
+            const saved = localStorage.getItem('favorites');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
 
     // Body Scroll Lock
     useBodyScrollLock(!!selectedShop || showPaymentPopup);
