@@ -89,7 +89,7 @@ function MyShopContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const brand = useBrand();
-    const { userType: authUserType, user: authUser } = useAuth();
+    const { userType: authUserType, user: authUser, isLoading: authLoading } = useAuth();
     const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | 'guest' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
     const [editingAdId, setEditingAdId] = useState<any | null>(null);
@@ -273,24 +273,29 @@ function MyShopContent() {
     usePreventLeave(formState.isDirty && view === 'form');
 
     useEffect(() => {
+        // [Critical Fix] 세션 로딩 중에는 아무것도 하지 않음
+        // authLoading이 true인 동안 authUserType은 'guest' 초기값 → 리다이렉트 금지
+        if (authLoading) return;
+
         const simulate = searchParams.get('simulate');
         const viewParam = searchParams.get('view');
-        if (authUserType) {
-            // [Auth Guard] 비로그인(guest) 접근 차단 → 로그인 페이지로
-            if (authUserType === 'guest') {
-                router.replace('/?page=login');
+
+        // [Auth Guard] 비로그인(guest) 접근 차단 → 로그인 페이지로
+        if (authUserType === 'guest') {
+            router.replace('/?page=login');
+            return;
+        }
+        if (authUserType === 'admin' && !simulate) {
+            // [Security] Only redirect if absolutely NO view context exists
+            if (!viewParam && !searchParams.has('view') && searchParams.toString() === '') {
+                router.replace('/admin');
                 return;
             }
-            if (authUserType === 'admin' && !simulate) {
-                // [Security] Only redirect if absolutely NO view context exists
-                if (!viewParam && !searchParams.has('view') && searchParams.toString() === '') {
-                    router.replace('/admin');
-                    return;
-                }
-            }
+        }
+        if (authUserType) {
             setUserType(authUserType === 'admin' ? (simulate === 'individual' ? 'individual' : 'corporate') : authUserType);
         }
-    }, [authUserType, authUser.id, authUser.name, authUser.nickname, searchParams]);
+    }, [authUserType, authLoading, authUser.id, authUser.name, authUser.nickname, searchParams]);
 
     useEffect(() => {
         const viewParam = (searchParams.get('view') || 'dashboard') as any;
