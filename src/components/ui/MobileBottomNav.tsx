@@ -67,7 +67,7 @@ const MobileBottomNavContent = () => {
         { label: '홈', icon: <Home size={24} />, href: '/' },
         { label: '커뮤니티', icon: <MessageSquare size={24} />, href: '/community' },
         {
-            label: mounted && (userType === 'individual') ? '이력서등록' : '광고등록',
+            label: (!mounted || isLoading) ? '등록하기' : (userType === 'individual') ? '이력서등록' : '광고등록',
             icon: <Plus size={32} className="text-white" />,
             href: mounted && userType === 'individual' ? '/my-shop?view=resume-form' : '/ad-register',
             isMain: true
@@ -192,7 +192,7 @@ const MobileBottomNavContent = () => {
                                         }}
                                         className={`flex flex-col items-center justify-center gap-1 py-1 ${isActive ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-500' : 'text-gray-400')}`}
                                     >
-                                        <div className={isActive ? 'text-blue-500' : ''}>
+                                        <div className={isActive ? 'text-[#f82b60]' : ''}>
                                             {item.icon}
                                         </div>
                                         <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>
@@ -208,7 +208,7 @@ const MobileBottomNavContent = () => {
                                     href={item.href}
                                     className={`flex flex-col items-center justify-center gap-1 py-1 ${isActive ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-500' : 'text-gray-400')}`}
                                 >
-                                    <div className={isActive ? 'text-blue-500' : ''}>
+                                    <div className={isActive ? 'text-[#f82b60]' : ''}>
                                         {item.icon}
                                     </div>
                                     <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>
