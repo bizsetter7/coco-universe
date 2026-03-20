@@ -1267,5 +1267,195 @@
         "description": "Verify no blue-600 colors are visible in the modal"
       }
     ]
+  },
+  {
+    "id": "TC038",
+    "title": "Personal dashboard shows correct nickname (no '회원님 님' duplication)",
+    "description": "개인회원 마이페이지 대시보드에서 '회원님 님의 구직활동' 중복 표현 없이 닉네임만 표시되는지 검증. useAuth 대신 localStorage 직접 접근으로 인한 닉네임 중복 버그 재발 방지.",
+    "category": "개인회원 마이페이지 (PersonalDashboard)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /?page=login and login as test_user with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text '회원님 님의 구직활동' is NOT visible (중복 표현 없음)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text '님의 구직활동' is visible (닉네임+님의 구직활동 형태)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the greeting does not contain double '님' (e.g. '회원님 님' pattern)"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Personal dashboard scrap count reflects actual localStorage favorites",
+    "description": "개인회원 마이페이지의 '스크랩한 공고' 숫자가 실제로 스크랩한 공고 수를 반영하는지 검증. 하드코딩 0 버그 재발 방지.",
+    "category": "개인회원 마이페이지 (PersonalDashboard)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to / (main page)"
+      },
+      {
+        "type": "action",
+        "description": "Click any job/ad card to open the detail modal"
+      },
+      {
+        "type": "action",
+        "description": "Click the star (★) button in the modal to scrap the job"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify '스크랩한 공고' count is greater than 0 (at least 1)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the count matches the number of starred jobs"
+      }
+    ]
+  },
+  {
+    "id": "TC040",
+    "title": "Personal dashboard viewed shops count reflects actual viewed history",
+    "description": "개인회원 마이페이지의 '열람한 기업' 숫자가 실제 viewed_shops localStorage를 반영하는지 검증.",
+    "category": "개인회원 마이페이지 (PersonalDashboard)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to / and click at least one job card to view a shop"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal and navigate to /my-shop"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify '열람한 기업' count is greater than 0"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Resume count does not flicker (no infinite re-render loop)",
+    "description": "개인회원 마이페이지 대시보드에서 이력서 등록수/공개중인 이력서 숫자가 깜빡이거나 왔다갔다하지 않는지 검증. useEffect 무한루프 버그 재발 방지.",
+    "category": "개인회원 마이페이지 (PersonalDashboard)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /?page=login and login as test_user with Coco#2025!"
+      },
+      {
+        "type": "action",
+        "description": "Accept the alert and navigate to /my-shop"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify '이력서 등록수' shows a stable number (not flickering between 0 and actual value)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify '공개중인 이력서' shows a stable number"
+      },
+      {
+        "type": "action",
+        "description": "Wait 3 seconds and observe if numbers change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify numbers remain stable after 3 seconds (no re-render loop)"
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Favorites page shows scrapped jobs (localStorage key consistency)",
+    "description": "메인/업종/지역 페이지에서 스크랩한 공고가 /favorites 페이지에 실제로 표시되는지 검증. 'favorites' vs 'coco-favorites' 키 불일치 버그 재발 방지.",
+    "category": "스크랩/즐겨찾기 (Favorites)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to / (main page)"
+      },
+      {
+        "type": "action",
+        "description": "Click a job card and click the star (★) button to scrap"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /favorites"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the scrapped job appears on the favorites page (not empty)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify scrapped job card shows shop name and region"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "Scrap toggle works from job detail modal (star button)",
+    "description": "광고 상세 모달에서 별표 클릭 시 스크랩 추가/제거가 정상 동작하고 favorites 페이지에 반영되는지 검증.",
+    "category": "스크랩/즐겨찾기 (Favorites)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to / and click a job card to open the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify star button is visible (top left of modal)"
+      },
+      {
+        "type": "action",
+        "description": "Click the star button to scrap"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify star button turns yellow/filled (스크랩 상태)"
+      },
+      {
+        "type": "action",
+        "description": "Click the star button again to unscrap"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify star button returns to unfilled state"
+      }
+    ]
   }
 ]
