@@ -1457,5 +1457,79 @@
         "description": "Verify star button returns to unfilled state"
       }
     ]
+  },
+  {
+    "id": "TC044",
+    "category": "스크랩/즐겨찾기",
+    "title": "BannerSidebar 모달 스크랩 버튼 동작 확인",
+    "description": "좌우 사이드바 광고 카드 클릭 후 모달의 ☆ 버튼 클릭 시 favorites 저장 확인",
+    "steps": [
+      "개인회원 로그인 상태에서 메인 페이지 접속",
+      "좌측 또는 우측 사이드바 광고 카드 클릭",
+      "모달 상단 좌측 ☆ 버튼 클릭",
+      "별이 노란색으로 채워지는지 확인",
+      "localStorage.getItem('favorites') 값이 배열로 저장되는지 확인"
+    ],
+    "expectedResult": "별 아이콘이 노란색으로 변경되고, localStorage 'favorites' 키에 광고 ID가 저장됨",
+    "priority": "HIGH",
+    "status": "PASS",
+    "bugFixed": "BUG-017"
+  },
+  {
+    "id": "TC045",
+    "category": "스크랩/즐겨찾기",
+    "title": "새로고침 후 스크랩 목록 유지 확인",
+    "description": "스크랩 후 페이지 새로고침 시 스크랩 상태(별 채워짐)가 유지되는지 확인",
+    "steps": [
+      "광고 카드 스크랩 후 페이지 새로고침",
+      "동일한 광고 카드를 다시 클릭",
+      "☆ 버튼이 ★(노란색)으로 이미 채워져 있는지 확인"
+    ],
+    "expectedResult": "새로고침 후에도 스크랩 상태 유지 (localStorage lazy init으로 복원)",
+    "priority": "MEDIUM",
+    "status": "PASS",
+    "bugFixed": "BUG-018"
+  },
+  {
+    "id": "TC046",
+    "category": "브랜드 컬러",
+    "title": "광고 모달 전화/문자 지원하기 버튼 컬러",
+    "description": "JobDetailModal 하단 전화/문자 지원하기 버튼이 핫핑크(#f82b60)인지 확인",
+    "steps": [
+      "광고 카드 클릭하여 모달 열기",
+      "모달 하단 '전화/문자 지원하기' 버튼 색상 확인"
+    ],
+    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨 (파란색 금지)",
+    "priority": "LOW",
+    "status": "PASS",
+    "bugFixed": "BUG-019"
+  },
+  {
+    "id": "TC047",
+    "category": "브랜드 컬러",
+    "title": "개인 마이페이지 새 이력서 작성 버튼 컬러",
+    "description": "이력서 관리 탭의 '+ 새 이력서 작성' 버튼이 핫핑크인지 확인",
+    "steps": [
+      "개인회원 로그인 후 마이페이지 → 이력서 관리 탭 이동",
+      "'+ 새 이력서 작성' 버튼 색상 확인"
+    ],
+    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨",
+    "priority": "LOW",
+    "status": "PASS",
+    "bugFixed": "BUG-020"
+  },
+  {
+    "id": "TC048",
+    "category": "브랜드 컬러",
+    "title": "업체 마이페이지 새 공고 등록 버튼 컬러",
+    "description": "업체 마이페이지의 '+ 새 공고 등록' 버튼이 핫핑크인지 확인",
+    "steps": [
+      "업체회원 로그인 후 마이페이지 접속",
+      "'+ 새 공고 등록' 버튼 색상 확인"
+    ],
+    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨",
+    "priority": "LOW",
+    "status": "PASS",
+    "bugFixed": "BUG-021"
   }
 ]
