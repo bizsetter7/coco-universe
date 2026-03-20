@@ -9,6 +9,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import JobDetailModal from './jobs/JobDetailModal';
+import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
@@ -87,21 +88,11 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const isMobile = useMobile();
     const isVisible = useBannerControl(); // Global + Manual Control
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
-    const [favorites, setFavorites] = useState<string[]>(() => {
-        if (typeof window === 'undefined') return [];
-        try {
-            const saved = localStorage.getItem('favorites');
-            return saved ? JSON.parse(saved) : [];
-        } catch { return []; }
-    });
+    const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
 
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        const newFavs = favorites.includes(id)
-            ? favorites.filter(fid => fid !== id)
-            : [...favorites, id];
-        setFavorites(newFavs);
-        localStorage.setItem('favorites', JSON.stringify(newFavs));
+        setFavorites(prev => toggleFav(id, prev));
     };
 
     const isLeft = side === 'left';

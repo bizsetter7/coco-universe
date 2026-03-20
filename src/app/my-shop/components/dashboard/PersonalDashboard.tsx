@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings, LayoutDashboard } from 'lucide-react';
+import { List, Star, CreditCard, AlertTriangle, Briefcase, FileText, User, LogOut, ChevronRight, Home, Settings, LayoutDashboard, Phone, MessageCircle, X } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
 import { ResumeForm } from '../ResumeForm';
 import { ResumeListView } from '../ResumeListView';
 import { ComingSoonView } from '../ComingSoonView';
+import shopsData from '@/lib/data/shops.json';
+import JobDetailModal from '@/components/jobs/JobDetailModal';
+import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS } from '@/utils/favorites';
 
 
 
@@ -54,7 +57,6 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
         { id: 'custom-jobs', icon: Briefcase, label: '맞춤구인정보' },
         { id: 'my-posts', icon: FileText, label: '내가 작성한 게시글' },
         { id: 'block-settings', icon: User, label: '회원 차단 설정' },
-        { id: 'post-bookmarks', icon: Star, label: '즐겨찾기한 게시글' }
     ];
 
     return (
@@ -113,6 +115,103 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                 </div>
             </div>
         </aside>
+    );
+}
+
+export function ScrapJobsView({ setView }: { setView: (v: any) => void }) {
+    const brand = useBrand();
+    const [favorites, setFavorites] = useState<string[]>([]);
+    const [selectedShop, setSelectedShop] = useState<any | null>(null);
+
+    useEffect(() => {
+        // 만료 항목 자동 정리 후 유효 목록 로드
+        setFavorites(getFavorites());
+    }, []);
+
+    const handleToggle = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        const newFavs = toggleFav(id, favorites);
+        setFavorites(newFavs);
+        if (selectedShop?.id === id) setSelectedShop(null);
+    };
+
+    const favoriteShops = (shopsData as any[]).filter(s => favorites.includes(s.id));
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-black flex items-center gap-2">
+                    <Star size={20} className="text-yellow-400 fill-yellow-400" /> 채용정보 스크랩
+                </h2>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-bold">{SCRAP_EXPIRE_DAYS}일 후 자동 삭제</span>
+                    <span className="text-sm font-black text-[#f82b60]">{favoriteShops.length}건</span>
+                </div>
+            </div>
+
+            {favoriteShops.length === 0 ? (
+                <div className={`p-12 rounded-[32px] border text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+                    <Star size={40} className="text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-400 font-bold text-sm">스크랩한 공고가 없습니다.</p>
+                    <p className="text-gray-300 text-xs mt-1">공고 상세 화면의 ☆ 버튼을 눌러 스크랩하세요.</p>
+                    <button
+                        onClick={() => setView('dashboard')}
+                        className="mt-6 px-6 py-2.5 bg-[#f82b60] text-white rounded-xl text-sm font-black hover:bg-[#db2456] transition-all"
+                    >
+                        공고 보러 가기
+                    </button>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-3">
+                    {favoriteShops.map((shop: any) => {
+                        const daysLeft = getDaysUntilExpiry(shop.id);
+                        const isExpiringSoon = daysLeft !== null && daysLeft <= 7;
+                        return (
+                            <div
+                                key={shop.id}
+                                onClick={() => setSelectedShop(shop)}
+                                className={`p-5 rounded-[24px] border shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                            >
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
+                                            <Star size={18} className="text-yellow-400 fill-yellow-400" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="font-black text-sm truncate">{shop.name || shop.title}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{shop.region} · {shop.pay}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {daysLeft !== null && (
+                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isExpiringSoon ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-gray-400'}`}>
+                                                {daysLeft}일 후 만료
+                                            </span>
+                                        )}
+                                        <button
+                                            onClick={(e) => handleToggle(e, shop.id)}
+                                            className="p-2 text-yellow-400 hover:text-gray-300 transition-colors"
+                                            aria-label="스크랩 해제"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {selectedShop && (
+                <JobDetailModal
+                    shop={selectedShop}
+                    onClose={() => setSelectedShop(null)}
+                    isFavorite={favorites.includes(selectedShop.id)}
+                    onToggleFavorite={(e) => handleToggle(e, selectedShop.id)}
+                />
+            )}
+        </div>
     );
 }
 
@@ -234,13 +333,12 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
                 )}
                 {(view as any) === 'resume-list' && <ResumeListView setView={setView} onShowDetail={onShowResumeDetail} authUser={authUser} />}
 
-                {view === 'scrap-jobs' && <ComingSoonView title="채용정보 스크랩" />}
+                {view === 'scrap-jobs' && <ScrapJobsView setView={setView} />}
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}
                 {view === 'excluded-shops' && <ComingSoonView title="열람불가 업소설정" />}
                 {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}
                 {view === 'my-posts' && <ComingSoonView title="내가 작성한 게시글" />}
                 {view === 'block-settings' && <ComingSoonView title="회원 차단 설정" />}
-                {view === 'post-bookmarks' && <ComingSoonView title="즐겨찾기한 게시글" />}
             </main>
         </div>
     );

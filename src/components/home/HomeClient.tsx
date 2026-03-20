@@ -15,6 +15,7 @@ import { QuickMenu } from './QuickMenu';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import JobListView from '@/components/jobs/JobListView';
 import { FloatingConversion } from './FloatingConversion';
+import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
 
 // --- Type Definitions ---
 interface HomeClientProps {
@@ -30,13 +31,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
     const [selectedShop, setSelectedShop] = React.useState<Shop | null>(null);
     const [showPaymentPopup, setShowPaymentPopup] = React.useState(false);
     const [selectedTier, setSelectedTier] = React.useState('grand');
-    const [favorites, setFavorites] = React.useState<string[]>(() => {
-        if (typeof window === 'undefined') return [];
-        try {
-            const saved = localStorage.getItem('favorites');
-            return saved ? JSON.parse(saved) : [];
-        } catch { return []; }
-    });
+    const [favorites, setFavorites] = React.useState<string[]>(() => getFavorites());
 
     // Body Scroll Lock
     useBodyScrollLock(!!selectedShop || showPaymentPopup);
@@ -44,11 +39,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
     // -- Handlers --
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        const newFavs = favorites.includes(id)
-            ? favorites.filter(fid => fid !== id)
-            : [...favorites, id];
-        setFavorites(newFavs);
-        localStorage.setItem('favorites', JSON.stringify(newFavs));
+        setFavorites(prev => toggleFav(id, prev));
     };
 
     const handleAdRegister = (tier?: string) => {
