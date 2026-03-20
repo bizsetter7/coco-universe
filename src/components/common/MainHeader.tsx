@@ -429,7 +429,6 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                 { label: '맞춤구인정보', id: 'custom-jobs' },
                                                 { label: '내가 작성한 게시글', id: 'my-posts' },
                                                 { label: '회원 차단 설정', id: 'block-settings' },
-                                                { label: '즐겨찾기한 게시글', id: 'post-bookmarks' },
                                             ].map((item) => (
                                                 <button
                                                     key={item.id}
