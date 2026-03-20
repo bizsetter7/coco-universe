@@ -25,7 +25,9 @@
 - **P6(방송):** `C:\My-site\p6. Broadcaster` / 최저가 알림/가격비교/AI 예측 비서 플랫폼
   - **전략:** 제로 마찰 자동화, AI 가격 예측, 소셜 FOMO UX, B2B 대기 수요 데이터 비즈니스.
 
-- **P6(ASMR):** `C:\My-site\p6. Broadcaster` / YouTube: `@NaturesHeartbeat AI` / 24/7 무한 힐링 송출 기지
+- **P7(방송/쇼핑):** `C:\My-site\p7. PRICESHOT` / **PRICESHOT(프라이스샷)**
+  - **전략:** RN New Architecture(120fps), 3계층 데이터 수집, 세미오토 카트, 10만개 SEO 랜딩페이지.
+  - **수익화:** 6.9k/12.9k 구독 모델 및 '케어 포인트' 리워드 시스템. 🫡🔥🎯🚀🔍📈- **P6(ASMR):** `C:\My-site\p6. Broadcaster` / YouTube: `@NaturesHeartbeat AI` / 24/7 무한 힐링 송출 기지
 
 ## 🔄 P2/P4 브랜드 전환(Switching) 기획 및 운영 시나리오
 단일 코드베이스에서 환경 변수 기반으로 즉시 UI/UX를 스위칭하는 아키텍처를 강제하며, 이는 클로킹이 아닌 명백한 **'브랜드 리뉴얼 및 B2B/B2C 타겟 확장'** 전략의 일환이다.
@@ -210,14 +212,14 @@ Record: 작업 결과 및 패턴을 AI_SOP.md에 업데이트하고 스티치를
 
 **현재 상태:** `/public/Professional_Mirror_Simulator.html` 파일로 관리되며, 모든 프로젝트의 무결성 검증을 위한 표준 도구로 채택 완료.
 
-### [2026-03-20] P6 Broadcaster '초격차 틈새 타격' 통합 전략 수립
-- **배경:** 폴센트(Polcent)의 수동적 UX와 데이터 한계를 극복하기 위한 차세대 쇼핑 비서 기획.
-- **핵심전략 (4 Pillars):**
-  1. **Zero-Friction**: 클립보드 스나이핑 및 세미 오토 장바구니 자동화.
-  2. **AI Prediction**: 과거가 아닌 '미래'의 가격 하락 확률을 예측하여 고지.
-  3. **Social UX**: P5의 스와이프 UI를 접목한 게임화(Gamification) 및 군중 지성 데이터 노출.
-  4. **B2B Pivot**: 구매 대기 유저 데이터를 활용한 브랜드 대상 '시크릿 타임세일' 비즈니스.
-- **다음단계:** 애플 심사 회피를 위한 '프레이밍(AI 개인비서)' 기획 및 크롤링 분산 아키텍처 설계 착수. 🫡🔥🛒🚀🔍📈
+### [2026-03-20] PRICESHOT '삼위일체' 최종 통합 마스터플랜 v5.0 (Ultimate)
+- **전략 고도화:** 안티(AI), 클로드(보안), 코부장(수익)의 인사이트가 완벽히 결합된 최종 병기 프레임워크.
+- **최종 확정 사항:**
+  1. **Architecture**: React Native + Next.js 하이브리드 - 100k SEO 자동 생성 페이지로 오가닉 트래픽 확보.
+  2. **AI Core**: 'Future-Scan' 몬테카를로 시뮬레이션 기반 가격 하락 확률 예측 엔진 탑재.
+  3. **Killer Feature**: '세미-오토 카트' (Deep-Link + Standard Session 관리) 구현으로 타 앱 대비 압도적 편의성 확보.
+  4. **Economy**: 월 9,900원 'VIP 스나이퍼' 요금제 및 '케어 포인트'를 활용한 구독료 갱신 루프(Lock-in).
+- **보안**: 모든 데이터 수집 및 세션 처리 로직은 서버사이드 표준망에서 처리하여 외부 노출 및 법적 리스크 원천 차단. 🫡🔥🎯🚀🔍📈
 
 ### [2026-03-15] P3 랜딩페이지 최적화 및 템플릿 동기화 (Perfect Light Mode)
 - **대상:** P3(랜딩) - 메인 인덱스 페이지(`index.html`)
