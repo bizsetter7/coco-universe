@@ -7,6 +7,7 @@ import { ShopCard } from '../shop/ShopCard';
 import { Search, ChevronDown, Check } from 'lucide-react';
 import { JOB_CATEGORY_MAP, JOB_CATEGORIES } from '@/constants/jobs';
 import { REGIONS_MAP, REGION_LIST } from '@/constants/regions';
+import { LATEST_NOTICE } from '@/constants/notices';
 
 export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
     const brand = useBrand();
@@ -46,13 +47,16 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                 </div>
             </div>
 
-            {/* 2. Notice Box */}
-            <div className={`flex items-center gap-3 p-3 rounded-lg mb-6 text-sm ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded">공지사항</span>
+            {/* 2. Notice Box — notices.ts LATEST_NOTICE 자동 반영 */}
+            <div
+                className={`flex items-center gap-3 p-3 rounded-lg mb-6 text-sm cursor-pointer hover:shadow-sm transition-all ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}
+                onClick={() => window.location.href = LATEST_NOTICE.link ?? '/customer-center?tab=notice'}
+            >
+                <span className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded shrink-0">{LATEST_NOTICE.badge}</span>
                 <span className={`flex-1 truncate ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    [안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내
+                    {LATEST_NOTICE.title}
                 </span>
-                <ChevronDown size={14} className="text-gray-400" />
+                <ChevronDown size={14} className="text-gray-400 shrink-0" />
             </div>
 
             {/* 3. Search Bar */}

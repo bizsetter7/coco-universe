@@ -23,11 +23,25 @@ interface LeftSidebarProps {
     userCredit?: number;
 }
 
-// 지역 목록 (공식 전체명)
-const REGION_BUTTONS = [
-    '서울', '경기도', '인천', '부산', '대구', '광주', '대전', '울산',
-    '강원도', '경상남도', '경상북도', '전라남도', '전라북도',
-    '충청남도', '충청북도', '제주도', '세종시',
+// 지역 목록 (label: 2글자 표기, value: REGION_BRACKET_MAP 연동용 전체명)
+const REGION_BUTTONS: { label: string; value: string }[] = [
+    { label: '서울', value: '서울' },
+    { label: '경기', value: '경기도' },
+    { label: '인천', value: '인천' },
+    { label: '부산', value: '부산' },
+    { label: '대구', value: '대구' },
+    { label: '광주', value: '광주' },
+    { label: '대전', value: '대전' },
+    { label: '울산', value: '울산' },
+    { label: '세종', value: '세종시' },
+    { label: '강원', value: '강원도' },
+    { label: '충북', value: '충청북도' },
+    { label: '충남', value: '충청남도' },
+    { label: '전북', value: '전라북도' },
+    { label: '전남', value: '전라남도' },
+    { label: '경북', value: '경상북도' },
+    { label: '경남', value: '경상남도' },
+    { label: '제주', value: '제주도' },
 ];
 
 // 직종 목록 (1차 직종)
@@ -306,18 +320,18 @@ export default function LeftSidebar({
                 <div className={`grid grid-cols-5 gap-1 transition-all duration-300 overflow-hidden ${isRegionOpen ? 'max-h-[500px] mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
                     {REGION_BUTTONS.map((reg) => (
                         <button
-                            key={reg}
+                            key={reg.value}
                             onClick={() => {
-                                setSelectedRegion(reg);
+                                setSelectedRegion(reg.value);
                                 setSelectedSubRegion('전체');
-                                setIsRegionOpen(false); // Auto-close after selection
+                                setIsRegionOpen(false);
                             }}
-                            className={`px-1 py-1.5 rounded text-[10px] font-bold transition ${selectedRegion === reg
+                            className={`px-1 py-1.5 rounded text-[10px] font-bold transition ${selectedRegion === reg.value
                                 ? 'bg-purple-600 text-white'
                                 : brand.theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
-                            {reg}
+                            {reg.label}
                         </button>
                     ))}
                 </div>

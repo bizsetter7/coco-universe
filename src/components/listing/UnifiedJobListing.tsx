@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import JobListView from '@/components/jobs/JobListView';
 import { JOB_CATEGORIES, JOB_CATEGORY_MAP } from '@/constants/jobs';
 import { REGION_LIST, REGIONS_MAP } from '@/constants/regions';
+import { LATEST_NOTICE } from '@/constants/notices';
 import { Shop } from '@/types/shop';
 import { useBrand } from '@/components/BrandProvider';
 
@@ -68,13 +69,25 @@ export const UnifiedJobListing = ({
     const [activeTab, setActiveTab] = React.useState(title);
     const [viewedShops, setViewedShops] = React.useState<Shop[]>([]);
 
-    // 탭 변경 시 viewed_shops 로드
+    // 탭 변경 시 viewed_shops 로드 (24시간 이내 항목만 표시)
     React.useEffect(() => {
         if (activeTab === '오늘본공고') {
             const saved = localStorage.getItem('viewed_shops');
             if (saved) {
                 try {
-                    setViewedShops(JSON.parse(saved));
+                    const parsed = JSON.parse(saved);
+                    const now = Date.now();
+                    const MS_24H = 86400000;
+                    // 신형 포맷 { shop, timestamp }[] 처리
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].timestamp !== undefined) {
+                        const valid = (parsed as { shop: Shop; timestamp: number }[])
+                            .filter(e => e.shop && (now - e.timestamp) < MS_24H)
+                            .map(e => e.shop);
+                        setViewedShops(valid);
+                    } else {
+                        // 구형 포맷(Shop[]) 호환 — 그대로 표시 (타임스탬프 없으므로 만료 없음)
+                        setViewedShops(parsed as Shop[]);
+                    }
                 } catch (e) {
                     console.error('Failed to parse viewed_shops', e);
                 }
@@ -209,14 +222,18 @@ export const UnifiedJobListing = ({
                     </div>
                 </div>
 
-                {/* Announcement Bar */}
+                {/* Announcement Bar — notices.ts LATEST_NOTICE 자동 반영 */}
                 <div
-                    onClick={() => router.push('/?page=support')}
+                    onClick={() => router.push(LATEST_NOTICE.link ?? '/customer-center?tab=notice')}
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer bg-white border-gray-100 hover:shadow-md hover:-translate-y-0.5 mx-4 md:mx-0 group/notice`}
                 >
                     <div className="flex items-center gap-3 overflow-hidden">
-                        <span className="bg-blue-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm group-hover/notice:bg-blue-700 transition-colors">공지사항</span>
-                        <p className="text-[13px] font-bold text-gray-700 truncate group-hover/notice:text-black transition-colors">[안내] 프리미엄 광고 &quot;Grand Tier&quot; 서비스 개편 및 혜택 안내</p>
+                        <span className="bg-blue-600 text-white text-[10px] px-2 py-1 rounded-lg font-black shrink-0 uppercase tracking-wider shadow-sm group-hover/notice:bg-blue-700 transition-colors">
+                            {LATEST_NOTICE.badge}
+                        </span>
+                        <p className="text-[13px] font-bold text-gray-700 truncate group-hover/notice:text-black transition-colors">
+                            {LATEST_NOTICE.title}
+                        </p>
                     </div>
                     <ChevronRight size={16} className="text-gray-300 shrink-0 group-hover/notice:text-gray-500 transition-colors" />
                 </div>

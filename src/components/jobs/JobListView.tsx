@@ -31,35 +31,39 @@ interface JobListViewProps {
 }
 
 // [Optimization] Helper for Pay Badge Logic (Pure function)
+// ⚠️ Pay Badge Standards v1.0 — standards.ts PAY_BADGE_STANDARDS와 동기화 유지
 const getPayBadgeInfo = (shop: Shop) => {
     const payStr = shop.pay || '';
     let badgeLabel = '협';
-    let badgeColor = 'bg-gray-400';
+    let badgeColor = 'bg-gray-400';   // 기본값: 협의
     let amount = payStr;
 
     const typeToCheck = shop.payType || payStr;
 
-    if (typeToCheck.includes('TC')) {
+    if (typeToCheck.includes('TC') || typeToCheck === 'T') {
         badgeLabel = 'T';
-        badgeColor = 'bg-indigo-600';
-    } else if (typeToCheck.includes('시급')) {
+        badgeColor = 'bg-emerald-500'; // TC(테이블차지) — emerald
+    } else if (typeToCheck.includes('시급') || typeToCheck === '시') {
         badgeLabel = '시';
-        badgeColor = 'bg-cyan-500';
+        badgeColor = 'bg-cyan-500';   // 시급 — cyan
     } else if (typeToCheck.includes('일급') || typeToCheck.includes('일')) {
         badgeLabel = '일';
-        badgeColor = 'bg-blue-500';
-    } else if (typeToCheck.includes('주급')) {
+        badgeColor = 'bg-blue-500';   // 일급 — blue
+    } else if (typeToCheck.includes('주급') || typeToCheck.includes('주')) {
         badgeLabel = '주';
-        badgeColor = 'bg-blue-500';
+        badgeColor = 'bg-blue-500';   // 주급 — blue (일급과 동일)
     } else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) {
         badgeLabel = '월';
-        badgeColor = 'bg-purple-500';
-    } else if (typeToCheck.includes('연봉')) {
+        badgeColor = 'bg-purple-500'; // 월급 — purple
+    } else if (typeToCheck.includes('연봉') || typeToCheck.includes('연')) {
         badgeLabel = '연';
-        badgeColor = 'bg-green-600';
+        badgeColor = 'bg-green-600';  // 연봉 — green
+    } else if (typeToCheck.includes('건별') || typeToCheck.includes('건당') || typeToCheck.includes('건')) {
+        badgeLabel = '건';
+        badgeColor = 'bg-slate-500';  // 건별 — slate
     } else if (typeToCheck.includes('협의') || amount === '면접후결정') {
         badgeLabel = '협';
-        badgeColor = 'bg-gray-400';
+        badgeColor = 'bg-gray-400';   // 협의 — gray
         amount = '면접후협의';
     }
 

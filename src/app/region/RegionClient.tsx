@@ -40,16 +40,31 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
     const [visibleCount, setVisibleCount] = useState(20);
     const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
 
-    // Track viewed shops
+    // Track viewed shops (타임스탬프 포함 저장 → 24시간 후 자동 만료)
     const handleSetSelectedShop = React.useCallback((shop: Shop | null) => {
         setSelectedShop(shop);
         if (shop) {
             const saved = localStorage.getItem('viewed_shops');
-            let viewed: Shop[] = saved ? JSON.parse(saved) : [];
-
-            // Remove duplication and add to top
-            viewed = [shop, ...viewed.filter(s => s.id !== shop.id)].slice(0, 50);
-            localStorage.setItem('viewed_shops', JSON.stringify(viewed));
+            const now = Date.now();
+            const MS_24H = 86400000;
+            let entries: { shop: Shop; timestamp: number }[] = [];
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // 구형 포맷(Shop[]) 호환 처리
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].id) {
+                        entries = (parsed as Shop[]).map(s => ({ shop: s, timestamp: now }));
+                    } else {
+                        entries = parsed;
+                    }
+                } catch { entries = []; }
+            }
+            // 24시간 이내 + 중복 제거 + 최신 상단
+            entries = [
+                { shop, timestamp: now },
+                ...entries.filter(e => e.shop?.id !== shop.id && (now - e.timestamp) < MS_24H),
+            ].slice(0, 50);
+            localStorage.setItem('viewed_shops', JSON.stringify(entries));
         }
     }, []);
 
