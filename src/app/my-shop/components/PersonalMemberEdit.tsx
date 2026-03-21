@@ -22,6 +22,8 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
         nickname: '',
         email: '',
         phone: '',
+        birthDate: '',   // birth_date (본인인증 값, 표시 전용)
+        gender: '',      // gender (본인인증 값, 표시 전용)
         newPassword: '',
         newPasswordConfirm: '',
         smsConsent: true,
@@ -58,7 +60,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
         const loadProfile = async () => {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nickname, phone, sms_consent, nickname_updated_at')
+                .select('nickname, phone, sms_consent, nickname_updated_at, birth_date, gender')
                 .eq('id', user.id)
                 .single();
 
@@ -68,6 +70,8 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                 nickname: nick,
                 email: user?.email || '',
                 phone: profile?.phone || '',
+                birthDate: profile?.birth_date || '',
+                gender: profile?.gender || '',
                 smsConsent: profile?.sms_consent ?? true,
             }));
             setOriginalNickname(nick);
@@ -209,6 +213,37 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                                 className={`w-full p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
                             />
                         </div>
+                    </div>
+
+                    {/* 본인인증 정보 (생년월일 / 성별) — 표시 전용 */}
+                    <div className={`p-4 rounded-xl border ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-rose-50/50 border-rose-100'}`}>
+                        <p className={`text-xs font-black mb-3 flex items-center gap-2 ${isDark ? 'text-gray-400' : 'text-rose-700'}`}>
+                            <span className="w-1 h-4 bg-[#f82b60] rounded-full inline-block" />
+                            본인인증 확인 정보
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>생년월일</label>
+                                <input
+                                    type="text"
+                                    value={formData.birthDate || ''}
+                                    disabled
+                                    placeholder="본인인증 후 자동 입력"
+                                    className={`w-full p-3 rounded-xl font-bold border text-sm ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                                />
+                            </div>
+                            <div>
+                                <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>성별</label>
+                                <input
+                                    type="text"
+                                    value={formData.gender === 'male' ? '남성' : formData.gender === 'female' ? '여성' : ''}
+                                    disabled
+                                    placeholder="본인인증 후 자동 입력"
+                                    className={`w-full p-3 rounded-xl font-bold border text-sm ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
+                                />
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-rose-500 mt-2 font-bold">* 본인인증으로 확인된 정보로 임의 수정이 불가합니다.</p>
                     </div>
 
                     {/* 닉네임 */}

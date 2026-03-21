@@ -93,7 +93,7 @@ const AgreementItem = ({
 }) => {
     const [open, setOpen] = useState(false);
     return (
-        <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+        <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
             <div className="flex items-center gap-3 p-3">
                 <input
                     type="checkbox" id={id} checked={checked}
@@ -101,19 +101,19 @@ const AgreementItem = ({
                     className="w-4 h-4 rounded shrink-0"
                     style={{ accentColor: 'var(--brand-primary)' }}
                 />
-                <label htmlFor={id} className="flex-1 text-sm font-bold text-gray-200 cursor-pointer">
-                    {required && <span className="text-yellow-400 mr-1">[필수]</span>}
+                <label htmlFor={id} className="flex-1 text-sm font-bold text-gray-800 cursor-pointer">
+                    {required && <span className="text-rose-500 mr-1">[필수]</span>}
                     {label}
                 </label>
                 {children && (
-                    <button type="button" onClick={() => setOpen(!open)} className="text-gray-400 hover:text-gray-200 transition p-1">
+                    <button type="button" onClick={() => setOpen(!open)} className="text-gray-400 hover:text-gray-600 transition p-1">
                         {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                 )}
             </div>
             {open && children && (
                 <div className="px-3 pb-3">
-                    <div className="h-28 overflow-y-auto bg-gray-900 rounded-lg p-3 text-[11px] text-gray-400 leading-relaxed whitespace-pre-line">
+                    <div className="h-28 overflow-y-auto bg-gray-50 rounded-lg p-3 text-[11px] text-gray-500 leading-relaxed whitespace-pre-line border border-gray-100">
                         {children}
                     </div>
                 </div>
@@ -134,9 +134,9 @@ const GenderSelect = ({
                 onClick={() => !disabled && onChange(g)}
                 className="flex-1 py-3 rounded-xl text-sm font-bold border-2 transition-all disabled:opacity-60"
                 style={{
-                    borderColor: value === g ? primary : '#374151',
-                    backgroundColor: value === g ? `${primary}22` : 'transparent',
-                    color: value === g ? primary : '#9ca3af',
+                    borderColor: value === g ? primary : '#e5e7eb',
+                    backgroundColor: value === g ? `${primary}11` : '#f9fafb',
+                    color: value === g ? primary : '#6b7280',
                 }}
             >
                 {g}
@@ -150,9 +150,9 @@ const Field = ({
     label, required, hint, children
 }: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) => (
     <div className="space-y-1.5">
-        <label className="text-xs font-black text-gray-400">
-            {label} {required && <span className="text-red-400">*</span>}
-            {hint && <span className="text-gray-500 font-medium ml-1">({hint})</span>}
+        <label className="text-xs font-black text-gray-600">
+            {label} {required && <span className="text-red-500">*</span>}
+            {hint && <span className="text-gray-400 font-medium ml-1">({hint})</span>}
         </label>
         {children}
     </div>
@@ -161,7 +161,7 @@ const Field = ({
 const Input = ({ className = '', ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
         {...props}
-        className={`w-full p-3.5 rounded-xl border border-gray-700 bg-gray-800 text-gray-100 text-sm font-medium placeholder:text-gray-600 focus:outline-none focus:border-gray-500 disabled:opacity-60 disabled:bg-gray-900 ${className}`}
+        className={`w-full p-3 rounded-xl border border-gray-200 bg-white text-gray-900 text-sm font-medium placeholder:text-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 disabled:opacity-60 disabled:bg-gray-100 ${className}`}
     />
 );
 
@@ -173,16 +173,16 @@ const VerifyBlock = ({
     onOpen: () => void; primary: string;
 }) => (
     <div className="border-2 border-dashed rounded-xl p-4 space-y-3"
-        style={{ borderColor: verified ? '#22c55e' : '#374151' }}>
+        style={{ borderColor: verified ? '#22c55e' : '#d1d5db' }}>
         {verified && verifyResult ? (
             <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-green-400 shrink-0" />
-                <span className="text-xs font-bold text-green-400">
+                <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                <span className="text-xs font-bold text-green-600">
                     {verifyResult.name}님 본인인증 완료
                 </span>
             </div>
         ) : (
-            <p className="text-xs text-gray-400 font-medium">
+            <p className="text-xs text-gray-500 font-medium">
                 아래 버튼을 눌러 본인인증을 완료해주세요.
             </p>
         )}
@@ -283,12 +283,28 @@ export const SignupPage = () => {
         setStep(2);
     };
 
-    // ── 아이디 중복확인 (시뮬레이션) ──
-    const checkId = (id: string, setChecked: (v: boolean) => void) => {
+    // ── 아이디 중복확인 (실제 API 연동) ──
+    const [isCheckingId, setIsCheckingId] = useState(false);
+    const checkId = async (id: string, setChecked: (v: boolean) => void) => {
         if (!id.trim()) { alert('아이디를 입력해주세요.'); return; }
         if (id.length < 4) { alert('아이디는 4자 이상이어야 합니다.'); return; }
-        alert(`"${id}" 는 사용 가능한 아이디입니다.`);
-        setChecked(true);
+        if (!/^[a-zA-Z0-9]+$/.test(id)) { alert('아이디는 영문/숫자만 사용 가능합니다.'); return; }
+        setIsCheckingId(true);
+        try {
+            const res = await fetch(`/api/auth/check-username?id=${encodeURIComponent(id)}`);
+            const data = await res.json();
+            if (data.available) {
+                alert(`"${id}" 은(는) 사용 가능한 아이디입니다.`);
+                setChecked(true);
+            } else {
+                alert(data.message || '이미 사용 중인 아이디입니다.');
+                setChecked(false);
+            }
+        } catch {
+            alert('중복확인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } finally {
+            setIsCheckingId(false);
+        }
     };
 
     // ── 최종 가입 제출 ──
@@ -341,7 +357,7 @@ export const SignupPage = () => {
                         </div>
 
                         {/* 전체동의 */}
-                        <div className="bg-gray-800 rounded-xl p-3 border border-gray-700">
+                        <div className="bg-white rounded-xl p-3 border border-gray-200">
                             <label className="flex items-center gap-3 cursor-pointer">
                                 <input
                                     type="checkbox" checked={agreeAll}
@@ -349,7 +365,7 @@ export const SignupPage = () => {
                                     className="w-4 h-4 rounded"
                                     style={{ accentColor: primary }}
                                 />
-                                <span className="text-sm font-black text-white">정책 약관에 동의합니다</span>
+                                <span className="text-sm font-black text-gray-900">정책 약관에 동의합니다</span>
                             </label>
                         </div>
 
@@ -376,41 +392,41 @@ export const SignupPage = () => {
                         />
 
                         {/* 회원 유형 선택 */}
-                        <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700 space-y-3">
-                            <p className="text-sm font-black text-gray-300 text-center">회원 유형을 선택해주세요</p>
+                        <div className="bg-white rounded-2xl p-4 border border-gray-200 space-y-3">
+                            <p className="text-sm font-black text-gray-700 text-center">회원 유형을 선택해주세요</p>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button" onClick={() => setRole('individual')}
                                     className="py-5 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all"
                                     style={{
-                                        borderColor: role === 'individual' ? primary : '#374151',
-                                        backgroundColor: role === 'individual' ? `${primary}22` : 'transparent',
+                                        borderColor: role === 'individual' ? primary : '#e5e7eb',
+                                        backgroundColor: role === 'individual' ? `${primary}11` : '#f9fafb',
                                     }}
                                 >
                                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                                        style={{ backgroundColor: role === 'individual' ? `${primary}33` : '#374151' }}>
-                                        <User size={24} style={{ color: role === 'individual' ? primary : '#6b7280' }} />
+                                        style={{ backgroundColor: role === 'individual' ? `${primary}22` : '#e5e7eb' }}>
+                                        <User size={24} style={{ color: role === 'individual' ? primary : '#9ca3af' }} />
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-xs font-black text-white">개인(구직)회원</p>
-                                        <p className="text-[10px] text-gray-400 mt-0.5">이력서 등록가능</p>
+                                        <p className="text-xs font-black text-gray-800">개인(구직)회원</p>
+                                        <p className="text-[10px] text-gray-500 mt-0.5">이력서등록가능</p>
                                     </div>
                                 </button>
                                 <button
                                     type="button" onClick={() => setRole('corporate')}
                                     className="py-5 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all"
                                     style={{
-                                        borderColor: role === 'corporate' ? primary : '#374151',
-                                        backgroundColor: role === 'corporate' ? `${primary}22` : 'transparent',
+                                        borderColor: role === 'corporate' ? primary : '#e5e7eb',
+                                        backgroundColor: role === 'corporate' ? `${primary}11` : '#f9fafb',
                                     }}
                                 >
                                     <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                                        style={{ backgroundColor: role === 'corporate' ? `${primary}33` : '#374151' }}>
-                                        <Building2 size={24} style={{ color: role === 'corporate' ? primary : '#6b7280' }} />
+                                        style={{ backgroundColor: role === 'corporate' ? `${primary}22` : '#e5e7eb' }}>
+                                        <Building2 size={24} style={{ color: role === 'corporate' ? primary : '#9ca3af' }} />
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-xs font-black text-white">업체(구인)회원</p>
-                                        <p className="text-[10px] text-gray-400 mt-0.5">채용공고 등록가능</p>
+                                        <p className="text-xs font-black text-gray-800">업체(구인)회원</p>
+                                        <p className="text-[10px] text-gray-500 mt-0.5">채용공고등록가능</p>
                                     </div>
                                 </button>
                             </div>
@@ -429,13 +445,13 @@ export const SignupPage = () => {
 
                 {/* ───────────────── STEP 2: 개인(구직)회원 ───────────────── */}
                 {step === 2 && role === 'individual' && (
-                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="rounded-2xl p-5 text-center text-white" style={gradStyle}>
                             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
                                 <User size={24} />
                             </div>
-                            <p className="font-black text-base">개인회원 가입</p>
-                            <p className="text-xs text-white/70 mt-0.5">일자리를 찾는 구직자</p>
+                            <p className="font-black text-base">개인(구직)회원 가입</p>
+                            <p className="text-xs text-white/70 mt-0.5">구직자/이력서등록가능</p>
                         </div>
 
                         {/* 본인인증 */}
@@ -448,9 +464,10 @@ export const SignupPage = () => {
                                 <Input placeholder="4~20자의 영문/숫자" value={iId}
                                     onChange={(e) => { setIId(e.target.value); setIIdChecked(false); }} />
                                 <button type="button" onClick={() => checkId(iId, setIIdChecked)}
-                                    className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap"
+                                    disabled={isCheckingId}
+                                    className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap disabled:opacity-60"
                                     style={{ backgroundColor: iIdChecked ? '#22c55e' : primary }}>
-                                    {iIdChecked ? '확인됨' : '중복확인'}
+                                    {isCheckingId ? '확인중...' : iIdChecked ? '확인됨' : '중복확인'}
                                 </button>
                             </div>
                         </Field>
@@ -504,10 +521,10 @@ export const SignupPage = () => {
                         </Field>
 
                         {/* SMS 수신 동의 */}
-                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-800 border border-gray-700">
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-200">
                             <input type="checkbox" checked={iSms} onChange={(e) => setISms(e.target.checked)}
                                 className="w-4 h-4 mt-0.5 shrink-0" style={{ accentColor: primary }} />
-                            <span className="text-xs text-gray-300 font-medium leading-relaxed">
+                            <span className="text-xs text-gray-700 font-medium leading-relaxed">
                                 <span className="font-bold">SMS수신을 동의합니다.</span><br />
                                 <span className="text-gray-500">수신체크 시 보다 이용이 편리해집니다.</span>
                             </span>
@@ -515,7 +532,7 @@ export const SignupPage = () => {
 
                         <div className="flex gap-3 pt-2">
                             <button type="button" onClick={() => setStep(1)}
-                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 이전
                             </button>
                             <button type="button" onClick={handleSubmit} disabled={isLoading}
@@ -524,7 +541,7 @@ export const SignupPage = () => {
                                 {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : '본인인증 후 가입 진행'}
                             </button>
                             <button type="button" onClick={() => router.push('/?page=login')}
-                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 취소
                             </button>
                         </div>
@@ -533,33 +550,34 @@ export const SignupPage = () => {
 
                 {/* ───────────────── STEP 2: 업체(구인)회원 ───────────────── */}
                 {step === 2 && role === 'corporate' && (
-                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
                         <div className="rounded-2xl p-5 text-center text-white" style={gradStyle}>
                             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
                                 <Building2 size={24} />
                             </div>
-                            <p className="font-black text-base">업소회원 가입</p>
-                            <p className="text-xs text-white/70 mt-0.5">직원을 구하는 사장님</p>
+                            <p className="font-black text-base">업체(구인)회원 가입</p>
+                            <p className="text-xs text-white/70 mt-0.5">채용공고등록/이력서열람가능</p>
                         </div>
 
                         {/* ── 계정 정보 ── */}
-                        <div className="bg-gray-900 rounded-2xl p-4 space-y-4 border border-gray-700">
-                            <p className="text-xs font-black text-gray-400 flex items-center gap-2">
+                        <div className="bg-white rounded-2xl p-4 space-y-3 border border-gray-200">
+                            <p className="text-xs font-black text-gray-500 flex items-center gap-2">
                                 <span className="w-1 h-4 rounded-full inline-block" style={{ backgroundColor: primary }} />
                                 계정 정보
                             </p>
-                            <Field label="회원 아이디" required>
+                            <Field label="아이디" required>
                                 <div className="flex gap-2">
                                     <Input placeholder="4~20자의 영문/숫자" value={cId}
                                         onChange={(e) => { setCId(e.target.value); setCIdChecked(false); }} />
                                     <button type="button" onClick={() => checkId(cId, setCIdChecked)}
-                                        className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap"
+                                        disabled={isCheckingId}
+                                        className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap disabled:opacity-60"
                                         style={{ backgroundColor: cIdChecked ? '#22c55e' : primary }}>
-                                        {cIdChecked ? '확인됨' : '중복확인'}
+                                        {isCheckingId ? '확인중...' : cIdChecked ? '확인됨' : '중복확인'}
                                     </button>
                                 </div>
                             </Field>
-                            <Field label="회원 비밀번호" required>
+                            <Field label="비밀번호" required>
                                 <Input type="password" placeholder="6자 이상, 영문/숫자/특수기호 조합 포함"
                                     value={cPw} onChange={(e) => setCPw(e.target.value)} />
                             </Field>
@@ -567,21 +585,21 @@ export const SignupPage = () => {
                                 <Input type="password" placeholder="비밀번호를 다시 입력하세요"
                                     value={cPwConfirm} onChange={(e) => setCPwConfirm(e.target.value)} />
                                 {cPwConfirm && cPw !== cPwConfirm && (
-                                    <p className="text-[11px] text-red-400 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
+                                    <p className="text-[11px] text-red-500 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
                                 )}
                             </Field>
                         </div>
 
                         {/* ── 담당자 정보 ── */}
-                        <div className="bg-gray-900 rounded-2xl p-4 space-y-4 border border-gray-700">
-                            <p className="text-xs font-black text-gray-400 flex items-center gap-2">
+                        <div className="bg-white rounded-2xl p-4 space-y-3 border border-gray-200">
+                            <p className="text-xs font-black text-gray-500 flex items-center gap-2">
                                 <span className="w-1 h-4 rounded-full inline-block" style={{ backgroundColor: primary }} />
                                 담당자 정보
                             </p>
                             <VerifyBlock verified={verified} verifyResult={verifyResult}
                                 onOpen={() => setShowModal(true)} primary={primary} />
 
-                            <Field label="담당자" required>
+                            <Field label="담당자(성함)" required>
                                 <Input placeholder="인증 후 자동 입력" value={cManager}
                                     disabled={verified} onChange={(e) => setCManager(e.target.value)} />
                             </Field>
@@ -600,35 +618,29 @@ export const SignupPage = () => {
                         </div>
 
                         {/* ── 사업자 인증 안내 ── */}
-                        <div className="rounded-2xl p-4 border"
+                        <div className="rounded-2xl p-4 border space-y-1"
                             style={{ borderColor: `${primary}44`, backgroundColor: `${primary}10` }}>
-                            <p className="text-xs font-black text-center" style={{ color: primary }}>
-                                사업자정보인증은 공고등록 시 인증/등록
+                            <p className="text-[11px] font-black" style={{ color: primary }}>※ 안내</p>
+                            <p className="text-[11px] leading-relaxed" style={{ color: `${primary}cc` }}>
+                                공고등록 시, 유효한 사업자정보인증이 필요합니다.<br />
+                                가입 후 마이페이지 &gt; 사업자인증을 등록 바랍니다.<br />
+                                인증등록 후 24시간 이내 관리자 승인을 통해 반영되며,<br />
+                                광고등록 시 제공정보로만 서비스가 활용됩니다.
                             </p>
                         </div>
 
                         {/* SMS 수신 동의 */}
-                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-800 border border-gray-700">
-                            <input type="checkbox" className="w-4 h-4 mt-0.5 accent-pink-500 shrink-0" />
-                            <span className="text-xs text-gray-300 font-medium leading-relaxed">
+                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-200">
+                            <input type="checkbox" className="w-4 h-4 mt-0.5 shrink-0" style={{ accentColor: primary }} />
+                            <span className="text-xs text-gray-700 font-medium leading-relaxed">
                                 <span className="font-bold">SMS수신을 동의합니다.</span><br />
                                 <span className="text-gray-500">수신체크 시 보다 이용이 편리해집니다.</span>
                             </span>
                         </label>
 
-                        {/* 안내 */}
-                        <div className="p-3 rounded-xl border space-y-1"
-                            style={{ borderColor: `${primary}55`, backgroundColor: `${primary}15` }}>
-                            <p className="text-[11px] font-black" style={{ color: primary }}>※ 안내</p>
-                            <p className="text-[11px] leading-relaxed" style={{ color: `${primary}cc` }}>
-                                사업자등록증 확인 후 담당자가 승인 시 필요하실 수 있습니다.<br />
-                                광고 등록 시 제공 정보로만 서비스가 이용됩니다.
-                            </p>
-                        </div>
-
                         <div className="flex gap-3 pt-2">
                             <button type="button" onClick={() => setStep(1)}
-                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 이전
                             </button>
                             <button type="button" onClick={handleSubmit} disabled={isLoading}
@@ -637,7 +649,7 @@ export const SignupPage = () => {
                                 {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : '본인인증 후 가입 진행'}
                             </button>
                             <button type="button" onClick={() => router.push('/?page=login')}
-                                className="flex-1 py-4 rounded-2xl border border-gray-600 text-gray-400 font-bold text-sm">
+                                className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 취소
                             </button>
                         </div>
