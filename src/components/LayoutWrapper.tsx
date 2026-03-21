@@ -54,20 +54,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         }
 
         // 로그인된 유저가 인증된 파트너이거나, 로컬 스토리지에 기록이 있으면 통과
-        if (authUser && authUser.id !== 'guest' && authUser.isVerifiedPartnerVerified) { 
-            console.log('[LayoutWrapper] User is verified partner:', authUser.name);
-            setIsVerified(true); 
-            return; 
+        if (authUser && authUser.id !== 'guest' && authUser.isVerifiedPartnerVerified) {
+            setIsVerified(true);
+            return;
         }
-        
+
         const localVerified = localStorage.getItem('adult_verified') === 'true';
-        console.log('[LayoutWrapper] Status Check:', {
-            user: authUser?.name,
-            isLoggedIn: authUser?.id !== 'guest',
-            ADULT_GATE_DISABLED,
-            localVerified,
-            pathname
-        });
         setIsVerified(localVerified);
     }, [isLoading, authUser, pathname]);
 

@@ -89,7 +89,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log('[RootLayout] Status:', { AUDIT_MODE, ADULT_GATE_DISABLED });
   // [Optimization] Server-side data prep for sidebars
   const grandAds = (shopsData as Shop[]).filter(s => s.tier === 'grand');
   const premiumAds = (shopsData as Shop[]).filter(s => s.tier === 'premium' || s.is_premium);

@@ -45,7 +45,6 @@ export const NoteService = {
             query = query.eq('receiver_name', userName);
         }
 
-        console.log('DEBUG: getInbox', { userName });
         const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) {

@@ -85,8 +85,9 @@ export const UnifiedJobListing = ({
                             .map(e => e.shop);
                         setViewedShops(valid);
                     } else {
-                        // 구형 포맷(Shop[]) 호환 — 그대로 표시 (타임스탬프 없으므로 만료 없음)
-                        setViewedShops(parsed as Shop[]);
+                        // 구형 포맷(Shop[]) — 타임스탬프 없어 24시간 검증 불가 → 초기화
+                        localStorage.removeItem('viewed_shops');
+                        setViewedShops([]);
                     }
                 } catch (e) {
                     console.error('Failed to parse viewed_shops', e);

@@ -149,7 +149,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                         })()}
                                                                     </span>
                                                                     <span className="text-[10px] opacity-70">
-                                                                        {p.adObject.deadline || '2026-03-25'}
+                                                                        {p.adObject.deadline || '미정'}
                                                                     </span>
                                                                 </>
                                                             ) : (
@@ -299,7 +299,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                     })()}
                                                                 </span><br />
                                                                 <span className="text-[10px] text-gray-400">
-                                                                    {p.adObject.deadline || '2026-03-25'}
+                                                                    {p.adObject.deadline || '미정'}
                                                                 </span>
                                                             </>
                                                         ) : (

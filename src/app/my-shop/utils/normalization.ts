@@ -74,7 +74,7 @@ export const normalizeAd = (ad: any) => {
         // 본문 및 기타
         content: getValid(ad.content, opt.content || ad.jobContent, ''),
         jobContent: getValid(ad.content, opt.content || ad.jobContent, ''),
-        deadline: ad.deadline || opt.deadline || '2026-03-25',
+        deadline: ad.deadline || opt.deadline || '',
         status: ad.status || opt.status || '진행중',
         rejection_reason: ad.rejection_reason || opt.rejection_reason || '',
 

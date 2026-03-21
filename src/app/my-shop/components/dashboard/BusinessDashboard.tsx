@@ -126,7 +126,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                             {ad.approved_at && (
                                                 <span>게시일: {new Date(ad.approved_at).toISOString().split('T')[0]}</span>
                                             )}
-                                            <span>마감일: {ad.deadline || '2026-03-25'}</span>
+                                            <span>마감일: {ad.deadline || '미정'}</span>
                                         </div>
                                     </div>
 

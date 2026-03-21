@@ -270,7 +270,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                         {ad.status === 'active' ? (
                                                             <>
                                                                 <span className="text-blue-500 font-black">결제: {(ad as any).approved_at ? new Date((ad as any).approved_at).toISOString().split('T')[0] : (ad as any).created_at?.split('T')[0]}</span>
-                                                                <span>마감: {ad.deadline || '2026-03-25'}</span>
+                                                                <span>마감: {ad.deadline || '미정'}</span>
                                                             </>
                                                         ) : (
                                                             <span>신청: {new Date(ad.created_at || new Date()).toLocaleString()}</span>

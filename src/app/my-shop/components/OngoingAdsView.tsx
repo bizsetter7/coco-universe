@@ -94,7 +94,7 @@ export const OngoingAdsView = ({
                                                             '진행중'}
                                                 </span>
                                                 <span className="text-[10px] font-bold text-gray-400 shrink-0">
-                                                    마감일: {ad.deadline || '2026-03-25'}
+                                                    마감일: {ad.deadline || '미정'}
                                                 </span>
                                             </div>
 

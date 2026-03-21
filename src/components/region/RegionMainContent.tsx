@@ -13,6 +13,38 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
     const brand = useBrand();
     const isDark = brand.theme === 'dark';
 
+    // Tab State
+    const [activeTab, setActiveTab] = useState<'업종별 채용' | '지역별 채용' | '오늘본공고'>('업종별 채용');
+    const [viewedShops, setViewedShops] = useState<Shop[]>([]);
+
+    // 오늘본공고 탭 클릭 시 localStorage 로드 (24시간 이내 항목만)
+    useEffect(() => {
+        if (activeTab === '오늘본공고') {
+            const saved = localStorage.getItem('viewed_shops');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    const now = Date.now();
+                    const MS_24H = 86400000;
+                    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.timestamp !== undefined) {
+                        const valid = (parsed as { shop: Shop; timestamp: number }[])
+                            .filter(e => e.shop && (now - e.timestamp) < MS_24H)
+                            .map(e => e.shop);
+                        setViewedShops(valid);
+                    } else {
+                        // 구형 포맷 — 초기화
+                        localStorage.removeItem('viewed_shops');
+                        setViewedShops([]);
+                    }
+                } catch {
+                    setViewedShops([]);
+                }
+            } else {
+                setViewedShops([]);
+            }
+        }
+    }, [activeTab]);
+
     // Dropdown States
     const [selectedJobMain, setSelectedJobMain] = useState('');
     const [selectedJobSub, setSelectedJobSub] = useState('');
@@ -41,9 +73,19 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                 </h1>
 
                 <div className="flex text-sm font-bold border-b border-gray-200 dark:border-gray-700">
-                    <button className="flex-1 py-3 text-white bg-blue-500 rounded-t-lg">업종별 채용</button>
-                    <button className={`flex-1 py-3 ${isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-gray-50'}`}>지역별 채용</button>
-                    <button className={`flex-1 py-3 ${isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-gray-50'}`}>오늘본공고</button>
+                    {(['업종별 채용', '지역별 채용', '오늘본공고'] as const).map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex-1 py-3 rounded-t-lg transition-colors ${
+                                activeTab === tab
+                                    ? 'text-white bg-blue-500'
+                                    : isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-gray-50'
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -132,41 +174,63 @@ export const RegionMainContent = ({ shops }: { shops: Shop[] }) => {
                 </button>
             </div>
 
-            {/* 4. Grand Open */}
-            <section className="mb-12">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className={`text-lg font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        <Crown className="text-amber-500" fill="currentColor" size={20} />
-                        그랜드 오픈 / VIP 채용
-                    </h2>
-                    <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
-                        광고신청
-                    </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {grandShops.map((shop, idx) => (
-                        <ShopCard key={idx} shop={shop} rank={idx + 1} tierId="grand" />
-                    ))}
-                </div>
-            </section>
+            {/* 오늘본공고 탭 — localStorage 24시간 이내 항목만 표시 */}
+            {activeTab === '오늘본공고' && (
+                <section className="mb-12">
+                    <h2 className={`text-lg font-black mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>오늘 본 공고</h2>
+                    {viewedShops.length === 0 ? (
+                        <div className={`py-16 text-center rounded-2xl ${isDark ? 'bg-gray-800 text-gray-500' : 'bg-gray-50 text-gray-400'}`}>
+                            <p className="font-bold">오늘 본 공고가 없습니다.</p>
+                            <p className="text-sm mt-1">공고를 클릭하면 여기에 저장됩니다. (24시간 유지)</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {viewedShops.map((shop, idx) => (
+                                <ShopCard key={shop.id ?? idx} shop={shop} rank={idx + 1} />
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
 
-            {/* 5. Premium List */}
-            <section className="mb-12">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className={`text-lg font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        <Star className="text-purple-500" fill="currentColor" size={20} />
-                        프리미엄 채용정보
-                    </h2>
-                    <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
-                        광고신청
-                    </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {premiumShops.map((shop, idx) => (
-                        <ShopCard key={idx} shop={shop} rank={idx + 1} />
-                    ))}
-                </div>
-            </section>
+            {/* 4. Grand Open + 5. Premium — 오늘본공고 탭 외에만 표시 */}
+            {activeTab !== '오늘본공고' && (
+                <>
+                    <section className="mb-12">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className={`text-lg font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                <Crown className="text-amber-500" fill="currentColor" size={20} />
+                                그랜드 오픈 / VIP 채용
+                            </h2>
+                            <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
+                                광고신청
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {grandShops.map((shop, idx) => (
+                                <ShopCard key={idx} shop={shop} rank={idx + 1} tierId="grand" />
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="mb-12">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className={`text-lg font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                <Star className="text-purple-500" fill="currentColor" size={20} />
+                                프리미엄 채용정보
+                            </h2>
+                            <button className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white hover:bg-blue-600">
+                                광고신청
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {premiumShops.map((shop, idx) => (
+                                <ShopCard key={idx} shop={shop} rank={idx + 1} />
+                            ))}
+                        </div>
+                    </section>
+                </>
+            )}
         </div>
     );
 };

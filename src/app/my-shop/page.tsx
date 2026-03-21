@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    PlusSquare, AlignLeft, LayoutDashboard, Settings, Menu
+    PlusSquare, LayoutDashboard, Settings, Menu
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
