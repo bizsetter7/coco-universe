@@ -1,15 +1,41 @@
 import { supabase } from './supabase';
 
-export type PointReason = 'JOIN' | 'RESUME_UPLOAD' | 'COMMUNITY_POST' | 'COMMUNITY_COMMENT' | 'COUPON_EXCHANGE' | 'RESUME_JUMP';
+export type PointReason =
+    | 'JOIN'
+    | 'RESUME_UPLOAD'
+    | 'COMMUNITY_POST'
+    | 'COMMUNITY_COMMENT'
+    | 'COUPON_EXCHANGE'
+    | 'RESUME_JUMP'
+    | 'SHOP_JUMP'
+    | 'SOS_SEND_SMALL'   // ~10명 수신
+    | 'SOS_SEND_MEDIUM'  // ~30명 수신
+    | 'SOS_SEND_LARGE'   // ~50명 수신
+    | 'SOS_SEND_XLARGE'  // 50명 초과
+    | 'ADMIN_GRANT';     // 어드민 수동 지급 (customAmount 필수)
 
 const POINT_AMOUNTS: Record<PointReason, number> = {
     JOIN: 1000,
     RESUME_UPLOAD: 5000,
     COMMUNITY_POST: 200,
     COMMUNITY_COMMENT: 50,
-    COUPON_EXCHANGE: -5000, // Example: exchange for 5k coupon
-    RESUME_JUMP: -500, // Cost 500 Credits to jump resume to top
+    COUPON_EXCHANGE: -5000,
+    RESUME_JUMP: -500,
+    SHOP_JUMP: -500,       // 업체 공고 최상단 점프
+    SOS_SEND_SMALL: -200,  // ~10명
+    SOS_SEND_MEDIUM: -400, // ~30명
+    SOS_SEND_LARGE: -600,  // ~50명
+    SOS_SEND_XLARGE: -800, // 50명 초과
+    ADMIN_GRANT: 0,        // customAmount로 지정
 };
+
+/** 수신자 수 기반 SOS 차감 reason 결정 */
+export function getSosPointReason(recipientCount: number): PointReason {
+    if (recipientCount <= 10) return 'SOS_SEND_SMALL';
+    if (recipientCount <= 30) return 'SOS_SEND_MEDIUM';
+    if (recipientCount <= 50) return 'SOS_SEND_LARGE';
+    return 'SOS_SEND_XLARGE';
+}
 
 /**
  * Award or deduct points from a user

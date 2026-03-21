@@ -30,6 +30,9 @@ import { MemberInfoForm } from './components/MemberInfoForm';
 import { AdTemplateModal } from './components/AdTemplateModal';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
+import { SosAlertView } from './components/SosAlertView';
+import { BankTransferModal } from './components/BankTransferModal';
+import { PointShopView } from './components/PointShopView';
 
 // Simple Error Boundary for debugging
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -104,6 +107,8 @@ function MyShopContent() {
     const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showBankModal, setShowBankModal] = useState(false);
+    const [bankModalAmount, setBankModalAmount] = useState(0);
 
     useEffect(() => {
         setMounted(true);
@@ -213,6 +218,13 @@ function MyShopContent() {
         window.addEventListener('resume-updated', handleUpdate);
         return () => window.removeEventListener('resume-updated', handleUpdate);
     }, [authUser?.id]);
+
+    // SOS에서 공고등록 이동 이벤트
+    useEffect(() => {
+        const handleSetView = (e: any) => setView(e.detail);
+        window.addEventListener('setView', handleSetView);
+        return () => window.removeEventListener('setView', handleSetView);
+    }, []);
 
     const setView = (newView: any, adId?: string, isNew?: boolean) => {
         const viewId = typeof newView === 'object' ? newView.id : newView;
@@ -705,25 +717,41 @@ function MyShopContent() {
                     if (error) {
                         console.error("Payment log failed", error);
                         alert(`결제 내역 생성 실패: ${error.message}`);
+                    } else {
+                        // 텔레그램 관리자 알림
+                        fetch('/api/notify/new-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                shopName: formState.shopName,
+                                amount: formState.totalAmount,
+                                product: formState.selectedAdProduct,
+                                title: formState.title,
+                            }),
+                        }).catch(() => {});
                     }
                 }
                 const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
                 localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
             }
 
-            alert('등록/수정이 완료되었습니다.');
-
-            // [Critical Fix] Clean up BEFORE redirect to prevent confirm dialog
-            formState.resetAdStates();
-            window.dispatchEvent(new CustomEvent('resume-updated'));
-
-            // [Zombie Protection] Prevent stale re-fetch
-            isJustSaved.current = true;
-            setTimeout(() => { isJustSaved.current = false; }, 10000);
-
-            // [Fix] Force hard redirect (AFTER cleanup to avoid confirm dialog)
-            // [Fix] Use setView for SPA navigation to prevent browser confirm dialog
-            setView('dashboard');
+            // [무통장 입금 안내] 신규 공고 등록 시 입금 안내 모달 표시, 수정 시 바로 대시보드
+            if (!editingAdId && formState.totalAmount > 0) {
+                setBankModalAmount(formState.totalAmount);
+                formState.resetAdStates();
+                window.dispatchEvent(new CustomEvent('resume-updated'));
+                isJustSaved.current = true;
+                setTimeout(() => { isJustSaved.current = false; }, 10000);
+                setShowBankModal(true);
+            } else {
+                // 수정이거나 무료 등록인 경우 바로 대시보드로
+                formState.resetAdStates();
+                window.dispatchEvent(new CustomEvent('resume-updated'));
+                isJustSaved.current = true;
+                setTimeout(() => { isJustSaved.current = false; }, 10000);
+                alert(editingAdId ? '공고가 수정되었습니다.' : '공고가 접수되었습니다.');
+                setView('dashboard');
+            }
         } catch (err: any) {
             console.error("Save Error:", err);
             if (err.message?.includes('Failed to fetch')) {
@@ -749,6 +777,52 @@ function MyShopContent() {
             }
         }
     }, [view, authUser, formState.managerName, formState.managerPhone]);
+
+    const handleJump = async (adId: any) => {
+        if (!authUser?.id || authUser.id === 'guest') return;
+        const JUMP_COST = 500;
+
+        if (!window.confirm(`점프이용권을 사용하시겠습니까?\n500P가 차감되고 공고가 최상단으로 이동합니다.`)) return;
+
+        try {
+            // 포인트 확인
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles').select('points').eq('id', authUser.id).single();
+            if (profileError) throw profileError;
+            const currentPoints = profile?.points ?? 0;
+            if (currentPoints < JUMP_COST) {
+                alert(`포인트가 부족합니다. 필요: ${JUMP_COST}P, 보유: ${currentPoints}P\n포인트 충전 후 이용해주세요.`);
+                setView('buy-points');
+                return;
+            }
+
+            // 포인트 차감
+            const { error: deductError } = await supabase.from('profiles')
+                .update({ points: currentPoints - JUMP_COST, updated_at: new Date().toISOString() })
+                .eq('id', authUser.id);
+            if (deductError) throw deductError;
+
+            // point_logs 기록
+            await supabase.from('point_logs').insert({
+                user_id: authUser.id,
+                amount: -JUMP_COST,
+                reason: 'SHOP_JUMP',
+                note: `점프이용권 사용 (공고 ID: ${adId})`,
+            });
+
+            // 공고 created_at 현재시각으로 업데이트 → 최상단 노출
+            const { error: jumpError } = await supabase.from('shops')
+                .update({ created_at: new Date().toISOString() })
+                .eq('id', adId).eq('user_id', authUser.id);
+            if (jumpError) throw jumpError;
+
+            alert('점프이용권이 적용됐습니다! 공고가 최상단에 노출됩니다.');
+            fetchRegisteredAds();
+        } catch (err: any) {
+            console.error('Jump error:', err);
+            alert(`오류: ${err.message}`);
+        }
+    };
 
     const handleBack = () => {
         // [Fix] Restore exit confirmation logic
@@ -787,7 +861,12 @@ function MyShopContent() {
         return p;
     });
 
-    if (!mounted || userType === null) return <div className="min-h-screen bg-gray-50 dark:bg-gray-950" />;
+    if (!mounted || userType === null) return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center gap-3">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-bold text-gray-400">로딩 중...</p>
+        </div>
+    );
 
     const execCmd = (cmd: string, val?: string) => { formState.restoreSelection(); document.execCommand(cmd, false, val); formState.updateToolbarStatus(); formState.syncEditorHtml(); };
     const insertEmoji = (emoji: string) => { formState.restoreSelection(); document.execCommand('insertText', false, emoji); formState.syncEditorHtml(); };
@@ -821,6 +900,12 @@ function MyShopContent() {
                         }
                         setShowWarningModal(false);
                     }}
+                />
+            )}
+            {showBankModal && (
+                <BankTransferModal
+                    amount={bankModalAmount}
+                    onConfirm={() => { setShowBankModal(false); setView('dashboard'); }}
                 />
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
@@ -909,9 +994,11 @@ function MyShopContent() {
                                             setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
                                         />
                                     )}
-                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
+                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
                                     {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={syncedPaymentHistory} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                    {view === 'sos-alert' && <SosAlertView brand={brand} />}
+                                    {view === 'buy-points' && <PointShopView brand={brand} shopName={formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={registeredAds.filter(ad => ad.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
                                     {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
                                 </>

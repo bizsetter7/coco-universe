@@ -85,6 +85,7 @@ export default function LeftSidebar({
         userName: authUserName,
         userType: authUserType,
         userCredit: authUserCredit,
+        userPoints: authUserPoints,
         logout,
         login: authLogin,
         signIn
@@ -108,6 +109,7 @@ export default function LeftSidebar({
     const userName = propUserName ?? authUserName;
     const userType = propUserType ?? authUserType;
     const userCredit = propUserCredit ?? authUserCredit;
+    const userPoints = authUserPoints ?? 0;
 
     const handleLogin = async () => {
         if (!loginId || !loginPw) {
@@ -228,9 +230,21 @@ export default function LeftSidebar({
                                     {userType === 'admin' ? '최고 관리자' : (userType === 'corporate' ? '기업회원' : '일반회원')}
                                 </span> 입니다.
                             </p>
-                            <div className={`flex items-center gap-1 mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                                <span className="text-[11px] text-gray-500">C</span>
-                                <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>{userCredit.toLocaleString()}</span>
+                            <div className={`mb-3 p-2 rounded-lg ${brand.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] text-gray-500">코코 포인트</span>
+                                    <span className={`text-sm font-bold ${brand.theme === 'dark' ? 'text-yellow-400' : 'text-blue-600'}`}>
+                                        C {userPoints.toLocaleString()}
+                                    </span>
+                                </div>
+                                {(userCredit ?? 0) > 0 && (
+                                    <div className="flex items-center justify-between mt-0.5">
+                                        <span className="text-[10px] text-gray-400">크레딧</span>
+                                        <span className={`text-xs font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                            {(userCredit ?? 0).toLocaleString()}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-1">
                                 <button

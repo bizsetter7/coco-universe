@@ -264,29 +264,29 @@ export default function AdForm(props: AdFormProps) {
                 </div>
             </div>
 
-            {/* Sticky Bottom Navigation (Capture 3/4/5 Style) */}
-            <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-6 bg-white/90 pointer-events-none">
-                <div className="max-w-[1120px] mx-auto flex flex-row gap-2 md:gap-4 pointer-events-auto">
+            {/* Sticky Bottom Navigation */}
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-5 bg-white/90 pointer-events-none">
+                <div className="max-w-[640px] mx-auto flex flex-row gap-2 pointer-events-auto">
                     <button
-                        type="button" // Explicitly set type to button to prevent form submission
+                        type="button"
                         onClick={() => props.onPreview?.()}
-                        className="flex-[1.5] md:w-40 py-4 rounded-2xl bg-slate-800 text-white font-black text-xs md:text-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95 whitespace-nowrap"
+                        className="flex-1 py-3.5 rounded-2xl bg-slate-800 text-white font-black text-xs hover:bg-slate-900 transition flex items-center justify-center gap-1 shadow-lg active:scale-95 whitespace-nowrap"
                     >
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                         보기
                     </button>
                     <button
                         onClick={() => props.onBack?.()}
-                        className="flex-1 md:w-32 py-4 rounded-2xl bg-white text-gray-500 font-black text-xs md:text-lg hover:bg-gray-50 transition shadow-lg border border-gray-200 active:scale-95 whitespace-nowrap"
+                        className="flex-1 py-3.5 rounded-2xl bg-white text-gray-500 font-black text-xs hover:bg-gray-50 transition shadow-lg border border-gray-200 active:scale-95 whitespace-nowrap"
                     >
                         취소
                     </button>
                     <button
                         onClick={() => props.onSave?.()}
-                        className="flex-[3] md:flex-1 py-4 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black text-xs md:text-lg rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
+                        className="flex-[2] py-3.5 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-2xl flex items-center justify-center gap-1.5 shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
                     >
-                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-                        저장 및 심사 저장
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                        저장 및 심사
                     </button>
                 </div>
             </div>

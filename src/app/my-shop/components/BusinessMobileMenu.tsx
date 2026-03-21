@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import {
-    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -65,7 +65,13 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <User size={18} /> 지원자 관리
                             </div>
-                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('sos-alert'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-red-50 rounded-xl transition cursor-pointer text-red-500 font-black">
+                                <Zap size={18} /> SOS 긴급구인
+                            </div>
+                            <div onClick={() => { setView('buy-points'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Wallet size={18} /> 포인트 충전
+                            </div>
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1 pt-3">
                                 <Settings size={18} /> 회원 정보 수정
                             </div>
                         </>

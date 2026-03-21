@@ -19,7 +19,7 @@ const TIER_GRADIENTS: Record<string, string> = {
 };
 
 export const OngoingAdsView = ({
-    setView, ads = [], userName = '', onShowAdDetail, onOpenMenu, onEditAd, onDeleteAd
+    setView, ads = [], userName = '', onShowAdDetail, onOpenMenu, onEditAd, onDeleteAd, onJumpAd
 }: {
     setView: (v: any) => void,
     ads?: any[],
@@ -27,7 +27,8 @@ export const OngoingAdsView = ({
     onShowAdDetail?: (ad: any) => void,
     onOpenMenu?: () => void,
     onEditAd?: (ad: any) => void,
-    onDeleteAd?: (adId: any) => void
+    onDeleteAd?: (adId: any) => void,
+    onJumpAd?: (adId: any) => void,
 }) => {
     const brand = useBrand();
 
@@ -165,7 +166,10 @@ export const OngoingAdsView = ({
                                                     >
                                                         수정
                                                     </button>
-                                                    <button className="flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); onJumpAd?.(ad.id); }}
+                                                        className="flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition"
+                                                    >
                                                         <RefreshCw size={12} /> 점프
                                                     </button>
                                                     <button className="flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition">

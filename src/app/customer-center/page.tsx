@@ -159,7 +159,7 @@ export function CustomerCenterContent() {
                                     점심 12:00 ~ 13:00<br />
                                     <span className="text-[#f82b60] font-black mt-1 block">공휴일 / 주말 휴무</span>
                                 </p>
-                                <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg">
+                                <a href="https://t.me/cocoalba_cs" className="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition shadow-lg">
                                     <MessageCircle size={18} /> 텔레그램 실시간 상담
                                 </a>
                             </div>
@@ -223,7 +223,7 @@ export function CustomerCenterContent() {
                                 평일 10:00 ~ 18:00 / 점심 12:00 ~ 13:00<br />
                                 <span className="text-[#f82b60] font-black mt-1 block">공휴일 / 주말 휴무 (텔레그램 상시 대기)</span>
                             </p>
-                            <a href="https://t.me/your_telegram" className="mt-6 flex items-center justify-center gap-3 w-full py-4 bg-[#f82b60] text-white rounded-[20px] text-sm font-black hover:bg-[#db2456] transition shadow-xl shadow-rose-100">
+                            <a href="https://t.me/cocoalba_cs" className="mt-6 flex items-center justify-center gap-3 w-full py-4 bg-[#f82b60] text-white rounded-[20px] text-sm font-black hover:bg-[#db2456] transition shadow-xl shadow-rose-100">
                                 <MessageCircle size={18} /> 텔레그램 실시간 상담
                             </a>
                         </div>
