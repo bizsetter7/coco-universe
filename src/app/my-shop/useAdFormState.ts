@@ -118,7 +118,8 @@ export function useAdFormState() {
     const saveSelection = () => {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0) {
-            selectionRange.current = sel.getRangeAt(0);
+            // [Fix] cloneRange() — live reference 저장 시 removeAllRanges() 후 무효화 방지 (2026-03-22)
+            selectionRange.current = sel.getRangeAt(0).cloneRange();
         }
     };
 

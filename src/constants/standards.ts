@@ -9,22 +9,23 @@ export const AD_TIER_STANDARDS = [
     { name: 'T2 (Premium)', id: 'p2', altId: 'premium', tw: 'bg-red-600', hex: '#DC2626' },
     { name: 'T3 (Deluxe)', id: 'p3', altId: 'deluxe', tw: 'bg-blue-600', hex: '#2563EB' },
     { name: 'T4 (Special)', id: 'p4', altId: 'special', tw: 'bg-emerald-600', hex: '#059669' },
-    { name: 'T5 (Recommended)', id: 'p5', altId: 'recommended', tw: 'bg-orange-500', hex: '#F97316' },
+    { name: 'T5 (Urgent/Recommended)', id: 'p5', altId: 'recommended', tw: 'bg-purple-600', hex: '#9333EA' },
     { name: 'T6 (Native)', id: 'p6', altId: 'native', tw: 'bg-slate-600', hex: '#475569' },
-    { name: 'T7 (Basic)', id: 'p7', altId: 'basic', tw: 'bg-slate-900', hex: '#0F172A' },
+    { name: 'T7 (Basic)', id: 'p7', altId: 'basic', tw: 'bg-stone-700', hex: '#44403C' },
 ];
 
-// 2. 급여 배지 약어 및 컬러 표준 (Pay Badge Standards v1.0 — 2026-03-21 확정)
+// 2. 급여 배지 약어 및 컬러 표준 (Pay Badge Standards v2.0 — 2026-03-22 확정)
 // ⚠️ PROTECTED: 아래 색상/약어는 대표님 확정 규칙. 임의 변경 금지.
+// v2.0: 유사색 제거, 8종 완전 구별 색상으로 재정의
 export const PAY_BADGE_STANDARDS = [
-    { name: '시급', id: 'hourly',  abbr: '시', hex: '#06B6D4', tw: 'bg-cyan-500'    }, // cyan
-    { name: '일급', id: 'daily',   abbr: '일', hex: '#3B82F6', tw: 'bg-blue-500'    }, // blue
-    { name: '주급', id: 'weekly',  abbr: '주', hex: '#3B82F6', tw: 'bg-blue-500'    }, // blue (일급과 동일)
-    { name: '월급', id: 'monthly', abbr: '월', hex: '#A855F7', tw: 'bg-purple-500'  }, // purple
-    { name: '연봉', id: 'yearly',  abbr: '연', hex: '#16A34A', tw: 'bg-green-600'   }, // green
-    { name: 'TC',   id: 'tc',      abbr: 'T',  hex: '#10B981', tw: 'bg-emerald-500' }, // emerald (테이블 차지 전용)
-    { name: '건별', id: 'per_job', abbr: '건', hex: '#64748B', tw: 'bg-slate-500'   }, // slate
-    { name: '협의', id: 'nego',    abbr: '협', hex: '#9CA3AF', tw: 'bg-gray-400'    }, // gray (기본값/면접후결정)
+    { name: '시급', id: 'hourly',  abbr: '시', hex: '#06B6D4', tw: 'bg-cyan-500'    }, // 🩵 Cyan   — 시급
+    { name: '일급', id: 'daily',   abbr: '일', hex: '#3B82F6', tw: 'bg-blue-500'    }, // 🔵 Blue   — 일급
+    { name: '주급', id: 'weekly',  abbr: '주', hex: '#22C55E', tw: 'bg-green-500'   }, // 🟢 Green  — 주급 (v2: 파랑→초록)
+    { name: '월급', id: 'monthly', abbr: '월', hex: '#A855F7', tw: 'bg-purple-500'  }, // 🟣 Purple — 월급
+    { name: '연봉', id: 'yearly',  abbr: '연', hex: '#EF4444', tw: 'bg-red-500'     }, // 🔴 Red    — 연봉 (v2: 초록→빨강)
+    { name: 'TC',   id: 'tc',      abbr: 'T',  hex: '#F97316', tw: 'bg-orange-500'  }, // 🟠 Orange — TC (v2: 에메랄드→오렌지)
+    { name: '건별', id: 'per_job', abbr: '건', hex: '#64748B', tw: 'bg-slate-500'   }, // ⬛ Slate  — 건별
+    { name: '협의', id: 'nego',    abbr: '협', hex: '#9CA3AF', tw: 'bg-gray-400'    }, // ⬜ Gray   — 협의/면접후결정
 ];
 
 // 3. 유료 강조 옵션 표준 (Paid Option Standards)

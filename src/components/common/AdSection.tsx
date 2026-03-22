@@ -105,7 +105,7 @@ export const AdSection = React.memo(({ title, icon, shops, tierId, onAdRegister,
                         <div key={shop.id || idx} className={`${idx >= totalMob ? 'hidden md:block' : ''} h-full`}>
                             {useBanner ? (
                                 <div onClick={() => onSelectShop && onSelectShop(shop)} className="cursor-pointer h-full">
-                                    <AdBannerCard shop={shop} />
+                                    <AdBannerCard shop={shop} tierId={tierId} />
                                 </div>
                             ) : (
                                 <ShopCard

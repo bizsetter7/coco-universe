@@ -26,12 +26,19 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, ha
         );
     }
 
-    // Static slices for each tier
-    const grandShops = shops.slice(0, 12);
-    const premiumShops = shops.slice(12, 24);
-    const deluxeShops = shops.slice(24, 36);
-    const specialShops = shops.slice(36, 48);
-    const urgentShops = shops.slice(48, 60);
+    // [2026-03-22] Tier-based filtering — altId('grand') 및 id('p1') 양쪽 지원
+    // Supabase 실제 등록 공고는 tier='p1'~'p7', 샘플 데이터는 tier='grand'/'premium' 등 altId 형식
+    const isTier = (s: Shop, altId: string, id: string) =>
+        s.tier === altId || s.tier === id;
+
+    const grandShops   = shops.filter(s => isTier(s, 'grand', 'p1'));
+    const premiumShops = shops.filter(s => isTier(s, 'premium', 'p2') || (s as any).is_premium);
+    const deluxeShops  = shops.filter(s => isTier(s, 'deluxe', 'p3'));
+    const specialShops = shops.filter(s => isTier(s, 'special', 'p4'));
+    const urgentShops  = shops.filter(s =>
+        isTier(s, 'urgent', 'p5') || isTier(s, 'recommended', 'p5') ||
+        isTier(s, 'native', 'p6') || isTier(s, 'basic', 'p7')
+    );
 
     return (
         <div className="w-full">

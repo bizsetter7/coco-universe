@@ -22,24 +22,24 @@ export const ExposureItem = ({ rank, desc, onArrowClick }: ExposureItemProps) =>
                 text: isDark ? 'text-amber-200' : 'text-amber-900'
             };
             case 'PREMIUM': return {
-                badge: 'bg-purple-600 text-white shadow-purple-200',
-                box: isDark ? 'bg-purple-900/10 border-purple-900/30' : 'bg-purple-50 border-purple-100',
-                text: isDark ? 'text-purple-200' : 'text-purple-900'
+                badge: 'bg-red-500 text-white shadow-red-200',
+                box: isDark ? 'bg-red-900/10 border-red-900/30' : 'bg-red-50 border-red-100',
+                text: isDark ? 'text-red-200' : 'text-red-900'
             };
             case 'DELUXE': return {
-                badge: 'bg-[#f82b60] text-white shadow-rose-200',
-                box: isDark ? 'bg-[#f82b60]/10 border-[#f82b60]/30' : 'bg-rose-50 border-rose-100',
-                text: isDark ? 'text-rose-200' : 'text-rose-900'
+                badge: 'bg-blue-500 text-white shadow-blue-200',
+                box: isDark ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50 border-blue-100',
+                text: isDark ? 'text-blue-200' : 'text-blue-900'
             };
             case 'SPECIAL': return {
-                badge: 'bg-[#f82b60] text-white shadow-rose-200',
-                box: isDark ? 'bg-[#f82b60]/10 border-[#f82b60]/30' : 'bg-rose-50 border-rose-100',
-                text: isDark ? 'text-rose-200' : 'text-rose-900'
-            };
-            case 'NATIVE': return {
-                badge: 'bg-emerald-600 text-white shadow-emerald-200',
+                badge: 'bg-emerald-500 text-white shadow-emerald-200',
                 box: isDark ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100',
                 text: isDark ? 'text-emerald-200' : 'text-emerald-900'
+            };
+            case 'NATIVE': return {
+                badge: 'bg-teal-600 text-white shadow-teal-200',
+                box: isDark ? 'bg-teal-900/10 border-teal-900/30' : 'bg-teal-50 border-teal-100',
+                text: isDark ? 'text-teal-200' : 'text-teal-900'
             };
             default: return {
                 badge: 'bg-gray-600 text-white shadow-gray-200',

@@ -40,30 +40,31 @@ const getPayBadgeInfo = (shop: Shop) => {
 
     const typeToCheck = shop.payType || payStr;
 
+    // PAY_BADGE_STANDARDS v2.0 — standards.ts 동기화 (2026-03-22)
     if (typeToCheck.includes('TC') || typeToCheck === 'T') {
         badgeLabel = 'T';
-        badgeColor = 'bg-emerald-500'; // TC(테이블차지) — emerald
+        badgeColor = 'bg-orange-500'; // TC — 🟠 orange (v2.0)
     } else if (typeToCheck.includes('시급') || typeToCheck === '시') {
         badgeLabel = '시';
-        badgeColor = 'bg-cyan-500';   // 시급 — cyan
+        badgeColor = 'bg-cyan-500';   // 시급 — 🩵 cyan
     } else if (typeToCheck.includes('일급') || typeToCheck.includes('일')) {
         badgeLabel = '일';
-        badgeColor = 'bg-blue-500';   // 일급 — blue
+        badgeColor = 'bg-blue-500';   // 일급 — 🔵 blue
     } else if (typeToCheck.includes('주급') || typeToCheck.includes('주')) {
         badgeLabel = '주';
-        badgeColor = 'bg-blue-500';   // 주급 — blue (일급과 동일)
+        badgeColor = 'bg-green-500';  // 주급 — 🟢 green (v2.0: blue→green)
     } else if (typeToCheck.includes('월급') || typeToCheck.includes('월')) {
         badgeLabel = '월';
-        badgeColor = 'bg-purple-500'; // 월급 — purple
+        badgeColor = 'bg-purple-500'; // 월급 — 🟣 purple
     } else if (typeToCheck.includes('연봉') || typeToCheck.includes('연')) {
         badgeLabel = '연';
-        badgeColor = 'bg-green-600';  // 연봉 — green
+        badgeColor = 'bg-red-500';    // 연봉 — 🔴 red (v2.0: green→red)
     } else if (typeToCheck.includes('건별') || typeToCheck.includes('건당') || typeToCheck.includes('건')) {
         badgeLabel = '건';
-        badgeColor = 'bg-slate-500';  // 건별 — slate
+        badgeColor = 'bg-slate-500';  // 건별 — ⬛ slate
     } else if (typeToCheck.includes('협의') || amount === '면접후결정') {
         badgeLabel = '협';
-        badgeColor = 'bg-gray-400';   // 협의 — gray
+        badgeColor = 'bg-gray-400';   // 협의 — ⬜ gray
         amount = '면접후협의';
     }
 
@@ -172,7 +173,7 @@ const getTierBadge = (tier?: string) => {
     switch (tier) {
         case 'special': return { label: '스페셜', color: 'bg-emerald-500 text-white' };
         case 'deluxe': return { label: '디럭스', color: 'bg-blue-600 text-white' };
-        case 'urgent': return { label: '급구', color: 'bg-red-600 text-white' };
+        case 'urgent': return { label: '급구', color: 'bg-purple-600 text-white' }; // 🟣 보라 (급구/추천)
         case 'grand': return { label: '그랜드', color: 'bg-amber-400 text-black' };
         case 'premium': return { label: '프리미엄', color: 'bg-purple-600 text-white' };
         default: return null;

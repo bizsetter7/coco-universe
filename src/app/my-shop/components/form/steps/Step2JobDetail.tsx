@@ -122,6 +122,8 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
     };
 
     const applyPxFontSize = useCallback((size: string) => {
+        // [iOS Fix] focus() → restoreSelection() 순서 보장 (2026-03-22)
+        editorRef.current?.focus();
         let sel = window.getSelection();
         if (!sel || sel.rangeCount === 0) {
             restoreSelection(); // 유실된 경우 복원 시도
@@ -329,14 +331,14 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                         <div id="editor-toolbar" className="sticky top-0 z-[60] p-0.5 md:p-1 border-2 border-b-0 rounded-t-2xl flex flex-col gap-1 bg-white border-gray-200 text-gray-900 shadow-sm">
                             <div className="flex items-center flex-wrap gap-1 md:gap-1.5 p-1 pb-0">
                                 <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('bold'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('italic'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('underline'); editorRef.current?.focus(); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('bold'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('italic'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('underline'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
                                 </div>
                                 <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyLeft'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyCenter'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('justifyRight'); editorRef.current?.focus(); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyLeft'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyCenter'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
+                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyRight'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
                                 </div>
 
                                 {/* Media Upload Moved Here */}
@@ -369,7 +371,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     {showFontMenu && (
                                         <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[180px] py-1 overflow-hidden animate-in fade-in zoom-in duration-150">
                                             {Object.entries(FONT_DISPLAY_NAMES).map(([id, name]) => (
-                                                <button key={id} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('fontName', id); editorRef.current?.focus(); setShowFontMenu(false); }} className="w-full px-3 py-2 text-left hover:bg-gray-100 text-[13px] font-bold" style={{ fontFamily: id }}>{name}</button>
+                                                <button key={id} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('fontName', id); setShowFontMenu(false); }} className="w-full px-3 py-2 text-left hover:bg-gray-100 text-[13px] font-bold" style={{ fontFamily: id }}>{name}</button>
                                             ))}
                                         </div>
                                     )}
@@ -389,7 +391,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('foreColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Text Color"><Type size={16} style={{ color: toolbarStatus.currentForeColor }} /></button>
                                     {showForeColorMenu && (
                                         <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {TEXT_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('foreColor', c.value); editorRef.current?.focus(); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                            {TEXT_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('foreColor', c.value); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
                                         </div>
                                     )}
                                 </div>
@@ -397,7 +399,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('hiliteColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Highlight Color"><Palette size={16} style={{ backgroundColor: toolbarStatus.currentHiliteColor === 'transparent' ? 'transparent' : toolbarStatus.currentHiliteColor }} /></button>
                                     {showHiliteColorMenu && (
                                         <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {BG_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); execCmd('hiliteColor', c.value); editorRef.current?.focus(); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                            {BG_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('hiliteColor', c.value); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
                                         </div>
                                     )}
                                 </div>
@@ -406,7 +408,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                     {showEmojiMenu && (
                                         <div className="absolute top-full right-0 mt-1 grid grid-cols-6 gap-2 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[210px] max-h-48 overflow-y-auto animate-in fade-in zoom-in duration-150">
                                             {['😊', '😂', '😍', '👍', '🔥', '✨', '💖', '⭐', '🎈', '🍺', '🎁', '🍭', '🤣', '😉', '😜', '🤩', '🥳', '😭', '😱', '😡', '✅', '🌈', '💎', '💰', '👑'].map(emoji => (
-                                                <button key={emoji} onMouseDown={(e) => { e.preventDefault(); restoreSelection(); insertEmoji(emoji); editorRef.current?.focus(); setShowEmojiMenu(false); }} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-xl transition active:scale-90">{emoji}</button>
+                                                <button key={emoji} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); insertEmoji(emoji); setShowEmojiMenu(false); }} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-xl transition active:scale-90">{emoji}</button>
                                             ))}
                                         </div>
                                     )}

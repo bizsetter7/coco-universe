@@ -13,60 +13,83 @@ import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
-    // Premium Gradient Generator for Text Banners
-    const getPremiumGradient = (id: string) => {
-        const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const gradients = [
-            'from-slate-800 to-slate-900',
-            'from-indigo-800 to-purple-900',
-            'from-rose-800 to-red-900',
-            'from-blue-800 to-indigo-900',
-            'from-emerald-800 to-teal-900',
-            'from-amber-700 to-orange-800',
-        ];
-        return gradients[hash % gradients.length];
+    // AD_TIER_STANDARDS 동기화 — 등급별 고정 그라디언트 (2026-03-22)
+    const getTierGradient = (tier: string): string => {
+        switch (tier) {
+            case 'grand':       return 'from-amber-500 to-amber-600';      // 🟡 Grand
+            case 'premium':     return 'from-red-600 to-red-700';           // 🔴 Premium
+            case 'deluxe':      return 'from-blue-600 to-blue-700';         // 🔵 Deluxe
+            case 'special':     return 'from-emerald-600 to-emerald-700';   // 🟢 Special
+            case 'urgent':      return 'from-purple-600 to-purple-700';      // 🟣 Urgent/Recommended
+            case 'recommended': return 'from-purple-600 to-purple-700';     // 🟣 Urgent/Recommended
+            case 'native':      return 'from-slate-600 to-slate-700';       // ⬛ Native
+            default:            return 'from-stone-700 to-stone-800';       // 🪨 Basic
+        }
     };
 
-    // 2. Badge handling
-    const getBadgeChar = () => {
-        if (ad.payType) return ad.payType.substring(0, 1);
-        if (ad.pay === '면접후결정') return '면';
-        return '시';
-    };
-
-    const badgeChar = getBadgeChar();
+    const hasImage = !!ad.options?.mediaUrl;
+    const badgeChar = ad.payType?.substring(0, 1) || (String(ad.pay) === '면접후결정' ? '면' : '시');
+    const paySuffixes: string[] = ad.options?.paySuffixes || (ad.options as any)?.pay_suffixes || (ad as any).paySuffixes || [];
 
     return (
         <div
             onClick={() => onSelect(ad)}
             className="group relative w-full h-[140px] bg-white rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all border border-gray-100 flex flex-col"
         >
-            {/* 1. Header: Premium Text Banner (No Image) */}
-            <div className={`relative w-full h-[85px] overflow-hidden shrink-0 flex items-center justify-center bg-gradient-to-br ${getPremiumGradient(ad.id)}`}>
-                <div className="relative z-10 px-2 text-center">
-                    <span className="text-[8px] font-bold text-white/50 uppercase tracking-widest mb-1 block leading-none">{ad.workType || 'JOB'}</span>
-                    <h4 className="text-white font-black text-[12px] leading-tight drop-shadow-md break-keep">
-                        {ad.title || ad.name}
-                    </h4>
-                    <div className="w-6 h-0.5 bg-white/20 mx-auto mt-1.5 rounded-full" />
-                </div>
+            {/* ── 이미지 섹션 (고정 80px) ── */}
+            <div className={`relative w-full h-[80px] shrink-0 overflow-hidden ${!hasImage ? `bg-gradient-to-br ${getTierGradient(ad.tier || '')}` : ''}`}>
+                {hasImage ? (
+                    // 이미지 있을 경우: 이미지만 표시
+                    <img
+                        src={ad.options!.mediaUrl}
+                        alt={ad.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    // 이미지 없을 경우: 제목 텍스트만 중앙 표시
+                    <div className="absolute inset-0 flex items-center justify-center px-2">
+                        <h4 className="text-white font-black text-[11px] leading-tight drop-shadow-md break-keep text-center line-clamp-3 w-full">
+                            {ad.title || ad.name}
+                        </h4>
+                    </div>
+                )}
             </div>
 
-            {/* 2. Content Area */}
-            <div className="px-3 py-2 flex flex-col justify-center flex-1 bg-white gap-1.5">
-                <h4 className="text-[11px] font-bold text-gray-800 leading-tight truncate tracking-tight">
-                    {ad.title || ad.name}
-                </h4>
+            {/* ── 하단 정보 섹션 (고정 60px) ── */}
+            <div className="px-2 pt-1.5 pb-1 flex flex-col justify-between flex-1 bg-white overflow-hidden">
 
-                <div className="flex items-center gap-1">
-                    <span className={`shrink-0 w-[14px] h-[14px] flex items-center justify-center rounded-[3px] shadow-sm relative overflow-hidden ${getPayColor(ad.payType || (badgeChar === '면' ? '협의' : ''))} `} style={{ backgroundColor: badgeChar === '면' ? '#6b7280' : undefined }}>
-                        <span className="text-[9px] font-bold text-white leading-none absolute inset-0 flex items-center justify-center z-20 pt-[1px]">
+                {/* Row 1: 닉네임(좌) | 지역(우) */}
+                <div className="flex justify-between items-baseline gap-1 min-w-0">
+                    <span className="text-[9px] font-bold text-gray-700 truncate flex-1 leading-none">
+                        {ad.nickname || ad.name}
+                    </span>
+                    <span className="text-[9px] font-semibold text-gray-400 truncate shrink-0 text-right leading-none">
+                        {ad.region}
+                    </span>
+                </div>
+
+                {/* Row 2: 급여종류배지+급여(좌) | 업종(우) */}
+                <div className="flex justify-between items-center gap-1 min-w-0">
+                    <div className="flex items-center gap-0.5 min-w-0">
+                        <span className={`shrink-0 w-[13px] h-[13px] flex items-center justify-center rounded-[3px] text-[8px] font-black text-white leading-none ${getPayColor(ad.payType || '')}`}>
                             {badgeChar}
                         </span>
-                    </span>
-                    <div className="text-[10px] font-black text-gray-900 tracking-tighter">
-                        {formatKoreanMoney(ad.pay)}
+                        <span className="text-[10px] font-black text-gray-900 tracking-tighter truncate">
+                            {formatKoreanMoney(ad.pay)}
+                        </span>
                     </div>
+                    <span className="text-[9px] font-bold text-gray-400 truncate shrink-0 text-right max-w-[48%] leading-none">
+                        {ad.workType}
+                    </span>
+                </div>
+
+                {/* Row 3: 추가급여옵션 (paySuffixes) */}
+                <div className="flex gap-0.5 overflow-hidden h-[14px] items-center">
+                    {paySuffixes.slice(0, 3).map((s: string, i: number) => (
+                        <span key={i} className="text-[8px] text-gray-400 font-medium bg-gray-50 px-1 rounded border border-gray-100 whitespace-nowrap leading-[13px]">
+                            {s}
+                        </span>
+                    ))}
                 </div>
             </div>
         </div>
@@ -103,14 +126,16 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
     const grandAds = useMemo(() => {
         if (isMobile) return [];
-        const gr = allShops.filter(s => s.tier === 'grand');
+        // tier: 'grand'(샘플/altId) 또는 'p1'(실제 등록) 양쪽 지원 (2026-03-22)
+        const gr = allShops.filter(s => s.tier === 'grand' || s.tier === 'p1');
         if (isLeft) return [gr[0], gr[2]].filter(Boolean);
         return [gr[1], gr[3]].filter(Boolean);
     }, [allShops, isLeft, isMobile]);
 
     const premiumAds = useMemo(() => {
         if (isMobile) return [];
-        const pr = allShops.filter(s => s.tier === 'premium' || s.is_premium);
+        // tier: 'premium'(샘플/altId) 또는 'p2'(실제 등록) 양쪽 지원 (2026-03-22)
+        const pr = allShops.filter(s => s.tier === 'premium' || s.tier === 'p2' || s.is_premium);
         if (isLeft) return pr.slice(0, 2);
         return pr.slice(2, 4);
     }, [allShops, isLeft, isMobile]);

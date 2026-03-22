@@ -8,8 +8,8 @@ import { PAY_BADGE_STANDARDS } from '@/constants/standards';
 export const getPayColor = (payType: string = '') => {
     const type = payType.trim();
 
-    // TC/T 우선 처리
-    if (type.startsWith('TC') || type === 'T') return 'bg-emerald-500 text-white';
+    // TC/T 우선 처리 (Orange — v2.0)
+    if (type.startsWith('TC') || type === 'T') return 'bg-orange-500 text-white';
 
     // standards.ts PAY_BADGE_STANDARDS 순서대로 매칭
     const standard = PAY_BADGE_STANDARDS.find(s =>

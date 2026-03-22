@@ -603,7 +603,7 @@ function MyShopContent() {
                     highlighter_period: formState.highlighterPeriod,
                     border: formState.borderOption,
                     border_period: formState.borderPeriod,
-                    pay_suffixes: formState.paySuffixes,
+                    paySuffixes: formState.paySuffixes,  // camelCase — ShopCard/AdBannerCard 읽기 규격 통일 (2026-03-22)
                     ad_price: formState.totalAmount,
                     ageMin: formState.ageMin,
                     ageMax: formState.ageMax,

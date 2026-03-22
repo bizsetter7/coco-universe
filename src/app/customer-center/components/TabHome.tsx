@@ -82,26 +82,33 @@ export const TabHome = ({ onTabChange }: TabHomeProps) => {
             </div>
 
             {/* Support Info Card */}
-            <div className={`p-10 rounded-[50px] border flex flex-col md:flex-row items-center justify-between gap-8 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-gray-900 text-white rounded-[24px] flex items-center justify-center shrink-0">
-                        <PhoneCall size={30} />
+            <div className={`p-8 rounded-[50px] border flex flex-col md:flex-row items-center justify-between gap-6 ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+                {/* 전화 정보 */}
+                <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 bg-pink-500 text-white rounded-[18px] flex items-center justify-center shrink-0">
+                        <PhoneCall size={26} />
                     </div>
                     <div>
-                        <h4 className="text-2xl font-black text-gray-900 italic">1877-1442</h4>
-                        <p className="text-sm font-bold text-gray-400 mt-1">평일 10:00 - 18:00 (점심 12:00 - 13:00)</p>
+                        <p className={`text-xs font-bold mb-0.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`}>고객센터</p>
+                        <h4 className={`text-3xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>1877-1442</h4>
+                        <p className="text-xs font-bold text-gray-400 mt-0.5">평일 10:00 ~ 18:00</p>
+                        <p className="text-xs font-bold text-gray-400">점심 12:00 ~ 13:00</p>
+                        <p className="text-xs font-black text-pink-500 mt-0.5">공휴일 / 주말 휴무</p>
                     </div>
                 </div>
-                <div className="flex gap-3">
-                    <div className="p-4 bg-gray-50 rounded-2xl text-center min-w-[100px]">
-                        <p className="text-[10px] font-black text-gray-300 uppercase mb-1">Telegram</p>
-                        <p className="text-[13px] font-black text-[#f82b60]">@cocoplus_ad</p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-2xl text-center min-w-[100px]">
-                        <p className="text-[10px] font-black text-gray-300 uppercase mb-1">Kakao</p>
-                        <p className="text-[13px] font-black text-yellow-600">COCOPLUS</p>
-                    </div>
-                </div>
+
+                {/* 텔레그램 버튼 */}
+                <a
+                    href="https://t.me/cocoalba"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-gray-900 hover:bg-gray-800 text-white px-6 py-4 rounded-2xl transition-all group w-full md:w-auto justify-center"
+                >
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white shrink-0">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                    <span className="font-black text-sm">텔레그램 실시간 상담</span>
+                </a>
             </div>
         </div>
     );

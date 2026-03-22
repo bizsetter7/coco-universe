@@ -11,15 +11,16 @@ import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '@/components/common/IconBadge';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
+// v2.0 — AD_TIER_STANDARDS 동기화 (2026-03-22)
 const TIER_GRADIENTS: Record<string, string> = {
-    grand: 'bg-[#8B5CF6]',       // 보라 (Purple/Violet)
-    premium: 'bg-[#EF4444]',     // 빨강 (Red)
-    deluxe: 'bg-[#3B82F6]',      // 파랑 (Blue)
-    special: 'bg-[#10B981]',     // 민트 (Emerald/Mint)
-    urgent: 'bg-[#F97316]',      // 주황 (Orange)
-    recommended: 'bg-[#F59E0B]', // 추천 (Amber)
-    native: 'bg-[#94A3B8]',      // 그레이 (Gray)
-    common: 'bg-[#E2E8F0]'       // 연그레이 (Light Gray)
+    grand:       'bg-amber-500',   // 🟡 황금 (#F59E0B)
+    premium:     'bg-red-600',     // 🔴 레드 (#DC2626)
+    deluxe:      'bg-blue-600',    // 🔵 블루 (#2563EB)
+    special:     'bg-emerald-600', // 🟢 에메랄드 (#059669)
+    urgent:      'bg-purple-600',  // 🟣 보라 (급구/추천)
+    recommended: 'bg-purple-600',  // 🟣 보라 (급구/추천)
+    native:      'bg-slate-600',   // ⬛ 슬레이트 (#475569)
+    common:      'bg-stone-700'    // 🪨 스톤 다크 (#44403C)
 };
 
 

@@ -8,13 +8,14 @@ export const LAYOUT = {
     PADDING_TOP_ASIDE: '0px'
 } as const;
 
+// v2.0 — AD_TIER_STANDARDS 색상과 완전 동기화 (2026-03-22)
 export const GRADIENTS = {
-    grand: 'bg-gradient-to-r from-amber-500 to-yellow-400',
-    premium: 'bg-gradient-to-r from-purple-600 to-blue-500',
-    deluxe: 'bg-gradient-to-r from-blue-500 to-cyan-400',
-    special: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-    urgent: 'bg-gradient-to-r from-rose-500 to-orange-400',
-    recommended: 'bg-gradient-to-r from-indigo-500 to-violet-400',
-    native: 'bg-gray-100',
-    common: 'bg-gray-50'
+    grand:       'bg-gradient-to-br from-amber-500 to-amber-600',       // 🟡 황금
+    premium:     'bg-gradient-to-br from-red-600 to-red-700',           // 🔴 레드
+    deluxe:      'bg-gradient-to-br from-blue-600 to-blue-700',         // 🔵 블루
+    special:     'bg-gradient-to-br from-emerald-600 to-emerald-700',   // 🟢 에메랄드
+    urgent:      'bg-gradient-to-br from-rose-600 to-rose-700',         // 🌹 로즈 (긴급)
+    recommended: 'bg-gradient-to-br from-orange-500 to-orange-600',     // 🟠 오렌지
+    native:      'bg-gradient-to-br from-slate-600 to-slate-700',       // ⬛ 슬레이트
+    common:      'bg-gradient-to-br from-stone-700 to-stone-800'        // 🪨 스톤 다크
 } as const;

@@ -33,17 +33,23 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
-    const tierStandard = AD_TIER_STANDARDS.find(s => pt.includes(s.id) || pt.includes(s.altId)) || AD_TIER_STANDARDS[6];
+    // 'urgent'는 AD_TIER_STANDARDS altId에 없으므로 선처리 (2026-03-22)
+    const isUrgentTier = pt.includes('urgent');
+    const tierStandard = isUrgentTier
+        ? { id: 'urgent' }
+        : (AD_TIER_STANDARDS.find(s => pt.includes(s.id) || pt.includes(s.altId)) || AD_TIER_STANDARDS[6]);
 
+    // v2.0 — AD_TIER_STANDARDS 동기화 + 배지 흰색 통일 (2026-03-22)
     const getHeaderTheme = (tid: string) => {
         switch (tid) {
-            case 'p1': return { bg: "from-amber-500 to-amber-600", accent: "text-amber-600", badge: "bg-amber-100" };
-            case 'p2': return { bg: "from-red-600 to-red-700", accent: "text-red-600", badge: "bg-red-100" };
-            case 'p3': return { bg: "from-blue-600 to-blue-700", accent: "text-blue-600", badge: "bg-blue-100" };
-            case 'p4': return { bg: "from-emerald-600 to-emerald-700", accent: "text-emerald-600", badge: "bg-emerald-100" };
-            case 'p5': return { bg: "from-orange-500 to-orange-600", accent: "text-orange-500", badge: "bg-orange-100" };
-            case 'p6': return { bg: "from-slate-600 to-slate-700", accent: "text-slate-600", badge: "bg-slate-100" };
-            default: return { bg: "from-slate-900 to-slate-950", accent: "text-slate-900", badge: "bg-slate-100" };
+            case 'p1':     return { bg: "from-amber-500 to-amber-600",     accent: "text-amber-500",   badge: "bg-white/20" }; // Grand
+            case 'p2':     return { bg: "from-red-600 to-red-700",         accent: "text-red-600",     badge: "bg-white/20" }; // Premium
+            case 'p3':     return { bg: "from-blue-600 to-blue-700",       accent: "text-blue-600",    badge: "bg-white/20" }; // Deluxe
+            case 'p4':     return { bg: "from-emerald-600 to-emerald-700", accent: "text-emerald-600", badge: "bg-white/20" }; // Special
+            case 'p5':     return { bg: "from-purple-600 to-purple-700",   accent: "text-purple-500",  badge: "bg-white/20" }; // Urgent/Recommended 🟣
+            case 'p6':     return { bg: "from-slate-600 to-slate-700",     accent: "text-slate-500",   badge: "bg-white/20" }; // Native
+            case 'urgent': return { bg: "from-purple-600 to-purple-700",   accent: "text-purple-500",  badge: "bg-white/20" }; // Urgent 🟣
+            default:       return { bg: "from-stone-700 to-stone-800",     accent: "text-stone-400",   badge: "bg-white/20" }; // Basic
         }
     };
 
