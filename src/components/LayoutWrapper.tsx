@@ -69,6 +69,11 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         setIsVerified(true);
     };
 
+    const handleSkip = () => {
+        sessionStorage.setItem('adult_gate_skipped', 'true');
+        setIsVerified(true);
+    };
+
     if (isLoading || isVerified === null) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-white">
@@ -85,7 +90,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지는 제외)
     if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isPublicPage) {
-        return <AdultVerificationGate onVerify={handleVerify} />;
+        return <AdultVerificationGate onVerify={handleVerify} onSkip={handleSkip} />;
     }
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 

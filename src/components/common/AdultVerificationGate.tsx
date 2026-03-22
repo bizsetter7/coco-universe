@@ -9,6 +9,7 @@ import { AUDIT_MODE } from '@/lib/brand-config';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
+    onSkip?: () => void;
 }
 
 const MOCK_USERS: Record<string, { type: 'corporate' | 'individual', name: string }> = {
@@ -79,7 +80,7 @@ const LoginForm = ({ id, setId, pw, setPw, loginType, setLoginType, handleLogin,
     </div>
 );
 
-export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) => {
+export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGateProps) => {
     if (AUDIT_MODE) return null;
 
     const brand = useBrand();
@@ -92,7 +93,11 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
 
     const handleExit = () => {
         sessionStorage.setItem('adult_gate_skipped', 'true');
-        router.push('/');
+        if (onSkip) {
+            onSkip();
+        } else {
+            router.push('/');
+        }
     };
     
     const handleNonMemberAuth = async (type: string) => {
