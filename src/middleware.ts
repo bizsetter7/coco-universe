@@ -35,7 +35,7 @@ const PROTECTED_PATHS = [
 
 // ─── In-Memory Rate Limiter (배포 시 Upstash Redis 권장) ────────
 const ipRequestMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 60;       // 허용 요청 수
+const RATE_LIMIT = 60;       // 허용 요청 수 (1분당)
 const RATE_WINDOW = 60_000;  // 기준 시간 (ms) = 1분
 
 function isRateLimited(ip: string): boolean {
@@ -136,8 +136,10 @@ export function middleware(request: NextRequest) {
         return blocked('올바른 브라우저로 접속해주세요.', 403);
     }
 
-    // 4. Rate Limiting — 1분에 60회 초과 시 차단 (다만 /audit 경로는 제외)
-    if (isRateLimited(ip) && !isAuditPath) {
+    // 4. Rate Limiting — 1분에 60회 초과 시 차단 (다만 /audit 경로 및 로컬/터널 트래픽 제외)
+    // cf-connecting-ip 없음 = Cloudflare 미경유 = 로컬서버/테스트 트래픽 → 제외
+    const isLocalTraffic = !request.headers.get('cf-connecting-ip');
+    if (isRateLimited(ip) && !isAuditPath && !isLocalTraffic) {
         console.warn(`[RATE LIMITED] IP: ${ip} | Path: ${pathname}`);
         return new NextResponse('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.', {
             status: 429,

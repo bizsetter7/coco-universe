@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle } from 'lucide-react';
+import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
@@ -12,6 +12,7 @@ import { ICONS } from '@/constants/job-options';
 import { useBrand } from '@/components/BrandProvider';
 import { AD_TIER_STANDARDS } from '@/constants/standards';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
+import { ReportAdModal } from '@/components/common/ReportAdModal';
 
 interface JobDetailModalProps {
     shop: Shop;
@@ -30,6 +31,7 @@ interface JobDetailContentProps {
 }
 
 export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, onToggleFavorite }: JobDetailContentProps) => {
+    const [showReport, setShowReport] = useState(false);
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
@@ -233,6 +235,19 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                     </div>
                 </div>
             </div>
+
+            {/* 신고 링크 */}
+            <div className="px-6 py-2 bg-white flex justify-end">
+                <button
+                    onClick={() => setShowReport(true)}
+                    className="flex items-center gap-1 text-[11px] font-bold text-gray-400 hover:text-red-500 transition-colors"
+                >
+                    <Flag size={11} />
+                    신고
+                </button>
+            </div>
+
+            {showReport && <ReportAdModal onClose={() => setShowReport(false)} />}
 
             {/* 3. FOOTER SECTION */}
             <div className="p-6 bg-white border-t border-gray-100 grid grid-cols-4 gap-3 shrink-0 safe-area-bottom">

@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight } from 'lucide-react';
+import { ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight, Heart } from 'lucide-react';
 
 import { PaymentPopup } from '../home/PaymentPopup';
 import MessageModal from '../message/MessageModal';
@@ -254,18 +254,24 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                                     </div>
                                                     <div className="flex flex-col -space-y-0.5">
                                                         <span className="text-[10px] font-bold text-gray-400">사장님</span>
-                                                        <span className="text-xs font-black text-gray-900">기업회원</span>
+                                                        <span className="text-xs font-black text-gray-900">마이샵</span>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {userRole === 'individual' && (
-                                                <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all group">
-                                                    <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
-                                                        <span className="text-[10px] font-black">P</span>
+                                                <>
+                                                    <div onClick={() => router.push('/favorites')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-red-50 border border-transparent hover:border-red-100 transition-all group">
+                                                        <Heart size={16} className="text-gray-400 group-hover:text-red-500" />
+                                                        <span className="text-xs font-black text-gray-900">즐겨찾기</span>
                                                     </div>
-                                                    <span className="text-xs font-black text-gray-900">개인회원</span>
-                                                </div>
+                                                    <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all group">
+                                                        <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">
+                                                            <span className="text-[10px] font-black">P</span>
+                                                        </div>
+                                                        <span className="text-xs font-black text-gray-900">마이페이지</span>
+                                                    </div>
+                                                </>
                                             )}
 
                                             <div className="w-px h-3 bg-gray-300" />

@@ -89,7 +89,7 @@ export default function LeftSidebar({
     const [selectedKeywords, setSelectedKeywords] = React.useState<string[]>([]);
     const [isLoginOpen, setIsLoginOpen] = React.useState(false);
     const [isRegionOpen, setIsRegionOpen] = React.useState(false);
-    const [isJobTypeOpen, setIsJobTypeOpen] = React.useState(false);
+    const [isJobTypeOpen, setIsJobTypeOpen] = React.useState(true);
     const [isKeywordOpen, setIsKeywordOpen] = React.useState(false);
     const [isAdProductOpen, setIsAdProductOpen] = React.useState(false);
 

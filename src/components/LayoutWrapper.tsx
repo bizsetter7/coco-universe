@@ -46,7 +46,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     React.useEffect(() => {
         if (isLoading) return;
-        
+
         // 게이트가 비활성화(DISABLED=true) 되어있으면 즉시 통과
         if (ADULT_GATE_DISABLED) {
             setIsVerified(true);
@@ -60,7 +60,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         }
 
         const localVerified = localStorage.getItem('adult_verified') === 'true';
-        setIsVerified(localVerified);
+        const sessionSkipped = sessionStorage.getItem('adult_gate_skipped') === 'true';
+        setIsVerified(localVerified || sessionSkipped);
     }, [isLoading, authUser, pathname]);
 
     const handleVerify = () => {

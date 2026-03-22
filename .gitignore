@@ -42,3 +42,13 @@ next-env.d.ts
 
 # Claude Code local tooling (worktrees, settings, cache)
 .claude/
+
+# TestSprite 임시 파일 (로그/락/캐시/생성 스크립트)
+testsprite_tests/tmp/mcp.log
+testsprite_tests/tmp/execution.lock
+testsprite_tests/tmp/code_summary.yaml
+testsprite_tests/tmp/raw_report.md
+testsprite_tests/tmp/test_results.json
+testsprite_tests/tmp/config.json
+testsprite_tests/TC*.py
+testsprite_tests/*.html

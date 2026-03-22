@@ -90,7 +90,10 @@ export const AdultVerificationGate = ({ onVerify }: AdultVerificationGateProps) 
     const [pw, setPw] = useState('');
     const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-    const handleExit = () => { window.location.href = 'https://www.google.com'; };
+    const handleExit = () => {
+        sessionStorage.setItem('adult_gate_skipped', 'true');
+        router.push('/');
+    };
     
     const handleNonMemberAuth = async (type: string) => {
         if (typeof (window as any).PortOne === 'undefined') {

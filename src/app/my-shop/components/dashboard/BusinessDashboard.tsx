@@ -84,7 +84,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                 디자인 의뢰
                             </button>
                             <button onClick={() => handleAdClick(true)} className="flex-1 md:flex-none py-3 px-6 rounded-xl bg-[#f82b60] text-white text-sm font-black hover:bg-[#db2456] shadow-lg shadow-[#f82b60]/30 transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                <PlusSquare size={18} /> 새 공고 등록
+                                <PlusSquare size={18} /> 광고 등록
                             </button>
                         </div>
                     </div>
