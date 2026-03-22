@@ -26,18 +26,26 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, ha
         );
     }
 
-    // [2026-03-22] Tier-based filtering — altId('grand') 및 id('p1') 양쪽 지원
-    // Supabase 실제 등록 공고는 tier='p1'~'p7', 샘플 데이터는 tier='grand'/'premium' 등 altId 형식
-    const isTier = (s: Shop, altId: string, id: string) =>
-        s.tier === altId || s.tier === id;
-
-    const grandShops   = shops.filter(s => isTier(s, 'grand', 'p1'));
-    const premiumShops = shops.filter(s => isTier(s, 'premium', 'p2') || (s as any).is_premium);
-    const deluxeShops  = shops.filter(s => isTier(s, 'deluxe', 'p3'));
-    const specialShops = shops.filter(s => isTier(s, 'special', 'p4'));
-    const urgentShops  = shops.filter(s =>
-        isTier(s, 'urgent', 'p5') || isTier(s, 'recommended', 'p5') ||
-        isTier(s, 'native', 'p6') || isTier(s, 'basic', 'p7')
+    // [2026-03-22] 단일 pass로 전 tier 분류 (altId / p-id 양쪽 지원)
+    const { grandShops, premiumShops, deluxeShops, specialShops, urgentShops } = shops.reduce(
+        (acc, s) => {
+            const t = s.tier ?? '';
+            if (t === 'grand'   || t === 'p1') acc.grandShops.push(s);
+            else if (t === 'premium' || t === 'p2') acc.premiumShops.push(s);
+            else if (t === 'deluxe'  || t === 'p3') acc.deluxeShops.push(s);
+            else if (t === 'special' || t === 'p4') acc.specialShops.push(s);
+            else if (t === 'urgent' || t === 'recommended' || t === 'p5'
+                  || t === 'native' || t === 'p6'
+                  || t === 'basic'  || t === 'p7') acc.urgentShops.push(s);
+            return acc;
+        },
+        {
+            grandShops:   [] as Shop[],
+            premiumShops: [] as Shop[],
+            deluxeShops:  [] as Shop[],
+            specialShops: [] as Shop[],
+            urgentShops:  [] as Shop[],
+        }
     );
 
     return (

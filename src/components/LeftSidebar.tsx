@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useBrand } from '@/components/BrandProvider';
 import {
-    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText, ChevronDown, Coins
+    Phone, ChevronRight, Star, Flame, Zap, Gift, Crown, User, Sparkles, List, FileText, ChevronDown
 } from 'lucide-react';
 
 interface LeftSidebarProps {
@@ -14,8 +14,6 @@ interface LeftSidebarProps {
     setSelectedSubRegion: (subRegion: string) => void;
     selectedJobType: string;
     setSelectedJobType: (jobType: string) => void;
-    onLoginClick: () => void;
-    onSignupClick: () => void;
     onPaymentClick: (tier: string) => void;
     isLoggedIn?: boolean;
     userName?: string;
@@ -69,8 +67,6 @@ export default function LeftSidebar({
     setSelectedSubRegion,
     selectedJobType,
     setSelectedJobType,
-    onLoginClick,
-    onSignupClick,
     onPaymentClick,
     isLoggedIn: propIsLoggedIn,
     userName: propUserName,
@@ -111,6 +107,15 @@ export default function LeftSidebar({
     const userCredit = propUserCredit ?? authUserCredit;
     const userPoints = authUserPoints ?? 0;
 
+    // 반복 카드 컨테이너 className 상수화
+    const cardClass = `py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`;
+
+    const clearLoginForm = () => {
+        setIsLoginOpen(false);
+        setLoginId('');
+        setLoginPw('');
+    };
+
     const handleLogin = async () => {
         if (!loginId || !loginPw) {
             alert('아이디와 비밀번호를 입력해주세요.');
@@ -125,32 +130,29 @@ export default function LeftSidebar({
             // 1. Check for Test/Mock IDs
             if ((id === 'admin_shop' || id === 'admin_user') && pw === 'password123') {
                 authLogin('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
-                setIsLoginOpen(false);
-                setLoginId(''); setLoginPw('');
+                clearLoginForm();
                 return;
             } else if (id === 'test_shop' && pw === 'password123') {
                 authLogin('shop', id, '테스트 사장님', '번창하는조사장');
-                setIsLoginOpen(false);
-                setLoginId(''); setLoginPw('');
+                clearLoginForm();
                 return;
             } else if (id === 'test_user' && pw === 'password123') {
                 authLogin('personal', id, '테스트 회원', '밤의요정');
-                setIsLoginOpen(false);
-                setLoginId(''); setLoginPw('');
+                clearLoginForm();
                 return;
             }
 
             // 2. Real Supabase Login
             if (id.includes('@')) {
                 await signIn(id, pw);
-                setIsLoginOpen(false);
-                setLoginId(''); setLoginPw('');
+                clearLoginForm();
             } else {
                 alert('등록되지 않은 계정입니다.\n테스트 계정 또는 이메일 형식을 사용해주세요.');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : '아이디 또는 비밀번호를 확인해주세요.';
             console.error('Sidebar Login error:', err);
-            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+            alert(`로그인 실패: ${message}`);
         } finally {
             setIsLoginLoading(false);
         }
@@ -198,7 +200,7 @@ export default function LeftSidebar({
             */}
 
             {/* 1. MEMBER LOGIN / 로그인 상태 박스 */}
-            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={cardClass}>
                 <div
                     className="flex items-center justify-between cursor-pointer group"
                     onClick={() => setIsLoginOpen(!isLoginOpen)}
@@ -317,7 +319,7 @@ export default function LeftSidebar({
             </div>
 
             {/* 3. 지역별 채용정보 */}
-            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={cardClass}>
                 <div
                     className="flex items-center justify-between cursor-pointer group mb-1"
                     onClick={() => setIsRegionOpen(!isRegionOpen)}
@@ -352,7 +354,7 @@ export default function LeftSidebar({
             </div>
 
             {/* 4. 업직종별 채용정보 */}
-            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={cardClass}>
                 <div
                     className="flex items-center justify-between cursor-pointer group mb-1"
                     onClick={() => setIsJobTypeOpen(!isJobTypeOpen)}
@@ -388,7 +390,7 @@ export default function LeftSidebar({
 
 
             {/* 5. 편의사항/키워드 (최대 5개 선택 -> Expanded List) */}
-            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={cardClass}>
                 <div
                     className="flex items-center justify-between cursor-pointer group mb-1"
                     onClick={() => setIsKeywordOpen(!isKeywordOpen)}
@@ -510,7 +512,7 @@ export default function LeftSidebar({
             </div>
 
             {/* 7. 고객지원센터 (최하단 이동) */}
-            <div className={`py-2.5 px-4 rounded-xl border ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={cardClass}>
                 <div className="flex items-center justify-between mb-3">
                     <h4 className={`text-xs font-black flex items-center gap-1 ${brand.theme === 'dark' ? 'text-white' : 'text-black'}`}>
                         <Phone size={12} />

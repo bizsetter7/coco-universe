@@ -129,8 +129,6 @@ export default function JobClient({ shops }: JobClientProps) {
                         setSelectedSubRegion={setSelectedSubRegion}
                         selectedJobType={selectedJobType}
                         setSelectedJobType={setSelectedJobType}
-                        onLoginClick={() => router.push('/?page=login')}
-                        onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={openPaymentPopup}
                         isLoggedIn={isLoggedIn}
                         userType={userType === 'admin' || userType === 'guest' ? undefined : userType}

@@ -10,46 +10,33 @@ interface ExposureItemProps {
     onArrowClick?: () => void;
 }
 
-export const ExposureItem = ({ rank, desc, onArrowClick }: ExposureItemProps) => {
+// 컴포넌트 외부 상수 — 렌더링마다 재생성 방지
+const THEME_LIGHT = {
+    GRAND:   { badge: 'bg-amber-500 text-white shadow-amber-200',   box: 'bg-amber-50 border-amber-100',     text: 'text-amber-900' },
+    PREMIUM: { badge: 'bg-red-500 text-white shadow-red-200',       box: 'bg-red-50 border-red-100',         text: 'text-red-900' },
+    DELUXE:  { badge: 'bg-blue-500 text-white shadow-blue-200',     box: 'bg-blue-50 border-blue-100',       text: 'text-blue-900' },
+    SPECIAL: { badge: 'bg-emerald-500 text-white shadow-emerald-200', box: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-900' },
+    NATIVE:  { badge: 'bg-teal-600 text-white shadow-teal-200',     box: 'bg-teal-50 border-teal-100',       text: 'text-teal-900' },
+    DEFAULT: { badge: 'bg-gray-600 text-white shadow-gray-200',     box: 'bg-gray-50 border-gray-100',       text: 'text-gray-900' },
+} as const;
+
+const THEME_DARK = {
+    GRAND:   { badge: 'bg-amber-500 text-white shadow-amber-200',   box: 'bg-amber-900/10 border-amber-900/30',   text: 'text-amber-200' },
+    PREMIUM: { badge: 'bg-red-500 text-white shadow-red-200',       box: 'bg-red-900/10 border-red-900/30',       text: 'text-red-200' },
+    DELUXE:  { badge: 'bg-blue-500 text-white shadow-blue-200',     box: 'bg-blue-900/10 border-blue-900/30',     text: 'text-blue-200' },
+    SPECIAL: { badge: 'bg-emerald-500 text-white shadow-emerald-200', box: 'bg-emerald-900/10 border-emerald-900/30', text: 'text-emerald-200' },
+    NATIVE:  { badge: 'bg-teal-600 text-white shadow-teal-200',     box: 'bg-teal-900/10 border-teal-900/30',     text: 'text-teal-200' },
+    DEFAULT: { badge: 'bg-gray-600 text-white shadow-gray-200',     box: 'bg-gray-800/50 border-gray-700',        text: 'text-gray-300' },
+} as const;
+
+type ThemeKey = keyof typeof THEME_LIGHT;
+
+export const ExposureItem = React.memo(({ rank, desc, onArrowClick }: ExposureItemProps) => {
     const brand = useBrand();
 
-    const getTheme = (rank: string) => {
-        const isDark = brand.theme === 'dark';
-        switch (rank) {
-            case 'GRAND': return {
-                badge: 'bg-amber-500 text-white shadow-amber-200',
-                box: isDark ? 'bg-amber-900/10 border-amber-900/30' : 'bg-amber-50 border-amber-100',
-                text: isDark ? 'text-amber-200' : 'text-amber-900'
-            };
-            case 'PREMIUM': return {
-                badge: 'bg-red-500 text-white shadow-red-200',
-                box: isDark ? 'bg-red-900/10 border-red-900/30' : 'bg-red-50 border-red-100',
-                text: isDark ? 'text-red-200' : 'text-red-900'
-            };
-            case 'DELUXE': return {
-                badge: 'bg-blue-500 text-white shadow-blue-200',
-                box: isDark ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50 border-blue-100',
-                text: isDark ? 'text-blue-200' : 'text-blue-900'
-            };
-            case 'SPECIAL': return {
-                badge: 'bg-emerald-500 text-white shadow-emerald-200',
-                box: isDark ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100',
-                text: isDark ? 'text-emerald-200' : 'text-emerald-900'
-            };
-            case 'NATIVE': return {
-                badge: 'bg-teal-600 text-white shadow-teal-200',
-                box: isDark ? 'bg-teal-900/10 border-teal-900/30' : 'bg-teal-50 border-teal-100',
-                text: isDark ? 'text-teal-200' : 'text-teal-900'
-            };
-            default: return {
-                badge: 'bg-gray-600 text-white shadow-gray-200',
-                box: isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-100',
-                text: isDark ? 'text-gray-300' : 'text-gray-900'
-            };
-        }
-    };
-
-    const theme = getTheme(rank);
+    const map = brand.theme === 'dark' ? THEME_DARK : THEME_LIGHT;
+    const key: ThemeKey = (rank as ThemeKey) in map ? (rank as ThemeKey) : 'DEFAULT';
+    const theme = map[key];
 
     return (
         <div
@@ -73,4 +60,6 @@ export const ExposureItem = ({ rank, desc, onArrowClick }: ExposureItemProps) =>
             </div>
         </div>
     );
-};
+});
+
+ExposureItem.displayName = 'ExposureItem';

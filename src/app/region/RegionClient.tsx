@@ -118,8 +118,6 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                         setSelectedSubRegion={setSelectedSubRegion}
                         selectedJobType={selectedJobType}
                         setSelectedJobType={setSelectedJobType}
-                        onLoginClick={() => router.push('/?page=login')}
-                        onSignupClick={() => router.push('/?page=signup')}
                         onPaymentClick={openPaymentPopup}
                         isLoggedIn={isLoggedIn}
                         userType={userType as any}
