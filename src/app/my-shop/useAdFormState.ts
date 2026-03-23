@@ -15,7 +15,7 @@ export function useAdFormState() {
     // ... (States remain same)
     // --- Form States ---
     const [shopName, setShopName] = useState('코코 라운지');
-    const [isVerified, setIsVerified] = useState(true);
+    const [isVerified, setIsVerified] = useState(false);
     const [nickname, setNickname] = useState('');
 
     // Manager Info
@@ -147,7 +147,7 @@ export function useAdFormState() {
 
     const resetAdStates = () => {
         setShopName('코코 라운지');
-        setIsVerified(true);
+        setIsVerified(false);
         setNickname('');
         setManagerName('');
         setManagerPhone('');

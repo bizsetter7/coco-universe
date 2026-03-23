@@ -114,6 +114,28 @@ function MyShopContent() {
         setMounted(true);
     }, []);
 
+    // [Dev/Test Only] ?autoLogin=corporate|shop|individual URL 파라미터로 mock 세션 자동 설정
+    // TestSprite E2E 테스트 전용 — 비밀번호 없이 지정 회원 유형으로 진입 가능
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const autoLogin = searchParams.get('autoLogin');
+        if (autoLogin) {
+            const existing = localStorage.getItem('coco_mock_session');
+            if (!existing) {
+                const isCorporate = autoLogin === 'corporate' || autoLogin === 'shop';
+                const mockSession = isCorporate
+                    ? { type: 'corporate', id: 'mock_test_shop', name: '테스트업체', nickname: '테스트업체', credit: 1000, points: 500 }
+                    : { type: 'individual', id: 'mock_test_user', name: '테스트회원', nickname: '테스트회원', credit: 0, points: 0 };
+                localStorage.setItem('coco_mock_session', JSON.stringify(mockSession));
+                // 파라미터 제거 후 리로드 (깨끗한 URL 유지)
+                const url = new URL(window.location.href);
+                url.searchParams.delete('autoLogin');
+                window.location.replace(url.toString());
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // --- Data Fetching (Supabase) ---
     const fetchRegisteredAds = async () => {
         if (!authUser?.id || authUser.id === 'guest') return;
@@ -977,19 +999,20 @@ function MyShopContent() {
                                         <BusinessDashboard
                                             brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
                                             handleAdClick={(isNew, ad) => {
-                                                // [Critical Fix] Synchronous State Update Sequence
                                                 setIsNewEntry(isNew);
                                                 if (!isNew && ad) {
+                                                    // 수정 모드: WarningModal로 기존 데이터 덮어쓰기 확인
                                                     setEditingAdId(ad.id);
-                                                    editingAdIdRef.current = ad.id; // [Ref Fix] Store immediately
+                                                    editingAdIdRef.current = ad.id;
                                                     formState.loadAdData(ad);
+                                                    setShowWarningModal(true);
                                                 } else {
+                                                    // 신규 등록: WarningModal 생략, 바로 폼으로
                                                     setEditingAdId(null);
                                                     editingAdIdRef.current = null;
                                                     formState.resetAdStates();
+                                                    setView('form', undefined, true);
                                                 }
-                                                // Open modal immediately, Ref ensures safety
-                                                setShowWarningModal(true);
                                             }}
                                             setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
                                         />

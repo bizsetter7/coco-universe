@@ -13,7 +13,7 @@ import { BrandConfig } from '@/lib/brand-config';
 interface AdFormProps {
     brand: BrandConfig;
     shopName: string; setShopName: (v: string) => void;
-    isVerified: boolean;
+    isVerified: boolean; setIsVerified: (v: boolean) => void;
     nickname: string; setNickname: (v: string) => void;
     managerName: string; setManagerName: (v: string) => void;
     managerPhone: string; setManagerPhone: (v: string) => void;
@@ -217,7 +217,7 @@ export default function AdForm(props: AdFormProps) {
 
             {/* [Onboarding] Welcome Alert for New Posters */}
             {props.isNewEntry && (
-                <div className="bg-gradient-to-r from-blue-50 to-rose-50 border border-blue-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="bg-gradient-to-r from-blue-50 to-rose-50 border border-blue-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700 space-y-3">
                     <div className="flex items-start gap-3 md:gap-4">
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-sm shrink-0">✨</div>
                         <div>
@@ -227,6 +227,13 @@ export default function AdForm(props: AdFormProps) {
                                 작성이 어려우시면 언제든 우측 상단의 '예시 보기'를 참고해주세요!
                             </p>
                         </div>
+                    </div>
+                    {/* 게시글 작성 전 필독 (WarningModal 대체) */}
+                    <div className="bg-white/70 rounded-2xl p-3 md:p-4 space-y-1.5 text-[11px] md:text-[13px] font-bold text-gray-700 border border-blue-100">
+                        <p className="font-black text-gray-800 mb-1">📢 게시글 작성 전 필독!</p>
+                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">1.</span><span>월 수정횟수는 <strong className="text-black">30회</strong> 입니다.</span></p>
+                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">2.</span><span>금칙어 사용 시 <strong className="text-black">통보 없이 삭제</strong>될 수 있습니다.</span></p>
+                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">3.</span><span>본문 내용은 <strong className="text-black">1000자 이내</strong>로 작성해주세요.</span></p>
                     </div>
                 </div>
             )}

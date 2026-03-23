@@ -1,67 +1,219 @@
 [
   {
     "id": "TC001",
-    "title": "Submit inquiry form successfully from /audit",
-    "description": "Verifies the inquiry modal opens from the /audit landing page and can be submitted with all required fields to show the success message.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
+    "title": "Sign up as Regular member with valid details",
+    "description": "Verifies a new user can complete email/password registration as a Regular member and sees a success confirmation or authenticated landing state.",
+    "category": "회원가입 (Sign up)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to \"/audit\""
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\""
+        "description": "Click on the \"Sign up\" button in the header"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
+        "description": "Verify text \"Sign up\" is visible"
       },
       {
         "type": "action",
-        "description": "Type \"홍길동\" into the name field"
+        "description": "Type \"newuser_regular_01@example.com\" into the email field"
       },
       {
         "type": "action",
-        "description": "Type \"테스트컴퍼니\" into the company field"
+        "description": "Type \"ValidPass!234\" into the password field"
       },
       {
         "type": "action",
-        "description": "Type \"010-1234-5678\" into the contact field"
+        "description": "Select \"Regular\" member type"
       },
       {
         "type": "action",
-        "description": "Type \"문의 드립니다. 데모 및 도입 절차를 알고 싶습니다.\" into the message field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Submit\" on the inquiry form"
+        "description": "Click on the \"Complete Sign up\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
+        "description": "Verify text \"Sign up complete\" is visible"
       }
     ]
   },
   {
     "id": "TC002",
-    "title": "Contact field required validation then successful submit",
-    "description": "Verifies submitting the inquiry form with missing contact shows a validation error, then succeeds after entering contact info.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
+    "title": "Sign up as Business member with valid details",
+    "description": "Verifies a new user can complete email/password registration as a Business member and sees a success confirmation or authenticated landing state.",
+    "category": "회원가입 (Sign up)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to \"/audit\""
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click \"도입 문의하기\""
+        "description": "Click on the \"Sign up\" button in the header"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
+        "description": "Verify element \"Member type\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_business_01@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"ValidPass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Business\" member type"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Sign up complete\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Invalid email format shows validation error then allows correction",
+    "description": "Verifies client-side validation blocks sign up with an invalid email and proceeds after correcting the email.",
+    "category": "회원가입 (Sign up)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"not-an-email\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Invalid email\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_regular_02@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Sign up complete\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Attempt sign up with already-registered email shows error",
+    "description": "Verifies the UI shows a clear error message when the email is already registered.",
+    "category": "회원가입 (Sign up)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"existing_user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"ValidPass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Regular\" member type"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Email already registered\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Missing required fields prevents sign up (name not provided)",
+    "description": "Verifies the form blocks submission and shows a required-field message when name is missing.",
+    "category": "회원가입 (Sign up)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_missingname_01@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"ValidPass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Name is required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Missing required fields prevents sign up (contact not provided)",
+    "description": "Verifies the form blocks submission and shows a required-field message when contact information is missing.",
+    "category": "회원가입 (Sign up)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_missingcontact_01@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"ValidPass!234\" into the password field"
       },
       {
         "type": "action",
@@ -69,1347 +221,250 @@
       },
       {
         "type": "action",
-        "description": "Type \"테스트컴퍼니\" into the company field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"문의 내용입니다.\" into the message field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Submit\" on the inquiry form"
+        "description": "Click on the \"Complete Sign up\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"contact\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"010-0000-0000\" into the contact field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Submit\" on the inquiry form"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC003",
-    "title": "Close inquiry modal without submitting",
-    "description": "Verifies the inquiry modal can be dismissed and the landing page remains usable without submitting the form.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Close\" on the inquiry modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC004",
-    "title": "Cancel/escape out of inquiry modal (keyboard)",
-    "description": "Verifies the inquiry modal can be closed via keyboard escape without completing the form.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Press \"Escape\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC005",
-    "title": "Prevent submission when multiple required fields are empty",
-    "description": "Verifies the inquiry form does not submit and shows visible validation feedback when multiple required fields are missing.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Submit\" on the inquiry form"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC006",
-    "title": "Inquiry form accepts email-style contact and submits",
-    "description": "Verifies the contact field accepts an email-format value and the form can still submit successfully.",
-    "category": "B2B Landing Interaction (Inquiry Form)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"김테스트\" into the name field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Example B2B\" into the company field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"test.user@example.com\" into the contact field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"이메일로 연락 부탁드립니다.\" into the message field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Submit\" on the inquiry form"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"담당자 연락 예정(1877-1442)\" is visible"
+        "description": "Verify text \"Contact is required\" is visible"
       }
     ]
   },
   {
     "id": "TC007",
-    "title": "Partner Login button is visible on the /audit header",
-    "description": "Verifies the Partner Login (파트너 로그인) affordance is present and visible on the audit landing page header.",
-    "category": "Partner Login (Header)",
-    "priority": "High",
+    "title": "Password policy violation shows error and blocks sign up",
+    "description": "Verifies weak/invalid password input shows a validation message and prevents account creation.",
+    "category": "회원가입 (Sign up)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_weakpass_01@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"123\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"파트너 로그인\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify text \"Password\" is visible"
       }
     ]
   },
   {
     "id": "TC008",
-    "title": "Clicking Partner Login does not show a login modal (known limitation behavior)",
-    "description": "Verifies that clicking the Partner Login button does not render a login modal UI and no visible login fields appear.",
-    "category": "Partner Login (Header)",
-    "priority": "High",
+    "title": "Member type must be selected before completing sign up",
+    "description": "Verifies the form requires choosing Business or Regular before submission succeeds.",
+    "category": "회원가입 (Sign up)",
+    "priority": "Low",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click \"파트너 로그인\""
+        "description": "Click on the \"Sign up\" button in the header"
+      },
+      {
+        "type": "action",
+        "description": "Type \"newuser_nomembertype_01@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"ValidPass!234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Complete Sign up\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Email\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Password\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Login\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify text \"Select member type\" is visible"
       }
     ]
   },
   {
     "id": "TC009",
-    "title": "Repeated clicks on Partner Login do not change visible UI state",
-    "description": "Verifies repeated interaction with the Partner Login button does not produce any visible modal, message, or navigation change.",
-    "category": "Partner Login (Header)",
-    "priority": "Medium",
+    "title": "Email/password login succeeds and user lands in authenticated state",
+    "description": "Verifies a user can log in from the home page and sees UI indicating an authenticated session.",
+    "category": "로그인 (Login)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click \"파트너 로그인\""
+        "description": "Click on the \"Login\" button in the header"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"login\""
       },
       {
         "type": "action",
-        "description": "Click \"파트너 로그인\""
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify text \"Logout\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"파트너 로그인\" is visible"
+        "description": "Verify text \"My Shop\" is visible"
       }
     ]
   },
   {
     "id": "TC010",
-    "title": "No partner login form fields are present on initial page load",
-    "description": "Verifies the audit page does not show partner login email/password fields by default before any interaction.",
-    "category": "Partner Login (Header)",
-    "priority": "Medium",
+    "title": "Login fails with incorrect password and shows an error message",
+    "description": "Verifies invalid credentials are rejected and an authentication error is shown to the user.",
+    "category": "로그인 (Login)",
+    "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button in the header"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Email\" is not visible"
+        "description": "Verify URL contains \"login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"fake.user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"wrong-password-1234\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Password\" is not visible"
+        "description": "Verify text \"error\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Login\" is not visible"
+        "description": "Verify URL contains \"login\""
       }
     ]
   },
   {
     "id": "TC011",
-    "title": "No success/redirect indicators occur after clicking Partner Login",
-    "description": "Verifies there is no visible success message or redirect to a partner area after clicking Partner Login (since modal does not exist).",
-    "category": "Partner Login (Header)",
+    "title": "Attempt login with empty email shows validation and prevents sign-in",
+    "description": "Verifies the login form requires an email and does not proceed when the email field is empty.",
+    "category": "로그인 (Login)",
     "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /audit"
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click \"파트너 로그인\""
+        "description": "Click on the \"Login\" button in the header"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"Success\" is not visible"
+        "description": "Verify URL contains \"login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"some-password\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify text \"로그인\" is not visible"
+        "description": "Verify text \"email\" is visible"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify URL contains \"login\""
       }
     ]
   },
   {
     "id": "TC012",
-    "title": "Placeholder header navigation link does not change URL",
-    "description": "Verifies that clicking a placeholder header navigation link on /audit does not navigate away from the page.",
-    "category": "Navigation Links (Placeholders)",
-    "priority": "High",
+    "title": "Attempt login with empty password shows validation and prevents sign-in",
+    "description": "Verifies the login form requires a password and does not proceed when the password field is empty.",
+    "category": "로그인 (Login)",
+    "priority": "Medium",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click a header navigation link (for example, a top navigation item in the header)"
+        "description": "Click on the \"Login\" button in the header"
       },
       {
         "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
+        "description": "Verify URL contains \"login\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"fake.user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify page title contains \"Audit\""
+        "description": "Verify text \"password\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"login\""
       }
     ]
   },
   {
     "id": "TC013",
-    "title": "Placeholder navigation click provides predictable no-op feedback (if any)",
-    "description": "Verifies that clicking a placeholder header navigation link results in either a visible placeholder notice or no visible change while staying on /audit.",
-    "category": "Navigation Links (Placeholders)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click a header navigation link (choose a different link than the previous test, if multiple are visible)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Placeholder\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"B2B Audit\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC014",
-    "title": "Repeated clicks on placeholder navigation link remain stable",
-    "description": "Verifies that repeated clicking on a placeholder link does not cause navigation or visible errors.",
-    "category": "Navigation Links (Placeholders)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"header\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click a header navigation link (placeholder)"
-      },
-      {
-        "type": "action",
-        "description": "Click the same header navigation link (placeholder) again"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Not Found\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC015",
-    "title": "Different placeholder navigation links all behave as no-ops",
-    "description": "Verifies that multiple header navigation links (if present) do not navigate away from /audit when clicked.",
-    "category": "Navigation Links (Placeholders)",
+    "title": "Post-login navigation: access Favorites page after successful login",
+    "description": "Verifies the Favorites page (/favorites) is accessible and renders correctly.",
+    "category": "로그인 (Login)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to \"/audit\""
+        "description": "Navigate to /"
       },
       {
-        "type": "action",
-        "description": "Click the first visible header navigation link (placeholder)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "action",
-        "description": "Click a second visible header navigation link (placeholder)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"B2B Audit\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC016",
-    "title": "Attempted navigation expectation is unmet and should be identifiable as placeholder behavior",
-    "description": "Verifies that after clicking a placeholder link, the user can clearly tell no navigation happened (URL unchanged and audit content still visible).",
-    "category": "Navigation Links (Placeholders)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"B2B Audit\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click a header navigation link that appears intended to navigate (placeholder)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"B2B Audit\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Loading\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC017",
-    "title": "Audit page loads and shows audit landing UI shell",
-    "description": "Verifies the /audit route loads and key audit landing content is visible to the user.",
-    "category": "Audit Mode Cloaking & Brand Switch",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"도입 문의하기\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Partner Login\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC018",
-    "title": "Inquiry modal opens from '도입 문의하기' and can be closed",
-    "description": "Verifies the inquiry modal can be opened from the audit page and dismissed by the user.",
-    "category": "Audit Mode Cloaking & Brand Switch",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"도입 문의하기\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Inquiry\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Press \"Escape\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Inquiry\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC019",
-    "title": "Submit inquiry in modal and see simulated success message",
-    "description": "Verifies submitting the inquiry form shows a simulated success confirmation on the UI.",
-    "category": "Audit Mode Cloaking & Brand Switch",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"도입 문의하기\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Test Company\" into the \"Company\" field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"tester@example.com\" into the \"Email\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Submit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Success\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"문의\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC020",
-    "title": "Inquiry form validation: attempt submit with required fields empty",
-    "description": "Verifies the inquiry form prevents submission and shows a visible validation message when required fields are missing.",
-    "category": "Audit Mode Cloaking & Brand Switch",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"도입 문의하기\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Submit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Inquiry\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC021",
-    "title": "Audit-mode sanitization: page does not display sensitive keywords (UI check)",
-    "description": "Verifies visible UI copy on /audit does not expose common sensitive keywords during audit-mode presentation.",
-    "category": "Audit Mode Cloaking & Brand Switch",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/audit\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"SECRET\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"token\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"password\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC022",
-    "title": "Changing mirror profiles updates the mirrored width label and keeps content visible",
-    "description": "Validates that switching between mirror profiles updates the displayed width/status and does not hide the GO CTA.",
-    "category": "Mobile 1:1 Mirroring Simulator (QA)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /audit"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Open mirroring simulator\" control"
-      },
-      {
-        "type": "action",
-        "description": "Select \"S21 450px\" from the device/profile dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"450px\" is visible in the mirroring simulator status/label"
-      },
-      {
-        "type": "action",
-        "description": "Select \"S21 450px\" from the device/profile dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"GO\" button is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC023",
-    "title": "Mock login as test_shop (업체회원) and verify session persists",
-    "description": "업체회원 테스트 계정(test_shop / Coco#2025!)으로 로그인 후 세션이 유지되고 메인 페이지로 이동하는지 검증. 로그인 직후 세션이 풀리는 버그 재발 방지.",
-    "category": "인증 & 세션 (Auth & Session)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"로그인\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"test_shop\" into the 아이디 input field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the 로그인 button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify alert text contains \"기업 회원으로 로그인되었습니다\""
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL is \"/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"로그인\" is not visible in the header (로그인 버튼 사라짐 확인)"
-      }
-    ]
-  },
-  {
-    "id": "TC024",
-    "title": "Mock login as admin_user and access /admin page",
-    "description": "관리자 테스트 계정(admin_user / Coco#2025!)으로 로그인 후 /admin 페이지 접근 가능한지 검증. admin 로그인 루프 버그 재발 방지.",
-    "category": "인증 & 세션 (Auth & Session)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"admin_user\" into the 아이디 input field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the 로그인 button"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/admin\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"어드민\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC025",
-    "title": "Session does not reset after Supabase SIGNED_OUT event (mock session protection)",
-    "description": "Mock 로그인 후 페이지를 새로고침해도 세션이 유지되는지 검증. Supabase SIGNED_OUT 이벤트가 mock 세션을 덮어쓰는 버그 재발 방지.",
-    "category": "인증 & 세션 (Auth & Session)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"test_user\" into the 아이디 input field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the 로그인 button"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Reload the page (F5 / navigate to \"/\")"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL is \"/\" (로그인 페이지로 리다이렉트되지 않음)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify 로그인 버튼 is not visible in the header"
-      }
-    ]
-  },
-  {
-    "id": "TC026",
-    "title": "MY button navigates to /my-shop when logged in (not login page)",
-    "description": "업체회원으로 로그인 후 하단 네비게이션 MY 버튼 클릭 시 로그인 페이지가 아닌 마이페이지로 이동하는지 검증. MobileBottomNav 플리커링 버그 재발 방지.",
-    "category": "하단 네비게이션 (MobileBottomNav)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"test_shop\" into the 아이디 input field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Coco#2025!\" into the 비밀번호 input field"
-      },
-      {
-        "type": "action",
-        "description": "Click the 로그인 button"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the MY button in the bottom navigation bar"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/my-shop\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL does not contain \"page=login\""
-      }
-    ]
-  },
-  {
-    "id": "TC027",
-    "title": "MY button navigates to login page when not logged in",
-    "description": "비로그인 상태에서 하단 네비게이션 MY 버튼 클릭 시 로그인 페이지로 이동하는지 검증.",
-    "category": "하단 네비게이션 (MobileBottomNav)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/\" (logged out state)"
-      },
-      {
-        "type": "action",
-        "description": "Click the MY button in the bottom navigation bar"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"page=login\""
-      }
-    ]
-  },
-  {
-    "id": "TC028",
-    "title": "MY button does not flicker between /my-shop and login page on repeated clicks",
-    "description": "업체회원으로 로그인 후 MY 버튼을 3번 연속 클릭해도 항상 마이페이지로 이동하고 로그인 페이지로 튀지 않는지 검증. 플리커링 버그 재발 방지.",
-    "category": "하단 네비게이션 (MobileBottomNav)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the login alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the MY button in the bottom navigation bar"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/my-shop\""
-      },
-      {
-        "type": "action",
-        "description": "Navigate back to \"/\""
-      },
-      {
-        "type": "action",
-        "description": "Click the MY button in the bottom navigation bar again"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/my-shop\" (로그인 페이지로 가지 않음)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL does not contain \"page=login\""
-      }
-    ]
-  },
-  {
-    "id": "TC029",
-    "title": "MessageModal shows correct userName from mock session (not '회원')",
-    "description": "Mock 로그인 후 쪽지함을 열면 좌측 인사말에 '회원'이 아닌 실제 닉네임(번창하는조사장 등)이 표시되는지 검증. coco_mock_session 미탐색 버그 재발 방지.",
-    "category": "쪽지함 (MessageModal)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the login alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지함 button in the bottom navigation bar"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"회원\" is not visible as the greeting name (should be nickname, not generic '회원')"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"님\" is visible (닉네임+님 형태의 인사말)"
-      }
-    ]
-  },
-  {
-    "id": "TC030",
-    "title": "MessageModal inbox and sent tabs show different content",
-    "description": "쪽지함의 받은쪽지함과 보낸쪽지함이 서로 다른 내용을 보여주는지 검증. 동일 userName('회원')으로 양쪽을 조회하던 버그 재발 방지.",
-    "category": "쪽지함 (MessageModal)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the login alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지함 button to open MessageModal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"받은쪽지함\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click the 보낸쪽지함 tab"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"보낸쪽지함\" tab is active"
-      },
-      {
-        "type": "action",
-        "description": "Click the 받은쪽지함 tab"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"받은쪽지함\" tab is active"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify both tabs are independently queryable without showing identical data (받은/보낸 분리 확인)"
-      }
-    ]
-  },
-  {
-    "id": "TC031",
-    "title": "MessageModal send message with correct sender name",
-    "description": "쪽지 보내기 시 발신자가 '회원'이 아닌 실제 닉네임으로 전송되는지 검증.",
-    "category": "쪽지함 (MessageModal)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as test_shop with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지함 button to open MessageModal"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지보내기 tab"
-      },
-      {
-        "type": "action",
-        "description": "Type \"[관리자]\" into the 받는사람 field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"테스트 쪽지입니다.\" into the textarea"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지보내기 button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify alert text contains \"[관리자]님께 쪽지를 보냈습니다\""
-      }
-    ]
-  },
-  {
-    "id": "TC032",
-    "title": "Admin user sees logout button in mobile hamburger menu",
-    "description": "관리자 로그인 후 모바일 햄버거 메뉴를 열면 로그아웃 버튼이 보이는지 검증. admin 모바일 로그아웃 버튼 미존재 버그 재발 방지.",
-    "category": "관리자 (Admin UX)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as admin_user with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the hamburger menu button in the header"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"로그아웃\" is visible in the mobile menu"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"어드민 센터 이동\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC033",
-    "title": "Admin logout from mobile hamburger menu works correctly",
-    "description": "관리자 모바일 메뉴의 로그아웃 버튼 클릭 시 실제로 로그아웃되고 홈으로 이동하는지 검증.",
-    "category": "관리자 (Admin UX)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as admin_user with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the hamburger menu button in the header"
-      },
-      {
-        "type": "action",
-        "description": "Click the 로그아웃 button in the mobile menu"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL is \"/\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify user is logged out (로그인 버튼이 다시 보임)"
-      }
-    ]
-  },
-  {
-    "id": "TC034",
-    "title": "Scroll is functional after clicking an ad (job detail modal close)",
-    "description": "메인 페이지에서 광고(구인공고)를 클릭 후 모달을 닫았을 때 페이지 스크롤이 정상 동작하는지 검증. useBodyScrollLock 미해제 버그 재발 방지.",
-    "category": "스크롤 & 모달 (Scroll Lock)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/\""
-      },
-      {
-        "type": "action",
-        "description": "Click any job/ad card to open the detail modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the job detail modal is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click the close (X) button on the modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the modal is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify document.body.style.overflow is not 'hidden' (스크롤 해제 확인)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify document.body.style.touchAction is not 'none' (모바일 스크롤 해제 확인)"
-      }
-    ]
-  },
-  {
-    "id": "TC035",
-    "title": "Scroll is functional after selecting community category in hamburger menu",
-    "description": "커뮤니티 페이지에서 햄버거 메뉴의 카테고리를 선택한 후 스크롤이 정상 동작하는지 검증. 메뉴 닫기 전 라우팅 버그 재발 방지.",
-    "category": "스크롤 & 모달 (Scroll Lock)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/community\""
-      },
-      {
-        "type": "action",
-        "description": "Click the hamburger menu button to open the mobile category menu"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the category menu is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click any category item in the menu (e.g., '그녀들의수다')"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the category menu is not visible (메뉴가 닫힘)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify document.body.style.overflow is not 'hidden'"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page scroll is functional after category selection"
-      }
-    ]
-  },
-  {
-    "id": "TC036",
-    "title": "Community page uses hotpink brand color (no blue colors)",
-    "description": "커뮤니티 관련 페이지(목록/상세/글쓰기)에서 블루 계열 색상 없이 핫핑크(#f82b60) 브랜드 컬러가 올바르게 적용되었는지 검증.",
-    "category": "브랜드 컬러 (Brand Color)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/community\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the active tab underline or indicator color is hotpink (#f82b60), not blue"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the 글쓰기 button uses hotpink background color"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to \"/community/write\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the 등록 button uses hotpink background (#f82b60)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify no blue-600 or blue-500 colors are visible on the page"
-      }
-    ]
-  },
-  {
-    "id": "TC037",
-    "title": "MessageModal uses hotpink brand color (no blue colors)",
-    "description": "쪽지함 모달에서 블루 계열 색상 없이 핫핑크(#f82b60) 브랜드 컬러가 적용되었는지 검증.",
-    "category": "브랜드 컬러 (Brand Color)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/?page=login\" and login as test_user with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지함 button"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the active tab has hotpink (#f82b60) underline indicator"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the 쪽지보내기 tab is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click the 쪽지보내기 tab"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the 쪽지보내기 button has hotpink (#f82b60) background color"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify no blue-600 colors are visible in the modal"
-      }
-    ]
-  },
-  {
-    "id": "TC038",
-    "title": "Personal dashboard shows correct nickname (no '회원님 님' duplication)",
-    "description": "개인회원 마이페이지 대시보드에서 '회원님 님의 구직활동' 중복 표현 없이 닉네임만 표시되는지 검증. useAuth 대신 localStorage 직접 접근으로 인한 닉네임 중복 버그 재발 방지.",
-    "category": "개인회원 마이페이지 (PersonalDashboard)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /?page=login and login as test_user with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /my-shop"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text '회원님 님의 구직활동' is NOT visible (중복 표현 없음)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text '님의 구직활동' is visible (닉네임+님의 구직활동 형태)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the greeting does not contain double '님' (e.g. '회원님 님' pattern)"
-      }
-    ]
-  },
-  {
-    "id": "TC039",
-    "title": "Personal dashboard scrap count reflects actual localStorage favorites",
-    "description": "개인회원 마이페이지의 '스크랩한 공고' 숫자가 실제로 스크랩한 공고 수를 반영하는지 검증. 하드코딩 0 버그 재발 방지.",
-    "category": "개인회원 마이페이지 (PersonalDashboard)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to / (main page)"
-      },
-      {
-        "type": "action",
-        "description": "Click any job/ad card to open the detail modal"
-      },
-      {
-        "type": "action",
-        "description": "Click the star (★) button in the modal to scrap the job"
-      },
-      {
-        "type": "action",
-        "description": "Close the modal"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /my-shop"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify '스크랩한 공고' count is greater than 0 (at least 1)"
-      },
-      {
         "type": "assertion",
-        "description": "Verify the count matches the number of starred jobs"
-      }
-    ]
-  },
-  {
-    "id": "TC040",
-    "title": "Personal dashboard viewed shops count reflects actual viewed history",
-    "description": "개인회원 마이페이지의 '열람한 기업' 숫자가 실제 viewed_shops localStorage를 반영하는지 검증.",
-    "category": "개인회원 마이페이지 (PersonalDashboard)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to / and click at least one job card to view a shop"
-      },
-      {
-        "type": "action",
-        "description": "Close the modal and navigate to /my-shop"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify '열람한 기업' count is greater than 0"
-      }
-    ]
-  },
-  {
-    "id": "TC041",
-    "title": "Resume count does not flicker (no infinite re-render loop)",
-    "description": "개인회원 마이페이지 대시보드에서 이력서 등록수/공개중인 이력서 숫자가 깜빡이거나 왔다갔다하지 않는지 검증. useEffect 무한루프 버그 재발 방지.",
-    "category": "개인회원 마이페이지 (PersonalDashboard)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /?page=login and login as test_user with Coco#2025!"
-      },
-      {
-        "type": "action",
-        "description": "Accept the alert and navigate to /my-shop"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify '이력서 등록수' shows a stable number (not flickering between 0 and actual value)"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify '공개중인 이력서' shows a stable number"
-      },
-      {
-        "type": "action",
-        "description": "Wait 3 seconds and observe if numbers change"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify numbers remain stable after 3 seconds (no re-render loop)"
-      }
-    ]
-  },
-  {
-    "id": "TC042",
-    "title": "Favorites page shows scrapped jobs (localStorage key consistency)",
-    "description": "메인/업종/지역 페이지에서 스크랩한 공고가 /favorites 페이지에 실제로 표시되는지 검증. 'favorites' vs 'coco-favorites' 키 불일치 버그 재발 방지.",
-    "category": "스크랩/즐겨찾기 (Favorites)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to / (main page)"
-      },
-      {
-        "type": "action",
-        "description": "Click a job card and click the star (★) button to scrap"
-      },
-      {
-        "type": "action",
-        "description": "Close the modal"
+        "description": "Verify the page loads successfully (text \"코코알바\" or similar is visible)"
       },
       {
         "type": "action",
@@ -1417,162 +472,944 @@
       },
       {
         "type": "assertion",
-        "description": "Verify the scrapped job appears on the favorites page (not empty)"
+        "description": "Verify URL contains \"/favorites\""
       },
       {
         "type": "assertion",
-        "description": "Verify scrapped job card shows shop name and region"
+        "description": "Verify the favorites page content is visible (text \"즐겨찾기\" or \"스크랩\" is visible)"
       }
     ]
   },
   {
-    "id": "TC043",
-    "title": "Scrap toggle works from job detail modal (star button)",
-    "description": "광고 상세 모달에서 별표 클릭 시 스크랩 추가/제거가 정상 동작하고 favorites 페이지에 반영되는지 검증.",
-    "category": "스크랩/즐겨찾기 (Favorites)",
+    "id": "TC014",
+    "title": "Post-login navigation: access My Shop page after successful login",
+    "description": "Verifies a logged-in user can reach the protected My Shop page from the authenticated UI.",
+    "category": "로그인 (Login)",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to / and click a job card to open the modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify star button is visible (top left of modal)"
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Click the star button to scrap"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify star button turns yellow/filled (스크랩 상태)"
+        "description": "Click on the \"Login\" button in the header"
       },
       {
         "type": "action",
-        "description": "Click the star button again to unscrap"
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
       },
       {
         "type": "assertion",
-        "description": "Verify star button returns to unfilled state"
+        "description": "Verify text \"Logout\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"My Shop\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/my-shop\""
       }
     ]
   },
   {
-    "id": "TC044",
-    "category": "스크랩/즐겨찾기",
-    "title": "BannerSidebar 모달 스크랩 버튼 동작 확인",
-    "description": "좌우 사이드바 광고 카드 클릭 후 모달의 ☆ 버튼 클릭 시 favorites 저장 확인",
+    "id": "TC015",
+    "title": "Jobs listing page loads and shows job cards",
+    "description": "Verifies that the Jobs listing page loads successfully and displays job listing cards.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "High",
     "steps": [
-      "개인회원 로그인 상태에서 메인 페이지 접속",
-      "좌측 또는 우측 사이드바 광고 카드 클릭",
-      "모달 상단 좌측 ☆ 버튼 클릭",
-      "별이 노란색으로 채워지는지 확인",
-      "localStorage.getItem('favorites') 값이 배열로 저장되는지 확인"
-    ],
-    "expectedResult": "별 아이콘이 노란색으로 변경되고, localStorage 'favorites' 키에 광고 ID가 저장됨",
-    "priority": "HIGH",
-    "status": "PASS",
-    "bugFixed": "BUG-017"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/jobs\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"구인광고\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job card\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC045",
-    "category": "스크랩/즐겨찾기",
-    "title": "새로고침 후 스크랩 목록 유지 확인",
-    "description": "스크랩 후 페이지 새로고침 시 스크랩 상태(별 채워짐)가 유지되는지 확인",
+    "id": "TC016",
+    "title": "Filter jobs by region only",
+    "description": "Verifies that selecting a region filter updates the job cards shown in the list.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "High",
     "steps": [
-      "광고 카드 스크랩 후 페이지 새로고침",
-      "동일한 광고 카드를 다시 클릭",
-      "☆ 버튼이 ★(노란색)으로 이미 채워져 있는지 확인"
-    ],
-    "expectedResult": "새로고침 후에도 스크랩 상태 유지 (localStorage lazy init으로 복원)",
-    "priority": "MEDIUM",
-    "status": "PASS",
-    "bugFixed": "BUG-018"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"region filter\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"서울\" from dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"서울\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC046",
-    "category": "브랜드 컬러",
-    "title": "광고 모달 전화/문자 지원하기 버튼 컬러",
-    "description": "JobDetailModal 하단 전화/문자 지원하기 버튼이 핫핑크(#f82b60)인지 확인",
+    "id": "TC017",
+    "title": "Filter jobs by category only",
+    "description": "Verifies that selecting a category filter updates the job cards shown in the list.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "High",
     "steps": [
-      "광고 카드 클릭하여 모달 열기",
-      "모달 하단 '전화/문자 지원하기' 버튼 색상 확인"
-    ],
-    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨 (파란색 금지)",
-    "priority": "LOW",
-    "status": "PASS",
-    "bugFixed": "BUG-019"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"category filter\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"카페\" from dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"카페\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC047",
-    "category": "브랜드 컬러",
-    "title": "개인 마이페이지 새 이력서 작성 버튼 컬러",
-    "description": "이력서 관리 탭의 '+ 새 이력서 작성' 버튼이 핫핑크인지 확인",
+    "id": "TC018",
+    "title": "Filter jobs by region and category (happy path)",
+    "description": "Verifies that applying both region and category filters shows a filtered job card list.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "High",
     "steps": [
-      "개인회원 로그인 후 마이페이지 → 이력서 관리 탭 이동",
-      "'+ 새 이력서 작성' 버튼 색상 확인"
-    ],
-    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨",
-    "priority": "LOW",
-    "status": "PASS",
-    "bugFixed": "BUG-020"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"서울\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"카페\" from dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job card\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC048",
-    "category": "브랜드 컬러",
-    "title": "업체 마이페이지 새 공고 등록 버튼 컬러",
-    "description": "업체 마이페이지의 '+ 새 공고 등록' 버튼이 핫핑크인지 확인",
+    "id": "TC019",
+    "title": "Region + category filters return no matches and show no-results message",
+    "description": "Verifies that when filters produce no matches, the page shows a clear 'no results' empty state.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "High",
     "steps": [
-      "업체회원 로그인 후 마이페이지 접속",
-      "'+ 새 공고 등록' 버튼 색상 확인"
-    ],
-    "expectedResult": "버튼이 #f82b60 핫핑크 배경색으로 표시됨",
-    "priority": "LOW",
-    "status": "PASS",
-    "bugFixed": "BUG-021"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"세종\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"항공\" from dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"검색 결과가 없습니다\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC049",
-    "category": "모바일 UI",
-    "title": "모바일 하단 네비 활성 아이콘 핫핑크 색상 확인",
-    "description": "모바일 하단 네비에서 현재 활성 탭 아이콘 색상이 #f82b60(핫핑크)로 표시되는지 확인",
+    "id": "TC020",
+    "title": "Changing filters updates results (region change after category selected)",
+    "description": "Verifies that changing the region after a category is selected refreshes the displayed job cards or empty state.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "Medium",
     "steps": [
-      "모바일 뷰포트(390px)에서 사이트 접속",
-      "하단 네비에서 여러 탭 클릭",
-      "활성 탭 아이콘 색상 확인"
-    ],
-    "expected": "활성 아이콘이 #f82b60 핫핑크로 표시됨 (파란색 아님)",
-    "related_bug": "BUG-022",
-    "status": "pass"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"카페\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"부산\" from dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"부산\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC050",
-    "category": "모바일 UI",
-    "title": "모바일 하단 네비 가운데 버튼 플리커 없음 확인",
-    "description": "개인회원 로그인 시 모바일 하단 네비 가운데 버튼이 초기 렌더에서 플리커(광고등록→이력서등록) 없이 표시되는지 확인",
+    "id": "TC021",
+    "title": "Clear filters returns to broader job list",
+    "description": "Verifies that clearing selected filters returns the list to an unfiltered (or less filtered) state.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "Medium",
     "steps": [
-      "개인회원으로 로그인",
-      "모바일 뷰포트에서 사이트 접속",
-      "하단 네비 가운데 버튼 label 확인"
-    ],
-    "expected": "로딩 전 \"등록하기\" → 로딩 완료 후 \"이력서등록\"으로 자연스럽게 전환, 플리커 없음",
-    "related_bug": "BUG-023",
-    "status": "pass"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"서울\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"카페\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Clear filters\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job listings list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"job card\" is visible"
+      }
+    ]
   },
   {
-    "id": "TC051",
-    "category": "모바일 UI",
-    "title": "개인회원 마이페이지 모바일 수평 스크롤 탭 메뉴 확인",
-    "description": "개인회원이 모바일에서 /my-shop 접속 시 수평 스크롤 탭 메뉴가 노출되는지 확인",
+    "id": "TC022",
+    "title": "Filters persist while scrolling the jobs list",
+    "description": "Verifies that the selected region and category remain visible/selected while the user scrolls through the results.",
+    "category": "구인광고 목록 조회 (Jobs listing & filtering)",
+    "priority": "Low",
     "steps": [
-      "개인회원으로 로그인",
-      "모바일 뷰포트(390px)에서 /my-shop 접속",
-      "상단 수평 스크롤 탭 메뉴 확인",
-      "각 탭 클릭하여 뷰 전환 확인"
-    ],
-    "expected": "마이홈/정보수정/이력서/스크랩/결제내역/내게시글/맞춤공고 탭이 수평 스크롤로 표시됨",
-    "related_bug": "BUG-024",
-    "status": "pass"
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"region filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"서울\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"category filter\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"카페\" from dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to \"bottom of job listings\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"서울\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"카페\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Browse jobs list and open a job detail page",
+    "description": "Verifies a user can open a job detail page from the jobs list and see core detail UI.",
+    "category": "광고 상세 조회 (Job detail & apply/report)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"jobs\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the first job card in the jobs list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/jobs/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Apply\" button is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Report\" button is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Report a job ad from job detail (report UI opens)",
+    "description": "Verifies a user can start the report flow from a job detail page and sees the reporting UI.",
+    "category": "광고 상세 조회 (Job detail & apply/report)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first job card in the jobs list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Report\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Report\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Report\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Submit\" button is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Job detail page shows key information sections",
+    "description": "Verifies the job detail page renders key sections (title/company/location/pay/description) for a selected job.",
+    "category": "광고 상세 조회 (Job detail & apply/report)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first job card in the jobs list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/jobs/\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Job title\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Location\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Description\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "Apply button is visible and remains available after scrolling job detail",
+    "description": "Verifies the Apply entry point is discoverable even after the user scrolls through the job detail content.",
+    "category": "광고 상세 조회 (Job detail & apply/report)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first job card in the jobs list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Apply\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the job detail page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Apply\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the top of the job detail page"
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "Report button is visible and accessible after scrolling job detail",
+    "description": "Verifies the Report entry point is discoverable and accessible after scrolling the job detail page.",
+    "category": "광고 상세 조회 (Job detail & apply/report)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /jobs"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first job card in the jobs list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Report\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the job detail page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Report\" button is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Report\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "Ad creation full flow: form loads with all 4 steps visible (corporate login required)",
+    "description": "Verifies that the ad creation single-page scroll form loads with STEP 1~4 all simultaneously visible. REQUIRES corporate user login — use autoLogin=corporate param. All steps render on the same page without navigation.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "additionalInstructions": "Must use corporate account (기업회원). Navigate to /my-shop?autoLogin=corporate to trigger auto-login. The form is a single-page scroll layout — all 4 STEPs are always visible simultaneously, not a step-by-step wizard.",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains view=form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"STEP 1: 기본 정보 입력\" is visible on the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"STEP 2: 상세 내용 작성\" is visible on the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"STEP 3: 광고 타입 선택\" is visible on the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"STEP 4\" or \"추가 옵션\" is visible on the page"
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "Ad creation Step 1: fill basic info and proceed to Step 2",
+    "description": "Verifies Step 1 accepts input and allows moving to Step 2.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" or \"Create Ad\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 1\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"테스트 공고\" into the \"제목\" field"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 2\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "Ad creation Step 2: verify job detail section is visible and fillable (corporate login required)",
+    "description": "Verifies STEP 2 (상세 내용 작성) section is always visible on the single-page form and title input is fillable. REQUIRES corporate user login. STEP 2 section has id='myshop-step-2' and is always rendered — no navigation needed to reach it.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "additionalInstructions": "Must use corporate account (기업회원). Navigate to /my-shop?autoLogin=corporate. The form is a SINGLE-PAGE scroll layout — STEP 2 is always visible without completing STEP 1 first. The title input is inside section id='myshop-step-2'. Do NOT look for a '다음' navigation button — it does not exist.",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains view=form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify section with id \"myshop-step-2\" or text \"STEP 2: 상세 내용 작성\" is visible on the page"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the STEP 2 section (id='myshop-step-2')"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"테스트 공고 제목\" into the title input field inside STEP 2 section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the title input contains \"테스트 공고 제목\""
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "Ad creation Step 3: select product and proceed to Step 4",
+    "description": "Verifies a product can be selected in Step 3 and the wizard advances to Step 4.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" or \"Create Ad\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 3\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible product option (e.g., a plan card with a price)"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 4\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Ad creation Step 4: choose extras and proceed to payment",
+    "description": "Verifies extras/options can be chosen in Step 4 and the user can proceed to the payment step.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" or \"Create Ad\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"다음\" or \"Next\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 4\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible extra/option toggle or checkbox"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"결제 진행\" or \"Proceed to Payment\""
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Validation: saving with empty required fields shows alert and blocks submission",
+    "description": "Verifies that clicking '저장 및 심사' with required fields empty triggers a browser alert containing '필수 항목 누락' and does not navigate away. There is NO '다음' button on this single-page form — validation fires only on the final save button.",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "High",
+    "additionalInstructions": "Must use corporate account. The form has NO step-by-step '다음' navigation button. Validation is triggered by the '저장 및 심사' button at the bottom of the page. On validation failure, a browser alert dialog appears with text '필수 항목 누락'. Accept/dismiss the dialog and verify the form page is still visible (URL still contains view=form).",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" or \"Create Ad\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains view=form and all 4 STEP sections are visible"
+      },
+      {
+        "type": "action",
+        "description": "Do NOT fill any required fields — leave 공고 제목, 업종, 지역, 급여 all empty"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"저장 및 심사\" button at the bottom of the page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a browser alert dialog appears containing \"필수 항목 누락\" text — accept/dismiss the dialog"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL still contains view=form (form was not submitted)"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Step navigation persistence: returning to my-shop shows ad creation entry points still available",
+    "description": "Verifies the my-shop page remains usable after starting the wizard and returning (no broken state).",
+    "category": "마이페이지 광고 등록 (My-shop multi-step Ad creation)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop?autoLogin=corporate"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"광고 등록\" or \"Create Ad\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Step 1\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"취소\" or \"Cancel\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/my-shop\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"광고 등록\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "Browse community post list and open a post detail (personal user login required)",
+    "description": "Verifies a logged-in personal user can view the community post list and navigate to a post detail page. Non-logged-in users and corporate users are BLOCKED by design — they see a modal instead of the post. REQUIRES personal user (개인회원) login.",
+    "category": "커뮤니티 게시판 (Community board)",
+    "priority": "High",
+    "additionalInstructions": "Community posts are accessible ONLY to logged-in personal users (개인회원). Non-logged-in users see '그녀들만의 비밀 커뮤니티' login modal when clicking posts — this is intentional app behavior, NOT a bug. Must login as personal user before clicking a post. Use autoLogin=personal or login flow before navigating to /community.",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /community?autoLogin=personal to load the community page as a logged-in personal user"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"커뮤니티\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a list of community posts is visible on the page"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first post item in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL changes to contain \"/community/\" followed by a post ID"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify post title and post content area are visible on the detail page"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Customer Center: Expand an FAQ item to view the answer",
+    "description": "Verifies a user can open an FAQ item and see its answer content on the Customer Center page.",
+    "category": "고객센터 (Customer center: FAQ/Notice/Inquiry)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /customer-center"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"고객센터\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"FAQ\" tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"FAQ\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first FAQ question item in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an FAQ answer section is visible under the clicked question"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "Customer Center: Switch between FAQ and Inquiry tabs via URL params",
+    "description": "Verifies the Customer Center tab navigation updates visible content. Tab switching works via URL query params (?tab=faq, ?tab=inquiry). After clicking a tab, wait for navigation and React state update before asserting content.",
+    "category": "고객센터 (Customer center: FAQ/Notice/Inquiry)",
+    "priority": "Medium",
+    "additionalInstructions": "Tab switching uses router.push with ?tab= query param, then a useEffect detects the searchParams change and updates the activeTab state. Allow at least 500ms after tab click before asserting content change. The '자주묻는질문' tab maps to ?tab=faq, '1:1 문의' tab maps to ?tab=inquiry.",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /customer-center?tab=faq"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"자주묻는질문\" tab is active and FAQ content is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"1:1 문의\" tab in the sidebar"
+      },
+      {
+        "type": "action",
+        "description": "Wait 500ms for React state update after URL change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains ?tab=inquiry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify \"1:1 문의\" content area is now visible (FAQ content is no longer shown)"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"자주묻는질문\" tab"
+      },
+      {
+        "type": "action",
+        "description": "Wait 500ms for React state update"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify FAQ question list is visible again"
+      }
+    ]
+  },
+  {
+    "id": "TC038",
+    "title": "Customer Center: Submit a 1:1 inquiry successfully",
+    "description": "Verifies a user can fill out the full inquiry form (including password field) and see a confirmation after submitting.",
+    "category": "고객센터 (Customer center: FAQ/Notice/Inquiry)",
+    "priority": "High",
+    "additionalInstructions": "The inquiry form has a REQUIRED password field (type=password, placeholder='비밀번호 (4자리 이상)') used for later inquiry lookup. This field MUST be filled or submission will be blocked with '필수 항목(*)을 모두 입력해주세요.' alert. Fill all 4 fields: 제목, 내용, 이메일, 비밀번호.",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /customer-center?tab=inquiry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 1:1 문의 inquiry form is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"문의 테스트 제목\" into the inquiry title field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"테스트 문의 내용입니다. 확인 부탁드립니다.\" into the inquiry content/message field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"test.user@example.com\" into the contact email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"1234\" into the password field (placeholder: '비밀번호 (4자리 이상)', type=password) — this is required for inquiry lookup"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"등록\" or \"문의하기\" submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"접수\" or \"완료\" or \"문의가 등록되었습니다\" is visible as confirmation"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Customer Center: Notice section is reachable and displays notice list (if present)",
+    "description": "Verifies that the Customer Center can display a notices section and shows visible notice content when selected.",
+    "category": "고객센터 (Customer center: FAQ/Notice/Inquiry)",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /customer-center"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"공지\" or \"Notice\" tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"공지\" or \"Notice\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a notice list or notice items are visible"
+      }
+    ]
   }
 ]

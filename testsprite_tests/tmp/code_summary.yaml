@@ -1,52 +1,223 @@
 version: "2"
 type: frontend
 tech_stack:
-  - React (Next.js 15)
-  - TypeScript
-  - Tailwind CSS
-  - Lucide React
+  - language: TypeScript
+  - framework: Next.js 15 (App Router)
+  - ui_library: Tailwind CSS v4, Lucide React
+  - other: Supabase, TanStack React Query, React Hot Toast, Chart.js
+
 routes:
+  - path: /
+    file: src/app/page.tsx
+    auth_required: false
+    description: 메인 홈 페이지 (구인광고 목록, 지역 선택, 커뮤니티 등)
+  - path: /jobs
+    file: src/app/jobs/page.tsx
+    auth_required: false
+    description: 구인광고 리스트 페이지
+  - path: /jobs/[id]
+    file: src/app/jobs/[id]/page.tsx
+    auth_required: false
+    description: 구인광고 상세 페이지
+  - path: /coco/[region]
+    file: src/app/coco/[region]/page.tsx
+    auth_required: false
+    description: 지역별 광고 목록 페이지
+  - path: /region
+    file: src/app/region/page.tsx
+    auth_required: false
+    description: 지역 선택 페이지
+  - path: /community
+    file: src/app/community/page.tsx
+    auth_required: false
+    description: 커뮤니티 게시판 목록
+  - path: /community/write
+    file: src/app/community/write/page.tsx
+    auth_required: true
+    description: 커뮤니티 글쓰기
+  - path: /community/[id]
+    file: src/app/community/[id]/page.tsx
+    auth_required: false
+    description: 커뮤니티 게시글 상세
+  - path: /my-shop
+    file: src/app/my-shop/page.tsx
+    auth_required: true
+    description: 사업주/회원 마이페이지 (광고 관리, 결제, 지원자 관리)
+  - path: /favorites
+    file: src/app/favorites/page.tsx
+    auth_required: true
+    description: 찜한 광고 목록
+  - path: /talent
+    file: src/app/talent/page.tsx
+    auth_required: false
+    description: 인재 구직 공고 페이지
+  - path: /guide
+    file: src/app/guide/page.tsx
+    auth_required: false
+    description: 서비스 이용 가이드
+  - path: /customer-center
+    file: src/app/customer-center/page.tsx
+    auth_required: false
+    description: 고객센터 (FAQ, 공지사항, 문의하기, 이용안내)
   - path: /audit
-    file: src/components/audit/B2BAuditPage.tsx
+    file: src/app/audit/page.tsx
     auth_required: false
-    description: B2B Audit Landing and Auth Page
+    description: B2B 감사 페이지
+  - path: /admin
+    file: src/app/admin/page.tsx
+    auth_required: true
+    description: 관리자 대시보드
+
 features:
-  - name: Member Login
-    description: Login functionality for B2B members with ID and Password
+  - name: 회원가입
+    description: 이메일/비밀번호로 신규 회원 등록 (사업주/일반회원 구분)
     files:
-      - src/components/audit/B2BAuditPage.tsx
-    entry_route: /audit
+      - src/components/auth/SignupPage.tsx
+      - src/app/api/auth/register/route.ts
+    entry_route: /
     user_interactions:
-      - Fill ID field
-      - Fill Password field
-      - Click Login button
+      - 헤더에서 회원가입 버튼 클릭
+      - 아이디/비밀번호/이름/연락처 입력
+      - 사업주 또는 일반회원 선택
+      - 회원가입 완료 버튼 클릭
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/register
+    auth_required: false
+
+  - name: 로그인
+    description: Supabase 이메일/비밀번호 로그인
+    files:
+      - src/components/auth/LoginPage.tsx
+    entry_route: /
+    user_interactions:
+      - 헤더에서 로그인 버튼 클릭
+      - 아이디/비밀번호 입력
+      - 로그인 버튼 클릭
+      - 잘못된 정보 입력 시 오류 메시지 확인
+    api_calls:
+      - method: POST
+        endpoint: Supabase Auth signInWithPassword
+    auth_required: false
+
+  - name: 구인광고 목록 조회
+    description: 지역/카테고리별 구인광고 필터링 및 목록 조회
+    files:
+      - src/app/jobs/page.tsx
+      - src/app/jobs/JobClient.tsx
+      - src/components/jobs/JobListView.tsx
+    entry_route: /jobs
+    user_interactions:
+      - 지역 필터 선택
+      - 카테고리 필터 선택
+      - 광고 카드 클릭하여 상세 보기
     api_calls: []
     auth_required: false
-  - name: 3-Step Member Signup
-    description: Secure signup process with Terms Agreement (Step 1), Info Entry (Step 2), and Completion (Step 3)
+
+  - name: 광고 상세 조회
+    description: 구인광고 상세 정보 및 지원 기능
     files:
-      - src/components/audit/B2BAuditPage.tsx
-    entry_route: /audit
+      - src/app/jobs/[id]/page.tsx
+      - src/components/jobs/JobDetailModal.tsx
+    entry_route: /jobs
     user_interactions:
-      - Click Signup link
-      - Toggle All-Agree checkbox (syncs individual terms)
-      - Select Member Type (Personal/Business)
-      - Click Next step button (active only when conditions met)
-      - Fill member info
-      - Submit signup
+      - 광고 카드 클릭
+      - 상세 정보 확인
+      - 지원하기 버튼 클릭
+      - 신고하기 클릭
+    api_calls:
+      - method: POST
+        endpoint: /api/report/ad
+    auth_required: false
+
+  - name: 마이페이지 광고 등록
+    description: 사업주가 구인광고를 등록하는 다단계 폼
+    files:
+      - src/app/my-shop/AdForm.tsx
+      - src/app/my-shop/components/form/steps/Step1BasicInfo.tsx
+      - src/app/my-shop/components/form/steps/Step2JobDetail.tsx
+      - src/app/my-shop/components/form/steps/Step3ProductSelect.tsx
+      - src/app/my-shop/components/form/steps/Step4Extras.tsx
+    entry_route: /my-shop
+    user_interactions:
+      - 광고 등록 버튼 클릭
+      - 1단계 기본 정보 입력
+      - 2단계 근무 상세 조건 입력
+      - 3단계 상품 선택
+      - 4단계 추가 옵션 선택
+      - 결제 진행
+    api_calls: []
+    auth_required: true
+
+  - name: 커뮤니티 게시판
+    description: 회원 간 자유 게시판 (글 작성/조회/댓글)
+    files:
+      - src/app/community/page.tsx
+      - src/app/community/CommunityContent.tsx
+      - src/app/community/write/page.tsx
+      - src/app/community/[id]/CommunityDetailClient.tsx
+    entry_route: /community
+    user_interactions:
+      - 게시글 목록 확인
+      - 게시글 클릭하여 상세 보기
+      - 글쓰기 버튼 클릭
+      - 제목/내용 입력 후 등록
     api_calls: []
     auth_required: false
-  - name: Identity Verification Simulation
-    description: Simulation of mobile phone identity verification for audits
+
+  - name: 찜하기
+    description: 관심 광고 찜 목록 관리
     files:
-      - src/components/audit/B2BAuditPage.tsx
-    entry_route: /audit
+      - src/app/favorites/page.tsx
+    entry_route: /favorites
     user_interactions:
-      - Click Identity Auth button
-      - See "Service Maintenance" alert
+      - 광고 카드의 하트 아이콘 클릭
+      - 찜 목록 페이지에서 저장된 광고 확인
+      - 찜 해제
+    api_calls: []
+    auth_required: true
+
+  - name: 고객센터
+    description: FAQ, 공지사항, 1:1 문의
+    files:
+      - src/app/customer-center/page.tsx
+      - src/app/customer-center/components/TabFAQ.tsx
+      - src/app/customer-center/components/TabNotice.tsx
+      - src/app/customer-center/components/TabInquiry.tsx
+    entry_route: /customer-center
+    user_interactions:
+      - 탭 선택 (홈/FAQ/공지사항/이용안내/광고안내/약관)
+      - FAQ 항목 클릭하여 답변 확인
+      - 1:1 문의 폼 작성 및 제출
     api_calls: []
     auth_required: false
+
+  - name: 관리자 대시보드
+    description: 회원/광고/결제/문의 통합 관리 (관리자 전용)
+    files:
+      - src/app/admin/page.tsx
+      - src/components/admin/AdminSidebar.tsx
+      - src/components/admin/member/AdminMemberManagement.tsx
+      - src/components/admin/ad/AdminAdManagement.tsx
+      - src/components/admin/payment/AdminPaymentManagement.tsx
+    entry_route: /admin
+    user_interactions:
+      - 관리자 로그인 후 접근
+      - 사이드바 메뉴 클릭으로 섹션 이동
+      - 회원 목록 조회/검색
+      - 광고 승인/거절
+      - 결제 내역 확인
+    api_calls:
+      - method: POST
+        endpoint: /api/admin/save
+      - method: GET
+        endpoint: /api/admin/health
+    auth_required: true
+
 known_limitations:
-  - issue: Backend APIs are mocked for the audit simulation
-    location: src/components/audit/B2BAuditPage.tsx
-    impact: Data is not persisted to a real database
+  - issue: 성인 인증이 필요한 일부 페이지는 본인인증 API(identity) 연동 필요
+    location: src/components/auth/IdentityVerifyModal.tsx
+    impact: 성인 전용 콘텐츠 접근 제한 기능이 외부 API에 의존
+  - issue: SOS 알림은 Web Push 기반으로 브라우저 알림 권한 필요
+    location: src/components/PushPermission.tsx
+    impact: 알림 권한 미허용 시 SOS 수신 불가

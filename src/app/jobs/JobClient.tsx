@@ -14,6 +14,7 @@ import { Shop } from '@/types/shop';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { REGION_BRACKET_MAP } from '@/constants/regions';
+import { JOB_CATEGORY_MAP } from '@/constants/jobs';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
@@ -92,9 +93,19 @@ export default function JobClient({ shops }: JobClientProps) {
             }
             if (selectedSubRegion !== '전체' && !(shop.region?.includes(selectedSubRegion))) return false;
 
-            // Job Type Filter
-            if (selectedJobType !== '전체' && !(shop.workType?.includes(selectedJobType))) return false;
-            if (selectedSubJobType !== '전체' && !(shop.workType?.includes(selectedSubJobType))) return false;
+            // Job Type Filter (부모 카테고리 또는 서브카테고리 매칭)
+            // workType 형식: "부모명" 또는 "부모명-서브명" (대소문자 혼재 가능)
+            if (selectedJobType !== '전체') {
+                const subTypes = JOB_CATEGORY_MAP[selectedJobType] || [];
+                const wt = (shop.workType || '').toLowerCase();
+                const sjt = selectedJobType.toLowerCase();
+                // 정확한 부모 매칭: workType === parent 또는 "parent-xxx" 형태
+                const matchesParent = wt === sjt || wt.startsWith(sjt + '-');
+                // 서브카테고리 매칭 (대소문자 무시)
+                const matchesChild = subTypes.some(sub => sub && wt.includes(sub.toLowerCase()));
+                if (!matchesParent && !matchesChild) return false;
+            }
+            if (selectedSubJobType !== '전체' && !(shop.workType?.toLowerCase().includes(selectedSubJobType.toLowerCase()))) return false;
 
             // Search Query Filter
             if (activeSearchQuery) {

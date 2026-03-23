@@ -3,14 +3,20 @@
   "type": "frontend",
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
+  "loginUser": "test_user",
+  "loginPassword": "1234",
   "executionArgs": {
-    "projectName": "coco-universe",
-    "projectPath": "C:\\My-site\\통합사이트\\브랜드_통합_시스템",
-    "testIds": [],
-    "additionalInstruction": "회원가입 모달 내 '전체 약관 동의' 체크 시 개별 항목들이 모두 체크되는지, 그리고 필수 항목이 모두 채워졌을 때만 '다음 단계' 버튼이 활성화되는지 집중적으로 검증해줘. 또한 푸터 색상이 #0f1115(검은색)인지 확인해.",
-    "serverMode": "development",
+    "projectName": "p2. 브랜드_통합_시스템",
+    "projectPath": "C:\\My-site\\p2. 브랜드_통합_시스템",
+    "testIds": [
+      "TC038"
+    ],
+    "additionalInstruction": "【로그인 절차 필수 준수】 반드시 이 순서로 진행: (1) 회원 구분 라디오 버튼 먼저 선택 — 기업회원 테스트(TC002, TC014, TC028, TC029, TC030, TC031, TC032, TC033, TC034)는 '기업회원' 라디오 선택, 나머지는 '개인회원' 라디오 선택. (2) 아이디 입력 (이메일 아님, 영문/숫자 아이디). (3) 비밀번호 입력. (4) 로그인 버튼 클릭. 기업회원: 아이디 test_shop, 비밀번호 1234. 개인회원: 아이디 test_user, 비밀번호 1234. 【TC013 즐겨찾기】 TC013은 개인회원(test_user/1234)으로 로그인 후 헤더에서 '즐겨찾기' 링크를 클릭. 【성인인증 오버레이】 성인인증 오버레이가 나타나면 '성인인증없이 나가기' 버튼을 클릭한다. 버튼 클릭 즉시 오버레이가 닫히고 페이지 콘텐츠가 표시된다. 한 번만 클릭하면 충분하다. 【헤더 네비게이션】 로그인 후 헤더에서 마이샵 링크는 '마이샵' 텍스트, 즐겨찾기 링크는 '즐겨찾기' 텍스트로 찾을 것. 【광고 상세 신고】 광고 상세 모달 본문 하단에 '신고' 버튼이 있다. 모달 내에서 하단까지 스크롤한 후 '신고' 버튼을 클릭할 것. 【카테고리 필터】 /jobs 페이지의 카테고리 필터는 왼쪽 사이드바에 이미 펼쳐진 상태로 있다. TC017 카테고리 필터 테스트는 '룸알바' 항목을 사이드바에서 직접 클릭할 것. 별도로 드롭다운을 열 필요 없다. 【레이트리밋】 '요청이 너무 많습니다' 또는 스피너 5초 이상 → 5초 대기 후 F5, 최대 3회.",
+    "serverMode": "production",
     "envs": {
       "API_KEY": "sk-user-FN1CKVvN9x2yXCF4iXuP00xkwGsXtJ48mvryeCImogMTMpyghBdNgcLVk1rqUbo19BW6ZKbpLuYht_GNUm3EAWiu0WL2oy0UKidafPIU5EY-PbrOqK6z7Xx8XdF8qbGi4zw"
     }
-  }
+  },
+  "serverPort": 60784,
+  "proxy": "http://ec6785d3-1a1f-4ffe-b6fe-0b6935ac8d8c:2IajvaWfA6nlQzUlYJR8ysLcrlPSVZIo@tun.testsprite.com:8080"
 }

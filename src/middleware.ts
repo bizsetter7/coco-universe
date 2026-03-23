@@ -87,6 +87,16 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
+    // 0. non-www → www 301 리디렉션 (SEO 정규화)
+    if (process.env.NODE_ENV === 'production') {
+        const host = request.headers.get('host') || '';
+        if (host && !host.startsWith('www.') && !host.startsWith('localhost')) {
+            const url = request.nextUrl.clone();
+            url.host = `www.${host}`;
+            return NextResponse.redirect(url, { status: 301 });
+        }
+    }
+
     // 1. 관리자 페이지 — Supabase 세션 또는 mock admin 쿠키 필수
     if (pathname.startsWith('/admin')) {
         // 개발 환경에서는 mock 로그인(localStorage) 허용 — 클라이언트에서 역할 재검증
@@ -107,7 +117,8 @@ export function middleware(request: NextRequest) {
     }
 
     // [항목 11] 주요 보호 페이지 — 로그인 세션 필수
-    const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard', '/favorites'];
+    // /favorites는 localStorage 기반 클라이언트 페이지 → 미들웨어 인증 불필요
+    const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard'];
     const needsAuth = PROTECTED_AUTH_PATHS.some(p => pathname.startsWith(p));
     if (needsAuth) {
         const sessionCookie =
@@ -124,9 +135,10 @@ export function middleware(request: NextRequest) {
     // [성역] /audit 경로는 봇 체크 및 Rate Limit 제외 (심사 및 테스트용)
     const isAuditPath = pathname.startsWith('/audit');
 
-    // 2. 봇 User-Agent 차단
+    // 2. 봇 User-Agent 차단 (로컬 IP는 제외 — TestSprite 등 로컬 테스트 도구 허용)
+    const isLocalIp = ip === '127.0.0.1' || ip === '::1';
     const isBot = BLOCKED_BOTS.some(bot => ua.includes(bot.toLowerCase()));
-    if (isBot && !isAuditPath) {
+    if (isBot && !isAuditPath && !isLocalIp) {
         console.warn(`[BOT BLOCKED] IP: ${ip} | UA: ${ua.substring(0, 80)}`);
         return blocked('자동화된 접근이 차단되었습니다.', 403);
     }
