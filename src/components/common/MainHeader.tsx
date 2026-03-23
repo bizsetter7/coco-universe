@@ -291,17 +291,23 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                                     {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />}
                                 </button>
                             )}
-                            {/* 관리자: 모든 페이지에서 햄버거 메뉴 표시 */}
-                            {isMounted && userRole === 'admin' && isLoggedIn && !isLoading && (
-                                <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(true)} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}>
+                            {/* 마이페이지 혹은 햄버거 메뉴가 필요한 페이지에서 햄버거 표시 */}
+                            {isMounted && (pathname?.startsWith('/my-shop') || pathname?.startsWith('/customer-center') || pathname?.startsWith('/community') || !!page || isSimulated || userRole === 'admin') && (
+                                <button 
+                                    onClick={() => {
+                                        console.log('[DEBUG] Header Menu Clicked, Path:', pathname);
+                                        if (pathname?.includes('my-shop')) {
+                                            // 마이페이지 전용 메뉴 호출 (커스텀 이벤트)
+                                            console.log('[DEBUG] Dispatching open-my-shop-menu');
+                                            window.dispatchEvent(new CustomEvent('open-my-shop-menu', { bubbles: true, detail: { time: Date.now() } }));
+                                        } else {
+                                            setShowMobileMenu(true);
+                                        }
+                                    }} 
+                                    className={`p-1.5 focus:outline-none ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                >
                                     <Menu size={24} />
-                                </Button>
-                            )}
-                            {/* 일반 사용자: 특정 페이지에서만 햄버거 메뉴 표시 */}
-                            {userRole !== 'admin' && (pathname?.startsWith('/customer-center') || pathname?.startsWith('/my-shop') || pathname?.startsWith('/community') || !!page || isSimulated) && (
-                                <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(true)} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}>
-                                    <Menu size={24} />
-                                </Button>
+                                </button>
                             )}
                         </div>
                     </div>

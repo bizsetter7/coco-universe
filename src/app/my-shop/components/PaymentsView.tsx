@@ -144,12 +144,12 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                 <>
                                                                     <span className="text-blue-500 font-black">
                                                                         {(() => {
-                                                                            const d = safeParseDate(p.adObject.approved_at || p.date);
-                                                                            return d ? d.toISOString().split('T')[0] : '-';
+                                                                            const d = safeParseDate(p.adObject?.approved_at || p.date);
+                                                                            return d ? d.toLocaleDateString() : '-';
                                                                         })()}
                                                                     </span>
                                                                     <span className="text-[10px] opacity-70">
-                                                                        {p.adObject.deadline || '미정'}
+                                                                        {p.adObject?.deadline || '미정'}
                                                                     </span>
                                                                 </>
                                                             ) : (
@@ -294,12 +294,12 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                             <>
                                                                 <span className="text-blue-500 font-black">
                                                                     {(() => {
-                                                                        const d = safeParseDate(p.adObject.approved_at || p.date);
-                                                                        return d ? d.toISOString().split('T')[0] : '-';
+                                                                        const d = safeParseDate(p.adObject?.approved_at || p.date);
+                                                                        return d ? d.toLocaleDateString() : '-';
                                                                     })()}
                                                                 </span><br />
                                                                 <span className="text-[10px] text-gray-400">
-                                                                    {p.adObject.deadline || '미정'}
+                                                                    {p.adObject?.deadline || '미정'}
                                                                 </span>
                                                             </>
                                                         ) : (

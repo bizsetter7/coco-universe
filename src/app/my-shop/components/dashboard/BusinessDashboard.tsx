@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, Store, MapPin, Check, PlusSquare, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings } from 'lucide-react';
+import { ChevronLeft, Store, MapPin, Check, Plus, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings } from 'lucide-react';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { IconBadge } from '@/components/common/IconBadge';
 
@@ -84,7 +84,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                 디자인 의뢰
                             </button>
                             <button onClick={() => handleAdClick(true)} className="flex-1 md:flex-none py-3 px-6 rounded-xl bg-[#f82b60] text-white text-sm font-black hover:bg-[#db2456] shadow-lg shadow-[#f82b60]/30 transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                <PlusSquare size={18} /> 광고 등록
+                                <Plus size={18} /> 광고 등록
                             </button>
                         </div>
                     </div>
@@ -119,14 +119,14 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                             <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2 flex-1 min-w-0">
                                     <div className="flex gap-2 text-[11px] items-center font-black">
-                                        <span className={`${(ad.status === 'rejected' || ad.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
-                                            {(ad.status === 'rejected' || ad.status === 'REJECTED') ? '반려' : (ad.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
+                                        <span className={`${(ad?.status === 'rejected' || ad?.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad?.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
+                                            {(ad?.status === 'rejected' || ad?.status === 'REJECTED') ? '반려' : (ad?.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
                                         </span>
                                         <div className="flex flex-col text-gray-400">
-                                            {ad.approved_at && (
-                                                <span>게시일: {new Date(ad.approved_at).toISOString().split('T')[0]}</span>
+                                            {ad?.approved_at && (
+                                                <span>게시일: {new Date(ad.approved_at).toLocaleDateString()}</span>
                                             )}
-                                            <span>마감일: {ad.deadline || '미정'}</span>
+                                            <span>마감일: {ad?.deadline || '미정'}</span>
                                         </div>
                                     </div>
 
@@ -137,11 +137,11 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                             {/* Tier Code Badge (Mirroring Payments: bg-gray-900) */}
                                             <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap">
                                                 {(() => {
-                                                    const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+                                                    const pt = (ad?.productType || ad?.ad_type || ad?.options?.product_type || 'p7').toLowerCase();
                                                     const adProduct = [
                                                         { id: 'p1', code: 'T1' }, { id: 'p2', code: 'T2' }, { id: 'p3', code: 'T3' },
                                                         { id: 'p4', code: 'T4' }, { id: 'p5', code: 'T5' }, { id: 'p6', code: 'T6' }, { id: 'p7', code: 'T7' }
-                                                    ].find(tp => tp.id === pt || pt.includes(tp.id));
+                                                    ].find(tp => pt.includes(tp.id));
 
                                                     if (pt.includes('grand')) return 'T1';
                                                     if (pt.includes('premium')) return 'T2';

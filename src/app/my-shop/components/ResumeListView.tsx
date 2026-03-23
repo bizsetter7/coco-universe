@@ -54,30 +54,45 @@ export const ResumeListView = ({ setView, onShowDetail, authUser }: { setView: (
     }, []);
 
     const handleJump = async (resume: any) => {
-        if (!confirm('500 크레딧을 사용하여 이력서를 최상단으로 올리시겠습니까?')) return;
-
         const userId = authUser?.id;
         if (!userId || userId.startsWith('mock_')) return alert('로그인이 필요한 기능입니다.');
 
-        const currentCredit = await getUserPoints(userId);
-        if (currentCredit < 500) {
-            return alert('크레딧이 부족합니다. 파트너스 활동을 통해 크레딧을 충전해 주세요!');
+        const options = resume.options || {};
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+        
+        let currentJumps = options.daily_jump_count || 0;
+        if (options.last_jump_date !== today) {
+            currentJumps = 0;
         }
 
-        try {
-            // 1. Credit Deduction
-            const res = await updatePoints(userId, 'RESUME_JUMP');
-            if (!res.success) throw new Error('Credit update failed');
+        const maxJumps = 3; // 이력서는 기본 1일 3회 제공
 
-            // 2. Update resume created_at to now
+        if (currentJumps >= maxJumps) {
+            return alert(`오늘 제공된 이력서 점프 횟수를 모두 소진했습니다. (${maxJumps}/${maxJumps}회)\n내일 다시 이용해주세요.`);
+        }
+
+        if (!confirm(`이력서를 최상단으로 올리시겠습니까?\n(잔여 횟수: ${maxJumps - currentJumps}회 / 일일 최대 ${maxJumps}회)`)) return;
+
+        try {
+            const newOptions = {
+                ...options,
+                daily_jump_count: currentJumps + 1,
+                last_jump_date: today
+            };
+            const nowIso = new Date().toISOString();
+
+            // Update resume created_at to now
             const { error: jumpError } = await supabase
                 .from('resumes')
-                .update({ created_at: new Date().toISOString() })
+                .update({ 
+                    created_at: nowIso,
+                    options: newOptions
+                })
                 .eq('id', resume.id);
 
             if (jumpError) throw jumpError;
 
-            alert('이력서가 최상단으로 노출되었습니다! ✨');
+            alert(`이력서가 최상단으로 노출되었습니다! ✨\n(오늘 남은 횟수: ${maxJumps - (currentJumps + 1)}회)`);
             fetchResumes();
 
             // Refresh Header Credit (Global event)

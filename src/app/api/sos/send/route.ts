@@ -10,10 +10,10 @@ function getAdmin() {
 }
 
 const POINT_COST_MAP: Record<string, number> = {
-    SOS_SEND_SMALL: 200,
-    SOS_SEND_MEDIUM: 400,
-    SOS_SEND_LARGE: 600,
-    SOS_SEND_XLARGE: 800,
+    SOS_SEND_SMALL: 500,
+    SOS_SEND_MEDIUM: 1000,
+    SOS_SEND_LARGE: 1500,
+    SOS_SEND_XLARGE: 2000,
 };
 
 // POST /api/sos/send

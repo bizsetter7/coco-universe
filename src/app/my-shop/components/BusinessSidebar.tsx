@@ -1,5 +1,5 @@
 import React from 'react';
-import { Store, List, LogOut, User, CreditCard, Settings, ShieldCheck, Zap, Wallet } from 'lucide-react';
+import { Store, List, LogOut, User, CreditCard, Settings, ShieldCheck, Zap, Wallet, Coins } from 'lucide-react';
 
 export const BusinessSidebar = ({
     brand, shopName, nickname, view, setView
@@ -32,8 +32,9 @@ export const BusinessSidebar = ({
         { id: 'closed-ads', label: '마감된 채용정보', icon: LogOut },
         { id: 'applicants', label: '지원자 관리', icon: User },
         { id: 'sos-alert', label: 'SOS 긴급구인', icon: Zap, highlight: true },
-        { id: 'buy-points', label: '포인트 충전', icon: Wallet },
-        { id: 'payments', label: '결제 내역', icon: CreditCard },
+        { id: 'buy-points', label: '추가옵션안내', icon: Wallet },
+        { id: 'payments', label: '유료 결제 내역', icon: CreditCard },
+        { id: 'point-history', label: '포인트 및 점프 내역', icon: Coins },
         { id: 'member-info', label: '회원정보 수정', icon: Settings, borderTop: true },
     ];
 

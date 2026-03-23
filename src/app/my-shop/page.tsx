@@ -3,13 +3,19 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    PlusSquare, LayoutDashboard, Settings, Menu
+    Plus, LayoutDashboard, Settings, Menu
 } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
+
+// --- Late Imports Moved to top ---
+import { PaymentsView } from './components/PaymentsView';
+import { ApplicantsView } from './components/ApplicantsView';
+import { PointHistoryView } from './components/PointHistoryView';
+import { ResumeForm } from './components/ResumeForm';
 
 // --- Components ---
 import BusinessDashboard from './components/dashboard/BusinessDashboard';
@@ -34,42 +40,7 @@ import { SosAlertView } from './components/SosAlertView';
 import { BankTransferModal } from './components/BankTransferModal';
 import { PointShopView } from './components/PointShopView';
 
-// Simple Error Boundary for debugging
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
-    constructor(props: any) {
-        super(props);
-        this.state = { hasError: false, error: null };
-    }
-    static getDerivedStateFromError(error: any) {
-        return { hasError: true, error };
-    }
-    componentDidCatch(error: any, errorInfo: any) {
-        console.error("Critical Modal Error:", error, errorInfo);
-    }
-    render() {
-        if (this.state.hasError) {
-            return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-50">
-                    <div className="p-8 bg-white rounded-2xl shadow-xl max-w-md">
-                        <h2 className="text-xl font-black text-red-600 mb-4">오류 발생</h2>
-                        <p className="text-sm text-gray-600 mb-4">{this.state.error?.message || '알 수 없는 오류'}</p>
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="w-full px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition"
-                        >
-                            새로고침
-                        </button>
-                    </div>
-                </div>
-            );
-        }
-        return this.props.children;
-    }
-}
-import { PaymentsView } from './components/PaymentsView';
-import { ApplicantsView } from './components/ApplicantsView';
-import { ResumeForm } from './components/ResumeForm';
-
+// Removed problematic ErrorBoundary class for framework compatibility
 // --- Constants (Exported for sub-components) ---
 import { JOB_CATEGORY_MAP as INDUSTRY_DATA_MAP } from '@/constants/jobs';
 import { REGIONS_MAP as REGION_DATA_MAP } from '@/constants/regions';
@@ -92,7 +63,7 @@ function MyShopContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const brand = useBrand();
-    const { userType: authUserType, user: authUser, isLoading: authLoading } = useAuth();
+    const { userType: authUserType, user: authUser, isLoading: authLoading, userJumpBalance } = useAuth();
     const [userType, setUserType] = useState<'corporate' | 'individual' | 'admin' | 'guest' | null>(null);
     const [isNewEntry, setIsNewEntry] = useState(false);
     const [editingAdId, setEditingAdId] = useState<any | null>(null);
@@ -353,9 +324,13 @@ function MyShopContent() {
     }, [searchParams]); // Remove 'view' from dependencies to prevent race condition revert
 
     useEffect(() => {
-        const handleToggle = () => setShowMobileMenu(true);
-        window.addEventListener('toggle-mobile-menu', handleToggle);
-        return () => window.removeEventListener('toggle-mobile-menu', handleToggle);
+        const handleToggle = () => {
+            console.log('[DEBUG] Page Received open-my-shop-menu');
+            setShowMobileMenu(true);
+        };
+        // [New Navigator Integration] Listen for Global Header Menu Click
+        window.addEventListener('open-my-shop-menu', handleToggle);
+        return () => window.removeEventListener('open-my-shop-menu', handleToggle);
     }, []);
 
     useEffect(() => {
@@ -802,43 +777,87 @@ function MyShopContent() {
 
     const handleJump = async (adId: any) => {
         if (!authUser?.id || authUser.id === 'guest') return;
-        const JUMP_COST = 500;
-
-        if (!window.confirm(`점프이용권을 사용하시겠습니까?\n500P가 차감되고 공고가 최상단으로 이동합니다.`)) return;
 
         try {
-            // 포인트 확인
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles').select('points').eq('id', authUser.id).single();
-            if (profileError) throw profileError;
-            const currentPoints = profile?.points ?? 0;
-            if (currentPoints < JUMP_COST) {
-                alert(`포인트가 부족합니다. 필요: ${JUMP_COST}P, 보유: ${currentPoints}P\n포인트 충전 후 이용해주세요.`);
-                setView('buy-points');
-                return;
+            // 1. Get ad details for tier and jump counts
+            const ad = registeredAds.find(a => String(a.id) === String(adId));
+            if (!ad) throw new Error('공고를 찾을 수 없습니다.');
+            
+            const tier = ad.productType || ad.tier || ad.ad_type || '베이직';
+            // Tier Limits: basic=5, silver/gold(추천,급구)=8, deluxe/special=10, grand/premium/vip=15
+            let maxJumps = 5;
+            if (tier.includes('급구') || tier.includes('추천') || tier.includes('실버') || tier.includes('골드') || tier === 'T6') maxJumps = 8;
+            if (tier.includes('디럭스') || tier.includes('스페셜') || tier === 'T4' || tier === 'T5') maxJumps = 10;
+            if (tier.includes('그랜드') || tier.includes('프리미엄') || tier.includes('VIP') || tier === 'T1' || tier === 'T2' || tier === 'T3') maxJumps = 15;
+            
+            const options = ad.options || {};
+            // KST timezone today
+            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+            
+            let currentJumps = options.daily_manual_jump_count || 0;
+            if (options.last_manual_jump_date !== today) {
+                currentJumps = 0;
+            }
+            
+            let isPaidJump = false;
+            if (currentJumps >= maxJumps) {
+                if (userJumpBalance <= 0) {
+                    alert(`오늘 제공된 무료 점프 횟수를 모두 소진하셨습니다. (총 ${maxJumps}회)\n현재 보유 중인 유료 점프권도 없습니다.\n\n'추가옵션안내' 탭에서 점프 이용권을 충전 후 이용해주세요!`);
+                    setView('buy-points');
+                    return;
+                }
+
+                if (!window.confirm(`오늘 제공된 무료 점프 횟수를 모두 소진했습니다. (${maxJumps}/${maxJumps}회)\n\n보유 중인 유료 점프 이용권 1회를 사용하여 추가 점프하시겠습니까?\n(현재 잔여: ${userJumpBalance}회)`)) {
+                    return;
+                }
+                
+                // 유료 점프 횟수 차감 (profiles 테이블의 jump_balance)
+                const { error: deductError } = await supabase.from('profiles')
+                    .update({ 
+                        jump_balance: userJumpBalance - 1, 
+                        updated_at: new Date().toISOString() 
+                    })
+                    .eq('id', authUser.id);
+                
+                if (deductError) throw deductError;
+
+                // 점프 로그 (이유를 SHOP_JUMP로 유지하되 노트에 유료권 명시)
+                await supabase.from('point_logs').insert({
+                    user_id: authUser.id,
+                    amount: 0,
+                    reason: 'SHOP_JUMP',
+                    note: `유료 점프이용권 1회 차감 (공고 ID: ${adId})`,
+                });
+                
+                isPaidJump = true;
+            } else {
+                if (!window.confirm(`공고를 가장 위로 끌어올립니다.\n(무료 잔여 횟수: ${maxJumps - currentJumps}회 / 일일 최대 ${maxJumps}회)\n\n수동 점프를 사용하시겠습니까?`)) return;
             }
 
-            // 포인트 차감
-            const { error: deductError } = await supabase.from('profiles')
-                .update({ points: currentPoints - JUMP_COST, updated_at: new Date().toISOString() })
-                .eq('id', authUser.id);
-            if (deductError) throw deductError;
+            const newOptions = {
+                ...options,
+                daily_manual_jump_count: isPaidJump ? currentJumps : currentJumps + 1,
+                last_manual_jump_date: today
+            };
+            const nowIso = new Date().toISOString();
 
-            // point_logs 기록
-            await supabase.from('point_logs').insert({
-                user_id: authUser.id,
-                amount: -JUMP_COST,
-                reason: 'SHOP_JUMP',
-                note: `점프이용권 사용 (공고 ID: ${adId})`,
-            });
-
-            // 공고 created_at 현재시각으로 업데이트 → 최상단 노출
             const { error: jumpError } = await supabase.from('shops')
-                .update({ created_at: new Date().toISOString() })
+                .update({ 
+                    created_at: nowIso, 
+                    updated_at: nowIso,
+                    options: newOptions 
+                })
                 .eq('id', adId).eq('user_id', authUser.id);
             if (jumpError) throw jumpError;
 
-            alert('점프이용권이 적용됐습니다! 공고가 최상단에 노출됩니다.');
+            if (isPaidJump) {
+                alert(`유료 점프권 1회를 사용하여 성공적으로 추가 JUMP 되었습니다! ✨\n(잔여 유료 횟수: ${userJumpBalance - 1}회)`);
+                // useAuth의 세션 업데이트 유도를 위해 credit-updated 이벤트 활용 (또는 페이지 리로드)
+                window.dispatchEvent(new Event('credit-updated'));
+            } else {
+                alert(`무료 JUMP 완료! ✨\n(오늘 남은 무료 횟수: ${maxJumps - (currentJumps + 1)}회)`);
+            }
+            
             fetchRegisteredAds();
         } catch (err: any) {
             console.error('Jump error:', err);
@@ -947,14 +966,10 @@ function MyShopContent() {
             )}
 
             {selectedAdForModal && (
-                <ErrorBoundary>
-                    <AdDetailModal ad={selectedAdForModal} onClose={() => setSelectedAdForModal(null)} />
-                </ErrorBoundary>
+                <AdDetailModal ad={selectedAdForModal} onClose={() => setSelectedAdForModal(null)} />
             )}
             {selectedResumeForModal && (
-                <ErrorBoundary>
-                    <ResumeDetailModal resume={selectedResumeForModal} onClose={() => setSelectedResumeForModal(null)} />
-                </ErrorBoundary>
+                <ResumeDetailModal resume={selectedResumeForModal} onClose={() => setSelectedResumeForModal(null)} />
             )}
 
             {showMobileMenu && (
@@ -969,6 +984,14 @@ function MyShopContent() {
                 />
             )}
 
+            {/* Global Mobile Menu Trigger (Moves to Header position) */}
+            <button 
+                onClick={() => setShowMobileMenu(true)}
+                className="md:hidden fixed top-[10px] right-3 z-[20005] p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+                <Menu size={26} className={brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} />
+            </button>
+
             {/* Content View */}
             {view !== 'form' && (
                 <div className="max-w-6xl mx-auto px-4 md:px-6">
@@ -977,10 +1000,12 @@ function MyShopContent() {
                         className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border mb-5 mt-2 md:mt-4 ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
                     >
                         <div className="flex justify-between items-center">
-                            <h1 onClick={() => setView('dashboard')} className="text-xl md:text-2xl font-black flex items-center gap-3 cursor-pointer hover:text-blue-500 transition">
-                                <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
-                                마이페이지
-                            </h1>
+                            <div className="flex items-center gap-3">
+                                <h1 onClick={() => setView('dashboard')} className="text-xl md:text-2xl font-black flex items-center gap-3 cursor-pointer hover:text-blue-500 transition">
+                                    <span className="hidden md:inline-block w-2 h-8 bg-blue-500 rounded-full"></span>
+                                    마이페이지
+                                </h1>
+                            </div>
                             <div className="text-xs font-bold text-gray-400">MY DASHBOARD</div>
                         </div>
                     </div>
@@ -995,35 +1020,38 @@ function MyShopContent() {
                                 <PersonalDashboard view={view} setView={setView} resumeCount={resumeCount} onShowResumeDetail={(r) => setSelectedResumeForModal(r)} authUser={authUser} />
                             ) : (
                                 <>
-                                    {view === 'dashboard' && (
-                                        <BusinessDashboard
-                                            brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
-                                            handleAdClick={(isNew, ad) => {
-                                                setIsNewEntry(isNew);
-                                                if (!isNew && ad) {
-                                                    // 수정 모드: WarningModal로 기존 데이터 덮어쓰기 확인
-                                                    setEditingAdId(ad.id);
-                                                    editingAdIdRef.current = ad.id;
-                                                    formState.loadAdData(ad);
-                                                    setShowWarningModal(true);
-                                                } else {
-                                                    // 신규 등록: WarningModal 생략, 바로 폼으로
-                                                    setEditingAdId(null);
-                                                    editingAdIdRef.current = null;
-                                                    formState.resetAdStates();
-                                                    setView('form', undefined, true);
-                                                }
-                                            }}
-                                            setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
-                                        />
+                                    {userType === 'corporate' && (
+                                        <>
+                                            {view === 'dashboard' && (
+                                                <BusinessDashboard
+                                                    brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
+                                                    handleAdClick={(isNew, ad) => {
+                                                        setIsNewEntry(isNew);
+                                                        if (!isNew && ad) {
+                                                            setEditingAdId(ad.id);
+                                                            editingAdIdRef.current = ad.id;
+                                                            formState.loadAdData(ad);
+                                                            setShowWarningModal(true);
+                                                        } else {
+                                                            setEditingAdId(null);
+                                                            editingAdIdRef.current = null;
+                                                            formState.resetAdStates();
+                                                            setView('form', undefined, true);
+                                                        }
+                                                    }}
+                                                    setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds || []} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
+                                                />
+                                            )}
+                                            {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds || []} jumpBalance={userJumpBalance || 0} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
+                                            {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory || []} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'sos-alert' && <SosAlertView brand={brand} />}
+                                            {view === 'buy-points' && <PointShopView brand={brand} shopName={formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                             {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
+                                        </>
                                     )}
-                                    {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
-                                    {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={syncedPaymentHistory} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                    {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                    {view === 'sos-alert' && <SosAlertView brand={brand} />}
-                                    {view === 'buy-points' && <PointShopView brand={brand} shopName={formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                    {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={registeredAds.filter(ad => ad.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                    {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
                                 </>
                             )}
                         </div>

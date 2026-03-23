@@ -46,9 +46,51 @@ export default function TalentPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // [Business Logic] Talent Info only for Paid Corporate Members or Admin
-    // For demo: Admin bypass enabled.
-    const hasTalentAccess = userType === 'admin' || (userType === 'corporate' && (user.id === 'admin_shop' || user.points > 100000));
+    // [Phase 4: Business Logic] Talent Info only for Paid Corporate Members or Admin
+    const [hasTalentAccess, setHasTalentAccess] = React.useState<boolean | null>(null);
+
+    React.useEffect(() => {
+        if (userType === 'admin') {
+            setHasTalentAccess(true);
+            return;
+        }
+        if (userType !== 'corporate' || !user?.id) {
+            setHasTalentAccess(false);
+            return;
+        }
+
+        const checkPaidAdAccess = async () => {
+            if (user.id.startsWith('mock_')) {
+                setHasTalentAccess(true);
+                return;
+            }
+            try {
+                // Fetch all active ads for this corporate user
+                const { data, error } = await supabase
+                    .from('shops')
+                    .select('tier, status, product_type, options, deadline')
+                    .eq('user_id', user.id)
+                    .in('status', ['published', 'pending', 'PENDING_REVIEW']);
+
+                if (error) throw error;
+
+                // Check if any ad is a "paid" tier and not expired
+                const hasPaid = (data || []).some(ad => {
+                    const pt = String(ad.tier || ad.product_type || ad.options?.product_type || 'p7').toLowerCase();
+                    const isFree = pt === 'p7' || pt === 't7' || pt === 'common' || pt === '일반';
+                    const isExpired = new Date(ad.deadline || '2099-01-01') < new Date();
+                    return !isFree && !isExpired;
+                });
+
+                setHasTalentAccess(hasPaid);
+            } catch (err) {
+                console.error("Ad access check failed:", err);
+                setHasTalentAccess(false);
+            }
+        };
+
+        checkPaidAdAccess();
+    }, [user?.id, userType]);
 
     const handleActionClick = (e: React.MouseEvent) => {
         e.stopPropagation();

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X } from 'lucide-react';
+import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X, Gift, Coins } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
@@ -10,6 +10,8 @@ import { ResumeListView } from '../ResumeListView';
 import { ComingSoonView } from '../ComingSoonView';
 import { MyPostsView } from '../MyPostsView';
 import { BlockSettingsView } from '../BlockSettingsView';
+import { PointExchangeView } from '../PointExchangeView';
+import { PointHistoryView } from '../PointHistoryView';
 import shopsData from '@/lib/data/shops.json';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS } from '@/utils/favorites';
@@ -62,7 +64,9 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
         { id: 'member-edit', icon: User, label: '정보수정' },
         { id: 'resume-list', icon: FileText, label: '이력서 관리' },
         { id: 'scrap-jobs', icon: Star, label: '채용정보 스크랩' },
-        { id: 'payment-history', icon: CreditCard, label: '유료결제 내역' },
+        { id: 'point-history', icon: Coins, label: '포인트 및 점프 내역' },
+        { id: 'point-exchange', icon: Gift, label: '포인트 상품권 교환' },
+        { id: 'payment-history', icon: CreditCard, label: '유료 결제 내역' },
         { id: 'excluded-shops', icon: AlertTriangle, label: '열람불가 업소설정' },
         { id: 'custom-jobs', icon: Briefcase, label: '맞춤구인정보' },
         { id: 'my-posts', icon: FileText, label: '내가 작성한 게시글' },
@@ -115,7 +119,9 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
                             onClick={() => setView(item.id)}
                             className={`w-full flex items-center gap-3 p-3.5 rounded-2xl text-sm font-black transition-all ${isItemActive(item.id)
                                 ? 'bg-[#f82b60] text-white shadow-lg shadow-rose-100'
-                                : 'text-gray-500 hover:bg-gray-50'
+                                : item.id === 'point-exchange'
+                                    ? 'text-[#f82b60] bg-rose-50 hover:bg-rose-100 border border-rose-100'
+                                    : 'text-gray-500 hover:bg-gray-50'
                                 }`}
                         >
                             <item.icon size={18} />
@@ -449,6 +455,8 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
                 {(view as any) === 'resume-list' && <ResumeListView setView={setView} onShowDetail={onShowResumeDetail} authUser={authUser} />}
 
                 {view === 'scrap-jobs' && <ScrapJobsView setView={setView} />}
+                {view === 'point-exchange' && <PointExchangeView setView={setView} />}
+                {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}
                 {view === 'excluded-shops' && <ComingSoonView title="열람불가 업소설정" />}
                 {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}

@@ -1,7 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useAuth } from '@/hooks/useAuth';
 import {
-    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -15,6 +16,7 @@ interface MobileMenuProps {
 }
 
 export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, setView, shopName, nickname, router, userType = 'corporate' }) => {
+    const { logout } = useAuth();
     if (typeof document === 'undefined') return null;
     return createPortal(
         <div className="fixed inset-0 z-[20000] flex justify-end">
@@ -28,39 +30,56 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                 </div>
 
                 <div
-                    onClick={() => { setView('dashboard'); onClose(); }}
-                    className="text-center pb-6 border-b border-gray-100 dark:border-gray-800 cursor-pointer active:opacity-70 transition"
+                    className="flex items-center justify-between pb-6 border-b border-gray-100 dark:border-gray-800"
                 >
-                    <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (userType === 'individual' ? '회원님' : '내 상점')}</h2>
-                    <p className="text-sm text-gray-500 font-bold tracking-tight">{userType === 'individual' ? '일반 회원' : '업주 관리자'}</p>
+                    <div 
+                        onClick={() => { setView('dashboard'); onClose(); }}
+                        className="cursor-pointer active:opacity-70 transition flex-1"
+                    >
+                        <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (userType === 'individual' ? '회원님' : '내 상점')}</h2>
+                        <p className="text-sm text-gray-500 font-bold tracking-tight">{userType === 'individual' ? '일반 회원' : '업주 관리자'}</p>
+                    </div>
+                    <button 
+                        onClick={() => { if (window.confirm('로그아웃 하시겠습니까?')) logout(); }}
+                        className={`p-3 rounded-2xl border transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-rose-500' : 'bg-gray-50 border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100'}`}
+                        title="로그아웃"
+                    >
+                        <LogOut size={18} />
+                    </button>
                 </div>
 
                 <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     {userType === 'individual' ? (
                         <>
-                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer text-blue-500 bg-blue-50/20">
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Home size={18} /> 마이 대시보드
                             </div>
+                            <div onClick={() => { setView('member-edit'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <User size={18} /> 내 정보수정
+                            </div>
                             <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <List size={18} /> 이력서 리스트
+                                <List size={18} /> 이력서 관리
                             </div>
                             <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <List size={18} /> 채용정보 스크랩
+                                <Star size={18} /> 채용정보 스크랩
                             </div>
-                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <Settings size={18} /> 회원 정보 수정
+                            <div onClick={() => { setView('point-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Coins size={18} /> 포인트 및 점프 내역
+                            </div>
+                            <div onClick={() => { setView('point-exchange'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Gift size={18} /> 포인트 상품권 교환
+                            </div>
+                            <div onClick={() => { setView('payment-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <CreditCard size={18} /> 유료 결제 내역
                             </div>
                         </>
                     ) : (
                         <>
-                            <div onClick={() => { setView('ongoing-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 진행중인 공고
                             </div>
                             <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <LogOut size={18} /> 마감된 공고
-                            </div>
-                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <CreditCard size={18} /> 유료 결제 내역
                             </div>
                             <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <User size={18} /> 지원자 관리
@@ -69,7 +88,13 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                                 <Zap size={18} /> SOS 긴급구인
                             </div>
                             <div onClick={() => { setView('buy-points'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <Wallet size={18} /> 포인트 충전
+                                <Wallet size={18} /> 추가옵션안내
+                            </div>
+                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <CreditCard size={18} /> 유료 결제 내역
+                            </div>
+                            <div onClick={() => { setView('point-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Coins size={18} /> 포인트 및 점프 내역
                             </div>
                             <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1 pt-3">
                                 <Settings size={18} /> 회원 정보 수정

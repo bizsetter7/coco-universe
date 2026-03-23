@@ -15,25 +15,25 @@ export type PointReason =
     | 'ADMIN_GRANT';     // 어드민 수동 지급 (customAmount 필수)
 
 const POINT_AMOUNTS: Record<PointReason, number> = {
-    JOIN: 1000,
-    RESUME_UPLOAD: 5000,
-    COMMUNITY_POST: 200,
-    COMMUNITY_COMMENT: 50,
-    COUPON_EXCHANGE: -5000,
-    RESUME_JUMP: -500,
-    SHOP_JUMP: -500,       // 업체 공고 최상단 점프
-    SOS_SEND_SMALL: -200,  // ~10명
-    SOS_SEND_MEDIUM: -400, // ~30명
-    SOS_SEND_LARGE: -600,  // ~50명
-    SOS_SEND_XLARGE: -800, // 50명 초과
+    JOIN: 100,
+    RESUME_UPLOAD: 500,
+    COMMUNITY_POST: 50,
+    COMMUNITY_COMMENT: 10,
+    COUPON_EXCHANGE: -2000,
+    RESUME_JUMP: 0,
+    SHOP_JUMP: 0,          // 업체 공고 최상단 점프 (횟수제로 변경)
+    SOS_SEND_SMALL: -500,  // ~10명
+    SOS_SEND_MEDIUM: -1000, // ~20명
+    SOS_SEND_LARGE: -1500,  // ~30명
+    SOS_SEND_XLARGE: -2000, // 30명 초과
     ADMIN_GRANT: 0,        // customAmount로 지정
 };
 
 /** 수신자 수 기반 SOS 차감 reason 결정 */
 export function getSosPointReason(recipientCount: number): PointReason {
     if (recipientCount <= 10) return 'SOS_SEND_SMALL';
-    if (recipientCount <= 30) return 'SOS_SEND_MEDIUM';
-    if (recipientCount <= 50) return 'SOS_SEND_LARGE';
+    if (recipientCount <= 20) return 'SOS_SEND_MEDIUM';
+    if (recipientCount <= 30) return 'SOS_SEND_LARGE';
     return 'SOS_SEND_XLARGE';
 }
 

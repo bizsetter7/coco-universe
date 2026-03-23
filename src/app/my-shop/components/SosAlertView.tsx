@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { getUserPoints } from '@/lib/points';
 import { supabase } from '@/lib/supabase';
-import { Zap, MapPin, Users, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
+import { Zap, MapPin, Users, AlertCircle, Check, ChevronDown } from 'lucide-react';
 
 // 발송 가능 지역 목록
 const REGION_OPTIONS = [
@@ -32,10 +32,10 @@ const REGION_OPTIONS = [
 ];
 
 const POINT_BY_COUNT = (count: number) => {
-    if (count <= 10) return 200;
-    if (count <= 30) return 400;
-    if (count <= 50) return 600;
-    return 800;
+    if (count <= 10) return 500;
+    if (count <= 20) return 1000;
+    if (count <= 30) return 1500;
+    return 2000;
 };
 
 // SOS 예시 메시지
@@ -64,7 +64,15 @@ export const SosAlertView = ({ brand }: { brand: any }) => {
     useEffect(() => {
         if (!user?.id) return;
         setMyPoints(authPoints ?? 0);
-        getUserPoints(user.id).then(p => setMyPoints(p)).catch(() => {});
+        const fetchPoints = async () => {
+            try {
+                const p = await getUserPoints(user.id);
+                setMyPoints(p);
+            } catch (err) {
+                console.warn('Failed to fetch points:', err);
+            }
+        };
+        fetchPoints();
     }, [user?.id, authPoints]);
 
     // 진행 중 유료공고 보유 여부 확인 (T1~T7 상품, status=active)
@@ -73,16 +81,21 @@ export const SosAlertView = ({ brand }: { brand: any }) => {
             setHasActivePaidAd(true); // mock 유저는 제한 없음
             return;
         }
-        supabase
-            .from('shops')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', user.id)
-            .eq('status', 'active')
-            .not('product_type', 'is', null)
-            .then(({ count }) => {
+
+        const checkPaidAd = async () => {
+            try {
+                const { count } = await supabase
+                    .from('shops')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', user.id)
+                    .eq('status', 'active')
+                    .not('product_type', 'is', null);
                 setHasActivePaidAd((count ?? 0) > 0);
-            })
-            .catch(() => setHasActivePaidAd(true));
+            } catch (err) {
+                setHasActivePaidAd(true);
+            }
+        };
+        checkPaidAd();
     }, [user?.id]);
 
     // 지역 변경 시 수신자 수 조회
@@ -184,15 +197,10 @@ export const SosAlertView = ({ brand }: { brand: any }) => {
             <div className={`p-6 rounded-2xl border shadow-sm text-center ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <div className="text-5xl mb-4">🔒</div>
                 <h3 className={`text-lg font-black mb-2 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>SOS 긴급구인 이용 불가</h3>
-                <p className={`text-sm font-bold mb-4 leading-relaxed ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    SOS 긴급구인은 <span className="text-rose-500 font-black">진행 중인 유료광고(T1~T7)가 1개 이상</span> 있는<br />업체회원만 사용할 수 있습니다.
+                <p className={`text-sm font-bold mb-6 leading-relaxed ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'}`}>
+                    SOS 긴급구인은 유료광고진행중인 <br /> 
+                    업체회원만 사용할 수 있습니다.
                 </p>
-                <div className={`text-xs font-bold rounded-xl p-4 mb-5 text-left space-y-1 ${brand.theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
-                    <p className="font-black text-sm mb-2">이용 조건</p>
-                    <p>✅ 현재 진행 중인 유료공고(T1~T7) 1개 이상 보유</p>
-                    <p>✅ 코코 포인트 보유 (200P ~ 800P)</p>
-                    <p>❌ 무료공고만 진행 중인 경우 사용 불가</p>
-                </div>
                 <button
                     onClick={() => window.dispatchEvent(new CustomEvent('setView', { detail: 'form' }))}
                     className="w-full py-3 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black rounded-2xl shadow-lg hover:brightness-110 transition"
@@ -360,7 +368,7 @@ export const SosAlertView = ({ brand }: { brand: any }) => {
                 <div className={`p-4 rounded-xl flex items-center gap-2 ${
                     result.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
                 }`}>
-                    <CheckCircle size={16} className={result.success ? 'text-green-600' : 'text-red-500'} />
+                    <Check size={16} className={result.success ? 'text-green-600' : 'text-red-500'} />
                     <p className={`text-sm font-bold ${result.success ? 'text-green-700' : 'text-red-600'}`}>
                         {result.message}
                     </p>

@@ -65,16 +65,40 @@ const HomeContent = () => {
       return { ...shop, tier, title: currentTitle, name: shopName, workType, category, description, options: currentOptions, lat, lng };
     });
 
-    if (userLat && userLng) {
-      rawShops = rawShops.sort((a, b) => {
-        const aPriority = (a.tier === 'grand' || a.tier === 'premium') ? 0 : 1;
-        const bPriority = (b.tier === 'grand' || b.tier === 'premium') ? 0 : 1;
-        if (aPriority !== bPriority) return aPriority - bPriority;
-        const distA = calculateDistance(userLat, userLng, a.lat!, a.lng!);
-        const distB = calculateDistance(userLat, userLng, b.lat!, b.lng!);
-        return distA - distB;
-      });
-    }
+    // [Feature] 자연스러운 티어별 정렬 및 시간/거리순 정렬 적용
+    rawShops = rawShops.sort((a, b) => {
+      const TIER_ORDER = ['vip', 'grand', 't1', 'premium', 't2', 'deluxe', 't3', 'special', 't4', 'urgent', '급구', 't5', 'recommended', '추천', 't6', 'basic', '일반', 't7', 'common'];
+      
+      const getRank = (tier: string) => {
+        const idx = TIER_ORDER.indexOf((tier || '').toLowerCase());
+        return idx === -1 ? 99 : idx;
+      };
+
+      const aRank = getRank(a.tier!);
+      const bRank = getRank(b.tier!);
+      
+      // 1. 광고 등급(티어)이 다르면 티어 우선순위로만 정렬 (상위 티어 보호)
+      if (aRank !== bRank) return aRank - bRank;
+
+      // 2. 점프(또는 생성) 시간 우선 정렬 (최신 순)
+      const aRaw = a as any;
+      const bRaw = b as any;
+      const aTime = new Date(aRaw.created_at || aRaw.updated_at || aRaw.createdAt || aRaw.updatedAt || aRaw.date || 0).getTime();
+      const bTime = new Date(bRaw.created_at || bRaw.updated_at || bRaw.createdAt || bRaw.updatedAt || bRaw.date || 0).getTime();
+      
+      if (aTime !== bTime && (aTime > 0 && bTime > 0)) {
+          return bTime - aTime;
+      }
+
+      // 3. 사용자 위치 기반 거리순 정렬 (좌표 허용 시)
+      if (userLat && userLng && a.lat && a.lng && b.lat && b.lng) {
+          const distA = calculateDistance(userLat, userLng, a.lat, a.lng);
+          const distB = calculateDistance(userLat, userLng, b.lat, b.lng);
+          return distA - distB;
+      }
+
+      return 0;
+    });
 
     return rawShops;
   }, [userLat, userLng, calculateDistance]);

@@ -1411,5 +1411,121 @@
         "description": "Verify a notice list or notice items are visible"
       }
     ]
+  },
+  {
+    "id": "TC040",
+    "title": "Verify Logout button in mobile menu",
+    "description": "Checks if the logout button is visible in the mobile menu and triggers a confirmation when clicked.",
+    "category": "모바일 메뉴 (Mobile Menu)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Switch to mobile viewport (e.g., 360x668)"
+      },
+      {
+        "type": "action",
+        "description": "Click on the hamburger menu icon"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the logout icon/button is visible in the header"
+      },
+      {
+        "type": "action",
+        "description": "Click on the logout button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a logout confirmation (confirm) is triggered"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Verify Point and Jump History integrated view in My Page",
+    "description": "Verifies that the Point History is correctly integrated into the My Page and accessible via the sidebar/menu.",
+    "category": "마이페이지 (My Page)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop"
+      },
+      {
+        "type": "action",
+        "description": "Click on '포인트 및 점프 내역' in the sidebar or mobile menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the header text '포인트 및 점프 내역' is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the point history list/table is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Verify Point Shop package toggle selection",
+    "description": "Verifies that clicking an already selected package in the Point Shop deselects it.",
+    "category": "추가옵션 (Point Shop)",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop (Point Shop view)"
+      },
+      {
+        "type": "action",
+        "description": "Select a point package (e.g., 1,000P)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the package is visually marked as selected"
+      },
+      {
+        "type": "action",
+        "description": "Click the same 1,000P package again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the package is no longer selected"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "Verify Point Shop confirmation step and bank info",
+    "description": "Verifies the two-step application process: summary confirmation followed by bank transfer details.",
+    "category": "추가옵션 (Point Shop)",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /my-shop (Point Shop view)"
+      },
+      {
+        "type": "action",
+        "description": "Select any package and click '신청하기'"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the confirmation summary modal/view is shown"
+      },
+      {
+        "type": "action",
+        "description": "Click '신청확인' in the confirmation view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the completion screen with '충전 신청 완료!' is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify bank account info and the ID remark are visible"
+      }
+    ]
   }
 ]
