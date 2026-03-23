@@ -802,12 +802,13 @@ function MyShopContent() {
             let isPaidJump = false;
             if (currentJumps >= maxJumps) {
                 if (userJumpBalance <= 0) {
-                    alert(`오늘 제공된 무료 점프 횟수를 모두 소진하셨습니다. (총 ${maxJumps}회)\n현재 보유 중인 유료 점프권도 없습니다.\n\n'추가옵션안내' 탭에서 점프 이용권을 충전 후 이용해주세요!`);
+                if (window.confirm('잔여 횟수가 소진되었습니다.\n\n점프 서비스 구매 페이지로 이동하시겠습니까?')) {
                     setView('buy-points');
-                    return;
                 }
+                return;
+            }
 
-                if (!window.confirm(`오늘 제공된 무료 점프 횟수를 모두 소진했습니다. (${maxJumps}/${maxJumps}회)\n\n보유 중인 유료 점프 이용권 1회를 사용하여 추가 점프하시겠습니까?\n(현재 잔여: ${userJumpBalance}회)`)) {
+            if (!window.confirm(`오늘 제공된 무료 점프 횟수를 모두 소진했습니다. (${maxJumps}/${maxJumps}회)\n\n보유 중인 유료 점프 이용권 1회를 사용하여 추가 점프하시겠습니까?\n(현재 잔여: ${userJumpBalance}회)`)) {
                     return;
                 }
                 
