@@ -87,10 +87,12 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
-    // 0. non-www → www 301 리디렉션 (SEO 정규화)
+    // 0. non-www → www 301 리디렉션 (SEO 정규화) — Vercel 프리뷰 도메인은 제외
     if (process.env.NODE_ENV === 'production') {
         const host = request.headers.get('host') || '';
-        if (host && !host.startsWith('www.') && !host.startsWith('localhost')) {
+        // .vercel.app으로 끝나는 프리뷰/시스템 도메인과 localhost는 리다이렉트 제외
+        const isVercelDomain = host.endsWith('.vercel.app');
+        if (host && !host.startsWith('www.') && !host.startsWith('localhost') && !isVercelDomain) {
             const url = request.nextUrl.clone();
             url.host = `www.${host}`;
             return NextResponse.redirect(url, { status: 301 });
