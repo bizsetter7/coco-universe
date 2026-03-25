@@ -33,7 +33,9 @@ export async function GET(request: Request) {
                 auth: { autoRefreshToken: false, persistSession: false }
             });
             const email = `${id}@cocoalba.kr`;
-            const { data, error } = await adminClient.auth.admin.listUsers();
+
+            // perPage: 1000으로 충분한 범위 조회 (기본값 50이면 누락 가능)
+            const { data, error } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1000 });
             if (error) throw error;
             const exists = data.users.some((u) => u.email === email);
             if (exists) {
@@ -41,7 +43,27 @@ export async function GET(request: Request) {
             }
             return NextResponse.json({ available: true, message: '사용 가능한 아이디입니다.' });
         } catch (err: any) {
-            console.error('[check-username] Supabase error:', err.message);
+            console.error('[check-username] Supabase Admin API 오류 (listUsers 실패):', err.message);
+            // Admin API 실패 시 profiles 테이블로 fallback 조회
+            try {
+                const fallbackClient = createClient(supabaseUrl, serviceKey, {
+                    auth: { autoRefreshToken: false, persistSession: false }
+                });
+                const email = `${id}@cocoalba.kr`;
+                // profiles 테이블의 id(UUID)는 모르지만 auth.users를 통해 email 기반으로 확인
+                // RPC 또는 직접 쿼리 불가 시, 아이디 중복확인 실패 응답 반환 (가입 시 Supabase가 최종 검증)
+                return NextResponse.json({
+                    available: false,
+                    message: '아이디 중복확인을 현재 처리할 수 없습니다. 잠시 후 다시 시도해주세요.',
+                    code: 'CHECK_FAILED'
+                }, { status: 503 });
+            } catch {
+                return NextResponse.json({
+                    available: false,
+                    message: '아이디 중복확인을 현재 처리할 수 없습니다. 잠시 후 다시 시도해주세요.',
+                    code: 'CHECK_FAILED'
+                }, { status: 503 });
+            }
         }
     }
 

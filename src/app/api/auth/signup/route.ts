@@ -44,9 +44,20 @@ export async function POST(req: NextRequest) {
         });
 
         if (error) {
+            // 이미 등록된 이메일(아이디) 중복 처리 → 한국어 메시지 반환
+            const isAlreadyRegistered =
+                error.message?.toLowerCase().includes('already registered') ||
+                error.message?.toLowerCase().includes('already exists') ||
+                error.message?.toLowerCase().includes('duplicate');
             return NextResponse.json(
-                { success: false, message: error.message },
-                { status: 400 }
+                {
+                    success: false,
+                    code: isAlreadyRegistered ? 'ALREADY_REGISTERED' : 'SIGNUP_ERROR',
+                    message: isAlreadyRegistered
+                        ? '이미 사용 중인 아이디입니다. 다른 아이디를 선택해주세요.'
+                        : error.message,
+                },
+                { status: isAlreadyRegistered ? 409 : 400 }
             );
         }
 

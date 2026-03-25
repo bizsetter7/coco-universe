@@ -338,7 +338,15 @@ export const SignupPage = () => {
             });
             goStep(3);
         } catch (err: any) {
-            alert(`회원가입 실패: ${err.message || '다시 시도해주세요.'}`);
+            const msg = err.message || '다시 시도해주세요.';
+            const isAlreadyRegistered = msg.includes('이미 사용 중인 아이디') || msg.toLowerCase().includes('already registered');
+            if (isAlreadyRegistered) {
+                alert('이미 사용 중인 아이디입니다. 다른 아이디를 선택해주세요.');
+                if (role === 'individual') { setIId(''); setIIdChecked(false); }
+                else { setCId(''); setCIdChecked(false); }
+            } else {
+                alert(`회원가입 실패: ${msg}`);
+            }
         } finally {
             setIsLoading(false);
         }
