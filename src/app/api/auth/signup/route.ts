@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
             try {
                 await supabaseAdmin.from('profiles').upsert({
                     id: data.user.id,
+                    username: email.split('@')[0],   // 로그인 아이디 저장 (중복확인용)
                     full_name: name || '',
                     nickname: nickname || name || '',
                     role: role || 'individual',

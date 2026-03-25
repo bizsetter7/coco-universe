@@ -60,7 +60,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
         const loadProfile = async () => {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nickname, phone, sms_consent, nickname_updated_at, birth_date, gender')
+                .select('nickname, phone, nickname_updated_at, birth_date, gender')
                 .eq('id', user.id)
                 .single();
 
@@ -72,7 +72,6 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                 phone: profile?.phone || '',
                 birthDate: profile?.birth_date || '',
                 gender: profile?.gender || '',
-                smsConsent: profile?.sms_consent ?? true,
             }));
             setOriginalNickname(nick);
             setNicknameLastUpdated(profile?.nickname_updated_at || null);
@@ -124,7 +123,6 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                 const updatePayload: any = {
                     nickname: formData.nickname,
                     phone: formData.phone,
-                    sms_consent: formData.smsConsent,
                 };
 
                 // 닉네임이 변경된 경우 nickname_updated_at 갱신
@@ -196,16 +194,16 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                     {/* 아이디 / 이메일 (고정) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>아이디 (고정)</label>
+                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>아이디</label>
                             <input
                                 type="text"
-                                value={user?.name || ''}
+                                value={user?.email?.split('@')[0] || user?.name || ''}
                                 disabled
                                 className={`w-full p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
                             />
                         </div>
                         <div>
-                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>이메일 (고정)</label>
+                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>이메일</label>
                             <input
                                 type="email"
                                 value={formData.email}
@@ -236,7 +234,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                                 <label className={`block text-xs font-bold mb-1.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>성별</label>
                                 <input
                                     type="text"
-                                    value={formData.gender === 'male' ? '남성' : formData.gender === 'female' ? '여성' : ''}
+                                    value={formData.gender === 'M' ? '남성' : formData.gender === 'F' ? '여성' : (formData.gender === '남성' || formData.gender === '여성') ? formData.gender : ''}
                                     disabled
                                     placeholder="본인인증 후 자동 입력"
                                     className={`w-full p-3 rounded-xl font-bold border text-sm ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}

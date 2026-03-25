@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
 
 /**
  * GET /api/auth/check-username?id=bizsetter
  * 아이디 중복확인 API
- * - Supabase email 포맷: ${id}@cocoalba.kr
- * - SUPABASE_SERVICE_ROLE_KEY 있으면 실제 DB 조회, 없으면 users.json 폴백
+ * - profiles.username 컬럼으로 직접 조회 (listUsers 불필요)
  */
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -23,62 +20,38 @@ export async function GET(request: Request) {
         return NextResponse.json({ available: false, message: '아이디는 영문/숫자만 사용 가능합니다.' }, { status: 400 });
     }
 
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    // Service Role Key 있으면 → Supabase admin 조회
-    if (serviceKey && supabaseUrl) {
+    if (supabaseUrl && supabaseAnonKey) {
         try {
-            const adminClient = createClient(supabaseUrl, serviceKey, {
+            // profiles.username 컬럼으로 직접 조회 (Public read 정책으로 anon key 사용 가능)
+            const client = createClient(supabaseUrl, supabaseAnonKey, {
                 auth: { autoRefreshToken: false, persistSession: false }
             });
-            const email = `${id}@cocoalba.kr`;
+            const { data, error } = await client
+                .from('profiles')
+                .select('id')
+                .eq('username', id)
+                .maybeSingle();
 
-            // perPage: 1000으로 충분한 범위 조회 (기본값 50이면 누락 가능)
-            const { data, error } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1000 });
             if (error) throw error;
-            const exists = data.users.some((u) => u.email === email);
-            if (exists) {
+
+            if (data) {
                 return NextResponse.json({ available: false, message: '이미 사용 중인 아이디입니다.' });
             }
             return NextResponse.json({ available: true, message: '사용 가능한 아이디입니다.' });
         } catch (err: any) {
-            console.error('[check-username] Supabase Admin API 오류 (listUsers 실패):', err.message);
-            // Admin API 실패 시 profiles 테이블로 fallback 조회
-            try {
-                const fallbackClient = createClient(supabaseUrl, serviceKey, {
-                    auth: { autoRefreshToken: false, persistSession: false }
-                });
-                const email = `${id}@cocoalba.kr`;
-                // profiles 테이블의 id(UUID)는 모르지만 auth.users를 통해 email 기반으로 확인
-                // RPC 또는 직접 쿼리 불가 시, 아이디 중복확인 실패 응답 반환 (가입 시 Supabase가 최종 검증)
-                return NextResponse.json({
-                    available: false,
-                    message: '아이디 중복확인을 현재 처리할 수 없습니다. 잠시 후 다시 시도해주세요.',
-                    code: 'CHECK_FAILED'
-                }, { status: 503 });
-            } catch {
-                return NextResponse.json({
-                    available: false,
-                    message: '아이디 중복확인을 현재 처리할 수 없습니다. 잠시 후 다시 시도해주세요.',
-                    code: 'CHECK_FAILED'
-                }, { status: 503 });
-            }
+            console.error('[check-username] profiles 조회 오류:', err.message);
+            // 조회 실패 시 안전하게 사용불가 반환 (가입 시 Supabase 최종 검증)
+            return NextResponse.json({
+                available: false,
+                message: '아이디 중복확인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+                code: 'CHECK_FAILED'
+            }, { status: 503 });
         }
     }
 
-    // 폴백 → users.json 체크
-    try {
-        const dataPath = path.join(process.cwd(), 'src', 'data', 'users.json');
-        if (fs.existsSync(dataPath)) {
-            const users = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-            const exists = Array.isArray(users) && users.some((u: any) => u.id === id);
-            if (exists) {
-                return NextResponse.json({ available: false, message: '이미 사용 중인 아이디입니다.' });
-            }
-        }
-    } catch { /* ignore */ }
-
-    // 최종 폴백 → 사용 가능 (signUp 시 Supabase가 이메일 중복 최종 검증)
+    // 환경변수 없음 → 사용 가능 (signUp 시 Supabase 최종 검증)
     return NextResponse.json({ available: true, message: '사용 가능한 아이디입니다.' });
 }
