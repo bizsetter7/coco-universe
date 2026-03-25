@@ -535,9 +535,9 @@ export const SignupPage = () => {
                         </Field>
 
                         <Field label="휴대폰 번호" required>
-                            <Input placeholder="인증 후 자동 입력" value={iPhone}
-                                disabled={verified} onChange={(e) => setIPhone(e.target.value)} />
-                            {verified && <p className="text-[10px] text-gray-500 mt-1">본인인증으로 확인된 번호입니다.</p>}
+                            <Input placeholder="010-0000-0000" value={iPhone}
+                                onChange={(e) => setIPhone(e.target.value)} />
+                            <p className="text-[10px] text-gray-400 mt-1">본인인증에 사용한 휴대폰 번호를 입력해주세요.</p>
                         </Field>
 
                         {/* SMS 수신 동의 */}
@@ -632,8 +632,9 @@ export const SignupPage = () => {
                                     disabled={verified && !!cGender} />
                             </Field>
                             <Field label="핸드폰" required>
-                                <Input placeholder="인증 후 자동 입력" value={cPhone}
-                                    disabled={verified} onChange={(e) => setCPhone(e.target.value)} />
+                                <Input placeholder="010-0000-0000" value={cPhone}
+                                    onChange={(e) => setCPhone(e.target.value)} />
+                                <p className="text-[10px] text-gray-400 mt-1">본인인증에 사용한 휴대폰 번호를 입력해주세요.</p>
                             </Field>
                         </div>
 
