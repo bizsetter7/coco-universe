@@ -61,6 +61,19 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // [이중보장] email_confirm: true가 키 권한 문제로 미적용될 경우를 대비해
+        // updateUserById로 한 번 더 이메일 확인 처리
+        if (data.user?.id && !data.user?.email_confirmed_at) {
+            try {
+                await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
+                    email_confirm: true,
+                });
+                console.log('[signup] updateUserById email_confirm 적용 완료');
+            } catch (updateErr) {
+                console.warn('[signup] updateUserById 실패 (무시):', updateErr);
+            }
+        }
+
         return NextResponse.json({ success: true, userId: data.user?.id });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : '서버 오류';

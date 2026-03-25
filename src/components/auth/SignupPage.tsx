@@ -263,10 +263,25 @@ export const SignupPage = () => {
         document.body.scrollTop = 0;
     }, []);
 
-    // ── 본인인증 완료 처리 (CI/DI만 저장, 입력값은 사용자가 직접 입력) ──
+    // ── 본인인증 완료 처리 (이름/생년월일/성별 자동입력 → 수정 불가, 보안 강화) ──
     const handleVerified = (result: IdentityVerifyResult) => {
         setVerifyResult(result);
         setShowModal(false);
+
+        // 인증된 실명/생년월일/성별을 자동입력하고 수정 불가 처리
+        if (result.name) {
+            setIName(result.name);
+            setCManager(result.name);
+        }
+        if (result.birthdate) {
+            setIBirth(result.birthdate);
+            setCBirth(result.birthdate);
+        }
+        if (result.gender) {
+            const g = result.gender === 'M' ? '남성' : result.gender === 'F' ? '여성' : '';
+            setIGender(g);
+            setCGender(g);
+        }
     };
 
     // ── 스텝 전환 공통 (항상 최상단에서 시작) ──
@@ -493,17 +508,20 @@ export const SignupPage = () => {
                         </Field>
 
                         <Field label="이름" required>
-                            <Input placeholder="실명을 입력해주세요" value={iName}
+                            <Input placeholder={verified ? '' : '본인인증 후 자동 입력'}
+                                value={iName} disabled={verified}
                                 onChange={(e) => setIName(e.target.value)} />
                         </Field>
 
                         <Field label="생년월일" required hint="예: 1990-01-01">
-                            <Input placeholder="1990-01-01" value={iBirth}
+                            <Input placeholder={verified ? '' : '본인인증 후 자동 입력'}
+                                value={iBirth} disabled={verified}
                                 onChange={(e) => setIBirth(e.target.value)} />
                         </Field>
 
                         <Field label="성별" required>
-                            <GenderSelect value={iGender} onChange={setIGender} primary={primary} />
+                            <GenderSelect value={iGender} onChange={setIGender} primary={primary}
+                                disabled={verified} />
                         </Field>
 
                         <Field label="닉네임" required hint="닉네임은 1일 1회만 수정됩니다">
@@ -610,15 +628,18 @@ export const SignupPage = () => {
                             </p>
 
                             <Field label="담당자(성함)" required>
-                                <Input placeholder="실명을 입력해주세요" value={cManager}
+                                <Input placeholder={verified ? '' : '본인인증 후 자동 입력'}
+                                    value={cManager} disabled={verified}
                                     onChange={(e) => setCManager(e.target.value)} />
                             </Field>
                             <Field label="생년월일" required hint="예: 1990-01-01">
-                                <Input placeholder="1990-01-01" value={cBirth}
+                                <Input placeholder={verified ? '' : '본인인증 후 자동 입력'}
+                                    value={cBirth} disabled={verified}
                                     onChange={(e) => setCBirth(e.target.value)} />
                             </Field>
                             <Field label="성별">
-                                <GenderSelect value={cGender} onChange={setCGender} primary={primary} />
+                                <GenderSelect value={cGender} onChange={setCGender} primary={primary}
+                                    disabled={verified} />
                             </Field>
 
                             {/* 휴대폰 번호 + 본인인증 인라인 */}

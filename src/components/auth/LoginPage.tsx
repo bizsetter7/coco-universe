@@ -50,7 +50,18 @@ export const LoginPage = () => {
             window.location.href = '/';
         } catch (err: any) {
             console.error('Login error:', err);
-            alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);
+            const msg: string = err.message || '';
+            let korMsg = '아이디 또는 비밀번호를 확인해주세요.';
+            if (msg.toLowerCase().includes('invalid login') || msg.toLowerCase().includes('invalid credentials')) {
+                korMsg = '아이디 또는 비밀번호가 올바르지 않습니다.';
+            } else if (msg.toLowerCase().includes('email not confirmed')) {
+                korMsg = '이메일 인증이 완료되지 않은 계정입니다. 관리자에게 문의해주세요.';
+            } else if (msg.toLowerCase().includes('user not found') || msg.toLowerCase().includes('no user found')) {
+                korMsg = '등록되지 않은 아이디입니다.';
+            } else if (msg.toLowerCase().includes('too many requests')) {
+                korMsg = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+            }
+            alert(korMsg);
         } finally {
             setIsLoading(false);
         }
