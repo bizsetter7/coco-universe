@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
@@ -251,6 +251,11 @@ export const SignupPage = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    // ── 컴포넌트 마운트 시 항상 최상단 ──
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, []);
+
     // ── 본인인증 완료 처리 ──
     const handleVerified = (result: IdentityVerifyResult) => {
         setVerifyResult(result);
@@ -274,13 +279,19 @@ export const SignupPage = () => {
         }
     };
 
+    // ── 스텝 전환 공통 (항상 최상단에서 시작) ──
+    const goStep = (n: 1 | 2 | 3) => {
+        setStep(n);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+
     // ── STEP1 → STEP2 ──
     const goStep2 = () => {
         if (!agreeTerms || !agreePrivacy || !agreeAge) {
             alert('필수 약관에 모두 동의해주세요.');
             return;
         }
-        setStep(2);
+        goStep(2);
     };
 
     // ── 아이디 중복확인 (실제 API 연동) ──
@@ -333,8 +344,7 @@ export const SignupPage = () => {
                 role,
                 identity_ci: verifyResult?.ci,
             });
-            setStep(3);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            goStep(3);
         } catch (err: any) {
             alert(`회원가입 실패: ${err.message || '다시 시도해주세요.'}`);
         } finally {
@@ -532,7 +542,7 @@ export const SignupPage = () => {
                         </label>
 
                         <div className="flex gap-3 pt-2">
-                            <button type="button" onClick={() => setStep(1)}
+                            <button type="button" onClick={() => goStep(1)}
                                 className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 이전
                             </button>
@@ -640,7 +650,7 @@ export const SignupPage = () => {
                         </label>
 
                         <div className="flex gap-3 pt-2">
-                            <button type="button" onClick={() => setStep(1)}
+                            <button type="button" onClick={() => goStep(1)}
                                 className="flex-1 py-4 rounded-2xl border border-gray-300 text-gray-600 font-bold text-sm">
                                 이전
                             </button>
