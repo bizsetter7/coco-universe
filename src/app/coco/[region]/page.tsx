@@ -16,7 +16,6 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
     const { region } = await params;
     const decodedRegionSlug = decodeURIComponent(region);
 
-    // [SEO 무결성] P3(지역페이지)는 심사 모드 여부와 관계없이 항상 원본 하이엔드 키워드(Shadow SEO)를 표출하여 랭킹 방어
     const regionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug) || {
         mainRegion: decodedRegionSlug.replace(/-/g, ' '),
         keywords: [`${decodedRegionSlug.replace(/-/g, ' ')} 알바`]

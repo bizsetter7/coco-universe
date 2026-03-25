@@ -41,22 +41,6 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  if (isAuditMode) {
-    return {
-      title: "코코알바 - B2B 점주 전용 매칭 솔루션",
-      description: "코코알바 파트너스가 제안하는 검증된 원스톱 인재 채용 플랫폼입니다. 맞춤 분석 및 정산 솔루션을 제공합니다.",
-      other: {
-        google: "notranslate",
-        "color-scheme": "light",
-        "supported-color-schemes": "light",
-      },
-      robots: {
-        index: true,
-        follow: true,
-      }
-    };
-  }
-
   const seoConfig = getCurrentSEO();
   return {
     title: seoConfig.metadata.title,
@@ -181,27 +165,23 @@ export default function RootLayout({
           </>
         )}
         
-        {AUDIT_MODE ? (
-          // [Perfect Cloaking] 완전한 B2B 솔루션 화면만 렌더링 (코코알바 테마/사이드바 등 일절 없음)
-          <B2BAuditPage />
-        ) : (
-          <>
-            <SEOManager />
-            <SEOInjection />
-            <BrandProvider>
-              <ScrollToTop />
-              <div className="flex flex-col h-auto">
-                <Suspense fallback={<div className="min-h-screen bg-white" />}>
-                  <LayoutWrapper sideAds={sideAds}>
-                    <Suspense fallback={null}>
-                      {children}
-                    </Suspense>
-                  </LayoutWrapper>
+        <Suspense fallback={null}>
+          <SEOManager />
+          <SEOInjection />
+        </Suspense>
+
+        <BrandProvider>
+          <div className="flex flex-col h-auto">
+            <Suspense fallback={<div className="min-h-screen bg-white" />}>
+              <LayoutWrapper sideAds={sideAds}>
+                <Suspense fallback={null}>
+                  {children}
                 </Suspense>
-              </div>
-            </BrandProvider>
-          </>
-        )}
+              </LayoutWrapper>
+            </Suspense>
+          </div>
+          <ScrollToTop />
+        </BrandProvider>
       </body>
     </html>
   );

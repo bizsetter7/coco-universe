@@ -1,11 +1,13 @@
 /**
  * B2B 랜딩 모드 플래그
  * 환경변수 NEXT_PUBLIC_AUDIT_MODE=true 일 때 AuditLanding 컴포넌트 노출
- * - P2 (코코알바) Vercel 프로젝트: 미설정(default false) → 실제 P2 사이트 렌더링
- * - P4 (초코파트너스) Vercel 프로젝트: NEXT_PUBLIC_AUDIT_MODE=true → AuditLanding 렌더링
  */
-// [화이트셀 해제] 실전 PRODUCTION 모드 상시 활성화
-export const AUDIT_MODE = false;
+/**
+ * [브랜드 통합 설정]
+ * P2 (코코알바): 2026-03-25부로 심사 위장막(WhiteCell) 영구 폐기 -> 상시 B2C 실전 모드.
+ */
+export const AUDIT_MODE = false; // [핵심] P2는 이제 위장막이 필요 없습니다. (SOP v1.9.8)
+export const IS_PRODUCTION = true; // 실전 모드 강제
 
 /**
  * 기업전용인증 게이트 마스터 락 (Master Lock)
