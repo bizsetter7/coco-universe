@@ -536,6 +536,7 @@ export const SignupPage = () => {
                         <Field label="휴대폰 번호" required>
                             <div className="flex gap-2">
                                 <Input placeholder="010-0000-0000" value={iPhone}
+                                    disabled={verified}
                                     onChange={(e) => setIPhone(e.target.value)} />
                                 <button type="button" onClick={() => setShowModal(true)}
                                     className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
@@ -649,6 +650,7 @@ export const SignupPage = () => {
                             <Field label="핸드폰" required>
                                 <div className="flex gap-2">
                                     <Input placeholder="010-0000-0000" value={cPhone}
+                                        disabled={verified}
                                         onChange={(e) => setCPhone(e.target.value)} />
                                     <button type="button" onClick={() => setShowModal(true)}
                                         className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
@@ -716,9 +718,7 @@ export const SignupPage = () => {
                             <h2 className="text-2xl font-black text-white mb-2">회원가입 완료!</h2>
                             <p className="text-gray-400 text-sm leading-relaxed">
                                 {brand.displayName}의 회원이 되신 것을 환영합니다.<br />
-                                {role === 'corporate'
-                                    ? '관리자 승인 후 서비스 이용이 가능합니다. (최대 24시간)'
-                                    : '이제부터 다양한 서비스를 이용하실 수 있습니다.'}
+                                이제부터 다양한 서비스를 이용하실 수 있습니다.
                             </p>
                         </div>
                         <button onClick={() => router.push('/?page=login')}

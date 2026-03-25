@@ -46,19 +46,18 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
         const loadProfile = async () => {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nickname, phone, sms_consent, full_name, birth_date, gender, email')
+                .select('nickname, phone, full_name, birth_date, gender')
                 .eq('id', user.id)
                 .single();
 
             setFormData(prev => ({
                 ...prev,
                 nickname: profile?.nickname || user?.nickname || '',
-                email: profile?.email || user?.email || '',
+                email: user?.email || '',
                 phone: profile?.phone || '',
                 managerName: profile?.full_name || user?.name || '',
                 birthDate: profile?.birth_date || '',
                 gender: profile?.gender || '',
-                smsConsent: profile?.sms_consent ?? true,
             }));
             setIsLoaded(true);
         };
@@ -89,10 +88,7 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
             if (!user.id.startsWith('mock_')) {
                 const updatePayload: any = {
                     nickname: formData.nickname,
-                    sms_consent: formData.smsConsent,
                 };
-                // 이메일 필드가 profiles 테이블에 있으면 저장
-                if (formData.email) updatePayload.email = formData.email;
 
                 const { error } = await supabase
                     .from('profiles')
@@ -153,40 +149,24 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                         <label className={labelCls}>아이디</label>
                         <input type="text" value={username} disabled className={disabledCls} />
                     </div>
-                    <div>
-                        <label className={labelCls}>비밀번호 변경</label>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                            <input
-                                type="password"
-                                placeholder="변경할 비밀번호 입력"
-                                value={formData.newPassword}
-                                onChange={(e) => handleChange('newPassword', e.target.value)}
-                                className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border transition focus:ring-2 focus:ring-blue-500/20 outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-blue-500' : 'bg-white border-gray-200 text-gray-900 focus:border-blue-500'}`}
-                            />
-                            <button
-                                onClick={() => {
-                                    if (!formData.newPassword) { alert('변경할 비밀번호를 입력해주세요.'); return; }
-                                    handleChange('newPasswordConfirm', formData.newPassword);
-                                    alert('비밀번호가 확인되었습니다. 저장 시 변경됩니다.');
-                                }}
-                                className={`w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap ${isDark ? 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700' : 'bg-gray-950 text-white border border-gray-950 hover:bg-black transition'}`}
-                            >
-                                변경
-                            </button>
-                        </div>
-                        {formData.newPassword && (
-                            <div className="mt-2">
-                                <input
-                                    type="password"
-                                    placeholder="비밀번호 확인"
-                                    value={formData.newPasswordConfirm}
-                                    onChange={(e) => handleChange('newPasswordConfirm', e.target.value)}
-                                    className={`w-full p-3 rounded-xl font-bold border text-sm outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                                />
-                                {formData.newPasswordConfirm && formData.newPassword !== formData.newPasswordConfirm && (
-                                    <p className="text-[10px] text-red-500 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
-                                )}
-                            </div>
+                    <div className="space-y-2">
+                        <label className={labelCls}>비밀번호 변경 <span className="font-normal text-gray-400">(변경하지 않으면 비워두세요)</span></label>
+                        <input
+                            type="password"
+                            placeholder="새 비밀번호 (6자 이상)"
+                            value={formData.newPassword}
+                            onChange={(e) => handleChange('newPassword', e.target.value)}
+                            className={inputCls}
+                        />
+                        <input
+                            type="password"
+                            placeholder="비밀번호 확인"
+                            value={formData.newPasswordConfirm}
+                            onChange={(e) => handleChange('newPasswordConfirm', e.target.value)}
+                            className={inputCls}
+                        />
+                        {formData.newPasswordConfirm && formData.newPassword !== formData.newPasswordConfirm && (
+                            <p className="text-[10px] text-red-500 font-bold">비밀번호가 일치하지 않습니다.</p>
                         )}
                     </div>
                 </div>
@@ -272,7 +252,7 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                         </div>
                         <div>
                             <label className={labelCls}>성별</label>
-                            <input type="text" value={formData.gender === 'male' ? '남성' : formData.gender === 'female' ? '여성' : ''} disabled className={disabledCls} placeholder="본인인증 후 자동 입력" />
+                            <input type="text" value={formData.gender === 'M' ? '남성' : formData.gender === 'F' ? '여성' : (formData.gender === '남성' || formData.gender === '여성') ? formData.gender : ''} disabled className={disabledCls} placeholder="본인인증 후 자동 입력" />
                         </div>
                     </div>
                     <p className="text-[10px] text-blue-500 mt-2 font-bold">* 본인인증으로 확인된 정보로 임의 수정이 불가합니다.</p>
