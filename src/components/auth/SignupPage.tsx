@@ -253,7 +253,14 @@ export const SignupPage = () => {
 
     // ── 컴포넌트 마운트 시 항상 최상단 ──
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        // 브라우저 스크롤 자동복원 비활성화
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        // 여러 방법으로 강제 최상단
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
     }, []);
 
     // ── 본인인증 완료 처리 ──
@@ -282,7 +289,9 @@ export const SignupPage = () => {
     // ── 스텝 전환 공통 (항상 최상단에서 시작) ──
     const goStep = (n: 1 | 2 | 3) => {
         setStep(n);
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
     };
 
     // ── STEP1 → STEP2 ──

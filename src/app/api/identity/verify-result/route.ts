@@ -71,6 +71,9 @@ export async function POST(req: NextRequest) {
         // 인증 성공 데이터 정제 (PortOne V2 verifiedCustomer 객체)
         const identity = verifyData.verifiedCustomer;
 
+        // 원본 필드 디버깅 로그 (실제 응답 구조 파악용)
+        console.log('[Identity/verify-result] verifiedCustomer raw:', JSON.stringify(identity));
+
         // PortOne V2: gender는 'MALE'/'FEMALE'/'UNKNOWN' 형식으로 반환
         const genderRaw = identity?.gender || '';
         const genderCode = genderRaw === 'MALE' ? 'M' : genderRaw === 'FEMALE' ? 'F' : 'U';
@@ -81,18 +84,25 @@ export async function POST(req: NextRequest) {
                 ? `${identity.birthYear}-${String(identity.birthMonth ?? '').padStart(2, '0')}-${String(identity.birthDay ?? '').padStart(2, '0')}`
                 : '');
 
+        // PortOne V2: phoneNumber 필드 — +82로 시작하면 한국 국내 형식(010...)으로 변환
+        const rawPhone = identity?.phoneNumber || identity?.phone || identity?.mobile || '';
+        const normalizedPhone = rawPhone
+            .replace(/^\+82/, '0')   // +821012345678 → 01012345678
+            .replace(/^82/, '0')     // 821012345678  → 01012345678
+            .replace(/[^0-9]/g, ''); // 숫자 외 제거
+
         const result: IdentityVerifyResult = {
             success: true,
             provider: 'danal',
             name: identity?.name || '알수없음',
-            phone: identity?.phoneNumber || identity?.phone || '',
+            phone: normalizedPhone,
             birthdate: birthDate,
             gender: genderCode,
             ci: identity?.ci,
             di: identity?.di
         };
 
-        console.log('[Identity/verify-result] PortOne V2 실전 인증 성공:', result.name);
+        console.log('[Identity/verify-result] 정제된 결과:', { name: result.name, phone: result.phone, gender: result.gender, birthdate: result.birthdate });
 
         return NextResponse.json({
             success: true,
