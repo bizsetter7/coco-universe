@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { email, password, name, nickname, role } = await req.json();
+        const { email, password, name, nickname, role, phone, birthdate, gender } = await req.json();
 
         if (!email || !password) {
             return NextResponse.json(
@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
                 full_name: name,
                 nickname: nickname || '',
                 role: role || 'individual',
+                phone: phone || '',
+                birthdate: birthdate || '',
+                gender: gender || '',
             },
         });
 
@@ -71,6 +74,23 @@ export async function POST(req: NextRequest) {
                 console.log('[signup] updateUserById email_confirm 적용 완료');
             } catch (updateErr) {
                 console.warn('[signup] updateUserById 실패 (무시):', updateErr);
+            }
+        }
+
+        // profiles 테이블에 직접 upsert (트리거 보완 — phone/birthdate/gender 포함)
+        if (data.user?.id) {
+            try {
+                await supabaseAdmin.from('profiles').upsert({
+                    id: data.user.id,
+                    full_name: name || '',
+                    nickname: nickname || name || '',
+                    role: role || 'individual',
+                    phone: phone || '',
+                    birth_date: birthdate || '',
+                    gender: gender || '',
+                }, { onConflict: 'id' });
+            } catch (profileErr) {
+                console.warn('[signup] profiles upsert 실패 (무시):', profileErr);
             }
         }
 

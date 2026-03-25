@@ -349,6 +349,9 @@ export const SignupPage = () => {
                 name: role === 'individual' ? iName : cManager,
                 nickname: role === 'individual' ? iNickname : undefined,
                 role,
+                phone: role === 'individual' ? iPhone : cPhone,
+                birthdate: role === 'individual' ? iBirth : cBirth,
+                gender: role === 'individual' ? iGender : cGender,
                 identity_ci: verifyResult?.ci,
             });
             goStep(3);

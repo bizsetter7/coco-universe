@@ -272,6 +272,9 @@ export function useAuth() {
                     name: metadata.name,
                     nickname: metadata.nickname,
                     role: metadata.role || 'individual',
+                    phone: metadata.phone,
+                    birthdate: metadata.birthdate,
+                    gender: metadata.gender,
                 }),
             });
             const json = await res.json();
