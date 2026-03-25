@@ -263,27 +263,10 @@ export const SignupPage = () => {
         document.body.scrollTop = 0;
     }, []);
 
-    // ── 본인인증 완료 처리 ──
+    // ── 본인인증 완료 처리 (CI/DI만 저장, 입력값은 사용자가 직접 입력) ──
     const handleVerified = (result: IdentityVerifyResult) => {
         setVerifyResult(result);
         setShowModal(false);
-        if (result.name) {
-            role === 'individual' ? setIName(result.name) : setCManager(result.name);
-        }
-        if (result.birthdate) {
-            const b = result.birthdate.replace(/\D/g, '').slice(0, 8);
-            const fmt = b.length === 8
-                ? `${b.slice(0, 4)}-${b.slice(4, 6)}-${b.slice(6)}`
-                : result.birthdate;
-            role === 'individual' ? setIBirth(fmt) : setCBirth(fmt);
-        }
-        if (result.gender) {
-            const g = result.gender === 'M' ? '남성' : '여성';
-            role === 'individual' ? setIGender(g) : setCGender(g);
-        }
-        if (result.phone) {
-            role === 'individual' ? setIPhone(result.phone) : setCPhone(result.phone);
-        }
     };
 
     // ── 스텝 전환 공통 (항상 최상단에서 시작) ──
@@ -474,10 +457,6 @@ export const SignupPage = () => {
                             <p className="text-xs text-white/70 mt-0.5">구직자/이력서등록가능</p>
                         </div>
 
-                        {/* 본인인증 */}
-                        <VerifyBlock verified={verified} verifyResult={verifyResult}
-                            onOpen={() => setShowModal(true)} primary={primary} />
-
                         {/* 아이디 */}
                         <Field label="아이디" required>
                             <div className="flex gap-2">
@@ -505,28 +484,18 @@ export const SignupPage = () => {
                             )}
                         </Field>
 
-                        {/* 자동입력 안내 */}
-                        <div className="p-3 rounded-xl border"
-                            style={{ borderColor: `${primary}55`, backgroundColor: `${primary}15` }}>
-                            <p className="text-[11px] font-bold text-center"
-                                style={{ color: primary }}>
-                                본인인증 완료 시 아래 정보가 자동으로 입력됩니다.
-                            </p>
-                        </div>
-
                         <Field label="이름" required>
-                            <Input placeholder="인증 후 자동 입력" value={iName}
-                                disabled={verified} onChange={(e) => setIName(e.target.value)} />
+                            <Input placeholder="실명을 입력해주세요" value={iName}
+                                onChange={(e) => setIName(e.target.value)} />
                         </Field>
 
                         <Field label="생년월일" required hint="예: 1990-01-01">
-                            <Input placeholder="인증 후 자동 입력" value={iBirth}
-                                disabled={verified} onChange={(e) => setIBirth(e.target.value)} />
+                            <Input placeholder="1990-01-01" value={iBirth}
+                                onChange={(e) => setIBirth(e.target.value)} />
                         </Field>
 
                         <Field label="성별" required>
-                            <GenderSelect value={iGender} onChange={setIGender} primary={primary}
-                                disabled={verified && !!iGender} />
+                            <GenderSelect value={iGender} onChange={setIGender} primary={primary} />
                         </Field>
 
                         <Field label="닉네임" required hint="닉네임은 1일 1회만 수정됩니다">
@@ -534,10 +503,25 @@ export const SignupPage = () => {
                                 onChange={(e) => setINickname(e.target.value)} />
                         </Field>
 
+                        {/* 휴대폰 번호 + 본인인증 인라인 */}
                         <Field label="휴대폰 번호" required>
-                            <Input placeholder="010-0000-0000" value={iPhone}
-                                onChange={(e) => setIPhone(e.target.value)} />
-                            <p className="text-[10px] text-gray-400 mt-1">본인인증에 사용한 휴대폰 번호를 입력해주세요.</p>
+                            <div className="flex gap-2">
+                                <Input placeholder="010-0000-0000" value={iPhone}
+                                    onChange={(e) => setIPhone(e.target.value)} />
+                                <button type="button" onClick={() => setShowModal(true)}
+                                    className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
+                                    style={{ backgroundColor: verified ? '#22c55e' : primary }}>
+                                    {verified ? '인증완료' : '본인인증'}
+                                </button>
+                            </div>
+                            {verified && verifyResult && (
+                                <p className="text-[10px] text-green-600 font-bold mt-1 flex items-center gap-1">
+                                    <CheckCircle2 size={10} /> {verifyResult.name}님 본인인증 완료
+                                </p>
+                            )}
+                            {!verified && (
+                                <p className="text-[10px] text-red-400 font-bold mt-1">* 가입 전 반드시 본인인증이 필요합니다.</p>
+                            )}
                         </Field>
 
                         {/* SMS 수신 동의 */}
@@ -616,25 +600,38 @@ export const SignupPage = () => {
                                 <span className="w-1 h-4 rounded-full inline-block" style={{ backgroundColor: primary }} />
                                 담당자 정보
                             </p>
-                            <VerifyBlock verified={verified} verifyResult={verifyResult}
-                                onOpen={() => setShowModal(true)} primary={primary} />
 
                             <Field label="담당자(성함)" required>
-                                <Input placeholder="인증 후 자동 입력" value={cManager}
-                                    disabled={verified} onChange={(e) => setCManager(e.target.value)} />
+                                <Input placeholder="실명을 입력해주세요" value={cManager}
+                                    onChange={(e) => setCManager(e.target.value)} />
                             </Field>
                             <Field label="생년월일" required hint="예: 1990-01-01">
-                                <Input placeholder="인증 후 자동 입력" value={cBirth}
-                                    disabled={verified} onChange={(e) => setCBirth(e.target.value)} />
+                                <Input placeholder="1990-01-01" value={cBirth}
+                                    onChange={(e) => setCBirth(e.target.value)} />
                             </Field>
                             <Field label="성별">
-                                <GenderSelect value={cGender} onChange={setCGender} primary={primary}
-                                    disabled={verified && !!cGender} />
+                                <GenderSelect value={cGender} onChange={setCGender} primary={primary} />
                             </Field>
+
+                            {/* 휴대폰 번호 + 본인인증 인라인 */}
                             <Field label="핸드폰" required>
-                                <Input placeholder="010-0000-0000" value={cPhone}
-                                    onChange={(e) => setCPhone(e.target.value)} />
-                                <p className="text-[10px] text-gray-400 mt-1">본인인증에 사용한 휴대폰 번호를 입력해주세요.</p>
+                                <div className="flex gap-2">
+                                    <Input placeholder="010-0000-0000" value={cPhone}
+                                        onChange={(e) => setCPhone(e.target.value)} />
+                                    <button type="button" onClick={() => setShowModal(true)}
+                                        className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
+                                        style={{ backgroundColor: verified ? '#22c55e' : primary }}>
+                                        {verified ? '인증완료' : '본인인증'}
+                                    </button>
+                                </div>
+                                {verified && verifyResult && (
+                                    <p className="text-[10px] text-green-600 font-bold mt-1 flex items-center gap-1">
+                                        <CheckCircle2 size={10} /> {verifyResult.name}님 본인인증 완료
+                                    </p>
+                                )}
+                                {!verified && (
+                                    <p className="text-[10px] text-red-400 font-bold mt-1">* 가입 전 반드시 본인인증이 필요합니다.</p>
+                                )}
                             </Field>
                         </div>
 
