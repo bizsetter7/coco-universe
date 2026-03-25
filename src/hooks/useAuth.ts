@@ -258,21 +258,58 @@ export function useAuth() {
 
     /**
      * [New] 실서비스용 실제 Supabase 회원가입
+     * 1순위: /api/auth/signup (Admin API, email_confirm: true → 즉시 로그인 가능)
+     * 2순위: supabase.auth.signUp() fallback (SUPABASE_SERVICE_ROLE_KEY 미설정 시)
      */
     const signUp = async (email: string, pw: string, metadata: any) => {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password: pw,
-            options: {
-                data: {
-                    full_name: metadata.name,
+        try {
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email,
+                    password: pw,
+                    name: metadata.name,
                     nickname: metadata.nickname,
-                    role: metadata.role || 'individual'
-                }
+                    role: metadata.role || 'individual',
+                }),
+            });
+            const json = await res.json();
+
+            // Admin API 성공
+            if (res.ok && json.success) return json;
+
+            // SERVICE_ROLE_KEY 미설정 시 fallback
+            if (json.code === 'NO_ADMIN_KEY') {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password: pw,
+                    options: {
+                        data: {
+                            full_name: metadata.name,
+                            nickname: metadata.nickname,
+                            role: metadata.role || 'individual',
+                        },
+                    },
+                });
+                if (error) throw error;
+                return data;
             }
-        });
-        if (error) throw error;
-        return data;
+
+            throw new Error(json.message || '회원가입 처리 중 오류가 발생했습니다.');
+        } catch (err: any) {
+            // fetch 자체 실패 시 fallback
+            if (err?.message?.includes('fetch')) {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password: pw,
+                    options: { data: { full_name: metadata.name, nickname: metadata.nickname, role: metadata.role || 'individual' } },
+                });
+                if (error) throw error;
+                return data;
+            }
+            throw err;
+        }
     };
 
     return {

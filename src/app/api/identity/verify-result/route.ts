@@ -70,13 +70,24 @@ export async function POST(req: NextRequest) {
 
         // 인증 성공 데이터 정제 (PortOne V2 verifiedCustomer 객체)
         const identity = verifyData.verifiedCustomer;
+
+        // PortOne V2: gender는 'MALE'/'FEMALE'/'UNKNOWN' 형식으로 반환
+        const genderRaw = identity?.gender || '';
+        const genderCode = genderRaw === 'MALE' ? 'M' : genderRaw === 'FEMALE' ? 'F' : 'U';
+
+        // PortOne V2: birthDate는 ISO 형식 "2000-01-01" 또는 개별 필드 fallback
+        const birthDate = identity?.birthDate
+            || (identity?.birthYear
+                ? `${identity.birthYear}-${String(identity.birthMonth ?? '').padStart(2, '0')}-${String(identity.birthDay ?? '').padStart(2, '0')}`
+                : '');
+
         const result: IdentityVerifyResult = {
             success: true,
             provider: 'danal',
             name: identity?.name || '알수없음',
-            phone: identity?.phoneNumber || '',
-            birthdate: (identity?.birthYear || '') + (identity?.birthMonth || '') + (identity?.birthDay || ''),
-            gender: identity?.gender || 'U',
+            phone: identity?.phoneNumber || identity?.phone || '',
+            birthdate: birthDate,
+            gender: genderCode,
             ci: identity?.ci,
             di: identity?.di
         };

@@ -115,7 +115,7 @@ export default function WritePostPage() {
             if (isLoggedIn && user?.id && !user.id.startsWith('mock_')) {
                 try {
                     await updatePoints(user.id as string, 'COMMUNITY_POST');
-                    alert('게시글이 등록되었습니다! 200포인트가 적립되었습니다. ✨');
+                    alert('게시글이 등록되었습니다! 50포인트가 적립되었습니다. ✨');
                 } catch (pErr) {
                     console.error('Point award failed:', pErr);
                     alert('게시글이 등록되었습니다!');

@@ -42,14 +42,12 @@ export const LoginPage = () => {
                 return;
             }
 
-            // 2. Real Supabase Login (Assume email format for real accounts)
-            if (id.includes('@')) {
-                await signIn(id, pw);
-                alert('로그인에 성공했습니다.');
-                window.location.href = '/';
-            } else {
-                alert('등록되지 않은 계정입니다.\n테스트 계정 또는 이메일 형식을 사용해주세요.');
-            }
+            // 2. Real Supabase Login
+            // 아이디만 입력한 경우 @cocoalba.kr 이메일 형식으로 변환
+            const email = id.includes('@') ? id : `${id}@cocoalba.kr`;
+            await signIn(email, pw);
+            alert('로그인에 성공했습니다.');
+            window.location.href = '/';
         } catch (err: any) {
             console.error('Login error:', err);
             alert(`로그인 실패: ${err.message || '아이디 또는 비밀번호를 확인해주세요.'}`);

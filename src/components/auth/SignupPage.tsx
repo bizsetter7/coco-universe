@@ -334,6 +334,7 @@ export const SignupPage = () => {
                 identity_ci: verifyResult?.ci,
             });
             setStep(3);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err: any) {
             alert(`회원가입 실패: ${err.message || '다시 시도해주세요.'}`);
         } finally {
