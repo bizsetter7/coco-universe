@@ -266,6 +266,13 @@ export function useAuth() {
      * - 가입 후 세션이 있으면 profiles 직접 UPDATE (phone/birth_date/gender/username 보완)
      */
     const signUpClientFallback = async (email: string, pw: string, metadata: any) => {
+        // 신규 가입 전 이전 세션 데이터 정리 (다른 계정 데이터 잔존 방지)
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('favorites');
+            localStorage.removeItem('favorites_timestamps');
+            localStorage.removeItem('viewed_shops');
+        }
+
         const { data, error } = await supabase.auth.signUp({
             email,
             password: pw,

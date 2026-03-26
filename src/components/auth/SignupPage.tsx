@@ -538,7 +538,10 @@ export const SignupPage = () => {
                                 <Input placeholder="010-0000-0000" value={iPhone}
                                     disabled={verified && !!iPhone}
                                     onChange={(e) => setIPhone(e.target.value)} />
-                                <button type="button" onClick={() => setShowModal(true)}
+                                <button type="button" onClick={() => {
+                                    if (!iPhone.trim()) { alert('휴대폰 번호를 먼저 입력해주세요.'); return; }
+                                    setShowModal(true);
+                                }}
                                     className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
                                     style={{ backgroundColor: verified ? '#22c55e' : primary }}>
                                     {verified ? '인증완료' : '본인인증'}
@@ -652,7 +655,10 @@ export const SignupPage = () => {
                                     <Input placeholder="010-0000-0000" value={cPhone}
                                         disabled={verified && !!cPhone}
                                         onChange={(e) => setCPhone(e.target.value)} />
-                                    <button type="button" onClick={() => setShowModal(true)}
+                                    <button type="button" onClick={() => {
+                                        if (!cPhone.trim()) { alert('휴대폰 번호를 먼저 입력해주세요.'); return; }
+                                        setShowModal(true);
+                                    }}
                                         className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
                                         style={{ backgroundColor: verified ? '#22c55e' : primary }}>
                                         {verified ? '인증완료' : '본인인증'}

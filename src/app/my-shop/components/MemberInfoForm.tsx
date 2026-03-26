@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
+import { IdentityVerifyModal } from '@/components/auth/IdentityVerifyModal';
+import type { IdentityVerifyResult } from '@/types/identity-verify';
 
 /**
  * 기업회원 회원정보수정 폼
@@ -16,15 +18,14 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
     const isDark = brand?.theme === 'dark';
     const [isLoaded, setIsLoaded] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [showIdentityModal, setShowIdentityModal] = useState(false);
 
     const [formData, setFormData] = useState({
-        nickname: '',
         email: '',
         phone: '',
         managerName: '',   // full_name
         birthDate: '',     // birth_date
         gender: '',        // gender
-        smsConsent: true,
         newPassword: '',
         newPasswordConfirm: '',
     });
@@ -44,20 +45,25 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
         }
 
         const loadProfile = async () => {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('nickname, phone, full_name, birth_date, gender')
-                .eq('id', user.id)
-                .single();
+            const [{ data: profile }, { data: { user: authUser } }] = await Promise.all([
+                supabase
+                    .from('profiles')
+                    .select('phone, full_name, birth_date, gender')
+                    .eq('id', user.id)
+                    .single(),
+                supabase.auth.getUser(),
+            ]);
+
+            // user_metadata를 fallback으로 활용 (profiles 데이터가 없을 경우 대비)
+            const meta = authUser?.user_metadata || {};
 
             setFormData(prev => ({
                 ...prev,
-                nickname: profile?.nickname || user?.nickname || '',
                 email: user?.email || '',
-                phone: profile?.phone || '',
-                managerName: profile?.full_name || user?.name || '',
-                birthDate: profile?.birth_date || '',
-                gender: profile?.gender || '',
+                phone: profile?.phone || meta.phone || '',
+                managerName: profile?.full_name || meta.full_name || user?.name || '',
+                birthDate: profile?.birth_date || meta.birthdate || '',
+                gender: profile?.gender || meta.gender || '',
             }));
             setIsLoaded(true);
         };
@@ -86,21 +92,7 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
         setIsSaving(true);
         try {
             if (!user.id.startsWith('mock_')) {
-                const updatePayload: any = {
-                    nickname: formData.nickname,
-                };
-
-                const { error } = await supabase
-                    .from('profiles')
-                    .update(updatePayload)
-                    .eq('id', user.id);
-
-                if (error) throw error;
-
-                // auth 메타데이터 닉네임 동기화
-                await supabase.auth.updateUser({ data: { nickname: formData.nickname } });
-
-                // 비밀번호 변경
+                // 비밀번호 변경 (입력한 경우만)
                 if (formData.newPassword) {
                     const { error: pwError } = await supabase.auth.updateUser({
                         password: formData.newPassword,
@@ -171,38 +163,20 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                     </div>
                 </div>
 
-                {/* ── 닉네임 / 상호명 ── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className={`${labelCls} flex items-center gap-1`}>
-                            닉네임 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.nickname}
-                            maxLength={10}
-                            onChange={(e) => handleChange('nickname', e.target.value)}
-                            className={inputCls}
-                        />
-                        <p className="text-[10px] text-blue-500 mt-1.5 font-bold flex items-center gap-1">
-                            <span className="w-1 h-1 bg-blue-500 rounded-full" />
-                            최대 10자 (공백 포함) / 구인 리스트에 노출됩니다.
-                        </p>
-                    </div>
-                    <div>
-                        <label className={`${labelCls} flex items-center gap-1`}>
-                            상호명 (고정) <Check size={14} className="text-green-500" />
-                        </label>
-                        <input
-                            type="text"
-                            value={shopName || ''}
-                            disabled
-                            className={`w-full p-3 md:p-4 rounded-xl font-bold border opacity-70 ${isDark ? 'bg-gray-800 border-gray-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}
-                        />
-                        <p className="text-[10px] text-green-600 mt-1.5 font-bold">
-                            * 사업자등록증 기반으로 인증된 상호명입니다.
-                        </p>
-                    </div>
+                {/* ── 상호명 ── */}
+                <div>
+                    <label className={`${labelCls} flex items-center gap-1`}>
+                        상호명 (고정) <Check size={14} className="text-green-500" />
+                    </label>
+                    <input
+                        type="text"
+                        value={shopName || ''}
+                        disabled
+                        className={`w-full p-3 md:p-4 rounded-xl font-bold border opacity-70 ${isDark ? 'bg-gray-800 border-gray-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}
+                    />
+                    <p className="text-[10px] text-green-600 mt-1.5 font-bold">
+                        * 사업자등록증 기반으로 인증된 상호명입니다.
+                    </p>
                 </div>
 
                 {/* ── 이메일 / 휴대폰 ── */}
@@ -224,11 +198,14 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                         <div className="flex flex-col sm:flex-row gap-2">
                             <input
                                 type="text"
-                                value={formData.phone}
+                                value={formData.phone || '미등록'}
                                 readOnly
                                 className={`w-full sm:flex-1 p-3 md:p-4 rounded-xl font-bold border outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-900'}`}
                             />
-                            <button className="w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/30 transition">
+                            <button
+                                onClick={() => setShowIdentityModal(true)}
+                                className="w-full sm:w-auto px-6 py-3 md:py-4 rounded-xl font-bold whitespace-nowrap bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/30 transition"
+                            >
                                 재인증
                             </button>
                         </div>
@@ -258,22 +235,6 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                     <p className="text-[10px] text-blue-500 mt-2 font-bold">* 본인인증으로 확인된 정보로 임의 수정이 불가합니다.</p>
                 </div>
 
-                {/* ── SMS 수신동의 ── */}
-                <div className={`p-4 rounded-xl border flex items-center gap-3 ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <div
-                        onClick={() => handleChange('smsConsent', !formData.smsConsent)}
-                        className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition ${formData.smsConsent ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-gray-300'}`}
-                    >
-                        {formData.smsConsent && <Check size={16} />}
-                    </div>
-                    <label
-                        className={`cursor-pointer font-bold select-none ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
-                        onClick={() => handleChange('smsConsent', !formData.smsConsent)}
-                    >
-                        [필수] SMS 수신 동의 (중요 알림 및 공지사항)
-                    </label>
-                </div>
-
                 {/* ── 버튼 ── */}
                 <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-gray-100 dark:border-gray-800">
                     <button
@@ -291,6 +252,19 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                     </button>
                 </div>
             </div>
+
+            {/* 재인증 모달 */}
+            {showIdentityModal && (
+                <IdentityVerifyModal
+                    onClose={() => setShowIdentityModal(false)}
+                    onVerified={(result: IdentityVerifyResult) => {
+                        setShowIdentityModal(false);
+                        if (result.phone) {
+                            setFormData(prev => ({ ...prev, phone: result.phone || prev.phone }));
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 };
