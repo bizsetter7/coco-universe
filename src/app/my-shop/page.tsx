@@ -160,10 +160,12 @@ function MyShopContent() {
 
             const dbPayments = data || [];
 
-            const mockPaymentsRaw = localStorage.getItem('my_site_payment_history');
+            // [Fix] 실제 회원은 localStorage 결제내역 무시 (중복·타 세션 데이터 방지)
+            const isMockUser2 = authUser.id.startsWith('mock_');
+            const mockPaymentsRaw = isMockUser2 ? localStorage.getItem('my_site_payment_history') : null;
             const mockPayments = mockPaymentsRaw ? JSON.parse(mockPaymentsRaw) : [];
 
-            const finalPayments = [...dbPayments, ...mockPayments].map((p: any) => normalizePayment(p, formState.shopName));
+            const finalPayments = [...dbPayments, ...mockPayments].map((p: any) => normalizePayment(p, bizShopName || formState.shopName));
 
             // [Debug/Test] If no payments exist, add a sample one for verification
             if (finalPayments.length === 0 && authUser.id !== 'guest') {
@@ -196,7 +198,12 @@ function MyShopContent() {
         } catch (e) { console.warn(e); }
     };
 
-    // 업체회원 상호명 DB에서 로드 (하드코딩 '코코 라운지' 제거)
+    // 업체회원 사업자 인증 상태 + 상호명 로드
+    const [bizVerified, setBizVerified] = React.useState(false);
+    const [bizAddress, setBizAddress] = React.useState('');
+    // [Fix] bizShopName은 formState.resetAdStates()에 영향 안 받는 별도 state (상호명 깜빡임 방지)
+    const [bizShopName, setBizShopName] = React.useState('');
+
     useEffect(() => {
         if (!authUser?.id || authUser.id === 'guest' || authUser.id.startsWith('mock_')) return;
         if (authUserType !== 'corporate') return;
@@ -204,14 +211,22 @@ function MyShopContent() {
         const loadShopName = async () => {
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nickname, full_name, business_name')
+                .select('nickname, full_name, business_name, business_verified, business_address, business_address_detail')
                 .eq('id', authUser.id)
                 .single();
 
             if (profile) {
-                // business_name 우선 → nickname → full_name 순서로 fallback
-                const name = (profile as any).business_name || profile.nickname || profile.full_name || '';
-                if (name) formState.setShopName(name);
+                const verified = (profile as any).business_verified === true;
+                setBizVerified(verified);
+                // 인증 완료된 경우에만 business_name 반영
+                if (verified && (profile as any).business_name) {
+                    formState.setShopName((profile as any).business_name);
+                    setBizShopName((profile as any).business_name);
+                }
+                // 사업장 주소 로드
+                const addr = (profile as any).business_address || '';
+                const detail = (profile as any).business_address_detail || '';
+                if (addr) setBizAddress(detail ? `${addr} ${detail}` : addr);
             }
         };
 
@@ -221,6 +236,10 @@ function MyShopContent() {
 
     useEffect(() => {
         if (!authUser?.id || authUser.id === 'guest') return;
+        // [Fix] 실제 회원은 localStorage 결제 캐시 초기화 (중복·타 세션 데이터 방지)
+        if (!authUser.id.startsWith('mock_')) {
+            localStorage.removeItem('my_site_payment_history');
+        }
         fetchRegisteredAds();
         fetchPaymentHistory();
         fetchResumeCount();
@@ -379,6 +398,8 @@ function MyShopContent() {
                 const ad = registeredAds.find(a => String(a.id) === String(adIdParam));
                 if (ad) {
                     formState.loadAdData(ad);
+                    // [Fix] 인증된 업체회원 — 프로필 상호명으로 덮어쓰기 (ad.name 대신)
+                    if (bizVerified && bizShopName) formState.setShopName(bizShopName);
                     setLastLoadedId(adIdParam);
                 }
             }
@@ -751,8 +772,14 @@ function MyShopContent() {
                         }).catch(() => {});
                     }
                 }
-                const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
-                localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
+                // [Fix] 실제 회원은 localStorage 저장 안 함 (중복 방지)
+                if (isTargetMock) {
+                    const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
+                    localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
+                } else {
+                    // 실제 회원은 DB에서 다시 읽어 최신 결제 상태 반영
+                    fetchPaymentHistory();
+                }
             }
 
             // [무통장 입금 안내] 신규 공고 등록 시 입금 안내 모달 표시, 수정 시 바로 대시보드
@@ -1001,7 +1028,7 @@ function MyShopContent() {
                     brand={brand}
                     onClose={() => setShowMobileMenu(false)}
                     setView={setView}
-                    shopName={userType === 'individual' ? (authUser?.nickname || authUser?.name || '개인회원') : (formState.shopName || '내 상점')}
+                    shopName={userType === 'individual' ? (authUser?.nickname || authUser?.name || '개인회원') : (bizShopName || formState.shopName || '내 상점')}
                     nickname={formState.nickname || authUser?.nickname || '회원님'}
                     router={router}
                     userType={userType}
@@ -1036,7 +1063,7 @@ function MyShopContent() {
 
                     <div className={`grid grid-cols-1 ${userType === 'individual' ? '' : 'md:grid-cols-4'} gap-4 md:pt-0 md:pb-6`}>
                         {userType === 'corporate' && (
-                            <BusinessSidebar brand={brand} shopName={formState.shopName} nickname={formState.nickname || authUser?.nickname || '사장님'} view={view} setView={setView} />
+                            <BusinessSidebar brand={brand} shopName={bizShopName || formState.shopName} nickname={formState.nickname || authUser?.nickname || '사장님'} view={view} setView={setView} />
                         )}
 
                         <div className={userType === 'individual' ? 'w-full' : 'col-span-3 space-y-4'}>
@@ -1048,31 +1075,33 @@ function MyShopContent() {
                                         <>
                                             {view === 'dashboard' && (
                                                 <BusinessDashboard
-                                                    brand={brand} shopName={formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified}
+                                                    brand={brand} shopName={bizShopName || formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified} bizVerified={bizVerified} bizAddress={bizAddress} onGoMemberInfo={() => setView('member-info')}
                                                     handleAdClick={(isNew, ad) => {
                                                         setIsNewEntry(isNew);
                                                         if (!isNew && ad) {
                                                             setEditingAdId(ad.id);
                                                             editingAdIdRef.current = ad.id;
                                                             formState.loadAdData(ad);
-                                                            setShowWarningModal(true);
+                                                            // [Fix] 인증된 업체회원 — 프로필 상호명으로 덮어쓰기
+                                                            if (bizVerified && bizShopName) formState.setShopName(bizShopName);
                                                         } else {
                                                             setEditingAdId(null);
                                                             editingAdIdRef.current = null;
                                                             formState.resetAdStates();
-                                                            setView('form', undefined, true);
+                                                            if (bizVerified && bizShopName) formState.setShopName(bizShopName);
                                                         }
+                                                        setShowWarningModal(true);
                                                     }}
                                                     setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds || []} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
                                                 />
                                             )}
-                                            {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={formState.shopName} ads={registeredAds || []} jumpBalance={userJumpBalance || 0} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); setShowWarningModal(true); }} />}
-                                            {view === 'payments' && <PaymentsView setView={setView} userName={formState.shopName} payments={paymentHistory || []} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={bizShopName || formState.shopName} ads={registeredAds || []} jumpBalance={userJumpBalance || 0} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); if (bizVerified && bizShopName) formState.setShopName(bizShopName); setShowWarningModal(true); }} />}
+                                            {view === 'payments' && <PaymentsView setView={setView} userName={bizShopName || formState.shopName} payments={syncedPaymentHistory || []} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'sos-alert' && <SosAlertView brand={brand} />}
-                                            {view === 'buy-points' && <PointShopView brand={brand} shopName={formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                            {view === 'applicants' && <ApplicantsView setView={setView} userName={formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'applicants' && <ApplicantsView setView={setView} userName={bizShopName || formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
                                              {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
                                         </>
                                     )}

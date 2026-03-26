@@ -27,6 +27,7 @@ import { AdminInquiryManagement } from '@/components/admin/inquiry/AdminInquiryM
 import { AdminMemberManagement } from '@/components/admin/member/AdminMemberManagement';
 import { AdminPaymentManagement } from '@/components/admin/payment/AdminPaymentManagement';
 import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
+import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 
 export default function AdminPage() {
     return (
@@ -472,7 +473,12 @@ function AdminContent() {
                         fetchData={fetchData}
                     />
                 )
-            }  {/* Tab 6: SEO & System Settings */}
+            }
+            {/* Tab 6: Business Verification */}
+            {activeTab === 'business' && (
+                <BusinessVerifyView />
+            )}
+            {/* Tab 7: SEO & System Settings */}
             {activeTab === 'seo' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
                     {/* SEO Exposure Dashboard */}

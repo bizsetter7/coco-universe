@@ -11,10 +11,11 @@ import {
     Database,
     CreditCard,
     XCircle,
-    LogOut
+    LogOut,
+    Building2
 } from 'lucide-react';
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -22,6 +23,7 @@ interface AdminSidebarProps {
         ads?: number;
         inquiries?: number;
         payments?: number;
+        business?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -111,6 +113,13 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     onClick={() => handleNav('users')}
                 />
                 <NavItem
+                    icon={<Building2 size={20} className="text-amber-400" />}
+                    label="사업자 인증 심사"
+                    active={activeTab === 'business'}
+                    badge={counts?.business}
+                    onClick={() => handleNav('business')}
+                />
+                <NavItem
                     icon={<Megaphone size={20} />}
                     label="마케팅 자동화"
                     active={activeTab === 'marketing'}
@@ -193,6 +202,13 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         label="회원 관리"
                         active={activeTab === 'users'}
                         onClick={() => handleNav('users')}
+                    />
+                    <NavItem
+                        icon={<Building2 size={20} className="text-amber-400" />}
+                        label="사업자 인증 심사"
+                        active={activeTab === 'business'}
+                        badge={counts?.business}
+                        onClick={() => handleNav('business')}
                     />
                     <NavItem
                         icon={<Megaphone size={20} />}

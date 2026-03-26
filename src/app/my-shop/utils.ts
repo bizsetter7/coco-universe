@@ -1,4 +1,6 @@
 
+import { ICONS } from '@/constants/job-options';
+
 // --- Helper Functions ---
 
 export const normalizeAd = (ad: any) => {
@@ -32,6 +34,17 @@ export const normalizeAd = (ad: any) => {
     else if (rawTier.includes('recommended') || rawTier === 'p5' || rawTier.includes('급구')) safeAd.productType = 'p5';
     else if (rawTier.includes('native') || rawTier === 'p6' || rawTier.includes('네이티브')) safeAd.productType = 'p6';
     else safeAd.productType = 'p7';
+
+    // 5. [Fix] Icon Normalization — emoji string → numeric ID (레거시 호환 + 최상위 필드 추가)
+    // DB에 options.icon = "🔥" (emoji) 또는 options.icon = 2 (ID) 모두 처리
+    const rawIcon = ad.options?.icon ?? ad.selectedIcon ?? null;
+    if (rawIcon !== null && rawIcon !== undefined && rawIcon !== 0 && rawIcon !== '') {
+        const iconObj = ICONS.find(i => String(i.id) === String(rawIcon) || i.icon === String(rawIcon));
+        if (iconObj) {
+            safeAd.selectedIcon = iconObj.id; // 최상위 필드 (항상 숫자 ID)
+            safeAd.options = { ...(ad.options || {}), icon: iconObj.id }; // options.icon도 숫자 ID로 표준화
+        }
+    }
 
     return safeAd;
 };

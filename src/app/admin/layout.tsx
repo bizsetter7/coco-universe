@@ -39,7 +39,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const [counts, setCounts] = useState({
         ads: 0,
         inquiries: 0,
-        payments: 0
+        payments: 0,
+        business: 0
     });
 
     const fetchCounts = React.useCallback(async () => {
@@ -62,6 +63,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 .select('*', { count: 'exact', head: true })
                 .neq('status', 'completed');
 
+            // Fetch Pending Business Verifications
+            const { count: bizCount } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true })
+                .eq('business_verify_status', 'pending');
+
             // Merge Local Mocks
             const localMockAdsRaw = localStorage.getItem('coco_mock_ads');
             let localPendingAds = 0;
@@ -75,7 +82,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             setCounts({
                 ads: (adsCount || 0) + localPendingAds,
                 inquiries: inqCount || 0,
-                payments: payCount || 0
+                payments: payCount || 0,
+                business: bizCount || 0
             });
         } catch (e) {
             console.error('Error fetching admin counts:', e);

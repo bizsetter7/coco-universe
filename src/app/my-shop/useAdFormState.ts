@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { DETAILED_PRICING, FORBIDDEN_WORDS } from './constants';
+import { ICONS } from '@/constants/job-options';
 
 // [Total Reset] Robust Helper
 const getValid = (v1: any, v2: any, defaultValue: any = '') => {
@@ -15,6 +16,7 @@ export function useAdFormState() {
     // ... (States remain same)
     // --- Form States ---
     const [shopName, setShopName] = useState('');
+    const [shopAddress, setShopAddress] = useState('');
     const [isVerified, setIsVerified] = useState(false);
     const [nickname, setNickname] = useState('');
 
@@ -146,7 +148,7 @@ export function useAdFormState() {
     const [totalAmount, setTotalAmount] = useState(0);
 
     const resetAdStates = () => {
-        setShopName('코코 라운지');
+        setShopName('');
         setIsVerified(false);
         setNickname('');
         setManagerName('');
@@ -262,13 +264,19 @@ export function useAdFormState() {
             keywords: opts.keywords || ad.keywords || [],
             productType: ad.tier || ad.productType || opts.product_type || ad.ad_type || null,
             productPeriod: opts.product_period || ad.productPeriod || 30,
-            icon: opts.icon || ad.icon || null,
+            icon: (() => {
+                const raw = opts.icon || ad.icon || null;
+                if (!raw) return null;
+                // [Fix] 이모지 문자열 → 숫자 ID 정규화 (레거시 DB 데이터 호환)
+                const found = ICONS.find(i => String(i.id) === String(raw) || i.icon === String(raw));
+                return found ? found.id : null;
+            })(),
             icon_period: opts.icon_period || ad.icon_period || 0,
             highlighter: opts.highlighter || ad.highlighter || null,
             highlighter_period: opts.highlighter_period || ad.highlighter_period || 0,
             border: opts.border || opts.border_option || ad.border || 'none',
             border_period: opts.border_period || ad.border_period || 0,
-            pay_suffixes: opts.pay_suffixes || ad.pay_suffixes || []
+            pay_suffixes: opts.pay_suffixes || opts.paySuffixes || ad.pay_suffixes || ad.paySuffixes || []
         };
 
         // Apply to States
@@ -316,7 +324,7 @@ export function useAdFormState() {
     };
 
     return {
-        shopName, setShopName, isVerified, setIsVerified, nickname, setNickname,
+        shopName, setShopName, shopAddress, setShopAddress, isVerified, setIsVerified, nickname, setNickname,
         managerName, setManagerName,
         managerPhone, setManagerPhone, messengers, setMessengers, title, setTitle,
         regionCity, setRegionCity, regionGu, setRegionGu, addressDetail, setAddressDetail,

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface BankTransferModalProps {
     amount: number;
@@ -17,8 +18,10 @@ export function BankTransferModal({ amount, onConfirm }: BankTransferModalProps)
         });
     };
 
-    return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
             <div className="bg-white rounded-[28px] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-500 to-rose-600 px-6 py-5 text-white text-center">
@@ -62,7 +65,7 @@ export function BankTransferModal({ amount, onConfirm }: BankTransferModalProps)
                     {/* Notice */}
                     <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
                         <p className="text-xs font-bold text-yellow-700 leading-relaxed">
-                            📌 입금 시 <span className="font-black">업체명 또는 닉네임</span>을 메모에 남겨주세요.<br />
+                            📌 입금 시 <span className="font-black">업체명 또는 아이디</span>를 메모에 남겨주세요.<br />
                             입금 확인 후 보통 <span className="font-black">1~3시간 내</span> 광고가 활성화됩니다.<br />
                             문의:{' '}
                             <a href="https://t.me/cocoalba_cs" target="_blank" rel="noopener noreferrer" className="underline font-black">텔레그램 @cocoalba_cs</a>
@@ -81,6 +84,7 @@ export function BankTransferModal({ amount, onConfirm }: BankTransferModalProps)
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

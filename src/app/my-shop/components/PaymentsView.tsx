@@ -2,6 +2,7 @@ import { CreditCard, ArrowRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { HIGHLIGHTERS, DETAILED_PRICING } from '../constants';
+import { IconBadge } from '@/components/common/IconBadge';
 
 const getHighlighterStyle = (id: number | string | undefined) => {
     const h = HIGHLIGHTERS.find(item => String(item.id) === String(id));
@@ -62,12 +63,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                             <th className="py-4 px-2">결제 금액</th>
                                             <th className="py-4 px-2">결제 방식</th>
                                             <th className="py-4 px-2">닉네임</th>
-                                            <th className="py-4 px-2">
-                                                {(() => {
-                                                    const hasActive = payments.some(p => p.adObject?.status === 'active' || p.adObject?.status === 'ACTIVE');
-                                                    return hasActive ? '결제일/마감일' : '신청일';
-                                                })()}
-                                            </th>
+                                            <th className="py-4 px-2">신청일 / 마감일</th>
                                             <th className="py-4 px-2">상태</th>
                                         </tr>
                                     </thead>
@@ -112,22 +108,17 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                 {p.adObject?.options?.icon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">아</span>}
                                                                 {p.adObject?.options?.highlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">형</span>}
                                                                 {(p.adObject?.options?.border && p.adObject?.options?.border !== 'none') && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>}
-                                                                {(p.adObject?.options?.pay_suffixes && p.adObject?.options?.pay_suffixes.length > 0) && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>}
+                                                                {((p.adObject?.options?.paySuffixes?.length > 0) || (p.adObject?.options?.pay_suffixes?.length > 0)) && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>}
                                                             </div>
-                                                            <span
+                                                            <div
                                                                 onClick={(e) => { e.stopPropagation(); onShowAdDetail?.(p.adObject || p); }}
-                                                                className={`font-black text-[14px] hover:text-blue-500 cursor-pointer transition line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                                                                style={getHighlighterStyle(p.adObject?.selectedHighlighter || p.adObject?.options?.highlighter)}
+                                                                className={`font-black text-[14px] hover:text-blue-500 cursor-pointer transition line-clamp-1 break-all px-1 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                                                style={getHighlighterStyle(p.adObject?.options?.highlighter || p.adObject?.selectedHighlighter)}
                                                             >
+                                                                {(p.adObject?.options?.icon || p.adObject?.selectedIcon) && (
+                                                                    <IconBadge iconId={p.adObject?.options?.icon || p.adObject?.selectedIcon} />
+                                                                )}
                                                                 {p.adTitle || p.adObject?.title || '공고 제목 없음'}
-                                                            </span>
-                                                            {/* [Sync] Edit Counter in Payment History */}
-                                                            <div className="flex items-center gap-1.5 mt-0.5 px-1">
-                                                                <span className="text-[10px] text-gray-400 font-bold">월간 수정:</span>
-                                                                <span className={`text-[10px] font-black ${(p.adObject?.edit_count || 0) >= 25 ? 'text-red-500' : 'text-gray-500'
-                                                                    }`}>
-                                                                    {p.adObject?.edit_count || 0}/30
-                                                                </span>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -136,7 +127,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                         {p.method === 'bank_transfer' ? '무통장입금' : p.method}
                                                     </td>
                                                     <td className="py-5 px-2 font-black max-w-[100px] truncate">
-                                                        {p.adObject?.nickname || p.nickname || userName}
+                                                        {p.adObject?.options?.nickname || p.adObject?.nickname || p.nickname || '-'}
                                                     </td>
                                                     <td className="py-5 px-2 text-[11px] text-gray-400 font-mono leading-tight whitespace-nowrap">
                                                         <div className="flex flex-col">
@@ -179,7 +170,7 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                                 return <span className="px-2 py-1 bg-red-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">반려</span>;
                                                             }
                                                             if (adStatus === 'active' || adStatus === 'ACTIVE') {
-                                                                return <span className="px-2 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">승인완료</span>;
+                                                                return <span className="px-2 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">승인됨</span>;
                                                             }
                                                             if (adStatus === 'PENDING_REVIEW' || adStatus === 'pending_review') {
                                                                 return <span className="px-2 py-1 bg-orange-500 text-white text-[10px] font-black rounded-lg shadow-sm whitespace-nowrap">심사중</span>;
@@ -236,28 +227,25 @@ export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDe
                                                         <span className={`${brand.theme === 'dark' ? 'bg-blue-500' : 'bg-gray-900'} text-white text-[9.5px] px-2 py-0.5 rounded-sm font-black uppercase whitespace-nowrap tracking-tighter`}>
                                                             {typeCode}
                                                         </span>
-                                                        {p.adObject?.selectedIcon && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
-                                                        {p.adObject?.selectedHighlighter && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">형</span>}
-                                                        {p.adObject?.borderOption && p.adObject?.borderOption !== 'none' && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">테</span>}
-                                                        {p.adObject?.paySuffixes && p.adObject?.paySuffixes.length > 0 && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
+                                                        {(p.adObject?.options?.icon || p.adObject?.selectedIcon) && <span className="bg-indigo-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">아</span>}
+                                                        {(p.adObject?.options?.highlighter || p.adObject?.selectedHighlighter) && <span className="bg-gray-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">형</span>}
+                                                        {((p.adObject?.options?.border && p.adObject?.options?.border !== 'none') || (p.adObject?.borderOption && p.adObject?.borderOption !== 'none')) && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">테</span>}
+                                                        {((p.adObject?.options?.paySuffixes?.length > 0) || (p.adObject?.options?.pay_suffixes?.length > 0) || ((p.adObject?.paySuffixes || []).length > 0)) && <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">급</span>}
                                                     </div>
-                                                    <h3
+                                                    <div
                                                         onClick={(e) => { e.stopPropagation(); onShowAdDetail?.(p.adObject || p); }}
-                                                        className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 inline-block ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-blue-500`}
-                                                        style={getHighlighterStyle(p.adObject?.selectedHighlighter || p.adObject?.options?.highlighter)}
+                                                        className={`text-[15px] font-black leading-tight line-clamp-1 break-all px-1 flex items-center gap-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} active:text-blue-500 cursor-pointer`}
+                                                        style={getHighlighterStyle(p.adObject?.options?.highlighter || p.adObject?.selectedHighlighter)}
                                                     >
+                                                        {(p.adObject?.options?.icon || p.adObject?.selectedIcon) && (
+                                                            <IconBadge iconId={p.adObject?.options?.icon || p.adObject?.selectedIcon} />
+                                                        )}
                                                         {p.adTitle || p.adObject?.title || '공고 제목 없음'}
-                                                    </h3>
-                                                    {/* [Sync] Nickname & Edit Counter in Mobile Payment History */}
+                                                    </div>
+                                                    {/* Nickname */}
                                                     <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 px-1">
                                                         <span className="text-[10px] text-blue-500 font-black">
-                                                            {p.adObject?.nickname || p.nickname || userName}
-                                                        </span>
-                                                        <span className="w-px h-2 bg-gray-200"></span>
-                                                        <span className="text-[9px] text-gray-400 font-bold uppercase">수정:</span>
-                                                        <span className={`text-[10px] font-black ${(p.adObject?.edit_count || 0) >= 25 ? 'text-red-500' : 'text-gray-500'
-                                                            }`}>
-                                                            {p.adObject?.edit_count || 0}/30
+                                                            {p.adObject?.options?.nickname || p.adObject?.nickname || p.nickname || '-'}
                                                         </span>
                                                     </div>
                                                 </div>

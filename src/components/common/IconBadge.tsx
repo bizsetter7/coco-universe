@@ -18,7 +18,18 @@ export const IconBadge: React.FC<IconBadgeProps> = ({ iconId, className = "text-
     // Now: IconBadge -> job-options -> ICONS (cleaner)
     const iconObj = useMemo(() => {
         if (!iconId) return null;
-        return ICONS.find(icon => String(icon.id) === String(iconId)) || null;
+        // 1순위: ID 매칭 (정상 저장된 경우: options.icon = 9)
+        const byId = ICONS.find(icon => String(icon.id) === String(iconId));
+        if (byId) return byId;
+        // 2순위: 이모지 문자 직접 매칭 (레거시: options.icon = "⚡")
+        const byChar = ICONS.find(icon => icon.icon === String(iconId));
+        if (byChar) return byChar;
+        // 3순위: 유효한 이모지/문자열이면 임시 객체로 직접 렌더링
+        const strId = String(iconId);
+        if (strId && strId !== 'null' && strId !== 'undefined' && strId !== '0' && isNaN(Number(strId))) {
+            return { id: strId, name: strId, icon: strId };
+        }
+        return null;
     }, [iconId]);
 
     if (!iconObj) return null;
@@ -63,7 +74,8 @@ export const IconBadge: React.FC<IconBadgeProps> = ({ iconId, className = "text-
     }
 
     return (
-        <span className={`${className} shrink-0 align-middle animate-seesaw`}>
+        // [Fix] color:'initial' — 부모(h4)에 rainbow 형광펜(color:transparent) 적용 시 이모지가 투명해지는 문제 방지
+        <span className={`${className} shrink-0 align-middle animate-seesaw`} style={{ color: 'initial' }}>
             {iconObj.icon}
         </span>
     );

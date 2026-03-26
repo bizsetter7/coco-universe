@@ -13,6 +13,7 @@ import { BrandConfig } from '@/lib/brand-config';
 interface AdFormProps {
     brand: BrandConfig;
     shopName: string; setShopName: (v: string) => void;
+    shopAddress?: string; setShopAddress?: (v: string) => void;
     isVerified: boolean; setIsVerified: (v: boolean) => void;
     nickname: string; setNickname: (v: string) => void;
     managerName: string; setManagerName: (v: string) => void;
@@ -204,7 +205,7 @@ export default function AdForm(props: AdFormProps) {
                 isStep4Done={isStep4Done}
             />
 
-            {/* Recruitment Registration Header (Capture 3) */}
+            {/* Recruitment Registration Header */}
             <div className={`p-4 md:p-5 rounded-[24px] md:rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                 <div className="flex items-start gap-2 md:gap-4 mb-0.5 md:mb-2 text-left">
                     <div className="w-1.5 h-6 md:w-2 md:h-8 bg-blue-500 rounded-full shrink-0"></div>
@@ -213,30 +214,10 @@ export default function AdForm(props: AdFormProps) {
                 <p className={`${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-900'} font-bold text-[11px] md:text-base ml-0 leading-tight md:leading-normal`}>
                     <span className="mr-0.5 text-blue-500 font-extrabold">*</span> 표시 항목은 필수 입력입니다. 정확히 입력해주세요.
                 </p>
+                <p className={`${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} font-bold text-[10px] md:text-sm ml-0 mt-0.5`}>
+                    작성시, 우측 상단의 &apos;예시 보기&apos;를 참고해주세요!
+                </p>
             </div>
-
-            {/* [Onboarding] Welcome Alert for New Posters */}
-            {props.isNewEntry && (
-                <div className="bg-gradient-to-r from-blue-50 to-rose-50 border border-blue-100 p-4 md:p-6 rounded-[24px] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700 space-y-3">
-                    <div className="flex items-start gap-3 md:gap-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-xl md:text-2xl shadow-sm shrink-0">✨</div>
-                        <div>
-                            <h3 className="text-sm md:text-lg font-black text-blue-600 mb-0.5 md:mb-1">사장님, 코코알바에 오신 것을 환영합니다!</h3>
-                            <p className="text-[11px] md:text-[13px] text-blue-800/70 font-bold leading-relaxed">
-                                지금 첫 공고를 등록하고 <span className="text-blue-600 font-black underline underline-offset-2">SNS 홍보 혜택</span>을 받아보세요. <br className="hidden md:block" />
-                                작성이 어려우시면 언제든 우측 상단의 '예시 보기'를 참고해주세요!
-                            </p>
-                        </div>
-                    </div>
-                    {/* 게시글 작성 전 필독 (WarningModal 대체) */}
-                    <div className="bg-white/70 rounded-2xl p-3 md:p-4 space-y-1.5 text-[11px] md:text-[13px] font-bold text-gray-700 border border-blue-100">
-                        <p className="font-black text-gray-800 mb-1">📢 게시글 작성 전 필독!</p>
-                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">1.</span><span>월 수정횟수는 <strong className="text-black">30회</strong> 입니다.</span></p>
-                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">2.</span><span>금칙어 사용 시 <strong className="text-black">통보 없이 삭제</strong>될 수 있습니다.</span></p>
-                        <p className="flex gap-2"><span className="text-blue-500 font-black shrink-0">3.</span><span>본문 내용은 <strong className="text-black">1000자 이내</strong>로 작성해주세요.</span></p>
-                    </div>
-                </div>
-            )}
 
             <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} setShowTemplateModal={props.setShowTemplateModal} />
@@ -271,30 +252,42 @@ export default function AdForm(props: AdFormProps) {
                 </div>
             </div>
 
-            {/* Sticky Bottom Navigation */}
-            <div className="fixed bottom-0 left-0 right-0 z-[1000] p-4 md:p-5 bg-white/90 pointer-events-none">
-                <div className="max-w-[640px] mx-auto flex flex-row gap-2 pointer-events-auto">
-                    <button
-                        type="button"
-                        onClick={() => props.onPreview?.()}
-                        className="flex-1 py-3.5 rounded-2xl bg-slate-800 text-white font-black text-xs hover:bg-slate-900 transition flex items-center justify-center gap-1 shadow-lg active:scale-95 whitespace-nowrap"
-                    >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                        보기
-                    </button>
-                    <button
-                        onClick={() => props.onBack?.()}
-                        className="flex-1 py-3.5 rounded-2xl bg-white text-gray-500 font-black text-xs hover:bg-gray-50 transition shadow-lg border border-gray-200 active:scale-95 whitespace-nowrap"
-                    >
-                        취소
-                    </button>
-                    <button
-                        onClick={() => props.onSave?.()}
-                        className="flex-[2] py-3.5 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-2xl flex items-center justify-center gap-1.5 shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-                        저장 및 심사
-                    </button>
+            {/* Sticky Bottom Navigation — 가격 포함 */}
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pointer-events-none">
+                <div className="max-w-[640px] mx-auto pointer-events-auto">
+                    {/* 가격 행 (상품 선택 시만 표시) */}
+                    {props.totalAmount > 0 && (
+                        <div className="flex items-center justify-between px-4 pt-2.5 pb-0">
+                            <span className="text-[10px] font-bold text-gray-400">총 신청 금액</span>
+                            <span className="text-base font-black text-[#e0007b] tracking-tight">
+                                {props.totalAmount.toLocaleString()}원
+                            </span>
+                        </div>
+                    )}
+                    {/* 버튼 행 */}
+                    <div className="flex flex-row gap-2 p-3">
+                        <button
+                            type="button"
+                            onClick={() => props.onPreview?.()}
+                            className="flex-1 py-3 rounded-2xl bg-slate-800 text-white font-black text-xs hover:bg-slate-900 transition flex items-center justify-center gap-1 shadow-lg active:scale-95 whitespace-nowrap"
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            보기
+                        </button>
+                        <button
+                            onClick={() => props.onBack?.()}
+                            className="flex-1 py-3 rounded-2xl bg-white text-gray-500 font-black text-xs hover:bg-gray-50 transition shadow-sm border border-gray-200 active:scale-95 whitespace-nowrap"
+                        >
+                            취소
+                        </button>
+                        <button
+                            onClick={() => props.onSave?.()}
+                            className="flex-[2] py-3 bg-gradient-to-r from-blue-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-2xl flex items-center justify-center gap-1.5 shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-110 whitespace-nowrap"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                            저장 및 심사
+                        </button>
+                    </div>
                 </div>
             </div>
             <style jsx global>{`

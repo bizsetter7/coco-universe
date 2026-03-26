@@ -3,6 +3,7 @@ import { List, RefreshCw, Calendar, User, ChevronLeft, Zap } from 'lucide-react'
 import { useBrand } from '@/components/BrandProvider';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { getHighlighterStyle } from '@/utils/highlighter';
+import { IconBadge } from '@/components/common/IconBadge';
 import { DETAILED_PRICING } from '../constants';
 
 const TIER_GRADIENTS: Record<string, string> = {
@@ -130,9 +131,12 @@ export const OngoingAdsView = ({
 
                                         <h4
                                             onClick={() => onShowAdDetail?.(ad)}
-                                            className={`font-black text-xl md:text-2xl cursor-pointer hover:text-blue-500 transition-colors leading-tight line-clamp-1 break-all ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                            className={`font-black text-xl md:text-2xl cursor-pointer hover:text-blue-500 transition-colors leading-tight line-clamp-1 break-all flex items-center gap-1.5 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                                             style={getHighlighterStyle(options.highlighter || ad.selectedHighlighter)}
                                         >
+                                            {(options.icon || ad.selectedIcon) && (
+                                                <IconBadge iconId={options.icon || ad.selectedIcon} />
+                                            )}
                                             {ad.title}
                                         </h4>
 

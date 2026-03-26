@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { FileText, Check, Search, AlertCircle, Upload, X, ChevronDown, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { FileText, Check, Search, AlertCircle, Upload, X, ChevronDown, Loader2, ShieldCheck } from 'lucide-react';
 import { JOB_CATEGORIES } from '@/constants/jobs';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
 function formatBizNumber(value: string): string {
     const n = value.replace(/\D/g, '').slice(0, 10);
@@ -15,6 +17,8 @@ interface Step1Props {
     brand: any;
     shopName: string;
     setShopName: (v: string) => void;
+    shopAddress?: string;
+    setShopAddress?: (v: string) => void;
     isVerified: boolean;
     setIsVerified: (v: boolean) => void;
     nickname: string;
@@ -30,16 +34,66 @@ interface Step1Props {
 }
 
 export const Step1BasicInfo: React.FC<Step1Props> = ({
-    brand, shopName, setShopName, isVerified, setIsVerified,
+    brand, shopName, setShopName, shopAddress = '', setShopAddress,
+    isVerified, setIsVerified,
     nickname, setNickname, industryMain, setIndustryMain,
     managerName, setManagerName, managerPhone, setManagerPhone,
     messengers, setMessengers
 }) => {
+    const { user, userType } = useAuth();
     const [bizNumber, setBizNumber] = useState('');
     const [bizStatus, setBizStatus] = useState<'idle' | 'loading' | 'valid' | 'invalid' | 'closed' | 'suspended'>('idle');
     const [bizStatusText, setBizStatusText] = useState('');
     const [bizDocFile, setBizDocFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // [사업자 인증] 인증된 프로필에서 자동 반영
+    const [bizProfile, setBizProfile] = useState<any>(null);
+
+    useEffect(() => {
+        if (!user?.id || userType !== 'corporate') return;
+
+        const loadBizProfile = async () => {
+            const { data } = await supabase
+                .from('profiles')
+                .select('business_name, business_number, business_type, business_address, manager_phone, manager_kakao, manager_line, manager_telegram, business_verified, business_verify_status, full_name')
+                .eq('id', user.id)
+                .single();
+
+            if (data && (data as any).business_verified) {
+                const p = data as any;
+                setBizProfile(p);
+
+                // 인증된 정보를 폼에 자동 반영
+                // [Fix] 상호명은 프로필 값으로 항상 덮어쓰기
+                if (p.business_name) setShopName(p.business_name);
+                // [Fix] 업종(business_type)은 Step1에 표시만 (bizProfile에 보관) — industryMain(공고 직종)과 분리
+                if (!shopAddress && p.business_address && setShopAddress) setShopAddress(p.business_address);
+                if (!managerName && p.full_name) setManagerName(p.full_name);
+                if (!managerPhone && p.manager_phone) setManagerPhone(p.manager_phone);
+                if ((!messengers.kakao && !messengers.line && !messengers.telegram) &&
+                    (p.manager_kakao || p.manager_line || p.manager_telegram)) {
+                    setMessengers({
+                        kakao: p.manager_kakao || '',
+                        line: p.manager_line || '',
+                        telegram: p.manager_telegram || '',
+                    });
+                }
+                // 사업자 번호를 로컬 state에 표시
+                if (p.business_number) {
+                    setBizNumber(formatBizNumber(p.business_number));
+                    setBizStatus('valid');
+                    setBizStatusText('인증된 사업자 (관리자 승인 완료)');
+                    setIsVerified(true);
+                }
+            }
+        };
+
+        loadBizProfile();
+    }, [user?.id, userType]);
+
+    // 인증된 사업자인지 여부
+    const isCertified = bizProfile?.business_verified === true;
 
     const handleVerify = async () => {
         const raw = bizNumber.replace(/\D/g, '');
@@ -105,7 +159,18 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                     <h2 className="font-black text-gray-800 mb-3 md:mb-4 flex items-center gap-2 text-sm">
                         <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
                         사업자 기본 정보
+                        {isCertified && (
+                            <span className="ml-auto flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black">
+                                <ShieldCheck size={12} /> 인증된 사업자
+                            </span>
+                        )}
                     </h2>
+                    {isCertified && (
+                        <div className="mb-3 px-3 py-2 bg-green-50 border border-green-200 rounded-xl text-[11px] text-green-700 font-bold flex items-center gap-2">
+                            <ShieldCheck size={13} className="shrink-0" />
+                            회원정보에 등록된 인증 사업자 정보가 자동으로 반영되었습니다. 광고 닉네임만 별도 설정하세요.
+                        </div>
+                    )}
 
                     {/* 1행: 상호명 + 업종선택 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
@@ -122,22 +187,30 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                             />
                         </div>
 
-                        {/* 업종선택 */}
+                        {/* 업종선택 — 인증된 사업자: 사업자 인증 업종 표시(read-only), 미인증: 직접 선택 */}
                         <div>
                             <label className={labelCls}><span className="text-red-500 mr-1">*</span>업종선택</label>
-                            <div className="relative">
-                                <select
-                                    value={industryMain}
-                                    onChange={(e) => setIndustryMain(e.target.value)}
-                                    className={`${inputCls} appearance-none pr-8 cursor-pointer`}
-                                >
-                                    <option value="">업종선택</option>
-                                    {JOB_CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                            </div>
+                            {isCertified && bizProfile?.business_type ? (
+                                // [Fix] 인증된 사업자 업종은 프로필 값으로 고정 표시 (industryMain/공고 직종과 무관)
+                                <div className={`${inputCls} opacity-60 cursor-not-allowed flex items-center justify-between`}>
+                                    <span>{bizProfile.business_type}</span>
+                                    <span className="text-[10px] text-gray-400 font-bold">인증 업종</span>
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    <select
+                                        value={industryMain}
+                                        onChange={(e) => setIndustryMain(e.target.value)}
+                                        className={`${inputCls} appearance-none pr-8 cursor-pointer`}
+                                    >
+                                        <option value="">업종선택</option>
+                                        {JOB_CATEGORIES.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -155,7 +228,9 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                                         <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white shrink-0"><Check size={12} strokeWidth={3} /></div>
                                         {bizNumber} 인증완료
                                     </div>
-                                    <button type="button" onClick={() => { setIsVerified(false); setBizStatus('idle'); setBizDocFile(null); }} className="text-xs text-gray-400 hover:text-gray-600 font-bold underline">재입력</button>
+                                    {!isCertified && (
+                                        <button type="button" onClick={() => { setIsVerified(false); setBizStatus('idle'); setBizDocFile(null); }} className="text-xs text-gray-400 hover:text-gray-600 font-bold underline">재입력</button>
+                                    )}
                                 </div>
                             ) : (
                                 <div>
@@ -191,7 +266,11 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <label className={`${labelCls} mb-0 shrink-0`}><span className="text-red-500 mr-1">*</span>사업자등록증 첨부</label>
-                                {bizDocFile ? (
+                                {isCertified ? (
+                                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-bold shrink-0 bg-green-50 border-green-200 text-green-700">
+                                        <Check size={11} strokeWidth={3} /> 인증완료
+                                    </div>
+                                ) : bizDocFile ? (
                                     <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-bold shrink-0 ${isDark ? 'bg-gray-800 border-gray-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700'}`}>
                                         <span className="truncate max-w-[80px]">{bizDocFile.name}</span>
                                         <button type="button" onClick={() => { setBizDocFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="text-gray-400 hover:text-red-500 transition shrink-0"><X size={12} /></button>
@@ -206,13 +285,28 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                                     </button>
                                 )}
                             </div>
-                            <p className="text-[10px] text-gray-500 font-bold">사업자등록증 / 직업소개사업등록증 / 영업허가증 中 택1</p>
+                            {!isCertified && <p className="text-[10px] text-gray-500 font-bold">사업자등록증 / 직업소개사업등록증 / 영업허가증 中 택1</p>}
                             <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleFileChange} />
+                        </div>
+
+                        {/* 사업장 주소 - 회원정보에서만 수정 가능 */}
+                        <div>
+                            <label className={labelCls}>
+                                사업장 주소
+                                <span className="ml-1 text-[9px] text-gray-400 font-normal">(회원정보수정에서 변경)</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="회원정보수정 &gt; 사업장 주소에서 입력하세요"
+                                value={shopAddress}
+                                readOnly
+                                className={`${inputCls} opacity-60 cursor-not-allowed bg-gray-50`}
+                            />
                         </div>
 
                         {/* 광고 닉네임 */}
                         <div>
-                            <label className={labelCls}>광고 닉네임</label>
+                            <label className={labelCls}>광고별 닉네임<span className="ml-1 text-[9px] text-blue-500 font-bold">(공고별 수정 가능)</span></label>
                             <input
                                 type="text"
                                 placeholder="광고에 표시될 닉네임"
@@ -229,6 +323,11 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                     <h2 className="font-black text-gray-800 mb-3 md:mb-4 flex items-center gap-2 text-sm">
                         <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
                         담당자 정보
+                        {isCertified && (
+                            <span className="ml-auto text-[10px] text-green-600 font-bold flex items-center gap-1">
+                                <ShieldCheck size={11} /> 인증된 정보 자동 반영
+                            </span>
+                        )}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3">
                         <div>
@@ -243,7 +342,10 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                             />
                         </div>
                         <div>
-                            <label className={labelCls}><span className="text-red-500 mr-1">*</span>담당자 연락처</label>
+                            <label className={labelCls}>
+                                <span className="text-red-500 mr-1">*</span>담당자 연락처
+                                {isCertified && <span className="ml-1 text-[9px] text-blue-500 font-bold">(공고별 수정 가능)</span>}
+                            </label>
                             <input
                                 type="text"
                                 placeholder="010-0000-0000"
@@ -255,15 +357,21 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                         <div>
-                            <label className="block text-[10px] font-black mb-1.5 text-yellow-600">카톡</label>
+                            <label className="block text-[10px] font-black mb-1.5 text-yellow-600">
+                                카톡 {isCertified && <span className="text-[8px] text-blue-400">(공고별)</span>}
+                            </label>
                             <input type="text" placeholder="ID" value={messengers.kakao} onChange={(e) => setMessengers({ ...messengers, kakao: e.target.value })} className={`w-full border rounded-lg p-2 text-xs font-bold outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-200'}`} />
                         </div>
                         <div>
-                            <label className="block text-[10px] font-black mb-1.5 text-green-600">라인</label>
+                            <label className="block text-[10px] font-black mb-1.5 text-green-600">
+                                라인 {isCertified && <span className="text-[8px] text-blue-400">(공고별)</span>}
+                            </label>
                             <input type="text" placeholder="ID" value={messengers.line} onChange={(e) => setMessengers({ ...messengers, line: e.target.value })} className={`w-full border rounded-lg p-2 text-xs font-bold outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-200'}`} />
                         </div>
                         <div>
-                            <label className="block text-[10px] font-black mb-1.5 text-blue-600">텔레</label>
+                            <label className="block text-[10px] font-black mb-1.5 text-blue-600">
+                                텔레 {isCertified && <span className="text-[8px] text-blue-400">(공고별)</span>}
+                            </label>
                             <input type="text" placeholder="ID" value={messengers.telegram} onChange={(e) => setMessengers({ ...messengers, telegram: e.target.value })} className={`w-full border rounded-lg p-2 text-xs font-bold outline-none ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-gray-50 border-gray-200'}`} />
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MessageSquare, Phone, MapPin, Briefcase, User, Star, Info } from 'lucide-react';
 import { formatKoreanMoney } from '@/utils/formatMoney';
@@ -25,15 +25,85 @@ const TIER_GRADIENTS: Record<string, string> = {
 
 
 
+// 카카오맵 SDK 로드
+const loadKakaoMapSdk = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        if ((window as any).kakao?.maps?.services) { resolve(); return; }
+        const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
+        if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
+        const script = document.createElement('script');
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
+        script.onload = () => {
+            (window as any).kakao.maps.load(() => resolve());
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+};
+
 export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void }) => {
     const [mounted, setMounted] = useState(false);
+    const [bizAddress, setBizAddress] = useState<string | null>(null);
+    const [mapError, setMapError] = useState<string | null>(null);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
 
     useBodyScrollLock(!!ad);
 
     useEffect(() => {
-
         setMounted(true);
     }, [ad]);
+
+    // 사업장 주소 로드 (profiles.business_address)
+    useEffect(() => {
+        const userId = ad?.user_id || ad?.options?.user_id;
+        if (!userId) return;
+        import('@/lib/supabase').then(({ supabase }) => {
+            supabase.from('profiles')
+                .select('business_address, business_address_detail')
+                .eq('id', userId)
+                .single()
+                .then(({ data }) => {
+                    if (data?.business_address) {
+                        const detail = (data as any).business_address_detail;
+                        setBizAddress(detail ? `${data.business_address} ${detail}` : data.business_address);
+                    }
+                });
+        });
+    }, [ad?.user_id]);
+
+    // 카카오맵 렌더링
+    useEffect(() => {
+        if (!bizAddress || !mapContainerRef.current) return;
+        let cancelled = false;
+
+        loadKakaoMapSdk()
+            .then(() => {
+                if (cancelled || !mapContainerRef.current) return;
+                const kakao = (window as any).kakao;
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(bizAddress, (result: any[], status: string) => {
+                    if (cancelled || !mapContainerRef.current) return;
+                    if (status !== kakao.maps.services.Status.OK || !result[0]) {
+                        setMapError('주소를 지도에서 찾을 수 없습니다.');
+                        return;
+                    }
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    const map = new kakao.maps.Map(mapContainerRef.current, {
+                        center: coords,
+                        level: 4,
+                    });
+                    new kakao.maps.Marker({ map, position: coords });
+                    // 인포윈도우 (주소 말풍선)
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:6px 10px;font-size:11px;font-weight:700;white-space:nowrap;">${bizAddress}</div>`,
+                    });
+                    infowindow.open(map, new kakao.maps.Marker({ map, position: coords }));
+                });
+            })
+            .catch(() => setMapError('지도를 불러오지 못했습니다.'));
+
+        return () => { cancelled = true; };
+    }, [bizAddress]);
 
     if (!mounted || !ad) return null;
     if (typeof document === 'undefined') return null;
@@ -181,17 +251,54 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                     </div>
 
                     {/* 위치 정보 */}
-                    <div className="space-y-3">
-                        <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
-                            <span className="w-1 h-4 bg-green-500 rounded-full"></span>
-                            위치 정보
-                        </h3>
-                        <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
-                            <MapPin size={32} className="opacity-50" />
-                            <span className="text-xs font-bold">{norm.regionCity} {norm.regionGu}</span>
-                            <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
+                    {bizAddress && (
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
+                                <span className="w-1 h-4 bg-green-500 rounded-full"></span>
+                                위치 정보
+                            </h3>
+                            <div className="rounded-xl border border-gray-100 overflow-hidden">
+                                {/* 주소 텍스트 */}
+                                <div className="flex items-start gap-2 px-4 py-2.5 bg-gray-50">
+                                    <MapPin size={13} className="text-green-500 shrink-0 mt-0.5" />
+                                    <span className="text-xs font-black text-gray-900 leading-relaxed">{bizAddress}</span>
+                                </div>
+                                {/* 카카오맵 임베드 */}
+                                {mapError ? (
+                                    <div className="h-44 flex flex-col items-center justify-center text-gray-400 gap-2 bg-gray-50">
+                                        <MapPin size={24} className="opacity-30" />
+                                        <span className="text-xs font-bold">{mapError}</span>
+                                        <a
+                                            href={`https://map.kakao.com/?q=${encodeURIComponent(bizAddress)}`}
+                                            target="_blank" rel="noopener noreferrer"
+                                            className="text-[11px] text-yellow-600 font-black underline"
+                                        >
+                                            카카오맵에서 보기
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div ref={mapContainerRef} className="w-full h-48" />
+                                )}
+                                {/* 외부 지도 열기 버튼 */}
+                                <div className="flex border-t border-gray-100">
+                                    <a
+                                        href={`https://map.kakao.com/?q=${encodeURIComponent(bizAddress)}`}
+                                        target="_blank" rel="noopener noreferrer"
+                                        className="flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-black text-yellow-600 hover:bg-yellow-50 transition border-r border-gray-100"
+                                    >
+                                        🗺 카카오맵
+                                    </a>
+                                    <a
+                                        href={`https://map.naver.com/v5/search/${encodeURIComponent(bizAddress)}`}
+                                        target="_blank" rel="noopener noreferrer"
+                                        className="flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-black text-green-600 hover:bg-green-50 transition"
+                                    >
+                                        🗺 네이버맵
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* [Restored] Keyword & Info */}
                     <div className="space-y-2 pt-4 border-t border-gray-100">

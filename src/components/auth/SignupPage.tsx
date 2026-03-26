@@ -727,10 +727,10 @@ export const SignupPage = () => {
                                 이제부터 다양한 서비스를 이용하실 수 있습니다.
                             </p>
                         </div>
-                        <button onClick={() => router.push('/?page=login')}
+                        <button onClick={() => router.push('/my-shop')}
                             className="w-full py-4 rounded-2xl text-white font-black text-sm shadow-xl active:scale-[0.98] transition-all"
                             style={{ backgroundColor: primary }}>
-                            로그인하러 가기
+                            마이샵으로 바로 가기
                         </button>
                     </div>
                 )}

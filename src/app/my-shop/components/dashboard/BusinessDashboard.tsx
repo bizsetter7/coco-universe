@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, Store, MapPin, Check, Plus, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings } from 'lucide-react';
+import { ChevronLeft, Store, MapPin, Check, Plus, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings, AlertTriangle, ChevronRight } from 'lucide-react';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { IconBadge } from '@/components/common/IconBadge';
 
@@ -10,6 +10,9 @@ interface BusinessDashboardProps {
     shopName: string;
     nickname: string;
     isVerified: boolean;
+    bizVerified?: boolean;
+    bizAddress?: string;
+    onGoMemberInfo?: () => void;
     handleAdClick: (isNew: boolean, ad?: any) => void;
     setShowDesignModal: (v: boolean) => void;
     setView: (v: any) => void;
@@ -30,7 +33,7 @@ const TIER_COLORS: Record<string, string> = {
 };
 
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd
+    brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd
 }) => {
     const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
 
@@ -62,20 +65,42 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
 
     return (
         <div className="w-full space-y-3 md:space-y-6 pb-20">
+            {/* 사업자 미인증 배너 */}
+            {!bizVerified && (
+                <button
+                    onClick={onGoMemberInfo}
+                    className="w-full flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-left hover:bg-amber-100 transition group"
+                >
+                    <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                        <AlertTriangle size={18} className="text-amber-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="font-black text-amber-800 text-sm">사업자 인증이 필요합니다</p>
+                        <p className="text-xs text-amber-600 font-bold">공고 등록 전 회원정보수정에서 사업자 인증을 완료해주세요.</p>
+                    </div>
+                    <ChevronRight size={16} className="text-amber-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </button>
+            )}
+
             <header className="flex flex-col gap-2 md:gap-4 mb-2 md:mb-4">
                 <div className={`p-4 md:p-6 sm:rounded-[32px] shadow-sm border relative ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} `}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4">
                         <div className="flex items-center gap-4">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-blue-600'} `}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg ${brand.theme === 'dark' ? 'bg-gray-800' : bizVerified ? 'bg-blue-600' : 'bg-gray-400'} `}>
                                 <Store size={32} />
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h2 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>{shopName}</h2>
-                                    {isVerified && <Check size={16} className="text-blue-500" strokeWidth={3} />}
+                                    <h2 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}>
+                                        {bizVerified ? shopName : '미인증 업체'}
+                                    </h2>
+                                    {bizVerified && <Check size={16} className="text-blue-500" strokeWidth={3} />}
                                 </div>
-                                <p className="text-sm text-gray-500 font-bold flex items-center gap-1">
-                                    <MapPin size={14} /> 서울 강남구 테헤란로
+                                <p className={`text-sm font-bold flex items-center gap-1 ${bizVerified ? 'text-gray-500' : 'text-amber-500'}`}>
+                                    {bizVerified
+                                        ? <><MapPin size={14} /> {bizAddress || '인증된 사업자'}</>
+                                        : <><AlertTriangle size={14} /> 사업자 인증 후 공고 등록 가능</>
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -119,14 +144,23 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                             <div className="flex flex-col md:flex-row justify-between gap-4">
                                 <div className="space-y-2 flex-1 min-w-0">
                                     <div className="flex gap-2 text-[11px] items-center font-black">
-                                        <span className={`${(ad?.status === 'rejected' || ad?.status === 'REJECTED') ? 'bg-red-100 text-red-500' : (ad?.status === 'PENDING_REVIEW' ? 'bg-orange-100 text-orange-500' : (activeTab === 'ongoing' ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500'))} px-2 py-0.5 rounded shadow-sm`}>
-                                            {(ad?.status === 'rejected' || ad?.status === 'REJECTED') ? '반려' : (ad?.status === 'PENDING_REVIEW' ? '심사중' : (activeTab === 'ongoing' ? '진행중' : '마감'))}
+                                        <span className={`${
+                                            (ad?.status === 'rejected' || ad?.status === 'REJECTED') ? 'bg-red-100 text-red-500' :
+                                            (ad?.status === 'active' || ad?.status === 'ACTIVE') ? 'bg-green-100 text-green-600' :
+                                            (ad?.status === 'PENDING_REVIEW' || ad?.status === 'pending_review') ? 'bg-orange-100 text-orange-500' :
+                                            (activeTab === 'ongoing' ? 'bg-blue-100 text-blue-500' : 'bg-gray-200 text-gray-500')
+                                        } px-2 py-0.5 rounded shadow-sm`}>
+                                            {(ad?.status === 'rejected' || ad?.status === 'REJECTED') ? '반려' :
+                                             (ad?.status === 'active' || ad?.status === 'ACTIVE') ? '광고게시중' :
+                                             (ad?.status === 'PENDING_REVIEW' || ad?.status === 'pending_review') ? '심사중' :
+                                             (activeTab === 'ongoing' ? '진행중' : '마감')}
                                         </span>
                                         <div className="flex flex-col text-gray-400">
-                                            {ad?.approved_at && (
-                                                <span>게시일: {new Date(ad.approved_at).toLocaleDateString()}</span>
+                                            {(ad?.status === 'active' || ad?.status === 'ACTIVE') ? (
+                                                <span>마감일: {ad?.deadline || '미정'}</span>
+                                            ) : (
+                                                <span>신청일: {ad?.created_at ? new Date(ad.created_at).toLocaleDateString() : '날짜 없음'}</span>
                                             )}
-                                            <span>마감일: {ad?.deadline || '미정'}</span>
                                         </div>
                                     </div>
 
@@ -160,7 +194,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                 {(ad.options?.border && ad.options?.border !== 'none' || (ad.borderOption && ad.borderOption !== 'none')) && (
                                                     <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">테</span>
                                                 )}
-                                                {(ad.options?.pay_suffixes || ad.options?.paySuffixes || ad.paySuffixes?.length > 0) && (
+                                                {(ad.options?.pay_suffixes?.length > 0 || ad.options?.paySuffixes?.length > 0 || (ad.paySuffixes || []).length > 0) && (
                                                     <span className="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm">급</span>
                                                 )}
                                             </div>
@@ -169,9 +203,12 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         {/* Title Line (Under Badges) */}
                                         <h4
                                             onClick={() => onShowAdDetail?.(ad)}
-                                            className={`font-black text-[17px] md:text-[19px] cursor-pointer hover:text-blue-500 transition leading-tight block w-full ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
+                                            className={`font-black text-[17px] md:text-[19px] cursor-pointer hover:text-blue-500 transition leading-tight flex items-center gap-1.5 w-full ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'} `}
                                             style={getHighlighterStyle(ad.options?.highlighter || ad.selectedHighlighter)}
                                         >
+                                            {(ad.options?.icon || ad.selectedIcon) && (
+                                                <IconBadge iconId={ad.options?.icon || ad.selectedIcon} />
+                                            )}
                                             {ad.title}
                                         </h4>
 
