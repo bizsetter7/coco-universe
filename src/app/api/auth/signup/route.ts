@@ -78,20 +78,24 @@ export async function POST(req: NextRequest) {
         }
 
         // profiles 테이블에 직접 upsert (트리거 보완 — phone/birthdate/gender 포함)
+        // null 처리: 빈 문자열 대신 null 사용 (DATE 타입 컬럼에 '' 삽입 시 오류 방지)
         if (data.user?.id) {
             try {
-                await supabaseAdmin.from('profiles').upsert({
+                const { error: upsertError } = await supabaseAdmin.from('profiles').upsert({
                     id: data.user.id,
                     username: email.split('@')[0],   // 로그인 아이디 저장 (중복확인용)
                     full_name: name || '',
                     nickname: nickname || name || '',
                     role: role || 'individual',
-                    phone: phone || '',
-                    birth_date: birthdate || '',
-                    gender: gender || '',
+                    phone: phone || null,
+                    birth_date: birthdate || null,
+                    gender: gender || null,
                 }, { onConflict: 'id' });
+                if (upsertError) {
+                    console.error('[signup] profiles upsert 실패:', upsertError.message);
+                }
             } catch (profileErr) {
-                console.warn('[signup] profiles upsert 실패 (무시):', profileErr);
+                console.warn('[signup] profiles upsert 예외:', profileErr);
             }
         }
 

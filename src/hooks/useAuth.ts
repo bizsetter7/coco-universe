@@ -261,6 +261,45 @@ export function useAuth() {
     };
 
     /**
+     * [Internal] 클라이언트 SDK fallback 가입 (SUPABASE_SERVICE_ROLE_KEY 미설정 시)
+     * - user_metadata에 모든 필드 포함
+     * - 가입 후 세션이 있으면 profiles 직접 UPDATE (phone/birth_date/gender/username 보완)
+     */
+    const signUpClientFallback = async (email: string, pw: string, metadata: any) => {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password: pw,
+            options: {
+                data: {
+                    full_name: metadata.name || '',
+                    nickname: metadata.nickname || metadata.name || '',
+                    role: metadata.role || 'individual',
+                    phone: metadata.phone || '',
+                    birthdate: metadata.birthdate || '',
+                    gender: metadata.gender || '',
+                },
+            },
+        });
+        if (error) throw error;
+
+        // 가입 직후 세션이 있으면 profiles UPDATE로 누락 필드 보완
+        // (handle_new_user 트리거가 full_name/nickname/role만 저장하므로 보완 필요)
+        if (data.user?.id) {
+            try {
+                await supabase.from('profiles').update({
+                    username: email.split('@')[0],
+                    phone: metadata.phone || null,
+                    birth_date: metadata.birthdate || null,
+                    gender: metadata.gender || null,
+                }).eq('id', data.user.id);
+            } catch (e) {
+                console.warn('[signup fallback] profiles update 실패:', e);
+            }
+        }
+        return data;
+    };
+
+    /**
      * [New] 실서비스용 실제 Supabase 회원가입
      * 1순위: /api/auth/signup (Admin API, email_confirm: true → 즉시 로그인 가능)
      * 2순위: supabase.auth.signUp() fallback (SUPABASE_SERVICE_ROLE_KEY 미설정 시)
@@ -288,32 +327,14 @@ export function useAuth() {
 
             // SERVICE_ROLE_KEY 미설정 시 fallback
             if (json.code === 'NO_ADMIN_KEY') {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password: pw,
-                    options: {
-                        data: {
-                            full_name: metadata.name,
-                            nickname: metadata.nickname,
-                            role: metadata.role || 'individual',
-                        },
-                    },
-                });
-                if (error) throw error;
-                return data;
+                return await signUpClientFallback(email, pw, metadata);
             }
 
             throw new Error(json.message || '회원가입 처리 중 오류가 발생했습니다.');
         } catch (err: any) {
             // fetch 자체 실패 시 fallback
             if (err?.message?.includes('fetch')) {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password: pw,
-                    options: { data: { full_name: metadata.name, nickname: metadata.nickname, role: metadata.role || 'individual' } },
-                });
-                if (error) throw error;
-                return data;
+                return await signUpClientFallback(email, pw, metadata);
             }
             throw err;
         }
