@@ -26,6 +26,7 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
         managerName: '',   // full_name
         birthDate: '',     // birth_date
         gender: '',        // gender
+        smsConsent: true,  // SMS 수신 동의 (마케팅 활용)
         newPassword: '',
         newPasswordConfirm: '',
     });
@@ -233,6 +234,22 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                         </div>
                     </div>
                     <p className="text-[10px] text-blue-500 mt-2 font-bold">* 본인인증으로 확인된 정보로 임의 수정이 불가합니다.</p>
+                </div>
+
+                {/* ── SMS 수신동의 ── */}
+                <div className={`p-4 rounded-xl border flex items-center gap-3 ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <div
+                        onClick={() => handleChange('smsConsent', !formData.smsConsent)}
+                        className={`w-6 h-6 rounded border flex items-center justify-center cursor-pointer transition ${formData.smsConsent ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-gray-300'}`}
+                    >
+                        {formData.smsConsent && <Check size={16} />}
+                    </div>
+                    <label
+                        className={`cursor-pointer font-bold select-none ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                        onClick={() => handleChange('smsConsent', !formData.smsConsent)}
+                    >
+                        [필수] SMS 수신 동의 (중요 알림 및 공지사항)
+                    </label>
                 </div>
 
                 {/* ── 버튼 ── */}

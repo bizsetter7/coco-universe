@@ -25,6 +25,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
         phone: '',
         birthDate: '',   // birth_date (본인인증 값, 표시 전용)
         gender: '',      // gender (본인인증 값, 표시 전용)
+        smsConsent: true, // SMS 수신 동의 (마케팅 활용)
         newPassword: '',
         newPasswordConfirm: '',
     });
@@ -320,6 +321,17 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                             />
                         </div>
                     </div>
+
+                    {/* SMS 수신 동의 */}
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={formData.smsConsent}
+                            onChange={(e) => handleChange('smsConsent', e.target.checked)}
+                            className="w-4 h-4 accent-[#f82b60]"
+                        />
+                        <span className={`text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>SMS 수신 동의 (중요 알림 및 공지사항)</span>
+                    </label>
 
                     {/* 하단 버튼 */}
                     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-gray-100 dark:border-gray-800">
