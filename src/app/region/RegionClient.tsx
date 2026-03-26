@@ -170,6 +170,7 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
 
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
+                        activeSearchQuery={activeSearchQuery}
                         setActiveSearchQuery={setActiveSearchQuery}
                         filterOrder={['region', 'subRegion', 'job', 'subJob']} // Custom order for Region page
                     />

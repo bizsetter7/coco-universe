@@ -182,6 +182,7 @@ export default function JobClient({ shops }: JobClientProps) {
 
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
+                        activeSearchQuery={activeSearchQuery}
                         setActiveSearchQuery={setActiveSearchQuery}
                     />
                 </ListingPageLayout>

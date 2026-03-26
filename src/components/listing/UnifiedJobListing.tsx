@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import JobListView from '@/components/jobs/JobListView';
 import { JOB_CATEGORIES, JOB_CATEGORY_MAP } from '@/constants/jobs';
 import { REGION_LIST, REGIONS_MAP } from '@/constants/regions';
@@ -33,6 +33,7 @@ interface UnifiedJobListingProps {
 
     searchQuery: string;
     setSearchQuery: (v: string) => void;
+    activeSearchQuery: string;
     setActiveSearchQuery: (v: string) => void;
 
     // Configuration
@@ -60,6 +61,7 @@ export const UnifiedJobListing = ({
     setSelectedSubJobType,
     searchQuery,
     setSearchQuery,
+    activeSearchQuery,
     setActiveSearchQuery,
     filterOrder = ['job', 'subJob', 'region', 'subRegion'], // Default Order
     adGrid
@@ -68,6 +70,20 @@ export const UnifiedJobListing = ({
     const router = useRouter();
     const [activeTab, setActiveTab] = React.useState(title);
     const [viewedShops, setViewedShops] = React.useState<Shop[]>([]);
+
+    // 활성 필터 여부 감지 (필터 초기화 버튼 표시 조건)
+    const hasActiveFilter = selectedRegion !== '전체' || selectedSubRegion !== '전체' ||
+        selectedJobType !== '전체' || selectedSubJobType !== '전체' || !!activeSearchQuery;
+
+    // 전체 필터 초기화
+    const resetFilters = () => {
+        setSelectedRegion('전체');
+        setSelectedSubRegion('전체');
+        setSelectedJobType('전체');
+        setSelectedSubJobType('전체');
+        setSearchQuery('');
+        setActiveSearchQuery('');
+    };
 
     // 탭 변경 시 viewed_shops 로드 (24시간 이내 항목만 표시)
     React.useEffect(() => {
@@ -251,15 +267,27 @@ export const UnifiedJobListing = ({
                                 <input
                                     type="text"
                                     placeholder="키워드 검색"
-                                    className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 text-sm font-bold outline-none focus:border-blue-300 transition-all font-black text-black"
+                                    className="w-full h-12 bg-gray-50 border border-gray-100 rounded-2xl px-4 pr-10 text-sm font-bold outline-none focus:border-blue-300 transition-all font-black text-black"
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        // 입력 클리어 시 검색 필터도 즉시 초기화
+                                        if (!e.target.value) setActiveSearchQuery('');
+                                    }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             setActiveSearchQuery(searchQuery);
                                         }
                                     }}
                                 />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => { setSearchQuery(''); setActiveSearchQuery(''); }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
                             </div>
                             <button
                                 onClick={() => setActiveSearchQuery(searchQuery)}
@@ -279,44 +307,54 @@ export const UnifiedJobListing = ({
                     </div>
                 )}
 
-                {/* Skeleton Loader (Always present to prevent CLS) */}
-
-                {shops.length === 0 && (
-                    <div className="space-y-4 pt-8 mx-4 md:mx-0">
-                        <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                            {[...Array(8)].map((_, i) => (
-                                <div key={i} className="aspect-square bg-gray-100 rounded-[20px] animate-pulse relative overflow-hidden">
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <div className="w-12 h-12 rounded-full bg-gray-200" />
-                                            <span className="text-gray-300 font-black text-xs">RESERVED</span>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 space-y-3 absolute bottom-0 w-full bg-white/50 backdrop-blur-sm">
-                                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                        <div className="h-4 bg-gray-200 rounded w-1/2" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                {/* 검색/필터 결과 없음 (스켈레톤 대체) */}
+                {activeTab !== '오늘본공고' && shops.length === 0 && (
+                    <div className="py-16 text-center mx-4 md:mx-0">
+                        <div className="text-5xl mb-4">🔍</div>
+                        <p className="text-gray-700 font-black text-lg mb-2">검색 결과가 없습니다</p>
+                        <p className="text-gray-400 text-sm mb-6 font-medium">
+                            {hasActiveFilter ? '선택한 조건에 맞는 공고가 없습니다. 필터를 조정해 보세요.' : '현재 등록된 공고가 없습니다.'}
+                        </p>
+                        {hasActiveFilter && (
+                            <button
+                                onClick={resetFilters}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/20"
+                            >
+                                필터 전체 초기화
+                            </button>
+                        )}
                     </div>
                 )}
 
                 {/* List View */}
-                {activeTab === '오늘본공고' && displayShops.length === 0 ? (
-                    <div className="py-20 text-center mx-4 md:mx-0">
-                        <p className="text-gray-400 font-bold mb-4">오늘 본 공고가 아직 없습니다. 😲</p>
-                        <button
-                            onClick={() => setActiveTab(title)}
-                            className="text-blue-600 font-black text-sm underline"
-                        >
-                            전체 공고 보러가기
-                        </button>
-                    </div>
-                ) : (
+                {activeTab === '오늘본공고' ? (
+                    viewedShops.length === 0 ? (
+                        <div className="py-20 text-center mx-4 md:mx-0">
+                            <div className="text-5xl mb-4">👀</div>
+                            <p className="text-gray-400 font-bold mb-4">오늘 본 공고가 아직 없습니다.</p>
+                            <button
+                                onClick={() => setActiveTab(title)}
+                                className="text-blue-600 font-black text-sm underline"
+                            >
+                                전체 공고 보러가기
+                            </button>
+                        </div>
+                    ) : (
+                        <JobListView
+                            shops={viewedShops}
+                            brand={brand}
+                            favorites={favorites}
+                            toggleFavorite={toggleFavorite}
+                            setSelectedShop={setSelectedShop}
+                            visibleCount={visibleCount}
+                            setVisibleCount={setVisibleCount}
+                            onAdRegister={onAdRegister}
+                            onNativeAdRegister={onNativeAdRegister}
+                        />
+                    )
+                ) : shops.length > 0 ? (
                     <JobListView
-                        shops={displayShops}
+                        shops={shops}
                         brand={brand}
                         favorites={favorites}
                         toggleFavorite={toggleFavorite}
@@ -326,7 +364,7 @@ export const UnifiedJobListing = ({
                         onAdRegister={onAdRegister}
                         onNativeAdRegister={onNativeAdRegister}
                     />
-                )}
+                ) : null}
             </div>
         </div>
     );
