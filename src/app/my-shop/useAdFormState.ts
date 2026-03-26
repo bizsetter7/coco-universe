@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { DETAILED_PRICING, FORBIDDEN_WORDS } from './constants';
+import { DETAILED_PRICING } from './constants';
 import { ICONS } from '@/constants/job-options';
 
 // [Total Reset] Robust Helper

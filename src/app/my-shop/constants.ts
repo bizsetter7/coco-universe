@@ -23,7 +23,6 @@ export const PAY_TYPES = GLOBAL_PAY_TYPES;
 // 단일 출처(job-options.ts) 사용 — 중복 배열 제거
 export const PAY_SUFFIX_OPTIONS = GLOBAL_PAY_SUFFIX;
 export const STEP4_CONVENIENCE_KEYWORDS = GLOBAL_CONVENIENCE;
-export const CONVENIENCE_KEYWORDS = GLOBAL_CONVENIENCE;
 
 export const FONT_DISPLAY_NAMES: { [key: string]: string } = {
     'Pretendard': '프리텐다드 (기본)',
@@ -55,9 +54,3 @@ export const DETAILED_PRICING = [
 export const ICONS = GLOBAL_ICONS;
 export const HIGHLIGHTERS = GLOBAL_HIGHLIGHTERS;
 
-export const FORBIDDEN_WORDS = [
-    '키스방', '대딸', '마사지', '안마', '보도방', '노래방', '풀싸롱', '룸싸롱',
-    '성매매', '조건만남', '애인대행', '유사성행위', '오피', '핸플', '마무리',
-    '소액결제', '내구제', '대출', '마약', '떨', '아이스', '작대기',
-    '도우미', '전문 인재', '엔터프라이즈 인재 솔루션'
-];
