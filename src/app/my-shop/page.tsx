@@ -196,6 +196,29 @@ function MyShopContent() {
         } catch (e) { console.warn(e); }
     };
 
+    // 업체회원 상호명 DB에서 로드 (하드코딩 '코코 라운지' 제거)
+    useEffect(() => {
+        if (!authUser?.id || authUser.id === 'guest' || authUser.id.startsWith('mock_')) return;
+        if (authUserType !== 'corporate') return;
+
+        const loadShopName = async () => {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('nickname, full_name, business_name')
+                .eq('id', authUser.id)
+                .single();
+
+            if (profile) {
+                // business_name 우선 → nickname → full_name 순서로 fallback
+                const name = (profile as any).business_name || profile.nickname || profile.full_name || '';
+                if (name) formState.setShopName(name);
+            }
+        };
+
+        loadShopName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authUser?.id, authUserType]);
+
     useEffect(() => {
         if (!authUser?.id || authUser.id === 'guest') return;
         fetchRegisteredAds();

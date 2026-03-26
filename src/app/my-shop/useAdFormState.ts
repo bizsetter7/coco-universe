@@ -14,7 +14,7 @@ const getValid = (v1: any, v2: any, defaultValue: any = '') => {
 export function useAdFormState() {
     // ... (States remain same)
     // --- Form States ---
-    const [shopName, setShopName] = useState('코코 라운지');
+    const [shopName, setShopName] = useState('');
     const [isVerified, setIsVerified] = useState(false);
     const [nickname, setNickname] = useState('');
 
@@ -211,7 +211,7 @@ export function useAdFormState() {
     }, [selectedAdProduct, selectedAdPeriod, selectedIcon, iconPeriod, selectedHighlighter, highlighterPeriod, paySuffixes, borderOption, borderPeriod]);
 
     const isDirty = (
-        (shopName !== '' && shopName !== '코코 라운지') ||
+        shopName !== '' ||
         managerName !== '' ||
         managerPhone !== '' ||
         messengers.kakao !== '' || messengers.line !== '' || messengers.telegram !== '' ||
