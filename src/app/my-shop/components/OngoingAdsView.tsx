@@ -6,17 +6,6 @@ import { getHighlighterStyle } from '@/utils/highlighter';
 import { IconBadge } from '@/components/common/IconBadge';
 import { DETAILED_PRICING } from '../constants';
 
-const TIER_GRADIENTS: Record<string, string> = {
-    grand: 'bg-[#8B5CF6]',       // 보라 (Purple/Violet)
-    premium: 'bg-[#EF4444]',     // 빨강 (Red)
-    p1: 'bg-[#8B5CF6]',
-    p2: 'bg-[#EF4444]',
-    p3: 'bg-[#3B82F6]',
-    p4: 'bg-[#10B981]',
-    p5: 'bg-[#F97316]',
-    p6: 'bg-[#94A3B8]',
-    p7: 'bg-[#E2E8F0]'
-};
 
 export const OngoingAdsView = ({
     setView, ads = [], userName = '', jumpBalance = 0, onShowAdDetail, onOpenMenu, onEditAd, onDeleteAd, onJumpAd

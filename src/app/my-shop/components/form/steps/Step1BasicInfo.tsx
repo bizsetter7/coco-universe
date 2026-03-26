@@ -5,13 +5,7 @@ import { FileText, Check, Search, AlertCircle, Upload, X, ChevronDown, Loader2, 
 import { JOB_CATEGORIES } from '@/constants/jobs';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
-
-function formatBizNumber(value: string): string {
-    const n = value.replace(/\D/g, '').slice(0, 10);
-    if (n.length <= 3) return n;
-    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
-}
+import { formatBizNumber } from '../../../utils';
 
 interface Step1Props {
     brand: any;

@@ -20,19 +20,9 @@ export const AGES = GLOBAL_AGES;
 
 export const PAY_TYPES = GLOBAL_PAY_TYPES;
 
-export const PAY_SUFFIX_OPTIONS = [
-    '보도', '고정아가씨', '+α', '보너스', '팁별도', '고액알바', '갯수보장', '만근비지원', '출퇴근지원',
-    '고정구함', '초보가능', '선불가능', '급전가능', '성형지원', '따당가능', '순번확실', '푸쉬가능', '대학생알바', '지명우대',
-    '친구동반우대', '가족같은분위기', '밀방없음', '뒷방없음', '칼퇴보장', '텃세없음', '당일지급', '면접비지원', '회식활발',
-    '출퇴근자유', '홀복지원', '해외여행지원', 'BJ알바', '인플루언서', '엔터테인먼트', '숙식제공', '식사제공', '교통비지원', '인센티브', '남자실장', '여자실장'
-];
-
-export const STEP4_CONVENIENCE_KEYWORDS = [
-    '초보가능', '당일지급', '당일알바', '평일알바', '주말알바', '주간알바', '초이스없음', '20대알바', '30대알바', '40대알바',
-    '투잡알바', '야간알바', '단기알바', '경력우대', '파트타임', '여성알바', '여자알바',
-    '노래빠알바', '모델알바', '보도알바', '유흥알바', '룸알바추천', '엔터테인먼트', '고액알바', '밤알바'
-];
-
+// 단일 출처(job-options.ts) 사용 — 중복 배열 제거
+export const PAY_SUFFIX_OPTIONS = GLOBAL_PAY_SUFFIX;
+export const STEP4_CONVENIENCE_KEYWORDS = GLOBAL_CONVENIENCE;
 export const CONVENIENCE_KEYWORDS = GLOBAL_CONVENIENCE;
 
 export const FONT_DISPLAY_NAMES: { [key: string]: string } = {

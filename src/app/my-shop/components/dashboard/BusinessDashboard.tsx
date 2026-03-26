@@ -23,15 +23,6 @@ interface BusinessDashboardProps {
     onDeleteAd?: (adId: string) => void;
 }
 
-const TIER_COLORS: Record<string, string> = {
-    p1: 'bg-[#8B5CF6]', // GRAND
-    p2: 'bg-[#EF4444]', // PREMIUM
-    p3: 'bg-[#3B82F6]', // DELUXE
-    p4: 'bg-[#10B981]', // SPECIAL
-    p5: 'bg-[#F97316]', // URGENT
-    p7: 'bg-[#E2E8F0]'  // NORMAL
-};
-
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
     brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd
 }) => {
@@ -40,28 +31,6 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
     const ongoingAds = ads.filter(ad => !ad.isClosed);
     const closedAds = ads.filter(ad => ad.isClosed);
     const displayedAds = activeTab === 'ongoing' ? ongoingAds : closedAds;
-
-    // Helper to get tier label
-    const getTierLabel = (ad: any) => {
-        const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
-        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return 'T1';
-        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return 'T2';
-        if (pt === 'p3') return 'T3';
-        if (pt === 'p4') return 'T4';
-        if (pt === 'p5') return 'T5';
-        if (pt === 'p6') return 'T6';
-        return 'T7';
-    };
-
-    const getTierColor = (ad: any) => {
-        const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
-        if (pt.includes('grand') || pt === 'p1' || pt.includes('그랜드')) return TIER_COLORS.p1;
-        if (pt.includes('premium') || pt === 'p2' || pt.includes('프리미엄')) return TIER_COLORS.p2;
-        if (pt === 'p3') return TIER_COLORS.p3;
-        if (pt === 'p4') return TIER_COLORS.p4;
-        if (pt === 'p5') return TIER_COLORS.p5;
-        return TIER_COLORS.p7;
-    };
 
     return (
         <div className="w-full space-y-3 md:space-y-6 pb-20">

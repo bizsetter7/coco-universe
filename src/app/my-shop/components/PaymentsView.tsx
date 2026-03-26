@@ -1,26 +1,10 @@
 import { CreditCard, ArrowRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
-import { HIGHLIGHTERS, DETAILED_PRICING } from '../constants';
+import { getHighlighterStyle } from '@/utils/highlighter';
+import { DETAILED_PRICING } from '../constants';
 import { IconBadge } from '@/components/common/IconBadge';
-
-const getHighlighterStyle = (id: number | string | undefined) => {
-    const h = HIGHLIGHTERS.find(item => String(item.id) === String(id));
-    return h ? { backgroundColor: h.color + 'cc', color: '#000', padding: '0 4px', borderRadius: '4px' } : {};
-};
-
-// [Fix] Robust date parsing helper for cross-browser/mobile compatibility (Safari/iOS)
-const safeParseDate = (dateStr: string | null | undefined): Date | null => {
-    if (!dateStr) return null;
-    let d = new Date(dateStr);
-    if (!isNaN(d.getTime())) return d;
-
-    // Try forcing ISO format if space exists (common SQL timestamp issue)
-    d = new Date(dateStr.replace(' ', 'T'));
-    if (!isNaN(d.getTime())) return d;
-
-    return null;
-};
+import { safeParseDate } from '../utils';
 
 export const PaymentsView = ({ setView, payments = [], userName = '', onShowAdDetail, onOpenMenu }: { setView: (v: any) => void, payments?: any[], userName?: string, onShowAdDetail?: (adId: any) => void, onOpenMenu?: () => void }) => {
     const brand = useBrand();

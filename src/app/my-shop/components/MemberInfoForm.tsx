@@ -7,13 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { IdentityVerifyModal } from '@/components/auth/IdentityVerifyModal';
 import type { IdentityVerifyResult } from '@/types/identity-verify';
 import { JOB_CATEGORIES } from '@/constants/jobs';
-
-function formatBizNumber(value: string): string {
-    const n = value.replace(/\D/g, '').slice(0, 10);
-    if (n.length <= 3) return n;
-    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
-}
+import { formatBizNumber } from '../utils';
 
 /**
  * 기업회원 회원정보수정 폼
