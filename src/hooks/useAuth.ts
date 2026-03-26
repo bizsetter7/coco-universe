@@ -228,6 +228,10 @@ export function useAuth() {
             localStorage.removeItem('coco_mock_session');
             localStorage.removeItem('adult_verified');
             localStorage.removeItem('coco_sim_mode');
+            // 로그아웃 시 개인 데이터 정리 (다른 계정 로그인 시 이전 데이터 잔존 방지)
+            localStorage.removeItem('favorites');
+            localStorage.removeItem('favorites_timestamps');
+            localStorage.removeItem('viewed_shops');
             // admin mock 쿠키 제거
             document.cookie = 'coco_admin_mock=; path=/; max-age=0';
         }

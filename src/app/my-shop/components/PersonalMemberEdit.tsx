@@ -20,13 +20,13 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
 
     const [formData, setFormData] = useState({
         nickname: '',
+        fullName: '',    // full_name (본인인증 이름, 표시 전용)
         email: '',
         phone: '',
         birthDate: '',   // birth_date (본인인증 값, 표시 전용)
         gender: '',      // gender (본인인증 값, 표시 전용)
         newPassword: '',
         newPasswordConfirm: '',
-        smsConsent: true,
     });
 
     // 닉네임 수정 가능 여부 (1일 1회 제한)
@@ -58,20 +58,27 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
         }
 
         const loadProfile = async () => {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('nickname, phone, nickname_updated_at, birth_date, gender')
-                .eq('id', user.id)
-                .single();
+            const [{ data: profile }, { data: { user: authUser } }] = await Promise.all([
+                supabase
+                    .from('profiles')
+                    .select('nickname, full_name, phone, nickname_updated_at, birth_date, gender')
+                    .eq('id', user.id)
+                    .single(),
+                supabase.auth.getUser(),
+            ]);
+
+            // user_metadata를 fallback으로 활용 (profiles 데이터가 없을 경우 대비)
+            const meta = authUser?.user_metadata || {};
 
             const nick = profile?.nickname || user?.nickname || '';
             setFormData(prev => ({
                 ...prev,
                 nickname: nick,
+                fullName: profile?.full_name || meta.full_name || '',
                 email: user?.email || '',
-                phone: profile?.phone || '',
-                birthDate: profile?.birth_date || '',
-                gender: profile?.gender || '',
+                phone: profile?.phone || meta.phone || '',
+                birthDate: profile?.birth_date || meta.birthdate || '',
+                gender: profile?.gender || meta.gender || '',
             }));
             setOriginalNickname(nick);
             setNicknameLastUpdated(profile?.nickname_updated_at || null);
@@ -191,7 +198,7 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
 
                 <div className="space-y-6 md:space-y-8">
 
-                    {/* 아이디 / 이메일 (고정) */}
+                    {/* 아이디 / 이름 (고정) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>아이디</label>
@@ -203,11 +210,12 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                             />
                         </div>
                         <div>
-                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>이메일</label>
+                            <label className={`block text-xs font-black mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>이름</label>
                             <input
-                                type="email"
-                                value={formData.email}
+                                type="text"
+                                value={formData.fullName}
                                 disabled
+                                placeholder="본인인증 후 자동 입력"
                                 className={`w-full p-3 md:p-4 rounded-xl font-bold border ${isDark ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}
                             />
                         </div>
@@ -312,17 +320,6 @@ export const PersonalMemberEdit = ({ setView, onOpenMenu }: { setView: (v: any) 
                             />
                         </div>
                     </div>
-
-                    {/* SMS 수신 동의 */}
-                    <label className="flex items-center gap-3 cursor-pointer select-none">
-                        <input
-                            type="checkbox"
-                            checked={formData.smsConsent}
-                            onChange={(e) => handleChange('smsConsent', e.target.checked)}
-                            className="w-4 h-4 accent-[#f82b60]"
-                        />
-                        <span className={`text-sm font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>SMS 수신 동의</span>
-                    </label>
 
                     {/* 하단 버튼 */}
                     <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-gray-100 dark:border-gray-800">

@@ -18,23 +18,45 @@ export const FindAccountPage = ({ initialTab = 'find-id' }: { initialTab?: TabTy
     const [verified, setVerified] = useState(false);
     const [verifyResult, setVerifyResult] = useState<IdentityVerifyResult | null>(null);
     const [foundId, setFoundId] = useState('');
+    const [foundIds, setFoundIds] = useState<string[]>([]);
     const [newPw, setNewPw] = useState('');
     const [newPwConfirm, setNewPwConfirm] = useState('');
     const [pwStep, setPwStep] = useState<'input' | 'verified' | 'done'>('input');
+    const [isLoading, setIsLoading] = useState(false);
 
     const primary = brand.primaryColor;
     const gradientStyle = {
         background: `linear-gradient(135deg, ${primary} 0%, ${primary}cc 100%)`,
     };
 
-    const handleVerified = (result: IdentityVerifyResult) => {
+    const handleVerified = async (result: IdentityVerifyResult) => {
         setVerifyResult(result);
         setVerified(true);
         setShowModal(false);
 
         if (tab === 'find-id') {
-            // 아이디 찾기: 인증 정보로 DB 조회 (시뮬레이션)
-            setFoundId('user_****');
+            // 아이디 찾기: 본인인증 이름으로 DB 조회
+            setIsLoading(true);
+            try {
+                const res = await fetch('/api/auth/find-username', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: result.name }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setFoundIds(data.usernames || []);
+                    setFoundId(data.exactUsername || data.usernames?.[0] || '');
+                } else {
+                    setFoundId('');
+                    setFoundIds([]);
+                    alert(data.message || '계정을 찾을 수 없습니다.');
+                }
+            } catch {
+                alert('아이디 조회 중 오류가 발생했습니다.');
+            } finally {
+                setIsLoading(false);
+            }
         } else {
             // 비밀번호 찾기: 비밀번호 변경 단계로
             setPwStep('verified');
@@ -46,13 +68,15 @@ export const FindAccountPage = ({ initialTab = 'find-id' }: { initialTab?: TabTy
         setVerified(false);
         setVerifyResult(null);
         setFoundId('');
+        setFoundIds([]);
         setUserId('');
         setPwStep('input');
         setNewPw('');
         setNewPwConfirm('');
+        setIsLoading(false);
     };
 
-    const handleChangePw = () => {
+    const handleChangePw = async () => {
         if (!newPw || newPw.length < 6) {
             alert('비밀번호는 6자 이상 입력해주세요.');
             return;
@@ -61,7 +85,29 @@ export const FindAccountPage = ({ initialTab = 'find-id' }: { initialTab?: TabTy
             alert('비밀번호가 일치하지 않습니다.');
             return;
         }
-        setPwStep('done');
+
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: userId.trim(),
+                    newPassword: newPw,
+                    verifiedName: verifyResult?.name,
+                }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPwStep('done');
+            } else {
+                alert(data.message || '비밀번호 변경에 실패했습니다.');
+            }
+        } catch {
+            alert('비밀번호 변경 중 오류가 발생했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -120,17 +166,26 @@ export const FindAccountPage = ({ initialTab = 'find-id' }: { initialTab?: TabTy
                                             휴대폰 본인인증
                                         </button>
                                     </>
+                                ) : isLoading ? (
+                                    <div className="text-center py-8 text-gray-400 font-bold text-sm">조회 중...</div>
                                 ) : (
                                     <div className="text-center space-y-4 py-2">
                                         <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto">
                                             <CheckCircle2 size={28} className="text-green-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-400 font-medium mb-1">회원님의 아이디</p>
-                                            <p className="text-xl font-black text-gray-900">{foundId}</p>
-                                            <p className="text-[11px] text-gray-400 mt-1">
-                                                {verifyResult?.name}님으로 가입된 계정입니다.
+                                            <p className="text-xs text-gray-400 font-medium mb-2">
+                                                {verifyResult?.name}님으로 가입된 아이디
                                             </p>
+                                            {foundIds.length > 0 ? (
+                                                <div className="space-y-1.5">
+                                                    {foundIds.map((id, i) => (
+                                                        <p key={i} className="text-lg font-black text-gray-900 bg-gray-50 rounded-xl py-2 px-4">{id}</p>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-gray-400">아이디를 찾을 수 없습니다.</p>
+                                            )}
                                         </div>
                                         <button
                                             onClick={() => router.push('/?page=login')}
@@ -217,10 +272,11 @@ export const FindAccountPage = ({ initialTab = 'find-id' }: { initialTab?: TabTy
                                         </div>
                                         <button
                                             onClick={handleChangePw}
-                                            className="w-full py-4 rounded-2xl text-white font-black text-sm shadow-lg active:scale-[0.98] transition-all"
+                                            disabled={isLoading}
+                                            className="w-full py-4 rounded-2xl text-white font-black text-sm shadow-lg active:scale-[0.98] transition-all disabled:opacity-60"
                                             style={{ backgroundColor: primary }}
                                         >
-                                            비밀번호 변경하기
+                                            {isLoading ? '변경 중...' : '비밀번호 변경하기'}
                                         </button>
                                     </div>
                                 )}

@@ -163,12 +163,10 @@ export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGat
                 return;
             }
 
-            if (targetId.includes('@')) {
-                await signIn(targetId, pw);
-                onVerify();
-            } else {
-                alert('등록되지 않은 아이디입니다.');
-            }
+            // 아이디 입력 시 @cocoalba.kr 이메일로 변환 (LoginPage와 동일한 로직)
+            const email = targetId.includes('@') ? targetId : `${targetId}@cocoalba.kr`;
+            await signIn(email, pw);
+            onVerify();
         } catch (err: any) {
             alert(`로그인 실패: ${err.message}`);
         } finally {

@@ -536,7 +536,7 @@ export const SignupPage = () => {
                         <Field label="휴대폰 번호" required>
                             <div className="flex gap-2">
                                 <Input placeholder="010-0000-0000" value={iPhone}
-                                    disabled={verified}
+                                    disabled={verified && !!iPhone}
                                     onChange={(e) => setIPhone(e.target.value)} />
                                 <button type="button" onClick={() => setShowModal(true)}
                                     className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
@@ -650,7 +650,7 @@ export const SignupPage = () => {
                             <Field label="핸드폰" required>
                                 <div className="flex gap-2">
                                     <Input placeholder="010-0000-0000" value={cPhone}
-                                        disabled={verified}
+                                        disabled={verified && !!cPhone}
                                         onChange={(e) => setCPhone(e.target.value)} />
                                     <button type="button" onClick={() => setShowModal(true)}
                                         className="shrink-0 px-3 py-2 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all"
