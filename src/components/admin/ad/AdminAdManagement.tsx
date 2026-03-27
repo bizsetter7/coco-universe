@@ -67,7 +67,6 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
             if (newStatus === 'active') {
                 updateData.approved_at = nowIso;
                 updateData.pay_status = '결제완료';
-                updateData.paid_at = nowIso;
             }
             if (reason) {
                 updateData.rejection_reason = reason;
