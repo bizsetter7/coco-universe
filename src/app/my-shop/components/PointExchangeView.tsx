@@ -18,8 +18,8 @@ export function PointExchangeView({ setView }: { setView: (v: any) => void }) {
     const [submitted, setSubmitted] = useState(false);
 
     const EXCHAGE_ITEMS = [
-        { id: 'naver', name: '네이버페이 포인트 (2,000원)', points: 2000, img: 'https://img.icons8.com/color/96/naver.png' },
-        { id: 'baemin', name: '배달의민족 상품권 (2,000원)', points: 2000, img: 'https://img.icons8.com/plasticine/100/food.png' },
+        { id: 'naver', name: '네이버페이 포인트 (20,000원)', points: 2000, img: 'https://img.icons8.com/color/96/naver.png' },
+        { id: 'baemin', name: '배달의민족 상품권 (20,000원)', points: 2000, img: 'https://img.icons8.com/plasticine/100/food.png' },
     ];
 
     const handleSubmit = () => {
@@ -87,10 +87,10 @@ export function PointExchangeView({ setView }: { setView: (v: any) => void }) {
 
                     <div className={`p-4 rounded-2xl mb-8 space-y-1 text-xs font-bold ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-rose-50/50 text-gray-500'}`}>
                         <p className="text-[#f82b60] mb-2 font-black text-[13px]">💡 포인트를 모으는 방법 (가입만 해도 600P!)</p>
-                        <p>1. 회원가입 달성: <span className="text-gray-900 dark:text-gray-100 font-black">+100P</span></p>
-                        <p>2. 이력서 1회 등록: <span className="text-gray-900 dark:text-gray-100 font-black">+500P</span></p>
-                        <p>3. 커뮤니티 게시글 작성: <span className="text-gray-900 dark:text-gray-100 font-black">건당 +50P</span></p>
-                        <p>4. 커뮤니티 댓글 작성: <span className="text-gray-900 dark:text-gray-100 font-black">건당 +10P</span></p>
+                        <p>1. 회원가입 달성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+100P</span></p>
+                        <p>2. 이력서 1회 등록: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+500P</span></p>
+                        <p>3. 커뮤니티 게시글 작성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>건당 +20P</span></p>
+                        <p>4. 커뮤니티 댓글 작성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>건당 +5P</span></p>
                     </div>
 
                     <button

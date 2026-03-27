@@ -241,7 +241,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                     <div className="md:col-span-9 space-y-4">
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">아이디</label>
-                            <div className="sm:col-span-9 text-sm font-bold truncate w-full">{userId || 'guest'}</div>
+                            <div className="sm:col-span-9 text-sm font-bold truncate w-full">{authUser?.username || authUser?.email?.replace('@cocoalba.kr', '') || authUser?.nickname || 'guest'}</div>
                         </div>
                         <div className="flex flex-col sm:grid sm:grid-cols-12 items-start sm:items-center gap-1 sm:gap-0">
                             <label className="sm:col-span-3 text-xs font-bold text-gray-500">이름(닉네임)</label>

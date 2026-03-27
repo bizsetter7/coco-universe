@@ -90,12 +90,25 @@ export async function POST(req: NextRequest) {
                     phone: phone || null,
                     birth_date: birthdate || null,
                     gender: gender || null,
+                    points: 100,  // 가입 보너스 100P
                 }, { onConflict: 'id' });
                 if (upsertError) {
                     console.error('[signup] profiles upsert 실패:', upsertError.message);
                 }
             } catch (profileErr) {
                 console.warn('[signup] profiles upsert 예외:', profileErr);
+            }
+
+            // 가입 보너스 100P 포인트 로그 기록
+            try {
+                await supabaseAdmin.from('point_logs').insert({
+                    user_id: data.user.id,
+                    amount: 100,
+                    reason: 'JOIN',
+                    note: '[COCO] 회원가입 축하 보너스',
+                });
+            } catch (logErr) {
+                console.warn('[signup] point_logs insert 예외 (무시):', logErr);
             }
         }
 

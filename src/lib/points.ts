@@ -17,8 +17,8 @@ export type PointReason =
 const POINT_AMOUNTS: Record<PointReason, number> = {
     JOIN: 100,
     RESUME_UPLOAD: 500,
-    COMMUNITY_POST: 50,
-    COMMUNITY_COMMENT: 10,
+    COMMUNITY_POST: 20,
+    COMMUNITY_COMMENT: 5,
     COUPON_EXCHANGE: -2000,
     RESUME_JUMP: 0,
     SHOP_JUMP: 0,          // 업체 공고 최상단 점프 (횟수제로 변경)
