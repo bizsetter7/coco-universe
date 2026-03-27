@@ -69,7 +69,7 @@ export function BankTransferModal({ amount, onConfirm, title }: BankTransferModa
                             📌 입금 시 <span className="font-black">업체명 또는 아이디</span>를 메모에 남겨주세요.<br />
                             입금 확인 후 보통 <span className="font-black">1~3시간 내</span> 광고가 활성화됩니다.<br />
                             문의:{' '}
-                            <a href="https://t.me/cocoalba_cs" target="_blank" rel="noopener noreferrer" className="underline font-black">텔레그램 @cocoalba_cs</a>
+                            <a href="https://t.me/cocoalba_cs_bot" target="_blank" rel="noopener noreferrer" className="underline font-black">텔레그램 @cocoalba_cs_bot</a>
                             {' '}또는 1:1문의
                         </p>
                     </div>
