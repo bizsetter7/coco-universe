@@ -233,8 +233,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0 whitespace-nowrap">
-                                        {pkg.id === 1 && <span className="block text-gray-400 line-through text-[10px] mb-[-2px]">350,000원</span>}
-                                        <span className={`text-base md:text-lg font-black ${pkg.id === 1 ? 'text-red-500' : (brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800')}`}>{pkg.id === 1 ? '0원' : pkg.price}</span>
+                                        <span className={`text-base md:text-lg font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{pkg.price}</span>
                                     </div>
                                 </div>
                             </label>
