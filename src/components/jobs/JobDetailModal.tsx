@@ -77,7 +77,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
             onClick={e => e.stopPropagation()}
         >
             {/* 1. HEADER SECTION */}
-            <div className={`relative px-6 py-6 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-4 shrink-0 shadow-lg`}>
+            <div className={`relative px-6 py-4 md:py-5 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
 
                 {/* [Mod Moved] Close Button (Inside Header) */}
                 <button
@@ -103,7 +103,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                 </div>
 
                 {/* Ad Title White Box Layout (CENTERED) */}
-                <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-3">
+                <div className="w-full bg-white px-4 md:px-6 py-3 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2">
                     <div className="flex flex-wrap items-center justify-center gap-2 w-full">
                         {/* Icon Logic */}
                         {(shop.options?.icon) && (() => {
@@ -127,7 +127,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                 </div>
 
                 {/* Nickname Badge */}
-                <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
+                <div className="flex items-center gap-2 opacity-95 font-black text-[12px] md:text-[13px] bg-black/10 px-3 py-1 rounded-full">
                     {cleanShopTitle(undefined, shop.nickname || shop.name)}
                 </div>
             </div>
@@ -247,7 +247,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
 
             {/* 온라인 지원 섹션 (개인회원만) */}
             {isLoggedIn && userType === 'individual' && (
-                <div className="mx-6 mb-4 p-4 rounded-2xl border border-blue-100 bg-blue-50/50">
+                <div className="mx-6 mb-2 p-3 rounded-2xl border border-blue-100 bg-blue-50/50">
                     {applied ? (
                         <div className="flex items-center gap-2 text-green-600 font-black text-sm justify-center py-2">
                             <CheckCircle size={18} /> 지원이 완료되었습니다!
@@ -309,7 +309,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
             )}
 
             {/* 3. FOOTER SECTION */}
-            <div className="p-6 bg-white border-t border-gray-100 grid grid-cols-4 gap-3 shrink-0 safe-area-bottom">
+            <div className="px-4 py-3 bg-white border-t border-gray-100 grid grid-cols-4 gap-2 shrink-0 safe-area-bottom">
                 <button
                     onClick={() => {
                         const event = new CustomEvent('open-note-modal', {
@@ -317,9 +317,9 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                         });
                         window.dispatchEvent(event);
                     }}
-                    className="col-span-1 py-4 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
+                    className="col-span-1 py-3 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
                 >
-                    <MessageSquare size={20} className="mb-0.5 text-gray-400" />
+                    <MessageSquare size={18} className="text-gray-400" />
                     <span className="text-[10px] font-black">쪽지문의</span>
                 </button>
                 <button
@@ -332,19 +332,17 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
                             alert('등록된 메신저 ID가 없습니다.');
                         }
                     }}
-                    className="col-span-1 py-4 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
+                    className="col-span-1 py-3 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
                 >
-                    <MessageCircle size={20} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                    <MessageCircle size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px]">카톡문의</span>
                 </button>
                 <a
                     href={`tel:${shop.phone}`}
-                    className="col-span-2 py-4 bg-[#f82b60] text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
+                    className="col-span-2 py-3 bg-[#f82b60] text-white rounded-2xl flex items-center justify-center gap-2 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
                 >
-                    <div className="flex items-center gap-2">
-                        <Phone size={18} fill="currentColor" className="group-hover:animate-bounce" />
-                        <span className="text-[15px] font-black">전화/문자 지원하기</span>
-                    </div>
+                    <Phone size={17} fill="currentColor" className="group-hover:animate-bounce shrink-0" />
+                    <span className="text-[13px] font-black">전화/문자문의</span>
                 </a>
             </div>
         </div>
