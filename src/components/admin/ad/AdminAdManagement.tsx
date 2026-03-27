@@ -348,7 +348,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                         );
                                                         const approvedAt = (ad as any).approved_at;
                                                         const createdAt = ad.created_at;
-                                                        const paidAt = (ad as any).paid_at;
+                                                        const paidAt = (ad as any).approved_at;
                                                         // 마감일은 승인일 기준으로만 계산 (결제대기/승인대기 상태엔 미표시)
                                                         const deadlineBase = approvedAt || null;
 

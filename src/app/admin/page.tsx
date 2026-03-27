@@ -213,8 +213,9 @@ function AdminContent() {
                     ad_price: adPrice,
                     // [Fix] 인증 상호명 우선 (profiles.business_name → DB name)
                     shopName: profile?.business_name || ad.name || '—',
-                    // [Fix] 로그인 아이디 (profiles.username)
-                    username: profile?.username || '',
+                    // [Fix] 로그인 아이디 (profiles.username → nickname 순서로 폴백)
+                    username: profile?.username || profile?.nickname || '',
+                    payStatus: ad.pay_status || (ad as any).payStatus || '',
                     categorySub: ad.category_sub || opt.categorySub || '',
                     selectedIcon: opt.icon || (ad as any).selectedIcon,
                     selectedHighlighter: opt.highlighter || (ad as any).selectedHighlighter,
