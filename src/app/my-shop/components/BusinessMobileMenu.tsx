@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
-    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift, AlertTriangle, Briefcase, FileText, Shield
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -29,23 +29,31 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                     </button>
                 </div>
 
-                <div
-                    className="flex items-center justify-between pb-6 border-b border-gray-100 dark:border-gray-800"
-                >
-                    <div 
-                        onClick={() => { setView('dashboard'); onClose(); }}
-                        className="cursor-pointer active:opacity-70 transition flex-1"
-                    >
-                        <h2 className={`font-black text-xl mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (userType === 'individual' ? '회원님' : '내 상점')}</h2>
-                        <p className="text-sm text-gray-500 font-bold tracking-tight">{userType === 'individual' ? '일반 회원' : '업주 관리자'}</p>
+                <div className="pb-4 border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <div
+                            onClick={() => { setView('dashboard'); onClose(); }}
+                            className="cursor-pointer active:opacity-70 transition min-w-0"
+                        >
+                            <h2 className={`font-black text-lg truncate ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{shopName || (userType === 'individual' ? '회원님' : '내 상점')}</h2>
+                            <p className="text-xs text-gray-500 font-bold">{userType === 'individual' ? '일반 회원' : '업주 관리자'}</p>
+                        </div>
+                        <button
+                            onClick={() => { if (window.confirm('로그아웃 하시겠습니까?')) logout(); }}
+                            className={`p-2.5 rounded-xl border shrink-0 transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-rose-500' : 'bg-gray-50 border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100'}`}
+                            title="로그아웃"
+                        >
+                            <LogOut size={16} />
+                        </button>
                     </div>
-                    <button 
-                        onClick={() => { if (window.confirm('로그아웃 하시겠습니까?')) logout(); }}
-                        className={`p-3 rounded-2xl border transition-all ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-rose-500' : 'bg-gray-50 border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100'}`}
-                        title="로그아웃"
-                    >
-                        <LogOut size={18} />
-                    </button>
+                    {userType === 'individual' && (
+                        <button
+                            onClick={() => { setView('member-edit'); onClose(); }}
+                            className={`w-full py-1.5 text-[10px] font-black rounded-lg border transition ${brand.theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                        >
+                            내 정보수정
+                        </button>
+                    )}
                 </div>
 
                 <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -71,6 +79,18 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             </div>
                             <div onClick={() => { setView('payment-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <CreditCard size={18} /> 유료 결제 내역
+                            </div>
+                            <div onClick={() => { setView('excluded-shops'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <AlertTriangle size={18} /> 열람불가 업소설정
+                            </div>
+                            <div onClick={() => { setView('custom-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Briefcase size={18} /> 맞춤구인정보
+                            </div>
+                            <div onClick={() => { setView('my-posts'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <FileText size={18} /> 내가 작성한 게시글
+                            </div>
+                            <div onClick={() => { setView('block-settings'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Shield size={18} /> 회원 차단 설정
                             </div>
                         </>
                     ) : (

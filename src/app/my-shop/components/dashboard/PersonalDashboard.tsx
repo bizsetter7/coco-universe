@@ -412,78 +412,43 @@ function MobileProfileHeader({ view, setView }: { view: any, setView: (v: any) =
 
     const currentViewId = typeof view === 'object' ? view.id : view;
 
-    const mobileTabs = [
-        { id: 'dashboard', icon: LayoutDashboard, label: '마이홈' },
-        { id: 'resume-list', icon: FileText, label: '이력서' },
-        { id: 'scrap-jobs', icon: Star, label: '채용스크랩' },
-        { id: 'point-history', icon: Coins, label: '포인트내역' },
-        { id: 'point-exchange', icon: Gift, label: '상품권교환' },
-        { id: 'payment-history', icon: CreditCard, label: '결제내역' },
-        { id: 'member-edit', icon: User, label: '정보수정' },
-        { id: 'excluded-shops', icon: AlertTriangle, label: '열람불가' },
-        { id: 'my-posts', icon: FileText, label: '내게시글' },
-        { id: 'block-settings', icon: User, label: '차단설정' },
-    ];
-
-    const isTabActive = (id: string) => {
-        if (id === 'resume-list') return currentViewId === 'resume-list' || currentViewId === 'resume-form';
-        return currentViewId === id;
-    };
-
     return (
-        <div className="md:hidden mb-4 space-y-3">
-            {/* 프로필 영역 */}
-            <div className={`p-4 rounded-[24px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                <div className="flex items-center gap-4">
-                    <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-14 h-14 rounded-full overflow-hidden border-2 border-rose-100 bg-rose-50 flex items-center justify-center shrink-0 cursor-pointer relative group"
-                    >
-                        {profileImage ? (
-                            <img src={profileImage} alt="프로필" className="w-full h-full object-cover" />
-                        ) : (
-                            <User size={24} className="text-[#f82b60]" />
-                        )}
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-full transition">
-                            <Settings size={12} className="text-white" />
-                        </div>
-                    </div>
-                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                    <div className="flex-1 min-w-0">
-                        <p className="font-black text-base truncate">{displayName}님</p>
-                        <div className="flex gap-2 mt-1.5">
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="px-3 py-1.5 text-[10px] font-black rounded-full bg-rose-50 text-[#f82b60] border border-rose-100"
-                            >사진 등록/수정</button>
-                            <button
-                                onClick={() => setView('member-edit')}
-                                className={`px-3 py-1.5 text-[10px] font-black rounded-full border transition ${currentViewId === 'member-edit' ? 'bg-[#f82b60] text-white border-[#f82b60]' : 'bg-gray-50 text-gray-500 border-gray-200'}`}
-                            >내 정보수정</button>
-                        </div>
+        <div className={`md:hidden mb-4 p-4 rounded-[24px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
+            <div className="flex items-center gap-4">
+                <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-16 h-16 rounded-full overflow-hidden border-2 border-rose-100 bg-rose-50 flex items-center justify-center shrink-0 cursor-pointer relative group"
+                >
+                    {profileImage ? (
+                        <img src={profileImage} alt="프로필" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={28} className="text-[#f82b60]" />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-full transition">
+                        <Settings size={14} className="text-white" />
                     </div>
                 </div>
-            </div>
-
-            {/* 모바일 카테고리 탭 (가로 스크롤) */}
-            <div className={`rounded-[20px] border shadow-sm overflow-hidden ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
-                <div className="flex overflow-x-auto scrollbar-hide px-2 py-2 gap-1.5">
-                    {mobileTabs.map((tab) => (
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                <div className="flex-1 min-w-0">
+                    <p className="font-black text-base truncate">{displayName}님</p>
+                    <div className="flex gap-2 mt-2">
                         <button
-                            key={tab.id}
-                            onClick={() => setView(tab.id)}
-                            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl shrink-0 transition-all ${
-                                isTabActive(tab.id)
-                                    ? 'bg-[#f82b60] text-white shadow-md shadow-rose-100'
-                                    : tab.id === 'point-exchange'
-                                        ? 'bg-rose-50 text-[#f82b60] border border-rose-100'
-                                        : brand.theme === 'dark' ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-500 hover:bg-gray-50'
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-3 py-1.5 text-[10px] font-black rounded-full bg-rose-50 text-[#f82b60] border border-rose-100 hover:bg-rose-100 transition"
+                        >
+                            사진 등록/수정
+                        </button>
+                        <button
+                            onClick={() => setView('member-edit')}
+                            className={`px-3 py-1.5 text-[10px] font-black rounded-full border transition ${
+                                currentViewId === 'member-edit'
+                                    ? 'bg-[#f82b60] text-white border-[#f82b60]'
+                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
                             }`}
                         >
-                            <tab.icon size={15} />
-                            <span className="text-[9px] font-black whitespace-nowrap">{tab.label}</span>
+                            내 정보수정
                         </button>
-                    ))}
+                    </div>
                 </div>
             </div>
         </div>
