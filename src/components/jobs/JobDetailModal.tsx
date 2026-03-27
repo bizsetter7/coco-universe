@@ -58,25 +58,13 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
     const themeConfig = getHeaderTheme(tierStandard.id);
     const headerBg = themeConfig.bg;
 
-    const borderOpt = shop.options?.border || (shop as any).borderOption;
-    const getBorderClass = (opt: string) => {
-        switch (opt) {
-            case 'color': return 'border-4 border-blue-500';
-            case 'glow': return 'border-4 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.4)]';
-            case 'sparkle': return 'border-4 border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.6)] animate-pulse';
-            case 'rainbow': return 'animate-rainbow-border shadow-2xl';
-            default: return '';
-        }
-    };
-
     return (
         <div
             className={`
                 bg-white shadow-2xl overflow-hidden flex flex-col
                 fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
                 md:static md:w-[500px] lg:w-[600px] md:h-auto md:max-h-[90vh] md:rounded-[32px]
-                transform-gpu will-change-transform backface-hidden 
-                ${getBorderClass(borderOpt)}
+                transform-gpu will-change-transform backface-hidden
             `}
             onClick={e => e.stopPropagation()}
         >
