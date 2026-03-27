@@ -48,7 +48,7 @@ function calcDeadline(baseIso: string | undefined | null, periodDays: number): s
 
 export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdManagementProps) {
     const brand = useBrand();
-    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all');
+    const [adFilter, setAdFilter] = useState<'all' | 'pending'>('pending');
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
     const [selectedAdForModal, setSelectedAdForModal] = useState<Shop | null>(null);
 
@@ -173,9 +173,9 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 <div className="flex gap-2">
                     <button
                         onClick={() => setAdFilter(adFilter === 'all' ? 'pending' : 'all')}
-                        className={`px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 ${adFilter === 'pending' ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-200' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}
+                        className={`px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 ${adFilter === 'all' ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-200' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}
                     >
-                        {adFilter === 'pending' ? '전체 보기' : `심사 대기 ${mockAds.filter(a => a.status === 'pending').length}건`}
+                        {adFilter === 'all' ? '승인완료 숨기기' : `전체 보기 (승인완료 포함 ${mockAds.length}건)`}
                     </button>
                 </div>
             </div>
@@ -199,8 +199,8 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                 mockAds
                                     .filter(ad => {
                                         if (adFilter === 'all') return true;
-                                        if (adFilter === 'pending') return ad.status === 'pending';
-                                        return true;
+                                        // 기본: 승인완료(active) 광고는 결제 내역에서 관리
+                                        return ad.status !== 'active';
                                     })
                                     .map((ad) => (
                                         <React.Fragment key={ad.id}>
@@ -380,21 +380,13 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                         const isActive = ad.status === 'active';
                                                         const isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
 
-                                                        if (isActive || isRejected) {
-                                                            // 게시중/반려 — 상태 변경만 허용
-                                                            return (
-                                                                <div className="flex justify-end gap-2">
-                                                                    {isActive && (
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'CLOSED'); }}
-                                                                            className="px-2 py-1.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 text-[10px] font-black transition-all"
-                                                                            title="게시 종료"
-                                                                        >
-                                                                            마감
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            );
+                                                        if (isActive) {
+                                                            // 게시중 — 자동 마감, 버튼 없음
+                                                            return <div className="flex justify-end"><span className="text-[10px] text-slate-300 font-bold">자동마감</span></div>;
+                                                        }
+
+                                                        if (isRejected) {
+                                                            return <div className="flex justify-end"><span className="text-[10px] text-slate-300 font-bold">—</span></div>;
                                                         }
 
                                                         // 결제대기 OR 승인대기 — 입금확인(=승인) 단일 버튼
