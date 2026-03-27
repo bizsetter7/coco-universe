@@ -148,7 +148,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
     return (
         <div className={`flex flex-col h-full bg-white rounded-[32px] overflow-hidden shadow-sm ${getBorderClass(formData.borderOption)}`}>
             {/* Header (Capture 3 style) */}
-            <div className={`relative px-6 py-5 md:py-8 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 md:gap-4 shrink-0 shadow-lg`}>
+            <div className={`relative px-6 py-4 md:py-5 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-2 md:gap-3 shrink-0 shadow-lg`}>
                 <div className="absolute top-0 left-0 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-br-lg z-10">
                     MOBILE PREVIEW
                 </div>
@@ -158,7 +158,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                 </div>
 
                 {/* Ad Title White Box Layout (CENTERED) */}
-                <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2 md:gap-3">
+                <div className="w-full bg-white px-4 md:px-6 py-3 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2">
                     <div className="flex items-center justify-center gap-2 md:gap-3 w-full">
                         <IconBadge iconId={formData.selectedIcon} showName={true} />
 
@@ -170,7 +170,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 opacity-95 font-black text-[13px] md:text-sm bg-black/10 px-4 py-1.5 rounded-full">
+                <div className="flex items-center gap-2 opacity-95 font-black text-[12px] md:text-[13px] bg-black/10 px-3 py-1 rounded-full">
                     {cleanShopTitle(undefined, formData.nickname || formData.shopName || '비즈니스 파트너')}
                 </div>
             </div>
@@ -273,20 +273,18 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
             </div>
 
             {/* Footer Buttons (Mockup style) */}
-            <div className="p-6 bg-white border-t border-gray-100 grid grid-cols-4 gap-3 shrink-0">
-                <button className="col-span-1 py-4 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group">
-                    <MessageCircle size={20} className="group-hover:scale-110 transition-transform" />
+            <div className="px-4 py-3 bg-white border-t border-gray-100 grid grid-cols-4 gap-2 shrink-0">
+                <button className="col-span-1 py-3 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group">
+                    <MessageCircle size={18} className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px] font-black">쪽지문의</span>
                 </button>
-                <button className="col-span-1 py-4 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group">
-                    <MessageCircle size={20} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                <button className="col-span-1 py-3 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group">
+                    <MessageCircle size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px]">카톡문의</span>
                 </button>
-                <button className="col-span-2 py-4 bg-blue-600 text-white rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 group">
-                    <div className="flex items-center gap-2">
-                        <Phone size={18} fill="currentColor" className="group-hover:animate-bounce" />
-                        <span className="text-[15px] font-black">전화/문자 지원하기</span>
-                    </div>
+                <button className="col-span-2 py-3 bg-[#f82b60] text-white rounded-2xl flex items-center justify-center gap-2 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group">
+                    <Phone size={17} fill="currentColor" className="group-hover:animate-bounce shrink-0" />
+                    <span className="text-[13px] font-black">전화/문자문의</span>
                 </button>
             </div>
         </div>

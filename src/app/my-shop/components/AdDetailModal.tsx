@@ -188,7 +188,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 onClick={e => e.stopPropagation()}
             >
                 {/* 1. HEADER SECTION */}
-                <div className={`p-5 md:p-8 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-3 md:gap-4`}>
+                <div className={`p-4 md:p-5 relative text-center shrink-0 ${headerBg} transition-colors duration-300 flex flex-col items-center gap-2 md:gap-3`}>
                     <div className="absolute top-5 right-6 flex items-center gap-2 z-50">
                         <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition">
                             <X size={24} className="text-white" />
@@ -203,7 +203,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         <MapPin size={10} /> {norm.regionCity} {norm.regionGu} | <Briefcase size={10} /> {norm.category} | {norm.categorySub}
                     </div>
 
-                    <div className="w-full bg-white px-4 md:px-6 py-5 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2 md:gap-3">
+                    <div className="w-full bg-white px-4 md:px-6 py-3 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2">
                         <div className="flex items-center justify-center gap-2 md:gap-3">
                             <IconBadge iconId={norm.selectedIcon} showName={true} />
                             <h2 className="text-[13px] md:text-sm font-black leading-tight text-gray-900 line-clamp-2 text-center break-all">
@@ -214,7 +214,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5 opacity-95 font-black text-sm bg-black/10 px-4 py-1.5 rounded-full text-white">
+                    <div className="flex items-center gap-2 opacity-95 font-black text-[12px] md:text-[13px] bg-black/10 px-3 py-1 rounded-full text-white">
                         <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                             <User size={12} className="fill-current" />
                         </div>
@@ -346,14 +346,14 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                 </div>
 
                 {/* 3. FOOTER SECTION (Contact) */}
-                <div className="p-4 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
-                    <div className="flex gap-3">
+                <div className="px-4 py-3 bg-white border-t border-gray-100 shrink-0 safe-area-bottom">
+                    <div className="grid grid-cols-4 gap-2">
                         <button
                             onClick={() => alert(`쪽지 기능을 준비 중입니다. (${norm.nickname || '사장님'}께)`)}
-                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl hover:bg-gray-50 transition active:scale-[0.98]"
+                            className="col-span-1 flex flex-col items-center justify-center gap-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-2xl hover:bg-gray-50 transition active:scale-[0.98]"
                         >
-                            <MessageSquare size={20} className="stroke-current" />
-                            <span className="text-xs font-black">쪽지문의</span>
+                            <MessageSquare size={18} className="stroke-current" />
+                            <span className="text-[10px] font-black">쪽지문의</span>
                         </button>
                         <button
                             onClick={() => {
@@ -364,10 +364,10 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                                     alert('등록된 카카오톡 ID가 없습니다.');
                                 }
                             }}
-                            className="flex-1 flex flex-col items-center justify-center gap-1 bg-yellow-400 text-yellow-900 py-3 rounded-xl hover:bg-yellow-500 transition active:scale-[0.98]"
+                            className="col-span-1 flex flex-col items-center justify-center gap-1 bg-yellow-400 text-yellow-900 py-3 rounded-2xl hover:bg-yellow-500 transition active:scale-[0.98]"
                         >
-                            <MessageSquare size={20} className="fill-yellow-900/20 stroke-current" />
-                            <span className="text-xs font-black">카톡문의</span>
+                            <MessageSquare size={18} className="fill-yellow-900/20 stroke-current" />
+                            <span className="text-[10px] font-black">카톡문의</span>
                         </button>
                         <button
                             onClick={() => {
@@ -378,10 +378,10 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                                     alert('등록된 연락처가 없습니다.');
                                 }
                             }}
-                            className="flex-[2] flex flex-col items-center justify-center gap-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition active:scale-[0.98] shadow-lg shadow-blue-200"
+                            className="col-span-2 flex items-center justify-center gap-2 bg-[#f82b60] text-white py-3 rounded-2xl hover:bg-[#db2456] transition active:scale-[0.98] shadow-lg shadow-[#f82b60]/30"
                         >
-                            <Phone size={20} className="fill-white/20 stroke-current" />
-                            <span className="text-xs font-black">전화/문자 지원하기</span>
+                            <Phone size={17} fill="currentColor" />
+                            <span className="text-[13px] font-black">전화/문자문의</span>
                         </button>
                     </div>
                 </div>
