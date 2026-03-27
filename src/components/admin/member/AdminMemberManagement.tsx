@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Unlock, Lock, XCircle, TrendingUp, Zap } from 'lucide-react';
+import { Search, Unlock, Lock, XCircle, TrendingUp, Zap, Coins, Send } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { updatePoints } from '@/lib/points';
 import { AdminAdRegistrationModal } from '../ad/AdminAdRegistrationModal';
 
 interface AdminMemberManagementProps {
@@ -16,6 +17,9 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [isAdModalOpen, setIsAdModalOpen] = useState(false);
     const [adTargetUser, setAdTargetUser] = useState<any | null>(null);
+    const [pointAmount, setPointAmount] = useState('');
+    const [pointNote, setPointNote] = useState('');
+    const [isGrantingPoint, setIsGrantingPoint] = useState(false);
 
     const handleUserToggleStatus = async (userId: string, currentStatus: string) => {
         const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
@@ -39,6 +43,24 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
         } catch (err: any) {
             console.error('User status update error:', err);
             alert('상태 업데이트 실패: ' + (err.message || '알 수 없는 오류'));
+        }
+    };
+
+    const handleGrantPoint = async () => {
+        if (!selectedUser?.id) return;
+        const amount = parseInt(pointAmount);
+        if (isNaN(amount) || amount === 0) { alert('올바른 포인트 금액을 입력하세요.'); return; }
+        if (!confirm(`${selectedUser.name || selectedUser.full_name || '회원'}님께 ${amount}P를 ${amount > 0 ? '지급' : '차감'}하시겠습니까?`)) return;
+        setIsGrantingPoint(true);
+        const result = await updatePoints(selectedUser.id, 'ADMIN_GRANT', amount);
+        setIsGrantingPoint(false);
+        if (result.success) {
+            alert(`${amount}P ${amount > 0 ? '지급' : '차감'} 완료! 현재 잔액: ${result.newTotal}P`);
+            setPointAmount('');
+            setPointNote('');
+            fetchData();
+        } else {
+            alert('포인트 처리 실패: ' + (result.error as any)?.message || '오류 발생');
         }
     };
 
@@ -240,6 +262,30 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                         </div>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* 포인트 수동 지급 */}
+                            <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100">
+                                <h4 className="text-xs font-black text-amber-700 mb-3 flex items-center gap-2">
+                                    <Coins size={14} /> 포인트 수동 지급 / 차감
+                                </h4>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="number"
+                                        placeholder="금액 (음수=차감)"
+                                        value={pointAmount}
+                                        onChange={e => setPointAmount(e.target.value)}
+                                        className="flex-1 px-3 py-2 text-xs font-bold rounded-xl border border-amber-200 bg-white focus:outline-none focus:border-amber-400"
+                                    />
+                                    <button
+                                        onClick={handleGrantPoint}
+                                        disabled={isGrantingPoint}
+                                        className="px-4 py-2 bg-amber-500 text-white text-xs font-black rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 disabled:opacity-50"
+                                    >
+                                        <Send size={12} /> {isGrantingPoint ? '처리중...' : '지급'}
+                                    </button>
+                                </div>
+                                <p className="text-[9px] text-amber-600 font-bold mt-2">* 양수=지급, 음수=차감. 예) 500 또는 -100</p>
                             </div>
 
                             <div className="pt-4 border-t border-slate-50">

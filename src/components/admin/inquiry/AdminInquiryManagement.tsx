@@ -6,7 +6,9 @@ import {
     Paperclip,
     PenBox,
     X,
-    User
+    User,
+    Megaphone,
+    Loader2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { NoteService } from '@/lib/noteService';
@@ -30,6 +32,47 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
     const [tempWriterName, setTempWriterName] = useState('');
     const [isUpdatingWriter, setIsUpdatingWriter] = useState(false);
     const [memberProfile, setMemberProfile] = useState<any | null>(null);
+    const [showBroadcast, setShowBroadcast] = useState(false);
+    const [broadcastMsg, setBroadcastMsg] = useState('');
+    const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+    const handleBroadcast = async () => {
+        if (!broadcastMsg.trim()) { alert('메시지 내용을 입력하세요.'); return; }
+        if (!confirm(`전체 회원에게 쪽지를 발송하시겠습니까?\n\n"${broadcastMsg}"`)) return;
+        setIsBroadcasting(true);
+        try {
+            const { data: users, error } = await supabase
+                .from('profiles')
+                .select('id, username')
+                .neq('role', 'admin');
+            if (error) throw error;
+            if (!users || users.length === 0) { alert('발송할 회원이 없습니다.'); return; }
+
+            const msgs = users.map(u => ({
+                from: '운영팀',
+                to: u.username || u.id,
+                receiver_id: u.id,
+                content: broadcastMsg,
+                sender_name: '운영팀',
+                is_read: false,
+                created_at: new Date().toISOString(),
+            }));
+
+            // 50건씩 배치 insert
+            for (let i = 0; i < msgs.length; i += 50) {
+                const { error: batchErr } = await supabase.from('messages').insert(msgs.slice(i, i + 50));
+                if (batchErr) throw batchErr;
+            }
+            alert(`전체 ${users.length}명에게 쪽지 발송 완료!`);
+            setBroadcastMsg('');
+            setShowBroadcast(false);
+            fetchData();
+        } catch (err: any) {
+            alert('발송 실패: ' + (err.message || '오류'));
+        } finally {
+            setIsBroadcasting(false);
+        }
+    };
 
     const handleViewMember = async (userId: string) => {
         if (!userId) return;
@@ -154,7 +197,15 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                 {/* Message List */}
                 <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
-                        <h3 className="text-lg font-black text-slate-900">통합 문의 관리</h3>
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-lg font-black text-slate-900">통합 문의 관리</h3>
+                            <button
+                                onClick={() => setShowBroadcast(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-black rounded-xl hover:bg-indigo-700 transition"
+                            >
+                                <Megaphone size={12} /> 전체 쪽지
+                            </button>
+                        </div>
                         <div className="flex bg-slate-100 p-1 rounded-lg gap-1">
                             {(['all', 'inquiry', 'message'] as const).map((tab) => (
                                 <button
@@ -600,6 +651,46 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                             <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Email</p>
                             <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.email || '-'}</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        )}
+        {/* Broadcast Message Modal */}
+        {showBroadcast && (
+            <div className="fixed inset-0 z-[10030] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-md" onClick={() => setShowBroadcast(false)} />
+                <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
+                    <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                                <Megaphone size={20} className="text-indigo-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-slate-900">전체 회원 쪽지 발송</h3>
+                                <p className="text-[10px] text-slate-400 font-bold">관리자 역할 제외 전체 회원에게 발송됩니다.</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setShowBroadcast(false)} className="p-2 text-slate-300 hover:text-slate-700 transition"><X size={22} /></button>
+                    </div>
+                    <div className="p-6 space-y-4">
+                        <textarea
+                            value={broadcastMsg}
+                            onChange={e => setBroadcastMsg(e.target.value)}
+                            placeholder="전체 회원에게 전달할 메시지를 입력하세요..."
+                            rows={5}
+                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:border-indigo-400 resize-none"
+                        />
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowBroadcast(false)} className="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-500 text-sm font-black hover:bg-slate-200 transition">취소</button>
+                            <button
+                                onClick={handleBroadcast}
+                                disabled={isBroadcasting || !broadcastMsg.trim()}
+                                className="flex-1 py-3 rounded-2xl bg-indigo-600 text-white text-sm font-black hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {isBroadcasting ? <><Loader2 size={16} className="animate-spin" /> 발송중...</> : <><Send size={16} /> 전체 발송</>}
+                            </button>
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-bold text-center">⚠️ 발송 후 취소 불가. 수신자가 많을 경우 시간이 걸릴 수 있습니다.</p>
                     </div>
                 </div>
             </div>

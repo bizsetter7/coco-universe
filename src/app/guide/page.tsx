@@ -44,10 +44,10 @@ export default function CocoGuidePage() {
                             <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-5 shadow-inner">
                                 <Trophy size={28} />
                             </div>
-                            <h2 className="text-xl md:text-xl font-black text-slate-900 mb-4 tracking-tight">무료 광고 등록하기</h2>
+                            <h2 className="text-xl md:text-xl font-black text-slate-900 mb-4 tracking-tight">1+1 광고 이벤트</h2>
                             <p className="text-slate-600 text-xs md:text-sm leading-relaxed break-keep font-bold opacity-90">
-                                사장님이라면 누구나<br /> <strong className="text-[#f82b60]">첫 1개월간 기본 노출 광고를 무료</strong>로 게재할 수 있습니다.
-                                <span className="block mt-4 text-[10px] text-slate-400 font-bold tracking-tight">골드 보더 + 상단 고정 효과와 유사한<br />프리미엄 노출을 경험하세요.</span>
+                                <strong className="text-[#f82b60]">1개월 결제 시 1개월 추가 무료!</strong><br />지금 신청하면 총 2개월을 경험하세요.
+                                <span className="block mt-4 text-[10px] text-slate-400 font-bold tracking-tight">골드 보더 + 상단 고정 효과와 유사한<br />프리미엄 노출을 2배로 경험하세요.</span>
                             </p>
                         </div>
                     </div>
