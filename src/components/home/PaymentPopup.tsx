@@ -201,9 +201,9 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                     <div className="bg-red-50 text-red-600 text-center leading-relaxed p-4 rounded-xl mb-6 font-bold flex flex-col items-center justify-center gap-1 shadow-inner border border-red-100">
                         <div className="flex items-center gap-1.5 text-sm md:text-base">
                             <span className="animate-bounce">🎉</span>
-                            <span>오픈 기념 선착순 100업소</span>
+                            <span>한정 이벤트 · 선착순 100업소</span>
                         </div>
-                        <span className="block text-lg md:text-xl font-black text-red-600 tracking-tight">3개월 무료 체험 진행 중!</span>
+                        <span className="block text-lg md:text-xl font-black text-red-600 tracking-tight">1개월 결제 시 1개월 추가 무료!</span>
                     </div>
 
                     <div className="space-y-3">

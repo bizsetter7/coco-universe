@@ -72,12 +72,12 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
                         🚀 GRAND OPEN EVENT
                     </span>
                     <h2 className="text-2xl font-black mb-2 text-gray-800">
-                        사장님, <span style={{ color: brand.primaryColor }}>광고비 0원</span><br />
+                        사장님, <span style={{ color: brand.primaryColor }}>1+1 이벤트</span><br />
                         지금 바로 시작하세요!
                     </h2>
                     <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                        오픈 기념! 최초 가입 시<br />
-                        <strong className="text-gray-800">프리미엄 광고 3개월 무료</strong> 혜택을 드립니다.<br />
+                        한정 이벤트! 1개월 결제 시<br />
+                        <strong className="text-gray-800">1개월 추가 무료</strong> 혜택을 드립니다.<br />
                         (선착순 100업소 한정)
                     </p>
 
