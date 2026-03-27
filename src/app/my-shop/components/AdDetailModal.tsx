@@ -31,12 +31,32 @@ const loadKakaoMapSdk = (): Promise<void> => {
         if ((window as any).kakao?.maps?.services) { resolve(); return; }
         const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
         if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
+        // 이미 스크립트가 로드되어 있으면 재사용
+        const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
+        if (existing) {
+            const kakao = (window as any).kakao;
+            if (kakao?.maps?.load) {
+                kakao.maps.load(() => resolve());
+            } else {
+                reject(new Error('카카오 지도 도메인 미등록 (플랫폼→웹 등록 필요)'));
+            }
+            return;
+        }
         const script = document.createElement('script');
         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
         script.onload = () => {
-            (window as any).kakao.maps.load(() => resolve());
+            try {
+                const kakao = (window as any).kakao;
+                if (!kakao?.maps?.load) {
+                    reject(new Error('카카오 지도 도메인 미등록'));
+                    return;
+                }
+                kakao.maps.load(() => resolve());
+            } catch (e) {
+                reject(e);
+            }
         };
-        script.onerror = reject;
+        script.onerror = () => reject(new Error('카카오 지도 스크립트 로드 실패'));
         document.head.appendChild(script);
     });
 };

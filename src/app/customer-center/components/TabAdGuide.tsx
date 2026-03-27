@@ -58,14 +58,14 @@ const AD_TIERS = [
 ];
 
 const DETAILED_PRICING = [
-    { type: '메인 독점', name: '타입1. 그랜드(Grand)', d30: 350000, d60: 630000, d90: 840000, benefit: (<span>메인 최상단 노출 및<br />압도적 광고 효과</span>) },
-    { type: '메인 상단', name: '타입2. 프리미엄(Premium)', d30: 200000, d60: 360000, d90: 480000, benefit: (<span>상단 시선 집중<br />높은 효율성 노출</span>) },
-    { type: '메인 일반', name: '타입3. 디럭스(Deluxe)', d30: 180000, d60: 324000, d90: 432000, benefit: (<span>타겟 지역 집중<br />전략적 배너 노출</span>) },
-    { type: '리스트 상단', name: '타입4. 스페셜(Special)', d30: 150000, d60: 270000, d90: 360000, benefit: (<span>가성비 최우선<br />실속형 배너 노출</span>) },
-    { type: '리스트 강조', name: '타입5. 급구/추천(Urgent)', d30: 120000, d60: 216000, d90: 288000, benefit: (<span>급구/추천 배지 노출로<br />주목도 실속형</span>) },
-    { type: '리스트 네이티브', name: '타입6. 네이티브(Native)', d30: 100000, d60: 180000, d90: 240000, benefit: (<span>리스트 광고에 배치<br />랜덤 상단노출효과</span>) },
-    { type: '리스트 기본', name: '타입7. 베이직(줄광고)', d30: 60000, d60: 100000, d90: 140000, benefit: (<span>최신 구인정보 리스트<br />(실속형 구인 상품)</span>) },
-    { type: '리스트 옵션', name: '8번-강조옵션(Emphasis)', d30: 30000, d60: 55000, d90: 70000, benefit: (<span>아이콘/형광펜<br />테두리/급여추가 선택가능<br />(주목도 200% 상승)</span>) },
+    { type: '메인 독점',    name: '타입1. 그랜드(Grand)',      d30: 350000, d60: 630000, d90: 840000, jumpManual: 15, jumpAuto: 8,  benefit: (<span>메인 최상단 노출 및<br />압도적 광고 효과</span>) },
+    { type: '메인 상단',    name: '타입2. 프리미엄(Premium)',  d30: 200000, d60: 360000, d90: 480000, jumpManual: 15, jumpAuto: 8,  benefit: (<span>상단 시선 집중<br />높은 효율성 노출</span>) },
+    { type: '메인 일반',    name: '타입3. 디럭스(Deluxe)',     d30: 180000, d60: 324000, d90: 432000, jumpManual: 10, jumpAuto: 6,  benefit: (<span>타겟 지역 집중<br />전략적 배너 노출</span>) },
+    { type: '리스트 상단',  name: '타입4. 스페셜(Special)',    d30: 150000, d60: 270000, d90: 360000, jumpManual: 10, jumpAuto: 6,  benefit: (<span>가성비 최우선<br />실속형 배너 노출</span>) },
+    { type: '리스트 강조',  name: '타입5. 급구/추천(Urgent)',  d30: 120000, d60: 216000, d90: 288000, jumpManual: 8,  jumpAuto: 3,  benefit: (<span>급구/추천 배지 노출로<br />주목도 실속형</span>) },
+    { type: '리스트 네이티브', name: '타입6. 네이티브(Native)', d30: 100000, d60: 180000, d90: 240000, jumpManual: 6,  jumpAuto: 0,  benefit: (<span>리스트 광고에 배치<br />랜덤 상단노출효과</span>) },
+    { type: '리스트 기본',  name: '타입7. 베이직(줄광고)',      d30: 60000,  d60: 100000, d90: 140000, jumpManual: 5,  jumpAuto: 0,  benefit: (<span>최신 구인정보 리스트<br />(실속형 구인 상품)</span>) },
+    { type: '리스트 옵션',  name: '8번-강조옵션(Emphasis)',    d30: 30000,  d60: 55000,  d90: 70000,  jumpManual: 0,  jumpAuto: 0,  benefit: (<span>아이콘/형광펜<br />테두리/급여추가 선택가능<br />(주목도 200% 상승)</span>) },
 ];
 
 interface TabAdGuideProps {
@@ -173,9 +173,25 @@ export function TabAdGuide({ onTabChange }: TabAdGuideProps) {
                                     <td className="py-3 pl-4">
                                         <div className="flex flex-col">
                                             <span className={`text-[15px] font-black mb-1 ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</span>
-                                            <span className={`text-[11px] text-gray-400 font-bold self-start mt-0.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            <span className={`text-[11px] font-bold self-start mt-0.5 ${brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                 {item.benefit}
                                             </span>
+                                            {item.jumpManual > 0 && (
+                                                <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                                                    <span className="text-[10px] font-black bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                        수동 {item.jumpManual}회/일
+                                                    </span>
+                                                    {item.jumpAuto > 0 ? (
+                                                        <span className="text-[10px] font-black bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                            자동 {item.jumpAuto}회/일
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[10px] font-black bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                            자동없음
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="py-3 text-right text-[15px] font-black text-[#f82b60] pr-8 pl-8 tabular-nums whitespace-nowrap">{item.d30.toLocaleString()}원</td>
@@ -205,6 +221,22 @@ export function TabAdGuide({ onTabChange }: TabAdGuideProps) {
                                         {item.benefit}
                                     </p>
                                 </div>
+                                {item.jumpManual > 0 && (
+                                    <div className="flex items-center gap-1 flex-wrap mt-1">
+                                        <span className="text-[9px] font-black bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                            수동 {item.jumpManual}회
+                                        </span>
+                                        {item.jumpAuto > 0 ? (
+                                            <span className="text-[9px] font-black bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                자동 {item.jumpAuto}회
+                                            </span>
+                                        ) : (
+                                            <span className="text-[9px] font-black bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                자동없음
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             <div className={`mt-3 pt-2.5 border-t space-y-1 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>

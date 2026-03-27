@@ -74,6 +74,23 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                                 <p className="text-[10px] md:text-[12px] text-gray-500 font-bold whitespace-pre-line leading-tight opacity-90 break-keep">
                                     {p.desc}
                                 </p>
+                                {/* 점프 기본 제공 횟수 */}
+                                {p.jumpManual > 0 && (
+                                    <div className="mt-2 flex items-center gap-1 flex-wrap">
+                                        <span className="text-[8px] md:text-[9px] font-black bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                            수동 {p.jumpManual}회/일
+                                        </span>
+                                        {p.jumpAuto > 0 ? (
+                                            <span className="text-[8px] md:text-[9px] font-black bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                자동 {p.jumpAuto}회/일
+                                            </span>
+                                        ) : (
+                                            <span className="text-[8px] md:text-[9px] font-black bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                자동없음
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* 세로 구분선 (PC 전용) */}

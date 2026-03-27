@@ -104,8 +104,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     return (
         <React.Fragment>
-            {/* Global Header */}
-            <MainHeader />
+            {/* Global Header — 어드민 페이지는 자체 레이아웃이 있으므로 제외 */}
+            {!isAdminPage && <MainHeader />}
 
             {/*
                [Golden Rule - Framework Reconstruction v2]

@@ -199,6 +199,9 @@ function AdminContent() {
             const allAdsComp = Array.from(uniqueAdsMap.values());
 
             const enrichedAds = allAdsComp.map(ad => {
+                // [Fix] 광고주 프로필 매핑 (상호명·로그인ID)
+                const profile = (userData || []).find((p: any) => p.id === ad.user_id);
+
                 let adPrice = Number((ad.options as any)?.ad_price || ad.ad_price || ad.adPrice || ad.price || 0);
                 if (!adPrice) {
                     const lastPayment = allPaymentsComp.find(p => String(p.shop_id || p.shopId || (p as any).metadata?.shop_id || '') === String(ad.id));
@@ -208,7 +211,11 @@ function AdminContent() {
                 return {
                     ...ad,
                     ad_price: adPrice,
-                    categorySub: ad.category_sub || opt.categorySub || '일반',
+                    // [Fix] 인증 상호명 우선 (profiles.business_name → DB name)
+                    shopName: profile?.business_name || ad.name || '—',
+                    // [Fix] 로그인 아이디 (profiles.username)
+                    username: profile?.username || '',
+                    categorySub: ad.category_sub || opt.categorySub || '',
                     selectedIcon: opt.icon || (ad as any).selectedIcon,
                     selectedHighlighter: opt.highlighter || (ad as any).selectedHighlighter,
                     borderOption: opt.border || (ad as any).border || 'none',

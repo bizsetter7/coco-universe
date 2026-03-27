@@ -23,6 +23,7 @@ import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import { normalizeAd, normalizePayment } from './utils';
+import { getJumpConfig } from './constants';
 
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
@@ -38,6 +39,7 @@ import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
 import { SosAlertView } from './components/SosAlertView';
 import { BankTransferModal } from './components/BankTransferModal';
+import { ExtendAdModal } from './components/ExtendAdModal';
 import { PointShopView } from './components/PointShopView';
 
 // Removed problematic ErrorBoundary class for framework compatibility
@@ -80,6 +82,11 @@ function MyShopContent() {
     const [mounted, setMounted] = useState(false);
     const [showBankModal, setShowBankModal] = useState(false);
     const [bankModalAmount, setBankModalAmount] = useState(0);
+    const [bankModalTitle, setBankModalTitle] = useState<string | undefined>(undefined);
+
+    // 연장 모달 state
+    const [showExtendModal, setShowExtendModal] = useState(false);
+    const [extendTargetAd, setExtendTargetAd] = useState<any>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -832,13 +839,22 @@ function MyShopContent() {
             // 1. Get ad details for tier and jump counts
             const ad = registeredAds.find(a => String(a.id) === String(adId));
             if (!ad) throw new Error('공고를 찾을 수 없습니다.');
-            
-            const tier = ad.productType || ad.tier || ad.ad_type || '베이직';
-            // Tier Limits: basic=5, silver/gold(추천,급구)=8, deluxe/special=10, grand/premium/vip=15
-            let maxJumps = 5;
-            if (tier.includes('급구') || tier.includes('추천') || tier.includes('실버') || tier.includes('골드') || tier === 'T6') maxJumps = 8;
-            if (tier.includes('디럭스') || tier.includes('스페셜') || tier === 'T4' || tier === 'T5') maxJumps = 10;
-            if (tier.includes('그랜드') || tier.includes('프리미엄') || tier.includes('VIP') || tier === 'T1' || tier === 'T2' || tier === 'T3') maxJumps = 15;
+
+            // [Guard] 관리자 승인(active) 상태만 점프 허용
+            const adStatus = (ad.status || '').toLowerCase();
+            if (adStatus !== 'active') {
+                const msg = adStatus === 'pending_review' || adStatus === 'pending'
+                    ? '관리자 승인 대기 중입니다.\n승인 완료 후 점프 기능을 이용할 수 있습니다.'
+                    : adStatus === 'rejected'
+                    ? '반려된 공고는 점프할 수 없습니다.\n공고를 수정 후 재신청해 주세요.'
+                    : '현재 점프 기능을 사용할 수 없는 상태입니다.';
+                alert(msg);
+                return;
+            }
+
+            // [Fix] getJumpConfig로 tier 매핑 통일 (p1~p7, altId, 레거시 한글명 모두 대응)
+            const tierKey = (ad.productType || ad.tier || ad.ad_type || 'p7').toLowerCase();
+            const { manual: maxJumps } = getJumpConfig(tierKey);
             
             const options = ad.options || {};
             // KST timezone today
@@ -913,6 +929,92 @@ function MyShopContent() {
         } catch (err: any) {
             console.error('Jump error:', err);
             alert(`오류: ${err.message}`);
+        }
+    };
+
+    const handleExtend = async (adId: string, period: 30 | 60 | 90, amount: number) => {
+        setShowExtendModal(false);
+        setExtendTargetAd(null);
+
+        try {
+            if (!authUser?.id || authUser.id === 'guest') return;
+
+            const ad = registeredAds.find(a => String(a.id) === String(adId));
+            if (!ad) throw new Error('공고를 찾을 수 없습니다.');
+
+            if (!authUser.id.startsWith('mock_')) {
+                const paymentData = {
+                    user_id: authUser.id,
+                    shop_id: adId,
+                    amount,
+                    method: 'bank_transfer',
+                    status: 'pending',
+                    description: `[연장 ${period}일] ${ad.title || ad.name || '공고'} 기간 연장`,
+                    metadata: {
+                        type: 'extend',
+                        period,
+                        shopName: bizShopName || formState.shopName,
+                        adTitle: ad.title || ad.name || '',
+                    },
+                    created_at: new Date().toISOString(),
+                };
+
+                const { error } = await supabase.from('payments').insert([paymentData]);
+                if (error) {
+                    console.error('연장 결제 내역 생성 실패:', error);
+                    alert(`연장 신청 실패: ${error.message}`);
+                    return;
+                }
+
+                fetchPaymentHistory();
+
+                // 텔레그램 관리자 알림
+                fetch('/api/notify/new-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        shopName: bizShopName || formState.shopName,
+                        amount,
+                        product: `연장 ${period}일`,
+                        title: ad.title || ad.name || '',
+                    }),
+                }).catch(() => {});
+            }
+
+            setBankModalTitle('연장 신청이 접수되었습니다!');
+            setBankModalAmount(amount);
+            setShowBankModal(true);
+        } catch (err: any) {
+            console.error('[EXTEND] Error:', err);
+            alert('연장 신청 중 오류: ' + err.message);
+        }
+    };
+
+    const handleToggleAutoJump = async (adId: string, enabled: boolean) => {
+        const ad = registeredAds.find(a => String(a.id) === String(adId));
+        if (!ad) return;
+
+        const newOptions = { ...(ad.options || {}), auto_jump_enabled: enabled };
+
+        // 즉시 UI 반영
+        setRegisteredAds(prev =>
+            prev.map(a => String(a.id) === String(adId) ? { ...a, options: newOptions } : a)
+        );
+
+        if (!authUser?.id || authUser.id.startsWith('mock_')) return; // mock 세션은 DB 스킵
+
+        const { error } = await supabase
+            .from('shops')
+            .update({ options: newOptions })
+            .eq('id', adId)
+            .eq('user_id', authUser.id);
+
+        if (error) {
+            // 실패 시 롤백
+            setRegisteredAds(prev =>
+                prev.map(a => String(a.id) === String(adId) ? { ...a, options: ad.options } : a)
+            );
+            alert('자동 점프 설정 저장 실패: ' + error.message);
         }
     };
 
@@ -997,7 +1099,16 @@ function MyShopContent() {
             {showBankModal && (
                 <BankTransferModal
                     amount={bankModalAmount}
-                    onConfirm={() => { setShowBankModal(false); setView('dashboard'); }}
+                    title={bankModalTitle}
+                    onConfirm={() => { setShowBankModal(false); setBankModalTitle(undefined); setView('dashboard'); }}
+                />
+            )}
+            {showExtendModal && extendTargetAd && (
+                <ExtendAdModal
+                    ad={extendTargetAd}
+                    brand={brand}
+                    onConfirm={handleExtend}
+                    onClose={() => { setShowExtendModal(false); setExtendTargetAd(null); }}
                 />
             )}
             {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
@@ -1092,7 +1203,7 @@ function MyShopContent() {
                                                         }
                                                         setShowWarningModal(true);
                                                     }}
-                                                    setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds || []} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete}
+                                                    setShowDesignModal={setShowDesignModal} setView={setView} router={router} ads={registeredAds || []} onOpenMenu={() => setShowMobileMenu(true)} onShowAdDetail={(ad) => setSelectedAdForModal(ad)} onDeleteAd={handleDelete} onJumpAd={handleJump} onExtendAd={(ad) => { setExtendTargetAd(ad); setShowExtendModal(true); }} onToggleAutoJump={handleToggleAutoJump}
                                                 />
                                             )}
                                             {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={bizShopName || formState.shopName} ads={registeredAds || []} jumpBalance={userJumpBalance || 0} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); if (bizVerified && bizShopName) formState.setShopName(bizShopName); setShowWarningModal(true); }} />}

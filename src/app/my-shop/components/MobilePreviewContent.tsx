@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Store, MessageCircle, Phone, Info } from 'lucide-react'; // Removed X import as it is part of Modal wrapper
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { cleanShopTitle } from '@/utils/shopUtils';
@@ -6,19 +8,102 @@ import { IconBadge } from '@/components/common/IconBadge';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 
+const loadKakaoMapSdk = (): Promise<void> =>
+    new Promise((resolve, reject) => {
+        if ((window as any).kakao?.maps?.services) { resolve(); return; }
+        const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
+        if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
+        // 이미 스크립트가 로드되어 있으면 재사용
+        const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
+        if (existing) {
+            // kakao 객체가 이미 있으면 바로 load
+            const kakao = (window as any).kakao;
+            if (kakao?.maps?.load) {
+                kakao.maps.load(() => resolve());
+            } else {
+                reject(new Error('카카오 지도 도메인 미등록 (플랫폼→웹 등록 필요)'));
+            }
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
+        script.onload = () => {
+            try {
+                const kakao = (window as any).kakao;
+                if (!kakao?.maps?.load) {
+                    reject(new Error('카카오 지도 도메인 미등록'));
+                    return;
+                }
+                kakao.maps.load(() => resolve());
+            } catch (e) {
+                reject(e);
+            }
+        };
+        script.onerror = () => reject(new Error('카카오 지도 스크립트 로드 실패'));
+        document.head.appendChild(script);
+    });
+
 interface MobilePreviewContentProps {
     formData: any;
     brand?: any; // Optional, defaults used if missing
 }
 
 export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ formData, brand }) => {
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const [bizAddress, setBizAddress] = useState<string | null>(null);
+    const [mapError, setMapError] = useState<string | null>(null);
+
+    // 사업장 주소 로드 (user_id → profiles.business_address)
+    useEffect(() => {
+        const userId = formData.user_id || formData.ownerId;
+        if (!userId) return;
+        import('@/lib/supabase').then(({ supabase }) => {
+            supabase.from('profiles')
+                .select('business_address, business_address_detail')
+                .eq('id', userId)
+                .single()
+                .then(({ data }) => {
+                    if (data?.business_address) {
+                        const detail = (data as any).business_address_detail;
+                        setBizAddress(detail ? `${data.business_address} ${detail}` : data.business_address);
+                    }
+                });
+        });
+    }, [formData.user_id, formData.ownerId]);
+
+    // 카카오맵 렌더링
+    useEffect(() => {
+        if (!bizAddress || !mapContainerRef.current) return;
+        let cancelled = false;
+        loadKakaoMapSdk()
+            .then(() => {
+                if (cancelled || !mapContainerRef.current) return;
+                const kakao = (window as any).kakao;
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(bizAddress, (result: any[], status: string) => {
+                    if (cancelled || !mapContainerRef.current) return;
+                    if (status !== kakao.maps.services.Status.OK || !result[0]) {
+                        setMapError('주소를 지도에서 찾을 수 없습니다.'); return;
+                    }
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    const map = new kakao.maps.Map(mapContainerRef.current, { center: coords, level: 4 });
+                    new kakao.maps.Marker({ map, position: coords });
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:6px 10px;font-size:11px;font-weight:700;white-space:nowrap;">${bizAddress}</div>`,
+                    });
+                    infowindow.open(map, new kakao.maps.Marker({ map, position: coords }));
+                });
+            })
+            .catch(() => setMapError('지도를 불러오지 못했습니다.'));
+        return () => { cancelled = true; };
+    }, [bizAddress]);
     // [표준 규정] 광고 등급별 스타일 맵 (T1~T7 지원)
     const TIER_STYLE_MAP: Record<string, { header: string, accent: string, badge: string }> = {
         'p1': { header: "from-amber-400 via-orange-500 to-amber-600", accent: "text-amber-600", badge: "bg-amber-100" }, // Grand (Gold)
         'p2': { header: "from-red-500 to-rose-700", accent: "text-red-600", badge: "bg-red-100" },               // Premium (Red)
         'p3': { header: "from-blue-500 to-indigo-600", accent: "text-blue-600", badge: "bg-blue-100" },               // Deluxe (Blue)
         'p4': { header: "from-emerald-400 to-teal-600", accent: "text-emerald-600", badge: "bg-emerald-100" },          // Special (Green)
-        'p5': { header: "from-orange-400 to-red-600", accent: "text-orange-600", badge: "bg-orange-100" },            // Urgent/Rec (Orange)
+        'p5': { header: "from-purple-500 to-violet-600", accent: "text-purple-600", badge: "bg-purple-100" },          // Urgent/Rec (Purple)
         'p6': { header: "from-slate-400 to-gray-600", accent: "text-gray-600", badge: "bg-gray-100" },               // Native (Slate)
         'p7': { header: "from-slate-300 to-slate-400", accent: "text-slate-400", badge: "bg-slate-50" },                // Basic (Gray)
     };
@@ -109,13 +194,14 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
 
                     {/* Right: Keywords (Grid 3 cols) */}
                     <div className="flex-1 md:pl-6 grid grid-cols-3 gap-1.5 py-4 md:py-0">
-                        {formData.selectedKeywords?.slice(0, 6).map((kw: string, i: number) => (
+                        {(formData.paySuffixes || formData.options?.paySuffixes || formData.options?.pay_suffixes)?.slice(0, 6).map((kw: string, i: number) => (
                             <span key={i} className="px-1 py-1.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-lg border border-blue-100/50 flex items-center justify-center text-center leading-tight shadow-sm">
                                 {kw}
                             </span>
                         ))}
-                        {(!formData.selectedKeywords || formData.selectedKeywords.length === 0) && (
-                            <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 키워드 없음</span>
+                        {(!(formData.paySuffixes || formData.options?.paySuffixes || formData.options?.pay_suffixes) ||
+                            (formData.paySuffixes || formData.options?.paySuffixes || formData.options?.pay_suffixes).length === 0) && (
+                            <span className="col-span-3 text-gray-300 text-[11px] font-bold italic py-2">등록된 급여 옵션 없음</span>
                         )}
                     </div>
                 </div>
@@ -134,17 +220,31 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     </div>
                 </div>
 
-                {/* 위치 정보 (위치 정보 섹션 스타일 JobDetailModal과 통일) */}
+                {/* 위치 정보 (카카오 지도 연동) */}
                 <div className="space-y-3">
                     <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
                         <span className="w-1 h-4 bg-green-500 rounded-full"></span>
                         위치 정보
                     </h3>
-                    <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
-                        <MapPin size={32} className="opacity-50" />
-                        <span className="text-xs font-bold">{formData.regionCity} {formData.regionGu}</span>
-                        <span className="text-[10px] opacity-60">지도 보기 (준비중)</span>
-                    </div>
+                    {bizAddress ? (
+                        <div>
+                            {mapError ? (
+                                <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
+                                    <MapPin size={32} className="opacity-50" />
+                                    <span className="text-xs font-bold">{formData.regionCity} {formData.regionGu}</span>
+                                    <span className="text-[10px] text-red-400">{mapError}</span>
+                                </div>
+                            ) : (
+                                <div ref={mapContainerRef} className="w-full aspect-video rounded-xl overflow-hidden border border-gray-100" />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
+                            <MapPin size={32} className="opacity-50" />
+                            <span className="text-xs font-bold">{formData.regionCity} {formData.regionGu}</span>
+                            <span className="text-[10px] opacity-60">{formData.user_id ? '주소 로딩 중...' : '사업장 주소 미등록'}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Keyword & Info (Keyword 섹션 스타일 JobDetailModal과 통일) */}

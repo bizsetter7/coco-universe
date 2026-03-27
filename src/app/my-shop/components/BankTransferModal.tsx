@@ -6,9 +6,10 @@ import { createPortal } from 'react-dom';
 interface BankTransferModalProps {
     amount: number;
     onConfirm: () => void;
+    title?: string; // 기본값: '공고가 접수되었습니다!' / 연장 시 '연장 신청이 접수되었습니다!'
 }
 
-export function BankTransferModal({ amount, onConfirm }: BankTransferModalProps) {
+export function BankTransferModal({ amount, onConfirm, title }: BankTransferModalProps) {
     const [copied, setCopied] = useState(false);
 
     const copyAccount = () => {
@@ -26,7 +27,7 @@ export function BankTransferModal({ amount, onConfirm }: BankTransferModalProps)
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-500 to-rose-600 px-6 py-5 text-white text-center">
                     <div className="text-3xl mb-2">✅</div>
-                    <h2 className="text-xl font-black">공고가 접수되었습니다!</h2>
+                    <h2 className="text-xl font-black">{title ?? '공고가 접수되었습니다!'}</h2>
                     <p className="text-white/80 text-sm mt-1 font-semibold">아래 계좌로 입금하시면 관리자 심사 후 광고가 노출됩니다.</p>
                 </div>
 

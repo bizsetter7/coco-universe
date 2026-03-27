@@ -19,6 +19,33 @@ interface AdminAdManagementProps {
     fetchData: () => void;
 }
 
+// KST 날짜+시간 포맷 헬퍼 (ex. 26.03.27 오후 01:13)
+function fmtKST(isoStr: string | undefined | null): string {
+    if (!isoStr) return '—';
+    const d = new Date(isoStr);
+    const kst = new Intl.DateTimeFormat('ko-KR', {
+        timeZone: 'Asia/Seoul',
+        year: '2-digit', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: true,
+    }).formatToParts(d);
+    const get = (t: string) => kst.find(p => p.type === t)?.value ?? '';
+    const yy = get('year'), mo = get('month'), dd = get('day');
+    const ampm = get('dayPeriod') === '오전' ? '오전' : '오후';
+    const hh = get('hour').padStart(2, '0'), mi = get('minute');
+    return `${yy}.${mo}.${dd} ${ampm} ${hh}:${mi}`;
+}
+
+// 마감일 계산: 승인일(또는 신청일) + 광고 기간(일) → 26.04.26 형식
+function calcDeadline(baseIso: string | undefined | null, periodDays: number): string {
+    if (!baseIso) return '—';
+    const d = new Date(baseIso);
+    d.setDate(d.getDate() + periodDays);
+    // ko-KR 로케일: "26. 04. 26." → 공백+점 제거 → 마지막 점 제거
+    return d.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', year: '2-digit', month: '2-digit', day: '2-digit' })
+        .replace(/\. /g, '.')   // "26. 04. 26." → "26.04.26."
+        .replace(/\.$/, '');     // 끝 점만 제거 → "26.04.26"
+}
+
 export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdManagementProps) {
     const brand = useBrand();
     const [adFilter, setAdFilter] = useState<'all' | 'pending'>('all');
@@ -35,9 +62,12 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
             // Get ad details for notification
             const ad = mockAds.find(a => a.id === adId);
 
-            const updateData: any = { status: newStatus, updated_at: new Date().toISOString() };
+            const nowIso = new Date().toISOString();
+            const updateData: any = { status: newStatus, updated_at: nowIso };
             if (newStatus === 'active') {
-                updateData.approved_at = new Date().toISOString();
+                updateData.approved_at = nowIso;
+                updateData.pay_status = '결제완료';
+                updateData.paid_at = nowIso;
             }
             if (reason) {
                 updateData.rejection_reason = reason;
@@ -89,7 +119,8 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                     ...ad,
                     status: newStatus as Shop['status'],
                     rejection_reason: reason,
-                    rejection_history: updateData.rejection_history || (ad as any).rejection_history
+                    rejection_history: updateData.rejection_history || (ad as any).rejection_history,
+                    ...(newStatus === 'active' ? { payStatus: '결제완료', paid_at: nowIso } : {}),
                 } as Shop) : ad
             ));
 
@@ -138,8 +169,8 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">No.</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상점(회원ID)</th>
+                                <th className="pl-8 pr-2 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">No.</th>
+                                <th className="pl-3 pr-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상점(회원ID)</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">신청 옵션(유료)</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap text-center">결제금액</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
@@ -162,25 +193,40 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                 className={`border-b border-slate-50 hover:bg-slate-50/70 transition-colors cursor-pointer group ${expandedAd === ad.id ? 'bg-blue-50/30' : ''}`}
                                             >
                                                 {/* 0. No. Column */}
-                                                <td className="px-8 py-6">
+                                                <td className="pl-8 pr-2 py-6">
                                                     <span className="text-[10px] font-black text-slate-400 font-mono">
                                                         {(ad as any).adNo || String(ad.id || '').substring(0, 8)}
                                                     </span>
                                                 </td>
 
                                                 {/* 1. Shop Info */}
-                                                <td className="px-8 py-6">
+                                                <td className="pl-3 pr-8 py-6">
                                                     <div
-                                                        className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setSelectedAdForModal(ad);
-                                                        }}
+                                                        className="flex flex-col gap-0.5 cursor-pointer hover:opacity-70 transition-opacity"
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedAdForModal(ad); }}
                                                     >
-                                                        <div className="text-sm font-black text-slate-900 leading-tight mb-0.5">{ad.name || ad.shopName}</div>
-                                                        <div className="text-[10px] font-bold text-slate-400">ID: {(ad as any).user_id || ad.ownerId}</div>
-                                                        <div className="text-[10px] font-bold text-blue-600 mt-0.5 bg-blue-50 px-1.5 py-0.5 rounded-sm w-fit">
-                                                            {ad.region} - {ad.work_region_sub || (ad as any).regionGu || ad.region?.split(' ')[1] || ad.region}
+                                                        {/* 1) 상호명 */}
+                                                        <div className="text-sm font-black text-slate-900 leading-tight">
+                                                            {(ad as any).shopName || ad.name || '—'}
+                                                        </div>
+                                                        {/* 2) 회원ID (username 우선, 없으면 UUID 앞 8자) */}
+                                                        <div className="text-[10px] font-bold text-slate-400 font-mono">
+                                                            ID: {(ad as any).username || String((ad as any).user_id || ad.ownerId || '').slice(0, 8) + '…'}
+                                                        </div>
+                                                        {/* 3) 지역 / 직종 1차 / 직종 2차(상세) */}
+                                                        <div className="flex gap-1 mt-0.5 flex-wrap">
+                                                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                                                {(ad as any).regionCity || ad.region || '—'} {(ad as any).regionGu || ad.work_region_sub || ''}
+                                                            </span>
+                                                            <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                                                {(ad as any).category || (ad as any).jobCategory || (ad as any).options?.category || '직종미상'}
+                                                            </span>
+                                                            {/* 직종 2차(상세) — category_sub → enriched categorySub */}
+                                                            {((ad as any).categorySub || (ad as any).category_sub || (ad as any).options?.categorySub) && (
+                                                                <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                                                    {(ad as any).categorySub || (ad as any).category_sub || (ad as any).options?.categorySub}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -188,7 +234,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                 {/* 2. Options */}
                                                 <td className="px-8 py-6">
                                                     <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <div className="flex items-center gap-1 flex-nowrap overflow-hidden">
                                                             {(() => {
                                                                 const pt = String((ad as any).productType || (ad as any).ad_type || ad.options?.product_type || ad.tier || 'p7').toLowerCase();
                                                                 let badgeColor = 'bg-slate-900';
@@ -245,61 +291,116 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                     </span>
                                                 </td>
 
-                                                {/* 4. Status */}
+                                                {/* 4. Status — 단일 배지 */}
                                                 <td className="px-8 py-6">
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black w-fit ${(ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
-                                                            {(ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success' ? '결제완료' : '결제대기'}
-                                                        </span>
-                                                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black w-fit ${ad.status === 'active' ? 'bg-green-100 text-green-600' : (ad.status === 'rejected' ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-400')}`}>
-                                                            {ad.status === 'active' ? '승인' : (ad.status === 'rejected' ? '반려' : '승인대기')}
-                                                        </span>
-                                                        {ad.status === 'rejected' && (ad as any).rejection_history && (ad as any).rejection_history.length > 0 && (
-                                                            <div className="text-[9px] text-rose-500 font-bold mt-1 leading-tight max-w-[120px]">
-                                                                {(ad as any).rejection_history.map((h: any, idx: number) => (
-                                                                    <div key={idx} className="truncate">{idx + 1}. {h.reason}</div>
-                                                                ))}
+                                                    {(() => {
+                                                        const isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
+                                                        const isActive = ad.status === 'active';
+                                                        const isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
+
+                                                        let label = '결제대기';
+                                                        let cls = 'bg-amber-100 text-amber-700';
+
+                                                        if (isRejected) { label = '반려'; cls = 'bg-rose-100 text-rose-600'; }
+                                                        else if (isActive) { label = '게시중'; cls = 'bg-green-100 text-green-600'; }
+                                                        else if (isPaid) { label = '승인대기'; cls = 'bg-orange-100 text-orange-600'; }
+
+                                                        return (
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className={`px-2 py-1 rounded-lg text-[10px] font-black w-fit ${cls}`}>
+                                                                    {label}
+                                                                </span>
+                                                                {isRejected && (ad as any).rejection_reason && (
+                                                                    <div className="text-[9px] text-rose-400 font-bold max-w-[100px] leading-tight truncate" title={(ad as any).rejection_reason}>
+                                                                        ↳ {(ad as any).rejection_reason}
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </div>
+                                                        );
+                                                    })()}
                                                 </td>
 
-                                                {/* 5. Dates */}
+                                                {/* 5. Dates — KST 포맷 */}
                                                 <td className="px-8 py-6">
-                                                    <div className="flex flex-col text-[10px] font-bold text-slate-400 leading-tight">
-                                                        {ad.status === 'active' ? (
-                                                            <>
-                                                                <span className="text-blue-500 font-black">결제: {(ad as any).approved_at ? new Date((ad as any).approved_at).toISOString().split('T')[0] : (ad as any).created_at?.split('T')[0]}</span>
-                                                                <span>마감: {ad.deadline || '미정'}</span>
-                                                            </>
-                                                        ) : (
-                                                            <span>신청: {new Date(ad.created_at || new Date()).toLocaleString()}</span>
-                                                        )}
-                                                    </div>
+                                                    {(() => {
+                                                        const periodDays = Number(
+                                                            (ad as any).options?.period ||
+                                                            (ad as any).options?.ad_period ||
+                                                            (ad as any).ad_period ||
+                                                            (ad as any).adPeriod ||
+                                                            30
+                                                        );
+                                                        const approvedAt = (ad as any).approved_at;
+                                                        const createdAt = ad.created_at;
+                                                        const paidAt = (ad as any).paid_at;
+                                                        // 마감일은 승인일 기준으로만 계산 (결제대기/승인대기 상태엔 미표시)
+                                                        const deadlineBase = approvedAt || null;
+
+                                                        return (
+                                                            <div className="flex flex-col gap-1 text-[10px] font-bold leading-tight whitespace-nowrap">
+                                                                <div className="text-slate-400">
+                                                                    <span className="text-slate-500 font-black">신청일</span><br />
+                                                                    {fmtKST(createdAt)}
+                                                                </div>
+                                                                {paidAt && (
+                                                                    <div className="text-blue-500">
+                                                                        <span className="font-black">결제일</span><br />
+                                                                        {fmtKST(paidAt)}
+                                                                    </div>
+                                                                )}
+                                                                <div className={deadlineBase ? 'text-green-600' : 'text-slate-300'}>
+                                                                    <span className="font-black">마감일 ({periodDays}일)</span><br />
+                                                                    {deadlineBase ? calcDeadline(deadlineBase, periodDays) : '승인 후 확정'}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
 
-                                                {/* 6. Actions */}
+                                                {/* 6. Actions — 결제 상태별 워크플로 */}
                                                 <td className="px-8 py-6 text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'active'); }}
-                                                            className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-green-50 hover:text-green-600 transition-all"
-                                                            title="승인"
-                                                        >
-                                                            <CheckCircle2 size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setRejectingAdId(ad.id);
-                                                                setIsRejectModalOpen(true);
-                                                            }}
-                                                            className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
-                                                            title="거절"
-                                                        >
-                                                            <XCircle size={16} />
-                                                        </button>
-                                                    </div>
+                                                    {(() => {
+                                                        const isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
+                                                        const isActive = ad.status === 'active';
+                                                        const isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
+
+                                                        if (isActive || isRejected) {
+                                                            // 게시중/반려 — 상태 변경만 허용
+                                                            return (
+                                                                <div className="flex justify-end gap-2">
+                                                                    {isActive && (
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'CLOSED'); }}
+                                                                            className="px-2 py-1.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 text-[10px] font-black transition-all"
+                                                                            title="게시 종료"
+                                                                        >
+                                                                            마감
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        // 결제대기 OR 승인대기 — 입금확인(=승인) 단일 버튼
+                                                        return (
+                                                            <div className="flex justify-end gap-2">
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); handleStatusUpdate(ad.id, 'active'); }}
+                                                                    className="px-2.5 py-1.5 bg-green-600 text-white rounded-xl hover:bg-green-700 text-[10px] font-black transition-all active:scale-95 shadow-sm shadow-green-200 whitespace-nowrap"
+                                                                    title="입금확인 = 승인 (결제완료 + 게시중 동시 반영)"
+                                                                >
+                                                                    입금확인(승인)
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); setRejectingAdId(ad.id); setIsRejectModalOpen(true); }}
+                                                                    className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all"
+                                                                    title="반려"
+                                                                >
+                                                                    <XCircle size={16} />
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
                                             </tr>
                                             {expandedAd === ad.id && (

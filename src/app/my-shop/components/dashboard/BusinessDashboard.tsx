@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, Store, MapPin, Check, Plus, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings, AlertTriangle, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Store, MapPin, Check, Plus, RefreshCw, Calendar, List, LogOut, CreditCard, User, Settings, AlertTriangle, ChevronRight, Zap } from 'lucide-react';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { IconBadge } from '@/components/common/IconBadge';
+import { getJumpConfig } from '../../constants';
 
 interface BusinessDashboardProps {
     brand: any;
@@ -21,10 +22,13 @@ interface BusinessDashboardProps {
     onOpenMenu?: () => void;
     onShowAdDetail?: (ad: any) => void;
     onDeleteAd?: (adId: string) => void;
+    onJumpAd?: (adId: string) => void;
+    onExtendAd?: (ad: any) => void;
+    onToggleAutoJump?: (adId: string, enabled: boolean) => void;
 }
 
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd
+    brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd, onJumpAd, onExtendAd, onToggleAutoJump
 }) => {
     const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
 
@@ -207,43 +211,110 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         {ad.regionCity || '지역 정보 없음'} {ad.regionGu || ''} | {ad.category || '종류'} | {ad.categorySub || '자유직종'}
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-2 mt-3 md:mt-0 shrink-0 w-full md:w-auto">
-                                    {/* [Feature] Monthly Edit Tracker - Clean Style */}
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 shadow-sm">
-                                        <span className="text-[14px]">📝</span>
-                                        <span className="text-[11px] font-black text-gray-500">월간 수정:</span>
-                                        <span className={`text-[12px] font-black ${(ad.edit_count || 0) >= 25 ? 'text-red-600' : 'text-gray-900'}`}>
-                                            {ad.edit_count || 0}
-                                        </span>
-                                        <span className="text-[11px] font-bold text-gray-400">/ 30회</span>
-                                    </div>
+                                {(() => {
+                                    // 승인 여부 — active 상태만 점프 허용
+                                    const isApproved = ad?.status === 'active' || ad?.status === 'ACTIVE';
 
-                                    <div className="flex flex-wrap gap-1.5 items-center justify-end w-full md:w-auto">
-                                        <button onClick={() => handleAdClick(false, ad)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">
-                                            수정
-                                        </button>
-                                        <button className="flex items-center gap-1.5 px-3 py-2 bg-green-500 text-white text-xs font-black rounded-lg hover:bg-green-600 shadow-sm transition">
-                                            <RefreshCw size={12} /> 점프
-                                        </button>
-                                        <button className="flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition">
-                                            <Calendar size={12} /> 연장
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onDeleteAd?.(ad.id);
-                                            }}
-                                            style={{
-                                                backgroundColor: '#ef4444',
-                                                color: 'white',
-                                                border: '2px solid #dc2626'
-                                            }}
-                                            className="px-3 py-2 text-xs font-bold rounded-lg hover:bg-red-600 transition"
-                                        >
-                                            삭제🔴
-                                        </button>
-                                    </div>
-                                </div>
+                                    // 잔여 수동 점프 횟수 계산
+                                    const todayKST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+                                    const tierKey = (ad.productType || ad.tier || ad.ad_type || 'p7').toLowerCase();
+                                    const jumpCfg = getJumpConfig(tierKey);
+                                    const usedManual = ad.options?.last_manual_jump_date === todayKST
+                                        ? (ad.options?.daily_manual_jump_count || 0) : 0;
+                                    const remainManual = Math.max(0, jumpCfg.manual - usedManual);
+                                    const usedAuto = ad.options?.last_auto_jump_date === todayKST
+                                        ? (ad.options?.daily_auto_jump_count || 0) : 0;
+                                    const remainAuto = Math.max(0, jumpCfg.auto - usedAuto);
+                                    const autoEnabled = !!ad.options?.auto_jump_enabled;
+
+                                    return (
+                                        <div className="flex flex-col items-end gap-2 mt-3 md:mt-0 shrink-0 w-full md:w-auto">
+                                            {/* 월간 수정 + 점프 잔여 */}
+                                            <div className="flex items-center gap-2 flex-wrap justify-end">
+                                                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 shadow-sm">
+                                                    <span className="text-[14px]">📝</span>
+                                                    <span className="text-[11px] font-black text-gray-500">월간 수정:</span>
+                                                    <span className={`text-[12px] font-black ${(ad.edit_count || 0) >= 25 ? 'text-red-600' : 'text-gray-900'}`}>
+                                                        {ad.edit_count || 0}
+                                                    </span>
+                                                    <span className="text-[11px] font-bold text-gray-400">/ 30회</span>
+                                                </div>
+                                                {/* 수동 점프 잔여 — 미승인 시 잠금 표시 */}
+                                                <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border shadow-sm ${
+                                                    !isApproved ? 'border-gray-200 bg-gray-50' :
+                                                    remainManual === 0 ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
+                                                }`}>
+                                                    <RefreshCw size={11} className={!isApproved ? 'text-gray-300' : remainManual === 0 ? 'text-red-400' : 'text-green-500'} />
+                                                    <span className={`text-[11px] font-black ${!isApproved ? 'text-gray-400' : remainManual === 0 ? 'text-red-500' : 'text-green-700'}`}>
+                                                        {!isApproved ? '점프 잠김' : `수동 ${remainManual}/${jumpCfg.manual}`}
+                                                    </span>
+                                                </div>
+                                                {/* 자동 점프 잔여 (지원 tier + 승인된 광고만) */}
+                                                {jumpCfg.auto > 0 && (
+                                                    <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border shadow-sm ${
+                                                        !isApproved ? 'border-gray-200 bg-gray-50' :
+                                                        autoEnabled ? (remainAuto === 0 ? 'border-orange-200 bg-orange-50' : 'border-blue-200 bg-blue-50') : 'border-gray-200 bg-gray-50'
+                                                    }`}>
+                                                        <Zap size={11} className={!isApproved ? 'text-gray-300' : autoEnabled ? (remainAuto === 0 ? 'text-orange-400' : 'text-blue-500') : 'text-gray-400'} />
+                                                        <span className={`text-[11px] font-black ${!isApproved ? 'text-gray-400' : autoEnabled ? (remainAuto === 0 ? 'text-orange-500' : 'text-blue-600') : 'text-gray-400'}`}>
+                                                            {!isApproved ? '자동 잠김' : autoEnabled ? `${remainAuto}/${jumpCfg.auto}` : 'OFF'}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* 버튼 영역 */}
+                                            <div className="flex flex-wrap gap-1.5 items-center justify-end w-full md:w-auto">
+                                                <button onClick={() => handleAdClick(false, ad)} className="px-3 py-2 border border-blue-200 text-blue-500 text-xs font-bold rounded-lg hover:bg-blue-50 transition">
+                                                    수정
+                                                </button>
+                                                <button
+                                                    onClick={() => onJumpAd?.(String(ad.id))}
+                                                    disabled={!isApproved || remainManual === 0}
+                                                    title={
+                                                        !isApproved ? '관리자 승인 후 점프 이용 가능' :
+                                                        remainManual === 0 ? `오늘 수동 점프 소진 (${jumpCfg.manual}/${jumpCfg.manual}회)` :
+                                                        `수동 점프 (잔여 ${remainManual}회)`
+                                                    }
+                                                    className={`flex items-center gap-1.5 px-3 py-2 text-white text-xs font-black rounded-lg shadow-sm transition active:scale-95 ${
+                                                        !isApproved || remainManual === 0 ? 'bg-gray-400 cursor-not-allowed opacity-60' : 'bg-green-500 hover:bg-green-600'
+                                                    }`}
+                                                >
+                                                    <RefreshCw size={12} />
+                                                    {!isApproved ? '승인대기' : `점프 ${remainManual}/${jumpCfg.manual}`}
+                                                </button>
+                                                {/* 자동 점프 ON/OFF (지원 tier + 승인된 광고만) */}
+                                                {jumpCfg.auto > 0 && (
+                                                    <button
+                                                        onClick={() => isApproved && onToggleAutoJump?.(String(ad.id), !autoEnabled)}
+                                                        disabled={!isApproved}
+                                                        title={!isApproved ? '관리자 승인 후 자동 점프 설정 가능' : autoEnabled ? '자동 점프 끄기' : '자동 점프 켜기'}
+                                                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-black rounded-lg border-2 transition active:scale-95 ${
+                                                            !isApproved ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-60' :
+                                                            autoEnabled ? 'bg-blue-500 border-blue-500 text-white shadow-sm shadow-blue-500/30' :
+                                                            'bg-white border-gray-300 text-gray-500 hover:border-blue-400'
+                                                        }`}
+                                                    >
+                                                        <Zap size={12} /> 자동{autoEnabled ? ' ON' : ' OFF'}
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => onExtendAd?.(ad)}
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-blue-500 text-white text-xs font-black rounded-lg hover:bg-blue-600 shadow-sm transition active:scale-95"
+                                                >
+                                                    <Calendar size={12} /> 연장
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); onDeleteAd?.(ad.id); }}
+                                                    style={{ backgroundColor: '#ef4444', color: 'white', border: '2px solid #dc2626' }}
+                                                    className="px-3 py-2 text-xs font-bold rounded-lg hover:bg-red-600 transition"
+                                                >
+                                                    삭제🔴
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
 
                             {/* Bottom Action Area (Applicants) */}
