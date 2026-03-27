@@ -1111,7 +1111,7 @@ function MyShopContent() {
                     onClose={() => { setShowExtendModal(false); setExtendTargetAd(null); }}
                 />
             )}
-            {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} />}
+            {showDesignModal && <DesignRequestModal brand={brand} onClose={() => setShowDesignModal(false)} user={authUser} shopName={bizShopName || formState.shopName} />}
             {showExampleModal && <ExampleModal show={true} type={exampleType} onClose={() => setShowExampleModal(false)} brand={brand} />}
             {showTemplateModal && (
                 <AdTemplateModal

@@ -4,7 +4,9 @@ import {
     Save,
     Send,
     Paperclip,
-    PenBox
+    PenBox,
+    X,
+    User
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { NoteService } from '@/lib/noteService';
@@ -27,6 +29,14 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
     const [editingWriterName, setEditingWriterName] = useState(false);
     const [tempWriterName, setTempWriterName] = useState('');
     const [isUpdatingWriter, setIsUpdatingWriter] = useState(false);
+    const [memberProfile, setMemberProfile] = useState<any | null>(null);
+
+    const handleViewMember = async (userId: string) => {
+        if (!userId) return;
+        const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+        if (data) setMemberProfile(data);
+        else alert('회원 정보를 찾을 수 없습니다.');
+    };
 
     const handleWriterNameUpdate = async () => {
         if (!selectedInquiry || !tempWriterName.trim() || tempWriterName === selectedInquiry.writer_name) {
@@ -138,6 +148,7 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
     };
 
     return (
+        <>
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 max-w-[1600px] mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[700px]">
                 {/* Message List */}
@@ -307,7 +318,15 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-medium pl-1">
                                         <span className="font-bold text-slate-700">{item.shop_name || item.sender || '정보 없음'}</span>
                                         <span className="w-px h-3 bg-slate-200" />
-                                        <span>{item.user_id || item.sender_id || '-'}</span>
+                                        {(item.user_id || item.sender_id) ? (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleViewMember(item.user_id || item.sender_id); }}
+                                                className="text-blue-500 hover:text-blue-700 hover:underline font-bold flex items-center gap-1"
+                                            >
+                                                <User size={10} />
+                                                {item.user_id?.substring(0, 8) || item.sender_id?.substring(0, 8)}...
+                                            </button>
+                                        ) : <span>-</span>}
                                         <span className="w-px h-3 bg-slate-200" />
                                         <span>{item.contact || item.sender || '-'}</span>
                                     </div>
@@ -540,5 +559,51 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                 </div>
             </div>
         </div>
+
+        {/* Member Info Popup */}
+        {memberProfile && (
+            <div className="fixed inset-0 z-[10030] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md" onClick={() => setMemberProfile(null)} />
+                <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
+                    <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-xl">👤</div>
+                            <div>
+                                <span className="bg-slate-900 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase inline-block mb-1">CRM Profile</span>
+                                <h3 className="text-lg font-black text-slate-950">{memberProfile.full_name || '이름없음'}</h3>
+                            </div>
+                        </div>
+                        <button onClick={() => setMemberProfile(null)} className="p-2 text-slate-300 hover:text-slate-700 transition">
+                            <X size={22} />
+                        </button>
+                    </div>
+                    <div className="p-6 grid grid-cols-2 gap-3">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Login ID</p>
+                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.username || memberProfile.email || '-'}</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone</p>
+                            <p className="text-sm font-bold text-slate-900">{memberProfile.phone || '-'}</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Member Type</p>
+                            <p className="text-sm font-bold text-slate-900">
+                                {memberProfile.role === 'admin' ? '관리자' : (memberProfile.role === 'corporate' ? '기업회원 (사장님)' : '개인회원 (구직자)')}
+                            </p>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Join Date</p>
+                            <p className="text-sm font-bold text-slate-900">{new Date(memberProfile.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div className="col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Email</p>
+                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.email || '-'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
