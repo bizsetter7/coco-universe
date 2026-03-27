@@ -35,22 +35,46 @@ export function PointExchangeView({ setView }: { setView: (v: any) => void }) {
                 </div>
                 <div>
                     <h2 className="text-xl md:text-2xl font-black">포인트 상품권 교환</h2>
-                    <p className={`text-sm font-bold mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>커뮤니티 활동으로 모은 포인트를 진짜 돈으로 바꾸세요!</p>
+                    <p className={`text-sm font-bold mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>2,000P 모으면 2만원 상품권으로 바로 교환!</p>
                 </div>
             </div>
 
             {/* My Points Area */}
-            <div className={`p-6 rounded-3xl mb-8 flex flex-col md:flex-row items-center justify-between gap-4 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                <div>
-                    <h3 className={`text-sm font-black ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>현재 보유 포인트</h3>
-                    <div className="text-3xl font-black text-[#f82b60] mt-1">{userPoints.toLocaleString()} <span className="text-lg">P</span></div>
-                </div>
-                {!canExchange && (
-                    <div className="flex items-center gap-2 text-xs font-bold text-orange-600 bg-orange-50 px-4 py-2 rounded-xl border border-orange-100">
-                        <AlertCircle size={16} />
-                        <span>교환까지 <b>{(2000 - userPoints).toLocaleString()}P</b> 남았습니다!</span>
+            <div className={`p-6 rounded-3xl mb-8 border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h3 className={`text-sm font-black ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>현재 보유 포인트</h3>
+                        <div className="text-3xl font-black text-[#f82b60] mt-1">{userPoints.toLocaleString()} <span className="text-lg">P</span></div>
                     </div>
-                )}
+                    {!canExchange && (
+                        <div className="flex items-center gap-2 text-xs font-bold text-orange-600 bg-orange-50 px-4 py-2 rounded-xl border border-orange-100">
+                            <AlertCircle size={16} />
+                            <span>교환까지 <b>{(2000 - userPoints).toLocaleString()}P</b> 남았습니다!</span>
+                        </div>
+                    )}
+                    {canExchange && (
+                        <div className="flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-4 py-2 rounded-xl border border-green-100">
+                            <Check size={16} />
+                            <span>교환 가능! 상품권을 선택해주세요</span>
+                        </div>
+                    )}
+                </div>
+                {/* 달성률 프로그레스바 */}
+                <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                        <span className={`text-[11px] font-black ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>교환 달성률</span>
+                        <span className="text-[11px] font-black text-[#f82b60]">{Math.min(100, Math.round((userPoints / 2000) * 100))}% · {Math.min(userPoints, 2000).toLocaleString()} / 2,000P</span>
+                    </div>
+                    <div className={`w-full h-3 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                        <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{
+                                width: `${Math.min(100, Math.round((userPoints / 2000) * 100))}%`,
+                                background: canExchange ? 'linear-gradient(90deg, #10b981, #34d399)' : 'linear-gradient(90deg, #f82b60, #fb7185)',
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
 
             {!submitted ? (
