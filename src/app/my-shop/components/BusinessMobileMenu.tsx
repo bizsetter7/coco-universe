@@ -62,9 +62,6 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Home size={18} /> 마이 대시보드
                             </div>
-                            <div onClick={() => { setView('member-edit'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
-                                <User size={18} /> 내 정보수정
-                            </div>
                             <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 이력서 관리
                             </div>
