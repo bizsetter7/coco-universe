@@ -68,6 +68,7 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                                     {selectedAdProduct === p.id && <Award size={16} className={`${p.color.replace('text-', 'text-')} shrink-0`} />}
                                 </div>
                                 <div className="mb-2.5">
+                                    <div className={`text-[9px] md:text-[11px] font-black mb-0.5 opacity-60 ${p.color}`}>{p.code}</div>
                                     <h3 className={`text-[18px] md:text-[24px] font-black leading-tight tracking-tighter ${p.color}`}>{p.tier}</h3>
                                     <div className={`text-[10px] md:text-[12px] font-bold opacity-70 italic ${p.color}`}>{p.eng || ''}</div>
                                 </div>
