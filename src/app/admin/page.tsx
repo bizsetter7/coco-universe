@@ -9,12 +9,9 @@ import {
     CreditCard,
     MessageSquare
 } from 'lucide-react';
-import { useBrand } from '@/components/BrandProvider';
 
 import { Shop } from '@/types/shop';
 import { useAuth } from '@/hooks/useAuth';
-import { SEOIndexingControl } from '@/components/admin/SEOIndexingControl';
-import { CompetitorAnalysis } from '@/components/admin/CompetitorAnalysis';
 import { HealthDashboard } from '@/components/admin/HealthDashboard';
 import { supabase } from '@/lib/supabase';
 import { StandardsGuardView } from './components/StandardsGuardView';
@@ -42,13 +39,13 @@ function AdminContent() {
     const router = useRouter();
     const { isLoggedIn, userType, isLoading } = useAuth();
     // useSearchParams 제거 (Diet)
-    const brand = useBrand();
 
     // --- 1. Core State Section ---
     const [mockAds, setMockAds] = useState<Shop[]>([]);
     const [realUsers, setRealUsers] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
     const [pendingApplications, setPendingApplications] = useState(0);
+    const [healthIssueCount, setHealthIssueCount] = useState(0);
     const [stats, setStats] = useState({
         totalRevenue: 124030000,
         activeAds: 0,
@@ -259,6 +256,25 @@ function AdminContent() {
 
 
 
+
+    // 헬스체크 폴링 (어드민 진입 시 + 5분마다)
+    useEffect(() => {
+        if (!isAuthorized) return;
+
+        const runHealthCheck = async () => {
+            try {
+                const res = await fetch('/api/admin/health', { method: 'GET' });
+                const data = await res.json();
+                setHealthIssueCount(data.issueCount || 0);
+            } catch {
+                setHealthIssueCount(1); // 연결 실패도 이슈로 처리
+            }
+        };
+
+        runHealthCheck();
+        const interval = setInterval(runHealthCheck, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [isAuthorized]);
 
     useEffect(() => {
         if (isAuthorized) {
@@ -499,92 +515,12 @@ function AdminContent() {
             {activeTab === 'applications' && (
                 <AdminApplicationManagement fetchData={fetchData} />
             )}
-            {/* Tab 7: SEO & System Settings */}
+            {/* Tab 7: 시스템 설정 */}
             {activeTab === 'seo' && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-                    {/* SEO Exposure Dashboard */}
-                    <div className="bg-slate-950 rounded-[40px] p-8 md:p-12 text-white overflow-hidden relative border border-slate-800 shadow-2xl">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-
-                        <div className="relative z-10">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Global SEO Visibility</span>
-                                    </div>
-                                    <h3 className="text-3xl font-black tracking-tighter italic">실시간 검색 노출 현황 <span className="text-blue-500">Live</span></h3>
-                                    <p className="text-slate-400 text-sm font-bold mt-2">56개 지역 위성 페이지 및 1.7만건의 공고들이 검색 엔진에 노출 중입니다.</p>
-                                </div>
-                                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-3xl backdrop-blur-md flex items-center gap-4">
-                                    <div className="text-center">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase">Indexing</p>
-                                        <p className="text-xl font-black text-white">98.2%</p>
-                                    </div>
-                                    <div className="w-px h-8 bg-slate-800" />
-                                    <div className="text-center">
-                                        <p className="text-[10px] font-black text-slate-500 uppercase">Keywords</p>
-                                        <p className="text-xl font-black text-blue-500">1,240+</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* Google Snippet Preview */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Google Search Snippet Preview</h4>
-                                    <div className="bg-white rounded-3xl p-6 md:p-8 space-y-2 border border-slate-100 shadow-xl">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <div className="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-[10px] text-slate-500 font-black">C</div>
-                                            <div>
-                                                <p className="text-[11px] text-[#202124] leading-none font-bold">코코알바 - cocoalba.kr</p>
-                                                <p className="text-[10px] text-[#5f6368] leading-none mt-0.5">https://cocoalba.kr › coco › gangnam</p>
-                                            </div>
-                                        </div>
-                                        <h3 className="text-[18px] text-[#1a0dab] hover:underline cursor-pointer leading-tight font-medium">
-                                            강남구 전문 인재 | 엔터프라이즈 인재 솔루션 1위 코코알바 - 엔터프라이즈 보장 & 당일지급
-                                        </h3>
-                                        <p className="text-[13px] text-[#4d5156] leading-relaxed">
-                                            강남구 전지역 전문 인재, 엔터프라이즈 인재 솔루션 정보를 한눈에! 2026년 최신 공고 1,200건 보유. {brand.name}(코코알바)는 가장 빠르고 정확한 구인구직 정보를 제공합니다.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Region Reach Chart (Visual Representation) */}
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-end">
-                                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">Major Region Reach</h4>
-                                        <span className="text-[10px] font-bold text-blue-400">Targeting 56 Cities</span>
-                                    </div>
-                                    <div className="bg-slate-900/50 rounded-3xl p-6 border border-slate-800 space-y-4">
-                                        {[
-                                            { name: '서울/강남', reach: 98, color: 'bg-blue-500' },
-                                            { name: '부산/해운대', reach: 85, color: 'bg-indigo-500' },
-                                            { name: '경기/수원', reach: 72, color: 'bg-blue-500' },
-                                            { name: '인천/송도', reach: 64, color: 'bg-slate-500' }
-                                        ].map((reg, idx) => (
-                                            <div key={idx} className="space-y-1.5">
-                                                <div className="flex justify-between text-[11px] font-black">
-                                                    <span className="text-slate-300">{reg.name}</span>
-                                                    <span className="text-white">{reg.reach}% Optimized</span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                                    <div className={`h-full ${reg.color} transition-all duration-1000`} style={{ width: `${reg.reach}%` }} />
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <SEOIndexingControl />
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
                     <HealthDashboard />
-                    <CompetitorAnalysis />
                 </div>
-            )
-            }
+            )}
 
             {/* Tab 7: System Health / Verification Center */}
             {

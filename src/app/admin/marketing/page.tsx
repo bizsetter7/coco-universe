@@ -3,7 +3,7 @@
 import React, { useState, cloneElement } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMarketingTargets, updateMarketingTarget, sendCampaignMessage, uploadMarketingTargets, deleteMarketingTarget, deleteMarketingTargets, getUploadHistory, removeMarketingTargetLink, deleteUploadBatch, updateUploadBatchName, MarketingTarget } from '@/services/marketingService';
-import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle, Megaphone, Zap } from 'lucide-react';
+import { Send, Users, Filter, Plus, MessageSquare, RefreshCw, Upload, FileDown, Trash2, ArrowUpDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ExternalLink, X, Edit2, CheckSquare, AlertCircle, Megaphone, Zap, WifiOff, Wifi } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { REGION_DATA, INDUSTRY_DATA } from '@/constants/marketing-data';
 
@@ -80,16 +80,38 @@ export default function MarketingPage() {
         queryFn: () => getUploadHistory(),
     });
 
+    // 카카오 연결 상태 확인
+    const { data: kakaoStatus } = useQuery({
+        queryKey: ['kakao-status'],
+        queryFn: async () => {
+            const res = await fetch('/api/marketing/kakao');
+            return res.json() as Promise<{ connected: boolean; isMock: boolean; message: string }>;
+        },
+        staleTime: 1000 * 60 * 5, // 5분 캐시
+    });
+
+    // 발송 시 전체 타겟 fetch (현재 필터 기준 전체, 페이지 무관)
+    const fetchAllTargets = async () => {
+        return getMarketingTargets({
+            ...filters,
+            page: 1,
+            limit: 10000,
+            orderBy: sortConfig.key,
+            orderAsc: sortConfig.asc,
+        });
+    };
+
     // --- Mutations ---
     const sendMutation = useMutation({
         mutationFn: async (campaign: { title: string; message_content: string; channel: "sms" | "lms" | "kakao" | "telegram" }) => {
-            if (!data?.data || data.data.length === 0) throw new Error('No targets selected');
-            return sendCampaignMessage(campaign, data.data);
+            const allData = await fetchAllTargets();
+            if (!allData?.data || allData.data.length === 0) throw new Error('발송 대상이 없습니다.');
+            return sendCampaignMessage(campaign, allData.data);
         },
         onSuccess: () => {
             toast.success('캠페인 발송이 완료되었습니다!');
             setShowSendModal(false);
-            queryClient.invalidateQueries({ queryKey: ['marketing-campaigns'] }); // If we had a campaign list
+            queryClient.invalidateQueries({ queryKey: ['marketing-campaigns'] });
         },
         onError: (err: Error) => {
             toast.error(`발송 실패: ${err.message}`);
@@ -302,7 +324,8 @@ export default function MarketingPage() {
 
     const handleSendSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!confirm(`정말로 ${data?.count || 0}명의 대상에게 ${campaignForm.channel.toUpperCase()} 메시지를 발송하시겠습니까?`)) return;
+        const mockLabel = (campaignForm.channel === 'kakao' && kakaoStatus?.isMock) ? ' [Mock 모드]' : '';
+        if (!confirm(`필터 조건에 해당하는 전체 ${data?.count || 0}명에게 ${campaignForm.channel.toUpperCase()} 메시지를 발송합니다.${mockLabel}\n\n계속하시겠습니까?`)) return;
 
         sendMutation.mutate({
             title: campaignForm.title,
@@ -330,6 +353,15 @@ export default function MarketingPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3 ml-11 md:ml-0">
+                    {/* 카카오 연결 상태 배지 */}
+                    <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-black border ${kakaoStatus?.connected ? 'bg-yellow-50 border-yellow-200 text-yellow-700' : 'bg-slate-100 border-slate-200 text-slate-400'}`}
+                        title={kakaoStatus?.message}>
+                        {kakaoStatus?.connected
+                            ? <><Wifi size={13} /> 카카오 연결됨</>
+                            : <><WifiOff size={13} /> 카카오 미연결</>
+                        }
+                    </div>
+
                     <button
                         onClick={() => refetch()}
                         className="p-2.5 text-slate-400 hover:text-blue-600 rounded-xl hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
@@ -813,7 +845,7 @@ export default function MarketingPage() {
                                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">캠페인 통합 발송</h3>
                                 </div>
                                 <p className="text-slate-500 text-sm font-bold ml-11">
-                                    <span className="text-blue-600 font-black">{data?.count || 0}건</span>의 선택된 고객군에게 즉시 전송합니다.
+                                    현재 필터 기준 <span className="text-blue-600 font-black">{(data?.count || 0).toLocaleString()}명 전체</span>에게 즉시 전송합니다.
                                 </p>
                             </div>
 
@@ -832,21 +864,36 @@ export default function MarketingPage() {
                                 <div className="space-y-2">
                                     <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Delivery Channel</label>
                                     <div className="flex gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-200">
-                                        {['SMS', 'LMS', 'Kakao', 'Telegram'].map(ch => (
-                                            <label key={ch} className={`flex-1 px-3 py-2.5 rounded-xl text-center text-[11px] font-black cursor-pointer transition-all ${campaignForm.channel.toLowerCase() === ch.toLowerCase()
-                                                ? 'bg-slate-950 text-white shadow-lg'
-                                                : 'text-slate-400 hover:text-slate-600 hover:bg-white'}`}>
+                                        {[
+                                            { label: 'SMS', value: 'sms' },
+                                            { label: 'LMS', value: 'lms' },
+                                            { label: 'Kakao', value: 'kakao' },
+                                            { label: 'Telegram', value: 'telegram', disabled: true },
+                                        ].map(ch => (
+                                            <label key={ch.value} className={`flex-1 px-3 py-2.5 rounded-xl text-center text-[11px] font-black transition-all relative
+                                                ${ch.disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
+                                                ${campaignForm.channel === ch.value ? 'bg-slate-950 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600 hover:bg-white'}`}>
                                                 <input
                                                     type="radio" className="hidden"
                                                     name="channel"
-                                                    value={ch.toLowerCase()}
-                                                    checked={campaignForm.channel.toLowerCase() === ch.toLowerCase()}
+                                                    value={ch.value}
+                                                    disabled={ch.disabled}
+                                                    checked={campaignForm.channel === ch.value}
                                                     onChange={(e) => setCampaignForm({ ...campaignForm, channel: e.target.value })}
                                                 />
-                                                {ch}
+                                                {ch.label}
                                             </label>
                                         ))}
                                     </div>
+                                    {/* 카카오 미연결 경고 */}
+                                    {campaignForm.channel === 'kakao' && kakaoStatus?.isMock && (
+                                        <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-xs font-bold text-yellow-700">
+                                            <WifiOff size={14} className="shrink-0 mt-0.5" />
+                                            <span>카카오 채널 미연결 상태입니다. Mock 모드로 실행됩니다.<br />
+                                                <span className="font-black">Vercel 환경변수</span>에 KAKAO_SENDER_KEY · KAKAO_APP_KEY · KAKAO_TEMPLATE_CODE를 설정하면 즉시 활성화됩니다.
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">

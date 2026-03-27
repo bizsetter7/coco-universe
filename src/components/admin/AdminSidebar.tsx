@@ -26,6 +26,7 @@ interface AdminSidebarProps {
         payments?: number;
         business?: number;
         applications?: number;
+        health?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -138,6 +139,7 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     icon={<ShieldCheck size={20} className="text-emerald-500" />}
                     label="시스템 검증 센터"
                     active={activeTab === 'health'}
+                    badge={counts?.health}
                     onClick={() => router.push('/admin/system-verification')}
                 />
                 <NavItem
@@ -229,6 +231,7 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         icon={<ShieldCheck size={20} className="text-emerald-500" />}
                         label="시스템 검증 센터"
                         active={activeTab === 'health'}
+                        badge={counts?.health}
                         onClick={() => { router.push('/admin/system-verification'); onClose(); }}
                     />
                     <NavItem

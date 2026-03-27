@@ -12,7 +12,14 @@ import {
     Lock,
     Cpu,
     Server,
-    Search
+    FileText,
+    Clock,
+    MessageSquare,
+    CreditCard,
+    Phone,
+    MessageCircle,
+    Tag,
+    ShieldCheck
 } from 'lucide-react';
 
 interface HealthStatus {
@@ -69,18 +76,36 @@ export const HealthDashboard = () => {
     const getComponentIcon = (id: string) => {
         switch (id) {
             case 'supabase': return <Database size={18} />;
+            case 'db_points': return <Database size={18} />;
+            case 'db_point_logs': return <Database size={18} />;
+            case 'db_applications': return <Database size={18} />;
+            case 'title_length': return <FileText size={18} />;
+            case 'pending_ads': return <Clock size={18} />;
+            case 'unanswered_inquiries': return <MessageSquare size={18} />;
+            case 'pending_payments': return <CreditCard size={18} />;
+            case 'env_sms': return <Phone size={18} />;
+            case 'env_kakao': return <MessageCircle size={18} />;
             case 'portone': return <Lock size={18} />;
-            case 'env': return <Server size={18} />;
+            case 'standards': return <Tag size={18} />;
             case 'normalization': return <Cpu size={18} />;
             default: return <Activity size={18} />;
         }
     };
 
-    const labelMap: any = {
+    const labelMap: Record<string, string> = {
         supabase: 'Supabase DB 연결',
-        portone: '포트원 API 설정 (기업전용인증)',
-        env: 'Vercel 환경 변수 상태',
-        normalization: '데이터 처리 엔진 (Normalization)'
+        db_points: 'DB 스키마 — profiles.points',
+        db_point_logs: 'DB 스키마 — point_logs 테이블',
+        db_applications: 'DB 스키마 — applications 테이블',
+        title_length: '공고 제목 26자 규격',
+        pending_ads: '심사 대기 광고 (24h+)',
+        unanswered_inquiries: '미답변 문의 (24h+)',
+        pending_payments: '결제 미처리 (72h+)',
+        env_sms: 'SMS 환경변수 (알리고)',
+        env_kakao: '카카오 알림톡 환경변수',
+        portone: '포트원 결제 설정',
+        standards: '급여 뱃지 표준 (약어·색상)',
+        normalization: '데이터 정규화 엔진',
     };
 
     return (
@@ -142,39 +167,6 @@ export const HealthDashboard = () => {
                         )}
                     </div>
                 ))}
-
-                {/* [AI Insight] 사용자 지시: standards 카드 바로 옆 빈 공간(Captured Spot)에 배치 */}
-                {!loading && status && (
-                    <div className="p-6 rounded-3xl border border-slate-100 bg-white transition-all hover:shadow-xl hover:shadow-slate-200/50 flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center font-black text-[10px]">
-                                    AI
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-black text-slate-950 tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">AI 시스템 분석 및 가이드</h3>
-                                    <p className="text-[9px] text-slate-400 font-bold">시스템 유지보수 포인트 분석 완료</p>
-                                </div>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-blue-500 bg-white px-1.5 py-0.5 rounded border border-blue-100">TIP</span>
-                                        <span className="text-[11px] font-bold text-slate-700">포트원 기업전용인증 연동 오류 해결 가이드</span>
-                                    </div>
-                                    <RefreshCw size={12} className="text-slate-300 group-hover:text-blue-500 transition-all" />
-                                </div>
-                                <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-emerald-500 bg-white px-1.5 py-0.5 rounded border border-emerald-100">SAFE</span>
-                                        <span className="text-[11px] font-bold text-slate-700">Supabase RLS 보안 정책 가이드</span>
-                                    </div>
-                                    <RefreshCw size={12} className="text-slate-300 group-hover:text-blue-500 transition-all" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {loading && !status && [1, 2, 3, 4].map(i => (
                     <div key={i} className="h-40 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse" />

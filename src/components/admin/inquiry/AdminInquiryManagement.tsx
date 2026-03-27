@@ -446,9 +446,12 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                                                            <button
+                                                                onClick={() => handleViewMember(selectedInquiry.user_id || selectedInquiry.targetUserId)}
+                                                                className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-indigo-400 transition-colors underline-offset-2 hover:underline"
+                                                            >
                                                                 {selectedInquiry.writer_name || selectedInquiry.sender || 'Unknown'}
-                                                            </span>
+                                                            </button>
                                                             <button
                                                                 onClick={() => {
                                                                     setTempWriterName(selectedInquiry.writer_name || '');

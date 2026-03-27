@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase as supabaseAdmin } from '@/lib/supabase';
 import { sendSMS, isSMSMock } from '@/lib/sms';
+import { sendKakaoAlimtalk, isKakaoMock } from '@/lib/kakao';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,49 +17,66 @@ export async function POST(request: Request) {
             );
         }
 
-        // ── Mock 모드 판단 ────────────────────────────────────────────────
-        // lib/sms.ts 의 isSMSMock(환경변수 누락 여부)를 단일 진실 공급원으로 사용.
-        // SOLAPI_* 참조 완전 제거 → ALIGO_* 기반으로 통일.
-        const isMock = isSMSMock;
-
-        // ── 발송 ─────────────────────────────────────────────────────────
+        // ── 채널별 발송 분기 ─────────────────────────────────────────────
         let successCount = 0;
         let failedCount  = 0;
         let errorMsg     = '';
+        let isMock       = false;
+        let provider     = '';
 
         try {
-            const phoneNumbers: string[] = targets
-                .map((t: any) => t.phone_number as string)
-                .filter((p: string) => p?.trim());
+            if (channel === 'kakao') {
+                // ── 카카오 알림톡 ────────────────────────────────────────
+                isMock    = isKakaoMock;
+                provider  = 'kakao';
 
-            if (phoneNumbers.length > 0) {
-                const result = await sendSMS(phoneNumbers, message, {
-                    // LMS 채널이면 제목 주입 (90자 이하도 LMS 강제)
-                    title   : channel === 'lms' ? '[코코알바]' : undefined,
-                    // ALIGO_TEST_MODE=true 이면 testmode_yn=Y → 과금 없음
-                    testmode: process.env.ALIGO_TEST_MODE === 'true',
-                });
+                const kakaoMessages = targets
+                    .filter((t: any) => t.phone_number?.trim())
+                    .map((t: any) => ({ to: t.phone_number, content: message }));
 
+                const result = await sendKakaoAlimtalk(kakaoMessages);
                 if (result.success) {
-                    switch (result.type) {
-                        case 'mock':
-                        case 'aligo-test':
-                            // Mock 또는 알리고 테스트 모드: 전원 성공 처리
-                            successCount = phoneNumbers.length;
-                            break;
-                        default:
-                            // 실제 발송: 알리고 집계값 사용
-                            successCount = result.successCount ?? 0;
-                            failedCount  = result.failCount    ?? 0;
-                    }
-                    // 부분 실패 경고 (성공이지만 일부 오류)
-                    if (result.error) {
-                        console.warn('[API/marketing/send] 부분 실패:', result.error);
-                        errorMsg = result.error;
-                    }
+                    successCount = result.successCount ?? 0;
+                    failedCount  = result.failCount    ?? 0;
+                    if (result.error) errorMsg = result.error;
                 } else {
-                    failedCount = phoneNumbers.length;
-                    errorMsg    = result.error || '알리고 발송 실패';
+                    failedCount = kakaoMessages.length;
+                    errorMsg    = result.error || '카카오 알림톡 발송 실패';
+                }
+
+            } else {
+                // ── SMS / LMS (알리고) ────────────────────────────────────
+                isMock   = isSMSMock;
+                provider = 'aligo';
+
+                const phoneNumbers: string[] = targets
+                    .map((t: any) => t.phone_number as string)
+                    .filter((p: string) => p?.trim());
+
+                if (phoneNumbers.length > 0) {
+                    const result = await sendSMS(phoneNumbers, message, {
+                        title   : channel === 'lms' ? '[코코알바]' : undefined,
+                        testmode: process.env.ALIGO_TEST_MODE === 'true',
+                    });
+
+                    if (result.success) {
+                        switch (result.type) {
+                            case 'mock':
+                            case 'aligo-test':
+                                successCount = phoneNumbers.length;
+                                break;
+                            default:
+                                successCount = result.successCount ?? 0;
+                                failedCount  = result.failCount    ?? 0;
+                        }
+                        if (result.error) {
+                            console.warn('[API/marketing/send] 부분 실패:', result.error);
+                            errorMsg = result.error;
+                        }
+                    } else {
+                        failedCount = phoneNumbers.length;
+                        errorMsg    = result.error || '알리고 발송 실패';
+                    }
                 }
             }
         } catch (e: any) {
@@ -82,7 +100,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success : true,
             isMock,
-            provider: 'aligo',
+            provider,
             summary : {
                 total  : targets.length,
                 success: successCount,

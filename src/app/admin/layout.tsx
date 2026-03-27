@@ -41,7 +41,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         inquiries: 0,
         payments: 0,
         business: 0,
-        applications: 0
+        applications: 0,
+        health: 0
     });
 
     const fetchCounts = React.useCallback(async () => {
@@ -85,12 +86,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'pending');
 
+            // Health check (경량 GET)
+            let healthCount = 0;
+            try {
+                const healthRes = await fetch('/api/admin/health', { method: 'GET' });
+                const healthData = await healthRes.json();
+                healthCount = healthData.issueCount || 0;
+            } catch { healthCount = 1; }
+
             setCounts({
                 ads: (adsCount || 0) + localPendingAds,
                 inquiries: inqCount || 0,
                 payments: payCount || 0,
                 business: bizCount || 0,
-                applications: appCount || 0
+                applications: appCount || 0,
+                health: healthCount
             });
         } catch (e) {
             console.error('Error fetching admin counts:', e);
