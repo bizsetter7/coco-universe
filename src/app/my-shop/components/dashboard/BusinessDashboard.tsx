@@ -325,9 +325,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                 >
                                     온라인 인재관리
                                 </button>
-                                <div className="flex gap-4 text-[13px] font-black">
-                                    <span className="flex items-center gap-1.5 text-blue-500 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-full"><User size={14} /> 지원자 {ad.applicantCount || 0}</span>
-                                </div>
+                                <div className="flex gap-4 text-[13px] font-black"></div>
                             </div>
                         </div>
                     ))

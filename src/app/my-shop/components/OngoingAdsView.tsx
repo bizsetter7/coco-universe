@@ -141,12 +141,6 @@ export const OngoingAdsView = ({
                                                 <span className="text-gray-400">마감일</span>
                                                 <span className="text-gray-600 font-black">{ad.deadline || '상시채용'}</span>
                                             </div>
-                                            <div className="h-4 w-px bg-gray-200 hidden md:block" />
-                                            <div className="flex items-center gap-1.5">
-                                                <User size={14} className="text-blue-500" />
-                                                <span className="text-gray-400">지원자</span>
-                                                <span className="text-blue-600 font-black">{ad.applicantCount || 0}</span>
-                                            </div>
                                         </div>
                                     </div>
 
