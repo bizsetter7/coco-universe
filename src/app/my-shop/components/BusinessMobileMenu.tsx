@@ -56,64 +56,64 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                     )}
                 </div>
 
-                <nav className={`mt-6 space-y-1 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <nav className={`mt-4 space-y-0.5 text-sm font-bold ${brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     {userType === 'individual' ? (
                         <>
-                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Home size={18} /> 마이 대시보드
                             </div>
-                            <div onClick={() => { setView('resume-list'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('resume-list'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 이력서 관리
                             </div>
-                            <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('scrap-jobs'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Star size={18} /> 채용정보 스크랩
                             </div>
-                            <div onClick={() => { setView('point-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('point-history'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Coins size={18} /> 포인트 및 점프 내역
                             </div>
-                            <div onClick={() => { setView('point-exchange'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('point-exchange'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Gift size={18} /> 포인트 상품권 교환
                             </div>
-                            <div onClick={() => { setView('payment-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('payment-history'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <CreditCard size={18} /> 유료 결제 내역
                             </div>
-                            <div onClick={() => { setView('excluded-shops'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('excluded-shops'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <AlertTriangle size={18} /> 열람불가 업소설정
                             </div>
-                            <div onClick={() => { setView('custom-jobs'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('custom-jobs'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Briefcase size={18} /> 맞춤구인정보
                             </div>
-                            <div onClick={() => { setView('my-posts'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('my-posts'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <FileText size={18} /> 내가 작성한 게시글
                             </div>
-                            <div onClick={() => { setView('block-settings'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('block-settings'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Shield size={18} /> 회원 차단 설정
                             </div>
                         </>
                     ) : (
                         <>
-                            <div onClick={() => { setView('dashboard'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('dashboard'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <List size={18} /> 진행중인 공고
                             </div>
-                            <div onClick={() => { setView('closed-ads'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('closed-ads'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <LogOut size={18} /> 마감된 공고
                             </div>
-                            <div onClick={() => { setView('applicants'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('applicants'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <User size={18} /> 지원자 관리
                             </div>
-                            <div onClick={() => { setView('sos-alert'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-red-50 rounded-xl transition cursor-pointer text-red-500 font-black">
+                            <div onClick={() => { setView('sos-alert'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-red-50 rounded-xl transition cursor-pointer text-red-500 font-black">
                                 <Zap size={18} /> SOS 긴급구인
                             </div>
-                            <div onClick={() => { setView('buy-points'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('buy-points'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Wallet size={18} /> 추가옵션안내
                             </div>
-                            <div onClick={() => { setView('payments'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('payments'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <CreditCard size={18} /> 유료 결제 내역
                             </div>
-                            <div onClick={() => { setView('point-history'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                            <div onClick={() => { setView('point-history'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Coins size={18} /> 포인트 및 점프 내역
                             </div>
-                            <div onClick={() => { setView('member-info'); onClose(); }} className="p-4 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1 pt-3">
+                            <div onClick={() => { setView('member-info'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1">
                                 <Settings size={18} /> 회원 정보 수정
                             </div>
                         </>
