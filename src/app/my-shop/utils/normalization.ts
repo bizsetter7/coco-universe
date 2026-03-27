@@ -25,6 +25,8 @@ export const normalizeAd = (ad: any) => {
     // root 컬럼이 비어있으면 options Snapshot에서 즉시 복구합니다.
     const normalized = {
         id: ad.id,
+        user_id: ad.user_id || ad.options?.user_id || '',
+        created_at: ad.created_at || '',
         // 제목
         title: getValid(ad.title, opt.title, '제목 없음'),
         jobTitle: getValid(ad.title, opt.title, '제목 없음'),
@@ -140,6 +142,9 @@ export const normalizePayment = (p: any, defaultUserName: string = '관리자') 
         regionGu: opt.regionGu || adMetadata.work_region_sub || '',
         category: opt.category || adMetadata.category || '업종',
         categorySub: opt.categorySub || adMetadata.category_sub || '',
+        deadline: opt.deadline || adMetadata.deadline || p.deadline || '',
+        status: opt.status || adMetadata.status || p.status || 'pending',
+        approved_at: p.approved_at || adMetadata.approved_at || '',
         options: opt,
         productType: opt.product_type || adMetadata.ad_type || '그랜드'
     };
@@ -154,7 +159,7 @@ export const normalizePayment = (p: any, defaultUserName: string = '관리자') 
         })(),
         method: p.method,
         status: p.status,
-        date: new Date(p.created_at || Date.now()).toLocaleString(),
+        date: p.created_at || new Date().toISOString(),
         description: p.description,
         type: opt.product_type || adMetadata.ad_type || p.ad_type || 'AD',
         nickname: finalAdObject.nickname,

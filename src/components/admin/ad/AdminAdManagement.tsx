@@ -73,12 +73,29 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 updateData.rejection_reason = reason;
             }
 
+            // 1. Update shops table
             const { error } = await supabase
                 .from('shops')
                 .update(updateData)
                 .eq('id', adId);
 
             if (error) throw error;
+
+            // 2. Update payments table if approving (status = 'active')
+            if (newStatus === 'active' && ad) {
+                const paymentId = (ad as any).payment_id || (ad as any).paymentId;
+                if (paymentId) {
+                    const { error: payError } = await supabase
+                        .from('payments')
+                        .update({ status: 'completed', updated_at: nowIso })
+                        .eq('id', paymentId);
+
+                    if (payError) {
+                        console.error('Payment update failed:', payError);
+                        // 수정: payments 업데이트 실패해도 shops는 이미 업데이트됨. 계속 진행.
+                    }
+                }
+            }
 
             // [New] Create notification and update history for rejected ads
             if (newStatus === 'rejected' && ad) {

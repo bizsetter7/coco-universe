@@ -6,6 +6,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { AUDIT_MODE } from '@/lib/brand-config';
+import { supabase } from '@/lib/supabase';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
@@ -166,6 +167,19 @@ export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGat
             // 아이디 입력 시 @cocoalba.kr 이메일로 변환 (LoginPage와 동일한 로직)
             const email = targetId.includes('@') ? targetId : `${targetId}@cocoalba.kr`;
             await signIn(email, pw);
+
+            // 로그인 타입 불일치 경고
+            try {
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+                if (authUser) {
+                    const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
+                    const actualRole = profile?.role || 'individual';
+                    if (loginType !== actualRole) {
+                        alert(`로그인은 성공했지만, 회원 구분이 다릅니다.\n선택: ${loginType === 'corporate' ? '기업회원' : '개인회원'} / 실제: ${actualRole === 'corporate' ? '기업회원' : '개인회원'}\n올바른 탭을 선택해주세요.`);
+                    }
+                }
+            } catch (_) { /* 경고 실패 시 로그인은 계속 진행 */ }
+
             onVerify();
         } catch (err: any) {
             alert(`로그인 실패: ${err.message}`);

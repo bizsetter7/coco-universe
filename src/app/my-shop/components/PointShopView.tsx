@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { BrandConfig } from '@/lib/brand-config';
 import { Zap, RefreshCw, Check, Copy, ExternalLink, AlertCircle, ChevronRight, X, Info } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface PointShopViewProps {
     brand: BrandConfig;
@@ -49,14 +50,34 @@ export function PointShopView({ brand, shopName, userId, onOpenMenu }: PointShop
         setShowConfirm(true);
     };
 
-    const handleFinalSubmit = () => {
-        if (activeTab === 'sos') {
-            const pkg = SOS_PACKAGES.find(p => p.id === selectedSosId);
-            if (pkg) setSubmittedPkg(pkg);
-        } else {
-            const pkg = JUMP_PACKAGES.find(p => p.id === selectedJumpId);
-            if (pkg) setSubmittedPkg(pkg);
+    const handleFinalSubmit = async () => {
+        const pkg = activeTab === 'sos'
+            ? SOS_PACKAGES.find(p => p.id === selectedSosId)
+            : JUMP_PACKAGES.find(p => p.id === selectedJumpId);
+        if (!pkg) return;
+
+        // DB에 충전 신청 기록
+        if (userId) {
+            const isPoint = 'points' in pkg;
+            const chargeDesc = isPoint
+                ? `SOS 포인트 충전 ${(pkg as any).points}P (${pkg.price.toLocaleString()}원)`
+                : `점프 서비스 충전 ${(pkg as any).count}회 (${pkg.price.toLocaleString()}원)`;
+            await supabase.from('payments').insert([{
+                user_id: userId,
+                amount: pkg.price,
+                status: 'pending',
+                method: 'bank_transfer',
+                description: chargeDesc,
+                metadata: {
+                    type: isPoint ? 'point_charge' : 'jump_charge',
+                    packageId: pkg.id,
+                    shopName,
+                    ...(isPoint ? { points: (pkg as any).points } : { count: (pkg as any).count })
+                }
+            }]);
         }
+
+        setSubmittedPkg(pkg);
         setShowConfirm(false);
     };
 

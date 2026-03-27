@@ -22,7 +22,7 @@ import BusinessDashboard from './components/dashboard/BusinessDashboard';
 import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
-import { normalizeAd, normalizePayment } from './utils';
+import { normalizeAd, normalizePayment } from './utils/normalization';
 import { getJumpConfig } from './constants';
 
 // --- Components (Refactored) ---

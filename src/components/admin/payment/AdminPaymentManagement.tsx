@@ -12,32 +12,75 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
         if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
 
         try {
-            // 1. Payment Status Change
             const { error: payError } = await supabase
                 .from('payments')
                 .update({ status: 'completed', updated_at: new Date().toISOString() })
                 .eq('id', paymentId);
-
             if (payError) throw payError;
 
-            // 2. Shop Status Change (Optional)
             if (shopId) {
                 const { error: shopError } = await supabase
                     .from('shops')
-                    .update({
-                        status: 'active',
-                        approved_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    })
+                    .update({ status: 'active', approved_at: new Date().toISOString(), updated_at: new Date().toISOString() })
                     .eq('id', shopId);
-
                 if (shopError) console.error("Ad auto-approval failed:", shopError);
             }
 
             alert('결제 승인 및 광고 게시 처리가 완료되었습니다.');
-            fetchData(); // Refresh
+            fetchData();
         } catch (err) {
             console.error('Payment confirmation error:', err);
+            alert('오류가 발생했습니다.');
+        }
+    };
+
+    // 포인트/점프 충전 지급 처리
+    const handlePointGrant = async (paymentId: string, userId: string, metadata: any) => {
+        const isPoint = metadata?.type === 'point_charge';
+        const typeLabel = isPoint ? '포인트' : '점프 서비스';
+        const amount = isPoint ? metadata?.points : metadata?.count;
+        if (!confirm(`${typeLabel} ${amount?.toLocaleString()}${isPoint ? 'P' : '회'} 지급하시겠습니까?`)) return;
+
+        try {
+            const now = new Date().toISOString();
+
+            // 1. payments 완료 처리
+            const { error: payError } = await supabase
+                .from('payments')
+                .update({ status: 'completed', updated_at: now })
+                .eq('id', paymentId);
+            if (payError) throw payError;
+
+            // 2. profiles 포인트/점프 차감
+            const field = isPoint ? 'points' : 'jump_balance';
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select(field)
+                .eq('id', userId)
+                .single();
+
+            const current = (profile as any)?.[field] || 0;
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ [field]: current + Number(amount), updated_at: now })
+                .eq('id', userId);
+            if (profileError) throw profileError;
+
+            // 3. point_logs 기록
+            if (isPoint) {
+                await supabase.from('point_logs').insert([{
+                    user_id: userId,
+                    amount: Number(amount),
+                    reason: 'POINT_CHARGE',
+                    description: `포인트 충전 (관리자 지급)`,
+                    created_at: now
+                }]);
+            }
+
+            alert(`${typeLabel} 지급 완료!`);
+            fetchData();
+        } catch (err) {
+            console.error('Point grant error:', err);
             alert('오류가 발생했습니다.');
         }
     };
@@ -75,7 +118,14 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                             payments.map((pay) => (
                                 <tr key={pay.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                                     <td className="px-8 py-4">
-                                        <div className="text-sm font-black text-slate-900">{pay.metadata?.adTitle || pay.description || '광고 결제'}</div>
+                                        <div className="flex items-center gap-2">
+                                            {(pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') && (
+                                                <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-purple-100 text-purple-600 shrink-0">
+                                                    {pay.metadata?.type === 'point_charge' ? '포인트충전' : '점프충전'}
+                                                </span>
+                                            )}
+                                            <div className="text-sm font-black text-slate-900">{pay.metadata?.adTitle || pay.description || '광고 결제'}</div>
+                                        </div>
                                         <div className="text-[10px] text-slate-400 font-bold">Ref: {pay.id.substring(0, 8)}</div>
                                     </td>
                                     <td className="px-8 py-4">
@@ -96,12 +146,21 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                                     </td>
                                     <td className="px-8 py-4 text-right">
                                         {pay.status !== 'completed' && (
-                                            <button
-                                                onClick={() => handlePaymentConfirm(pay.id, pay.shop_id)}
-                                                className="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-lg font-black hover:bg-blue-700 transition"
-                                            >
-                                                승인하기
-                                            </button>
+                                            (pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') ? (
+                                                <button
+                                                    onClick={() => handlePointGrant(pay.id, pay.user_id, pay.metadata)}
+                                                    className="text-[10px] bg-purple-600 text-white px-3 py-1.5 rounded-lg font-black hover:bg-purple-700 transition"
+                                                >
+                                                    포인트 지급
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handlePaymentConfirm(pay.id, pay.shop_id)}
+                                                    className="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-lg font-black hover:bg-blue-700 transition"
+                                                >
+                                                    승인하기
+                                                </button>
+                                            )
                                         )}
                                     </td>
                                 </tr>
