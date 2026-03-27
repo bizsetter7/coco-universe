@@ -80,19 +80,33 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
 
             if (error) throw error;
 
-            // 2. Update payments table if approving (status = 'active')
+            // 2. 승인 시 payments 레코드 생성/업데이트 (결제 내역 관리에 표시되도록)
             if (newStatus === 'active' && ad) {
-                const paymentId = (ad as any).payment_id || (ad as any).paymentId;
-                if (paymentId) {
-                    const { error: payError } = await supabase
+                const { data: existingPayments } = await supabase
+                    .from('payments')
+                    .select('id')
+                    .eq('shop_id', adId);
+
+                if (existingPayments && existingPayments.length > 0) {
+                    await supabase
                         .from('payments')
                         .update({ status: 'completed', updated_at: nowIso })
-                        .eq('id', paymentId);
-
-                    if (payError) {
-                        console.error('Payment update failed:', payError);
-                        // 수정: payments 업데이트 실패해도 shops는 이미 업데이트됨. 계속 진행.
-                    }
+                        .eq('shop_id', adId);
+                } else {
+                    const adPrice = Number((ad as any).ad_price || (ad as any).adPrice || 0);
+                    const userId = (ad as any).user_id || ad.ownerId;
+                    await supabase.from('payments').insert([{
+                        shop_id: adId,
+                        user_id: userId,
+                        amount: adPrice,
+                        status: 'completed',
+                        method: 'bank_transfer',
+                        description: ad.title || '광고 결제',
+                        depositor_name: (ad as any).shopName || ad.name || '',
+                        metadata: { adTitle: ad.title, type: 'ad_payment' },
+                        created_at: nowIso,
+                        updated_at: nowIso,
+                    }]);
                 }
             }
 
