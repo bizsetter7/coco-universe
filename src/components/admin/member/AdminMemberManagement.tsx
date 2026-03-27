@@ -44,8 +44,8 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
 
     const effectiveUsers = (users && users.length > 0) ? users : mockUsers;
     const filteredUsers = effectiveUsers
-        .filter(u => filter === 'all' || u.type === filter || (filter === 'corporate' && u.role === 'seller') || (filter === 'individual' && u.role === 'user'))
-        .filter(u => !search || (u.name || u.full_name || '').includes(search) || (u.loginId || u.email || '').includes(search));
+        .filter(u => filter === 'all' || u.role === filter || u.type === filter)
+        .filter(u => !search || (u.name || u.full_name || '').includes(search) || (u.username || u.loginId || u.email || '').includes(search) || (u.phone || '').includes(search));
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -98,7 +98,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                                 </div>
                                                 <div>
                                                     <div className="text-sm font-black text-slate-900">{user.name || user.full_name || '이름없음'}</div>
-                                                    <div className="text-[10px] font-bold text-slate-400">@{user.loginId || user.email?.split('@')[0]} ({user.nickname || '닉네임없음'})</div>
+                                                    <div className="text-[10px] font-bold text-slate-400">@{user.username || user.loginId || user.email?.split('@')[0] || '-'} ({user.nickname || '닉네임없음'})</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -111,7 +111,9 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                             <span className={`px-2 py-0.5 rounded-md text-[9px] font-black ${user.status === 'blocked' ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}`}>
                                                 {user.status === 'blocked' ? '차단됨' : '활동중'}
                                             </span>
-                                            <span className="ml-2 text-[10px] font-bold text-slate-500">{user.type === 'corporate' || user.role === 'seller' ? '기업회원' : '개인회원'}</span>
+                                            <span className="ml-2 text-[10px] font-bold text-slate-500">
+                                                {user.role === 'admin' ? '관리자' : (user.role === 'corporate' || user.type === 'corporate' ? '기업회원' : '개인회원')}
+                                            </span>
                                             {/* [Admin Feature] Show Ad Count if possible (simplified badge) */}
                                             <span className="ml-2 px-1.5 py-0.5 bg-indigo-50 text-indigo-500 rounded text-[9px] font-black">Ad: {user.ad_count || 0}</span>
                                         </td>
@@ -199,7 +201,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Login ID / Email</p>
-                                    <p className="text-sm font-bold text-slate-900 text-wrap break-all">{selectedUser.loginId || selectedUser.email}</p>
+                                    <p className="text-sm font-bold text-slate-900 text-wrap break-all">{selectedUser.username || selectedUser.loginId || selectedUser.email || '-'}</p>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone Number</p>
@@ -207,7 +209,9 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Member Type</p>
-                                    <p className="text-sm font-bold text-slate-900">{selectedUser.role === 'seller' || selectedUser.type === 'corporate' ? '기업회원 (사장님)' : '개인회원 (구직자)'}</p>
+                                    <p className="text-sm font-bold text-slate-900">
+                                        {selectedUser.role === 'admin' ? '관리자 (최고 권한)' : (selectedUser.role === 'corporate' || selectedUser.type === 'corporate' ? '기업회원 (사장님)' : '개인회원 (구직자)')}
+                                    </p>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Join Date</p>

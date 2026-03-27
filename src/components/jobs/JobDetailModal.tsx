@@ -140,7 +140,7 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
             <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gray-50/30 relative">
                 {/* Ad No */}
                 <div className="absolute top-2 right-4 text-[10px] font-mono font-bold text-gray-400 select-all z-10">
-                    No.{shop.adNo || shop.id?.substring(0, 4) || '1004'}
+                    No.{shop.adNo || String(shop.id ?? '').substring(0, 4) || '1004'}
                 </div>
 
                 {/* Pay & Keywords Box */}
