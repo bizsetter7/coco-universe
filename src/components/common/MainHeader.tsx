@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight, Heart } from 'lucide-react';
+import { ChevronLeft, House, MessageCircle, Menu, LogOut, User, ShieldCheck, ArrowRight, Star } from 'lucide-react';
 
 import { PaymentPopup } from '../home/PaymentPopup';
 import MessageModal from '../message/MessageModal';
@@ -261,9 +261,9 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
 
                                             {userRole === 'individual' && (
                                                 <>
-                                                    <div onClick={() => router.push('/favorites')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-red-50 border border-transparent hover:border-red-100 transition-all group">
-                                                        <Heart size={16} className="text-gray-400 group-hover:text-red-500" />
-                                                        <span className="text-xs font-black text-gray-900">즐겨찾기</span>
+                                                    <div onClick={() => router.push('/my-shop?view=scrap-jobs')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-all group">
+                                                        <Star size={16} className="text-gray-400 group-hover:text-amber-400" />
+                                                        <span className="text-xs font-black text-gray-900">채용정보</span>
                                                     </div>
                                                     <div onClick={() => router.push('/my-shop?view=member-info')} className="flex items-center gap-1.5 cursor-pointer p-1.5 rounded-xl hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all group">
                                                         <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:scale-105 transition-transform">

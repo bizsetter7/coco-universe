@@ -12,7 +12,7 @@ import { MyPostsView } from '../MyPostsView';
 import { BlockSettingsView } from '../BlockSettingsView';
 import { PointExchangeView } from '../PointExchangeView';
 import { PointHistoryView } from '../PointHistoryView';
-import shopsData from '@/lib/data/shops.json';
+import { supabase } from '@/lib/supabase';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS } from '@/utils/favorites';
 
@@ -138,20 +138,44 @@ export function ScrapJobsView({ setView }: { setView: (v: any) => void }) {
     const brand = useBrand();
     const [favorites, setFavorites] = useState<string[]>([]);
     const [selectedShop, setSelectedShop] = useState<any | null>(null);
+    const [favoriteShops, setFavoriteShops] = useState<any[]>([]);
 
     useEffect(() => {
         // 만료 항목 자동 정리 후 유효 목록 로드
-        setFavorites(getFavorites());
+        const validIds = getFavorites();
+        setFavorites(validIds);
+        if (validIds.length === 0) { setFavoriteShops([]); return; }
+
+        // Supabase에서 스크랩된 shop ID들에 해당하는 활성 공고 조회
+        supabase
+            .from('shops')
+            .select('*')
+            .in('id', validIds)
+            .eq('status', 'active')
+            .then(({ data }) => {
+                const shops = (data || []).map((ad: any) => ({
+                    ...ad,
+                    workType: ad.work_type || ad.category || ad.options?.category || '',
+                    region: ad.region || ad.work_region || ad.options?.regionCity || '',
+                    name: ad.name || ad.shop_name || '',
+                    phone: ad.phone || ad.manager_phone || '',
+                    kakao: ad.kakao || ad.kakao_id || ad.options?.kakao || '',
+                    pay: String(ad.pay_amount || ad.options?.payAmount || 0),
+                    is_placeholder: false, url: '', site: '',
+                }));
+                // 스크랩 순서 유지 (validIds 순서 기준)
+                shops.sort((a: any, b: any) => validIds.indexOf(a.id) - validIds.indexOf(b.id));
+                setFavoriteShops(shops);
+            });
     }, []);
 
     const handleToggle = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         const newFavs = toggleFav(id, favorites);
         setFavorites(newFavs);
+        setFavoriteShops(prev => prev.filter(s => s.id !== id));
         if (selectedShop?.id === id) setSelectedShop(null);
     };
-
-    const favoriteShops = (shopsData as any[]).filter(s => favorites.includes(s.id));
 
     return (
         <div className="space-y-4">
