@@ -12,10 +12,11 @@ import {
     CreditCard,
     XCircle,
     LogOut,
-    Building2
+    Building2,
+    ClipboardList
 } from 'lucide-react';
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -24,6 +25,7 @@ interface AdminSidebarProps {
         inquiries?: number;
         payments?: number;
         business?: number;
+        applications?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -118,6 +120,13 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'business'}
                     badge={counts?.business}
                     onClick={() => handleNav('business')}
+                />
+                <NavItem
+                    icon={<ClipboardList size={20} className="text-emerald-400" />}
+                    label="지원자 관리"
+                    active={activeTab === 'applications'}
+                    badge={counts?.applications}
+                    onClick={() => handleNav('applications')}
                 />
                 <NavItem
                     icon={<Megaphone size={20} />}

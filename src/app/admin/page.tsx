@@ -28,6 +28,7 @@ import { AdminMemberManagement } from '@/components/admin/member/AdminMemberMana
 import { AdminPaymentManagement } from '@/components/admin/payment/AdminPaymentManagement';
 import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
+import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
 
 export default function AdminPage() {
     return (
@@ -47,6 +48,7 @@ function AdminContent() {
     const [mockAds, setMockAds] = useState<Shop[]>([]);
     const [realUsers, setRealUsers] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+    const [pendingApplications, setPendingApplications] = useState(0);
     const [stats, setStats] = useState({
         totalRevenue: 124030000,
         activeAds: 0,
@@ -137,6 +139,13 @@ function AdminContent() {
                 .select('*, profiles(nickname, full_name)')
                 .order('created_at', { ascending: false })
                 .limit(2000);
+
+            // 3-1. Fetch Applications count (pending)
+            const { count: appCount } = await supabase
+                .from('applications')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'pending');
+            setPendingApplications(appCount || 0);
 
             // 4. Fetch Messages
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
@@ -289,7 +298,7 @@ function AdminContent() {
     const pendingAdsCount = mockAds.filter(a => a.status === 'pending').length;
     const pendingInquiriesCount = realInquiries.filter(i => i.status === 'new').length;
     const pendingPaymentsCount = payments.filter(p => p.status !== 'completed').length;
-    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount;
+    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount + pendingApplications;
 
     return (
         <div className="p-5 md:p-10 pb-20">
@@ -485,6 +494,10 @@ function AdminContent() {
             {/* Tab 6: Business Verification */}
             {activeTab === 'business' && (
                 <BusinessVerifyView />
+            )}
+            {/* Tab: Applications */}
+            {activeTab === 'applications' && (
+                <AdminApplicationManagement fetchData={fetchData} />
             )}
             {/* Tab 7: SEO & System Settings */}
             {activeTab === 'seo' && (

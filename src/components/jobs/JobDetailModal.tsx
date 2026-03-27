@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag } from 'lucide-react';
+import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag, ClipboardList, CheckCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
@@ -13,6 +13,7 @@ import { useBrand } from '@/components/BrandProvider';
 import { AD_TIER_STANDARDS } from '@/constants/standards';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
+import { useAuth } from '@/hooks/useAuth';
 
 interface JobDetailModalProps {
     shop: Shop;
@@ -32,6 +33,13 @@ interface JobDetailContentProps {
 
 export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, onToggleFavorite }: JobDetailContentProps) => {
     const [showReport, setShowReport] = useState(false);
+    const { user, userType, isLoggedIn } = useAuth();
+    const [showApplyForm, setShowApplyForm] = useState(false);
+    const [applyName, setApplyName] = useState('');
+    const [applyPhone, setApplyPhone] = useState('');
+    const [applyMsg, setApplyMsg] = useState('');
+    const [applying, setApplying] = useState(false);
+    const [applied, setApplied] = useState(false);
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
@@ -236,6 +244,69 @@ export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, 
             </div>
 
             {showReport && <ReportAdModal onClose={() => setShowReport(false)} />}
+
+            {/* 온라인 지원 섹션 (개인회원만) */}
+            {isLoggedIn && userType === 'individual' && (
+                <div className="mx-6 mb-4 p-4 rounded-2xl border border-blue-100 bg-blue-50/50">
+                    {applied ? (
+                        <div className="flex items-center gap-2 text-green-600 font-black text-sm justify-center py-2">
+                            <CheckCircle size={18} /> 지원이 완료되었습니다!
+                        </div>
+                    ) : !showApplyForm ? (
+                        <button
+                            onClick={() => {
+                                setApplyName((user as any)?.full_name || (user as any)?.nickname || '');
+                                setApplyPhone((user as any)?.phone || '');
+                                setShowApplyForm(true);
+                            }}
+                            className="w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-black flex items-center justify-center gap-2 hover:bg-blue-700 transition"
+                        >
+                            <ClipboardList size={16} /> 온라인 지원하기
+                        </button>
+                    ) : (
+                        <div className="space-y-2">
+                            <p className="text-xs font-black text-blue-700 mb-2">지원 정보 입력</p>
+                            <input value={applyName} onChange={e => setApplyName(e.target.value)}
+                                placeholder="이름 *" className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                            <input value={applyPhone} onChange={e => setApplyPhone(e.target.value)}
+                                placeholder="연락처 *" className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                            <textarea value={applyMsg} onChange={e => setApplyMsg(e.target.value)}
+                                placeholder="한 줄 소개 (선택)" rows={2}
+                                className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowApplyForm(false)}
+                                    className="flex-1 py-2 rounded-xl border border-blue-200 text-blue-500 text-xs font-black">취소</button>
+                                <button
+                                    disabled={applying || !applyName.trim() || !applyPhone.trim()}
+                                    onClick={async () => {
+                                        setApplying(true);
+                                        try {
+                                            await supabase.from('applications').insert({
+                                                shop_id: shop.id,
+                                                user_id: user?.id || null,
+                                                applicant_name: applyName.trim(),
+                                                applicant_phone: applyPhone.trim(),
+                                                message: applyMsg.trim() || null,
+                                                status: 'pending',
+                                                created_at: new Date().toISOString(),
+                                            });
+                                            setApplied(true);
+                                            setShowApplyForm(false);
+                                        } catch {
+                                            alert('지원 접수 중 오류가 발생했습니다.');
+                                        } finally {
+                                            setApplying(false);
+                                        }
+                                    }}
+                                    className="flex-1 py-2 rounded-xl bg-blue-600 text-white text-xs font-black flex items-center justify-center gap-1 disabled:opacity-60 hover:bg-blue-700 transition"
+                                >
+                                    {applying ? <Loader2 size={14} className="animate-spin" /> : '지원 제출'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* 3. FOOTER SECTION */}
             <div className="p-6 bg-white border-t border-gray-100 grid grid-cols-4 gap-3 shrink-0 safe-area-bottom">

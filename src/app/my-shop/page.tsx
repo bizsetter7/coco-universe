@@ -1212,7 +1212,7 @@ function MyShopContent() {
                                             {view === 'sos-alert' && <SosAlertView brand={brand} />}
                                             {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                            {view === 'applicants' && <ApplicantsView setView={setView} userName={bizShopName || formState.shopName} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'applicants' && <ApplicantsView setView={setView} userName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                              {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
                                         </>
                                     )}
