@@ -71,7 +71,7 @@ const CLEAN_SEO: SEOConfig = {
   metadata: {
     title: "코코알바(COCOALBA) B2B - 데이터 기반 기업 맞춤 채용 매칭 플랫폼",
     description: "코코알바 B2B는 평가정보 연동을 통해 검증된 프리미엄 인재와 기업을 안전하고 빠르게 연결하는 100% 실명 기반 스마트 파트너십 솔루션입니다.",
-    keywords: ["B2B채용", "기업전용솔루션", "인재풀검증", "맞춤채용", "실명인증채용", "스마트에스크로"],
+    keywords: ["B2B채용", "기업전용솔루션", "인재풀검증", "맞춤채용", "실명인증채용", "스마트에스크로", "노래방알바", "노래빠알바", "노래주점알바", "룸알바", "유흥알바"],
     verification: {
         google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
         other: {

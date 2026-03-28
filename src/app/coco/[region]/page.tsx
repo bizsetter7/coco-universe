@@ -145,6 +145,22 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
                     "@type": "Answer",
                     "text": `네, 코코알바에는 숙식제공 조건의 ${regionName} 업체들이 등록되어 있습니다. 필터에서 '숙식제공' 조건을 선택하면 해당 업체만 모아볼 수 있습니다.`
                 }
+            },
+            {
+                "@type": "Question",
+                "name": `${regionName} 노래빠알바(노래방알바) 일당은 얼마인가요?`,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": `${regionName} 노래빠알바(노래주점 도우미)의 일당은 보통 15만원~30만원 수준입니다. 노래방알바는 룸알바 대비 진입 난이도가 낮고 처음 시작하는 분들에게 인기 있는 업종입니다. 코코알바에서 ${regionName} 노래주점 알바 공고를 무료로 확인하실 수 있습니다.`
+                }
+            },
+            {
+                "@type": "Question",
+                "name": `노래빠알바와 룸알바의 차이는 무엇인가요?`,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": `노래빠알바(노래주점)는 노래방 도우미 형태로 손님과 함께 노래를 즐기는 서비스를 제공하며, 룸알바(룸싸롱)는 고급 룸에서 서비스하는 형태입니다. 노래빠알바는 상대적으로 진입 장벽이 낮고, 룸알바는 수입이 더 높은 편입니다. 코코알바에서 두 업종 모두 비교해보실 수 있습니다.`
+                }
             }
         ]
     };
