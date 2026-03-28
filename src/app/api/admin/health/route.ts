@@ -233,6 +233,159 @@ export async function POST() {
         overall = setWorst(overall, 'error');
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // 확장 체크 (14~30번)
+    // ══════════════════════════════════════════════════════════════
+
+    // ── 14. DB 스키마 — messages 테이블 ─────────────────────────
+    try {
+        const { error } = await supabase.from('messages').select('id').limit(1);
+        if (error) throw error;
+        components.db_messages = { status: 'healthy', message: 'messages 테이블 정상' };
+    } catch {
+        components.db_messages = { status: 'error', message: 'messages 테이블 없음 — 쪽지 기능 불가' };
+        overall = setWorst(overall, 'error');
+    }
+
+    // ── 15. DB 스키마 — resumes 테이블 ──────────────────────────
+    try {
+        const { error } = await supabase.from('resumes').select('id').limit(1);
+        if (error) throw error;
+        components.db_resumes = { status: 'healthy', message: 'resumes 테이블 정상' };
+    } catch {
+        components.db_resumes = { status: 'warning', message: 'resumes 테이블 없음 — 이력서 기능 불가' };
+        overall = setWorst(overall, 'warning');
+    }
+
+    // ── 16. DB 스키마 — contact_email 컬럼 ──────────────────────
+    try {
+        const { error } = await supabase.from('profiles').select('contact_email').limit(1);
+        if (error) throw error;
+        components.db_contact_email = { status: 'healthy', message: 'profiles.contact_email 컬럼 존재 — 비밀번호 복구 이메일 수집 가능' };
+    } catch {
+        components.db_contact_email = { status: 'warning', message: 'profiles.contact_email 컬럼 없음 — SQL: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS contact_email text;' };
+        overall = setWorst(overall, 'warning');
+    }
+
+    // ── 17. 포인트 음수 회원 ─────────────────────────────────────
+    try {
+        const { count, error } = await supabase
+            .from('profiles').select('*', { count: 'exact', head: true }).lt('points', 0);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.negative_points = { status: 'healthy', message: '포인트 음수 회원 없음' };
+        } else {
+            components.negative_points = { status: 'error', message: `포인트 음수 회원 ${count}명 — 즉시 확인 필요`, count };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.negative_points = { status: 'warning', message: `포인트 음수 검사 실패: ${err.message}` };
+    }
+
+    // ── 18. 고아 공고 (user_id 없음) ────────────────────────────
+    try {
+        const { count, error } = await supabase
+            .from('shops').select('*', { count: 'exact', head: true }).is('user_id', null);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.orphaned_shops = { status: 'healthy', message: '고아 공고(user_id 없음) 없음' };
+        } else {
+            components.orphaned_shops = { status: 'warning', message: `user_id 없는 공고 ${count}건 — 데이터 정리 필요`, count };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.orphaned_shops = { status: 'warning', message: `고아 공고 검사 실패: ${err.message}` };
+    }
+
+    // ── 19. 결제↔공고 상태 불일치 ───────────────────────────────
+    try {
+        const { data: completedPayments, error } = await supabase
+            .from('payments').select('shop_id').eq('status', 'completed').limit(500);
+        if (error) throw error;
+        let mismatch = 0;
+        if (completedPayments && completedPayments.length > 0) {
+            const shopIds = [...new Set(completedPayments.map((p: any) => p.shop_id).filter(Boolean))];
+            if (shopIds.length > 0) {
+                const { count } = await supabase
+                    .from('shops').select('*', { count: 'exact', head: true })
+                    .in('id', shopIds).eq('status', 'PENDING_REVIEW');
+                mismatch = count || 0;
+            }
+        }
+        if (mismatch === 0) {
+            components.payment_ad_mismatch = { status: 'healthy', message: '결제 완료 공고 상태 모두 정상' };
+        } else {
+            components.payment_ad_mismatch = { status: 'warning', message: `결제 완료됐는데 심사대기 상태인 공고 ${mismatch}건`, count: mismatch };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.payment_ad_mismatch = { status: 'warning', message: `결제↔공고 검사 실패: ${err.message}` };
+    }
+
+    // ── 20. 최근 24h 가입자 중 포인트 0 (가입 보너스 미적립) ─────
+    try {
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { count, error } = await supabase
+            .from('profiles').select('*', { count: 'exact', head: true })
+            .gte('created_at', since).eq('points', 0);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.new_join_no_points = { status: 'healthy', message: '최근 24h 신규 가입자 포인트 정상 적립' };
+        } else {
+            components.new_join_no_points = { status: 'warning', message: `최근 24h 가입자 중 포인트 미적립 ${count}명`, count };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.new_join_no_points = { status: 'warning', message: `가입 포인트 검사 실패: ${err.message}` };
+    }
+
+    // ── 21. 어드민 권한 동기화 (role=admin 인데 is_admin=false) ──
+    try {
+        const { count, error } = await supabase
+            .from('profiles').select('*', { count: 'exact', head: true })
+            .eq('role', 'admin').eq('is_admin', false);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.admin_role_sync = { status: 'healthy', message: 'admin role ↔ is_admin 플래그 동기화 정상' };
+        } else {
+            components.admin_role_sync = { status: 'error', message: `role=admin인데 is_admin=false인 계정 ${count}건 — 권한 불일치`, count };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.admin_role_sync = { status: 'warning', message: `어드민 권한 검사 실패: ${err.message}` };
+    }
+
+    // ── 22. 무승인 활성 공고 ─────────────────────────────────────
+    try {
+        const { count, error } = await supabase
+            .from('shops').select('*', { count: 'exact', head: true })
+            .eq('status', 'active').is('approved_at', null);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.active_without_approval = { status: 'healthy', message: '모든 활성 공고 정상 승인됨' };
+        } else {
+            components.active_without_approval = { status: 'warning', message: `승인 없이 활성화된 공고 ${count}건`, count };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.active_without_approval = { status: 'warning', message: `무승인 공고 검사 실패: ${err.message}` };
+    }
+
+    // ── 23. 사이트맵 접근성 ──────────────────────────────────────
+    try {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cocoalba.kr';
+        const res = await fetch(`${siteUrl}/sitemap.xml`, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+        if (res.ok) {
+            components.sitemap_accessible = { status: 'healthy', message: '/sitemap.xml 정상 응답 (200 OK)' };
+        } else {
+            components.sitemap_accessible = { status: 'warning', message: `/sitemap.xml HTTP ${res.status} — 검색 노출 영향 가능` };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.sitemap_accessible = { status: 'warning', message: `사이트맵 접근 실패: ${err.message}` };
+        overall = setWorst(overall, 'warning');
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 

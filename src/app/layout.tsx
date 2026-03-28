@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Shop } from "@/types/shop";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import ScrollToTop from "@/components/common/ScrollToTop";
+import { MonitorProvider } from "@/components/MonitorProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -167,6 +168,8 @@ export default function RootLayout({
         </Suspense>
 
         <BrandProvider>
+          {/* 전역 감시 훅 — JS에러/DeadClick/WebVitals/LongTask 수집 */}
+          <MonitorProvider />
           <div className="flex flex-col h-auto">
             <Suspense fallback={<div className="min-h-screen bg-white" />}>
               <LayoutWrapper sideAds={sideAds}>

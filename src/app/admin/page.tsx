@@ -337,6 +337,14 @@ function AdminContent() {
                 </div>
 
                 <div className="flex items-center gap-3 relative">
+                    {/* 홈으로 */}
+                    <button
+                        onClick={() => router.push('/')}
+                        title="사이트 홈으로"
+                        className="w-9 h-9 md:w-10 md:h-10 rounded-2xl border border-slate-100 bg-white text-slate-500 flex items-center justify-center shadow-sm hover:text-slate-800 hover:border-slate-300 transition-all active:scale-95 text-base font-black text-xs"
+                    >
+                        홈
+                    </button>
                     {/* Role Simulator Icons */}
                     <div className="flex -space-x-2 mr-2">
                         <div
