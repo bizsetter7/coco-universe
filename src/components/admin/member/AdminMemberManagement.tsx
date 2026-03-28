@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Unlock, Lock, XCircle, TrendingUp, Zap, Coins, Send } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { updatePoints } from '@/lib/points';
 import { AdminAdRegistrationModal } from '../ad/AdminAdRegistrationModal';
 
 interface AdminMemberManagementProps {
@@ -52,15 +51,25 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
         if (isNaN(amount) || amount === 0) { alert('올바른 포인트 금액을 입력하세요.'); return; }
         if (!confirm(`${selectedUser.name || selectedUser.full_name || '회원'}님께 ${amount}P를 ${amount > 0 ? '지급' : '차감'}하시겠습니까?`)) return;
         setIsGrantingPoint(true);
-        const result = await updatePoints(selectedUser.id, 'ADMIN_GRANT', amount);
-        setIsGrantingPoint(false);
-        if (result.success) {
-            alert(`${amount}P ${amount > 0 ? '지급' : '차감'} 완료! 현재 잔액: ${result.newTotal}P`);
-            setPointAmount('');
-            setPointNote('');
-            fetchData();
-        } else {
-            alert('포인트 처리 실패: ' + (result.error as any)?.message || '오류 발생');
+        try {
+            const res = await fetch('/api/admin/grant-points', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: selectedUser.id, amount }),
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert(`${amount}P ${amount > 0 ? '지급' : '차감'} 완료! 현재 잔액: ${result.newTotal}P`);
+                setPointAmount('');
+                setPointNote('');
+                fetchData();
+            } else {
+                alert('포인트 처리 실패: ' + (result.message || '오류 발생'));
+            }
+        } catch (err: any) {
+            alert('포인트 처리 실패: ' + (err.message || '네트워크 오류'));
+        } finally {
+            setIsGrantingPoint(false);
         }
     };
 
