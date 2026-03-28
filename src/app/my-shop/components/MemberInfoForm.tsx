@@ -80,6 +80,34 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+    const handleWithdraw = async () => {
+        if (!user?.id || user.id === 'guest') return;
+        const confirmed = window.confirm(
+            '정말 탈퇴하시겠습니까?\n\n탈퇴 시 모든 개인정보가 삭제되며 복구할 수 없습니다.\n등록된 공고 및 포인트도 모두 소멸됩니다.'
+        );
+        if (!confirmed) return;
+
+        setIsWithdrawing(true);
+        try {
+            const res = await fetch('/api/auth/withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '탈퇴 처리 실패');
+            await supabase.auth.signOut();
+            alert('탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.');
+            window.location.href = '/';
+        } catch (e: any) {
+            alert('탈퇴 처리 중 오류가 발생했습니다: ' + e.message);
+        } finally {
+            setIsWithdrawing(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!user?.id || user.id === 'guest') {
             alert('로그인이 필요합니다.');
@@ -239,20 +267,30 @@ export const MemberInfoForm = ({ brand, setView, onOpenMenu, shopName }: any) =>
                 </div>
 
                 {/* ── 저장 버튼 ── */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex flex-col sm:flex-row justify-between gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
+                    {/* 회원탈퇴 */}
                     <button
-                        onClick={() => setView('dashboard')}
-                        className={`order-2 sm:order-1 px-8 py-4 rounded-2xl font-black transition ${isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                        onClick={handleWithdraw}
+                        disabled={isWithdrawing}
+                        className={`px-5 py-3 rounded-2xl font-black text-xs transition disabled:opacity-60 ${isDark ? 'text-gray-600 hover:text-red-400' : 'text-gray-300 hover:text-red-500'}`}
                     >
-                        취소
+                        {isWithdrawing ? '처리 중...' : '회원 탈퇴'}
                     </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="order-1 sm:order-2 px-8 py-4 rounded-2xl bg-blue-500 text-white font-black hover:bg-blue-600 shadow-xl shadow-blue-500/20 transition active:scale-95 disabled:opacity-50"
-                    >
-                        {isSaving ? '저장 중...' : '회원정보 수정하기'}
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                            onClick={() => setView('dashboard')}
+                            className={`px-8 py-4 rounded-2xl font-black transition ${isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                        >
+                            취소
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="px-8 py-4 rounded-2xl bg-blue-500 text-white font-black hover:bg-blue-600 shadow-xl shadow-blue-500/20 transition active:scale-95 disabled:opacity-50"
+                        >
+                            {isSaving ? '저장 중...' : '회원정보 수정하기'}
+                        </button>
+                    </div>
                 </div>
 
                 {/* ══════════════════════════════════════════════

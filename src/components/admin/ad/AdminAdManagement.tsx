@@ -110,6 +110,27 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 }
             }
 
+            // 승인 시 알림쪽지
+            if (newStatus === 'active' && ad) {
+                try {
+                    const rawUserId = (ad as any).user_id || ad.ownerId;
+                    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawUserId || '');
+                    if (isUuid) {
+                        await supabase.from('notifications').insert({
+                            user_id: rawUserId,
+                            type: 'AD_APPROVED',
+                            title: '광고가 승인되었습니다 ✅',
+                            message: `'${ad.title || ad.shopName}' 공고가 심사를 통과하여 정상 게재 중입니다. 마이샵에서 확인하세요.`,
+                            read: false,
+                            link: '/my-shop?view=dashboard',
+                            created_at: new Date().toISOString(),
+                        });
+                    }
+                } catch (notifError) {
+                    console.error('Approval notification failed:', notifError);
+                }
+            }
+
             // [New] Create notification and update history for rejected ads
             if (newStatus === 'rejected' && ad) {
                 // Update rejection history
