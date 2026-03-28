@@ -53,6 +53,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             return;
         }
 
+        // 관리자 계정은 모든 게이트 자동 통과
+        if (authUser && authUser.type === 'admin') {
+            setIsVerified(true);
+            return;
+        }
+
         // 로그인된 유저가 인증된 파트너이거나, 로컬 스토리지에 기록이 있으면 통과
         if (authUser && authUser.id !== 'guest' && authUser.isVerifiedPartnerVerified) {
             setIsVerified(true);
