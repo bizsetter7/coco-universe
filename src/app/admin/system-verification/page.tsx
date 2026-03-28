@@ -100,7 +100,7 @@ export default function SystemVerificationPage() {
                                                 </td>
                                                 <td className="p-3">
                                                     <div className="font-bold text-sm text-gray-900 line-clamp-1">{shop.name}</div>
-                                                    <div className="text-[10px] text-gray-400 font-mono">{shop.id.split('-')[0]}...</div>
+                                                    <div className="text-[10px] text-gray-400 font-mono">{String(shop.id).split('-')[0]}...</div>
                                                 </td>
                                                 <td className="p-3">
                                                     <div className={`font-bold text-sm mb-0.5 line-clamp-1 break-all ${isIssue ? 'text-red-600' : 'text-gray-700'}`}>{title}</div>

@@ -34,6 +34,7 @@ import { ResumeDetailModal } from './components/ResumeDetailModal';
 import { BusinessMobileMenu } from './components/BusinessMobileMenu';
 import { BusinessSidebar } from './components/BusinessSidebar';
 import { MemberInfoForm } from './components/MemberInfoForm';
+import { ChangePasswordView } from './components/ChangePasswordView';
 import { AdTemplateModal } from './components/AdTemplateModal';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
@@ -1208,6 +1209,7 @@ function MyShopContent() {
                                             {view === 'ongoing-ads' && <OngoingAdsView setView={setView} userName={bizShopName || formState.shopName} ads={registeredAds || []} jumpBalance={userJumpBalance || 0} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} onJumpAd={handleJump} onEditAd={(ad) => { setIsNewEntry(false); setEditingAdId(ad.id); editingAdIdRef.current = ad.id; formState.loadAdData(ad); if (bizVerified && bizShopName) formState.setShopName(bizShopName); setShowWarningModal(true); }} />}
                                             {view === 'payments' && <PaymentsView setView={setView} userName={bizShopName || formState.shopName} payments={syncedPaymentHistory || []} onShowAdDetail={(item) => { const ad = typeof item === 'object' ? item : registeredAds.find(a => String(a.id) === String(item)); if (ad) setSelectedAdForModal(ad); else alert('공고 상세 정보를 찾을 수 없습니다.'); }} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'change-password' && <ChangePasswordView setView={setView} />}
                                             {view === 'sos-alert' && <SosAlertView brand={brand} />}
                                             {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}

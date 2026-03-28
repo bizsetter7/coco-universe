@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X, Gift, Coins } from 'lucide-react';
+import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X, Gift, Coins, Lock } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
@@ -13,6 +13,7 @@ import { MyPostsView } from '../MyPostsView';
 import { BlockSettingsView } from '../BlockSettingsView';
 import { PointExchangeView } from '../PointExchangeView';
 import { PointHistoryView } from '../PointHistoryView';
+import { ChangePasswordView } from '../ChangePasswordView';
 import { supabase } from '@/lib/supabase';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS, getAllShopSnapshots } from '@/utils/favorites';
@@ -72,6 +73,7 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
         { id: 'custom-jobs', icon: Briefcase, label: '맞춤구인정보' },
         { id: 'my-posts', icon: FileText, label: '내가 작성한 게시글' },
         { id: 'block-settings', icon: User, label: '회원 차단 설정' },
+        { id: 'change-password', icon: Lock, label: '비밀번호 변경' },
     ];
 
     return (
@@ -491,6 +493,7 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
                 {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}
                 {view === 'my-posts' && <MyPostsView setView={setView} />}
                 {view === 'block-settings' && <BlockSettingsView />}
+                {view === 'change-password' && <ChangePasswordView setView={setView} />}
             </main>
         </div>
     );

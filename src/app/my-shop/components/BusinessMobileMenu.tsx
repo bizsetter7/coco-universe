@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
-    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift, AlertTriangle, Briefcase, FileText, Shield
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift, AlertTriangle, Briefcase, FileText, Shield, Lock
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -89,6 +89,9 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             <div onClick={() => { setView('block-settings'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Shield size={18} /> 회원 차단 설정
                             </div>
+                            <div onClick={() => { setView('change-password'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1">
+                                <Lock size={18} /> 비밀번호 변경
+                            </div>
                         </>
                     ) : (
                         <>
@@ -115,6 +118,9 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             </div>
                             <div onClick={() => { setView('member-info'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer border-t border-gray-100 mt-1">
                                 <Settings size={18} /> 회원 정보 수정
+                            </div>
+                            <div onClick={() => { setView('change-password'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
+                                <Lock size={18} /> 비밀번호 변경
                             </div>
                         </>
                     )}
