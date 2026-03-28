@@ -25,7 +25,8 @@ export interface Shop {
     is_premium?: boolean;
     is_verified?: boolean;
     recommended?: boolean;
-    tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic';
+    tier?: 'grand' | 'premium' | 'deluxe' | 'special' | 'urgent' | 'recommended' | 'native' | 'common' | 'basic'
+          | 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6' | 'p7'; // DB 실등록 ID 포맷 (2026-03-22)
     color?: string;
     updatedAt?: string;
     date?: string;

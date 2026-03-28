@@ -27,12 +27,17 @@ interface JobDetailModalProps {
 interface JobDetailContentProps {
     shop: Shop;
     publisherAddress?: string | null;
-    onClose: () => void;
-    isFavorite: boolean;
-    onToggleFavorite: (e: React.MouseEvent) => void;
+    onClose?: () => void;
+    isFavorite?: boolean;
+    onToggleFavorite?: (e: React.MouseEvent) => void;
 }
 
-export const JobDetailContent = ({ shop, publisherAddress, onClose, isFavorite, onToggleFavorite }: JobDetailContentProps) => {
+export const JobDetailContent = ({
+    shop, publisherAddress,
+    onClose = () => window.history.back(),
+    isFavorite = false,
+    onToggleFavorite = () => {},
+}: JobDetailContentProps) => {
     const [showReport, setShowReport] = useState(false);
     const { user, userType, isLoggedIn } = useAuth();
     const [showApplyForm, setShowApplyForm] = useState(false);
