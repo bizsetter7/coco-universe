@@ -62,7 +62,7 @@ export const REGION_DATA: Record<string, string[]> = {
 };
 
 export const INDUSTRY_DATA: Record<string, string[]> = {
-    '프라이빗 매칭': ['퍼블릭', '가라오케', '클럽', '룸싸롱'],
+    '룸알바': ['퍼블릭', '가라오케', '클럽', '룸싸롱'],
     '노래주점': ['아가씨', '미씨', 'TC'],
     'VIP 파트너스/VIP 파트너스': ['VIP 파트너스', 'VIP 파트너스', '텐카페'],
     '요정': ['요정'],

@@ -71,7 +71,7 @@ export const generateSEOKeywords = (region?: string): string[] => {
         `${regionName}인재알바`,
         `${regionName}여성알바`,
         `${regionName}엔터프라이즈 인재 솔루션`,
-        `${regionName}프라이빗 매칭`,
+        `${regionName}룸알바`,
         `${regionName}엔터프라이즈 인재 솔루션`,
         `${regionName}당일알바`,
         `${regionName}20대알바`,
