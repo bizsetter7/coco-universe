@@ -102,7 +102,7 @@ export const PushPermission = () => {
     if (!show) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50 animate-slide-up">
+        <div className="fixed bottom-24 left-4 right-4 md:bottom-4 md:left-auto md:right-6 md:w-96 z-[200] animate-slide-up">
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                 {/* 헤더 */}
                 <div className="bg-gradient-to-r from-red-500 to-red-600 p-4 flex items-center justify-between">

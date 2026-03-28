@@ -66,7 +66,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
             window.removeEventListener('open-note-modal', handleOpenNote);
             window.removeEventListener('notes-updated', updateUnreadCount);
         };
-    }, [pathname]);
+    }, [pathname, user?.name]);
 
     const handleLogout = async () => {
         await logout();
