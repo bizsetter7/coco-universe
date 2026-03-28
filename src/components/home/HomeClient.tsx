@@ -15,7 +15,7 @@ import { QuickMenu } from './QuickMenu';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import JobListView from '@/components/jobs/JobListView';
 import { FloatingConversion } from './FloatingConversion';
-import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
+import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
 
 // --- Type Definitions ---
 interface HomeClientProps {
@@ -39,6 +39,8 @@ export default function HomeClient({ shops }: HomeClientProps) {
     // -- Handlers --
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
+        const shop = (shops as any[])?.find((s: any) => s.id === id) || selectedShop;
+        if (shop) saveShopSnapshot(id, shop);
         setFavorites(prev => toggleFav(id, prev));
     };
 

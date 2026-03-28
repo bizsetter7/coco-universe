@@ -18,7 +18,7 @@ import { JOB_CATEGORY_MAP } from '@/constants/jobs';
 import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
-import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
+import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
 
 interface RegionClientProps {
     shops: Shop[];
@@ -75,8 +75,10 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
 
     const toggleFavorite = React.useCallback((e: React.MouseEvent, id: string) => {
         e.stopPropagation();
+        const shop = shops?.find(s => s.id === id);
+        if (shop) saveShopSnapshot(id, shop);
         setFavorites(prev => toggleFav(id, prev));
-    }, []);
+    }, [shops]);
 
     // Data Filtering
     const filteredShops = useMemo(() => {

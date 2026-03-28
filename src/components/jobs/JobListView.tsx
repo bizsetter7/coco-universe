@@ -9,6 +9,7 @@ import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
+import { saveShopSnapshot } from '@/utils/favorites';
 
 // Use Shop type directly
 type Job = Shop;
@@ -106,7 +107,7 @@ const JobRow = React.memo(({
 
             {/* 2. 스크랩 */}
             <td className="py-4 px-2 text-center">
-                <button onClick={(e) => onToggleFav(e, shop.id)} className={`transition-transform active:scale-90 ${isFav ? 'text-amber-400' : 'text-gray-200 group-hover:text-gray-300'}`}>
+                <button onClick={(e) => { saveShopSnapshot(shop.id, shop); onToggleFav(e, shop.id); }} className={`transition-transform active:scale-90 ${isFav ? 'text-amber-400' : 'text-gray-200 group-hover:text-gray-300'}`}>
                     <Star size={18} fill={isFav ? "currentColor" : "none"} />
                 </button>
             </td>
@@ -250,7 +251,7 @@ const MobileJobRow = React.memo(({
 
                 {/* Right: Star Icon */}
                 <button
-                    onClick={(e) => onToggleFav(e, shop.id)}
+                    onClick={(e) => { saveShopSnapshot(shop.id, shop); onToggleFav(e, shop.id); }}
                     className="p-1 shrink-0 text-gray-300 active:scale-90 transition-transform"
                 >
                     <Star size={20} fill={isFav ? "currentColor" : "none"} className={isFav ? "text-amber-400" : ""} />

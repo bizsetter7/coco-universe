@@ -2,11 +2,13 @@
  * Favorites (스크랩) 유틸리티
  * - localStorage 'favorites' 키: 스크랩된 shop ID 배열
  * - localStorage 'favorites_timestamps' 키: { [shopId]: timestamp(ms) }
+ * - localStorage 'favorites_snapshots' 키: { [shopId]: 공고 핵심 데이터 }
  * - 30일 초과 항목은 자동 만료/삭제
  */
 
 const FAVORITES_KEY = 'favorites';
 const TIMESTAMPS_KEY = 'favorites_timestamps';
+const SNAPSHOTS_KEY = 'favorites_snapshots';
 export const SCRAP_EXPIRE_DAYS = 30;
 const EXPIRE_MS = SCRAP_EXPIRE_DAYS * 24 * 60 * 60 * 1000;
 
@@ -30,6 +32,14 @@ export function getFavorites(): string[] {
             validIds.forEach(id => { if (timestamps[id]) cleanTs[id] = timestamps[id]; });
             localStorage.setItem(FAVORITES_KEY, JSON.stringify(validIds));
             localStorage.setItem(TIMESTAMPS_KEY, JSON.stringify(cleanTs));
+
+            // 만료된 ID의 스냅샷도 정리
+            try {
+                const snapshots = JSON.parse(localStorage.getItem(SNAPSHOTS_KEY) || '{}');
+                const expiredIds = ids.filter(id => !validIds.includes(id));
+                expiredIds.forEach(id => delete snapshots[id]);
+                localStorage.setItem(SNAPSHOTS_KEY, JSON.stringify(snapshots));
+            } catch { /* ignore */ }
         }
 
         return validIds;
@@ -54,6 +64,35 @@ export function toggleFavorite(id: string, current: string[]): string[] {
         localStorage.setItem(TIMESTAMPS_KEY, JSON.stringify(timestamps));
         return newFavs;
     } catch { return current; }
+}
+
+/** 스크랩 시 공고 핵심 데이터를 localStorage에 캐시 (Supabase 미존재 공고 대응) */
+export function saveShopSnapshot(id: string, shop: any): void {
+    if (typeof window === 'undefined') return;
+    try {
+        const snapshots = JSON.parse(localStorage.getItem(SNAPSHOTS_KEY) || '{}');
+        snapshots[id] = {
+            id: shop.id,
+            name: shop.name || shop.shop_name || '',
+            title: shop.title || '',
+            region: shop.region || shop.work_region || '',
+            workType: shop.workType || shop.work_type || shop.category || '',
+            pay: shop.pay || String(shop.pay_amount || shop.options?.payAmount || 0),
+            tier: shop.tier || '',
+            options: shop.options || {},
+            adNo: shop.adNo,
+            status: shop.status || 'active',
+        };
+        localStorage.setItem(SNAPSHOTS_KEY, JSON.stringify(snapshots));
+    } catch { /* ignore */ }
+}
+
+/** 스냅샷으로 저장된 전체 공고 데이터 반환 */
+export function getAllShopSnapshots(): Record<string, any> {
+    if (typeof window === 'undefined') return {};
+    try {
+        return JSON.parse(localStorage.getItem(SNAPSHOTS_KEY) || '{}');
+    } catch { return {}; }
 }
 
 /** 특정 shopId의 스크랩 등록일 반환 (없으면 null) */

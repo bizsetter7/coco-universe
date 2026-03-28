@@ -15,7 +15,7 @@ import { PointExchangeView } from '../PointExchangeView';
 import { PointHistoryView } from '../PointHistoryView';
 import { supabase } from '@/lib/supabase';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
-import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS } from '@/utils/favorites';
+import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS, getAllShopSnapshots } from '@/utils/favorites';
 
 
 
@@ -148,14 +148,13 @@ export function ScrapJobsView({ setView }: { setView: (v: any) => void }) {
         setFavorites(validIds);
         if (validIds.length === 0) { setFavoriteShops([]); return; }
 
-        // Supabase에서 스크랩된 shop ID들에 해당하는 활성 공고 조회
+        // Supabase에서 스크랩된 shop ID들에 해당하는 공고 조회 (status 무관 — 임시/심사중 공고도 표시)
         supabase
             .from('shops')
             .select('*')
             .in('id', validIds)
-            .eq('status', 'active')
             .then(({ data }) => {
-                const shops = (data || []).map((ad: any) => ({
+                const dbShops = (data || []).map((ad: any) => ({
                     ...ad,
                     workType: ad.work_type || ad.category || ad.options?.category || '',
                     region: ad.region || ad.work_region || ad.options?.regionCity || '',
@@ -165,9 +164,18 @@ export function ScrapJobsView({ setView }: { setView: (v: any) => void }) {
                     pay: String(ad.pay_amount || ad.options?.payAmount || 0),
                     is_placeholder: false, url: '', site: '',
                 }));
+
+                // Supabase에 없는 ID(shops.json 공고 등)는 localStorage 스냅샷으로 보완
+                const dbIds = new Set(dbShops.map((s: any) => s.id));
+                const snapshots = getAllShopSnapshots();
+                const snapshotShops = validIds
+                    .filter(id => !dbIds.has(id) && snapshots[id])
+                    .map(id => ({ ...snapshots[id], is_placeholder: false, url: '', site: '' }));
+
+                const merged = [...dbShops, ...snapshotShops];
                 // 스크랩 순서 유지 (validIds 순서 기준)
-                shops.sort((a: any, b: any) => validIds.indexOf(a.id) - validIds.indexOf(b.id));
-                setFavoriteShops(shops);
+                merged.sort((a: any, b: any) => validIds.indexOf(a.id) - validIds.indexOf(b.id));
+                setFavoriteShops(merged);
             });
     }, []);
 

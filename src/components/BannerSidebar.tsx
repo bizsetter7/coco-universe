@@ -9,7 +9,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import JobDetailModal from './jobs/JobDetailModal';
-import { getFavorites, toggleFavorite as toggleFav } from '@/utils/favorites';
+import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
@@ -115,6 +115,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
+        if (selectedAd?.id === id) saveShopSnapshot(id, selectedAd);
         setFavorites(prev => toggleFav(id, prev));
     };
 
