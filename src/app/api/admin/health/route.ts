@@ -191,21 +191,20 @@ export async function POST() {
     }
 
     // ── 11. 포트원 결제 설정 ─────────────────────────────────────
+    // storeId/channelKey는 클라이언트 코드에 하드코딩됨 — 서버 시크릿만 확인
     const portoneSecret = process.env.PORTONE_API_SECRET;
-    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
-    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
-    if (portoneSecret && storeId && channelKey) {
-        components.portone = { status: 'healthy', message: '포트원 API 자격증명 설정 완료' };
+    if (portoneSecret) {
+        components.portone = { status: 'healthy', message: '포트원 API 자격증명 설정 완료 (storeId·channelKey 하드코딩)' };
     } else {
-        const missing = [!portoneSecret && 'PORTONE_API_SECRET', !storeId && 'PORTONE_STORE_ID', !channelKey && 'PORTONE_CHANNEL_KEY'].filter(Boolean);
-        components.portone = { status: 'warning', message: `포트원 미설정: ${missing.join(', ')} — 본인인증/결제 불가` };
+        components.portone = { status: 'warning', message: `포트원 미설정: PORTONE_API_SECRET — 본인인증 서버 검증 불가` };
         overall = setWorst(overall, 'warning');
     }
 
     // ── 12. 급여 뱃지 표준 검증 ──────────────────────────────────
     try {
+        // v2.0 표준 (2026-03-22 확정) — standards.ts PAY_BADGE_STANDARDS 반영
         const expected = ['시', '일', '주', '월', '연', 'T', '건', '협'];
-        const expectedColors = ['bg-cyan-500', 'bg-[#3B82F6]', 'bg-[#EC4899]', 'bg-[#7C3AED]', 'bg-[#EF4444]', 'bg-emerald-500', 'bg-emerald-500', 'bg-[#6B7280]'];
+        const expectedColors = ['bg-cyan-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 'bg-orange-500', 'bg-slate-500', 'bg-gray-400'];
         const payTypes = ['시급', '일급', '주급', '월급', '연봉', 'TC', '건별', '협의'];
         const errors: string[] = [];
 
