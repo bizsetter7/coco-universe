@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const { email, password, name, nickname, role, phone, birthdate, gender } = await req.json();
+        const { email, password, name, nickname, role, phone, birthdate, gender, contact_email } = await req.json();
 
         if (!email || !password) {
             return NextResponse.json(
@@ -97,6 +97,13 @@ export async function POST(req: NextRequest) {
                 }
             } catch (profileErr) {
                 console.warn('[signup] profiles upsert 예외:', profileErr);
+            }
+
+            // contact_email 별도 저장 (컬럼이 없으면 무시 — DB 마이그레이션 후 자동 활성화)
+            if (contact_email && data.user?.id) {
+                try {
+                    await supabaseAdmin.from('profiles').update({ contact_email }).eq('id', data.user.id);
+                } catch { /* profiles.contact_email 컬럼 미생성 시 무시 */ }
             }
 
             // 가입 보너스 100P 포인트 로그 기록

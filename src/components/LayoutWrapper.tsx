@@ -94,8 +94,11 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     // 로그인 전 인증 관련 페이지 — 사이드 배너 미노출
     const isAuthPage = ['login', 'signup', 'find-id', 'find-pw', 'guest'].includes(currentQueryPage || '');
 
-    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지는 제외)
-    if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isPublicPage) {
+    // /auth/ 하위 경로 (비밀번호 재설정 등) — 성인인증 게이트 없이 접근 가능해야 함
+    const isAuthFlowPage = pathname?.startsWith('/auth/');
+
+    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우 제외)
+    if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage) {
         return <AdultVerificationGate onVerify={handleVerify} onSkip={handleSkip} />;
     }
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────

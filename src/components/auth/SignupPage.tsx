@@ -237,6 +237,7 @@ export const SignupPage = () => {
     const [iGender, setIGender] = useState('');
     const [iNickname, setINickname] = useState('');
     const [iPhone, setIPhone] = useState('');
+    const [iEmail, setIEmail] = useState('');
     const [iSms, setISms] = useState(false);
 
     // ── 업체회원 폼 ──
@@ -248,6 +249,7 @@ export const SignupPage = () => {
     const [cBirth, setCBirth] = useState('');
     const [cGender, setCGender] = useState('');
     const [cPhone, setCPhone] = useState('');
+    const [cEmail, setCEmail] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -353,6 +355,7 @@ export const SignupPage = () => {
                 birthdate: role === 'individual' ? iBirth : cBirth,
                 gender: role === 'individual' ? iGender : cGender,
                 identity_ci: verifyResult?.ci,
+                contact_email: role === 'individual' ? iEmail : cEmail,
             });
             goStep(3);
         } catch (err: any) {
@@ -557,6 +560,12 @@ export const SignupPage = () => {
                             )}
                         </Field>
 
+                        {/* 이메일 (비밀번호 찾기용, 선택) */}
+                        <Field label="이메일" hint="선택 — 비밀번호 분실 시 재설정에 사용">
+                            <Input type="email" placeholder="example@gmail.com"
+                                value={iEmail} onChange={(e) => setIEmail(e.target.value)} />
+                        </Field>
+
                         {/* SMS 수신 동의 */}
                         <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl bg-gray-50 border border-gray-200">
                             <input type="checkbox" checked={iSms} onChange={(e) => setISms(e.target.checked)}
@@ -624,6 +633,10 @@ export const SignupPage = () => {
                                 {cPwConfirm && cPw !== cPwConfirm && (
                                     <p className="text-[11px] text-red-500 font-bold mt-1">비밀번호가 일치하지 않습니다.</p>
                                 )}
+                            </Field>
+                            <Field label="이메일" hint="선택 — 비밀번호 분실 시 재설정에 사용">
+                                <Input type="email" placeholder="example@gmail.com"
+                                    value={cEmail} onChange={(e) => setCEmail(e.target.value)} />
                             </Field>
                         </div>
 

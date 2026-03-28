@@ -384,7 +384,12 @@ function AdminContent() {
                                     <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">MASTER ADMIN</p>
                                     <p className="text-sm font-black text-slate-950">운영자 계정</p>
                                 </div>
-                                <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">프로필 설정</button>
+                                <button
+                                    onClick={() => router.push('/auth/update-password')}
+                                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
+                                >
+                                    🔑 비밀번호 변경
+                                </button>
                                 <button className="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">로그 관리</button>
                                 <button
                                     onClick={() => { localStorage.clear(); window.location.href = '/'; }}
