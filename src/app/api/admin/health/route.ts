@@ -385,6 +385,61 @@ export async function POST() {
         overall = setWorst(overall, 'warning');
     }
 
+    // ── 24. 회원 탈퇴 컬럼 ──────────────────────────────────────
+    try {
+        const { error } = await supabase.from('profiles').select('is_withdrawn').limit(1);
+        if (error) throw error;
+        components.db_withdraw = { status: 'healthy', message: 'profiles.is_withdrawn 컬럼 존재 — 회원 탈퇴 기능 정상' };
+    } catch {
+        components.db_withdraw = { status: 'error', message: 'profiles.is_withdrawn 컬럼 없음 — SQL: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_withdrawn boolean DEFAULT false, ADD COLUMN IF NOT EXISTS withdrawn_at timestamptz;' };
+        overall = setWorst(overall, 'error');
+    }
+
+    // ── 25. 만료 임박 공고 (7일 내) ─────────────────────────────
+    try {
+        const sevenDaysLater = new Date();
+        sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
+        const soonStr = sevenDaysLater.toISOString().split('T')[0];
+        const todayStr = new Date().toISOString().split('T')[0];
+        const { count, error } = await supabase
+            .from('shops').select('*', { count: 'exact', head: true })
+            .eq('status', 'active').lte('deadline', soonStr).gte('deadline', todayStr);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.expiring_soon = { status: 'healthy', message: '7일 내 만료 예정 공고 없음' };
+        } else {
+            components.expiring_soon = { status: 'warning', message: `7일 내 만료 예정 공고 ${count}건`, count };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.expiring_soon = { status: 'warning', message: `만료 임박 검사 실패: ${err.message}` };
+    }
+
+    // ── 26. notifications 테이블 (알림쪽지 시스템) ───────────────
+    try {
+        const { error } = await supabase.from('notifications').select('id').limit(1);
+        if (error) throw error;
+        components.db_notifications = { status: 'healthy', message: 'notifications 테이블 정상 — 알림쪽지 시스템 작동 가능' };
+    } catch {
+        components.db_notifications = { status: 'error', message: 'notifications 테이블 없음 — 승인/거절/만료 알림쪽지 발송 불가' };
+        overall = setWorst(overall, 'error');
+    }
+
+    // ── 27. 읽지 않은 알림 누적 (100건 초과 = 운영 경고) ────────
+    try {
+        const { count, error } = await supabase
+            .from('notifications').select('*', { count: 'exact', head: true }).eq('read', false);
+        if (error) throw error;
+        if (!count || count < 100) {
+            components.unread_notifications = { status: 'healthy', message: `미읽 알림 ${count ?? 0}건 — 정상 범위` };
+        } else {
+            components.unread_notifications = { status: 'warning', message: `미읽 알림 ${count}건 누적 — 회원 앱 접속 유도 필요`, count };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.unread_notifications = { status: 'warning', message: `미읽 알림 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 
