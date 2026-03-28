@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -13,8 +14,108 @@ import {
     XCircle,
     LogOut,
     Building2,
-    ClipboardList
+    ClipboardList,
+    Lock,
+    Eye,
+    EyeOff,
+    CheckCircle
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+// ── 비밀번호 변경 모달 ─────────────────────────────────────────
+function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
+    const [newPw, setNewPw] = useState('');
+    const [confirmPw, setConfirmPw] = useState('');
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDone, setIsDone] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        if (newPw.length < 6) { setError('비밀번호는 6자 이상이어야 합니다.'); return; }
+        if (newPw !== confirmPw) { setError('비밀번호가 일치하지 않습니다.'); return; }
+
+        setIsLoading(true);
+        const { error: updateError } = await supabase.auth.updateUser({ password: newPw });
+        setIsLoading(false);
+
+        if (updateError) { setError('변경 실패: ' + updateError.message); return; }
+        setIsDone(true);
+        setTimeout(onClose, 2000);
+    };
+
+    return (
+        <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+                <div className="flex items-center gap-3 mb-5">
+                    <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <Lock size={16} className="text-white" />
+                    </div>
+                    <h2 className="text-white font-black text-lg">어드민 비밀번호 변경</h2>
+                    <button onClick={onClose} className="ml-auto text-slate-500 hover:text-white transition">
+                        <XCircle size={20} />
+                    </button>
+                </div>
+
+                {isDone ? (
+                    <div className="text-center py-6">
+                        <CheckCircle size={40} className="text-emerald-400 mx-auto mb-3" />
+                        <p className="text-emerald-400 font-black">비밀번호가 변경되었습니다!</p>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <div>
+                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">새 비밀번호</label>
+                            <div className="relative">
+                                <input
+                                    type={showNew ? 'text' : 'password'}
+                                    value={newPw}
+                                    onChange={(e) => setNewPw(e.target.value)}
+                                    placeholder="6자 이상"
+                                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm font-bold pr-10 outline-none focus:ring-2 focus:ring-blue-500/30"
+                                    required
+                                />
+                                <button type="button" onClick={() => setShowNew(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                                    {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">비밀번호 확인</label>
+                            <div className="relative">
+                                <input
+                                    type={showConfirm ? 'text' : 'password'}
+                                    value={confirmPw}
+                                    onChange={(e) => setConfirmPw(e.target.value)}
+                                    placeholder="동일하게 입력"
+                                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm font-bold pr-10 outline-none focus:ring-2 focus:ring-blue-500/30"
+                                    required
+                                />
+                                <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                                    {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
+                        </div>
+                        {confirmPw && newPw !== confirmPw && (
+                            <p className="text-xs font-bold text-red-400">비밀번호가 일치하지 않습니다.</p>
+                        )}
+                        {error && <p className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">{error}</p>}
+                        <div className="flex gap-3 mt-1">
+                            <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-800 text-slate-400 rounded-xl font-black text-sm hover:bg-slate-700 transition">취소</button>
+                            <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-sm hover:bg-blue-500 transition disabled:opacity-50">
+                                {isLoading ? '변경 중...' : '변경하기'}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications';
 
@@ -61,14 +162,12 @@ const NavItem = ({ icon, label, active, badge, onClick }: { icon: React.ReactNod
 
 export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: AdminSidebarProps) => {
     const router = useRouter();
+    const [showPwModal, setShowPwModal] = useState(false);
 
     const handleNav = (tab: AdminTab) => {
         if (tab === 'marketing') {
             router.push('/admin/marketing');
         } else if (tab === 'stats') {
-            // If we are not on the main admin page, we might need to push
-            // But if this component is used in admin/page, onNavigate handles it.
-            // We'll let the parent handle the logic mostly, but marketing usually implies a page change.
             onNavigate(tab);
         } else {
             onNavigate(tab);
@@ -76,6 +175,7 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
     };
 
     return (
+        <>
         <aside className={`hidden md:flex w-64 bg-slate-950 text-white flex-col border-r border-slate-900 z-[10001] sticky top-0 min-h-screen shrink-0 ${className}`}>
             <div className="p-6 border-b border-slate-900">
                 <h1 className="text-xl font-black text-blue-400 tracking-tighter">COCO ADMIN</h1>
@@ -149,12 +249,26 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     onClick={() => handleNav('seo')}
                 />
             </nav>
+            <div className="p-4 border-t border-slate-900 space-y-2">
+                <button
+                    onClick={() => setShowPwModal(true)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
+                >
+                    <Lock size={18} /> 비밀번호 변경
+                </button>
+                <button onClick={() => router.push('/')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
+                    <LogOut size={18} /> 홈페이지로 이동
+                </button>
+            </div>
         </aside>
+        {showPwModal && <AdminChangePasswordModal onClose={() => setShowPwModal(false)} />}
+        </>
     );
 };
 
 export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onClose }: AdminMobileSidebarProps) => {
     const router = useRouter();
+    const [showPwModal, setShowPwModal] = useState(false);
 
     if (!isOpen) return null;
 
@@ -241,12 +355,19 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         onClick={() => handleNav('seo')}
                     />
                 </nav>
-                <div className="pt-6 border-t border-slate-900">
-                    <button onClick={() => router.push('/')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
+                <div className="pt-6 border-t border-slate-900 space-y-2">
+                    <button
+                        onClick={() => { setShowPwModal(true); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
+                    >
+                        <Lock size={18} /> 비밀번호 변경
+                    </button>
+                    <button onClick={() => { router.push('/'); onClose(); }} className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
                         <LogOut size={18} /> 홈페이지로 이동
                     </button>
                 </div>
             </aside>
+            {showPwModal && <AdminChangePasswordModal onClose={() => setShowPwModal(false)} />}
         </div>
     );
 };
