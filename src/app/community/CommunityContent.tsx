@@ -226,6 +226,34 @@ function CommunityContentInner() {
                 </div>
             </div>
 
+            {/* 포인트 적립 안내 — 전 카테고리 노출 */}
+            {activeTab !== '프리미엄 라운지' && (
+                <div className="px-4 sm:px-4 pt-3 pb-1">
+                    <div className="max-w-[1200px] mx-auto rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 px-4 py-3.5 flex items-start gap-3">
+                        <span className="text-lg leading-none mt-0.5 shrink-0">💡</span>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-black text-amber-800 mb-2">
+                                포인트를 모으는 방법!&nbsp;
+                                <span className="text-[#f82b60]">가입만 해도 600P!</span>
+                            </p>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                {[
+                                    { label: '회원가입 달성', point: '+100P' },
+                                    { label: '이력서 1회 등록', point: '+500P' },
+                                    { label: '게시글 작성', point: '+20P' },
+                                    { label: '댓글 작성', point: '+5P' },
+                                    { label: '출석체크', point: '+3P' },
+                                ].map(({ label, point }) => (
+                                    <span key={label} className="text-[11px] text-amber-700 font-bold whitespace-nowrap">
+                                        ✅ {label} <span className="text-[#f82b60] font-black">{point}</span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="pt-2 md:pt-4 pb-20">
                 <main className="max-w-[1200px] mx-auto px-0 sm:px-4 space-y-4">
 
