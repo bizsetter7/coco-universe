@@ -16,18 +16,30 @@ export default function UpdatePasswordPage() {
     const [error, setError] = useState('');
     const [sessionReady, setSessionReady] = useState(false);
 
-    // Supabase가 URL 해시(#access_token=...)를 자동으로 세션으로 교환함
+    // Supabase 세션 확인 — 3가지 경로 모두 커버
+    // 1) 이메일 재설정 링크 → PASSWORD_RECOVERY 이벤트
+    // 2) 로그인 상태에서 직접 진입 → getUser()로 즉시 확인
+    // 3) SIGNED_IN 이벤트 (Supabase가 토큰 교환 후 발생)
     useEffect(() => {
+        // 즉시 로그인 상태 확인 (getUser가 getSession보다 신뢰도 높음)
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) setSessionReady(true);
+        });
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-            if (event === 'PASSWORD_RECOVERY') {
+            if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
                 setSessionReady(true);
             }
         });
-        // 이미 세션이 있을 수도 있으므로 체크
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) setSessionReady(true);
-        });
-        return () => subscription.unsubscribe();
+
+        // 안전망: 3초 후에도 세션 미확인이면 강제 활성화
+        // (updateUser 자체가 세션 없으면 에러를 반환하므로 보안상 안전)
+        const fallback = setTimeout(() => setSessionReady(true), 3000);
+
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(fallback);
+        };
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
