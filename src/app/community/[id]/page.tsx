@@ -6,7 +6,7 @@ import CommunityDetailClient from './CommunityDetailClient';
 // 제목+내용에서 의미있는 단어를 추출하고, 코코알바 관련 고정 키워드와 합칩니다.
 function extractSeoKeywords(title: string, content: string, category: string): string {
     const BASE_KEYWORDS = [
-        '코코알바', '코코판', '여성알바', '엔터프라이즈알바', '프라이빗 매칭', '언니들수다',
+        '코코알바', '코코판', '여성알바', '엔터프라이즈알바', '룸알바', '언니들수다',
         '연애고민', '인재커뮤니티', '썰', '공감', '연애썰', '직장인고민'
     ];
 
