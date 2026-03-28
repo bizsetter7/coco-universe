@@ -143,12 +143,10 @@ export default function LeftSidebar({
             }
 
             // 2. Real Supabase Login
-            if (id.includes('@')) {
-                await signIn(id, pw);
-                clearLoginForm();
-            } else {
-                alert('등록되지 않은 계정입니다.\n테스트 계정 또는 이메일 형식을 사용해주세요.');
-            }
+            // 아이디만 입력한 경우 @cocoalba.kr 이메일 형식으로 변환 (LoginPage와 동일한 로직)
+            const email = id.includes('@') ? id : `${id}@cocoalba.kr`;
+            await signIn(email, pw);
+            clearLoginForm();
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : '아이디 또는 비밀번호를 확인해주세요.';
             console.error('Sidebar Login error:', err);
