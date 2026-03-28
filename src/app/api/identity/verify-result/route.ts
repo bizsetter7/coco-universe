@@ -71,9 +71,6 @@ export async function POST(req: NextRequest) {
         // 인증 성공 데이터 정제 (PortOne V2 verifiedCustomer 객체)
         const identity = verifyData.verifiedCustomer;
 
-        // 원본 필드 디버깅 로그 (실제 응답 구조 파악용)
-        console.log('[Identity/verify-result] verifiedCustomer raw:', JSON.stringify(identity));
-
         // PortOne V2: gender는 'MALE'/'FEMALE'/'UNKNOWN' 형식으로 반환
         const genderRaw = identity?.gender || '';
         const genderCode = genderRaw === 'MALE' ? 'M' : genderRaw === 'FEMALE' ? 'F' : 'U';

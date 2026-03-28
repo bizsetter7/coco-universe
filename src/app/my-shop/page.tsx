@@ -374,7 +374,6 @@ function MyShopContent() {
 
     useEffect(() => {
         const handleToggle = () => {
-            console.log('[DEBUG] Page Received open-my-shop-menu');
             setShowMobileMenu(true);
         };
         // [New Navigator Integration] Listen for Global Header Menu Click

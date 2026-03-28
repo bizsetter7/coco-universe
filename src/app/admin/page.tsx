@@ -85,11 +85,6 @@ function AdminContent() {
 
     const [realInquiries, setRealInquiries] = useState<any[]>([]);
 
-    // 모달 오픈 시 배경 스크롤 방지
-
-    // 모달 오픈 시 배경 스크롤 방지
-    // 모달 오픈 시 배경 스크롤 방지
-
 
     // [Safety] Force cleanup on mount to prevent stuck scroll from previous navigation
     useEffect(() => {
@@ -104,20 +99,23 @@ function AdminContent() {
             const { data: inqData } = await supabase
                 .from('inquiries')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .limit(500);
             if (inqData) setRealInquiries(inqData);
 
             // 1. Fetch Shops
             const { data: adsData } = await supabase
                 .from('shops')
                 .select('*')
-                .order('updated_at', { ascending: false });
+                .order('updated_at', { ascending: false })
+                .limit(500);
 
             // 2. Fetch Profiles
             const { data: userData } = await supabase
                 .from('profiles')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .limit(1000);
             if (userData) {
                 setRealUsers(userData);
                 setStats(prev => ({
@@ -282,15 +280,23 @@ function AdminContent() {
 
             window.addEventListener('notes-updated', fetchData);
 
+            // Debounce: Realtime 이벤트가 연속 발생해도 1초에 한 번만 fetchData 실행
+            let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+            const debouncedFetch = () => {
+                if (debounceTimer) clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(fetchData, 1000);
+            };
+
             const channel = supabase
                 .channel('admin-realtime')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'shops' }, fetchData)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, fetchData)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, fetchData)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchData)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'shops' }, debouncedFetch)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, debouncedFetch)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, debouncedFetch)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, debouncedFetch)
                 .subscribe();
 
             return () => {
+                if (debounceTimer) clearTimeout(debounceTimer);
                 window.removeEventListener('notes-updated', fetchData);
                 supabase.removeChannel(channel);
             };

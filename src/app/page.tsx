@@ -2,13 +2,15 @@
 
 import React, { useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import HomeClient from '@/components/home/HomeClient';
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
-import { LoginPage } from '@/components/auth/LoginPage';
-import { SignupPage } from '@/components/auth/SignupPage';
-import { FindAccountPage } from '@/components/auth/FindAccountPage';
-import { CustomerCenterContent } from '@/app/customer-center/page';
+
+const LoginPage = dynamic(() => import('@/components/auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const SignupPage = dynamic(() => import('@/components/auth/SignupPage').then(m => ({ default: m.SignupPage })));
+const FindAccountPage = dynamic(() => import('@/components/auth/FindAccountPage').then(m => ({ default: m.FindAccountPage })));
+const CustomerCenterContent = dynamic(() => import('@/app/customer-center/page').then(m => ({ default: m.CustomerCenterContent })));
 import { useLocation } from '@/hooks/useLocation';
 import { isPreRelease } from '@/lib/config';
 import { ShieldCheck } from 'lucide-react';

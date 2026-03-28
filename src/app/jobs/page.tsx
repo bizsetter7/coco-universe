@@ -22,7 +22,8 @@ export default async function JobPage() {
         .from('shops')
         .select('*')
         .eq('status', 'active')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(500);
 
     const shops: Shop[] = (data || []).map((ad: any) => ({
         ...ad,

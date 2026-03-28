@@ -37,14 +37,13 @@ export const HeroSection = () => {
 
     return (
         <div className="relative w-full h-[360px] md:h-[340px] overflow-hidden bg-slate-950 text-white shadow-2xl">
-            {/* Background Layer with Animated Gradient Mesh */}
-            <div className={`absolute inset-0 transition-opacity duration-1000 ${bannerInfo.bg} opacity-80`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(219,39,119,0.1),transparent_70%)] animate-pulse" />
+            {/* Background Layer */}
+            <div className={`absolute inset-0 ${bannerInfo.bg} opacity-80`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(219,39,119,0.1),transparent_70%)]" />
             </div>
 
-            {/* Glassmorphism Grain Overlay */}
+            {/* Overlay */}
             <div className="absolute inset-0 bg-slate-950/20 backdrop-brightness-75 z-0" />
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')] opacity-10 pointer-events-none" />
 
             {/* Main Content Box - Stable Responsive Layout */}
             <div className="relative z-10 h-full max-w-3xl mx-auto flex flex-col items-center justify-center px-6 text-center">

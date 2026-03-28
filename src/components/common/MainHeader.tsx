@@ -295,10 +295,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                             {isMounted && (pathname?.startsWith('/my-shop') || pathname?.startsWith('/customer-center') || pathname?.startsWith('/community') || !!page || isSimulated || userRole === 'admin') && (
                                 <button 
                                     onClick={() => {
-                                        console.log('[DEBUG] Header Menu Clicked, Path:', pathname);
                                         if (pathname?.includes('my-shop')) {
-                                            // 마이페이지 전용 메뉴 호출 (커스텀 이벤트)
-                                            console.log('[DEBUG] Dispatching open-my-shop-menu');
                                             window.dispatchEvent(new CustomEvent('open-my-shop-menu', { bubbles: true, detail: { time: Date.now() } }));
                                         } else {
                                             setShowMobileMenu(true);

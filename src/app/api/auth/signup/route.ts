@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
                 await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
                     email_confirm: true,
                 });
-                console.log('[signup] updateUserById email_confirm 적용 완료');
+
             } catch (updateErr) {
                 console.warn('[signup] updateUserById 실패 (무시):', updateErr);
             }
