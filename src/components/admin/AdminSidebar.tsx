@@ -20,12 +20,13 @@ import {
     EyeOff,
     CheckCircle
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-
 // ── 비밀번호 변경 모달 ─────────────────────────────────────────
 function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
+    const [email, setEmail] = useState('');
+    const [currentPw, setCurrentPw] = useState('');
     const [newPw, setNewPw] = useState('');
     const [confirmPw, setConfirmPw] = useState('');
+    const [showCurrent, setShowCurrent] = useState(false);
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,16 +36,27 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        if (newPw.length < 6) { setError('비밀번호는 6자 이상이어야 합니다.'); return; }
-        if (newPw !== confirmPw) { setError('비밀번호가 일치하지 않습니다.'); return; }
+        if (!email) { setError('이메일을 입력해주세요.'); return; }
+        if (!currentPw) { setError('현재 비밀번호를 입력해주세요.'); return; }
+        if (newPw.length < 6) { setError('새 비밀번호는 6자 이상이어야 합니다.'); return; }
+        if (newPw !== confirmPw) { setError('새 비밀번호가 일치하지 않습니다.'); return; }
 
         setIsLoading(true);
-        const { error: updateError } = await supabase.auth.updateUser({ password: newPw });
-        setIsLoading(false);
-
-        if (updateError) { setError('변경 실패: ' + updateError.message); return; }
-        setIsDone(true);
-        setTimeout(onClose, 2000);
+        try {
+            const res = await fetch('/api/admin/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, currentPassword: currentPw, newPassword: newPw }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '변경 실패');
+            setIsDone(true);
+            setTimeout(onClose, 2000);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -69,6 +81,33 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
                 ) : (
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         <div>
+                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">어드민 이메일</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="admin@example.com"
+                                className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/30"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">현재 비밀번호</label>
+                            <div className="relative">
+                                <input
+                                    type={showCurrent ? 'text' : 'password'}
+                                    value={currentPw}
+                                    onChange={(e) => setCurrentPw(e.target.value)}
+                                    placeholder="현재 비밀번호 입력"
+                                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm font-bold pr-10 outline-none focus:ring-2 focus:ring-blue-500/30"
+                                    required
+                                />
+                                <button type="button" onClick={() => setShowCurrent(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                                    {showCurrent ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
+                        </div>
+                        <div>
                             <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">새 비밀번호</label>
                             <div className="relative">
                                 <input
@@ -85,7 +124,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">비밀번호 확인</label>
+                            <label className="block text-xs font-black text-slate-400 mb-1.5 uppercase tracking-wider">새 비밀번호 확인</label>
                             <div className="relative">
                                 <input
                                     type={showConfirm ? 'text' : 'password'}
