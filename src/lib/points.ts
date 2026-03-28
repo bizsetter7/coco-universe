@@ -64,12 +64,11 @@ export async function updatePoints(userId: string, reason: PointReason, customAm
 
         // 2. Log the transaction (Using point_logs for isolation)
         const { error: logError } = await supabase
-            .from('point_logs') // [Fix] credit_logs와 분리
+            .from('point_logs')
             .insert({
                 user_id: userId,
                 amount,
-                reason, // [New] 포인트 전용 컬럼
-                note: `[COCO] ${reason}`,
+                reason,
             });
 
         if (logError) throw logError;
