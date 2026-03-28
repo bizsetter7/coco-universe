@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         // active 상태이면서 deadline이 오늘 이전인 공고 조회
         const { data: expiredShops, error: fetchError } = await supabaseAdmin
             .from('shops')
-            .select('id, user_id, title, shopName, deadline')
+            .select('id, user_id, title, name, deadline')
             .eq('status', 'active')
             .lt('deadline', todayKST)
             .not('deadline', 'is', null);
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
                         user_id: shop.user_id,
                         type: 'AD_EXPIRED',
                         title: '광고 기간이 만료되었습니다',
-                        message: `'${shop.title || shop.shopName}' 공고의 게재 기간이 만료되어 마감 처리되었습니다. 광고 연장을 원하시면 마이샵에서 신청해주세요.`,
+                        message: `'${shop.title || shop.name}' 공고의 게재 기간이 만료되어 마감 처리되었습니다. 광고 연장을 원하시면 마이샵에서 신청해주세요.`,
                         read: false,
                         link: '/my-shop?view=closed-ads',
                         created_at: nowIso,
