@@ -78,13 +78,6 @@ const CLEAN_SEO: SEOConfig = {
             'naver-site-verification': ['950201bcd2e28188884dfc9feeb6951a40c0887c'],
         },
     },
-    other: {
-        "geo.region": "KR",
-        "geo.placename": "Seoul",
-        "geo.position": "37.4979;127.0276",
-        "ICBM": "37.4979, 127.0276",
-        "og:image": "https://www.cocoalba.kr/og-image.jpg"
-    }
   },
   schemas: [BASE_ORGANIZATION_SCHEMA, CLEAN_LOCAL_BUSINESS_SCHEMA]
 };
@@ -99,13 +92,6 @@ const getShadowSEO = (): SEOConfig => ({
     description: decodeB64(shadowSEO.metadata.description),
     keywords: shadowSEO.metadata.keywords.map(decodeB64),
     verification: shadowSEO.metadata.verification,
-    other: {
-        "geo.region": "KR",
-        "geo.placename": (shadowSEO.metadata as any).placename ? decodeB64((shadowSEO.metadata as any).placename) : "Seoul",
-        "geo.position": "37.4979;127.0276",
-        "ICBM": "37.4979, 127.0276",
-        "og:image": "https://www.cocoalba.kr/og-image.jpg"
-    }
   },
   schemas: [
     {

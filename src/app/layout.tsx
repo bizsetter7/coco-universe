@@ -42,15 +42,35 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const seoConfig = getCurrentSEO();
+  const ogImage = 'https://www.cocoalba.kr/og-image.jpg';
   return {
     title: seoConfig.metadata.title,
     description: seoConfig.metadata.description,
     keywords: seoConfig.metadata.keywords,
     verification: seoConfig.metadata.verification,
+    openGraph: {
+      title: seoConfig.metadata.title,
+      description: seoConfig.metadata.description,
+      url: siteUrl,
+      siteName: '코코알바',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: '코코알바 - No.1 여성알바 매칭' }],
+      type: 'website',
+      locale: 'ko_KR',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoConfig.metadata.title,
+      description: seoConfig.metadata.description,
+      images: [ogImage],
+    },
     other: {
       google: "notranslate",
       "color-scheme": seoConfig.theme.colorScheme,
       "supported-color-schemes": seoConfig.theme.supportedColorSchemes,
+      "geo.region": "KR",
+      "geo.placename": "Seoul",
+      "geo.position": "37.4979;127.0276",
+      "ICBM": "37.4979, 127.0276",
     },
   };
 }
@@ -165,6 +185,28 @@ export default function RootLayout({
           </>
         )}
         
+        {/* WebSite + SearchAction Schema — 구글 사이트링크 검색박스 활성화 */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "코코알바",
+              "alternateName": "COCOALBA",
+              "url": "https://www.cocoalba.kr",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://www.cocoalba.kr/jobs?q={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+
         <Suspense fallback={null}>
           <SEOManager />
           <SEOInjection />
