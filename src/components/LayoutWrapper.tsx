@@ -15,6 +15,8 @@ import { AdultVerificationGate } from './common/AdultVerificationGate';
 import { AuditLanding } from './audit/AuditLanding';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useIdleLogout } from '@/hooks/useIdleLogout';
+import { IdleLogoutModal } from './auth/IdleLogoutModal';
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
 
 interface LayoutWrapperProps {
@@ -26,7 +28,13 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const { user: authUser, isLoading } = useAuth();
+    const { user: authUser, isLoading, isLoggedIn, logout } = useAuth();
+
+    // ── [Idle Logout Setup] ───────────────────────────────────────────────────
+    const { showWarning, secondsLeft, keepAlive } = useIdleLogout({
+        enabled: isLoggedIn && (authUser?.type === 'corporate' || authUser?.type === 'individual'),
+        onLogout: logout,
+    });
 
     const isAdminPage = pathname?.startsWith('/admin');
 
@@ -157,6 +165,13 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             <Suspense fallback={null}>
                 <MobileBottomNav />
             </Suspense>
+
+            <IdleLogoutModal
+                isOpen={showWarning}
+                secondsLeft={secondsLeft}
+                onKeepAlive={keepAlive}
+                onLogout={logout}
+            />
         </React.Fragment>
     );
 };
