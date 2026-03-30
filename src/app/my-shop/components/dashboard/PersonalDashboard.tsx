@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X, Gift, Coins, Lock } from 'lucide-react';
+import { Star, CreditCard, AlertTriangle, Briefcase, FileText, User, Home, Settings, LayoutDashboard, X, Gift, Coins, Lock, CalendarDays } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { PersonalMemberEdit } from '../PersonalMemberEdit';
@@ -14,6 +14,7 @@ import { BlockSettingsView } from '../BlockSettingsView';
 import { PointExchangeView } from '../PointExchangeView';
 import { PointHistoryView } from '../PointHistoryView';
 import { ChangePasswordView } from '../ChangePasswordView';
+import { AttendanceView } from '../AttendanceView';
 import { supabase } from '@/lib/supabase';
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, getDaysUntilExpiry, SCRAP_EXPIRE_DAYS, getAllShopSnapshots } from '@/utils/favorites';
@@ -73,7 +74,6 @@ export function PersonalSidebar({ view, setView }: { view: any, setView: (v: any
         { id: 'custom-jobs', icon: Briefcase, label: '맞춤구인정보' },
         { id: 'my-posts', icon: FileText, label: '내가 작성한 게시글' },
         { id: 'block-settings', icon: User, label: '회원 차단 설정' },
-        { id: 'change-password', icon: Lock, label: '비밀번호 변경' },
     ];
 
     return (
@@ -299,6 +299,21 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
         } catch { setApplyCount(0); }
     }, []);
 
+    const [todayChecked, setTodayChecked] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        if (!user?.id || user.id.startsWith('mock_')) return;
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const from = `${todayStr}T00:00:00`;
+        const to = `${todayStr}T23:59:59`;
+        import('@/lib/supabase').then(({ supabase }) => {
+            supabase.from('point_logs').select('id').eq('user_id', user.id).eq('reason', 'ATTENDANCE_CHECK').gte('created_at', from).lte('created_at', to).then(({ data }) => {
+                setTodayChecked(data ? data.length > 0 : false);
+            });
+        });
+    }, [user?.id]);
+
     const stats = [
         { label: '스크랩한 공고', val: scrapCount, icon: <Star className="text-yellow-400" />, onClick: () => setView('scrap-jobs') },
         { label: '열람한 공고', val: viewedCount, icon: <Home className="text-[#f82b60]" />, onClick: undefined },
@@ -307,6 +322,32 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
 
     return (
         <div className="space-y-6">
+            {/* 0. 출석체크 유도 배너 */}
+            {todayChecked === false && (
+                <button
+                    onClick={() => setView('attendance')}
+                    className="w-full p-4 rounded-[24px] bg-gradient-to-r from-[#f82b60] to-pink-400 text-white flex items-center justify-between gap-3 shadow-lg shadow-rose-200 hover:brightness-110 active:scale-[0.99] transition-all"
+                >
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl">📅</span>
+                        <div className="text-left">
+                            <p className="font-black text-sm">오늘 출석체크 안 하셨네요!</p>
+                            <p className="text-white/80 text-xs font-bold">지금 체크하면 +3P 즉시 적립</p>
+                        </div>
+                    </div>
+                    <span className="bg-white/20 rounded-xl px-3 py-1.5 text-xs font-black whitespace-nowrap">출석하기 →</span>
+                </button>
+            )}
+            {todayChecked === true && (
+                <div className="w-full p-4 rounded-[24px] bg-green-50 border border-green-100 flex items-center gap-3">
+                    <span className="text-2xl">✅</span>
+                    <div>
+                        <p className="font-black text-sm text-green-700">오늘 출석 완료!</p>
+                        <p className="text-green-500 text-xs font-bold">+3P 적립됐습니다. 내일도 만나요 😊</p>
+                    </div>
+                </div>
+            )}
+
             {/* 1. 통계 그리드 섹션 — 모바일: 건수를 텍스트 옆에 / PC: 대형 숫자 아래에 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 {stats.map((item, idx) => (
@@ -488,12 +529,12 @@ export default function PersonalDashboard({ view, setView, resumeCount = 0, onSh
                 {view === 'scrap-jobs' && <ScrapJobsView setView={setView} />}
                 {view === 'point-exchange' && <PointExchangeView setView={setView} />}
                 {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
+                {view === 'attendance' && <AttendanceView userId={authUser?.id ?? ''} />}
                 {view === 'payment-history' && <ComingSoonView title="유료결제 내역" />}
                 {view === 'excluded-shops' && <ComingSoonView title="열람불가 업소설정" />}
                 {view === 'custom-jobs' && <ComingSoonView title="맞춤구인정보" />}
                 {view === 'my-posts' && <MyPostsView setView={setView} />}
                 {view === 'block-settings' && <BlockSettingsView />}
-                {view === 'change-password' && <ChangePasswordView setView={setView} />}
             </main>
         </div>
     );

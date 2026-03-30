@@ -18,19 +18,16 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { updatePoints } from '@/lib/points';
 
-const CATEGORIES = [
-    '그녀들의 수다',
-    '꿀팁 & 노하우',
-    '뷰티·패션·이벤트',
-    '같이일할단짝',
-    '중고거래',
-    '무료법률상담',
-    '프리미엄 라운지'
-];
+import { CATEGORIES as COMMUNITY_CATEGORIES } from '@/constants/community';
+
+// '전체' 탭을 제외한 실제 작성 가능한 카테고리만 필터링
+const CATEGORIES = COMMUNITY_CATEGORIES
+    .filter(cat => cat.id !== 'all')
+    .map(cat => cat.name);
 
 export default function WritePostPage() {
     const router = useRouter();
-    const [category, setCategory] = useState(CATEGORIES[0]);
+    const [category, setCategory] = useState('');
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [images, setImages] = useState<string[]>([]);
@@ -42,8 +39,10 @@ export default function WritePostPage() {
 
     const { user, isLoggedIn } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    // usePreventLeave 우회용 — 등록 성공 직후 true로 설정
+    const isSubmittedRef = React.useRef(false);
 
-    usePreventLeave(title.trim() !== '' || content.trim() !== '');
+    usePreventLeave(!isSubmittedRef.current && (title.trim() !== '' || content.trim() !== ''));
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -70,8 +69,10 @@ export default function WritePostPage() {
         // Given "1:1 Inquiry" context, usually members write. But "Community" might be open.
         // Let's stick to "Login Required" for now to avoid spam, but ADD password as mandatory field.
 
+        if (!category) return alert('카테고리를 선택해주세요.');
         if (!title.trim() || !content.trim()) return alert('제목과 내용을 입력해주세요.');
-        if (!password.trim() || password.length < 4) return alert('게시글 비밀번호를 4자리 이상 입력해주세요. (수정/삭제 시 필요)');
+        // [New Policy] 모든 사용자(개인회원 포함) 수정/삭제를 위해 비밀번호 필수 입력 
+        if (!password.trim() || password.length < 4) return alert('추후 수정 및 삭제를 위해 비밀번호를 4자리 이상 입력해주세요.');
 
         setIsSubmitting(true);
 
@@ -88,34 +89,39 @@ export default function WritePostPage() {
         // ─────────────────────────────────────────────────────────────
 
         try {
-            // Include password and is_secret in insert
-            const { error } = await supabase
-                .from('community_posts')
-                .insert([{
+            // 서버 API 통해 등록 (RLS 우회)
+            const res = await fetch('/api/community/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     author_id: (isLoggedIn && user?.id && !user.id.startsWith('mock_')) ? user.id : null,
-                    author_name: isLoggedIn ? user.name : '익명',
-                    author_nickname: isLoggedIn ? user.nickname : '익명',
+                    author_name: isLoggedIn ? (user.nickname || '익명') : '익명',
+                    author_nickname: isLoggedIn ? (user.nickname || '익명') : '익명',
                     category,
                     title,
                     content,
                     images,
                     password,
                     is_secret: isSecret,
-                    seo_keywords: seoKeywords, // ← 자동 생성 SEO 키워드
-                    created_at: new Date().toISOString()
-                }]);
+                    seo_keywords: seoKeywords,
+                }),
+            });
 
-            // Inside WritePostPage component, update handleSubmit
-            if (error) {
-                console.warn("DB Insert failed, trying local backup...", error.message);
-                throw error;
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                throw new Error(result.error || '서버 오류');
             }
 
-            // [Gamification] Award points for posting
+            // ✅ 성공 — usePreventLeave 즉시 해제 후 이동
+            isSubmittedRef.current = true;
+            setTitle('');
+            setContent('');
+
+            // [Gamification] 포인트 지급
             if (isLoggedIn && user?.id && !user.id.startsWith('mock_')) {
                 try {
                     await updatePoints(user.id as string, 'COMMUNITY_POST');
-                    alert('게시글이 등록되었습니다! 50포인트가 적립되었습니다. ✨');
+                    alert('게시글이 등록되었습니다! +20P 적립되었습니다. ✨');
                 } catch (pErr) {
                     console.error('Point award failed:', pErr);
                     alert('게시글이 등록되었습니다!');
@@ -124,7 +130,7 @@ export default function WritePostPage() {
                 alert('게시글이 등록되었습니다!');
             }
 
-            router.back();
+            router.push(`/community?t=${Date.now()}`);
         } catch (err: any) {
             console.error(err);
             alert(`등록 실패: ${err.message || '알 수 없는 오류'}`);
@@ -175,8 +181,9 @@ export default function WritePostPage() {
                         <select
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
-                            className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:border-[#f82b60] transition-all appearance-none cursor-pointer"
+                            className={`w-full border-2 rounded-2xl px-5 py-4 text-sm font-black outline-none transition-all appearance-none cursor-pointer ${category === '' ? 'border-[#f82b60] text-[#f82b60] bg-rose-50' : 'bg-gray-50 border-gray-100 focus:border-[#f82b60]'}`}
                         >
+                            <option value="" disabled>카테고리를 선택해주세요</option>
                             {CATEGORIES.map(cat => (
                                 <option key={cat} value={cat}>{cat}</option>
                             ))}
@@ -203,7 +210,7 @@ export default function WritePostPage() {
                             <span className="text-[10px] text-gray-400 font-bold">관리자와 작성자만 확인 가능</span>
                         </div>
 
-                        <div className={`flex items-center gap-3 transition-all duration-300 ${isSecret ? 'opacity-100 translate-x-0' : 'opacity-40 pointer-events-none'}`}>
+                        <div className={`flex items-center gap-3 transition-opacity duration-300 opacity-100`}>
                             <div className="relative flex-1 sm:w-48">
                                 <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input
@@ -302,7 +309,7 @@ export default function WritePostPage() {
                     <button
                         onClick={handleSubmit}
                         className="flex-[2] py-4 bg-[#f82b60] text-white rounded-2xl font-black text-base shadow-xl shadow-rose-200 hover:bg-[#db2456] transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
-                        disabled={isSubmitting || !title.trim() || !content.trim() || !password.trim()}
+                        disabled={isSubmitting || !title.trim() || !content.trim() || ((isSecret || !isLoggedIn) && !password.trim())}
                     >
                         {isSubmitting ? '등록 중...' : '게시글 등록하기'}
                     </button>

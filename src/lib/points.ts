@@ -12,7 +12,8 @@ export type PointReason =
     | 'SOS_SEND_MEDIUM'  // ~30명 수신
     | 'SOS_SEND_LARGE'   // ~50명 수신
     | 'SOS_SEND_XLARGE'  // 50명 초과
-    | 'ADMIN_GRANT';     // 어드민 수동 지급 (customAmount 필수)
+    | 'ADMIN_GRANT'     // 어드민 수동 지급 (customAmount 필수)
+    | 'ATTENDANCE_CHECK'; // 출석체크 일일 지급
 
 const POINT_AMOUNTS: Record<PointReason, number> = {
     JOIN: 100,
@@ -27,6 +28,7 @@ const POINT_AMOUNTS: Record<PointReason, number> = {
     SOS_SEND_LARGE: -1500,  // ~30명
     SOS_SEND_XLARGE: -2000, // 30명 초과
     ADMIN_GRANT: 0,        // customAmount로 지정
+    ATTENDANCE_CHECK: 3,   // 일일 출석체크 +3P
 };
 
 /** 수신자 수 기반 SOS 차감 reason 결정 */
@@ -41,41 +43,22 @@ export function getSosPointReason(recipientCount: number): PointReason {
  * Award or deduct points from a user
  */
 export async function updatePoints(userId: string, reason: PointReason, customAmount?: number) {
-    const amount = customAmount ?? POINT_AMOUNTS[reason];
-
     try {
-        // 1. Update Profile (Total Points - Cocos side)
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('points') // [Fix] credit_balance가 아닌 points 컬럼 조회
-            .eq('id', userId)
-            .single();
+        const res = await fetch('/api/points/award', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, reason, customAmount }),
+        });
 
-        if (profileError) throw profileError;
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            console.error(`[updatePoints] API error (${reason}):`, data.error || data);
+            return { success: false, error: data.error };
+        }
 
-        const newTotal = (profile?.points || 0) + amount;
-
-        const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ points: newTotal, updated_at: new Date().toISOString() }) // [Fix] points 컬럼 업데이트
-            .eq('id', userId);
-
-        if (updateError) throw updateError;
-
-        // 2. Log the transaction (Using point_logs for isolation)
-        const { error: logError } = await supabase
-            .from('point_logs')
-            .insert({
-                user_id: userId,
-                amount,
-                reason,
-            });
-
-        if (logError) throw logError;
-
-        return { success: true, newTotal };
-    } catch (err) {
-        console.error('Credit update failed:', err);
+        return { success: true, newTotal: data.newTotal };
+    } catch (err: any) {
+        console.error(`[updatePoints] Network error (${reason}):`, err.message);
         return { success: false, error: err };
     }
 }

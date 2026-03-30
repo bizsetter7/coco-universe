@@ -15,7 +15,12 @@
 
 ### 📏 데이터 규격 (Standards Guard)
 - [ ] 모든 공고 요약 렌더링 시 [standards.ts](file:///src/constants/standards.ts)의 매핑 로직을 통과하는지 확인
-- [ ] `normalized_standards` 필터가 없는 공고 데이터(Null)를 `정보없음`으로 보정하는제 확인
+- [ ] `normalized_standards` 필터가 없는 공고 데이터(Null)를 `정보없음`으로 보정하는지 확인
+
+### 🔒 프라이버시 및 커뮤니티 권한 (Privacy & Board Policy)
+- [ ] `write/page.tsx`, `CommunityDetailClient.tsx` 등 모든 사용자 입력 폼에서 `user.name`(위험 실명) 대신 `user.nickname`(또는 '익명')만 전송되는지 확인
+- [ ] 관리자(`user.type === 'admin'`) 외에는 게시글/댓글 무단 삭제 및 우회가 불가능한지, RLS/API 엔드포인트 무결성 점검
+- [ ] 게시물 작성 시 익명/비로그인/일반회원 구분 없이 최소 4자 이상의 비밀번호가 원천 강제되어 수정/삭제 권리 충돌을 차단하는지 확인
 
 ## 2. 장애 복구 매뉴얼 (Recovery Manual)
 

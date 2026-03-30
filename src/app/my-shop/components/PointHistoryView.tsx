@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Coins, AlertCircle, ShoppingBag, Zap, CreditCard, MessageSquare, UserPlus, FileText } from 'lucide-react';
+import { Coins, AlertCircle, ShoppingBag, Zap, CreditCard, MessageSquare, UserPlus, FileText, CalendarCheck } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 
 export function PointHistoryView({ userId }: { userId: string }) {
@@ -38,6 +38,7 @@ export function PointHistoryView({ userId }: { userId: string }) {
             case 'RESUME_UPLOAD': return <FileText size={16} className="text-purple-500" />;
             case 'COMMUNITY_POST': return <MessageSquare size={16} className="text-green-500" />;
             case 'COMMUNITY_COMMENT': return <MessageSquare size={16} className="text-emerald-500" />;
+            case 'ATTENDANCE_CHECK': return <CalendarCheck size={16} className="text-rose-500" />;
             case 'SHOP_JUMP': return <Zap size={16} className="text-amber-500" />;
             case 'COUPON_EXCHANGE': return <ShoppingBag size={16} className="text-rose-500" />;
             default: return <CreditCard size={16} className="text-gray-400" />;
@@ -52,6 +53,7 @@ export function PointHistoryView({ userId }: { userId: string }) {
             case 'RESUME_UPLOAD': return '이력서 등록 혜택';
             case 'COMMUNITY_POST': return '커뮤니티 글 작성';
             case 'COMMUNITY_COMMENT': return '커뮤니티 댓글 작성';
+            case 'ATTENDANCE_CHECK': return '일일 출석체크';
             case 'SHOP_JUMP': return '공고 최상단 점프';
             case 'COUPON_EXCHANGE': return '상품권 교환 신청';
             case 'SOS_SEND_SMALL':

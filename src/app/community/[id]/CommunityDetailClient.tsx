@@ -21,11 +21,19 @@ import { MOCK_POSTS, MOCK_COMMENTS } from '@/constants/community';
 import { supabase } from '@/lib/supabase';
 import { Post, Comment } from '@/types/community';
 import { createPortal } from 'react-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { updatePoints } from '@/lib/points';
 
 export default function CommunityDetailClient({ id }: { id: string }) {
     const router = useRouter();
     const postId = parseInt(id);
     const [post, setPost] = useState<Post | null>(null);
+    const { user, isLoggedIn } = useAuth();
+
+    // [Comment Input State]
+    const [commentText, setCommentText] = useState('');
+    const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
 
     // [New] Views increment logic
     useEffect(() => {
@@ -130,6 +138,44 @@ export default function CommunityDetailClient({ id }: { id: string }) {
         }
     };
 
+    // [Comment Submit Handler] 서버 API → DB 삽입 + 5P 포인트 지급
+    const handleCommentSubmit = async () => {
+        if (!isLoggedIn || !commentText.trim()) return;
+        setIsSubmittingComment(true);
+        try {
+            // 서버 API 통해 등록 (RLS 우회)
+            const res = await fetch('/api/community/comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    post_id: postId,
+                    author_id: (user?.id && !user.id.startsWith('mock_')) ? user.id : null,
+                    author: user?.nickname || '익명',
+                    content: commentText.trim(),
+                }),
+            });
+
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.error || '서버 오류');
+
+            // 즉시 UI 갱신
+            setComments(prev => [...prev, result.data as Comment]);
+            setCommentText('');
+
+            // [Gamification] 포인트 지급 (+5P)
+            if (user?.id && !user.id.startsWith('mock_')) {
+                updatePoints(user.id, 'COMMUNITY_COMMENT').catch(e =>
+                    console.error('Comment point award failed:', e)
+                );
+            }
+        } catch (err: any) {
+            console.error('Comment submit error:', err);
+            alert(`댓글 등록 실패: ${err.message}`);
+        } finally {
+            setIsSubmittingComment(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -216,7 +262,23 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                                         <Edit size={14} /> 수정하기
                                     </button>
                                     <button
-                                        onClick={() => { setActionType('delete'); setShowActionMenu(false); }}
+                                        onClick={async () => {
+                                            setShowActionMenu(false);
+                                            if (user?.type === 'admin') {
+                                                if (confirm('관리자 권한으로 이 글을 완전히 삭제하시겠습니까?')) {
+                                                    try {
+                                                        const res = await fetch(`/api/community/post?id=${postId}`, { method: 'DELETE' });
+                                                        if (!res.ok) throw new Error('API 삭제 실패');
+                                                        alert('관리자 권한으로 완벽히 삭제되었습니다.');
+                                                        router.push('/community');
+                                                    } catch (e: any) {
+                                                        alert('삭제 중 오류: ' + e.message);
+                                                    }
+                                                }
+                                            } else {
+                                                setActionType('delete');
+                                            }
+                                        }}
                                         className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
                                     >
                                         <Trash2 size={14} /> 삭제하기
@@ -293,14 +355,23 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                 <div className="flex gap-3 items-center">
                     <input
                         type="text"
-                        placeholder="따뜻한 댓글을 남겨주세요."
-                        className="flex-1 bg-gray-100 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-[#f82b60] outline-none transition-shadow"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleCommentSubmit(); } }}
+                        placeholder={isLoggedIn ? "따뜻한 댓글을 남겨주세요." : "로그인 후 댓글을 작성할 수 있습니다."}
+                        disabled={!isLoggedIn || isSubmittingComment}
+                        className="flex-1 bg-gray-100 border-none rounded-2xl px-5 py-3.5 text-sm font-bold focus:ring-2 focus:ring-[#f82b60] outline-none transition-shadow disabled:opacity-60"
                     />
-                    <button className="bg-rose-50 text-[#f82b60] font-black px-6 py-3.5 rounded-2xl hover:bg-[#f82b60] hover:text-white transition-all shadow-sm">
-                        등록
+                    <button
+                        onClick={handleCommentSubmit}
+                        disabled={!isLoggedIn || !commentText.trim() || isSubmittingComment}
+                        className="bg-rose-50 text-[#f82b60] font-black px-6 py-3.5 rounded-2xl hover:bg-[#f82b60] hover:text-white transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        {isSubmittingComment ? '...' : '등록'}
                     </button>
                 </div>
             </div>
+
 
             {/* Password Verification Modal */}
             {actionType && createPortal(

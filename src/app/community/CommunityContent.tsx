@@ -62,7 +62,7 @@ function CommunityContentInner() {
         setMounted(true);
         fetchPosts();
         // [Cleanup] Removed manual localStorage check for user_type
-    }, []);
+    }, [searchParams]); // searchParams 변화 시 재조회 (글 등록 후 redirect 포함)
 
     // [Optimization] Prevent background scroll when modal is open (Fixes jitter)
     useBodyScrollLock(loginModalOpen || isCorporateModalOpen);
@@ -71,37 +71,40 @@ function CommunityContentInner() {
 
     const fetchPosts = async () => {
         try {
-            const { data, error } = await supabase
-                .from('community_posts')
-                .select('*')
-                .order('created_at', { ascending: false });
+            // 서버 API 통해 조회 (RLS 우회 — SELECT도 적용)
+            const res = await fetch('/api/community/posts');
+            const result = await res.json();
+
+            const dbData: any[] = (res.ok && result.success) ? result.data : [];
 
             let finalPosts: Post[] = [];
 
-            if (data && data.length > 0) {
-                // [Persistence Logic] Merge DB posts with ALL MOCK_POSTS
-                // Mocks are used as base, DB posts override or add to the list
-                const postsMap = new Map<number, Post>();
-
-                // 1. Load Mocks first
-                MOCK_POSTS.forEach(p => postsMap.set(p.id, p));
-
-                // 2. Override/Add with DB data
-                data.forEach((p: any) => postsMap.set(p.id, p as Post));
-
-                // 3. Convert back to array and sort by created_at or ID desc
-                finalPosts = Array.from(postsMap.values()).sort((a, b) => b.id - a.id);
-
+            if (dbData.length > 0) {
+                // [Persistence Logic] DB 글과 MOCK_POSTS 병합 시 날짜 기준 정렬
+                const dbIds = new Set(dbData.map((p: any) => p.id));
+                const nonDupMocks = MOCK_POSTS.filter(p => !dbIds.has(p.id));
+                
+                // MOCK 글에 created_at이 없다면 임시로 가장 오래된 날짜나 time 파싱을 해야 하지만,
+                // 가장 확실하게 "DB 최신글 > 화면 상단"을 보장하려면
+                // DB 데이터를 먼저 다 깔고(내림차순 정렬 상태), 그 뒤에 mock데이터를 붙이는 방식이 안전합니다.
+                const mappedDbData = dbData.map((p: any) => ({
+                    ...p,
+                    time: p.created_at ? new Date(p.created_at).toLocaleDateString('ko-KR') : '방금 전'
+                })).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                
+                finalPosts = [...mappedDbData, ...nonDupMocks]; // DB 최신글이 무조건 최상단
                 localStorage.setItem('community_posts_backup', JSON.stringify(finalPosts));
             } else {
-                finalPosts = MOCK_POSTS;
-                localStorage.removeItem('community_posts_backup');
+                // DB 조회 실패 시 로컬 백업 → 그 다음 MOCK_POSTS
+                const backup = localStorage.getItem('community_posts_backup');
+                finalPosts = backup ? JSON.parse(backup) : MOCK_POSTS;
             }
 
             setPosts(finalPosts);
         } catch (err) {
             console.error('[Community] Critical error in fetchPosts:', err);
-            setPosts(MOCK_POSTS);
+            const backup = localStorage.getItem('community_posts_backup');
+            setPosts(backup ? JSON.parse(backup) : MOCK_POSTS);
         }
     };
 

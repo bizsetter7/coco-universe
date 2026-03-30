@@ -83,39 +83,35 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
         }
 
         try {
-            let error;
+            let error: any = null;
             const isGuestOrMock = userId === 'guest' || (editData?.id && String(editData.id).startsWith('mock_'));
 
             if (!isGuestOrMock) {
-                if (editData?.id) {
-                    // Real DB Update - Strip ID and created_at from fields
-                    const { id: _, created_at: __, ...updateFields } = resumeData;
-                    const { error: err } = await supabase
-                        .from('resumes')
-                        .update(updateFields)
-                        .eq('id', editData.id);
-                    error = err;
-                } else {
-                    // Real DB Insert - Strip initial mock ID
-                    const { id: _, ...insertFields } = resumeData;
-                    const { error: err } = await supabase
-                        .from('resumes')
-                        .insert([insertFields]);
-                    error = err;
+                // 서버 API 통해 저장 (RLS 우회)
+                const res = await fetch('/api/resumes/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: editData?.id ? 'update' : 'insert',
+                        resumeData,
+                        resumeId: editData?.id,
+                    }),
+                });
+                const result = await res.json();
+                if (!res.ok || !result.success) {
+                    error = { message: result.error || '서버 오류', code: 'API_ERROR' };
                 }
             } else {
-                // Force local storage fallback for guests/mocks by setting a dummy error
+                // 게스트/목업 → 로컬 스토리지 폴백
                 error = { message: 'guest_mode', code: 'GUEST' };
             }
 
             if (error) {
-                console.error("Resume Save Error:", error);
-                const isSchemaError = error.message?.includes("relation \"resumes\" does not exist");
-                const isTypeError = error.message?.includes("invalid input syntax") || error.code === '22P02';
+                console.error("Resume Save Error:", error.message, error.code);
                 const isGuestMode = error.message === 'guest_mode';
 
-                if (isGuestMode || isSchemaError || isTypeError || isGuestOrMock) {
-                    // Update or Insert in Local Storage
+                if (isGuestMode || isGuestOrMock) {
+                    // 로컬 스토리지 업데이트
                     const existingResumes = JSON.parse(localStorage.getItem('coco_mock_resumes') || '[]');
                     const targetId = editData?.id;
                     const targetCreatedAt = editData?.created_at;
@@ -135,10 +131,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                         existingResumes.unshift(resumeData);
                     }
                     localStorage.setItem('coco_mock_resumes', JSON.stringify(existingResumes));
-
-                    if (isSchemaError) alert('DB 테이블이 없어 임시(로컬) 저장되었습니다.');
-                    else alert('이력서 수정이 완료되었습니다!');
-
+                    alert('이력서 수정이 완료되었습니다!');
                     setView('dashboard');
                     window.dispatchEvent(new CustomEvent('resume-updated'));
                     return;

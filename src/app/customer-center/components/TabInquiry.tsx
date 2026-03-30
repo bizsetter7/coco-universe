@@ -120,7 +120,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
             // [OPTIMIZATION] Select only necessary fields for list view to prevent timeout
             let query = supabase
                 .from('inquiries')
-                .select('id, type, title, writer_name, created_at, status, parent_id, is_secret, file_url', { count: 'planned' });
+                .select('id, type, title, writer_name, created_at, status, parent_id, is_secret, file_url', { count: 'exact' });
 
             if (activeCategory !== '전체') {
                 query = query.eq('type', activeCategory);
@@ -229,8 +229,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                         setInquiryTitle('');
                                         setInquiryContent('');
                                         setPasswordInput('');
-                                        // Set default nickname if logged in, otherwise '손님'
-                                        const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '손님';
+                                        // Set default nickname if logged in, otherwise '익명'
+                                        const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '익명';
                                         setInquiryContact(`|${nickname}`);
 
                                         setInquiryMode('write');
