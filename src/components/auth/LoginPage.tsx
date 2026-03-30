@@ -24,29 +24,34 @@ export const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            // 1. Check for Test/Mock IDs
-            if ((id === 'admin_shop' || id === 'admin_user') && pw === 'Coco#2025!') {
-                login('admin', id, id === 'admin_shop' ? '최고관리자' : '마스터관리자', id === 'admin_shop' ? '시스템마스터' : '운영총괄');
-                alert('마스터 관리자로 로그인되었습니다.');
-                window.location.href = '/admin';
-                return;
-            } else if (id === 'test_shop' && pw === 'Coco#2025!') {
-                login('shop', id, '테스트 사장님', '번창하는조사장');
-                alert('기업 회원으로 로그인되었습니다.');
-                window.location.href = '/';
-                return;
-            } else if (id === 'test_user' && pw === 'Coco#2025!') {
-                login('personal', id, '테스트 회원', '밤의요정');
-                alert('일반 회원으로 로그인되었습니다.');
-                window.location.href = '/';
-                return;
-            }
-
+            // 1. Real Supabase Login (실제 서비스 모드: 하드코딩 테스트 계정 우회 제거)
+            // 이제 admin_user 등도 실제 DB비밀번호를 검증하도록 직결됨
             // 2. Real Supabase Login
             // 아이디만 입력한 경우 @cocoalba.kr 이메일 형식으로 변환
             const email = id.includes('@') ? id : `${id}@cocoalba.kr`;
-            await signIn(email, pw);
+            const authResult = await signIn(email, pw);
             alert('로그인에 성공했습니다.');
+            
+            // role 체크를 통해 어드민이면 /admin, 아니면 / 로 이동
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+                const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+                const supabase = createClient(supabaseUrl, anonKey);
+                
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', authResult?.user?.id)
+                    .single();
+                
+                if (profile?.role === 'admin' || profile?.role === 'master') {
+                    window.location.href = '/admin';
+                    return;
+                }
+            } catch (err) {
+                console.error('Role check failed after login', err);
+            }
             window.location.href = '/';
         } catch (err: any) {
             console.error('Login error:', err);

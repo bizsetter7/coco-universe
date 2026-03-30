@@ -287,18 +287,18 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'seo'}
                     onClick={() => handleNav('seo')}
                 />
+                <div className="pt-6 mt-6 border-t border-slate-900 space-y-2">
+                    <button
+                        onClick={() => setShowPwModal(true)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
+                    >
+                        <Lock size={18} /> 비밀번호 변경
+                    </button>
+                    <button onClick={() => router.push('/')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
+                        <LogOut size={18} /> 홈페이지로 이동
+                    </button>
+                </div>
             </nav>
-            <div className="p-4 border-t border-slate-900 space-y-2">
-                <button
-                    onClick={() => setShowPwModal(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
-                >
-                    <Lock size={18} /> 비밀번호 변경
-                </button>
-                <button onClick={() => router.push('/')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
-                    <LogOut size={18} /> 홈페이지로 이동
-                </button>
-            </div>
         </aside>
         {showPwModal && <AdminChangePasswordModal onClose={() => setShowPwModal(false)} />}
         </>
@@ -393,18 +393,18 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'seo'}
                         onClick={() => handleNav('seo')}
                     />
+                    <div className="pt-6 border-t border-slate-900 space-y-2 mt-6">
+                        <button
+                            onClick={() => { setShowPwModal(true); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
+                        >
+                            <Lock size={18} /> 비밀번호 변경
+                        </button>
+                        <button onClick={() => { router.push('/'); onClose(); }} className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
+                            <LogOut size={18} /> 홈페이지로 이동
+                        </button>
+                    </div>
                 </nav>
-                <div className="pt-6 border-t border-slate-900 space-y-2">
-                    <button
-                        onClick={() => { setShowPwModal(true); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-black text-sm hover:bg-slate-900 hover:text-blue-400 rounded-2xl transition-all"
-                    >
-                        <Lock size={18} /> 비밀번호 변경
-                    </button>
-                    <button onClick={() => { router.push('/'); onClose(); }} className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 font-bold text-sm hover:bg-slate-900 rounded-xl transition-all">
-                        <LogOut size={18} /> 홈페이지로 이동
-                    </button>
-                </div>
             </aside>
             {showPwModal && <AdminChangePasswordModal onClose={() => setShowPwModal(false)} />}
         </div>
