@@ -12,7 +12,7 @@ import { Search, MapPin, Clock, Star, MessageSquare, ShieldAlert, ChevronLeft, C
 import { updatePoints } from '@/lib/points';
 import { supabase } from '@/lib/supabase';
 
-// Mock Data for Talent (Reused from HomeClient or similar)
+// 사장님 결제 유도용 미끼(Mock) 데이터 (하단 깔아두기용)
 const MOCK_TALENTS = [
     { name: '김민O', age: '23세', region: '서울 강남구', intro: '성실하고 밝은 성격입니다! 야간 근무 가능해요.', time: '10분 전', tags: ['야간', '서빙'] },
     { name: '이수O', age: '25세', region: '경기 수원시', intro: '경력 1년 있습니다. 바로 출근 가능합니다.', time: '25분 전', tags: ['경력자', '주말'] },
@@ -30,12 +30,64 @@ export default function TalentPage() {
     const { isLoggedIn, user, userType } = useAuth();
     const [accessDeniedModal, setAccessDeniedModal] = React.useState(false);
 
+    // [New] Real DB Data + Mock Data State
+    const [talents, setTalents] = React.useState<any[]>(MOCK_TALENTS);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchTalents = async () => {
+            setLoading(true);
+            try {
+                // [Fix] 서버사이드 API 호출 (RLS 우회 및 닉네임 조인 완료됨)
+                const response = await fetch('/api/talent/list');
+                const result = await response.json();
+                
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || '목록 로드 실패');
+                }
+
+                // 2) API 응답 데이터를 UI 카드 포맷에 맞게 최종 가공
+                const mappedTalents = (result.talents || []).map((r: any) => {
+                    const birthYear = r.birth_date ? parseInt(r.birth_date.split('-')[0]) : 2000;
+                    const age = new Date().getFullYear() - birthYear;
+                    
+                    // API에서 전송해준 마스킹된 닉네임(name) 사용
+                    const maskedName = r.name || '익명';
+
+                    const timeDiff = Math.floor((new Date().getTime() - new Date(r.created_at).getTime()) / 60000);
+                    const timeStr = timeDiff < 60 ? `${timeDiff}분 전` : timeDiff < 1440 ? `${Math.floor(timeDiff/60)}시간 전` : `${Math.floor(timeDiff/1440)}일 전`;
+
+                    return {
+                        id: r.id,
+                        name: maskedName,
+                        age: `${age}세`,
+                        region: `${r.region_main || ''} ${r.region_sub || ''}`.trim() || '전국',
+                        intro: r.title || '성실히 일하겠습니다.',
+                        time: timeStr,
+                        tags: [r.industry_main, r.pay_type].filter(Boolean),
+                        raw: r
+                    };
+                });
+                
+                // [Restore] 실제 데이터 + 미끼용 고급 프로필(MOCK_TALENTS) 결합!
+                setTalents([...mappedTalents, ...MOCK_TALENTS]);
+
+            } catch (err: any) {
+                console.error("Talent list fetch error:", err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTalents();
+    }, []);
+
     // Pagination Logic
     const [currentPage, setCurrentPage] = React.useState(1);
     const ITEMS_PER_PAGE = 6;
-    const totalPages = Math.ceil(MOCK_TALENTS.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(talents.length / ITEMS_PER_PAGE);
 
-    const currentTalents = MOCK_TALENTS.slice(
+    const currentTalents = talents.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
