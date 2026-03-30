@@ -8,6 +8,7 @@
 - [ ] `profiles.username`과 `profiles.user_id`가 동일한지 확인
 - [ ] 신규 가입 시 `user_type`이 `admin`이 아닌 경우 필수 정보(`nickname`, `phone`)가 누락되지 않았는지 확인
 - [ ] Supabase Auth의 이메일 유니크 제약 조건이 활성화되어 있는지 확인
+- [ ] **어드민 권한 동기화:** `profiles.role`이 `admin` 또는 `master`인 경우, 반드시 내부 보안 플래그인 `profiles.is_admin`도 `true`로 동기화되어 있어야 함 (어드민 패널 시스템 검증 센터 기준)
 
 ### 💰 자산 관리 (Asset Separation)
 - [ ] `updatePoints` (코코 포인트) 함수가 `credit_balance` 컬럼을 건드리지 않는지 확인

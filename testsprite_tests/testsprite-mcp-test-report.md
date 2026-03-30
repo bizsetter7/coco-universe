@@ -248,3 +248,4 @@
 | execution.lock 잔류 | 이전 실행 lock 파일로 신규 실행 차단 | 매 실행 전 lock 삭제 |
 | 프로덕션 빌드 불완전 | BUILD_ID 없음 → next start 실패 | npm run build 재실행 후 서버 재시작 |
 | TestSprite CLI 실행 방식 | MCP connection closed 오류 | 프로젝트 루트에서 CLI 직접 실행으로 우회 |
+| **로그인(Auth) 아키텍처** | 로컬 개발용 Mock 계정 의존으로 인한 실제 인증 플로우 테스트 생략 문제 | Mock Account 우회(admin_user 등) 전면 완전 삭제. 모든 테스트는 반드시 Supabase Real 인증 통과 계정 사용 |
