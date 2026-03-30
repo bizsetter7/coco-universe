@@ -248,6 +248,10 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Join Date</p>
                                     <p className="text-sm font-bold text-slate-900">{new Date(selectedUser.created_at || selectedUser.joinDate).toLocaleDateString()}</p>
                                 </div>
+                                <div className="col-span-2 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                                    <p className="text-[10px] font-black text-indigo-400 uppercase mb-1 tracking-widest">Points Balance</p>
+                                    <p className="text-sm font-bold text-indigo-900">{Number(selectedUser.points || 0).toLocaleString()} <span className="text-xs text-indigo-500">P</span></p>
+                                </div>
                             </div>
 
                             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
