@@ -41,7 +41,7 @@ export default function TalentPage() {
                 // [Fix] 서버사이드 API 호출 (RLS 우회 및 닉네임 조인 완료됨)
                 const response = await fetch('/api/talent/list');
                 const result = await response.json();
-                
+
                 if (!response.ok || !result.success) {
                     throw new Error(result.error || '목록 로드 실패');
                 }
@@ -50,12 +50,12 @@ export default function TalentPage() {
                 const mappedTalents = (result.talents || []).map((r: any) => {
                     const birthYear = r.birth_date ? parseInt(r.birth_date.split('-')[0]) : 2000;
                     const age = new Date().getFullYear() - birthYear;
-                    
+
                     // API에서 전송해준 마스킹된 닉네임(name) 사용
                     const maskedName = r.name || '익명';
 
                     const timeDiff = Math.floor((new Date().getTime() - new Date(r.created_at).getTime()) / 60000);
-                    const timeStr = timeDiff < 60 ? `${timeDiff}분 전` : timeDiff < 1440 ? `${Math.floor(timeDiff/60)}시간 전` : `${Math.floor(timeDiff/1440)}일 전`;
+                    const timeStr = timeDiff < 60 ? `${timeDiff}분 전` : timeDiff < 1440 ? `${Math.floor(timeDiff / 60)}시간 전` : `${Math.floor(timeDiff / 1440)}일 전`;
 
                     return {
                         id: r.id,
@@ -68,7 +68,7 @@ export default function TalentPage() {
                         raw: r
                     };
                 });
-                
+
                 // [Restore] 실제 데이터 + 미끼용 고급 프로필(MOCK_TALENTS) 결합!
                 setTalents([...mappedTalents, ...MOCK_TALENTS]);
 
@@ -187,7 +187,7 @@ export default function TalentPage() {
                                     자세한 내용은 마이페이지에서 확인해주세요!
                                 </p>
                             </div>
-                             <button
+                            <button
                                 onClick={() => router.push('/my-shop?view=resume-form&new=true')}
                                 className="px-8 py-4 bg-white text-purple-700 rounded-2xl font-black text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
                             >
