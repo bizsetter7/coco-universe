@@ -6,7 +6,7 @@ import {
     Terminal, Database, Lock, Cpu, Server, FileText, Clock,
     MessageSquare, CreditCard, Phone, MessageCircle, Tag,
     ShieldCheck, Zap, Bug, BarChart2, Eye, EyeOff, Wifi,
-    AlertTriangle, MousePointerClick, TrendingUp, Package
+    AlertTriangle, MousePointerClick, TrendingUp, Package, Layout
 } from 'lucide-react';
 
 // ── 타입 ──────────────────────────────────────────────────────────────────────
@@ -91,6 +91,7 @@ const componentIcon = (id: string) => {
         message_orphans: <MessageCircle size={16} />, application_orphans: <FileText size={16} />,
         new_join_no_points: <AlertTriangle size={16} />, admin_role_sync: <ShieldCheck size={16} />,
         active_without_approval: <AlertTriangle size={16} />, sitemap_accessible: <Wifi size={16} />,
+        z_index_standard: <Layout size={16} />,
     };
     return map[id] || <Activity size={16} />;
 };
@@ -111,6 +112,7 @@ const labelMap: Record<string, string> = {
     application_orphans: '삭제 공고에 달린 지원서', new_join_no_points: '가입 포인트 미적립',
     admin_role_sync: '어드민 권한 동기화', active_without_approval: '무승인 활성 공고',
     sitemap_accessible: '사이트맵 접근성',
+    z_index_standard: 'z-index 계층 표준',
 };
 
 // 체크 항목 카테고리 분류
@@ -119,7 +121,7 @@ const CATEGORY_MAP: Record<string, string[]> = {
     '운영 현황': ['pending_ads', 'unanswered_inquiries', 'pending_payments'],
     '데이터 무결성': ['negative_points', 'orphaned_shops', 'stale_active_ads', 'payment_ad_mismatch', 'point_log_integrity', 'duplicate_username', 'jump_abuse', 'message_orphans', 'application_orphans', 'new_join_no_points'],
     '보안': ['admin_role_sync', 'active_without_approval'],
-    '표준 검증': ['title_length', 'standards', 'normalization', 'sitemap_accessible'],
+    '표준 검증': ['title_length', 'standards', 'normalization', 'sitemap_accessible', 'z_index_standard'],
     '환경변수': ['env_sms', 'env_kakao', 'portone'],
 };
 

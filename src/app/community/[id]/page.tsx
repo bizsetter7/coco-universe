@@ -33,20 +33,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const { id } = await params;
     const postId = parseInt(id);
 
-    // 1. Mock에서 먼저 찾기 (안전장치)
-    let post: { title: string; content: string; category: string; author?: string } | null =
-        MOCK_POSTS.find(p => p.id === postId) || null;
+    // 1. DB에서 먼저 찾기 (실제 유저 글 우선)
+    let post: { title: string; content: string; category: string; author?: string } | null = null;
+    
+    try {
+        const { data } = await supabase
+            .from('community_posts')
+            .select('title, content, category')
+            .eq('id', postId)
+            .single();
+        if (data) post = data;
+    } catch { /* DB 오류 무시 */ }
 
-    // 2. DB에서 찾기 (실제 유저 글)
+    // 2. DB에 없으면 Mock에서 찾기 (안전장치)
     if (!post) {
-        try {
-            const { data } = await supabase
-                .from('community_posts')
-                .select('title, content, category')
-                .eq('id', postId)
-                .single();
-            if (data) post = data;
-        } catch { /* DB 오류 무시 */ }
+        post = MOCK_POSTS.find(p => p.id === postId) || null;
     }
 
     if (!post) return { title: '게시글을 찾을 수 없습니다 - 코코알바' };

@@ -172,7 +172,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
         return (
             <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="flex flex-col items-start leading-tight">
-                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 select-none uppercase">
+                    <span className="text-[9px] md:text-[10px] font-black text-slate-400 tracking-tighter mb-0.5 mt-1 pt-1 md:pt-0 select-none uppercase">
                         여성전문 엔터프라이즈 알바 No.1
                     </span>
                     <div className="flex items-center gap-0.5">
@@ -190,6 +190,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
 
     return (
         <React.Fragment>
+            {/* UI_Z_INDEX.HEADER (10000) 표준 적용 */}
             <header className={`sticky top-0 z-[10000] w-full h-[56px] border-b ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}>
                 <div className="w-full max-w-[1432px] h-full flex items-center justify-between mx-auto px-4 xl:px-[192px]">
                     <div className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">

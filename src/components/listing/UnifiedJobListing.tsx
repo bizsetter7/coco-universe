@@ -207,7 +207,7 @@ export const UnifiedJobListing = ({
                     <ChevronRight size={24} />
                 </button>
                 {/* Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-y-1/2 flex gap-1.5">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
                     {[1, 2, 3, 4, 5].map((_, i) => (
                         <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/40'}`} />
                     ))}

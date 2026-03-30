@@ -65,12 +65,15 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                     .eq('id', postId)
                     .single();
 
-                if (postData) setPost(postData as Post);
-                else {
-                    // Fallback to mock only if explicitly enabled or dev env? 
-                    // Keeping mock behavior for now as per existing codebase
+                let isFromMock = false;
+                if (postData) {
+                    setPost(postData as Post);
+                } else {
                     const mock = MOCK_POSTS.find(p => p.id === postId);
-                    if (mock) setPost(mock);
+                    if (mock) {
+                        setPost(mock);
+                        isFromMock = true;
+                    }
                 }
 
                 // Fetch Comments
@@ -79,11 +82,12 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                     .select('*')
                     .eq('post_id', postId);
 
-                // DB에 실제 댓글이 있을 때만 사용, 없으면 Mock 댓글로 폴백
-                if (commentData && commentData.length > 0) {
-                    setComments(commentData as Comment[]);
-                } else {
+                // [Fix] 맥락 불일치 해결: 게시글이 DB 데이터라면 DB 댓글만 표시 (댓글이 없어도 Mock으로 폴백하지 않음)
+                // 게시글이 Mock 데이터인 경우에만 Mock 댓글로 폴백
+                if (isFromMock) {
                     setComments(MOCK_COMMENTS.filter(c => c.postId === postId) as Comment[]);
+                } else {
+                    setComments((commentData as Comment[]) || []);
                 }
 
             } catch (error) {
@@ -141,6 +145,34 @@ export default function CommunityDetailClient({ id }: { id: string }) {
     // [Comment Submit Handler] 서버 API → DB 삽입 + 5P 포인트 지급
     const handleCommentSubmit = async () => {
         if (!isLoggedIn || !commentText.trim()) return;
+
+        const trimmed = commentText.trim();
+
+        // [New Validation] 최소 5자 이상 성의 있는 댓글 유도
+        if (trimmed.length < 5) {
+            alert('댓글은 최소 5자 이상 입력해주세요. (따뜻한 소통을 지향합니다! ✨)');
+            return;
+        }
+
+        // [New Validation] 포인트 파밍(단순 반복) 방지
+        const uniqueChars = new Set(trimmed.replace(/\s/g, '').split('')).size;
+        if (uniqueChars <= 2 && trimmed.length < 10) {
+            alert('조금 더 구체적인 내용을 작성해주세요! (무의미한 반복이나 단순 자음은 등록되지 않습니다)');
+            return;
+        }
+
+        // [New Validation] 무맥락/형식적 댓글 차단 (v1.5)
+        // 15자 미만의 짧은 댓글이면서, 게시글 제목의 키워드를 포함하지 않고 스팸 문구만 있는 경우 차단
+        const spamPhrases = ['잘보고갑니다', '좋은정보', '감사합니다', '출첵', '출석', 'ㅎㅇ', 'ㅎㅇㅌ', '화이팅', '다녀갑니다', '반가워요', '방가방가'];
+        const isSpamLabel = spamPhrases.some(p => trimmed.replace(/\s/g, '').includes(p.replace(/\s/g, '')));
+        const titleKeywords = (post?.title || '').split(/[\s,!?~]+/).filter(w => w.length >= 2);
+        const hasRelevance = titleKeywords.length === 0 || titleKeywords.some(kw => trimmed.includes(kw));
+
+        if (trimmed.length < 15 && isSpamLabel && !hasRelevance) {
+            alert('게시글 내용과 관련된 댓글을 작성해주세요! (형식적인 인사나 무맥락 댓글은 등록되지 않습니다) ✨');
+            return;
+        }
+
         setIsSubmittingComment(true);
         try {
             // 서버 API 통해 등록 (RLS 우회)
@@ -373,10 +405,10 @@ export default function CommunityDetailClient({ id }: { id: string }) {
             </div>
 
 
-            {/* Password Verification Modal */}
+            {/* UI_Z_INDEX.MODAL (20000) 표준 적용 */}
             {actionType && createPortal(
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActionType(null)}></div>
+                <div className="fixed inset-0 z-[20000] flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setActionType(null)}></div>
                     <div className="bg-white rounded-[32px] p-8 w-full max-w-sm relative z-10 shadow-2xl animate-in zoom-in-95">
                         <h3 className="text-xl font-black mb-2 text-gray-900">
                             {actionType === 'delete' ? '게시글 삭제' : '게시글 수정'}

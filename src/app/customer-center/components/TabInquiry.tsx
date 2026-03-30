@@ -476,8 +476,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
                                     <input
                                         type="text"
-                                        value={inquiryContact.split('|')[1] || ''}
-                                        onChange={(e) => setInquiryContact(prev => `${prev.split('|')[0]}|${e.target.value}`)}
+                                        value={isLoggedIn ? (currentUser?.nickname || '회원') : (inquiryContact.split('|')[1] || '')}
+                                        onChange={(e) => !isLoggedIn && setInquiryContact(prev => `${prev.split('|')[0]}|${e.target.value}`)}
                                         readOnly={isLoggedIn}
                                         className={`w-full border-2 rounded-2xl p-4 text-sm font-black outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'} ${isLoggedIn ? 'opacity-50' : ''}`}
                                         placeholder="닉네임을 입력해주세요"
@@ -597,7 +597,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     disabled={isInquirySubmitting}
                                     onClick={async () => {
                                         const contact = inquiryContact.split('|')[0];
-                                        const writer = inquiryContact.split('|')[1];
+                                        const writer = isLoggedIn ? (currentUser?.nickname || '회원') : inquiryContact.split('|')[1];
 
                                         if (!contact || !writer || !inquiryTitle || !inquiryContent) {
                                             alert('필수 항목(*)을 모두 입력해주세요.');
@@ -638,6 +638,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                 content: inquiryContent,
                                                 status: 'new',
                                                 is_secret: isSecretInquiry,
+                                                user_id: currentUser?.id || null,
                                                 file_url: finalFileUrl
                                             }]);
 
@@ -850,7 +851,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                             currentUser?.user_metadata?.role === 'admin'
                                                         );
 
-                                                        const writerName = canBypass ? '운영팀' : (currentUser?.user_metadata?.nickname || currentUser?.nickname || viewingInquiry.writer_name);
+                                                        const writerName = canBypass ? '운영팀' : (currentUser?.nickname || currentUser?.user_metadata?.nickname || '회원');
 
                                                         const { error } = await supabase.from('inquiries').insert([{
                                                             type: viewingInquiry.type,
@@ -862,7 +863,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                             content: inquiryContent,
                                                             status: 'new',
                                                             is_secret: viewingInquiry.is_secret,
-                                                            parent_id: rootId
+                                                            parent_id: rootId,
+                                                            user_id: currentUser?.id || null
                                                         }]);
 
                                                         if (error) throw error;

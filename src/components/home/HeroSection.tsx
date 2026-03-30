@@ -30,7 +30,7 @@ export const HeroSection = () => {
 
     // Simplified static banner info for diet
     const bannerInfo = {
-        title: "사장님! 1+1 광고 이벤트",
+        title: "1+1 광고 이벤트",
         subtitle: "1개월 결제 시 1개월 추가 무료 제공!",
         bg: "bg-gray-900"
     };
@@ -56,7 +56,7 @@ export const HeroSection = () => {
 
                     {/* Title */}
                     <h1 className="text-[28px] md:text-[52px] font-black mb-2 md:mb-4 tracking-tighter leading-[1.3] md:leading-[1.1] filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
-                        <>사장님!<br className="md:hidden" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-rose-400 to-blue-500">1+1 광고 이벤트</span><br className="md:hidden" /> 진행중</>
+                        <><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-rose-400 to-blue-500">1+1 광고 이벤트</span><br className="md:hidden" /> 진행중</>
 
                     </h1>
 

@@ -90,12 +90,20 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
         if (!user?.id || isMockUser) return;
         setIsLoadingInquiry(true);
         try {
-            // 닉네임과 이름 모두 체크 (정보수정 전 다른 값으로 저장됐을 수 있음)
+            // 1. user_id 매칭 우선 (정확한 본인 확인)
+            // 2. writer_name 매칭 (필드 미존재 데이터 소급 적용)
             const names = [user.nickname, user.name].filter(Boolean);
+            let filter = `user_id.eq.${user.id}`;
+            if (names.length > 0) {
+                // 콤마로 구분된 리스트 형식
+                const encodedNames = names.map(n => `"${n}"`).join(',');
+                filter += `,writer_name.in.(${encodedNames})`;
+            }
+
             const { data, error } = await supabase
                 .from('inquiries')
                 .select('id, type, title, created_at, status, is_secret')
-                .in('writer_name', names)
+                .or(filter)
                 .is('parent_id', null)
                 .order('created_at', { ascending: false })
                 .limit(50);
@@ -113,9 +121,10 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
     // 탭 전환 시 lazy load
     useEffect(() => {
         if (isMockUser) return;
-        if (activeTab === 'community' && !communityLoaded) {
+        // 작성 후 마이페이지 진입 시 즉시 반영을 위해 탭 전환 시 매번 로드
+        if (activeTab === 'community') {
             loadCommunityPosts();
-        } else if (activeTab === 'inquiry' && !inquiryLoaded) {
+        } else if (activeTab === 'inquiry') {
             loadInquiryPosts();
         }
     }, [activeTab, user?.id]);
@@ -154,11 +163,10 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
             <div className={`flex rounded-2xl p-1 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
                 <button
                     onClick={() => setActiveTab('community')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all ${
-                        activeTab === 'community'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'community'
                             ? 'bg-[#f82b60] text-white shadow-md shadow-rose-200'
                             : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                    }`}
+                        }`}
                 >
                     <FileText size={15} />
                     커뮤니티 게시글
@@ -170,11 +178,10 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
                 </button>
                 <button
                     onClick={() => setActiveTab('inquiry')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all ${
-                        activeTab === 'inquiry'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'inquiry'
                             ? 'bg-[#f82b60] text-white shadow-md shadow-rose-200'
                             : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                    }`}
+                        }`}
                 >
                     <MessageSquare size={15} />
                     1:1 문의

@@ -147,7 +147,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                         {children}
                     </main>
 
-                    {/* Right Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
+                    {/* Right Sidebar - [Optimization] PC Only, UI_Z_INDEX.SIDEBAR (10001) 표준 적용 */}
                     {(!isMobile && !isAdminPage && !isAuthPage) && (
                         <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                             <StickyWrapper offsetTop={56} zIndex={10001}>

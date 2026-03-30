@@ -7,6 +7,7 @@ import {
     AlertTriangle, CheckCircle, RefreshCcw, ExternalLink, Shield
 } from 'lucide-react';
 import { HealthDashboard } from '@/components/admin/HealthDashboard';
+import { StandardsGuardView } from '@/app/admin/components/StandardsGuardView';
 
 export default function SystemVerificationPage() {
     const [shops, setShops] = useState<Shop[]>([]);
@@ -39,6 +40,11 @@ export default function SystemVerificationPage() {
                     <span className="w-3 h-8 bg-red-600 rounded-full"></span>
                     시스템 검증 센터
                 </h1>
+            </div>
+
+            {/* [NEW] 통합 기술 표준 정보 (v2.0.6) */}
+            <div className="mb-10">
+                <StandardsGuardView ads={[]} payments={[]} />
             </div>
 
             {/* 실시간 헬스 대시보드 */}

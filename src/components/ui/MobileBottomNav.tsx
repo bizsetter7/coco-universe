@@ -63,13 +63,29 @@ const MobileBottomNavContent = () => {
         },
         { label: '심사', icon: <ShieldCheck size={24} />, href: '/admin?tab=ad-audit' },
         { label: '설정', icon: <Settings size={24} />, href: '/admin?tab=settings' },
-    ] : [
+    ] : userType === 'corporate' ? [ // Shop/Business accounts reconfigured
+        { label: '홈', icon: <Home size={24} />, href: '/' },
+        {
+            label: '광고등록',
+            icon: <Plus size={24} />,
+            href: '/ad-register',
+            isAction: false
+        },
+        {
+            label: isExpanded ? '숨기기' : '열기',
+            icon: isExpanded ? <ChevronDown size={32} className="text-white" /> : <ChevronUp size={32} className="text-white" />,
+            isMain: true,
+            isToggle: true
+        },
+        { label: '쪽지함', icon: <MessageSquare size={24} />, href: '#message-modal', isAction: true },
+        { label: 'MY', icon: <User size={24} />, href: '/my-shop' },
+    ] : [ // Individual/Guest accounts stay as original
         { label: '홈', icon: <Home size={24} />, href: '/' },
         { label: '커뮤니티', icon: <MessageSquare size={24} />, href: '/community' },
         {
-            label: (!mounted || isLoading) ? '등록하기' : (userType === 'individual') ? '이력서등록' : '광고등록',
+            label: (!mounted || isLoading) ? '등록하기' : (userType === 'individual') ? '이력서등록' : '등록하기',
             icon: <Plus size={32} className="text-white" />,
-            href: mounted && userType === 'individual' ? '/my-shop?view=resume-form' : '/ad-register',
+            href: (mounted && userType === 'individual') ? '/my-shop?view=resume-form' : '/ad-register',
             isMain: true
         },
         { label: '쪽지함', icon: <MessageSquare size={24} />, href: '#message-modal', isAction: true },
@@ -79,10 +95,13 @@ const MobileBottomNavContent = () => {
     const isDark = brand.theme === 'dark';
 
     const handleMainBtnClick = (e: React.MouseEvent) => {
-        if (mounted && userType === 'individual') {
-            router.push('/my-shop?view=resume-form');
+        if (mounted && userType === 'corporate') {
+            setIsExpanded(!isExpanded);
         } else if (mounted && userType === 'admin') {
             router.push('/admin?tab=users');
+        } else if (mounted && userType === 'individual') {
+            e.preventDefault();
+            router.push('/my-shop?view=resume-form');
         } else {
             e.preventDefault();
             setShowPaymentPopup(true);
@@ -98,10 +117,11 @@ const MobileBottomNavContent = () => {
     return (
         <>
             <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden flex flex-col items-center pointer-events-none bottom-nav">
-                {/* Toggle Handle */}
+            {/* Toggle Handle — Visibility corrected: Members/Guest/Admin use this, Corporate uses center button */}
+            {userType !== 'corporate' && (
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-10 flex items-center gap-1.5 text-xs font-bold transition-colors ${mounted && isDark
+                    className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-[110] flex items-center gap-1.5 text-xs font-bold transition-colors self-end mr-6 ${mounted && isDark
                         ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200'
                         : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'
                         }`}
@@ -118,6 +138,17 @@ const MobileBottomNavContent = () => {
                         </>
                     )}
                 </button>
+            )}
+
+            {/* Persistent handle if hidden — for corporate accounts */}
+            {!isExpanded && userType === 'corporate' && (
+                <button
+                    onClick={() => setIsExpanded(true)}
+                    className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-rose-500 shadow-lg shadow-blue-500/30 flex items-center justify-center pointer-events-auto hover:scale-105 transition-transform z-[111]`}
+                >
+                    <ChevronUp size={32} className="text-white" />
+                </button>
+            )}
 
                 {/* Nav Content */}
                 <div
@@ -129,11 +160,11 @@ const MobileBottomNavContent = () => {
                 >
                     <div className="grid grid-cols-5 h-16 items-center px-2">
                         {navItems.map((item, index) => {
-                            const isActive = item.href === '/'
+                            const isActive = (!item.href || item.href === '/')
                                 ? pathname === '/'
-                                : item.href.includes('?')
+                                : item.href?.includes('?')
                                     ? pathname === item.href.split('?')[0] && searchParams.get('tab') === item.href.split('tab=')[1]
-                                    : pathname?.startsWith(item.href) && item.href !== '#message-modal';
+                                    : pathname?.startsWith(item.href || '') && item.href !== '#message-modal';
 
                             if (item.isMain) {
                                 return (
@@ -205,7 +236,7 @@ const MobileBottomNavContent = () => {
                             return (
                                 <Link
                                     key={index}
-                                    href={item.href}
+                                    href={item.href || '#'}
                                     className={`flex flex-col items-center justify-center gap-1 py-1 ${isActive ? (isDark ? 'text-white' : 'text-gray-900') : (isDark ? 'text-gray-500' : 'text-gray-400')}`}
                                 >
                                     <div className={isActive ? 'text-[#f82b60]' : ''}>

@@ -314,7 +314,7 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
 
                                 {contactMethod === 'site_msg' && (
                                     <div className="w-full bg-gray-50 border border-gray-200 rounded p-2 text-[10px] text-gray-500 text-center font-bold">
-                                        구직자에게 사이트 내 쪽지로 연락을 받습니다. (연락처 비공개)
+                                        구직자에게 사이트 내 쪽지로 연락을 받습니다. <br /> (연락처 비공개)
                                     </div>
                                 )}
                             </div>

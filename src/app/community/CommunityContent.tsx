@@ -89,8 +89,10 @@ function CommunityContentInner() {
                 // DB 데이터를 먼저 다 깔고(내림차순 정렬 상태), 그 뒤에 mock데이터를 붙이는 방식이 안전합니다.
                 const mappedDbData = dbData.map((p: any) => ({
                     ...p,
+                    // 실명이나 ID가 아닌 닉네임을 우선적으로 표시
+                    author: p.author_nickname || p.author_name || p.author || '익명회원',
                     time: p.created_at ? new Date(p.created_at).toLocaleDateString('ko-KR') : '방금 전'
-                })).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                })).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
                 
                 finalPosts = [...mappedDbData, ...nonDupMocks]; // DB 최신글이 무조건 최상단
                 localStorage.setItem('community_posts_backup', JSON.stringify(finalPosts));
@@ -239,18 +241,30 @@ function CommunityContentInner() {
                                 포인트를 모으는 방법!&nbsp;
                                 <span className="text-[#f82b60]">가입만 해도 600P!</span>
                             </p>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                {[
-                                    { label: '회원가입 달성', point: '+100P' },
-                                    { label: '이력서 1회 등록', point: '+500P' },
-                                    { label: '게시글 작성', point: '+20P' },
-                                    { label: '댓글 작성', point: '+5P' },
-                                    { label: '출석체크', point: '+3P' },
-                                ].map(({ label, point }) => (
-                                    <span key={label} className="text-[11px] text-amber-700 font-bold whitespace-nowrap">
-                                        ✅ {label} <span className="text-[#f82b60] font-black">{point}</span>
-                                    </span>
-                                ))}
+                            <div className="flex flex-col md:flex-row md:items-center gap-y-1.5 md:gap-y-0 gap-x-0 md:gap-x-4">
+                                {/* Row 1: 회원가입, 이력서 등록 */}
+                                <div className="flex items-center gap-x-2 md:gap-x-4 flex-nowrap">
+                                    {[
+                                        { label: '회원가입 달성', point: '+100P' },
+                                        { label: '이력서 1회 등록', point: '+500P' },
+                                    ].map(({ label, point }) => (
+                                        <span key={label} className="text-[10px] md:text-[11px] text-amber-700 font-bold whitespace-nowrap">
+                                            ✅ {label} <span className="text-[#f82b60] font-black">{point}</span>
+                                        </span>
+                                    ))}
+                                </div>
+                                {/* Row 2: 게시글, 댓글, 출석체크 */}
+                                <div className="flex items-center gap-x-2 md:gap-x-4 flex-nowrap">
+                                    {[
+                                        { label: '게시글 작성', point: '+20P' },
+                                        { label: '댓글 작성', point: '+5P' },
+                                        { label: '출석체크', point: '+3P' },
+                                    ].map(({ label, point }) => (
+                                        <span key={label} className="text-[10px] md:text-[11px] text-amber-700 font-bold whitespace-nowrap">
+                                            ✅ {label} <span className="text-[#f82b60] font-black">{point}</span>
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -281,36 +295,7 @@ function CommunityContentInner() {
                                 )}
                             </div>
 
-                            {/* [NEW] Community-native Partners Credit Banner */}
-                            <div
-                                onClick={() => window.open('https://partners-credit.vercel.app', '_blank')}
-                                className="mb-6 p-6 rounded-[32px] bg-slate-900 border-2 border-[#f82b60]/50 cursor-pointer shadow-xl hover:scale-[1.01] transition-all group relative overflow-hidden"
-                            >
-                                <div className="absolute -right-4 -top-4 w-32 h-32 bg-yellow-400 opacity-5 blur-3xl group-hover:opacity-20 transition-opacity"></div>
-                                <div className="flex items-center justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-gradient-to-br from-yellow-400 to-orange-500 p-3 rounded-2xl shadow-lg shadow-yellow-500/20">
-                                            <Sparkles size={28} className="text-white" />
-                                        </div>
-                                        <div>
-                                            <p className="text-[11px] font-black text-yellow-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                                                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></span>
-                                                Exclusive Opportunity
-                                            </p>
-                                            <h4 className="text-white font-black text-lg md:text-xl leading-tight">
-                                                언니들의 <span className="text-yellow-400">리얼 수익 창출</span> 노하우!<br />
-                                                <span className="text-gray-400 text-sm font-bold">지금 파트너스 활동하고 출금까지 원스톱 💰</span>
-                                            </h4>
-                                        </div>
-                                    </div>
-                                    <div className="hidden md:flex flex-col items-end gap-2">
-                                        <div className="px-5 py-2.5 bg-yellow-500 text-slate-900 rounded-full font-black text-sm flex items-center gap-1.5 shadow-lg shadow-yellow-500/20 group-hover:bg-yellow-400">
-                                            참여하기 <ChevronRight size={16} strokeWidth={3} />
-                                        </div>
-                                        <p className="text-[10px] text-gray-500 font-bold whitespace-nowrap">현재 1,248명 활동 중</p>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div className="grid grid-cols-1 gap-4">
                                 {paginatedPosts.map((post, idx) => {
                                     const isAdPos = (idx + 1) % 4 === 0;
@@ -360,36 +345,22 @@ function CommunityContentInner() {
                                                 </div>
                                             </div>
 
-                                            {/* 커뮤니티 네이티브 광고 (4번째 게시글마다 삽입) */}
-                                            {isAdPos && (
-                                                <div className="bg-gradient-to-br from-rose-50 to-orange-50 border-y sm:border border-orange-100 sm:rounded-[32px] p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all group">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
-                                                            <Sparkles size={24} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Sponsored Content</p>
-                                                            <h4 className={`font-black leading-tight ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>[VIP 추천] {brand.name} 런칭 기념<br />역대급 혜택 받는 법! ✨</h4>
-                                                        </div>
-                                                    </div>
-                                                    <button className="bg-orange-600 text-white text-[11px] font-black px-6 py-3 rounded-2xl group-hover:scale-105 transition-transform shadow-lg shadow-orange-200/50">지금 확인하기</button>
-                                                </div>
-                                            )}
+
                                         </React.Fragment>
                                     );
                                 })}
                             </div>
 
-                            {/* [NEW] Pagination UI - Always Show if posts exist */}
+                            {/* [NEW] Pagination UI - Optimized for mobile (compact squares) */}
                             {filteredPosts.length > 0 && (
-                                <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+                                <div className="flex justify-center items-center gap-1.5 md:gap-2 mt-12 mb-8">
                                     <button
                                         onClick={() => {
                                             setCurrentPage(prev => Math.max(1, prev - 1));
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
                                         disabled={currentPage === 1}
-                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === 1 ? 'text-gray-300' : 'text-[#f82b60] hover:bg-rose-50'}`}
+                                        className={`h-8 md:h-10 px-3 md:px-4 rounded-lg md:rounded-xl font-bold transition-all flex items-center justify-center ${currentPage === 1 ? 'text-gray-300' : 'text-[#f82b60] hover:bg-rose-50'}`}
                                     >
                                         이전
                                     </button>
@@ -400,7 +371,7 @@ function CommunityContentInner() {
                                                 setCurrentPage(i + 1);
                                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
-                                            className={`w-10 h-10 rounded-xl font-black transition-all ${currentPage === i + 1 ? 'bg-[#f82b60] text-white shadow-lg shadow-rose-200' : 'text-gray-400 hover:bg-gray-100'}`}
+                                            className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl font-black transition-all flex items-center justify-center ${currentPage === i + 1 ? 'bg-[#f82b60] text-white shadow-lg shadow-rose-200' : 'text-gray-400 hover:bg-gray-100'}`}
                                         >
                                             {i + 1}
                                         </button>
@@ -411,7 +382,7 @@ function CommunityContentInner() {
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
                                         disabled={currentPage === totalPages}
-                                        className={`px-4 py-2 rounded-xl font-bold transition-all ${currentPage === totalPages ? 'text-gray-300' : 'text-[#f82b60] hover:bg-rose-50'}`}
+                                        className={`h-8 md:h-10 px-3 md:px-4 rounded-lg md:rounded-xl font-bold transition-all flex items-center justify-center ${currentPage === totalPages ? 'text-gray-300' : 'text-[#f82b60] hover:bg-rose-50'}`}
                                     >
                                         다음
                                     </button>
@@ -514,9 +485,9 @@ function CommunityContentInner() {
                 userType !== 'corporate' && activeTab !== '프리미엄 라운지' && (
                     <button
                         onClick={handleWriteClick}
-                        className="fixed bottom-24 right-5 md:right-10 bg-[#f82b60] text-white p-5 rounded-full shadow-2xl hover:bg-[#db2456] active:scale-90 transition-all z-50 hover:shadow-rose-300/50"
+                        className="fixed bottom-24 right-5 md:right-10 bg-[#f82b60] text-white p-3.5 rounded-full shadow-xl hover:bg-[#db2456] active:scale-90 transition-all z-50 hover:shadow-rose-300/50"
                     >
-                        <PenLine size={28} />
+                        <PenLine size={20} />
                     </button>
                 )
             }
