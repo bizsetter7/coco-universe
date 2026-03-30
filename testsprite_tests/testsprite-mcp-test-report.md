@@ -249,3 +249,4 @@
 | 프로덕션 빌드 불완전 | BUILD_ID 없음 → next start 실패 | npm run build 재실행 후 서버 재시작 |
 | TestSprite CLI 실행 방식 | MCP connection closed 오류 | 프로젝트 루트에서 CLI 직접 실행으로 우회 |
 | **로그인(Auth) 아키텍처** | 로컬 개발용 Mock 계정 의존으로 인한 실제 인증 플로우 테스트 생략 문제 | Mock Account 우회(admin_user 등) 전면 완전 삭제. 모든 테스트는 반드시 Supabase Real 인증 통과 계정 사용 |
+| **에러 모니터링 무결성 (NEW)** | `system_error_logs` DB 스키마 mismatch (`message` 컬럼 누락)로 인한 홈페이지 오류 추적/수집 불가 현상 | `message` 컬럼 누락 혹은 네이밍 불일치 복구 후, 전역 프론트/백엔드 에러 폴링 기능 및 어드민 대시보드 표출 작동 여부를 TestSprite E2E 시나리오에 편입 필수 |
