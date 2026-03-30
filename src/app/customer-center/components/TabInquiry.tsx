@@ -208,8 +208,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                     <div className="relative z-10">
                         <h3 className="text-2xl md:text-3xl font-black mb-2 tracking-tighter">1:1 맞춤 상담 게시판</h3>
                         <p className="text-rose-50 text-sm font-bold opacity-90 leading-relaxed">
-                            광고, 채용, 정책 등 궁금하신 점을 남겨주시면<br className="hidden md:block" />
-                            전문 상담원이 보안이 유지된 상태에서 24시간 이내에 답변해 드립니다.
+                            광고, 채용, 이벤트, 허위광고신고 등<br />
+                            회원분들의 소중한 의견을 남겨주세요!
                         </p>
                     </div>
                 </div>

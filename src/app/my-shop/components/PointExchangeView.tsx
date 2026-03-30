@@ -110,11 +110,12 @@ export function PointExchangeView({ setView }: { setView: (v: any) => void }) {
                     </div>
 
                     <div className={`p-4 rounded-2xl mb-8 space-y-1 text-xs font-bold ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-rose-50/50 text-gray-500'}`}>
-                        <p className="text-[#f82b60] mb-2 font-black text-[13px]">💡 포인트를 모으는 방법 (가입만 해도 600P!)</p>
-                        <p>1. 회원가입 달성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+100P</span></p>
-                        <p>2. 이력서 1회 등록: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+500P</span></p>
-                        <p>3. 커뮤니티 게시글 작성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>건당 +20P</span></p>
-                        <p>4. 커뮤니티 댓글 작성: <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>건당 +5P</span></p>
+                        <p className="text-[#f82b60] mb-2 font-black text-[13px]">💡 포인트를 모으는 방법! 가입만 해도 600P!</p>
+                        <p>✅ 회원가입 달성 <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+100P</span></p>
+                        <p>✅ 이력서 1회 등록 <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+500P</span></p>
+                        <p>✅ 게시글 작성 <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+20P</span></p>
+                        <p>✅ 댓글 작성 <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+5P</span></p>
+                        <p>✅ 출석체크 <span className={`font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>+3P</span></p>
                     </div>
 
                     <button

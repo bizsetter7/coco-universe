@@ -4,6 +4,7 @@ import { AlertTriangle, User, ChevronRight } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants';
 import { supabase } from '@/lib/supabase';
+import { updatePoints } from '@/lib/points';
 
 export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setView: (v: any) => void, onOpenMenu?: () => void, authUser: any, editData?: any }) => {
     const brand = useBrand();
@@ -144,6 +145,25 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                 }
                 alert('저장 중 오류가 발생했습니다: ' + error.message);
                 return;
+            }
+
+            // [Gamification] Award points for FIRST-TIME resume registration
+            if (!editData && !isGuestOrMock) {
+                try {
+                    // Check if this is truly the first resume for this user
+                    const { count } = await supabase
+                        .from('resumes')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', userId);
+                    
+                    // If count is 1 (the one we just inserted), award points
+                    if (count === 1) {
+                        await updatePoints(userId, 'RESUME_UPLOAD');
+                        console.log("Points awarded for first-time resume registration");
+                    }
+                } catch (e) {
+                    console.error("Failed to award points:", e);
+                }
             }
 
             alert(editData ? '이력서 수정이 완료되었습니다!' : '이력서 등록이 완료되었습니다!');
