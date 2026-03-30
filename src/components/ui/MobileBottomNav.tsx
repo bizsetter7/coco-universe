@@ -8,6 +8,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { NoteService } from '@/lib/noteService';
 import { useAuth } from '@/hooks/useAuth';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 export const MobileBottomNav = () => {
     return (
@@ -116,15 +117,16 @@ const MobileBottomNavContent = () => {
 
     return (
         <>
-            <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden flex flex-col items-center pointer-events-none bottom-nav">
+            <div className={`fixed bottom-0 left-0 right-0 md:hidden flex flex-col items-center pointer-events-none bottom-nav`} style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM }}>
             {/* Toggle Handle — Visibility corrected: Members/Guest/Admin use this, Corporate uses center button */}
             {userType !== 'corporate' && (
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 z-[110] flex items-center gap-1.5 text-xs font-bold transition-colors self-end mr-6 ${mounted && isDark
+                    className={`pointer-events-auto border border-b-0 rounded-t-xl px-4 py-1.5 shadow-md -mb-1 flex items-center gap-1.5 text-xs font-bold transition-colors self-end mr-6 ${mounted && isDark
                         ? 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200'
                         : 'bg-white border-gray-200 text-gray-400 hover:text-gray-600'
                         }`}
+                    style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM + 10 }}
                 >
                     {isExpanded ? (
                         <>
@@ -144,7 +146,8 @@ const MobileBottomNavContent = () => {
             {!isExpanded && userType === 'corporate' && (
                 <button
                     onClick={() => setIsExpanded(true)}
-                    className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-rose-500 shadow-lg shadow-blue-500/30 flex items-center justify-center pointer-events-auto hover:scale-105 transition-transform z-[111]`}
+                    className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-rose-500 shadow-lg shadow-blue-500/30 flex items-center justify-center pointer-events-auto hover:scale-105 transition-transform`}
+                    style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM + 11 }}
                 >
                     <ChevronUp size={32} className="text-white" />
                 </button>

@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { AUDIT_MODE } from '@/lib/brand-config';
 import { supabase } from '@/lib/supabase';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 interface AdultVerificationGateProps {
     onVerify: () => void;
@@ -189,7 +190,7 @@ export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGat
     };
 
     return (
-        <div className="fixed inset-0 z-[11000] overflow-hidden bg-white antialiased">
+        <div className={`fixed inset-0 z-[${UI_Z_INDEX.VERIFICATION_GATE}] overflow-hidden bg-white antialiased`}>
             <div className="flex flex-col items-center justify-start h-full w-full">
                 <div className="flex flex-col w-full h-full bg-white relative overflow-hidden animate-in fade-in duration-300" style={{ maxWidth: '400px', textRendering: 'optimizeLegibility' }}>
                     

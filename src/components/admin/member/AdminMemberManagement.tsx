@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Unlock, Lock, XCircle, TrendingUp, Zap, Coins, Send } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { AdminAdRegistrationModal } from '../ad/AdminAdRegistrationModal';
 
 interface AdminMemberManagementProps {
@@ -19,6 +20,9 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
     const [pointAmount, setPointAmount] = useState('');
     const [pointNote, setPointNote] = useState('');
     const [isGrantingPoint, setIsGrantingPoint] = useState(false);
+
+    // 모달 오픈 시 배경 스크롤 차단 (회원상세 또는 광고등록)
+    useBodyScrollLock(isDetailModalOpen || isAdModalOpen);
 
     const handleUserToggleStatus = async (userId: string, currentStatus: string) => {
         const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';

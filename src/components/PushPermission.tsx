@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, BellOff, X, Shield, Eye } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 const REGIONS = [
     '서울', '강남구', '서초구', '송파구', '마포구', '영등포구', '강서구', '노원구',
@@ -102,7 +103,7 @@ export const PushPermission = () => {
     if (!show) return null;
 
     return (
-        <div className="fixed bottom-24 left-4 right-4 md:bottom-4 md:left-auto md:right-6 md:w-96 z-[200] animate-slide-up">
+        <div className={`fixed bottom-24 left-4 right-4 md:bottom-4 md:left-auto md:right-6 md:w-96 z-[${UI_Z_INDEX.FLOATING}] animate-slide-up`}>
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                 {/* 헤더 */}
                 <div className="bg-gradient-to-r from-red-500 to-red-600 p-4 flex items-center justify-between">

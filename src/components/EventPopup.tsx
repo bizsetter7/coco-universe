@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { BrandConfig } from '@/lib/brand-config';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 export default function EventPopup({ brand }: { brand: BrandConfig }) {
     const router = useRouter();
@@ -49,7 +50,7 @@ export default function EventPopup({ brand }: { brand: BrandConfig }) {
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 touch-none overscroll-contain"
+            className={`fixed inset-0 z-[${UI_Z_INDEX.MODAL}] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 touch-none overscroll-contain`}
             onClick={() => closePopup(false)}
         >
             <div

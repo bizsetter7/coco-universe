@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShieldCheck, Smartphone, X, CheckCircle2, Loader2 } from 'lucide-react';
+import { UI_Z_INDEX } from '@/constants/ui';
 import type { IdentityVerifyProvider, IdentityVerifyResult } from '@/types/identity-verify';
 
 interface IdentityVerifyModalProps {
@@ -76,7 +77,7 @@ export const IdentityVerifyModal = ({ onClose, onVerified }: IdentityVerifyModal
     };
 
     return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-900/60">
+        <div className={`fixed inset-0 z-[${UI_Z_INDEX.MODAL}] flex items-center justify-center p-6 bg-slate-900/60`}>
             <div className="bg-white w-full max-w-md rounded-[28px] overflow-hidden shadow-2xl">
 
                 {/* Header */}

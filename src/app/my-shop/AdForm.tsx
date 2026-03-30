@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
+import { UI_Z_INDEX } from '@/constants/ui';
 import { Step1BasicInfo } from './components/form/steps/Step1BasicInfo';
 import { Step2JobDetail } from './components/form/steps/Step2JobDetail';
 import { Step3ProductSelect } from './components/form/steps/Step3ProductSelect';
@@ -84,7 +85,7 @@ const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Do
     };
 
     return (
-        <div className={`sticky top-[56px] z-[100] py-5 md:py-3 px-4 md:px-6 mb-4 backdrop-blur-md border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-950/80 border-gray-800' : 'bg-white/80 border-gray-100 shadow-sm'}`}>
+        <div className={`sticky top-[56px] py-5 md:py-3 px-4 md:px-6 mb-4 backdrop-blur-md border-b flex items-center justify-between ${brand.theme === 'dark' ? 'bg-gray-950/80 border-gray-800' : 'bg-white/80 border-gray-100 shadow-sm'}`} style={{ zIndex: UI_Z_INDEX.STICKY + 10 }}>
             <div className="flex items-center gap-3 md:gap-8 overflow-x-auto no-scrollbar scrollbar-hide max-w-full" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {steps.map((step) => {
                     const isActive = currentStep === step.id;
@@ -253,7 +254,7 @@ export default function AdForm(props: AdFormProps) {
             </div>
 
             {/* Sticky Bottom Navigation — 가격 포함 */}
-            <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pointer-events-none">
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pointer-events-none" style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM + 20 }}>
                 <div className="max-w-[640px] mx-auto pointer-events-auto">
                     {/* 가격 행 (상품 선택 시만 표시) */}
                     {props.totalAmount > 0 && (

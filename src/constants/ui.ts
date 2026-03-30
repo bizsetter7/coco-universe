@@ -14,6 +14,7 @@ export const UI_Z_INDEX = {
     
     // 부유형 요소
     STICKY: 50,
+    FLOATING: 9000,
     NAV_BOTTOM: 100,
     
     // 레이아웃 프레임 (Core Layout)
@@ -21,6 +22,7 @@ export const UI_Z_INDEX = {
     SIDEBAR: 10001,
     
     // 최상위 모달 및 레이어 (System Layer)
+    VERIFICATION_GATE: 11000,
     MODAL: 20000,
     SYSTEM_OVERLAY: 99999,
 } as const;

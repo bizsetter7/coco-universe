@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 interface BankTransferModalProps {
     amount: number;
@@ -22,7 +23,7 @@ export function BankTransferModal({ amount, onConfirm, title }: BankTransferModa
     if (typeof document === 'undefined') return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4" style={{ zIndex: UI_Z_INDEX.MODAL }}>
             <div className="bg-white rounded-[28px] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-blue-500 to-rose-600 px-6 py-5 text-white text-center">

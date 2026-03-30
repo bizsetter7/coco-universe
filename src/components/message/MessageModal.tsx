@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { NoteService, Note } from '@/lib/noteService';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { UI_Z_INDEX } from '@/constants/ui';
 
 interface MessageModalProps {
     isOpen: boolean;
@@ -138,7 +139,7 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
     `;
 
     return createPortal(
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
+        <div className={`fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4`} style={{ zIndex: UI_Z_INDEX.MODAL }}>
             {/* Main Container */}
             <div className="w-full sm:w-[95%] max-w-[850px] h-full sm:h-[650px] bg-white rounded-none sm:rounded-lg shadow-xl flex flex-col overflow-hidden relative transition-transform">
 
