@@ -317,24 +317,17 @@ export async function POST() {
         components.payment_ad_mismatch = { status: 'warning', message: `결제↔공고 검사 실패: ${err.message}` };
     }
 
-    // ── 20. 최근 24h 가입자 중 포인트 0 (개인 회원 보너스 미적립 체크) ─────
+    // ── 20. 최근 24h 가입자 중 포인트 0 (가입 보너스 미적립) ─────
     try {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
             .from('profiles').select('*', { count: 'exact', head: true })
-            .gte('created_at', since)
-            .eq('role', 'individual') // 개인 회원만 포인트 적립 대상
-            .eq('points', 0);
+            .gte('created_at', since).eq('points', 0);
         if (error) throw error;
-
         if (!count || count === 0) {
-            components.new_join_no_points = { status: 'healthy', message: '최근 24h 신규 개인 회원 포인트 정상 적립' };
+            components.new_join_no_points = { status: 'healthy', message: '최근 24h 신규 가입자 포인트 정상 적립' };
         } else {
-            components.new_join_no_points = { 
-                status: 'warning', 
-                message: `최근 24h 개인 가입자 중 포인트 미적립 ${count}명 (확인 필요)`, 
-                count 
-            };
+            components.new_join_no_points = { status: 'warning', message: `최근 24h 가입자 중 포인트 미적립 ${count}명`, count };
             overall = setWorst(overall, 'warning');
         }
     } catch (err: any) {

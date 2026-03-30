@@ -94,8 +94,7 @@ export default function WritePostPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    // 대표님 지시사항: 예외조건 없이 무조건 로그인한 회원의 고유 ID를 백엔드에 꽂아넣음
-                    author_id: (isLoggedIn && user?.id) ? user.id : null,
+                    author_id: (isLoggedIn && user?.id && !user.id.startsWith('mock_')) ? user.id : null,
                     author_name: isLoggedIn ? (user.nickname || '익명') : '익명',
                     author_nickname: isLoggedIn ? (user.nickname || '익명') : '익명',
                     category,

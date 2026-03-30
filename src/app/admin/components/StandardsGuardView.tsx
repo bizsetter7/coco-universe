@@ -298,14 +298,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                     </button>
                                     {openSection === 'layers' && (
                                         <div className="p-8 bg-white border-t border-rose-50 animate-in slide-in-from-top-2 duration-300 space-y-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                                    <div className="text-[10px] font-black text-slate-400 mb-2 uppercase">Floating Toast</div>
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-xs font-black text-slate-900">FLOATING (알림팝업)</span>
-                                                        <span className="text-slate-400 font-mono font-black text-lg">9000</span>
-                                                    </div>
-                                                </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                                     <div className="text-[10px] font-black text-slate-400 mb-2 uppercase">Core Frame</div>
                                                     <div className="flex justify-between items-center">
@@ -318,13 +311,6 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-xs font-black text-slate-900">SIDEBAR (좌우 배너)</span>
                                                         <span className="text-rose-500 font-mono font-black text-lg">10001</span>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                                                    <div className="text-[10px] font-black text-amber-500 mb-2 uppercase">Verify Gate</div>
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-xs font-black text-amber-900">VERIFICATION_GATE</span>
-                                                        <span className="text-amber-600 font-mono font-black text-lg">11000</span>
                                                     </div>
                                                 </div>
                                                 <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100 ring-2 ring-rose-200">
@@ -341,8 +327,6 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                                 </h4>
                                                 <p className="text-[11px] font-bold text-rose-600 leading-relaxed">
                                                     모든 팝업(MODAL)은 반드시 사이드바(`10001`)보다 높은 **`20000`** 수치를 유지해야 합니다.<br />
-                                                    성인인증 게이트(VERIFICATION_GATE `11000`)는 헤더는 덮되, 시스템 모달보다는 낮게 유지합니다.<br />
-                                                    관리자 페이지의 주요 모달은 오픈 시 반드시 배경 스크롤을 차단(`useBodyScrollLock`)해야 합니다.<br />
                                                     팝업 시 헤더나 사이드바가 노출되는 것은 시스템 보안 및 UI 무결성 결함으로 간주되어 즉각 수정 대상이 됩니다.
                                                 </p>
                                             </div>
@@ -371,7 +355,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                                     <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
                                                         <div className={`text-xs font-black mb-1 p-1 rounded font-mono ${tier.tw.replace('bg-', 'text-')}`}>{tier.id}</div>
                                                         <div className="text-[10px] font-bold text-slate-500">{tier.name}</div>
-                                                        <div className="text-[10px] font-black text-indigo-500 mt-1">Alt: {tier.altId}</div>
+                                                        <div className="text-[10px] font-black text-indigo-500 mt-1">Tier: {tier.weight}</div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -398,7 +382,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                                 {PAY_BADGE_STANDARDS.map((badge, i) => (
                                                     <div key={i} className="flex flex-col items-center">
-                                                        <span className={`px-3 py-1 rounded text-[10px] font-black text-white ${badge.tw}`}>{badge.name}</span>
+                                                        <span className={`px-3 py-1 rounded text-[10px] font-black text-white ${badge.tw}`}>{badge.label}</span>
                                                         <span className="text-[10px] text-slate-400 mt-2 font-mono">{badge.tw}</span>
                                                     </div>
                                                 ))}
@@ -495,19 +479,19 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                                 {DATA_MAPPING_STANDARDS.map((map, i) => (
                                                     <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:shadow-md transition-all">
-                                                        <div className="text-[10px] font-black text-indigo-500 mb-2 uppercase">{map.item}</div>
+                                                        <div className="text-[10px] font-black text-indigo-500 mb-2 uppercase">{map.feature}</div>
                                                         <div className="space-y-2">
                                                             <div className="flex justify-between items-center text-[11px]">
-                                                                <span className="text-slate-400 font-bold">DB</span>
-                                                                <code className="bg-indigo-100 px-2 py-0.5 rounded text-indigo-700 font-bold">{map.db}</code>
+                                                                <span className="text-slate-400 font-bold">Standard</span>
+                                                                <code className="bg-indigo-100 px-2 py-0.5 rounded text-indigo-700 font-bold">{map.standard}</code>
                                                             </div>
                                                             <div className="flex justify-between items-center text-[11px]">
-                                                                <span className="text-slate-400 font-bold">UI</span>
-                                                                <code className="bg-slate-200 px-2 py-0.5 rounded text-slate-600 font-bold">{map.ui}</code>
+                                                                <span className="text-slate-400 font-bold">Legacy/Alt</span>
+                                                                <code className="bg-slate-200 px-2 py-0.5 rounded text-slate-600 font-bold italic line-through">{map.alt}</code>
                                                             </div>
                                                         </div>
                                                         <div className="mt-3 pt-2 border-t border-slate-200 text-[10px] font-bold text-slate-400 leading-tight">
-                                                            {map.required ? '✅ 필수 항목' : '⬜ 선택 항목'}
+                                                            {map.reason}
                                                         </div>
                                                     </div>
                                                 ))}

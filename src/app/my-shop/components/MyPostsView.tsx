@@ -61,29 +61,22 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
     const [communityLoaded, setCommunityLoaded] = useState(false);
     const [inquiryLoaded, setInquiryLoaded] = useState(false);
 
-    // 게스트만 제외하고 로그인된 아이디가 있다면 모두 읽기 허용
-    const isMockUser = !user?.id || user.id === 'guest';
+    const isMockUser = !user?.id || user.id === 'guest' || user.id.startsWith('mock_');
 
     // 커뮤니티 게시글 로드
     const loadCommunityPosts = async () => {
         if (!user?.id || isMockUser) return;
         setIsLoadingCommunity(true);
         try {
-            // 대표님 지시사항: 닉네임 꼼수 없이, 무조건 로그인한 실제 고유 ID 기준으로만 1:1 완벽 매칭
             const { data, error } = await supabase
                 .from('community_posts')
-                .select('id, category, title, created_at, is_secret') // images 컬럼이 DB에 없어서 발생하는 크래시 버그 해결
+                .select('id, category, title, created_at, is_secret, images')
                 .eq('author_id', user.id)
                 .order('created_at', { ascending: false })
                 .limit(50);
 
             if (error) throw error;
-            // 타입스크립트 에러 방지용: DB에 images 컬럼이 없으므로 프론트엔드가 죽지 않게 빈 배열을 억지로 채워 줌
-            const mappedData = (data || []).map(post => ({
-                ...post,
-                images: []
-            }));
-            setCommunityPosts(mappedData);
+            setCommunityPosts(data || []);
         } catch (e) {
             console.warn('커뮤니티 게시글 로드 실패:', e);
         } finally {
@@ -92,16 +85,25 @@ export function MyPostsView({ setView }: { setView: (v: any) => void }) {
         }
     };
 
-    // 1:1 문의 로드
+    // 1:1 문의 로드 (writer_name = 닉네임 또는 이름으로 조회)
     const loadInquiryPosts = async () => {
         if (!user?.id || isMockUser) return;
         setIsLoadingInquiry(true);
         try {
-            // 대표님 지시사항: 닉네임 매칭 제거, 오직 고유 식별 ID로만 처리
+            // 1. user_id 매칭 우선 (정확한 본인 확인)
+            // 2. writer_name 매칭 (필드 미존재 데이터 소급 적용)
+            const names = [user.nickname, user.name].filter(Boolean);
+            let filter = `user_id.eq.${user.id}`;
+            if (names.length > 0) {
+                // 콤마로 구분된 리스트 형식
+                const encodedNames = names.map(n => `"${n}"`).join(',');
+                filter += `,writer_name.in.(${encodedNames})`;
+            }
+
             const { data, error } = await supabase
                 .from('inquiries')
                 .select('id, type, title, created_at, status, is_secret')
-                .eq('user_id', user.id)
+                .or(filter)
                 .is('parent_id', null)
                 .order('created_at', { ascending: false })
                 .limit(50);
