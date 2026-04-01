@@ -9,27 +9,25 @@ export const ResumeNoticeDetail = () => {
             {/* Main Header */}
             <div className="text-center space-y-2">
                 <p className="text-gray-900 font-black text-xl md:text-2xl tracking-tighter">이력서 등록 시</p>
-                <h4 className="text-4xl md:text-5xl font-black text-[#E14D2A] tracking-tighter break-keep">구직자 주의사항!</h4>
+                <h4 className="text-4xl md:text-5xl font-black text-[#f82b60] tracking-tighter break-keep">구직자 주의사항!</h4>
             </div>
 
             {/* Warning Box */}
-            <div className="w-full bg-[#E14D2A] rounded-[30px] md:rounded-[40px] p-6 md:p-12 text-center text-white relative shadow-xl shadow-red-100/50">
-                <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl md:rounded-3xl rotate-12 flex items-center justify-center shadow-lg border-4 border-[#E14D2A]">
+            <div className="w-full bg-[#f82b60] rounded-[30px] md:rounded-[40px] p-6 md:p-12 text-center text-white relative shadow-xl shadow-rose-100/50">
+                <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl md:rounded-3xl rotate-12 flex items-center justify-center shadow-lg border-4 border-[#f82b60]">
                     <div className="animate-pulse">
-                        <Zap size={32} className="md:size-[40px] text-[#E14D2A] fill-current" />
+                        <Zap size={32} className="md:size-[40px] text-[#f82b60] fill-current" />
                     </div>
                 </div>
                 <div className="pt-6 space-y-4">
                     <h5 className="text-2xl md:text-3xl font-black leading-tight break-keep">
-                        구직자분들의 피해 방지를 위해<br />
+                        구직자분들의 피해 방지를 위해<br className="hidden md:block" />
                         이력서 등록 시 반드시 주의하세요.
                     </h5>
                     <div className="h-px bg-white/20 w-full"></div>
-                    <div className="space-y-2 text-sm md:text-base font-bold text-red-50 leading-relaxed opacity-90 break-keep">
-                        <p>최근 불법 성매매 업소 및 보이스 피싱 등으로 인한</p>
-                        <p>피해 사례가 발생하고 있습니다.</p>
-                        <p className="mt-4 pt-4 border-t border-white/10">회원님들의 피해 방지와 투명한 구인 활동을 위해</p>
-                        <p>이력서 등록 시 주의 사항 및 대처 방법을 안내 드립니다.</p>
+                    <div className="space-y-2 text-sm md:text-base font-bold text-rose-50 leading-relaxed opacity-90 break-keep">
+                        <p>최근 불법 성매매 업소 및 보이스 피싱 등으로 인한<br className="hidden md:block" /> 피해 사례가 발생하고 있습니다.</p>
+                        <p className="mt-4 pt-4 border-t border-white/10">회원님들의 피해 방지와 투명한 구인 활동을 위해<br className="hidden md:block" /> 주의 사항 및 대처 방법을 안내 드립니다.</p>
                     </div>
                 </div>
             </div>
@@ -47,11 +45,11 @@ export const ResumeNoticeDetail = () => {
 
                 <div className="text-center space-y-4 px-4 py-8 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
                     <p className="text-lg md:text-xl font-black text-gray-900 break-keep">
-                        구직자분들께서는 기업에서 먼저 연락이 올 시<br />
-                        <span className="text-red-600 underline decoration-red-200 underline-offset-4">진행중인 채용공고를 요청하시어</span><br />
+                        구직자분들께서는 기업에서 먼저 연락이 올 시<br className="hidden md:block" />
+                        <span className="text-[#f82b60] underline decoration-rose-200 underline-offset-4">진행중인 채용공고를 요청하시어</span><br className="hidden md:block" />
                         정보와 공고의 기업정보를 반드시 확인해 주세요.
                     </p>
-                    <p className="text-sm font-bold text-gray-500">대면과 유선 상담에 대해서는 신중히 주의를 기울여 주시기 바랍니다.</p>
+                    <p className="text-sm font-bold text-gray-500 break-keep">대면과 유선 상담에 대해서는<br className="hidden md:block" /> 신중히 주의를 기울여 주시기 바랍니다.</p>
                 </div>
             </div>
 
@@ -62,11 +60,11 @@ export const ResumeNoticeDetail = () => {
                     "상호명이 아닌 별도의 개인이나 연락처 등은 곳에서 면접을 보자고 하는 경우",
                     "통장, 원본, 인감 등 개인정보를 요구하는 경우 (보이스 피싱, 대출 등 사기 주의)",
                     "취업을 조건으로 보증금, 선입금 등 금전을 요구하는 경우",
-                    "프리미엄비 대출 기만을 제의하는 경우 (보이스 피싱 및 성매매 등 불법 유입 주의)",
+                    "고수익 알바 미끼로 기만을 제의하는 경우 (보이스 피싱 및 성매매 등 불법 유입 주의)",
                     "그 외 채용공고의 내용과 다른 직무를 제안하거나 유도하는 경우"
                 ].map((item, i) => (
-                    <div key={i} className="group relative flex items-center bg-[#E14D2A] text-white p-5 md:p-6 rounded-full shadow-md transition-transform hover:-translate-y-1">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-[#E14D2A] rounded-full flex items-center justify-center text-lg md:text-xl font-black shrink-0 shadow-sm">
+                    <div key={i} className="group relative flex items-center bg-[#f82b60] text-white p-5 md:p-6 rounded-full shadow-md transition-transform hover:-translate-y-1">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white text-[#f82b60] rounded-full flex items-center justify-center text-lg md:text-xl font-black shrink-0 shadow-sm">
                             {i + 1}
                         </div>
                         <p className="flex-1 ml-4 md:ml-6 text-sm md:text-[17px] font-black leading-tight break-keep">
@@ -78,31 +76,31 @@ export const ResumeNoticeDetail = () => {
 
             {/* Important Warning Boxes */}
             <div className="w-full space-y-4 md:space-y-6">
-                <div className="bg-[#E14D2A]/90 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-sm">
+                <div className="bg-[#f82b60]/90 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
                         <X size={24} className="md:size-[32px]" />
                     </div>
                     <p className="text-[15px] md:text-lg font-black leading-normal pt-0.5 md:pt-1 break-keep">
-                        통장, 체크카드, 계좌 비밀번호, 개인정보 요구는<br />
+                        통장, 체크카드, 계좌 비밀번호, 개인정보 요구는<br className="hidden md:block" />
                         취업을 빙자한 보이스 피싱 사기 행위일 수 있습니다.
                     </p>
                 </div>
 
-                <div className="bg-[#E14D2A]/80 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-sm">
+                <div className="bg-[#f82b60]/80 text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] flex items-start gap-4 md:gap-6 shadow-lg border-2 border-white/20">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
                         <Zap size={24} className="md:size-[32px]" />
                     </div>
                     <p className="text-[15px] md:text-lg font-black leading-normal pt-0.5 md:pt-1 break-keep">
-                        엔터프라이즈이 가능하다고 현혹하는 업제의 광고는<br />
+                        고수익이 가능하다고 현혹하는 업체의 광고는<br className="hidden md:block" />
                         불법 성매매 광고일 가능성이 높으니 각별히 주의해 주세요.
                     </p>
                 </div>
             </div>
 
             {/* Call Center Text */}
-            <div className="w-full text-center space-y-2 py-6 border-y border-red-50">
-                <p className="text-[#E14D2A] text-sm md:text-base font-black break-keep">
-                    저희 브랜드 통합 시스템은 불법 행위 예방을 위해 최선을 다하고 있으며,<br />
+            <div className="w-full text-center space-y-2 py-6 border-y border-rose-50">
+                <p className="text-[#f82b60] text-sm md:text-base font-black break-keep">
+                    저희 코코알바 브랜드 통합 시스템은 불법 행위 예방을 위해 최선을 다하고 있으며,<br className="hidden md:block" />
                     회원분들의 안전하고 건강한 구인활동을 위해 지속적인 상시모니터링을 진행하고 있습니다.
                 </p>
             </div>
@@ -179,7 +177,7 @@ export const ResumeNoticeDetail = () => {
                     <div className="space-y-2">
                         <p className="text-[10px] md:text-sm font-bold text-rose-400 tracking-widest uppercase">Safe Recruitment Policy</p>
                         <h5 className="text-xl md:text-3xl font-black leading-tight break-keep">
-                            건강한 구인·구직 서비스,<br />
+                            건강한 구인·구직 서비스,<br className="hidden md:block" />
                             우리가 함께 만들어 갑니다.
                         </h5>
                     </div>
@@ -194,19 +192,19 @@ export const ResumeNoticeDetail = () => {
                         </div>
                     </div>
                     <p className="text-[11px] md:text-sm font-bold text-gray-400 leading-relaxed opacity-60 break-keep max-w-2xl mx-auto border-t border-white/5 pt-6 md:pt-8 line-clamp-2 md:line-clamp-none">
-                        회원분들의 안전하고 투명한 구인 서비스를 위해<br />
+                        회원분들의 안전하고 투명한 구인 서비스를 위해<br className="hidden md:block" />
                         항상 최선의 노력을 다하겠습니다.
                     </p>
                 </div>
             </div>
 
             {/* Call Center Info */}
-            <div className="w-full pt-10 border-t border-red-100 flex flex-col items-center gap-2">
-                <p className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-3">
-                    고객센터 <span className="text-[#E14D2A]">1877-1442</span>
+            <div className="w-full pt-10 border-t border-rose-100 flex flex-col items-center gap-2">
+                <p className="text-2xl md:text-4xl font-black text-gray-900 flex items-center gap-3">
+                    고객센터 <span className="text-[#f82b60]">1877-1442</span>
                 </p>
                 <div className="text-center">
-                    <p className="text-sm font-black text-red-600 mb-1">고객센터 운영시간</p>
+                    <p className="text-sm font-black text-[#f82b60] mb-1">고객센터 운영시간</p>
                     <p className="text-xs font-bold text-gray-500">(평일 10:00~18:00 / 점심시간 12:00~13:00)</p>
                     <p className="text-[10px] font-bold text-gray-400 mt-1">* 주말 및 공휴일은 고객센터 휴무입니다.</p>
                 </div>

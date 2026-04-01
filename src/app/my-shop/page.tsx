@@ -1077,10 +1077,11 @@ function MyShopContent() {
         return p;
     });
 
-    if (!mounted || userType === null) return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center gap-3">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm font-bold text-gray-400">로딩 중...</p>
+    // [Flicker Guard] 마운트 전, 세션 로딩 중, 혹은 기업회원인데 아직 데이터가 로드되지 않은 경우 로딩 화면 유지
+    if (!mounted || userType === null || authLoading || (userType === 'corporate' && !isDataLoaded)) return (
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
+            <div className="w-10 h-10 border-4 border-[#f82b60] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-bold text-gray-400 animate-pulse">정보를 안전하게 불러오는 중...</p>
         </div>
     );
 
@@ -1234,7 +1235,7 @@ function MyShopContent() {
                                             {view === 'change-password' && (userType as any) === 'admin' && <ChangePasswordView setView={setView} />}
                                             {view === 'sos-alert' && <SosAlertView brand={brand} />}
                                             {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
-                                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} />}
+                                            {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} />}
                                             {view === 'applicants' && <ApplicantsView setView={setView} userName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                              {view === 'point-history' && <PointHistoryView userId={authUser?.id ?? ''} />}
                                         </>

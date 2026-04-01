@@ -5,9 +5,18 @@ import { useBrand } from '@/components/BrandProvider';
 import { JobScamNoticeDetail } from './JobScamNoticeDetail';
 import { CardPaymentNoticeDetail } from './CardPaymentNoticeDetail';
 import { ResumeNoticeDetail } from './ResumeNoticeDetail';
+import { EventOpenNoticeDetail } from './EventOpenNoticeDetail';
 import { ChevronDown, Clock } from 'lucide-react';
 
 const NOTICES = [
+    {
+        id: 11,
+        title: '[이벤트] 코코알바 오픈기념 상생지원 이벤트 및 이용안내',
+        date: '2026-04-02',
+        isNew: true,
+        category: '이벤트',
+        type: 'event-open'
+    },
     {
         id: 10,
         title: '[필독] 취업사기 주의 — 피해 예방 가이드',
@@ -117,7 +126,7 @@ export const TabNotice = () => {
                                 {notice.category}
                             </span>
                             <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <span className={`text-[15px] font-black truncate ${notice.isNew ? (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900') : (brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}`}>
+                                <span className={`text-[14px] md:text-[15px] font-black line-clamp-2 ${notice.isNew ? (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900') : (brand.theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}`}>
                                     {notice.title}
                                 </span>
                                 {notice.isNew && <span className="w-1.5 h-1.5 bg-red-600 rounded-full shrink-0 animate-pulse"></span>}
@@ -140,6 +149,8 @@ export const TabNotice = () => {
                                 <CardPaymentNoticeDetail />
                             ) : notice.type === 'job-scam' ? (
                                 <JobScamNoticeDetail />
+                            ) : notice.type === 'event-open' ? (
+                                <EventOpenNoticeDetail />
                             ) : (
                                 notice.content
                             )}

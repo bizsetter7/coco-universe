@@ -173,8 +173,20 @@ export const OngoingAdsView = ({
                                         </div>
 
                                         <div className="flex gap-2 w-full">
-                                            <button onClick={() => onEditAd?.(ad)} className="flex-1 px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-50 transition-all font-black">수정</button>
-                                            <button onClick={() => onDeleteAd?.(ad.id)} className="px-4 py-2 bg-white border border-red-100 text-red-500 text-xs font-bold rounded-xl hover:bg-red-50 transition-all font-black">삭제</button>
+                                            <button onClick={() => onEditAd?.(ad)} className="flex-1 px-4 py-2 bg-white border border-gray-200 text-gray-600 text-[11px] md:text-xs font-bold rounded-xl hover:bg-gray-50 transition-all font-black">수정</button>
+                                            {(() => {
+                                                const isApprovedActive = ad.status !== 'rejected' && ad.status !== 'REJECTED' && ad.status !== 'PENDING_REVIEW' && ad.status !== 'pending';
+                                                return (
+                                                    <button 
+                                                        onClick={() => !isApprovedActive && onDeleteAd?.(ad.id)} 
+                                                        disabled={isApprovedActive}
+                                                        className={`px-4 py-2 border text-[11px] md:text-xs font-bold rounded-xl transition-all font-black ${isApprovedActive ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-60' : 'bg-white border-red-100 text-red-500 hover:bg-red-50 cursor-pointer'}`}
+                                                        title={isApprovedActive ? "게시 중인 공고는 삭제할 수 없습니다." : "공고 삭제"}
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>

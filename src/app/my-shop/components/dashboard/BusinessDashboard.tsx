@@ -305,11 +305,16 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                     <Calendar size={12} /> 연장
                                                 </button>
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); onDeleteAd?.(ad.id); }}
-                                                    style={{ backgroundColor: '#ef4444', color: 'white', border: '2px solid #dc2626' }}
-                                                    className="px-3 py-2 text-xs font-bold rounded-lg hover:bg-red-600 transition"
+                                                    onClick={(e) => { e.stopPropagation(); !isApproved && onDeleteAd?.(ad.id); }}
+                                                    disabled={isApproved}
+                                                    title={isApproved ? "게시 중인 공고는 삭제할 수 없습니다." : "공고 삭제"}
+                                                    className={`px-3 py-2 text-xs font-bold rounded-lg transition-all ${
+                                                        isApproved 
+                                                            ? 'bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed opacity-60' 
+                                                            : 'bg-[#ef4444] text-white border-2 border-[#dc2626] hover:bg-red-600 cursor-pointer'
+                                                    }`}
                                                 >
-                                                    삭제🔴
+                                                    삭제
                                                 </button>
                                             </div>
                                         </div>

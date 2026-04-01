@@ -2,7 +2,7 @@ import React from 'react';
 import { List } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 
-export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, onShowAdDetail }: { setView: (v: any) => void, ads?: any[], userName?: string, onOpenMenu?: () => void, onShowAdDetail?: (ad: any) => void }) => {
+export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, onShowAdDetail, onDeleteAd }: { setView: (v: any) => void, ads?: any[], userName?: string, onOpenMenu?: () => void, onShowAdDetail?: (ad: any) => void, onDeleteAd?: (adId: any) => void }) => {
     const brand = useBrand();
 
     return (
@@ -28,7 +28,7 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
                         {ads.map((ad: any) => (
                             <div key={ad.id} className={`${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border rounded-[28px] overflow-hidden relative shadow-sm opacity-75 grayscale-[0.5] transition-all`}>
                                 <div className="p-6 md:p-8 space-y-4">
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 relative">
                                         {/* Status & Tier Badges Line (Stacked above title) */}
                                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                                             {/* Tier Code Badge (Standard: bg-gray-900) */}
@@ -71,18 +71,28 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
                                         </h3>
 
                                         {/* Info Area [Pure Reflection Mode] - No Shop Name */}
-                                        <div className="text-[11px] font-bold text-gray-400 flex flex-wrap items-center gap-1.5">
-                                            <span className="text-blue-400/70 font-black uppercase">
-                                                {(() => {
-                                                    const nick = ad.options?.nickname || ad.nickname || userName || '';
-                                                    if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
-                                                    return nick;
-                                                })()}
-                                            </span>
-                                            <span className="text-gray-200">|</span>
-                                            <span className="shrink-0">{(ad.options?.regionCity || ad.regionCity)} {(ad.options?.regionGu || ad.regionGu)}</span>
-                                            <span className="text-gray-200">|</span>
-                                            <span className="truncate">{(ad.options?.category || ad.category)} | {(ad.options?.categorySub || ad.categorySub || '자유직종')}</span>
+                                        <div className="text-[11px] font-bold text-gray-400 flex flex-wrap items-center justify-between gap-1.5 mt-2">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-blue-400/70 font-black uppercase">
+                                                    {(() => {
+                                                        const nick = ad.options?.nickname || ad.nickname || userName || '';
+                                                        if (nick.includes('게스트') || nick === '관리자' || !nick) return '사업자';
+                                                        return nick;
+                                                    })()}
+                                                </span>
+                                                <span className="text-gray-200">|</span>
+                                                <span className="shrink-0">{(ad.options?.regionCity || ad.regionCity)} {(ad.options?.regionGu || ad.regionGu)}</span>
+                                                <span className="text-gray-200">|</span>
+                                                <span className="truncate">{(ad.options?.category || ad.category)} | {(ad.options?.categorySub || ad.categorySub || '자유직종')}</span>
+                                            </div>
+                                            
+                                            {/* Delete Button for Closed Ads */}
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); onDeleteAd?.(ad.id); }}
+                                                className="px-4 py-1.5 bg-white border border-red-100 text-red-500 text-[10px] font-black rounded-lg hover:bg-red-50 transition-all opacity-100 grayscale-0"
+                                            >
+                                                삭제
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

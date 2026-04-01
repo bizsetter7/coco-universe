@@ -13,6 +13,13 @@ export interface NoticeItem {
 
 export const NOTICES: NoticeItem[] = [
     {
+        id: 6,
+        badge: '공지',
+        title: '[이벤트] 코코알바 오픈기념 상생지원 이벤트 및 이용안내',
+        date: '2026-04-02',
+        link: '/customer-center?tab=notice',
+    },
+    {
         id: 5,
         badge: '공지',
         title: '[안내] 프리미엄 광고 "Grand Tier" 서비스 개편 및 혜택 안내',

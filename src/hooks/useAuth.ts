@@ -78,7 +78,7 @@ export function useAuth() {
                         credit: profile.credit_balance || 0,
                         points: profile.points || 0, // [Fix] 자산 독립 분리 (v1.0 약속 이행)
                         jump_balance: profile.jump_balance || 0, // [New] 유료 점프 횟수 연동
-                        isVerifiedPartnerVerified: !!profile.is_adult_verified, // [New] DB 기업전용인증 여부 반영
+                        isVerifiedPartnerVerified: profile.role === 'corporate' ? !!profile.business_verified : !!profile.is_adult_verified, // [Fix] 업체회원은 사업자인증, 개인은 본인인증 반영
                         email: authUser.email
                     };
 
