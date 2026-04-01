@@ -28,7 +28,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
     const router = useRouter();
     const postId = parseInt(id);
     const [post, setPost] = useState<Post | null>(null);
-    const { user, isLoggedIn } = useAuth();
+    const { user, isLoggedIn, userType } = useAuth();
 
     // [Comment Input State]
     const [commentText, setCommentText] = useState('');
@@ -288,7 +288,15 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                             {showActionMenu && (
                                 <div className="absolute right-0 top-full mt-2 w-32 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
                                     <button
-                                        onClick={() => { setActionType('edit'); setShowActionMenu(false); }}
+                                        onClick={() => {
+                                            setShowActionMenu(false);
+                                            if (userType === 'admin') {
+                                                // 관리자: 비밀번호 없이 수정 페이지로 이동
+                                                router.push(`/community/write?mode=edit&id=${postId}`);
+                                            } else {
+                                                setActionType('edit');
+                                            }
+                                        }}
                                         className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                     >
                                         <Edit size={14} /> 수정하기
@@ -296,7 +304,7 @@ export default function CommunityDetailClient({ id }: { id: string }) {
                                     <button
                                         onClick={async () => {
                                             setShowActionMenu(false);
-                                            if (user?.type === 'admin') {
+                                            if (userType === 'admin') {
                                                 if (confirm('관리자 권한으로 이 글을 완전히 삭제하시겠습니까?')) {
                                                     try {
                                                         const res = await fetch(`/api/community/post?id=${postId}`, { method: 'DELETE' });

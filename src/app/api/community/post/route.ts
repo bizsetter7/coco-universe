@@ -47,6 +47,33 @@ export async function POST(request: NextRequest) {
     }
 }
 
+/** PATCH /api/community/post — 관리자 권한 게시글 수정 */
+export async function PATCH(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { id, title, content, category } = body;
+
+        if (!id) return NextResponse.json({ error: '게시글 ID가 필요합니다.' }, { status: 400 });
+        if (!title?.trim() || !content?.trim()) return NextResponse.json({ error: '제목과 내용은 필수입니다.' }, { status: 400 });
+
+        const { error } = await supabaseAdmin
+            .from('community_posts')
+            .update({ title, content, category, updated_at: new Date().toISOString() })
+            .eq('id', id);
+
+        if (error) {
+            console.error('[community/post] Admin update error:', error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+
+    } catch (err: any) {
+        console.error('[community/post] Unexpected update error:', err.message);
+        return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
+    }
+}
+
 /** DELETE /api/community/post — 관리자 권한 게시글 삭제 (비밀번호 없음) */
 export async function DELETE(request: NextRequest) {
     try {

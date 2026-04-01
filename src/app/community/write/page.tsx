@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ArrowLeft,
     Image as ImageIcon,
@@ -11,7 +11,7 @@ import {
     Eye,
     EyeOff
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { supabase } from '@/lib/supabase';
@@ -27,10 +27,32 @@ const CATEGORIES = COMMUNITY_CATEGORIES
 
 export default function WritePostPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get('mode') === 'edit';
+    const editPostId = searchParams.get('id');
+
     const [category, setCategory] = useState('');
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [images, setImages] = useState<string[]>([]);
+
+    // edit 모드: 기존 글 데이터 로드
+    useEffect(() => {
+        if (!isEditMode || !editPostId) return;
+        const fetchPost = async () => {
+            const { data } = await supabase
+                .from('community_posts')
+                .select('*')
+                .eq('id', editPostId)
+                .single();
+            if (data) {
+                setCategory(data.category || '');
+                setTitle(data.title || '');
+                setContent(data.content || '');
+            }
+        };
+        fetchPost();
+    }, [isEditMode, editPostId]);
 
     // [Security] Password & Secret
     const [password, setPassword] = useState('');
@@ -55,6 +77,27 @@ export default function WritePostPage() {
 
     const removeImage = (index: number) => {
         setImages(images.filter((_, i) => i !== index));
+    };
+
+    const handleEditSubmit = async () => {
+        if (!title.trim() || !content.trim()) return alert('제목과 내용을 입력해주세요.');
+        setIsSubmitting(true);
+        try {
+            const res = await fetch(`/api/community/post`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: editPostId, title, content, category }),
+            });
+            const result = await res.json();
+            if (!res.ok || !result.success) throw new Error(result.error || '서버 오류');
+            isSubmittedRef.current = true;
+            alert('게시글이 수정되었습니다.');
+            router.push(`/community/${editPostId}`);
+        } catch (err: any) {
+            alert(`수정 실패: ${err.message}`);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleSubmit = async () => {
@@ -147,7 +190,7 @@ export default function WritePostPage() {
                 <button onClick={() => router.back()} className="p-2 -ml-2 text-gray-600">
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-lg font-black text-gray-900">글쓰기</h1>
+                <h1 className="text-lg font-black text-gray-900">{isEditMode ? '글 수정' : '글쓰기'}</h1>
                 <div className="flex items-center gap-2">
                     <button onClick={() => router.push('/')} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
                         <Home size={22} />
@@ -308,11 +351,11 @@ export default function WritePostPage() {
                         취소
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        onClick={isEditMode ? handleEditSubmit : handleSubmit}
                         className="flex-[2] py-4 bg-[#f82b60] text-white rounded-2xl font-black text-base shadow-xl shadow-rose-200 hover:bg-[#db2456] transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
-                        disabled={isSubmitting || !title.trim() || !content.trim() || ((isSecret || !isLoggedIn) && !password.trim())}
+                        disabled={isSubmitting || !title.trim() || !content.trim() || (!isEditMode && (isSecret || !isLoggedIn) && !password.trim())}
                     >
-                        {isSubmitting ? '등록 중...' : '게시글 등록하기'}
+                        {isSubmitting ? '처리 중...' : isEditMode ? '수정 완료' : '게시글 등록하기'}
                     </button>
                 </div>
             </div>
