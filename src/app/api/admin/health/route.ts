@@ -443,6 +443,45 @@ export async function POST() {
         components.unread_notifications = { status: 'warning', message: `미읽 알림 검사 실패: ${err.message}` };
     }
 
+    // ── 28. 포인트 로그 무결성 체크 (profiles.points ↔ SUM(point_logs.amount)) ──
+    try {
+        // [Optimization] 모든 유저를 대조하면 무거우므로 상위 100명 또는 최근 활동 위주로 체크하거나, 전체 합계를 비교
+        // 여기서는 전체 합계로 먼저 간단히 체크
+        const { data: profilePointsSum, error: pError } = await supabase.rpc('get_total_points');
+        const { data: logPointsSum, error: lError } = await supabase.rpc('get_total_log_points');
+
+        // RPC가 없으면 직접 쿼리 (가벼운 버전)
+        if (pError || lError) {
+            const { data: profiles } = await supabase.from('profiles').select('id, points').limit(50);
+            let mismatchCount = 0;
+            if (profiles) {
+                for (const p of profiles) {
+                    const { data: logs } = await supabase.from('point_logs').select('amount').eq('user_id', p.id);
+                    const logSum = (logs || []).reduce((sum, l) => sum + l.amount, 0);
+                    if (p.points !== logSum) mismatchCount++;
+                }
+            }
+
+            if (mismatchCount === 0) {
+                components.point_log_integrity = { status: 'healthy', message: '샘플링 50명 포인트 로그 무결성 확인 완료' };
+            } else {
+                components.point_log_integrity = { status: 'warning', message: `포인트-로그 불일치 의심 ${mismatchCount}건 발견`, count: mismatchCount };
+                overall = setWorst(overall, 'warning');
+            }
+        } else {
+            const pSum = profilePointsSum || 0;
+            const lSum = logPointsSum || 0;
+            if (pSum === lSum) {
+                components.point_log_integrity = { status: 'healthy', message: `전체 포인트 무결성 정상 (합계: ${pSum}P)` };
+            } else {
+                components.point_log_integrity = { status: 'error', message: `전체 포인트 합계 불일치 (P:${pSum} != L:${lSum}) — 로그 누락 의심`, count: 1 };
+                overall = setWorst(overall, 'error');
+            }
+        }
+    } catch (err: any) {
+        components.point_log_integrity = { status: 'warning', message: `무결성 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 

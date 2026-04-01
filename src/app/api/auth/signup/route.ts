@@ -77,48 +77,6 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // profiles 테이블에 직접 upsert (트리거 보완 — phone/birthdate/gender 포함)
-        // null 처리: 빈 문자열 대신 null 사용 (DATE 타입 컬럼에 '' 삽입 시 오류 방지)
-        if (data.user?.id) {
-            try {
-                const { error: upsertError } = await supabaseAdmin.from('profiles').upsert({
-                    id: data.user.id,
-                    username: email.split('@')[0],   // 로그인 아이디 저장 (중복확인용)
-                    full_name: name || '',
-                    nickname: nickname || name || '',
-                    role: role || 'individual',
-                    phone: phone || null,
-                    birth_date: birthdate || null,
-                    gender: gender || null,
-                    points: 100,  // 가입 보너스 100P
-                }, { onConflict: 'id' });
-                if (upsertError) {
-                    console.error('[signup] profiles upsert 실패:', upsertError.message);
-                }
-            } catch (profileErr) {
-                console.warn('[signup] profiles upsert 예외:', profileErr);
-            }
-
-            // contact_email 별도 저장 (컬럼이 없으면 무시 — DB 마이그레이션 후 자동 활성화)
-            if (contact_email && data.user?.id) {
-                try {
-                    await supabaseAdmin.from('profiles').update({ contact_email }).eq('id', data.user.id);
-                } catch { /* profiles.contact_email 컬럼 미생성 시 무시 */ }
-            }
-
-            // 가입 보너스 100P 포인트 로그 기록
-            try {
-                await supabaseAdmin.from('point_logs').insert({
-                    user_id: data.user.id,
-                    amount: 100,
-                    reason: 'JOIN',
-                    note: '[COCO] 회원가입 축하 보너스',
-                });
-            } catch (logErr) {
-                console.warn('[signup] point_logs insert 예외 (무시):', logErr);
-            }
-        }
-
         return NextResponse.json({ success: true, userId: data.user?.id });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : '서버 오류';

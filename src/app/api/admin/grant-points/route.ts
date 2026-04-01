@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
     try {
-        const { userId, amount } = await request.json();
+        const { userId, amount, reason } = await request.json();
 
         if (!userId || typeof amount !== 'number' || amount === 0) {
             return NextResponse.json({ success: false, message: '올바르지 않은 요청입니다.' }, { status: 400 });
@@ -36,10 +36,14 @@ export async function POST(request: Request) {
 
         if (updateError) throw updateError;
 
-        // 3. point_logs 기록
+        // 3. point_logs 기록 (사유 포함)
         const { error: logError } = await supabaseAdmin
             .from('point_logs')
-            .insert({ user_id: userId, amount, reason: 'ADMIN_GRANT' });
+            .insert({ 
+                user_id: userId, 
+                amount, 
+                reason: reason || 'ADMIN_GRANT' 
+            });
 
         if (logError) throw logError;
 

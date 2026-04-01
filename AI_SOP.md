@@ -1,4 +1,4 @@
-# 🚀 초코아이디어 통합 사령부 마스터 SOP (v2.0.0)
+# 🚀 초코아이디어 통합 사령부 마스터 SOP (v2.1.0)
 
 ## 🔐 핵심 가치: 보안 및 정예 정신
 1. **철저한 보안**: 모든 소스코드와 비즈니스 모델은 대외비다.
@@ -9,24 +9,24 @@
 이를 시스템화하여 다음 작업의 속도를 2배 이상 높인다.
 
 ## 🌐 마스터 맵 (The Absolute Truth)
-- **P1(본사):** `C:\My-site\p1. choco-idea` / GitHub: `chocoidea` / `chocoidea.vercel.app`
+- **P1(본사):** `C:\My-site\p1.choco-idea` / GitHub: `chocoidea` / `chocoidea.vercel.app`
 
-- **P2(코코알바):** `C:\My-site\p2. 브랜드_통합_시스템` / GitHub: `coco-universe` / 본체: `www.cocoalba.kr` / 복제: `-d386`
+- **P2(코코알바):** `C:\My-site\p2.브랜드_통합_시스템` / GitHub: `coco-universe` / 본체: `www.cocoalba.kr` / 복제: `-d386`
 
-- **P3(랜딩):** `C:\My-site\p3. 코코 랜딩페이지` / GitHub: `coco-landing` / Base: `coco-inky.vercel.app`
+- **P3(랜딩):** `C:\My-site\p3.코코 랜딩페이지` / GitHub: `coco-landing` / Base: `coco-inky.vercel.app`
   - **구조:** 총 73개 지역별 랜딩페이지 (`BaseURL/{지역명}` 형식)
   - **참조:** 지역 리스트는 프로젝트 내 위치 설정 파일 참고.
 
-- **P4(정산):** `C:\My-site\파트너스_사이트` / GitHub: `partners-credit` / `partners-credit.vercel.app`
+- **P4(정산):** `C:\My-site\p4.파트너스_사이트` / GitHub: `partners-credit` / `partners-credit.vercel.app`
   - **목적:** 개발자용 유지 마진표 작성 및 쇼핑 트래픽 쇼핑 (조회수 공유 트래픽 보상 시스템)
   - **파일럿 구조:** `AUDIT_MODE = true` (공식 B2B 마진표 대비 루즈한 '초코파트너스'로 사업 파일럿 및 PG 사의 심사 중)
   - **상세 기획/설명:** 프로젝트 루트의 `P4_마스터플랜.md` 문서 참고.
 
-- **P6(방송):** `C:\My-site\p6. Broadcaster` / 최저가 알림/가격비교 AI 예측 비서 플랫폼
-  - **전략:** 제로 마찰 자동화, AI 가격 예측, 세션 FOMO UX, B2B 대기 수요 데이터 비즈니스.
+- **P6(방송):** `C:\My-site\p6.Broadcaster` / 24/7 AI 지능형 스트리밍 & 자연 치유 ASMR 서비스
+  - **전략:** Jenny(제니) 캐릭터 스토리텔링, 자발적 체류시간(AVD) 극대화, 입체적 생활 폴리 사운드 믹싱.
 
-- **P7(방송/쇼핑):** `C:\My-site\p7. PRICESHOT` / **PRICESHOT(프라이스샷)**
-  - **전략:** RN New Architecture(120fps), 3계층 데이터 수집, 인스턴트 카트, 10만개 SEO 랜딩페이지.
+- **P7(쇼핑/AI):** `C:\My-site\p7.PRICESHOT` / **PRICESHOT(프라이스샷)** - AI 가격 하락 예측 엔진
+  - **전략:** Future-Scan 예측 알고리즘, 세미-오토 카트 UX, 3계층 데이터 수집망, 10만개 SEO 인덱싱 패키지.
   - **수익모델:** 6.9k/12.9k 구독 모델 및 '코인 포인트' 리워드 시스템. 📈🚀🔍🎯🔭
 
 - **P8(초코엔터):** `C:\My-site\p8.초코엔터` / 크리에이티즈 독립 엔터테인먼트 & 투자 플랫폼

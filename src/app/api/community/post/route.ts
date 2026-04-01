@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
             .from('community_posts')
             .insert([{
                 author_id: body.author_id || null,
-                author: body.author_name || body.author_nickname || '익명',
-                author_name: body.author_name || '익명',
-                author_nickname: body.author_nickname || '익명',
+                author: body.author_nickname || body.author_name || '익명', // 닉네임 최우선
+                author_name: '익명', // 실명 전송 원천 차단
+                author_nickname: body.author_nickname || body.author_name || '익명',
                 category: body.category,
                 title: body.title,
                 content: body.content,

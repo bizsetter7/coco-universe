@@ -59,7 +59,11 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
             const res = await fetch('/api/admin/grant-points', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: selectedUser.id, amount }),
+                body: JSON.stringify({ 
+                    userId: selectedUser.id, 
+                    amount,
+                    reason: pointNote || 'ADMIN_GRANT' // 사유가 없으면 기본값 사용
+                }),
             });
             const result = await res.json();
             if (result.success) {
@@ -284,25 +288,34 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                             {/* 포인트 수동 지급 */}
                             <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100">
                                 <h4 className="text-xs font-black text-amber-700 mb-3 flex items-center gap-2">
-                                    <Coins size={14} /> 포인트 수동 지급 / 차감
+                                    <Send size={14} /> 포인트 수동 지급 / 차감
                                 </h4>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        placeholder="금액 (음수=차감)"
-                                        value={pointAmount}
-                                        onChange={e => setPointAmount(e.target.value)}
-                                        className="flex-1 px-3 py-2 text-xs font-bold rounded-xl border border-amber-200 bg-white focus:outline-none focus:border-amber-400"
-                                    />
+                                <div className="space-y-2">
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="number"
+                                            placeholder="금액 (음수=차감)"
+                                            value={pointAmount}
+                                            onChange={e => setPointAmount(e.target.value)}
+                                            className="w-32 px-3 py-2 text-xs font-bold rounded-xl border border-amber-200 bg-white focus:outline-none focus:border-amber-400"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="지급/차감 사유 (예: 이벤트 당첨)"
+                                            value={pointNote}
+                                            onChange={e => setPointNote(e.target.value)}
+                                            className="flex-1 px-3 py-2 text-xs font-bold rounded-xl border border-amber-200 bg-white focus:outline-none focus:border-amber-400"
+                                        />
+                                    </div>
                                     <button
                                         onClick={handleGrantPoint}
                                         disabled={isGrantingPoint}
-                                        className="px-4 py-2 bg-amber-500 text-white text-xs font-black rounded-xl hover:bg-amber-600 transition flex items-center gap-1.5 disabled:opacity-50"
+                                        className="w-full py-2.5 bg-amber-500 text-white text-xs font-black rounded-xl hover:bg-amber-600 transition flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-md shadow-amber-200"
                                     >
-                                        <Send size={12} /> {isGrantingPoint ? '처리중...' : '지급'}
+                                        <Send size={12} /> {isGrantingPoint ? '처리 중...' : '지급 실행'}
                                     </button>
                                 </div>
-                                <p className="text-[9px] text-amber-600 font-bold mt-2">* 양수=지급, 음수=차감. 예) 500 또는 -100</p>
+                                <p className="text-[9px] text-amber-600 font-bold mt-2">* 양수는 지급, 음수는 차감으로 처리됩니다.</p>
                             </div>
 
                             <div className="pt-4 border-t border-slate-50">

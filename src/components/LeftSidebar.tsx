@@ -349,6 +349,33 @@ export default function LeftSidebar({
                         </button>
                     ))}
                 </div>
+
+                {/* Regional Specialty Mall Links (SEO & Direct Funnel) */}
+                {isRegionOpen && (
+                    <div className="mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-gray-700">
+                        <p className="text-[10px] font-black text-purple-500 mb-2 px-1">✨ 지역별 전문 가이드</p>
+                        <div className="flex flex-wrap gap-1">
+                            {[
+                                { label: '강남관', slug: 'gangnam' },
+                                { label: '강남논현', slug: 'gangnam-nonhyeon' },
+                                { label: '부산관', slug: 'busan' },
+                                { label: '인천관', slug: 'incheon' },
+                                { label: '수원관', slug: 'suwon-ingye' },
+                                { label: '대전관', slug: 'daejeon' },
+                                { label: '대구관', slug: 'daegu' },
+                                { label: '광주관', slug: 'gwangju-sangmu' }
+                            ].map((link) => (
+                                <button
+                                    key={link.slug}
+                                    onClick={() => window.open(`https://region.cocoalba.kr/${link.slug}/`, '_blank')}
+                                    className="px-2 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded text-[9px] font-black hover:bg-purple-600 hover:text-white transition-all border border-purple-100 dark:border-purple-800"
+                                >
+                                    {link.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* 4. 업직종별 채용정보 */}
