@@ -134,8 +134,8 @@ export default function AdForm(props: AdFormProps) {
         props.payAmount && props.payAmount !== '0' && props.payAmount !== ''
     );
 
-    // Step 3: 상품 선택 (StandardsGuard 규정에 따라 p1~p7 유효 코드만 인정)
-    const isStep3Done = !!(props.selectedAdProduct && /^p[1-7]$/.test(props.selectedAdProduct));
+    // Step 3: 상품 선택 (p1~p7 + p7e 이벤트 베이직 인정)
+    const isStep3Done = !!(props.selectedAdProduct && (/^p[1-7]$/.test(props.selectedAdProduct) || props.selectedAdProduct === 'p7e'));
 
     // Step 4: 추가 옵션 (아이콘, 형광펜, 키워드, 테두리 중 하나라도 '실제로' 선택된 경우만 완료)
     const isStep4Done = !!(

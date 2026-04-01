@@ -12,7 +12,7 @@ describe('normalizeAd', () => {
             pay_amount: 10000,
             options: { nickname: 'DB닉네임' }
         };
-        const normalized = normalizeAd(dbAd);
+        const normalized = normalizeAd(dbAd)!;
         expect(normalized.regionCity).toBe('서울');
         expect(normalized.regionGu).toBe('강남구');
         expect(normalized.nickname).toBe('DB닉네임');
@@ -28,7 +28,7 @@ describe('normalizeAd', () => {
             selectedHighlighter: 2,
             borderOption: 'glow'
         };
-        const normalized = normalizeAd(localAd);
+        const normalized = normalizeAd(localAd)!;
         expect(normalized.nickname).toBe('로컬닉네임');
         expect(normalized.selectedIcon).toBe(5);
         expect(normalized.selectedHighlighter).toBe(2);
@@ -37,7 +37,7 @@ describe('normalizeAd', () => {
 
     it('데이터가 비어있을 경우 기본값이 설정되어야 한다', () => {
         const emptyAd = { id: 999 };
-        const normalized = normalizeAd(emptyAd);
+        const normalized = normalizeAd(emptyAd)!;
         expect(normalized.nickname).toBe('관리자');
         expect(normalized.regionCity).toBe('지역');
         expect(normalized.status).toBe('진행중');

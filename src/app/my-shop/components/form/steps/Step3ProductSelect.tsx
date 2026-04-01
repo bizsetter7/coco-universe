@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Award, Zap } from 'lucide-react';
+import { Award, Zap, Gift } from 'lucide-react';
 import { DETAILED_PRICING } from '../../../constants';
 
 interface Step3Props {
@@ -18,6 +18,19 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
 }) => {
     // 그랜드부터 베이직까지만 필터링 (순서 보장)
     const mainProducts = DETAILED_PRICING.filter(p => p.isMain);
+    // 이벤트 상품 (isMain: false, d30 === 0)
+    const eventProduct = DETAILED_PRICING.find(p => p.id === 'p7e');
+
+    const handleEventSelect = () => {
+        if (isNewEntry === false) {
+            alert('등록한 옵션은 변경이 불가합니다.\nstep1, step2의 영역만 수정가능.');
+            return;
+        }
+        if (eventProduct) {
+            setSelectedAdProduct(eventProduct.id);
+            setSelectedAdPeriod(30);
+        }
+    };
 
     return (
         <section id="myshop-step-3" className={`p-1.5 md:p-5 rounded-[32px] shadow-lg border-2 overflow-hidden ${brand.theme === 'dark' ? 'bg-gradient-to-br from-purple-950 via-gray-900 to-gray-950 border-purple-900/50' : 'bg-gradient-to-br from-purple-50 via-white to-fuchsia-50 border-purple-200'}`}>
@@ -39,6 +52,38 @@ export const Step3ProductSelect: React.FC<Step3Props> = ({
                 <Zap size={14} className="animate-pulse shrink-0" />
                 <span className="text-[11px] md:text-[13px] font-black italic">광고 타입별 선택 (실시간 노출 최적화 적용됨)</span>
             </div>
+
+            {/* 오픈기념 무료 이벤트 상품 카드 */}
+            {eventProduct && (
+                <div
+                    onClick={handleEventSelect}
+                    className={`mb-4 mx-0.5 p-3 md:p-5 rounded-[20px] border-2 cursor-pointer transition-all duration-300 flex items-center justify-between gap-3
+                        ${selectedAdProduct === 'p7e'
+                            ? 'border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-100'
+                            : 'border-emerald-300 bg-white hover:border-emerald-400 hover:shadow-md'
+                        }`}
+                >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${selectedAdProduct === 'p7e' ? 'bg-emerald-500' : 'bg-emerald-100'}`}>
+                            <Gift size={20} className={selectedAdProduct === 'p7e' ? 'text-white' : 'text-emerald-600'} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                                <span className="text-[9px] md:text-[10px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full">오픈기념 FREE</span>
+                                <span className="text-[9px] md:text-[10px] font-black text-red-500">선착순 10개 업소</span>
+                                {selectedAdProduct === 'p7e' && <span className="text-[9px] md:text-[10px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">선택 완료</span>}
+                            </div>
+                            <h3 className="text-[14px] md:text-[16px] font-black text-emerald-700 leading-tight">오픈기념 무료 베이직</h3>
+                            <p className="text-[10px] md:text-[11px] text-gray-500 font-bold mt-0.5">최신 구인정보 리스트 · Step4 옵션 추가 가능</p>
+                        </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                        <div className="text-[11px] text-gray-400 font-bold line-through">60,000원</div>
+                        <div className="text-[18px] md:text-[22px] font-black text-emerald-600 leading-tight">0원</div>
+                        <div className="text-[9px] text-gray-400 font-bold">30일</div>
+                    </div>
+                </div>
+            )}
 
             {/* 그리드 설정: 모바일 2열(grid-cols-2), PC 3열(lg:grid-cols-3) */}
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 pb-3">

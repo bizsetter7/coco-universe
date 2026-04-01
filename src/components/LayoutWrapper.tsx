@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIdleLogout } from '@/hooks/useIdleLogout';
 import { IdleLogoutModal } from './auth/IdleLogoutModal';
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
+import OpenEventPopup from './OpenEventPopup';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -180,6 +181,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                 onKeepAlive={keepAlive}
                 onLogout={logout}
             />
+
+            {/* 오픈 상생지원 이벤트 팝업 (어드민/인증게이트 제외) */}
+            {!isAdminPage && !showAdultGate && <OpenEventPopup />}
         </React.Fragment>
     );
 };

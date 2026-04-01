@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useBrand } from '@/components/BrandProvider';
-import { X, CheckCircle2, Info } from 'lucide-react';
+import { X, CheckCircle2, Info, Gift } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 interface PaymentPopupProps {
     isOpen: boolean;
@@ -14,7 +15,31 @@ interface PaymentPopupProps {
     initialTier?: string;
 }
 
-const PACKAGES = [
+interface Package {
+    id: number;
+    tier: string;
+    name: string;
+    desc: React.ReactNode;
+    price: string;
+    originalPrice?: string;
+    isEvent?: boolean;
+}
+
+const PACKAGES: Package[] = [
+    {
+        id: 0,
+        tier: 'event_basic',
+        name: '오픈기념 무료 베이직',
+        desc: (
+            <>
+                최신 구인정보 리스트<br />
+                <span className="text-red-500 font-black">선착순 10개 업소 한정!</span>
+            </>
+        ),
+        price: '0원',
+        originalPrice: '60,000원',
+        isEvent: true,
+    },
     {
         id: 1,
         tier: 'grand',
@@ -114,12 +139,13 @@ const PACKAGES = [
     },
 ];
 
-export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, initialTier = 'grand' }) => {
+export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, initialTier = 'event_basic' }) => {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType } = useAuth();
     const [selectedTier, setSelectedTier] = useState(initialTier);
     const [mounted, setMounted] = useState(false);
+    const [applying, setApplying] = useState(false);
 
     // 전역 스크롤 관리자 연동
     useBodyScrollLock(isOpen);
@@ -132,7 +158,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     // SSR 환경에서 document.body 접근 에러 방지 및 컴포넌트 마운트 확인
     if (!mounted || !isOpen) return null;
 
-    const handleApply = () => {
+    const handleApply = async () => {
         // useAuth 훅 기반 인증 체크 (mock 세션 포함)
         if (!isLoggedIn) {
             if (confirm('광고를 신청하려면 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?')) {
@@ -145,7 +171,29 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
             alert('업체회원만 이용 가능한 서비스입니다.');
             return;
         }
-        // corporate 또는 admin → 광고 신청 진행
+        // corporate → 사업자인증 확인
+        if (userType === 'corporate') {
+            setApplying(true);
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('business_verified')
+                        .eq('id', user.id)
+                        .single();
+                    if (!profile?.business_verified) {
+                        alert('사업자 인증 후 광고를 등록하실 수 있습니다.\n마이페이지 > 회원정보수정 탭에서 사업자 인증을 완료해주세요.');
+                        onClose();
+                        router.push('/my-shop?view=member-info');
+                        return;
+                    }
+                }
+            } finally {
+                setApplying(false);
+            }
+        }
+        // 인증 완료 → 광고 신청 진행
         router.push(`/my-shop?view=form&tier=${selectedTier}`);
         onClose();
     };
@@ -210,30 +258,47 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                         {PACKAGES.map((pkg) => (
                             <label
                                 key={pkg.id}
-                                className={`block p-4 border rounded-xl cursor-pointer relative overflow-hidden transition-all 
-                                    ${selectedTier === pkg.tier
-                                        ? 'border-red-500 ring-1 ring-red-500 bg-red-50/10'
-                                        : (brand.theme === 'dark' ? 'border-gray-700 bg-gray-700/30' : 'border-gray-200 bg-white hover:border-gray-300')
+                                className={`block p-4 border rounded-xl cursor-pointer relative overflow-hidden transition-all
+                                    ${pkg.isEvent
+                                        ? (selectedTier === pkg.tier
+                                            ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/20'
+                                            : 'border-emerald-300 bg-emerald-50/10 hover:border-emerald-400')
+                                        : (selectedTier === pkg.tier
+                                            ? 'border-red-500 ring-1 ring-red-500 bg-red-50/10'
+                                            : (brand.theme === 'dark' ? 'border-gray-700 bg-gray-700/30' : 'border-gray-200 bg-white hover:border-gray-300'))
                                     }
                                 `}
                                 onClick={() => setSelectedTier(pkg.tier)}
                             >
+                                {/* 이벤트 상품 뱃지 */}
+                                {pkg.isEvent && (
+                                    <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter flex items-center gap-0.5">
+                                        <Gift size={9} />FREE
+                                    </div>
+                                )}
+                                {/* 기존 이벤트 뱃지 (id===1 → grand) */}
                                 {pkg.id === 1 && <div className="absolute top-0 right-0 bg-red-500 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter">Event</div>}
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                                        <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedTier === pkg.tier ? 'border-red-500' : 'border-gray-300'}`}>
-                                            {selectedTier === pkg.tier && <div className="w-2.5 h-2.5 rounded-full bg-red-500" />}
+                                        <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedTier === pkg.tier ? (pkg.isEvent ? 'border-emerald-500' : 'border-red-500') : 'border-gray-300'}`}>
+                                            {selectedTier === pkg.tier && <div className={`w-2.5 h-2.5 rounded-full ${pkg.isEvent ? 'bg-emerald-500' : 'bg-red-500'}`} />}
                                         </div>
                                         <div className="flex-1 min-w-0 pr-2">
-                                            <span className={`block font-black text-sm md:text-base mb-1 ${brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{pkg.name}</span>
-                                            {/* [UPDATE] Rich Text Description */}
+                                            <span className={`block font-black text-sm md:text-base mb-1 ${pkg.isEvent ? 'text-emerald-700' : (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900')}`}>{pkg.name}</span>
                                             <span className="text-[12px] md:text-[13px] text-gray-500 font-medium block leading-snug break-keep">
                                                 {pkg.desc}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0 whitespace-nowrap">
-                                        <span className={`text-base md:text-lg font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{pkg.price}</span>
+                                        {pkg.isEvent ? (
+                                            <div className="flex flex-col items-end gap-0.5">
+                                                <span className="text-[11px] text-gray-400 font-bold line-through">{pkg.originalPrice}</span>
+                                                <span className="text-base md:text-lg font-black text-emerald-600">{pkg.price}</span>
+                                            </div>
+                                        ) : (
+                                            <span className={`text-base md:text-lg font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{pkg.price}</span>
+                                        )}
                                     </div>
                                 </div>
                             </label>
@@ -244,12 +309,13 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                 {/* Footer */}
                 <div className={`p-4 border-t shrink-0 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>
                     <button
-                        style={primaryBgStyle}
-                        className="w-full text-white font-bold py-4 rounded-xl text-lg shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2"
+                        style={applying ? undefined : primaryBgStyle}
+                        className={`w-full text-white font-bold py-4 rounded-xl text-lg shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2 ${applying ? 'bg-gray-400 cursor-not-allowed' : ''}`}
                         onClick={handleApply}
+                        disabled={applying}
                     >
                         <CheckCircle2 size={20} />
-                        선택한 상품 신청하기
+                        {applying ? '확인 중...' : '선택한 상품 신청하기'}
                     </button>
                 </div>
             </div>

@@ -482,6 +482,41 @@ export async function POST() {
         components.point_log_integrity = { status: 'warning', message: `무결성 검사 실패: ${err.message}` };
     }
 
+    // ── 29. DB 스키마 — profiles.business_verified 컬럼 ─────────
+    try {
+        const { error } = await supabase.from('profiles').select('business_verified').limit(1);
+        if (error) throw error;
+        components.db_biz_verified = { status: 'healthy', message: 'profiles.business_verified 컬럼 존재 — 사업자 인증 게이트 정상 작동 가능' };
+    } catch {
+        components.db_biz_verified = {
+            status: 'error',
+            message: 'profiles.business_verified 컬럼 없음 — 업체회원 광고 등록 게이트 작동 불가. SQL: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS business_verified boolean DEFAULT false;'
+        };
+        overall = setWorst(overall, 'error');
+    }
+
+    // ── 30. 사업자 미인증 업체회원 현황 ─────────────────────────
+    try {
+        const { count, error } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'corporate')
+            .eq('business_verified', false);
+        if (error) throw error;
+        if (!count || count === 0) {
+            components.unverified_corporate = { status: 'healthy', message: '미인증 업체회원 없음' };
+        } else {
+            components.unverified_corporate = {
+                status: 'warning',
+                message: `사업자 미인증 업체회원 ${count}명 — 광고 등록 불가 상태. 홍보·안내 필요.`,
+                count
+            };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.unverified_corporate = { status: 'warning', message: `사업자 인증 현황 조회 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 

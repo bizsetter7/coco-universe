@@ -53,6 +53,7 @@ export const DETAILED_PRICING = [
     { id: 'p5', altId: 'recommended', code: 'T5', tier: '급구/추천',eng: '(Urgent/Rec)', name: '타입5. 급구/추천 (Urgent)',  color: 'text-purple-600', desc: '급구/추천 배지 노출로\n주목도 실속형',         d30: 120000, d60: 216000, d90: 288000, isMain: true,  jumpManual: 8,  jumpAuto: 3, jumpAutoIntervalHours: 8 },
     { id: 'p6', altId: 'native',      code: 'T6', tier: '네이티브', eng: '(Native)',     name: '타입6. 네이티브 (Native)',   color: 'text-slate-600',  desc: '리스트 광고에 배치\n랜덤 상단노출효과',          d30: 100000, d60: 180000, d90: 240000, isMain: true,  jumpManual: 6,  jumpAuto: 0, jumpAutoIntervalHours: 0 },
     { id: 'p7', altId: 'basic',       code: 'T7', tier: '베이직',   eng: '(Basic)',      name: '타입7. 베이직/줄광고',        color: 'text-slate-400',  desc: '최신 구인정보 리스트\n(실속형 구인 상품)',        d30: 60000,  d60: 100000, d90: 140000, isMain: true,  jumpManual: 5,  jumpAuto: 0, jumpAutoIntervalHours: 0 },
+    { id: 'p7e', altId: 'event_basic', code: 'T7', tier: '베이직',  eng: '(Basic)',      name: '오픈기념 무료 베이직',          color: 'text-slate-400',  desc: '최신 구인정보 리스트\n(오픈기념 선착순 무료)',   d30: 0,      d60: 100000, d90: 140000, isMain: false, jumpManual: 5,  jumpAuto: 0, jumpAutoIntervalHours: 0 },
     { id: 'bold',                      code: 'Opt',tier: '굵은글씨', eng: '',             name: '기타-강조옵션 (Emphasis)',   color: 'text-black',      desc: '아이콘/형광펜\n테두리/급여추가\n(주목도 200% 상승)', d30: 30000,  d60: 55000,  d90: 70000,  isMain: false, jumpManual: 0,  jumpAuto: 0, jumpAutoIntervalHours: 0 },
 ];
 

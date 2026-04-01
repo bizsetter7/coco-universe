@@ -23,7 +23,7 @@ import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import { normalizeAd, normalizePayment } from './utils/normalization';
-import { getJumpConfig } from './constants';
+import { getJumpConfig, DETAILED_PRICING } from './constants';
 
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
@@ -336,6 +336,15 @@ function MyShopContent() {
         }
     }, [view, userType]);
 
+    // [Security] 사업자 미인증 corporate → view=form 직접 접근 차단
+    useEffect(() => {
+        if (view === 'form' && userType === 'corporate' && isDataLoaded && !bizVerified) {
+            // [UX Fix] alert는 동기적으로 작동하므로 사용자가 확인을 누를 때까지 코드가 멈춤을 이용
+            window.alert('사업자 인증 후 광고를 등록하실 수 있습니다.\n\n마이페이지 > 회원정보수정 하단에서\n사업자 인증을 먼저 완료해주세요.');
+            setView('dashboard');
+        }
+    }, [view, userType, bizVerified, isDataLoaded]);
+
     useEffect(() => {
         // [Critical Fix] 세션 로딩 중에는 아무것도 하지 않음
         // authLoading이 true인 동안 authUserType은 'guest' 초기값 → 리다이렉트 금지
@@ -414,6 +423,19 @@ function MyShopContent() {
             if (lastLoadedId !== null) setLastLoadedId(null);
         }
     }, [searchParams, view, isDataLoaded, registeredAds, lastLoadedId]);
+
+    // [tier 자동선택] PaymentPopup에서 tier 파라미터와 함께 view=form으로 진입 시 Step3 자동 선택
+    useEffect(() => {
+        const tierParam = searchParams.get('tier');
+        if (view === 'form' && tierParam && !formState.selectedAdProduct) {
+            const product = DETAILED_PRICING.find(p => p.altId === tierParam || p.id === tierParam);
+            if (product) {
+                formState.setSelectedAdProduct(product.id);
+                formState.setSelectedAdPeriod(30);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [view, isNewEntry]);
 
     const onPreview = () => {
         const newAd = {
