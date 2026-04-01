@@ -208,33 +208,44 @@ function MyShopContent() {
 
     // 업체회원 사업자 인증 상태 + 상호명 로드
     const [bizVerified, setBizVerified] = React.useState(false);
+    const [bizDataLoaded, setBizDataLoaded] = React.useState(false); // [Fix] 레이스 컨디션 방지
     const [bizAddress, setBizAddress] = React.useState('');
     // [Fix] bizShopName은 formState.resetAdStates()에 영향 안 받는 별도 state (상호명 깜빡임 방지)
     const [bizShopName, setBizShopName] = React.useState('');
 
     useEffect(() => {
-        if (!authUser?.id || authUser.id === 'guest' || authUser.id.startsWith('mock_')) return;
-        if (authUserType !== 'corporate') return;
+        if (!authUser?.id || authUser.id === 'guest' || authUser.id.startsWith('mock_')) {
+            setBizDataLoaded(true); // 비기업 계정은 체크 불필요 → 즉시 완료 처리
+            return;
+        }
+        if (authUserType !== 'corporate') {
+            setBizDataLoaded(true);
+            return;
+        }
 
         const loadShopName = async () => {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('nickname, full_name, business_name, business_verified, business_address, business_address_detail')
-                .eq('id', authUser.id)
-                .single();
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('nickname, full_name, business_name, business_verified, business_address, business_address_detail')
+                    .eq('id', authUser.id)
+                    .single();
 
-            if (profile) {
-                const verified = (profile as any).business_verified === true;
-                setBizVerified(verified);
-                // 인증 완료된 경우에만 business_name 반영
-                if (verified && (profile as any).business_name) {
-                    formState.setShopName((profile as any).business_name);
-                    setBizShopName((profile as any).business_name);
+                if (profile) {
+                    const verified = (profile as any).business_verified === true;
+                    setBizVerified(verified);
+                    // 인증 완료된 경우에만 business_name 반영
+                    if (verified && (profile as any).business_name) {
+                        formState.setShopName((profile as any).business_name);
+                        setBizShopName((profile as any).business_name);
+                    }
+                    // 사업장 주소 로드
+                    const addr = (profile as any).business_address || '';
+                    const detail = (profile as any).business_address_detail || '';
+                    if (addr) setBizAddress(detail ? `${addr} ${detail}` : addr);
                 }
-                // 사업장 주소 로드
-                const addr = (profile as any).business_address || '';
-                const detail = (profile as any).business_address_detail || '';
-                if (addr) setBizAddress(detail ? `${addr} ${detail}` : addr);
+            } finally {
+                setBizDataLoaded(true); // [Fix] 성공/실패 무관하게 로드 완료 표시
             }
         };
 
@@ -337,13 +348,14 @@ function MyShopContent() {
     }, [view, userType]);
 
     // [Security] 사업자 미인증 corporate → view=form 직접 접근 차단
+    // [Fix] bizDataLoaded 추가: bizVerified 로드 완료 전 레이스 컨디션으로 인증 유저 튕기는 현상 방지
     useEffect(() => {
-        if (view === 'form' && userType === 'corporate' && isDataLoaded && !bizVerified) {
+        if (view === 'form' && userType === 'corporate' && isDataLoaded && bizDataLoaded && !bizVerified) {
             // [UX Fix] alert는 동기적으로 작동하므로 사용자가 확인을 누를 때까지 코드가 멈춤을 이용
             window.alert('사업자 인증 후 광고를 등록하실 수 있습니다.\n\n마이페이지 > 회원정보수정 하단에서\n사업자 인증을 먼저 완료해주세요.');
             setView('dashboard');
         }
-    }, [view, userType, bizVerified, isDataLoaded]);
+    }, [view, userType, bizVerified, isDataLoaded, bizDataLoaded]);
 
     useEffect(() => {
         // [Critical Fix] 세션 로딩 중에는 아무것도 하지 않음
