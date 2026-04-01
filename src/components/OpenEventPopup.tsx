@@ -5,17 +5,23 @@ import { createPortal } from 'react-dom';
 import { X, Megaphone, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function OpenEventPopup() {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    const { isLoggedIn, userType } = useAuth();
+
     // 전역 스크롤 관리자 연동
     useBodyScrollLock(isOpen);
 
     useEffect(() => {
         setMounted(true);
+
+        // 로그인된 사업자 회원에게만 노출
+        if (!isLoggedIn || userType !== 'corporate') return;
 
         // 오늘 하루 보지 않기 여부 체크
         const lastClose = localStorage.getItem('coco_open_event_hide');
@@ -24,7 +30,7 @@ export default function OpenEventPopup() {
         if (lastClose !== today) {
             setIsOpen(true);
         }
-    }, []);
+    }, [isLoggedIn, userType]);
 
     const closePopup = (hideForToday: boolean) => {
         setIsOpen(false);
@@ -104,7 +110,7 @@ export default function OpenEventPopup() {
                     >
                         무료 공고 등록하기 <ArrowRight size={20} />
                     </button>
-                    
+
                     <p className="mt-4 text-[13px] font-bold text-gray-400">
                         * 사업자 인증 완료 회원 한정 적용
                     </p>

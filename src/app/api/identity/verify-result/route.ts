@@ -99,8 +99,6 @@ export async function POST(req: NextRequest) {
             di: identity?.di
         };
 
-        console.log('[Identity/verify-result] 정제된 결과:', { name: result.name, phone: result.phone, gender: result.gender, birthdate: result.birthdate });
-
         return NextResponse.json({
             success: true,
             code: 'VERIFIED',
