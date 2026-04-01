@@ -36,7 +36,7 @@ export const EventOpenNoticeDetail = () => {
                         <Megaphone size={24} />
                     </div>
                     <p className="text-[#f82b60] font-black text-[11px] uppercase tracking-widest mb-1">Benefit 02</p>
-                    <h5 className="text-xl font-black text-gray-900 mb-2">모든 광구 1+1 혜택</h5>
+                    <h5 className="text-xl font-black text-gray-900 mb-2">모든 광고 1+1 혜택</h5>
                     <p className="text-[13px] md:text-[14px] font-bold text-gray-500 leading-relaxed break-keep">
                         <span className="md:whitespace-nowrap">등급에 상관없이 모든 유료 광고 등록 시</span><br className="hidden md:block" />
                         <span className="text-gray-900 font-black md:whitespace-nowrap">추가 1개월(1+1)을 더 지원해 드립니다.</span>

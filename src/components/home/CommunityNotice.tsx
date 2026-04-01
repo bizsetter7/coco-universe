@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { MessageCircle, Bell } from 'lucide-react';
 import { useBrand } from '../BrandProvider';
 import { MOCK_POSTS } from '@/constants/community';
+import { NOTICES } from '@/constants/notices';
 
 export const CommunityNotice = () => {
     const brand = useBrand();
@@ -67,23 +68,19 @@ export const CommunityNotice = () => {
                     <span className="text-[10px] md:text-xs text-gray-400 cursor-pointer hover:text-gray-600 ml-0.5">업데이트</span>
                 </div>
                 <div className={listStyle}>
-                    {[
-                        { title: '[중요] 카드 결제 서비스 종료 및 입금 방식 전환 안내', url: '/customer-center?tab=notice', important: true },
-                        { title: '[공지] 서비스 전면 개편 및 광고 상품 단가 확정 안내', url: '/customer-center?tab=notice' },
-                        { title: 'PC 사이드배너 광고 시스템 정식 도입', url: '/customer-center?tab=notice' }
-                    ].map((item, i) => (
+                    {NOTICES.slice(0, 3).map((item) => (
                         <div
-                            key={i}
+                            key={item.id}
                             className="flex items-center gap-2 md:gap-3 group cursor-pointer"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(item.url);
+                                router.push(item.link || '/customer-center?tab=notice');
                             }}
                         >
                             <span className={iconBoxStyle('text-[#f82b60]')}>
-                                {item.important ? '🚨' : '📢'}
+                                {item.badge === '중요' ? '🚨' : '📢'}
                             </span>
-                            <span className={`${itemStyle} group-hover:underline ${item.important ? 'font-bold text-red-500 dark:text-red-400' : ''}`}>
+                            <span className={`${itemStyle} group-hover:underline ${item.badge === '중요' ? 'font-bold text-red-500' : ''}`}>
                                 {item.title}
                             </span>
                         </div>
