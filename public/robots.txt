@@ -18,6 +18,27 @@ User-agent: Naverbot
 Allow: /
 Crawl-delay: 1
 
+# AI 검색 엔진 봇 (GEO 최적화)
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: OAI-SearchBot
+Allow: /
+Crawl-delay: 1
+
 User-agent: Baiduspider
 Disallow: /
 

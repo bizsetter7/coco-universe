@@ -47,7 +47,7 @@ const BASE_ORGANIZATION_SCHEMA = {
   ],
   "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+82-10-0000-0000",
+      "telephone": "+82-1877-1442",
       "contactType": "customer service",
       "areaServed": "KR",
       "availableLanguage": "Korean"
