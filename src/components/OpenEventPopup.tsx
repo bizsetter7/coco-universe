@@ -62,7 +62,7 @@ export default function OpenEventPopup() {
             onClick={() => closePopup(false)}
         >
             <div
-                className="relative w-[90%] max-w-xs md:max-w-sm bg-white rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-300"
+                className="relative w-[90%] max-w-sm md:max-w-md bg-white rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-300"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Decorative Top Gradient */}
