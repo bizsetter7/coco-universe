@@ -85,7 +85,7 @@ export default function OpenEventPopup() {
 
                             <h2 className="text-[20px] md:text-[30px] font-black leading-[1.2] tracking-tighter text-gray-900 mb-4 md:mb-6">
                                 사장님 주목! 🙌<br />
-                                <span className="text-[#f82b60]">파격 혜택</span> 드립니다
+                                <span className="text-[#f82b60]">통큰 혜택</span> 드립니다
                             </h2>
 
                             {/* Event Blocks (Extreme compact for mobile) */}
