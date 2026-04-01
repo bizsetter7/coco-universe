@@ -23,7 +23,7 @@ import PersonalDashboard from './components/dashboard/PersonalDashboard';
 import AdForm from './AdForm';
 import { useAdFormState } from './useAdFormState';
 import { normalizeAd, normalizePayment } from './utils/normalization';
-import { getJumpConfig } from './constants';
+import { getJumpConfig, DETAILED_PRICING } from './constants';
 
 // --- Components (Refactored) ---
 import { WarningModal } from './components/WarningModal';
@@ -91,28 +91,6 @@ function MyShopContent() {
 
     useEffect(() => {
         setMounted(true);
-    }, []);
-
-    // [Dev/Test Only] ?autoLogin=corporate|shop|individual URL 파라미터로 mock 세션 자동 설정
-    // TestSprite E2E 테스트 전용 — 비밀번호 없이 지정 회원 유형으로 진입 가능
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const autoLogin = searchParams.get('autoLogin');
-        if (autoLogin) {
-            const existing = localStorage.getItem('coco_mock_session');
-            if (!existing) {
-                const isCorporate = autoLogin === 'corporate' || autoLogin === 'shop';
-                const mockSession = isCorporate
-                    ? { type: 'corporate', id: 'mock_test_shop', name: '테스트업체', nickname: '테스트업체', credit: 1000, points: 500 }
-                    : { type: 'individual', id: 'mock_test_user', name: '테스트회원', nickname: '테스트회원', credit: 0, points: 0 };
-                localStorage.setItem('coco_mock_session', JSON.stringify(mockSession));
-                // 파라미터 제거 후 리로드 (깨끗한 URL 유지)
-                const url = new URL(window.location.href);
-                url.searchParams.delete('autoLogin');
-                window.location.replace(url.toString());
-            }
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // --- Data Fetching (Supabase) ---
@@ -335,6 +313,26 @@ function MyShopContent() {
             setView('dashboard');
         }
     }, [view, userType]);
+
+    // 사업자 미인증 corporate → view=form 직접 접근 차단
+    useEffect(() => {
+        if (view === 'form' && userType === 'corporate' && isDataLoaded && !bizVerified) {
+            alert('사업자 인증 후 광고를 등록하실 수 있습니다.\n마이페이지 > 회원정보수정에서 인증을 완료해주세요.');
+            setView('dashboard');
+        }
+    }, [view, userType, bizVerified, isDataLoaded]);
+
+    // tier 파라미터로 진입 시 Step3 상품 자동 선택
+    useEffect(() => {
+        const tierParam = searchParams.get('tier');
+        if (view === 'form' && tierParam && !formState.selectedAdProduct) {
+            const product = DETAILED_PRICING.find(p => p.altId === tierParam || p.id === tierParam);
+            if (product) {
+                formState.setSelectedAdProduct(product.id);
+                formState.setSelectedAdPeriod(30);
+            }
+        }
+    }, [view]);
 
     useEffect(() => {
         // [Critical Fix] 세션 로딩 중에는 아무것도 하지 않음

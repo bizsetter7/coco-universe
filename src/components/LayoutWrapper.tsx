@@ -8,6 +8,7 @@ import { StickyWrapper } from './ui/StickyWrapper';
 import { useMobile } from '@/hooks/useMobile';
 import { MobileBottomNav } from './ui/MobileBottomNav';
 import { useBrand } from './BrandProvider';
+import OpenEventPopup from './OpenEventPopup';
 import { Footer } from './layout/Footer';
 import MainHeader from './common/MainHeader';
 import { Shop } from '@/types/shop';
@@ -180,6 +181,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                 onKeepAlive={keepAlive}
                 onLogout={logout}
             />
+
+            {/* 오픈기념 상생지원 이벤트 팝업 — 로그인 유저에게만, 어드민/성인게이트 제외 */}
+            {!isAdminPage && !showAdultGate && isLoggedIn && <OpenEventPopup />}
         </React.Fragment>
     );
 };
