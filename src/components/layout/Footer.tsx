@@ -163,6 +163,25 @@ export const Footer = () => {
                         </Link>
                     </div>
 
+                    {/* ── 지역 바로가기 (SEO Spider Web) ─────────────────────── */}
+                    <div className="py-6 border-b border-gray-200 text-[11px] text-gray-500">
+                        <div className="flex flex-wrap gap-x-3 gap-y-2 leading-relaxed">
+                            <span className="font-bold text-gray-700 mr-1">지역 바로가기 :</span>
+                            <Link href="/coco/서울-강남구" className="hover:text-[#f82b60]">강남 알바</Link>
+                            <Link href="/coco/서울-강남구-논현동" className="hover:text-[#f82b60]">논현동 알바</Link>
+                            <Link href="/coco/서울-영등포구-여의도동" className="hover:text-[#f82b60]">여의도 알바</Link>
+                            <Link href="/coco/경기-수원시-인계동" className="hover:text-[#f82b60]">수원 인계동 밤알바</Link>
+                            <Link href="/coco/경기-부천시-상동" className="hover:text-[#f82b60]">부천 상동 알바</Link>
+                            <Link href="/coco/부산-부산진구" className="hover:text-[#f82b60]">부산 서면 알바</Link>
+                            <Link href="/coco/부산-해운대구" className="hover:text-[#f82b60]">해운대 알바</Link>
+                            <Link href="/coco/인천-계양구" className="hover:text-[#f82b60]">인천 계양구 알바</Link>
+                            <Link href="/coco/대전-유성구" className="hover:text-[#f82b60]">대전 유성 알바</Link>
+                            <Link href="/coco/대구-수성구" className="hover:text-[#f82b60]">대구 수성구 알바</Link>
+                            <Link href="/coco/광주-서구" className="hover:text-[#f82b60]">광주 상무지구 알바</Link>
+                            <Link href="/region/all" className="font-bold text-[#f82b60] hover:underline decoration-2 underline-offset-4">...전국 지역 전체보기</Link>
+                        </div>
+                    </div>
+
                     {/* ── 사업자 정보 (PC) ─────────────────────────────────── */}
                     <div className="hidden md:flex py-5 items-start gap-6">
                         {/* 3가지 링크 (좌측 컬럼) */}

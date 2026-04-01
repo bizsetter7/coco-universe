@@ -11,7 +11,7 @@
 ## 🌐 마스터 맵 (The Absolute Truth)
 - **P1(본사):** `C:\My-site\p1.choco-idea` / GitHub: `chocoidea` / `chocoidea.vercel.app`
 
-- **P2(코코알바):** `C:\My-site\p2.브랜드_통합_시스템` / GitHub: `coco-universe` / 본체: `www.cocoalba.kr` / 복제: `-d386`
+- **P2(코코알바):** `C:\My-site\p2.브랜드_통합_시스템` / GitHub: `coco-universe` / 본체: `www.cocoalba.kr` / 복제: `-d386` (SEO 점유의 핵심 기지)
 
 - **P3(랜딩):** `C:\My-site\p3.코코 랜딩페이지` / GitHub: `coco-landing` / Base: `coco-inky.vercel.app`
   - **구조:** 총 73개 지역별 랜딩페이지 (`BaseURL/{지역명}` 형식)
@@ -382,3 +382,42 @@ Record: 작업 결과 및 패턴을 AI_SOP.md에 업데이트하고 스티치를
 - **결과:** `ui.ts` 상수 파일 하나만 수정하면 전체 레이어가 동기화되는 **진정한 '중앙 통제실' 체계** 완성. (담당자: 안티그래비티) 📐🎛️🛡️
 - **진행:** P2 UI 레이어 전수 표준화 완결 (v2.0.9).
 - **과제:** P2/P3 오가닉 트래픽 모니터링 및 실전 사용자 피드백 대응.
+
+### [2026-04-01] P2 SEO 융단폭격 및 '유리문(Soft Gate)' 아키텍처 완결
+- **배경:** 구글 검색 엔진 색인율 0% 탈출 및 경쟁사(버블알바 등) 대비 기술적 SEO 우위 선점.
+- **주요 업데이트 사양:**
+    1. **Soft Gate (오버레이) 도입:** `LayoutWrapper.tsx`를 수정하여 성인인증을 리다이렉트 방식에서 블러(Blur) 오버레이 방식으로 변경. 구글 봇이 페이지 전체 텍스트를 크롤링할 수 있게 함.
+    2. **Spider Web (거미줄) 인덱스:** `region/all/page.tsx`를 신규 생성하여 3,000여 개 지역 페이지를 연결. 모든 지역 페이지가 구글 봇의 사정권에 들어오도록 설계.
+    3. **Schema.org 풀세트 장착:** `WebSite`, `SearchAction`, `FAQPage`, `BreadcrumbList`를 `layout.tsx`에 주입하여 검색 결과 내 '사이트링크 검색박스' 및 리치 스니펫 점유.
+    4. **고화력 키워드 정밀 주입:** `update_shadow_seo.py`를 통해 '수원 인계동 밤알바', '노래방알바 시급' 등 고트래픽 키워드를 메타데이터에 주입.
+
+---
+
+## 🌐 P2 SEO/GEO 초격차 마스터 플랜 (Claude Code 협업 가이드)
+
+### 🚨 [MANDATORY] 클로드 코드 필독: SEO 로직 보존 원칙
+1. **인증 게이트 변조 금지**: `LayoutWrapper.tsx`의 오버레이 로직을 리다이렉트로 되돌리지 마십시오. 이는 구글 봇의 접근을 차단하여 SEO를 파괴합니다.
+2. **JSON 데이터 구조 유지**: `src/lib/data/seo_regions_master.json`은 봇 전용 텍스트 허브입니다. 데이터를 추가할 때는 기존 구조를 깨뜨리지 마십시오.
+3. **Canonical URL 고정**: `www.cocoalba.kr`을 기본 도메인으로 인지하도록 모든 메타데이터 생성을 관리하십시오.
+
+### 🎯 추가 SEO 고도화 전략 (Next Steps)
+- **JobPosting 스키마 자동화**: 개별 공고 페이지(`store/[id]`) 진입 시 `JobPosting` 스키마를 동적으로 생성하여 구글 잡스(Google Jobs) 섹션 점유.
+- **지역별 '행정동' 키워드 확장**: 시/군/구 단위에서 '인계동', '논현동', '해운대' 등 동 단위 키워드(`update_shadow_seo.py`)를 지속적으로 보강.
+- **이미지 Alt SEO**: 모든 매장 이미지에 지역 기반 키워드가 포함된 Alt 속성 강제화.
+
+---
+
+---
+
+### [2026-04-01] P2 SEO/GEO 고도화 및 '유리문(Soft Gate)' 전략 수립
+- **배경:** 구글 검색 봇 차단 문제를 해결하고 전국 3,000개 지역 키워드 선점.
+- **핵심 아키텍처:**
+    1. **Soft Gate (Blur Overlay)**: `LayoutWrapper.tsx`에서 리다이렉트 대신 뷰포트에 오버레이를 씌워 봇 크롤링 허용.
+    2. **Spider Web Hub**: `/region/all` 페이지를 신규 구축하여 전체 지역 링크 네트워크 형성.
+    3. **Schema Markup**: `WebSite`, `SearchAction`, `FAQPage`, `BreadcrumbList` 적용.
+- **Claude Code 협업 가이드**: 
+    - **절대 금기**: `LayoutWrapper`의 오버레이 로직을 리다이렉트로 복구하지 말 것 (SEO 파손).
+    - **확장 과제**: 개별 공고 페이지(`store/[id]`)에 `JobPosting` 스키마 동적 생성 로직 추가 필요.
+    - **키워드**: '인계동 밤알바', '논현동 노래방알바' 등 동(District) 단위 고화력 키워드 위주로 `update_shadow_seo.py` 상시 업데이트.
+
+---

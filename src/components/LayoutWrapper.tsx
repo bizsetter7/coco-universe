@@ -106,9 +106,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isAuthFlowPage = pathname?.startsWith('/auth/');
 
     // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우 제외)
-    if (!isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage) {
-        return <AdultVerificationGate onVerify={handleVerify} onSkip={handleSkip} />;
-    }
+    // [Soft Gate Strategy] — SEO를 위해 children을 DOM에 남겨두고 오버레이만 씌움
+    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage;
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 
     if (isLoading) {
@@ -121,46 +120,55 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     return (
         <React.Fragment>
-            {/* Global Header — 어드민 페이지는 자체 레이아웃이 있으므로 제외 */}
-            {!isAdminPage && <MainHeader />}
+            {/* [Soft Gate Overlay] — 미인증 시에만 노출 */}
+            {showAdultGate && (
+                <div className="fixed inset-0 z-[20000] bg-white/40 backdrop-blur-xl flex items-center justify-center p-4">
+                    <AdultVerificationGate onVerify={handleVerify} onSkip={handleSkip} />
+                </div>
+            )}
 
-            {/*
-               [Golden Rule - Framework Reconstruction v2]
-               1. Outer Wrapper: Max 1432px, Centered, Relative
-               2. Main Grid: 160px Spacers + 1fr Content
-               3. Sidebars: Now nested INSIDE spacers to contribute to height and ensure alignment
-            */}
-            <div className={`w-full max-w-[1432px] mx-auto relative h-auto`}>
+            <div className={`flex flex-col min-h-screen ${showAdultGate ? 'blur-2xl pointer-events-none select-none max-h-screen overflow-hidden' : ''}`}>
+                {/* Global Header — 어드민 페이지는 자체 레이아웃이 있으므로 제외 */}
+                {!isAdminPage && <MainHeader />}
 
-                <div className={(isMobile || isAdminPage || isAuthPage) ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
-                    {/* Left Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
-                    {(!isMobile && !isAdminPage && !isAuthPage) && (
-                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
-                            <StickyWrapper offsetTop={56} zIndex={10001}>
-                                <BannerSidebar side="left" shops={sideAds} />
-                            </StickyWrapper>
-                        </aside>
-                    )}
+                {/*
+                   [Golden Rule - Framework Reconstruction v2]
+                   1. Outer Wrapper: Max 1432px, Centered, Relative
+                   2. Main Grid: 160px Spacers + 1fr Content
+                   3. Sidebars: Now nested INSIDE spacers to contribute to height and ensure alignment
+                */}
+                <div className={`w-full max-w-[1432px] mx-auto relative h-auto flex-1`}>
 
-                    {/* Main Content */}
-                    <main className={`w-full flex-1 min-w-0 relative z-[10] ${isAdminPage ? 'px-0' : ''}`}>
-                        {children}
-                    </main>
+                    <div className={(isMobile || isAdminPage || isAuthPage) ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
+                        {/* Left Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
+                        {(!isMobile && !isAdminPage && !isAuthPage) && (
+                            <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
+                                <StickyWrapper offsetTop={56} zIndex={10001}>
+                                    <BannerSidebar side="left" shops={sideAds} />
+                                </StickyWrapper>
+                            </aside>
+                        )}
 
-                    {/* Right Sidebar - [Optimization] PC Only, UI_Z_INDEX.SIDEBAR (10001) 표준 적용 */}
-                    {(!isMobile && !isAdminPage && !isAuthPage) && (
-                        <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
-                            <StickyWrapper offsetTop={56} zIndex={10001}>
-                                <BannerSidebar side="right" shops={sideAds} />
-                            </StickyWrapper>
-                        </aside>
-                    )}
+                        {/* Main Content */}
+                        <main className={`w-full flex-1 min-w-0 relative z-[10] ${isAdminPage ? 'px-0' : ''}`}>
+                            {children}
+                        </main>
+
+                        {/* Right Sidebar - [Optimization] PC Only, UI_Z_INDEX.SIDEBAR (10001) 표준 적용 */}
+                        {(!isMobile && !isAdminPage && !isAuthPage) && (
+                            <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
+                                <StickyWrapper offsetTop={56} zIndex={10001}>
+                                    <BannerSidebar side="right" shops={sideAds} />
+                                </StickyWrapper>
+                            </aside>
+                        )}
+                    </div>
+
                 </div>
 
+                {/* Global Footer */}
+                <Footer />
             </div>
-
-            {/* Global Footer */}
-            <Footer />
 
             <Suspense fallback={null}>
                 <MobileBottomNav />

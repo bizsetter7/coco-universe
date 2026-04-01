@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Re-generate every 1 hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://cocoalba.kr';
+    const baseUrl = 'https://www.cocoalba.kr';
 
     // 1. Static Routes
     const routes = [

@@ -1,15 +1,15 @@
 import json
 import base64
 
-PATH = r"c:\My-site\p2. 브랜드_통합_시스템\src\lib\data\Shadow_SEO_Master.json"
+PATH = r"c:\My-site\p2.브랜드_통합_시스템\src\lib\data\Shadow_SEO_Master.json"
 
 def encode_b64(text):
     return base64.b64encode(text.encode('utf-8')).decode('utf-8')
 
-# 주입할 고화력 데이터
-NEW_TITLE = "코코알바(COCOALBA) - No.1 노래방알바 · BJ알바 · 엔터알바 전문 플랫폼"
-NEW_DESC = "대한민국 1등 노래방알바, BJ알바, 엔터알바 전문 플랫폼 코코알바. 72개 지역별 맞춤 고소득 여성알바 정보를 실시간 확인하세요. 일급 50만원 이상, 당일지급 100% 보장!"
-NEW_KEYWORDS = ["노래방알바", "BJ알바", "엔터알바", "크리에이터", "피팅모델", "당일지급1위"]
+# 주입할 고화력 데이터 (수원 인계동 등 핵심 상권 타겟팅)
+NEW_TITLE = "코코알바(COCOALBA) - 수원 인계동 밤알바 · 노래방알바 · BJ알바 1등 플랫폼"
+NEW_DESC = "대한민국 1등 고소득 여성알바 코코알바. 수원 인계동 노래방알바, 인계동 밤알바, 전국 BJ알바 정보를 실시간 확인하세요. 일급 50만원 이상, 당일지급 100% 보장!"
+NEW_KEYWORDS = ["수원 인계동 밤알바", "인계동 노래방알바", "인계동 유흥알바", "노래방알바", "BJ알바", "엔터알바", "당일지급1위", "고소득알바", "밤알바 1위"]
 
 def update():
     with open(PATH, 'r', encoding='utf-8') as f:
