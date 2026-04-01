@@ -80,4 +80,7 @@ export interface Shop {
     work_region_sub?: string;
     category_sub?: string;
     ad_price?: number;
+    city?: string;
+    district?: string;
+    content?: string;
 }

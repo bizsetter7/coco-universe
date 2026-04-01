@@ -185,9 +185,32 @@ export const JobDetailContent = ({
                                 __html: (shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>`)
                                     .replace(/foxalba\.com|queenalba\.net|ladyalba\.co\.kr/gi, 'cocoalba.kr')
                                     .replace(/여우알바|퀸알바|레이디알바|악녀알바|버블알바|슈슈알바/g, '코코알바')
-                                    .replace(/엔터프라이즈|인재솔루션|인재알바/g, '고수익알바')
                             }}
                         />
+                    </div>
+
+                    {/* [v3.2] 대장님 요청: 상세 팝업 하단 지역 맞춤 키워드 주입 */}
+                    <div className="mt-4 pt-4 border-t border-dashed border-gray-100">
+                        <div className="flex flex-wrap gap-1.5">
+                            {(() => {
+                                // 지역 및 업종 정보 추출
+                                const city = shop.city || shop.region?.split(' ')[0] || '';
+                                const district = shop.district || shop.region?.split(' ')[1] || '';
+                                const category = shop.workType || shop.category || '룸알바';
+                                
+                                // 대장님 지시 키워드 조합 생성
+                                const targetKeywords = [
+                                    `${city} ${category}`, `${city} 노래방알바`, `${city} 유흥알바`,
+                                    `${city} ${district} ${category}`, `${city} ${district} 노래방알바`, `${city} ${district} 유흥알바`
+                                ].filter(k => k.trim().length > 2);
+
+                                return targetKeywords.map((kw, i) => (
+                                    <span key={`target-${i}`} className="px-2.5 py-1.5 bg-pink-50/50 text-[#f82b60] text-[10.5px] font-black rounded-xl border border-pink-100/50 shadow-sm transition-all hover:bg-pink-100/50 uppercase">
+                                        #{kw.replace(/\s+/g, '')}
+                                    </span>
+                                ));
+                            })()}
+                        </div>
                     </div>
                 </div>
 
@@ -219,7 +242,7 @@ export const JobDetailContent = ({
                 <div className="space-y-2 pt-2">
                     <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
                         <Info size={12} />
-                        Keyword & Info
+                        추가 태그정보
                     </h3>
                     <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
                         <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
@@ -227,17 +250,13 @@ export const JobDetailContent = ({
                                 const autoKeywords = generateSEOKeywords(shop.region);
                                 const userKeywords = shop.options?.keywords || [];
                                 
-                                // [2026-04-01] 필터링 강화: 저효율 키워드 및 금지어 제거
-                                const filterOut = ['숙식제공', '초보가능', '자유출퇴근', '텃세없음', '실장친절', '손님많음'];
-                                const forbidden = ['엔터프라이즈', '최엔터프라이즈', '엔터프라이즈알바', '인재', '솔루션', '레이디알바', '전문', '인재 솔루션'];
+                                // [2026-04-01] 대장님 피드백 반영: 필터링 조건 완화 및 AI 용어 배제
+                                const forbidden = ['레이디알바', '여우알바', '퀸알바', '악녀알바']; 
                                 
                                 const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords]))
                                     .filter((kw: any) => {
                                         const cleanKw = String(kw).replace('#', '').trim();
                                         if (!cleanKw) return false;
-                                        // 저효율 키워드 완전 일치 필터링
-                                        if (filterOut.includes(cleanKw)) return false;
-                                        // 금지어 포함 필터링
                                         if (forbidden.some(f => cleanKw.includes(f))) return false;
                                         return true;
                                     });
@@ -249,10 +268,14 @@ export const JobDetailContent = ({
                                         </span>
                                     ));
                                 } else {
-                                    return <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>;
+                                    return <span className="text-gray-300 text-[11px] font-bold">#여자밤알바정보</span>;
                                 }
                             })()}
                         </div>
+                        <p className="mt-3 text-[10px] text-gray-400 font-medium leading-relaxed">
+                            * 본 상세내용은 {shop.city} {shop.district} 지역의 실제 정보를 바탕으로 구성되었습니다. 
+                            코코알바는 검증된 {shop.city} 지역의 여자유흥알바 정보를 제공합니다.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
         keywords: [`${decodedRegionSlug.replace(/-/g, ' ')} 알바`]
     };
 
-    const title = `${regionData.mainRegion} 여성알바 1위 - 코코알바 (당일지급/숙식제공)`;
-    const description = `${regionData.mainRegion} 지역 ${regionData.keywords.slice(0, 3).join(', ')} 정보. 확실하게 검증된 고수익 알바에서 안전하게 일하세요.`;
+    // [v3.6] AI 용어 배제 및 타겟 SEO(여자밤알바) 강화
+    const regionName = regionData.mainRegion;
+    const title = `${regionName} 여자밤알바·여자유흥알바·여자룸알바 전문 - 코코알바`;
+    const description = `${regionName} 지역 확실하게 검증된 고소득 유흥알바 정보를 알아보세요. 지역별 상세정보를 실시간으로 제공합니다.`;
 
     return {
         title,
@@ -39,12 +41,12 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
                     url: 'https://cocoalba.kr/og-image.png',
                     width: 1200,
                     height: 630,
-                    alt: `${regionData.mainRegion} 여성알바 정보`,
+                    alt: `${regionName} 여자밤알바 정보`,
                 },
             ],
             type: 'website',
         },
-        keywords: [...regionData.keywords, '여성알바', '고수익알바', '유흥알바', '룸알바', '밤알바', '당일지급', '엔터프라이즈'],
+        keywords: [...regionData.keywords, '여자밤알바', '여자유흥알바', '여자룸알바', '고수익알바', '유흥알바', '룸알바', '밤알바', '여성알바전문'],
     };
 }
 
@@ -88,12 +90,12 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
     const kw0 = shadowRegionData?.keywords[0] || `${regionName} 룸알바`;
     const kw1 = shadowRegionData?.keywords[1] || `${regionName} 유흥알바`;
 
-    // [JSON-LD 1] WebPage
+    // [JSON-LD 1] WebPage - 타겟 키워드 고도화
     const webPageSchema = {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        "name": `${regionName} 여성알바 1위 - 코코알바`,
-        "description": `${regionName} 지역 검증된 ${kw0}, ${kw1} 실시간 정보. 당일지급·숙식제공 보장.`,
+        "name": `${regionName} 여자밤알바·여자유흥알바 전문 - 코코알바`,
+        "description": `${regionName} 지역 검증된 ${kw0}, ${kw1} 상세정보를 실시간으로 확인하세요.`,
         "url": `https://cocoalba.kr/region/${region}`,
         "publisher": { "@type": "Organization", "name": "코코알바", "url": "https://cocoalba.kr" }
     };
@@ -109,17 +111,17 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         ]
     };
 
-    // [JSON-LD 3] FAQPage — GEO(AI 검색) 핵심 신호
+    // [JSON-LD 3] FAQPage — 확실하게 검증된 업소정보만을 제공
     const faqSchema = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": `${regionName} 여성알바 평균 일당은 얼마인가요?`,
+                "name": `${regionName} 고소득알바 평균 일당은 얼마인가요?`,
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": `${regionName} 기준 여성알바 평균 일당은 업종과 경력에 따라 20만원~50만원 수준입니다. 룸알바·텐프로 등 고급 업종은 더 높은 수입이 가능하며, 코코알바에서 검증된 업체만 확인하실 수 있습니다.`
+                    "text": `${regionName} 기준 밤알바 평균 일당은 업종과 경력에 따라 20만원~50만원 수준입니다. 여자룸알바·노래방알바 등 인기 업종의 상세정보를 코코알바에서 확인하실 수 있습니다.`
                 }
             },
             {
@@ -127,15 +129,15 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
                 "name": `${regionName} ${kw0} 당일지급 가능한 곳이 있나요?`,
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": `네, 코코알바에 등록된 ${regionName} 업체 대부분이 당일지급을 지원합니다. 공고 상세 페이지에서 급여 조건과 지급 방식을 확인하고, 1:1 문의로 바로 상담받으실 수 있습니다.`
+                    "text": `네, 코코알바에 등록된 ${regionName} 업체 대부분이 당일지급을 원칙으로 합니다. 공고 상세내용에서 급여 조건과 지급 방식을 확인하고, 1:1 문의로 바로 상담받으실 수 있도록 안내해 드립니다.`
                 }
             },
             {
                 "@type": "Question",
-                "name": `${regionName} 처음 알바 시작하면 어떻게 되나요?`,
+                "name": `${regionName} 처음 여자밤알바 시작하면 어떻게 되나요?`,
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": `코코알바는 처음 시작하는 분들을 위해 업체 사전 검증과 안전 확인 시스템을 운영합니다. 공고 문의 → 면접 → 업무 안내 순으로 진행되며, 궁금한 점은 코코알바 고객센터(1877-1442)에서 상담 가능합니다.`
+                    "text": `코코알바는 처음 시작하는 분들을 위해 검증된 업체 정보를 제공합니다. 공고 상세정보 확인 후 면접 및 업무 안내 순으로 진행되며, 궁금한 점은 코코알바 고객센터(1877-1442)에서 상담 가능합니다.`
                 }
             },
             {
@@ -148,21 +150,60 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             },
             {
                 "@type": "Question",
-                "name": `${regionName} 노래빠알바(노래방알바) 일당은 얼마인가요?`,
+                "name": `${regionName} 노래방알바(노래빠) 일당은 얼마인가요?`,
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": `${regionName} 노래빠알바(노래주점 도우미)의 일당은 보통 15만원~30만원 수준입니다. 노래방알바는 룸알바 대비 진입 난이도가 낮고 처음 시작하는 분들에게 인기 있는 업종입니다. 코코알바에서 ${regionName} 노래주점 알바 공고를 무료로 확인하실 수 있습니다.`
+                    "text": `${regionName} 노래방알바(노래주점 도우미)의 일당은 보통 15만원~30만원 수준입니다. 노래방알바는 룸알바 대비 진입 난이도가 낮고 처음 시작하는 분들에게 인기 있는 업종입니다. 코코알바에서 ${regionName} 노래주점 알바 공고를 무료로 확인하실 수 있습니다.`
                 }
             },
             {
                 "@type": "Question",
-                "name": `노래빠알바와 룸알바의 차이는 무엇인가요?`,
+                "name": `노래방알바와 룸알바의 차이는 무엇인가요?`,
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": `노래빠알바(노래주점)는 노래방 도우미 형태로 손님과 함께 노래를 즐기는 서비스를 제공하며, 룸알바(룸싸롱)는 고급 룸에서 서비스하는 형태입니다. 노래빠알바는 상대적으로 진입 장벽이 낮고, 룸알바는 수입이 더 높은 편입니다. 코코알바에서 두 업종 모두 비교해보실 수 있습니다.`
+                    "text": `노래방알바(노래주점)는 노래방 도우미 형태로 손님과 함께 즐거운 시간을 보내는 서비스를 제공하며, 룸알바(룸싸롱)는 고급 룸에서 전문적인 서비스를 제공하는 형태입니다. 노래방알바는 진입 장벽이 낮고, 룸알바는 수입이 더 높은 편입니다.`
                 }
             }
         ]
+    };
+
+    // [JSON-LD 4] JobPosting - 엔터알바 제거 및 브랜드 정격화
+    const jobPostingSchema = {
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        "title": `[${regionName}] 룸알바·노래방알바·유흥알바 정보 플랫폼 코코알바`,
+        "description": `${regionName} 지역 1등 고소득 여성알바 정보를 실시간 확인하세요. 대한민국 프리미엄 고수익 알바 정보를 안전하게 제공합니다.`,
+        "identifier": {
+            "@type": "PropertyValue",
+            "name": "COCOALBA",
+            "value": `REGION_ADS_${region}`
+        },
+        "datePosted": "2026-03-01T00:00:00Z",
+        "validThrough": "2026-12-31T23:59:59Z",
+        "employmentType": "FULL_TIME",
+        "hiringOrganization": {
+            "@type": "Organization",
+            "name": "COCOALBA",
+            "sameAs": "https://cocoalba.kr"
+        },
+        "jobLocation": {
+            "@type": "Place",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": regionName,
+                "addressRegion": "KR",
+                "addressCountry": "KR"
+            }
+        },
+        "baseSalary": {
+            "@type": "MonetaryAmount",
+            "currency": "KRW",
+            "value": {
+                "@type": "QuantitativeValue",
+                "value": 500000,
+                "unitText": "DAY"
+            }
+        }
     };
 
     return (
@@ -170,6 +211,7 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }} />
             <RegionClient shops={shops} initialRegion={initialRegion} />
         </>
     );
