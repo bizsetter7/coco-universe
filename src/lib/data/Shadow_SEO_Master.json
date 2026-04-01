@@ -33,42 +33,18 @@
   "schemas": [
     {
       "@context": "https://schema.org",
-      "@type": "JobPosting",
-      "title": "룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바",
-      "description": "룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바. 대한민국 1등 고소득 여성알바 정보를 실시간 확인하세요.",
-      "identifier": {
-          "@type": "PropertyValue",
-          "name": "COCOALBA",
-          "value": "MAIN_ADS"
+      "@type": "EmploymentAgency",
+      "name": "코코알바 (COCOALBA)",
+      "description": "룸알바, 노래방알바, 노래빠알바, 유흥알바, BJ알바, 엔터알바 등 대한민국 고소득 여성알바 정보 전문 플랫폼. 검증된 전국 업체 정보를 실시간 제공합니다.",
+      "url": "https://cocoalba.kr",
+      "logo": "https://cocoalba.kr/logo.png",
+      "telephone": "+82-1877-1442",
+      "areaServed": {
+        "@type": "Country",
+        "name": "대한민국"
       },
-      "datePosted": "2026-03-01T00:00:00Z",
-      "validThrough": "2026-12-31T23:59:59Z",
-      "employmentType": "FULL_TIME",
-      "hiringOrganization": {
-          "@type": "Organization",
-          "name": "COCOALBA",
-          "sameAs": "https://cocoalba.kr"
-      },
-      "jobLocation": {
-          "@type": "Place",
-          "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Seoul",
-              "addressRegion": "KR",
-              "streetAddress": "Gangnam-gu",
-              "postalCode": "06000",
-              "addressCountry": "KR"
-          }
-      },
-      "baseSalary": {
-        "@type": "MonetaryAmount",
-        "currency": "KRW",
-        "value": {
-          "@type": "QuantitativeValue",
-          "value": 500000,
-          "unitText": "DAY"
-        }
-      }
+      "serviceType": ["룸알바 정보", "노래방알바 정보", "유흥알바 정보", "BJ알바 정보", "고소득 여성알바 매칭"],
+      "sameAs": "https://www.cocoalba.kr"
     }
   ]
 }
