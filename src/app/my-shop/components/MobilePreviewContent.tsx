@@ -247,7 +247,6 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     )}
                 </div>
 
-                {/* Keyword & Info (Keyword 섹션 스타일 JobDetailModal과 통일) */}
                 <div className="space-y-2 pt-2">
                     <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
                         <Info size={12} />
@@ -255,15 +254,29 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     </h3>
                     <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
                         <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
-                            {formData.selectedKeywords && formData.selectedKeywords.length > 0 ? (
-                                formData.selectedKeywords.map((kw: string, i: number) => (
-                                    <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
-                                        #{kw}
-                                    </span>
-                                ))
-                            ) : (
-                                <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>
-                            )}
+                            {(() => {
+                                const userKeywords = formData.selectedKeywords || [];
+                                const filterOut = ['숙식제공', '초보가능', '자유출퇴근', '텃세없음', '실장친절', '손님많음'];
+                                const forbidden = ['엔터프라이즈', '인재', '솔루션', '레이디알바', '전문'];
+                                
+                                const filteredKeywords = userKeywords.filter((kw: any) => {
+                                    const cleanKw = String(kw).replace('#', '').trim();
+                                    if (!cleanKw) return false;
+                                    if (filterOut.includes(cleanKw)) return false;
+                                    if (forbidden.some(f => cleanKw.includes(f))) return false;
+                                    return true;
+                                });
+
+                                if (filteredKeywords.length > 0) {
+                                    return filteredKeywords.map((kw: string, i: number) => (
+                                        <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
+                                            #{String(kw).replace('#', '')}
+                                        </span>
+                                    ));
+                                } else {
+                                    return <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>;
+                                }
+                            })()}
                         </div>
                     </div>
                 </div>

@@ -6,8 +6,8 @@
     "kakao": "young8746",
     "pay": "550000",
     "workType": "바(Bar)",
-    "url": "https://foxalba.com/special1",
-    "site": "foxalba",
+    "url": "https://cocoalba.kr/special1",
+    "site": "cocoalba",
     "id": "special-extra-01",
     "is_premium": false,
     "is_verified": true,
@@ -32,8 +32,8 @@
     "kakao": "jjh082200",
     "pay": "600000",
     "workType": "룸싸롱",
-    "url": "https://foxalba.com/999",
-    "site": "foxalba",
+    "url": "https://cocoalba.kr/999",
+    "site": "cocoalba",
     "id": "premium-extra-01",
     "is_premium": true,
     "is_verified": true,
@@ -59,8 +59,8 @@
     "telegram": "atl5566",
     "pay": "160000",
     "workType": "텐카페",
-    "url": "https://queenalba.net/guin_detail.php?num=34001",
-    "site": "queenalba",
+    "url": "https://cocoalba.kr/guin_detail.php?num=34001",
+    "site": "cocoalba",
     "id": "bait-seoul-01",
     "is_placeholder": false,
     "is_premium": true,
@@ -92,13 +92,13 @@
     "telegram": "",
     "pay": "면접후결정",
     "workType": "셔츠룸",
-    "url": "https://ladyalba.co.kr/guin_detail.php?num=5901",
-    "site": "ladyalba",
+    "url": "https://cocoalba.kr/guin_detail.php?num=5901",
+    "site": "cocoalba",
     "id": "bait-seoul-02",
     "is_placeholder": false,
     "is_premium": true,
     "is_verified": true,
-    "title": "(캐나다알바)❤️❤️캐나다 VIP 비지니스 벤쿠버 꿀단지  엔터프라이즈 가능!❤️❤️",
+    "title": "(캐나다알바)❤️❤️캐나다 VIP 비지니스 벤쿠버 꿀단지  여성알바 가능!❤️❤️",
     "tier": "grand",
     "updatedAt": "2026-01-28T09:55:00.000Z",
     "options": {
@@ -159,7 +159,7 @@
     "is_placeholder": false,
     "is_premium": true,
     "is_verified": true,
-    "title": "❣️❣️❣️(해운대 엔터프라이즈 인재 솔루션) ♥♥해운대♥퀄리티♥룸빠♥1번♥♥❣️❣️❣️",
+    "title": "❣️❣️❣️(해운대 여성알바) ♥♥해운대♥퀄리티♥룸빠♥1번♥♥❣️❣️❣️",
     "tier": "grand",
     "updatedAt": "2026-01-28T09:45:00.000Z",
     "options": {
@@ -168,7 +168,7 @@
       "bold": true,
       "color": "text-purple-600",
       "icons": [
-        "엔터프라이즈",
+        "여성알바",
         "럭셔리"
       ],
       "paySuffixes": [
@@ -1337,7 +1337,7 @@
       "color": "text-red-600",
       "icons": [
         "당일지급",
-        "엔터프라이즈",
+        "여성알바",
         "급구"
       ]
     },

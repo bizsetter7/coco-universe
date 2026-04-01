@@ -49,25 +49,25 @@ export const HeroSection = () => {
             <div className="relative z-10 h-full max-w-3xl mx-auto flex flex-col items-center justify-center px-6 text-center">
                 <div className="flex flex-col items-center -mt-4 md:-mt-6">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 bg-blue-600/10 backdrop-blur-xl px-4 py-1.5 rounded-full border border-blue-500/30 mb-3 md:mb-4 animate-in slide-in-from-top-4 duration-700">
-                        <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-ping" />
-                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-blue-400">Grand Infrastructure Live</span>
+                    <div className="inline-flex items-center gap-2 bg-rose-600/10 backdrop-blur-xl px-4 py-1.5 rounded-full border border-rose-500/30 mb-3 md:mb-4 animate-in slide-in-from-top-4 duration-700">
+                        <span className="flex h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-rose-400">Premium Female Job Hub Live</span>
                     </div>
 
                     {/* Title */}
                     <h1 className="text-[28px] md:text-[52px] font-black mb-2 md:mb-4 tracking-tighter leading-[1.3] md:leading-[1.1] filter drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
-                        <><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-rose-400 to-blue-500">1+1 광고 이벤트</span><br className="md:hidden" /> 진행중</>
+                        <><span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500">1+1 광고 이벤트</span><br className="md:hidden" /> 진행중</>
 
                     </h1>
 
                     {/* Subtitle */}
                     <div className="flex flex-col items-center mb-5 md:mb-7">
-                        <p className="text-base md:text-xl font-bold text-slate-200 mb-2 tracking-tight drop-shadow-md">
-                            {bannerInfo.subtitle}
+                        <p className="text-sm md:text-lg font-bold text-slate-200 mb-2 tracking-tight drop-shadow-md">
+                            룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼
                         </p>
-                        <div className="w-12 md:w-20 h-px bg-gradient-to-r from-transparent via-slate-400 to-transparent opacity-50" />
-                        <span className="text-[8px] md:text-[9px] font-black text-slate-400 mt-2 tracking-[0.3em] uppercase select-none">
-                            {brand.logoText} PREMIUM SYSTEM
+                        <div className="w-12 md:w-20 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent opacity-50" />
+                        <span className="text-[10px] md:text-[12px] font-black text-rose-500 mt-2 tracking-[0.3em] uppercase select-none">
+                            {brand.logoText} OFFICIAL SYSTEM
                         </span>
                     </div>
 

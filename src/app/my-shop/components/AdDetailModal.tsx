@@ -320,7 +320,6 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </div>
                     )}
 
-                    {/* [Restored] Keyword & Info */}
                     <div className="space-y-2 pt-4 border-t border-gray-100">
                         <h3 className="text-sm font-bold text-gray-300 flex items-center gap-1.5">
                             <Info size={16} />
@@ -328,17 +327,33 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
                         </h3>
 
                         {/* Keywords Grid Only (Subtle Style) */}
-                        {(ad.keywords || ad.options?.keywords || []).length > 0 ? (
-                            <div className="flex flex-wrap gap-1.5">
-                                {(ad.keywords || ad.options?.keywords || []).map((k: string, i: number) => (
-                                    <span key={i} className="text-[10px] font-normal text-gray-400 bg-gray-50/50 px-2 py-1 rounded border border-gray-100">
-                                        #{k}
-                                    </span>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30 flex items-center justify-center text-[10px] text-gray-300">등록된 키워드 없음</div>
-                        )}
+                        {(() => {
+                            const userKeywords = ad.keywords || ad.options?.keywords || [];
+                            const filterOut = ['숙식제공', '초보가능', '자유출퇴근', '텃세없음', '실장친절', '손님많음'];
+                            const forbidden = ['엔터프라이즈', '인재', '솔루션', '레이디알바', '전문'];
+                            
+                            const filteredKeywords = userKeywords.filter((kw: any) => {
+                                const cleanKw = String(kw).replace('#', '').trim();
+                                if (!cleanKw) return false;
+                                if (filterOut.includes(cleanKw)) return false;
+                                if (forbidden.some(f => cleanKw.includes(f))) return false;
+                                return true;
+                            });
+
+                            if (filteredKeywords.length > 0) {
+                                return (
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {filteredKeywords.map((k: string, i: number) => (
+                                            <span key={i} className="text-[10px] font-normal text-gray-400 bg-gray-50/50 px-2 py-1 rounded border border-gray-100">
+                                                #{String(k).replace('#', '')}
+                                            </span>
+                                        ))}
+                                    </div>
+                                );
+                            } else {
+                                return <div className="h-8 bg-gray-50/30 rounded border border-gray-100/30 flex items-center justify-center text-[10px] text-gray-300">등록된 키워드 없음</div>;
+                            }
+                        })()}
                     </div>
 
                     {/* Scroll Margin for Safe Area */}

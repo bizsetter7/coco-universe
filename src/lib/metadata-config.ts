@@ -57,8 +57,8 @@ const BASE_ORGANIZATION_SCHEMA = {
 const CLEAN_LOCAL_BUSINESS_SCHEMA = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": "코코알바(COCOALBA) B2B 매칭",
-    "description": "지역 내 검증된 기업과 최적의 인재를 안전하게 연결하는 엔터프라이즈 맞춤 채용 플랫폼입니다. 믿을 수 있는 지역 일자리 정보를 제공합니다.",
+    "name": "코코알바(COCOALBA) - 룸알바 노래방알바 유흥알바 1등 플랫폼",
+    "description": "지역 내 검증된 고소득 일자리와 구직자를 안전하게 연결하는 대한민국 대표 여성 전용 채용 플랫폼입니다. 룸알바, 노래방알바, BJ알바, 엔터알바 정보를 실시간 제공합니다.",
     "url": "https://cocoalba.kr",
     "image": "https://cocoalba.kr/logo.png"
 };
@@ -69,9 +69,9 @@ const CLEAN_SEO: SEOConfig = {
     supportedColorSchemes: 'light',
   },
   metadata: {
-    title: "코코알바(COCOALBA) B2B - 데이터 기반 기업 맞춤 채용 매칭 플랫폼",
-    description: "코코알바 B2B는 평가정보 연동을 통해 검증된 프리미엄 인재와 기업을 안전하고 빠르게 연결하는 100% 실명 기반 스마트 파트너십 솔루션입니다.",
-    keywords: ["B2B채용", "기업전용솔루션", "인재풀검증", "맞춤채용", "실명인증채용", "스마트에스크로", "노래방알바", "노래빠알바", "노래주점알바", "룸알바", "유흥알바"],
+    title: "룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바",
+    description: "코코알바는 평가정보 연동을 통해 검증된 프리미엄 업소와 언니들을 안전하고 빠르게 연결하는 100% 신뢰 기반 고소득 여성알바 매칭 솔루션입니다.",
+    keywords: ["룸알바", "노래방알바", "노래빠알바", "유흥알바", "BJ알바", "엔터알바", "여성알바", "밤알바", "고수익알바", "당일지급알바", "아가씨알바"],
     verification: {
         google: 'enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y',
         other: {
@@ -88,9 +88,9 @@ const getShadowSEO = (): SEOConfig => ({
     supportedColorSchemes: shadowSEO.themes.supportedColorSchemes,
   },
   metadata: {
-    title: decodeB64(shadowSEO.metadata.title),
-    description: decodeB64(shadowSEO.metadata.description),
-    keywords: shadowSEO.metadata.keywords.map(decodeB64),
+    title: shadowSEO.metadata.title,
+    description: shadowSEO.metadata.description,
+    keywords: shadowSEO.metadata.keywords,
     verification: shadowSEO.metadata.verification,
   },
   schemas: [
@@ -98,11 +98,7 @@ const getShadowSEO = (): SEOConfig => ({
         ...BASE_ORGANIZATION_SCHEMA,
         name: "COCOALBA (코코알바)",
     }, 
-    ...shadowSEO.schemas.map(s => ({
-        ...s,
-        title: s.title ? decodeB64(s.title) : undefined,
-        description: s.description ? decodeB64(s.description) : undefined,
-    }))
+    ...shadowSEO.schemas
   ]
 });
 

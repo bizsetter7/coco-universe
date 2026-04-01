@@ -20,6 +20,20 @@ const NAV_LINKS = [
     { label: '커뮤니티', href: '/community' },
 ] as const;
 
+const POPULAR_REGIONS = [
+    { label: '강남 알바', href: '/region/서울-강남구' },
+    { label: '논현동 알바', href: '/region/서울-강남구-논현동' },
+    { label: '여의도 알바', href: '/region/서울-영등포구-여의도동' },
+    { label: '수원 인계동 밤알바', href: '/region/경기-수원시-인계동' },
+    { label: '부천 상동 알바', href: '/region/경기-부천시-상동' },
+    { label: '부산 서면 알바', href: '/region/부산-부산진구' },
+    { label: '해운대 알바', href: '/region/부산-해운대구' },
+    { label: '인천 계양구 알바', href: '/region/인천-계양구' },
+    { label: '대전 유성 알바', href: '/region/대전-유성구' },
+    { label: '대구 수성구 알바', href: '/region/대구-수성구' },
+    { label: '광주 상무지구 알바', href: '/region/광주-서구' },
+];
+
 export const Footer = () => {
     const [reportOpen, setReportOpen] = useState(false);
 
@@ -28,8 +42,32 @@ export const Footer = () => {
             <footer className="border-t border-gray-200 bg-gray-50 font-sans text-gray-500">
                 <div className="w-full max-w-5xl mx-auto px-6">
 
-                    {/* ── PC: LADYALBA 스타일 4열 ─────────────────────── */}
-                    <div className="hidden md:flex items-start justify-between gap-0 py-8 border-b border-gray-200">
+                    {/* ── 인기 지역 바로가기 (SEO 최적화) ─────────────────────── */}
+                    <div className="py-8 border-b border-gray-200">
+                        <div className="flex flex-col md:flex-row md:items-start gap-4">
+                            <span className="text-[12px] font-black text-gray-900 shrink-0 mt-1">인기 지역 알바 :</span>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-2.5">
+                                {POPULAR_REGIONS.map((region) => (
+                                    <Link
+                                        key={region.href}
+                                        href={region.href}
+                                        className="text-[11px] text-gray-500 hover:text-[#f82b60] hover:font-bold transition-all truncate"
+                                    >
+                                        {region.label}
+                                    </Link>
+                                ))}
+                                <Link
+                                    href="/region/all"
+                                    className="text-[11px] font-black text-[#f82b60] hover:underline flex items-center"
+                                >
+                                    더보기 +
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── PC: LADYALBA 스타일 4열 (고객센터 및 무통장) ─────────────────────── */}
+                    <div className="hidden md:flex items-start justify-between gap-0 py-10 border-b border-gray-200">
 
                         <div className="shrink-0 pr-6 border-r border-gray-200">
                             <p className="text-xs font-black mb-2" style={{ color: HOT_PINK }}>고객센터</p>
@@ -163,24 +201,6 @@ export const Footer = () => {
                         </Link>
                     </div>
 
-                    {/* ── 지역 바로가기 (SEO Spider Web) ─────────────────────── */}
-                    <div className="py-6 border-b border-gray-200 text-[11px] text-gray-500">
-                        <div className="flex flex-wrap gap-x-3 gap-y-2 leading-relaxed">
-                            <span className="font-bold text-gray-700 mr-1">지역 바로가기 :</span>
-                            <Link href="/coco/서울-강남구" className="hover:text-[#f82b60]">강남 알바</Link>
-                            <Link href="/coco/서울-강남구-논현동" className="hover:text-[#f82b60]">논현동 알바</Link>
-                            <Link href="/coco/서울-영등포구-여의도동" className="hover:text-[#f82b60]">여의도 알바</Link>
-                            <Link href="/coco/경기-수원시-인계동" className="hover:text-[#f82b60]">수원 인계동 밤알바</Link>
-                            <Link href="/coco/경기-부천시-상동" className="hover:text-[#f82b60]">부천 상동 알바</Link>
-                            <Link href="/coco/부산-부산진구" className="hover:text-[#f82b60]">부산 서면 알바</Link>
-                            <Link href="/coco/부산-해운대구" className="hover:text-[#f82b60]">해운대 알바</Link>
-                            <Link href="/coco/인천-계양구" className="hover:text-[#f82b60]">인천 계양구 알바</Link>
-                            <Link href="/coco/대전-유성구" className="hover:text-[#f82b60]">대전 유성 알바</Link>
-                            <Link href="/coco/대구-수성구" className="hover:text-[#f82b60]">대구 수성구 알바</Link>
-                            <Link href="/coco/광주-서구" className="hover:text-[#f82b60]">광주 상무지구 알바</Link>
-                            <Link href="/region/all" className="font-bold text-[#f82b60] hover:underline decoration-2 underline-offset-4">...전국 지역 전체보기</Link>
-                        </div>
-                    </div>
 
                     {/* ── 사업자 정보 (PC) ─────────────────────────────────── */}
                     <div className="hidden md:flex py-5 items-start gap-6">
@@ -219,7 +239,7 @@ export const Footer = () => {
                                 직업정보제공사업신고번호 : J1806020260001
                             </p>
                             <p className="h-6 flex items-center">
-                                유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보&nbsp;&nbsp;·&nbsp;&nbsp;COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
+                                룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바&nbsp;&nbsp;·&nbsp;&nbsp;COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.
                             </p>
                         </div>
                     </div>
@@ -231,7 +251,7 @@ export const Footer = () => {
                         <p>통신판매업신고번호 : 제 2017-경기송탄-0029호</p>
                         <p>직업정보제공사업신고번호 : J1806020260001</p>
                         <p>개인정보 및 이용관리 bizsetter7@gmail.com</p>
-                        <p className="pt-2 text-gray-400/70 text-[9.5px]">유흥알바, 밤알바, 룸알바, 여성전문 고소득 업소알바 정보</p>
+                        <p className="pt-2 text-gray-400/70 text-[9.5px]">룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바</p>
                         <p className="text-gray-400/50 text-[9px]">COPYRIGHT (c) COCOALBA. ALL RIGHTS RESERVED.</p>
                     </div>
 

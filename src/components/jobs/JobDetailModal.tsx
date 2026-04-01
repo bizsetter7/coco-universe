@@ -181,7 +181,12 @@ export const JobDetailContent = ({
                     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
                         <div
                             className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm"
-                            dangerouslySetInnerHTML={{ __html: shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>` }}
+                            dangerouslySetInnerHTML={{ 
+                                __html: (shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>`)
+                                    .replace(/foxalba\.com|queenalba\.net|ladyalba\.co\.kr/gi, 'cocoalba.kr')
+                                    .replace(/여우알바|퀸알바|레이디알바|악녀알바|버블알바|슈슈알바/g, '코코알바')
+                                    .replace(/엔터프라이즈|인재솔루션|인재알바/g, '고수익알바')
+                            }}
                         />
                     </div>
                 </div>
@@ -221,12 +226,26 @@ export const JobDetailContent = ({
                             {(() => {
                                 const autoKeywords = generateSEOKeywords(shop.region);
                                 const userKeywords = shop.options?.keywords || [];
-                                const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords]));
+                                
+                                // [2026-04-01] 필터링 강화: 저효율 키워드 및 금지어 제거
+                                const filterOut = ['숙식제공', '초보가능', '자유출퇴근', '텃세없음', '실장친절', '손님많음'];
+                                const forbidden = ['엔터프라이즈', '최엔터프라이즈', '엔터프라이즈알바', '인재', '솔루션', '레이디알바', '전문', '인재 솔루션'];
+                                
+                                const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords]))
+                                    .filter((kw: any) => {
+                                        const cleanKw = String(kw).replace('#', '').trim();
+                                        if (!cleanKw) return false;
+                                        // 저효율 키워드 완전 일치 필터링
+                                        if (filterOut.includes(cleanKw)) return false;
+                                        // 금지어 포함 필터링
+                                        if (forbidden.some(f => cleanKw.includes(f))) return false;
+                                        return true;
+                                    });
 
                                 if (allKeywords.length > 0) {
                                     return allKeywords.map((kw: any, i: number) => (
                                         <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
-                                            #{kw}
+                                            #{String(kw).replace('#', '')}
                                         </span>
                                     ));
                                 } else {

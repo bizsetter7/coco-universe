@@ -7,8 +7,14 @@ import { ICONS } from '@/constants/job-options';
 export const cleanShopTitle = (title?: string, name?: string): string => {
     const rawTitle = title || name || '공고 정보';
     // 1단계: [], (), {} 및 내부 텍스트 제거
-    // 2단계: 연속된 공백을 하나로 합치고 트림
-    const cleaned = rawTitle.replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, ' ').replace(/\s+/g, ' ').trim();
+    // 2단계: 경쟁사 브랜드(여우, 퀸, 레이디, 알바몬, 알바천국 등) 및 B2B 키워드 제거
+    // 3단계: 연속된 공백을 하나로 합치고 트림
+    const cleaned = rawTitle
+        .replace(/\[.*?\]|\(.*?\)|\{.*?\}/g, ' ')
+        .replace(/여우알바|퀸알바|레이디알바|악녀알바|버블알바|슈슈알바|알바몬|알바천국/g, ' ')
+        .replace(/엔터프라이즈|인재솔루션|인재알바/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
     // 정제 후 너무 짧아지면 원본 반환 (시인성 확보)
     return cleaned.length < 2 ? rawTitle : cleaned;
 };
@@ -57,29 +63,51 @@ export const getShopDefaultImage = (workType?: string): string => {
         return 'https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&q=80&w=800'; // 공항/여행 이미지
     }
 
-    // 기본 리드 이미지 (b2blife)
+    // 기본 리드 이미지 (cocoalba premium)
     return 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&q=80&w=800';
 };
 /**
  * 🏷️ SEO 키워드 자동 생성 유틸리티
- * 지역명을 기반으로 검색 최적화된 키워드 배열을 반환합니다.
+ * 지역명을 기반으로 검색 최적화된 고효율 키워드 배열을 반환합니다.
+ * '엔터프라이즈', '인재', '솔루션' 등 불필요 단어 전수 제거 (2026-04-01)
+ * 지역명 중복 노출 해결 (예: 부산 부산진구 -> 부산진구)
  */
 export const generateSEOKeywords = (region?: string): string[] => {
-    const regionName = region?.replace(/[\[\]]/g, '') || '전국';
+    if (!region) return ['코코알바', '여성알바', '밤알바'];
 
-    return [
-        `${regionName}인재알바`,
-        `${regionName}여성알바`,
-        `${regionName}엔터프라이즈 인재 솔루션`,
-        `${regionName}룸알바`,
-        `${regionName}엔터프라이즈 인재 솔루션`,
-        `${regionName}당일알바`,
-        `${regionName}20대알바`,
-        `${regionName}30대알바`,
-        `${regionName}엔터프라이즈`,
-        `${regionName}전문 인재`,
-        `${regionName}전문 인재`,
-        `${regionName}레이디알바`,
+    const cleanRegion = region.replace(/[\[\]]/g, '').trim();
+    const parts = cleanRegion.split(/\s+/);
+    
+    // 마지막 구/동 단위 추출 (예: "부산 부산진구 개금동" -> "개금동")
+    const city = parts[0] || '';
+    const district = parts[1] || '';
+    const town = parts[parts.length - 1] || '';
+
+    // 지역명 중복 제거 로직 (예: "부산 부산진구" -> "부산진구")
+    // "서울", "부산" 같은 광역시는 1차 지역명이며, "강남구", "해운대구" 같은 2차 지역명이 있으면 1차는 생략
+    const displayRegion = district || city;
+    // "부산 부산진구" 대신 "부산진구", "서울 강남구" 대신 "강남구"
+    const fullPrefix = (district && city !== district) ? district : city;
+
+    const baseKeywords = [
+        `${fullPrefix} 여성알바`,
+        `${displayRegion} 여자유흥알바`,
+        `${displayRegion} 여자룸알바`,
+        `${town} 노래방알바`,
+        `${fullPrefix} 밤알바`,
+        `${town} 여우알바`,
+        `${displayRegion} 룸나무`,
+        `${displayRegion} 고수익알바`,
         '코코알바'
     ];
+
+    // 금지어 필터링 및 정규화 (B2B 잔재 및 경쟁사 브랜드)
+    const forbiddenWords = [
+        '엔터프라이즈', '인재', '솔루션', '레이디알바', '전문', '숙식', '초보', '자유', '텃세', '친절',
+        '여우알바', '퀸알바', '악녀알바', '슈슈알바', '버블알바'
+    ];
+    
+    return Array.from(new Set(baseKeywords))
+        .filter(kw => !forbiddenWords.some(fw => kw.includes(fw)))
+        .map(kw => kw.trim());
 };

@@ -11,7 +11,15 @@ const nextConfig: NextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/region/:path*",
+        destination: "/coco/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

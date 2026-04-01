@@ -27,7 +27,7 @@ export default function RightSidebar() {
 
     const JOB_TYPES = ['룸싸롱', '나이트', '주점', '노래방', '바(Bar)', '카페', '일반음식점', 'PC방/오락실', '기타'];
 
-    const WORK_TYPES = ['낮알바', '엔터프라이즈 인재 솔루션', '파트타임', '주말알바', '풀타임', '단기알바', '숙식제공', '당일지급'];
+    const WORK_TYPES = ['낮알바', '여성알바', '파트타임', '주말알바', '풀타임', '단기알바'];
 
     return (
         <aside className="w-[250px] shrink-0 hidden lg:block space-y-3 sticky top-20 h-fit pb-10">

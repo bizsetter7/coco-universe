@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
         openGraph: {
             title,
             description,
-            url: `https://cocoalba.kr/coco/${region}`,
+            url: `https://cocoalba.kr/region/${region}`,
             siteName: '코코알바',
             images: [
                 {
@@ -94,7 +94,7 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         "@type": "WebPage",
         "name": `${regionName} 여성알바 1위 - 코코알바`,
         "description": `${regionName} 지역 검증된 ${kw0}, ${kw1} 실시간 정보. 당일지급·숙식제공 보장.`,
-        "url": `https://cocoalba.kr/coco/${region}`,
+        "url": `https://cocoalba.kr/region/${region}`,
         "publisher": { "@type": "Organization", "name": "코코알바", "url": "https://cocoalba.kr" }
     };
 
@@ -105,7 +105,7 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "홈", "item": "https://cocoalba.kr" },
             { "@type": "ListItem", "position": 2, "name": "지역별 채용", "item": "https://cocoalba.kr/region" },
-            { "@type": "ListItem", "position": 3, "name": `${regionName} 채용`, "item": `https://cocoalba.kr/coco/${region}` }
+            { "@type": "ListItem", "position": 3, "name": `${regionName} 채용`, "item": `https://cocoalba.kr/region/${region}` }
         ]
     };
 
