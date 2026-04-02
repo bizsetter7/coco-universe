@@ -3,6 +3,8 @@ import shopsData from '@/lib/data/shops.json';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 import { MOCK_POSTS } from '@/constants/community';
 import { supabase } from '@/lib/supabase';
+import { WORK_TYPE_SLUGS } from '@/lib/data/work-type-guide';
+import { slugify } from '@/utils/shopUtils';
 
 // Dynamic so sitemap includes latest DB posts
 export const dynamic = 'force-dynamic';
@@ -41,9 +43,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // title 또는 description 중 하나라도 있어야 sitemap에 포함
     // → 빈 UUID 광고 제외로 크롤 예산 보호
     const shopRoutes = shopsData
-        .filter((shop) => {
-            const hasTitle = (shop.title || '').trim().length > 4;
-            const hasDesc = (shop.description || '').trim().length > 20;
+        .filter((shop: any) => {
+            const hasTitle = ((shop.title as string) || '').trim().length > 4;
+            const hasDesc = ((shop.description as string) || '').trim().length > 20;
             return hasTitle || hasDesc;
         })
         .map((shop) => ({
@@ -52,6 +54,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'weekly' as const,
             priority: 0.7,
         }));
+
+    // 4-A. 지역×업종 가이드 랜딩 페이지 (예: /coco/서울/룸알바)
+    // 실제 회원 없어도 색인 가능한 정보성 고품질 콘텐츠 페이지
+    const guideRoutes = seoRegionsMaster.flatMap((region) =>
+        WORK_TYPE_SLUGS.map((workType) => ({
+            url: `${baseUrl}/coco/${slugify(region.id)}/${workType}`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.8,
+        }))
+    );
 
     // 4. [SAFE] Mock Community Posts - 항상 포함되는 안전장치
     const mockPostRoutes = MOCK_POSTS.map((post) => ({
@@ -88,5 +101,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         console.warn('Sitemap: DB fetch failed, using mock only.');
     }
 
-    return [...routes, ...regionRoutes, ...shopRoutes, ...mockPostRoutes, ...dbPostRoutes];
+    return [...routes, ...regionRoutes, ...shopRoutes, ...guideRoutes, ...mockPostRoutes, ...dbPostRoutes];
 }
