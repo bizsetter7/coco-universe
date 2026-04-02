@@ -106,14 +106,26 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
                     </span>
                 </div>
 
-                {/* Row 3: 추가급여옵션 (paySuffixes) */}
+                {/* Row 3: 추가급여옵션 (paySuffixes) — 4개 이상 시 마퀴 슬라이드 */}
                 {paySuffixes.length > 0 && (
-                    <div className="flex flex-wrap gap-1 overflow-hidden max-h-[18px]">
-                        {paySuffixes.slice(0, 3).map((suffix: string, i: number) => (
-                            <span key={i} className="px-1.5 py-0.5 bg-gray-50 text-gray-500 text-[9px] font-bold rounded border border-gray-100 whitespace-nowrap leading-none">
-                                {suffix}
-                            </span>
-                        ))}
+                    <div className="overflow-hidden max-h-[18px]">
+                        {paySuffixes.length <= 3 ? (
+                            <div className="flex gap-1">
+                                {paySuffixes.map((suffix: string, i: number) => (
+                                    <span key={i} className="px-1.5 py-0.5 bg-gray-50 text-gray-500 text-[9px] font-bold rounded border border-gray-100 whitespace-nowrap leading-none">
+                                        {suffix}
+                                    </span>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="keyword-marquee flex gap-1" style={{ width: 'max-content' }}>
+                                {[...paySuffixes, ...paySuffixes].map((suffix: string, i: number) => (
+                                    <span key={i} className="px-1.5 py-0.5 bg-gray-50 text-gray-500 text-[9px] font-bold rounded border border-gray-100 whitespace-nowrap leading-none">
+                                        {suffix}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

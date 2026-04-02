@@ -2,6 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=Hahmlet:wght@100..900&family=Gowun+Batang:wght@400;700&display=swap');
 @import "tailwindcss";
 
+/* ── Keyword Marquee Animation ───────────────────────────────────────── */
+@keyframes keyword-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.keyword-marquee {
+  animation: keyword-marquee 12s linear infinite;
+  will-change: transform;
+}
+.keyword-marquee:hover {
+  animation-play-state: paused;
+}
+/* ── /keyword-marquee ────────────────────────────────────────────────── */
+
 /* Force Light Mode Globally */
 :root,
 html,
