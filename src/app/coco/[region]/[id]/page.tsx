@@ -18,6 +18,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!shop) {
         return {
             title: '업소를 찾을 수 없습니다 - 코코알바',
+            robots: { index: false, follow: false },
+        };
+    }
+
+    // 콘텐츠가 없는 thin 페이지 → noindex (크롤 예산 보호 + 품질 신호 유지)
+    const hasTitle = (shop.title || '').trim().length > 4;
+    const hasDesc = (shop.description || '').trim().length > 20;
+    const isThinContent = !hasTitle && !hasDesc;
+
+    if (isThinContent) {
+        return {
+            title: `${shop.name} - 코코알바`,
+            robots: { index: false, follow: true },
         };
     }
 

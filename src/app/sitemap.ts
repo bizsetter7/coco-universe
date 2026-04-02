@@ -37,13 +37,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
     }));
 
-    // 3. Shop Detail Pages
-    const shopRoutes = shopsData.map((shop) => ({
-        url: `${baseUrl}/coco/${shop.region}/${shop.id}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-    }));
+    // 3. Shop Detail Pages — 콘텐츠 있는 광고만 포함 (thin content 제외)
+    // title 또는 description 중 하나라도 있어야 sitemap에 포함
+    // → 빈 UUID 광고 제외로 크롤 예산 보호
+    const shopRoutes = shopsData
+        .filter((shop) => {
+            const hasTitle = (shop.title || '').trim().length > 4;
+            const hasDesc = (shop.description || '').trim().length > 20;
+            return hasTitle || hasDesc;
+        })
+        .map((shop) => ({
+            url: `${baseUrl}/coco/${shop.region}/${shop.id}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+        }));
 
     // 4. [SAFE] Mock Community Posts - 항상 포함되는 안전장치
     const mockPostRoutes = MOCK_POSTS.map((post) => ({
