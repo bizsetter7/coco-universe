@@ -118,7 +118,7 @@ const CLEAN_SEO: SEOConfig = {
         },
     },
   },
-  schemas: [BASE_ORGANIZATION_SCHEMA, CLEAN_LOCAL_BUSINESS_SCHEMA, FAQ_SCHEMA]
+  schemas: [BASE_ORGANIZATION_SCHEMA, CLEAN_LOCAL_BUSINESS_SCHEMA]
 };
 
 const getShadowSEO = (): SEOConfig => ({
@@ -138,7 +138,6 @@ const getShadowSEO = (): SEOConfig => ({
         name: "COCOALBA (코코알바)",
     },
     ...shadowSEO.schemas,
-    FAQ_SCHEMA
   ]
 });
 
