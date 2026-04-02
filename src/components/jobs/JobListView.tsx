@@ -155,12 +155,24 @@ const JobRow = React.memo(({
                         </div>
                     </div>
                     {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1 justify-end w-full">
-                            {shop.options.paySuffixes.map((suffix, i) => (
-                                <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200">
-                                    {suffix}
-                                </span>
-                            ))}
+                        <div className="overflow-hidden mt-1 w-full max-w-[160px]">
+                            {shop.options.paySuffixes.length <= 3 ? (
+                                <div className="flex gap-1 justify-end flex-wrap">
+                                    {shop.options.paySuffixes.map((suffix, i) => (
+                                        <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
+                                            {suffix}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="keyword-marquee flex gap-1" style={{ width: 'max-content' }}>
+                                    {[...shop.options.paySuffixes, ...shop.options.paySuffixes].map((suffix, i) => (
+                                        <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
+                                            {suffix}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -230,8 +242,8 @@ const MobileJobRow = React.memo(({
                         </div>
                     </div>
 
-                    {/* Line 3: Pay Badge + Amount + Options */}
-                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                    {/* Line 3: Pay Badge + Amount */}
+                    <div className="flex items-center gap-1 mt-0.5">
                         <div className={`
                             px-1.5 py-0.5 rounded-[4px] text-[10px] font-bold text-white shrink-0
                             ${badgeColor}
@@ -241,12 +253,29 @@ const MobileJobRow = React.memo(({
                         <div className={`text-[11px] font-black tracking-tighter !text-gray-900 force-dark-text shrink-0`}>
                             {amount}
                         </div>
-                        {shop.options?.paySuffixes?.slice(0, 2).map((suffix, i) => (
-                            <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
-                                {suffix}
-                            </span>
-                        ))}
                     </div>
+                    {/* Line 4: 추가급여옵션 마퀴 슬라이드 */}
+                    {shop.options?.paySuffixes && shop.options.paySuffixes.length > 0 && (
+                        <div className="overflow-hidden mt-0.5">
+                            {shop.options.paySuffixes.length <= 3 ? (
+                                <div className="flex gap-1 flex-wrap">
+                                    {shop.options.paySuffixes.map((suffix, i) => (
+                                        <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
+                                            {suffix}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="keyword-marquee flex gap-1" style={{ width: 'max-content' }}>
+                                    {[...shop.options.paySuffixes, ...shop.options.paySuffixes].map((suffix, i) => (
+                                        <span key={i} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[9px] rounded font-bold border border-gray-200 whitespace-nowrap">
+                                            {suffix}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Star Icon */}
