@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { WorkTypeSlug, WorkTypeInfo, RegionPayData, WORK_TYPE_SLUGS, WORK_TYPE_INFO } from '@/lib/data/work-type-guide';
