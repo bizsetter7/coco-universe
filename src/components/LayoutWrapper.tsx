@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIdleLogout } from '@/hooks/useIdleLogout';
 import { IdleLogoutModal } from './auth/IdleLogoutModal';
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
+import { isWorkTypeSlug } from '@/lib/data/work-type-guide';
 import OpenEventPopup from './OpenEventPopup';
 
 interface LayoutWrapperProps {
@@ -106,9 +107,14 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     // /auth/ 하위 경로 (비밀번호 재설정 등) — 성인인증 게이트 없이 접근 가능해야 함
     const isAuthFlowPage = pathname?.startsWith('/auth/');
 
-    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우 제외)
+    // 가이드 페이지 여부 확인 (예: /coco/서울/룸알바)
+    // pathname: ['', 'coco', 'region', 'id']
+    const pathParts = pathname?.split('/') || [];
+    const isGuidePage = pathParts.length === 4 && pathParts[1] === 'coco' && isWorkTypeSlug(decodeURIComponent(pathParts[3]).normalize('NFC'));
+
+    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우·가이드페이지 제외)
     // [Soft Gate Strategy] — SEO를 위해 children을 DOM에 남겨두고 오버레이만 씌움
-    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage;
+    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage;
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 
     if (isLoading) {

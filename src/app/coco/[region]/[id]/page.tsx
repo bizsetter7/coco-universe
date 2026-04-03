@@ -18,8 +18,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id, region } = await params;
-    const decodedId = decodeURIComponent(id);
-    const decodedRegionSlug = decodeURIComponent(region);
+    const decodedId = decodeURIComponent(id).normalize('NFC');
+    const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     // ── 업종 가이드 페이지 메타데이터 ──
     if (isWorkTypeSlug(decodedId)) {
@@ -122,8 +122,8 @@ export async function generateStaticParams() {
 
 export default async function ShopDetailPage({ params }: Props) {
     const { id, region } = await params;
-    const decodedId = decodeURIComponent(id);
-    const decodedRegionSlug = decodeURIComponent(region);
+    const decodedId = decodeURIComponent(id).normalize('NFC');
+    const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     // ── 업종 가이드 페이지 렌더링 ──
     if (isWorkTypeSlug(decodedId)) {
