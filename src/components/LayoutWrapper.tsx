@@ -20,6 +20,7 @@ import { IdleLogoutModal } from './auth/IdleLogoutModal';
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
 import { isWorkTypeSlug } from '@/lib/data/work-type-guide';
 import OpenEventPopup from './OpenEventPopup';
+import { PushPermission } from './PushPermission';
 
 interface LayoutWrapperProps {
     children: React.ReactNode;
@@ -191,6 +192,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
             {/* 오픈 상생지원 이벤트 팝업 (어드민/인증게이트 제외) */}
             {!isAdminPage && !showAdultGate && <OpenEventPopup />}
+
+            {/* SOS 알림 수신 동의 팝업 (구직자 로그인 시) */}
+            {!isAdminPage && !showAdultGate && <PushPermission />}
         </React.Fragment>
     );
 };

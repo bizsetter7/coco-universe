@@ -87,10 +87,26 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
         setFavorites(prev => toggleFav(id, prev));
     }, [shops, isLoggedIn, router]);
 
+    // [GeoTargeting] viewed_shops 기반 홈 지역 감지 (전체 뷰에서 해당 지역 광고 우선 노출)
+    const homeRegion = useMemo(() => {
+        try {
+            const saved = localStorage.getItem('viewed_shops');
+            if (!saved) return null;
+            const entries: { shop: Shop; timestamp: number }[] = JSON.parse(saved);
+            const regionCount: Record<string, number> = {};
+            entries.forEach(e => {
+                const r = e.shop?.region;
+                if (r) regionCount[r] = (regionCount[r] || 0) + 1;
+            });
+            const top = Object.entries(regionCount).sort((a, b) => b[1] - a[1])[0];
+            return top?.[0] || null;
+        } catch { return null; }
+    }, []);
+
     // Data Filtering
     const filteredShops = useMemo(() => {
         if (!shops) return [];
-        return shops.filter(shop => {
+        const filtered = shops.filter(shop => {
             // Region Filter (전체명 → shops.json 약칭 변환 후 substring 검색)
             if (selectedRegion !== '전체') {
                 const bracketKey = REGION_BRACKET_MAP[selectedRegion] || selectedRegion;
@@ -120,7 +136,18 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
             }
             return true;
         });
-    }, [shops, selectedRegion, selectedSubRegion, selectedJobType, selectedSubJobType, activeSearchQuery]);
+
+        // [GeoTargeting] 전체 뷰 + 홈 지역 감지된 경우 → 홈 지역 광고를 tier 내 상단으로 boost
+        if (selectedRegion === '전체' && homeRegion) {
+            filtered.sort((a, b) => {
+                const aMatch = a.region?.includes(homeRegion) ? 0 : 1;
+                const bMatch = b.region?.includes(homeRegion) ? 0 : 1;
+                return aMatch - bMatch;
+            });
+        }
+
+        return filtered;
+    }, [shops, selectedRegion, selectedSubRegion, selectedJobType, selectedSubJobType, activeSearchQuery, homeRegion]);
 
     // [BUG-04 FIX] LeftSidebar에서 직종 변경 시 subJobType도 함께 리셋
     // LeftSidebar에는 setSelectedSubJobType prop이 없어 잔류값이 필터를 오염시키는 버그 수정
