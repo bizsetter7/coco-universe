@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/requireAdmin';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +70,10 @@ export async function POST(req: NextRequest) {
  * GET /api/monitor/errors
  * 어드민용 에러 로그 조회 (최근 200건)
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const authError = await requireAdmin(req);
+    if (authError) return authError;
+
     try {
         const supabase = getAdmin();
         const { data, error } = await supabase
@@ -90,6 +94,9 @@ export async function GET() {
  * 에러 해결 처리 (resolved = true)
  */
 export async function PATCH(req: NextRequest) {
+    const authError = await requireAdmin(req);
+    if (authError) return authError;
+
     try {
         const { id } = await req.json();
         if (!id) return NextResponse.json({ success: false }, { status: 400 });

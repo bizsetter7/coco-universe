@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/requireAdmin';
 
 /**
  * [Admin API] /api/admin/grant-balance
@@ -13,6 +14,9 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(request: NextRequest) {
+    const authError = await requireAdmin(request);
+    if (authError) return authError;
+
     try {
         const { userId, amount, type } = await request.json();
 

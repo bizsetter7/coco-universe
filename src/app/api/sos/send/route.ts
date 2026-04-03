@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 import { getSosPointReason } from '@/lib/points';
@@ -6,7 +6,8 @@ import { getSosPointReason } from '@/lib/points';
 function getAdmin() {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!serviceKey) return null;
-    return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+    return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey,
+        { auth: { autoRefreshToken: false, persistSession: false } });
 }
 
 const POINT_COST_MAP: Record<string, number> = {
@@ -16,9 +17,33 @@ const POINT_COST_MAP: Record<string, number> = {
     SOS_SEND_XLARGE: 2000,
 };
 
+/** 요청자 user_id 검증 — Bearer 토큰 또는 mock 세션 쿠키 */
+async function getRequestUserId(request: NextRequest, supabaseAdmin: ReturnType<typeof getAdmin>): Promise<string | null> {
+    if (!supabaseAdmin) return null;
+
+    // 개발 환경 mock 세션 쿠키 허용
+    if (process.env.NODE_ENV !== 'production') {
+        const mockCookie = request.cookies.get('coco_mock_session');
+        if (mockCookie?.value) {
+            try { return JSON.parse(mockCookie.value)?.id || null; } catch { /* ignore */ }
+        }
+    }
+
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) return null;
+
+    try {
+        const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+        return user?.id || null;
+    } catch {
+        return null;
+    }
+}
+
 // POST /api/sos/send
 // body: { shopId, shopName, message, regions: string[] }
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const supabaseAdmin = getAdmin();
     if (!supabaseAdmin) {
         return NextResponse.json({ error: 'Server not configured' }, { status: 503 });
@@ -43,6 +68,15 @@ export async function POST(request: Request) {
 
         if (message.length > 50) {
             return NextResponse.json({ error: '메시지는 50자 이내로 작성해주세요.' }, { status: 400 });
+        }
+
+        // 요청자 본인 확인 — shopId는 반드시 로그인한 유저의 ID와 일치해야 함
+        const requesterId = await getRequestUserId(request, supabaseAdmin);
+        if (!requesterId) {
+            return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+        }
+        if (requesterId !== shopId) {
+            return NextResponse.json({ error: '본인 샵만 SOS 발송할 수 있습니다.' }, { status: 403 });
         }
 
         // 1. 해당 지역 구독자 조회
@@ -85,13 +119,22 @@ export async function POST(request: Request) {
 
         if (deductError) throw deductError;
 
-        // point_logs 기록
-        await supabaseAdmin.from('point_logs').insert({
+        // point_logs 기록 (note 컬럼 없음 — user_id/amount/reason만 사용)
+        const { error: logError } = await supabaseAdmin.from('point_logs').insert({
             user_id: shopId,
             amount: -pointCost,
             reason: pointReason,
-            note: `[SOS] ${shopName} → ${regions.join(', ')} (${recipientCount}명)`,
         });
+
+        if (logError) {
+            // 로그 실패 시 포인트 롤백
+            await supabaseAdmin
+                .from('profiles')
+                .update({ points: currentPoints, updated_at: new Date().toISOString() })
+                .eq('id', shopId);
+            console.error('[sos/send] point_logs 기록 실패, 포인트 롤백:', logError.message);
+            return NextResponse.json({ error: '발송 처리 중 오류가 발생했습니다. 다시 시도해주세요.' }, { status: 500 });
+        }
 
         // 3. SOS 발송 이력 저장
         const { data: alertData, error: alertError } = await supabaseAdmin
@@ -107,7 +150,22 @@ export async function POST(request: Request) {
             .select('id')
             .single();
 
-        if (alertError) throw alertError;
+        if (alertError) {
+            // sos_alerts 저장 실패 시 포인트 및 로그 롤백
+            await supabaseAdmin
+                .from('profiles')
+                .update({ points: currentPoints, updated_at: new Date().toISOString() })
+                .eq('id', shopId);
+            await supabaseAdmin
+                .from('point_logs')
+                .delete()
+                .eq('user_id', shopId)
+                .eq('reason', pointReason)
+                .order('created_at', { ascending: false })
+                .limit(1);
+            console.error('[sos/send] sos_alerts 저장 실패, 롤백 처리:', alertError.message);
+            throw alertError;
+        }
 
         const alertId = alertData?.id;
 

@@ -1,8 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { requireAdmin } from '@/lib/requireAdmin';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+    const authError = await requireAdmin(request);
+    if (authError) return authError;
+
     try {
         const data = await request.json();
 

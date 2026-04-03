@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/requireAdmin';
 
 // Service role key — RLS 완전 우회
 const supabaseAdmin = createClient(
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
 
 /** PATCH /api/community/post — 관리자 권한 게시글 수정 */
 export async function PATCH(request: NextRequest) {
+    const authError = await requireAdmin(request);
+    if (authError) return authError;
+
     try {
         const body = await request.json();
         const { id, title, content, category } = body;
@@ -76,6 +80,9 @@ export async function PATCH(request: NextRequest) {
 
 /** DELETE /api/community/post — 관리자 권한 게시글 삭제 (비밀번호 없음) */
 export async function DELETE(request: NextRequest) {
+    const authError = await requireAdmin(request);
+    if (authError) return authError;
+
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');

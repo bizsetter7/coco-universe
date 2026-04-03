@@ -596,6 +596,60 @@ export async function POST() {
         components.admin_mock_security = { status: 'warning', message: `Mock 보안 검사 실패: ${err.message}` };
     }
 
+    // ── 34. SOS 포인트 차감 무결성 — 차감 로그 대비 sos_alerts 누락 ──
+    try {
+        const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const SOS_REASONS = ['SOS_SEND_SMALL', 'SOS_SEND_MEDIUM', 'SOS_SEND_LARGE', 'SOS_SEND_XLARGE'];
+
+        const { data: sosLogs } = await supabase
+            .from('point_logs')
+            .select('user_id, created_at')
+            .in('reason', SOS_REASONS)
+            .gte('created_at', since24h);
+
+        let sosMismatch = 0;
+        if (sosLogs && sosLogs.length > 0) {
+            for (const log of sosLogs) {
+                const logTime = new Date(log.created_at).getTime();
+                const { data: alert } = await supabase
+                    .from('sos_alerts')
+                    .select('id')
+                    .eq('shop_id', log.user_id)
+                    .gte('created_at', new Date(logTime - 10000).toISOString())
+                    .lte('created_at', new Date(logTime + 10000).toISOString())
+                    .maybeSingle();
+                if (!alert) sosMismatch++;
+            }
+        }
+
+        if (sosMismatch === 0) {
+            components.sos_log_integrity = { status: 'healthy', message: '최근 24h SOS 포인트 차감 ↔ sos_alerts 일치' };
+        } else {
+            components.sos_log_integrity = { status: 'warning', message: `SOS 포인트 차감 ${sosMismatch}건에 대응하는 sos_alerts 없음 — 롤백 누락 가능성`, count: sosMismatch };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.sos_log_integrity = { status: 'warning', message: `SOS 무결성 검사 실패: ${err.message}` };
+    }
+
+    // ── 35. autoLogin URL 파라미터 — 프로덕션 환경 비활성 확인 ────
+    try {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+        if (isProduction && !siteUrl.includes('localhost')) {
+            // 프로덕션에서 autoLogin 파라미터가 활성 상태일 수 있음 — 코드 확인 권고
+            components.autologin_security = {
+                status: 'warning',
+                message: '⚠️ 프로덕션 환경: autoLogin URL 파라미터 활성 여부 코드 검토 필요 (/login 또는 AuthModal)',
+            };
+            overall = setWorst(overall, 'warning');
+        } else {
+            components.autologin_security = { status: 'healthy', message: '개발/로컬 환경 — autoLogin 허용 (정상)' };
+        }
+    } catch (err: any) {
+        components.autologin_security = { status: 'warning', message: `autoLogin 보안 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 

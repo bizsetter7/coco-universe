@@ -1,11 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/requireAdmin';
 
 /**
  * [Admin Tool] /api/admin/fix-points
  * 24시간 내 가입자 중 포인트가 0인 유저들에게 가입 보너스(100P)를 수동 지급합니다. (v2.0.8)
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
+    const authError = await requireAdmin(request);
+    if (authError) return authError;
+
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
