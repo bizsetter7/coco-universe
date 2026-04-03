@@ -212,7 +212,7 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }} />
-            <RegionClient shops={shops} initialRegion={initialRegion} />
+            <RegionClient shops={shops} initialRegion={initialRegion} regionSlug={decodedRegionSlug} />
         </>
     );
 }

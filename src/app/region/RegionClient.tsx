@@ -8,6 +8,7 @@ import LeftSidebar from '@/components/LeftSidebar';
 
 import JobDetailModal from '@/components/jobs/JobDetailModal';
 import { PaymentPopup } from '@/components/home/PaymentPopup';
+import { WorkTypeGuideLinks } from '@/components/guide/WorkTypeGuideLinks';
 
 // Types & Data
 import { Shop } from '@/types/shop';
@@ -23,9 +24,10 @@ import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/u
 interface RegionClientProps {
     shops: Shop[];
     initialRegion?: string;
+    regionSlug?: string;
 }
 
-export default function RegionClient({ shops, initialRegion = '전체' }: RegionClientProps) {
+export default function RegionClient({ shops, initialRegion = '전체', regionSlug }: RegionClientProps) {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType, userName, userCredit } = useAuth();
@@ -139,6 +141,9 @@ export default function RegionClient({ shops, initialRegion = '전체' }: Region
                         userCredit={userCredit}
                     />
                 }>
+                    {/* [v3.6] SEO 가이드 브릿지 추가 (TASK 2) */}
+                    {regionSlug && <WorkTypeGuideLinks regionSlug={regionSlug} />}
+
                     {/* Unified Listing Content with Ad Grid Injected */}
                     <UnifiedJobListing
                         title="지역별 채용"
