@@ -256,9 +256,11 @@ export default async function ShopDetailPage({ params }: Props) {
             "@type": "Place",
             "address": {
                 "@type": "PostalAddress",
-                "addressLocality": shop.city || shop.region,
+                "streetAddress": shop.businessAddress || shop.work_region_sub || shop.district || undefined,
+                "addressLocality": shop.city || shop.district || shop.region,
                 "addressRegion": shop.regionCity || shop.region,
-                "addressCountry": "KR"
+                "addressCountry": "KR",
+                ...(shop.businessAddress ? { "postalCode": "00000" } : {})
             }
         },
         "baseSalary": {
