@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Flame, Sparkles } from 'lucide-react';
 import { useBrand } from '@/components/BrandProvider';
 import { supabase } from '@/lib/supabase';
@@ -37,6 +37,7 @@ export function AttendanceView({ userId }: { userId: string }) {
     const [attendedDates, setAttendedDates] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [isChecking, setIsChecking] = useState(false);
+    const isCheckingRef = useRef(false); // [BUG-FIX] 레이스 컨디션 방지용 ref (state 업데이트 비동기 한계 보완)
     const [streak, setStreak] = useState(0);
 
     // ─── 이번 달 출석 로그 불러오기 ─────────────────────────────────────
@@ -55,8 +56,12 @@ export function AttendanceView({ userId }: { userId: string }) {
                 .gte('created_at', from)
                 .lte('created_at', to);
 
+            // [BUG-FIX] UTC→로컬 변환: DB created_at은 UTC, todayStr은 로컬(KST) 기준 → 변환 후 비교
             const dates = new Set<string>(
-                (data || []).map((row: any) => row.created_at.substring(0, 10))
+                (data || []).map((row: any) => {
+                    const d = new Date(row.created_at);
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                })
             );
             setAttendedDates(dates);
         } catch (e) {
@@ -106,7 +111,9 @@ export function AttendanceView({ userId }: { userId: string }) {
 
     // ─── 출석체크 실행 ───────────────────────────────────────────────────
     const handleCheckIn = async () => {
-        if (!userId || attendedDates.has(todayStr) || isChecking) return;
+        // [BUG-FIX] ref로 즉각 잠금 — state 업데이트 비동기 딜레이로 인한 연타 중복 방지
+        if (!userId || attendedDates.has(todayStr) || isCheckingRef.current) return;
+        isCheckingRef.current = true;
         setIsChecking(true);
         try {
             const result = await updatePoints(userId, 'ATTENDANCE_CHECK');
@@ -115,11 +122,18 @@ export function AttendanceView({ userId }: { userId: string }) {
                 setStreak(prev => prev + 1);
                 alert('🎉 출석체크 완료! +3P 적립되었습니다.');
             } else {
-                throw new Error('포인트 지급 실패');
+                // 서버에서 409 (이미 출석) 반환 시 UI 상태도 완료로 동기화
+                if ((result as any).alreadyChecked) {
+                    setAttendedDates(prev => new Set([...prev, todayStr]));
+                    alert('오늘 이미 출석체크를 완료했습니다.');
+                } else {
+                    throw new Error(result.error || '포인트 지급 실패');
+                }
             }
         } catch (e: any) {
             alert(`출석체크 실패: ${e.message}`);
         } finally {
+            isCheckingRef.current = false;
             setIsChecking(false);
         }
     };

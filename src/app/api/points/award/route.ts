@@ -37,6 +37,26 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: `Unknown point reason: ${reason}` }, { status: 400 });
         }
 
+        // [중복 방지] ATTENDANCE_CHECK: 오늘(UTC 기준) 이미 출석했는지 서버에서 검증
+        if (reason === 'ATTENDANCE_CHECK') {
+            const todayUtc = new Date().toISOString().substring(0, 10); // 'YYYY-MM-DD'
+            const { data: existing } = await supabaseAdmin
+                .from('point_logs')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('reason', 'ATTENDANCE_CHECK')
+                .gte('created_at', `${todayUtc}T00:00:00.000Z`)
+                .lte('created_at', `${todayUtc}T23:59:59.999Z`)
+                .maybeSingle();
+
+            if (existing) {
+                return NextResponse.json(
+                    { error: '오늘 이미 출석체크를 완료했습니다.', alreadyChecked: true },
+                    { status: 409 }
+                );
+            }
+        }
+
         // 1. 현재 포인트 조회
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('profiles')
@@ -69,7 +89,17 @@ export async function POST(request: NextRequest) {
 
         if (logError) {
             console.error('[award-points] Log insert error:', logError.message);
-            // 로그 실패해도 포인트 업데이트는 완료됐으므로 경고만
+
+            // [ATTENDANCE_CHECK] 로그 없으면 중복 체크 불가 → 포인트 롤백 후 에러 반환
+            if (reason === 'ATTENDANCE_CHECK') {
+                await supabaseAdmin
+                    .from('profiles')
+                    .update({ points: profile?.points || 0, updated_at: new Date().toISOString() })
+                    .eq('id', userId);
+                return NextResponse.json({ error: '출석 기록 저장에 실패했습니다. 다시 시도해주세요.' }, { status: 500 });
+            }
+
+            // 다른 reason은 경고만 (기존 동작 유지)
             return NextResponse.json({ success: true, newTotal, warning: 'Log failed: ' + logError.message });
         }
 
