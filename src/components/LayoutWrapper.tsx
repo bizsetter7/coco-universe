@@ -18,7 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useIdleLogout } from '@/hooks/useIdleLogout';
 import { IdleLogoutModal } from './auth/IdleLogoutModal';
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from '@/lib/brand-config';
-import { isWorkTypeSlug, WORK_TYPE_SLUGS } from '@/lib/data/work-type-guide';
+import { isWorkTypeSlug } from '@/lib/data/work-type-guide';
 import OpenEventPopup from './OpenEventPopup';
 
 interface LayoutWrapperProps {
