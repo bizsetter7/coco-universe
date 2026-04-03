@@ -300,8 +300,8 @@ export const UnifiedJobListing = ({
                     </div>
                 )}
 
-                {/* Ad Grid Section (Injected) */}
-                {adGrid && (
+                {/* Ad Grid Section — 필터/검색 활성화 시 숨김 (결과가 하단으로 밀리는 UX 버그 수정) */}
+                {adGrid && !hasActiveFilter && (
                     <div className="mt-6 md:mt-8">
                         {adGrid}
                     </div>
