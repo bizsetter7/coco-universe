@@ -177,29 +177,87 @@ export default async function ShopDetailPage({ params }: Props) {
         );
     }
 
-    // [JSON-LD 매핑] 잡포스팅(JobPosting) 스키마에 정화되지 않은 하이엔드 키워드 주입
+    // [JSON-LD 매핑] 잡포스팅(JobPosting) 스키마 강화 (SEO STEP 3 — 2026-04-03)
     const shadowRegionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug);
     const mainKeyword = shadowRegionData ? shadowRegionData.keywords[0] : '여성알바';
+
+    // ── datePosted: 실제 등록일 우선, 없으면 오늘
+    const rawDatePosted = shop.created_at || shop.adStartDate || shop.date || shop.updatedAt;
+    const datePosted = rawDatePosted
+        ? new Date(rawDatePosted).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+
+    // ── validThrough: 실제 만료일 우선, 없으면 등록일+30일
+    const rawValidThrough = shop.adEndDate || shop.deadline;
+    const validThrough = rawValidThrough
+        ? new Date(rawValidThrough).toISOString().split('T')[0]
+        : (() => {
+            const d = new Date(datePosted);
+            d.setDate(d.getDate() + 30);
+            return d.toISOString().split('T')[0];
+        })();
+
+    // ── employmentType: payType 기반 동적 매핑
+    const employmentTypeMap: Record<string, string> = {
+        '시급': 'PART_TIME',
+        '일급': 'PER_DIEM',
+        '월급': 'FULL_TIME',
+        '주급': 'FULL_TIME',
+        'TC': 'CONTRACTOR',
+    };
+    const employmentType = shop.payType ? (employmentTypeMap[shop.payType] ?? 'OTHER') : 'OTHER';
+
+    // ── baseSalary value: 숫자만 추출, 최소값 보장
+    const salaryRaw = shop.pay ? shop.pay.replace(/[^0-9]/g, '') : '';
+    const salaryValue = salaryRaw.length > 0 ? salaryRaw : '50000';
+    const salaryUnit = shop.payType === '시급' ? 'HOUR' : shop.payType === '일급' ? 'DAY' : 'MONTH';
+
+    // ── jobBenefits: options.icons + options.keywords 조합
+    const benefitParts: string[] = [];
+    if (shop.options?.icons && shop.options.icons.length > 0) {
+        benefitParts.push(...shop.options.icons);
+    }
+    if (shop.options?.keywords && shop.options.keywords.length > 0) {
+        benefitParts.push(...shop.options.keywords);
+    }
+    if (shop.keywords && shop.keywords.length > 0) {
+        benefitParts.push(...shop.keywords);
+    }
+    const jobBenefits = benefitParts.length > 0 ? benefitParts.join(', ') : undefined;
+
+    // ── description: 실 광고 내용 우선, 없으면 기본 문구
+    const jobDescription = (shop.description && shop.description.trim().length > 10)
+        ? shop.description.trim()
+        : `${shop.name}에서 ${mainKeyword}를 모집합니다. ${shop.payType || ''} ${shop.pay} 이상 보장. 최고의 대우와 확실한 수익을 약속드립니다.`;
+
+    // ── title: 실 광고 제목 우선
+    const jobTitle = (shop.title && shop.title.trim().length > 2)
+        ? `${shop.title.trim()} — ${shop.name}`
+        : `${shop.name} - ${mainKeyword} 모집`;
 
     const jsonLd = {
         "@context": "https://schema.org/",
         "@type": "JobPosting",
-        "title": `${shop.name} - ${mainKeyword} 모집`,
-        "description": `${shop.name}에서 ${mainKeyword}를 모집합니다. 최고의 대우와 확실한 수익을 보장합니다.`,
+        "title": jobTitle,
+        "description": jobDescription,
         "hiringOrganization": {
             "@type": "Organization",
             "name": shop.name,
             "sameAs": `https://cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`
         },
-        "employmentType": "FULL_TIME",
-        "datePosted": new Date().toISOString().split('T')[0],
-        "validThrough": new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+        "employmentType": employmentType,
+        "datePosted": datePosted,
+        "validThrough": validThrough,
+        "occupationalCategory": shop.workType || mainKeyword,
+        "workHours": shop.workTime || undefined,
+        "qualifications": shop.age ? `${shop.age} 지원 가능` : '나이 무관, 경험 무관',
+        ...(jobBenefits ? { "jobBenefits": jobBenefits } : {}),
         "jobLocation": {
             "@type": "Place",
             "address": {
                 "@type": "PostalAddress",
-                "addressLocality": shop.region,
-                "addressRegion": "KR",
+                "addressLocality": shop.city || shop.region,
+                "addressRegion": shop.regionCity || shop.region,
                 "addressCountry": "KR"
             }
         },
@@ -208,8 +266,8 @@ export default async function ShopDetailPage({ params }: Props) {
             "currency": "KRW",
             "value": {
                 "@type": "QuantitativeValue",
-                "value": shop.pay ? shop.pay.replace(/[^0-9]/g, '') || '50000' : '50000',
-                "unitText": shop.payType === '시급' ? 'HOUR' : shop.payType === '일급' ? 'DAY' : 'MONTH'
+                "value": salaryValue,
+                "unitText": salaryUnit
             }
         }
     };
