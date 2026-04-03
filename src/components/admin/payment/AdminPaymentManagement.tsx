@@ -51,31 +51,18 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                 .eq('id', paymentId);
             if (payError) throw payError;
 
-            // 2. profiles 포인트/점프 차감
-            const field = isPoint ? 'points' : 'jump_balance';
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select(field)
-                .eq('id', userId)
-                .single();
-
-            const current = (profile as any)?.[field] || 0;
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({ [field]: current + Number(amount), updated_at: now })
-                .eq('id', userId);
-            if (profileError) throw profileError;
-
-            // 3. point_logs 기록
-            if (isPoint) {
-                await supabase.from('point_logs').insert([{
-                    user_id: userId,
+            // 2+3. 포인트/점프 지급 — 서버 API 라우트 경유 (RLS 우회, point_logs 무결성 보장)
+            const grantRes = await fetch('/api/admin/grant-balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
                     amount: Number(amount),
-                    reason: 'POINT_CHARGE',
-                    description: `포인트 충전 (관리자 지급)`,
-                    created_at: now
-                }]);
-            }
+                    type: isPoint ? 'points' : 'jump_balance',
+                }),
+            });
+            const grantData = await grantRes.json();
+            if (!grantRes.ok || !grantData.success) throw new Error(grantData.error || '지급 실패');
 
             alert(`${typeLabel} 지급 완료!`);
             fetchData();

@@ -47,14 +47,13 @@ export async function POST() {
                 continue;
             }
 
-            // 로그 기록
+            // 로그 기록 (note 컬럼 미존재 — user_id/amount/reason만 사용)
             const { error: logError } = await supabaseAdmin
                 .from('point_logs')
                 .insert({
                     user_id: user.id,
                     amount: 100,
                     reason: 'JOIN',
-                    note: '[RECOVERY] 누락된 가입 축하 보너스 지급 (v2.0.8)',
                 });
             
             fixResults.push({ 

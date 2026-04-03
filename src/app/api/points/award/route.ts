@@ -37,16 +37,23 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: `Unknown point reason: ${reason}` }, { status: 400 });
         }
 
-        // [중복 방지] ATTENDANCE_CHECK: 오늘(UTC 기준) 이미 출석했는지 서버에서 검증
+        // [중복 방지] ATTENDANCE_CHECK: 오늘(KST 기준) 이미 출석했는지 서버에서 검증
+        // KST = UTC+9: new Date()에 9시간 더해 KST 날짜 추출 후 UTC 범위로 변환
         if (reason === 'ATTENDANCE_CHECK') {
-            const todayUtc = new Date().toISOString().substring(0, 10); // 'YYYY-MM-DD'
+            const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+            const nowKst = new Date(Date.now() + KST_OFFSET_MS);
+            const todayKst = nowKst.toISOString().substring(0, 10); // KST 기준 'YYYY-MM-DD'
+            // KST 하루 범위를 UTC ISO로 변환
+            const dayStartUtc = new Date(`${todayKst}T00:00:00+09:00`).toISOString();
+            const dayEndUtc   = new Date(`${todayKst}T23:59:59+09:00`).toISOString();
+
             const { data: existing } = await supabaseAdmin
                 .from('point_logs')
                 .select('id')
                 .eq('user_id', userId)
                 .eq('reason', 'ATTENDANCE_CHECK')
-                .gte('created_at', `${todayUtc}T00:00:00.000Z`)
-                .lte('created_at', `${todayUtc}T23:59:59.999Z`)
+                .gte('created_at', dayStartUtc)
+                .lte('created_at', dayEndUtc)
                 .maybeSingle();
 
             if (existing) {

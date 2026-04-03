@@ -517,6 +517,85 @@ export async function POST() {
         components.unverified_corporate = { status: 'warning', message: `사업자 인증 현황 조회 실패: ${err.message}` };
     }
 
+    // ── 31. 출석체크 당일 중복 발생 여부 (KST 기준) ──────────────
+    try {
+        const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+        const nowKst = new Date(Date.now() + KST_OFFSET_MS);
+        const todayKst = nowKst.toISOString().substring(0, 10);
+        const dayStartUtc = new Date(`${todayKst}T00:00:00+09:00`).toISOString();
+        const dayEndUtc   = new Date(`${todayKst}T23:59:59+09:00`).toISOString();
+
+        const { data: attendanceLogs } = await supabase
+            .from('point_logs')
+            .select('user_id')
+            .eq('reason', 'ATTENDANCE_CHECK')
+            .gte('created_at', dayStartUtc)
+            .lte('created_at', dayEndUtc);
+
+        if (attendanceLogs) {
+            const userCounts: Record<string, number> = {};
+            attendanceLogs.forEach(r => { userCounts[r.user_id] = (userCounts[r.user_id] || 0) + 1; });
+            const dupCount = Object.values(userCounts).filter(c => c > 1).length;
+            if (dupCount === 0) {
+                components.attendance_dup = { status: 'healthy', message: `오늘(KST) 출석체크 중복 없음` };
+            } else {
+                components.attendance_dup = { status: 'error', message: `오늘 출석체크 중복 ${dupCount}명 발견 — 서버 중복 방지 로직 확인 필요`, count: dupCount };
+                overall = setWorst(overall, 'error');
+            }
+        }
+    } catch (err: any) {
+        components.attendance_dup = { status: 'warning', message: `출석 중복 검사 실패: ${err.message}` };
+    }
+
+    // ── 32. point_logs 무결성 — payments 완료건 로그 누락 체크 ──
+    try {
+        // 최근 7일 내 completed payments(point_charge) 중 point_logs 미기록 건 샘플링
+        const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: completedPayments } = await supabase
+            .from('payments')
+            .select('id, user_id, metadata')
+            .eq('status', 'completed')
+            .gte('updated_at', since7d);
+
+        let missingLogCount = 0;
+        if (completedPayments) {
+            for (const pay of completedPayments.filter(p => p.metadata?.type === 'point_charge')) {
+                const { data: log } = await supabase
+                    .from('point_logs')
+                    .select('id')
+                    .eq('user_id', pay.user_id)
+                    .in('reason', ['POINT_CHARGE', 'ADMIN_GRANT'])
+                    .maybeSingle();
+                if (!log) missingLogCount++;
+            }
+        }
+        if (missingLogCount === 0) {
+            components.payment_log_sync = { status: 'healthy', message: '최근 7일 포인트 충전 완료건 — point_logs 누락 없음' };
+        } else {
+            components.payment_log_sync = { status: 'warning', message: `최근 7일 포인트충전 완료건 중 point_logs 누락 의심 ${missingLogCount}건`, count: missingLogCount };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.payment_log_sync = { status: 'warning', message: `충전-로그 동기화 검사 실패: ${err.message}` };
+    }
+
+    // ── 33. 어드민 계정 Mock 세션 보안 — 프로덕션 환경 확인 ────
+    try {
+        const isProduction = process.env.NODE_ENV === 'production';
+        if (isProduction) {
+            // 프로덕션에서 mock admin 쿠키가 미들웨어를 통과할 수 있는지 경고
+            components.admin_mock_security = {
+                status: 'warning',
+                message: '⚠️ 프로덕션 환경: coco_admin_mock 쿠키로 관리자 페이지 접근 가능 — middleware.ts의 mockAdminCookie 조건 제거 권고',
+            };
+            overall = setWorst(overall, 'warning');
+        } else {
+            components.admin_mock_security = { status: 'healthy', message: '개발 환경 — Mock 관리자 로그인 허용 (정상)' };
+        }
+    } catch (err: any) {
+        components.admin_mock_security = { status: 'warning', message: `Mock 보안 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 
