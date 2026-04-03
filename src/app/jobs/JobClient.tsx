@@ -124,6 +124,13 @@ export default function JobClient({ shops }: JobClientProps) {
         });
     }, [shops, selectedRegion, selectedSubRegion, selectedJobType, selectedSubJobType, activeSearchQuery]);
 
+    // [BUG-04 FIX] LeftSidebar에서 직종 변경 시 subJobType도 함께 리셋
+    // LeftSidebar에는 setSelectedSubJobType prop이 없어 잔류값이 필터를 오염시키는 버그 수정
+    const handleSetSelectedJobType = React.useCallback((v: string) => {
+        setSelectedJobType(v);
+        setSelectedSubJobType('전체');
+    }, []);
+
     const openPaymentPopup = React.useCallback((tier: string) => {
         setSelectedTier(tier);
         setShowPaymentPopup(true);
@@ -141,7 +148,7 @@ export default function JobClient({ shops }: JobClientProps) {
                         setSelectedRegion={setSelectedRegion}
                         setSelectedSubRegion={setSelectedSubRegion}
                         selectedJobType={selectedJobType}
-                        setSelectedJobType={setSelectedJobType}
+                        setSelectedJobType={handleSetSelectedJobType}
                         onPaymentClick={openPaymentPopup}
                         isLoggedIn={isLoggedIn}
                         userType={userType === 'admin' || userType === 'guest' ? undefined : userType}
