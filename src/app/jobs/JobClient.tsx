@@ -19,6 +19,7 @@ import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
+import { JobTypeGuideLinks } from '@/components/guide/JobTypeGuideLinks';
 
 interface JobClientProps {
     shops: Shop[];
@@ -161,6 +162,11 @@ export default function JobClient({ shops }: JobClientProps) {
                         userCredit={userCredit}
                     />
                 }>
+                    {/* 업종 선택 시 지역별 가이드 동적 표시 */}
+                    {selectedJobType !== '전체' && (
+                        <JobTypeGuideLinks jobType={selectedJobType} />
+                    )}
+
                     {/* Unified Listing Content with Ad Grid Injected */}
                     <UnifiedJobListing
                         title="업종별 채용"

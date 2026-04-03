@@ -153,8 +153,11 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
                         userCredit={userCredit}
                     />
                 }>
-                    {/* [v3.6] SEO 가이드 브릿지 추가 (TASK 2) */}
-                    {regionSlug && <WorkTypeGuideLinks regionSlug={regionSlug} />}
+                    {/* 지역 가이드 — 필터 선택 시 동적 업데이트, 미선택 시 URL regionSlug 기본값 */}
+                    {(() => {
+                        const dynamicSlug = selectedRegion !== '전체' ? selectedRegion : regionSlug;
+                        return dynamicSlug ? <WorkTypeGuideLinks regionSlug={dynamicSlug} /> : null;
+                    })()}
 
                     {/* Unified Listing Content with Ad Grid Injected */}
                     <UnifiedJobListing
