@@ -45,8 +45,10 @@ export function AttendanceView({ userId }: { userId: string }) {
         if (!userId) return;
         setIsLoading(true);
         try {
-            const from = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01T00:00:00`;
-            const to = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${new Date(viewYear, viewMonth + 1, 0).getDate()}T23:59:59`;
+            // [BUG-FIX] KST 보정: 로컬 월 시작~끝을 toISOString()으로 UTC 변환 (문자열 직접 포맷은 Supabase가 UTC로 해석)
+            const lastDay = new Date(viewYear, viewMonth + 1, 0).getDate();
+            const from = new Date(viewYear, viewMonth, 1, 0, 0, 0).toISOString();
+            const to   = new Date(viewYear, viewMonth, lastDay, 23, 59, 59).toISOString();
 
             const { data } = await supabase
                 .from('point_logs')

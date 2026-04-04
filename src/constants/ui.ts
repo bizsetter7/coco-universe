@@ -14,8 +14,8 @@ export const UI_Z_INDEX = {
     
     // 부유형 요소
     STICKY: 50,
-    FLOATING: 9000,
     NAV_BOTTOM: 100,
+    FLOATING: 20500,  // 헤더(10000)·사이드바(10001)·모달(20000) 위에 표시 (SOS 알림팝업 등)
     
     // 레이아웃 프레임 (Core Layout)
     HEADER: 10000,

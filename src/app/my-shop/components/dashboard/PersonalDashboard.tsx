@@ -304,9 +304,12 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
     useEffect(() => {
         if (!user?.id || user.id.startsWith('mock_')) return;
         const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        const from = `${todayStr}T00:00:00`;
-        const to = `${todayStr}T23:59:59`;
+        // [BUG-FIX] KST 타임존 보정: 로컬 자정~23:59를 toISOString()으로 UTC 변환 후 Supabase 비교
+        // (순수 문자열 '2026-04-04T00:00:00' 은 Supabase 가 UTC로 해석 → KST 이른 아침 출석 누락)
+        const fromLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        const toLocal   = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        const from = fromLocal.toISOString();
+        const to   = toLocal.toISOString();
         import('@/lib/supabase').then(({ supabase }) => {
             supabase.from('point_logs').select('id').eq('user_id', user.id).eq('reason', 'ATTENDANCE_CHECK').gte('created_at', from).lte('created_at', to).then(({ data }) => {
                 setTodayChecked(data ? data.length > 0 : false);
