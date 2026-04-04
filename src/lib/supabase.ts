@@ -16,6 +16,7 @@ export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
+        storageKey: 'sb-auth-token',
     },
     // Disable Realtime to prevent WebSocket errors (since we don't use it yet)
     realtime: {

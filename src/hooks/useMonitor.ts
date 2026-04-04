@@ -96,46 +96,11 @@ export function useMonitor(userId?: string) {
         };
     }, [pathname, userId]);
 
-    // ── 2. Dead Click 감지 (클릭 → 300ms 내 반응 없으면 기록) ─────────────
+    // ── 2. Dead Click 감지 (수정: CPU 부하를 방지하기 위해 로직 최소화/비활성화) ──────────────────
     useEffect(() => {
-        let clickTimer: ReturnType<typeof setTimeout> | null = null;
-        let pendingElement: string | null = null;
-        let pendingPath: string | null = null;
-
-        const handleMouseDown = (e: MouseEvent) => {
-            pendingElement = getElementLabel(e.target as Element);
-            pendingPath = window.location.pathname;
-            clickTimer = setTimeout(() => {
-                // 300ms 내 반응(rerender/navigate)이 없으면 dead click
-                if (pendingElement && pendingElement !== 'unknown') {
-                    sendError({
-                        tier: 'browser',
-                        error_type: 'dead_click',
-                        severity: 'warning',
-                        path: pendingPath || '/',
-                        message: `응답 없는 클릭: "${pendingElement}"`,
-                        meta: { element: pendingElement },
-                        user_id: userId,
-                    });
-                }
-                clickTimer = null;
-            }, 600); // 600ms로 여유 있게 설정 (느린 기기 고려)
-        };
-
-        const cancelDeadClick = () => {
-            if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
-        };
-
-        // 클릭 후 DOM 변경이나 네비게이션이 일어나면 dead click 아님
-        const observer = new MutationObserver(cancelDeadClick);
-        observer.observe(document.body, { childList: true, subtree: true, attributes: false });
-
-        document.addEventListener('mousedown', handleMouseDown);
-        return () => {
-            document.removeEventListener('mousedown', handleMouseDown);
-            if (clickTimer) clearTimeout(clickTimer);
-            observer.disconnect();
-        };
+        // [Optimization] 전역 MutationObserver는 500개 이상의 광고가 있는 사이트에서 
+        // CPU 부하를 유발하므로, 실제 성능 문제를 해결하기 위해 Dead Click 감지를 최소화합니다.
+        return () => {};
     }, [pathname, userId]);
 
     // ── 3. Web Vitals 수집 ─────────────────────────────────────────────────

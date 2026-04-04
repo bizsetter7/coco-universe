@@ -120,11 +120,11 @@ function AdminContent() {
                 setRealUsers(userData);
                 setStats(prev => ({
                     ...prev,
-                    totalUsers: userData.length,
-                    newUserToday: userData.filter(u => {
+                    totalUsers: userData?.length || 0,
+                    newUserToday: userData?.filter(u => {
                         const today = new Date().toISOString().split('T')[0];
-                        return u.created_at?.startsWith(today);
-                    }).length
+                        return u?.created_at?.startsWith(today);
+                    }).length || 0
                 }));
             }
 
@@ -143,9 +143,8 @@ function AdminContent() {
             setPendingApplications(appCount || 0);
 
             // 4. Fetch Messages
-            // [Fix] 공백이 포함된 관리자 앨리어스(시스템 관리자 등)를 위해 따옴표(\") 처리 추가 (Supabase .or() 문법 준수)
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
-            const adminQuery = ADMIN_ALIASES.map(a => `sender_name.eq.\"${a}\",receiver_name.eq.\"${a}\"`).join(',');
+            const adminQuery = ADMIN_ALIASES.map(a => `sender_name.eq."${a}",receiver_name.eq."${a}"`).join(',');
             const { data: msgData } = await supabase
                 .from('messages')
                 .select('*')
@@ -154,88 +153,88 @@ function AdminContent() {
                 .limit(500);
 
             // Local Data Merging
-            const localMessagesRaw = localStorage.getItem('coco_local_messages');
+            const localMessagesRaw = typeof window !== 'undefined' ? localStorage.getItem('coco_local_messages') : null;
             let localMessages: any[] = [];
             if (localMessagesRaw) {
                 try {
                     localMessages = JSON.parse(localMessagesRaw).map((m: any) => ({
-                        ...m,
-                        created_at: m.created_at || new Date().toISOString(),
-                        id: m.id || `local_${Math.random()}`
+                        ...(m || {}),
+                        created_at: m?.created_at || new Date().toISOString(),
+                        id: m?.id || `local_${Math.random()}`
                     }));
                 } catch (e) { }
             }
 
             const combinedMessages = [...(msgData || []), ...localMessages].sort((a, b) =>
-                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                new Date(b?.created_at || 0).getTime() - new Date(a?.created_at || 0).getTime()
             );
             setAllMessages(combinedMessages.map((m: any) => ({
-                ...m,
-                from: m.sender_name || '시스템',
-                to: m.receiver_name || '관리자',
-                date: new Date(m.created_at).toLocaleString('ko-KR', {
+                ...(m || {}),
+                from: m?.sender_name || '시스템',
+                to: m?.receiver_name || '관리자',
+                date: m?.created_at ? new Date(m.created_at).toLocaleString('ko-KR', {
                     month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
-                }),
-                is_read: m.is_read || false
+                }) : '—',
+                is_read: !!m?.is_read
             })));
 
-            const localMockPaymentsRaw = localStorage.getItem('my_site_payment_history');
+            const localMockPaymentsRaw = typeof window !== 'undefined' ? localStorage.getItem('my_site_payment_history') : null;
             let localPayments: any[] = [];
             if (localMockPaymentsRaw) {
-                try { localPayments = JSON.parse(localMockPaymentsRaw).map((p: any) => ({ ...p, isMock: true })); } catch (e) { }
+                try { localPayments = (JSON.parse(localMockPaymentsRaw) || []).map((p: any) => ({ ...(p || {}), isMock: true })); } catch (e) { }
             }
             const allPaymentsComp = [...(payData || []), ...localPayments];
-            setPayments(allPaymentsComp.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+            setPayments(allPaymentsComp.sort((a, b) => new Date(b?.created_at || 0).getTime() - new Date(a?.created_at || 0).getTime()));
 
             // Enrich Ads with prices logic (Simplified integration)
-            const localMockAdsRaw = localStorage.getItem('coco_mock_ads');
+            const localMockAdsRaw = typeof window !== 'undefined' ? localStorage.getItem('coco_mock_ads') : null;
             let localMockAds: any[] = [];
             if (localMockAdsRaw) {
                 try {
-                    localMockAds = JSON.parse(localMockAdsRaw).map((ad: any) => ({
-                        ...ad, isMock: true, status: ad.status || 'pending', created_at: ad.created_at || new Date().toISOString()
+                    localMockAds = (JSON.parse(localMockAdsRaw) || []).map((ad: any) => ({
+                        ...(ad || {}), isMock: true, status: ad?.status || 'pending', created_at: ad?.created_at || new Date().toISOString()
                     }));
                 } catch (e) { }
             }
 
             const rawAllAds = [...(adsData || []), ...localMockAds];
             const uniqueAdsMap = new Map();
-            rawAllAds.forEach(ad => { if (ad.id) uniqueAdsMap.set(String(ad.id), ad); });
+            rawAllAds.forEach(ad => { if (ad?.id) uniqueAdsMap.set(String(ad.id), ad); });
             const allAdsComp = Array.from(uniqueAdsMap.values());
 
             const enrichedAds = allAdsComp.map(ad => {
                 // [Fix] 광고주 프로필 매핑 (상호명·로그인ID)
-                const profile = (userData || []).find((p: any) => p.id === ad.user_id);
+                const profile = (userData || []).find((p: any) => p?.id === ad?.user_id);
 
-                let adPrice = Number((ad.options as any)?.ad_price || ad.ad_price || ad.adPrice || ad.price || 0);
+                let adPrice = Number(ad?.options?.ad_price || ad?.ad_price || ad?.adPrice || ad?.price || 0);
                 if (!adPrice) {
-                    const lastPayment = allPaymentsComp.find(p => String(p.shop_id || p.shopId || (p as any).metadata?.shop_id || '') === String(ad.id));
-                    if (lastPayment) adPrice = Number((lastPayment as any).amount || (lastPayment as any).price || 0);
+                    const lastPayment = allPaymentsComp.find(p => String(p?.shop_id || p?.shopId || p?.metadata?.shop_id || '') === String(ad?.id));
+                    if (lastPayment) adPrice = Number(lastPayment?.amount || lastPayment?.price || 0);
                 }
-                const opt = ad.options || {};
+                const opt = ad?.options || {};
                 return {
                     ...ad,
                     ad_price: adPrice,
                     // [Fix] 인증 상호명 우선 (profiles.business_name → DB name)
-                    shopName: profile?.business_name || ad.name || '—',
+                    shopName: profile?.business_name || ad?.name || '—',
                     // [Fix] 로그인 아이디 (profiles.username → nickname 순서로 폴백)
                     username: profile?.username || profile?.nickname || '',
-                    payStatus: ad.pay_status || (ad as any).payStatus || '',
-                    categorySub: ad.category_sub || opt.categorySub || '',
-                    selectedIcon: opt.icon || (ad as any).selectedIcon,
-                    selectedHighlighter: opt.highlighter || (ad as any).selectedHighlighter,
-                    borderOption: opt.border || (ad as any).border || 'none',
-                    paySuffixes: opt.pay_suffixes || opt.paySuffixes || [],
-                    selectedKeywords: opt.keywords || ad.keywords || [],
-                    payType: ad.pay_type || opt.payType || '협의'
+                    payStatus: ad?.pay_status || ad?.payStatus || '',
+                    categorySub: ad?.category_sub || opt?.categorySub || '',
+                    selectedIcon: opt?.icon || ad?.selectedIcon,
+                    selectedHighlighter: opt?.highlighter || ad?.selectedHighlighter,
+                    borderOption: opt?.border || ad?.border || 'none',
+                    paySuffixes: opt?.pay_suffixes || opt?.paySuffixes || [],
+                    selectedKeywords: opt?.keywords || ad?.keywords || [],
+                    payType: ad?.pay_type || opt?.payType || '협의'
                 };
             });
 
             setMockAds(enrichedAds);
             setStats(prev => ({
                 ...prev,
-                activeAds: enrichedAds.filter(a => a.status === 'active').length,
-                totalRevenue: 124030000 + enrichedAds.filter(a => a.status === 'active').reduce((acc, curr) => acc + (Number(curr.ad_price) || 0), 0)
+                activeAds: enrichedAds.filter(a => a?.status === 'active').length,
+                totalRevenue: 124030000 + enrichedAds.filter(a => a?.status === 'active').reduce((acc, curr) => acc + (Number(curr?.ad_price) || 0), 0)
             }));
 
         } catch (error) {

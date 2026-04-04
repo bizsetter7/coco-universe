@@ -87,18 +87,13 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
-    // 0. non-www → www 301 리디렉션 (SEO 정규화) — Vercel 프리뷰 도메인은 제외
-    if (process.env.NODE_ENV === 'production') {
-        // [Fix] 도메인 및 쿠키 정규화 — www.cocoalba.kr 강제 (세션 공유 품질 확보)
-        const host = request.headers.get('host');
-        const isVercelDomain = host?.endsWith('.vercel.app');
-        const isMainDomain = host === 'cocoalba.kr';
-
-        if (isMainDomain || (host && !host.startsWith('www.') && !host.startsWith('localhost') && !isVercelDomain)) {
-            const url = request.nextUrl.clone();
-            url.host = `www.${isMainDomain ? 'cocoalba.kr' : host}`;
-            return NextResponse.redirect(url, { status: 301 });
-        }
+    // 0. 도메인 정규화 (www → non-www 301 리디렉션)
+    // [Fix] 현대적 트렌드에 맞춰 'www.' 없이 접속하도록 통일하여 쿠키 도메인 파편화(로그인 루프)를 원천 해결합니다.
+    const host = request.headers.get('host') || '';
+    if (host === 'www.cocoalba.kr') {
+        const url = request.nextUrl.clone();
+        url.host = 'cocoalba.kr';
+        return NextResponse.redirect(url, { status: 301 });
     }
 
     // 1. 관리자 페이지 — 보안 이관 (미들웨어 간섭 제거)
