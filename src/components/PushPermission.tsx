@@ -13,6 +13,7 @@ const REGIONS = [
 ];
 
 const STORAGE_KEY = 'push_permission_dismissed';
+const DISMISS_EXPIRE_MS = 7 * 24 * 60 * 60 * 1000; // 7일 후 재표시
 
 export const PushPermission = () => {
     const { user, userType } = useAuth();
@@ -27,10 +28,22 @@ export const PushPermission = () => {
         if (userType !== 'individual') return;
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
-        const dismissed = localStorage.getItem(STORAGE_KEY);
-        if (dismissed) return;
+        // 이미 구독 완료된 경우 영구 숨김
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === 'subscribed') return;
 
-        // 이미 동의된 경우 표시 안 함
+        // "나중에" 클릭한 경우 7일 후 재표시 (타임스탬프 기록)
+        if (stored && stored !== 'dismissed') {
+            // 레거시 값 호환: 숫자 타임스탬프
+            const dismissedAt = parseInt(stored, 10);
+            if (!isNaN(dismissedAt) && Date.now() - dismissedAt < DISMISS_EXPIRE_MS) return;
+        } else if (stored === 'dismissed') {
+            // 구버전 'dismissed' 문자열 → 즉시 타임스탬프로 마이그레이션
+            localStorage.setItem(STORAGE_KEY, String(Date.now()));
+            return;
+        }
+
+        // 이미 브라우저 알림 동의된 경우 표시 안 함
         if (Notification.permission === 'granted') return;
 
         // 3초 후 표시 (페이지 안정화 대기)
@@ -39,7 +52,8 @@ export const PushPermission = () => {
     }, [user?.id, userType]);
 
     const handleDismiss = () => {
-        localStorage.setItem(STORAGE_KEY, 'dismissed');
+        // 타임스탬프 저장 → 7일 후 재표시
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
         setShow(false);
     };
 

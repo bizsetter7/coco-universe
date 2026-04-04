@@ -51,9 +51,14 @@ async function runTest(
 }
 
 // ── fetch 헬퍼 (AbortSignal 타임아웃 8초) ────────────────────────────────────
+// User-Agent 필수: 서버사이드 fetch는 UA 없음 → middleware 빈 UA 차단(403) 우회
 async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
     return fetch(url, {
         ...init,
+        headers: {
+            ...(init?.headers ?? {}),
+            'User-Agent': 'CocoAlba-E2E-Runner/1.0 (internal health check)',
+        },
         signal: AbortSignal.timeout(8000),
     });
 }
