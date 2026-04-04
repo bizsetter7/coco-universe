@@ -34,12 +34,10 @@ export const LoginPage = () => {
             
             // role 체크를 통해 어드민이면 /admin, 아니면 / 로 이동
             try {
-                const { createClient } = await import('@supabase/supabase-js');
-                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-                const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-                const supabase = createClient(supabaseUrl, anonKey);
+                // [Fix] 전역 supabase 인스턴스를 사용하여 세션 무결성 보장
+                const { supabase: sharedSupabase } = await import('@/lib/supabase');
                 
-                const { data: profile } = await supabase
+                const { data: profile } = await sharedSupabase
                     .from('profiles')
                     .select('role')
                     .eq('id', authResult?.user?.id)

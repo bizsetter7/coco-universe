@@ -9,10 +9,13 @@ from playwright.sync_api import Page, expect
 
 # ── 환경변수 ──────────────────────────────────────────────────────────────────
 BASE_URL       = os.environ.get("PLAYWRIGHT_BASE_URL", "https://www.cocoalba.kr")
-TEST_USER_ID   = os.environ.get("TEST_USER_ID",  "test_user")
-TEST_USER_PW   = os.environ.get("TEST_USER_PW",  "1234")
-TEST_SHOP_ID   = os.environ.get("TEST_SHOP_ID",  "test_shop")
-TEST_SHOP_PW   = os.environ.get("TEST_SHOP_PW",  "1234")
+TEST_USER_ID   = os.environ.get("TEST_USER_ID",  "")
+TEST_USER_PW   = os.environ.get("TEST_USER_PW",  "")
+TEST_SHOP_ID   = os.environ.get("TEST_SHOP_ID",  "")
+TEST_SHOP_PW   = os.environ.get("TEST_SHOP_PW",  "")
+
+# Secrets 설정 여부 — 미설정 시 로그인 필요 테스트 자동 skip
+SECRETS_CONFIGURED = bool(TEST_USER_ID and TEST_USER_PW and TEST_SHOP_ID and TEST_SHOP_PW)
 
 # ── pytest-playwright 옵션 오버라이드 ─────────────────────────────────────────
 def pytest_configure(config):
