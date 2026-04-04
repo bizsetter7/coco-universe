@@ -6,6 +6,20 @@ import { INDUSTRY_DATA, REGION_DATA, PAY_TYPES } from '../constants';
 import { supabase } from '@/lib/supabase';
 import { updatePoints } from '@/lib/points';
 
+/** Supabase 세션 토큰을 가져와 Authorization 헤더 반환 */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+            };
+        }
+    } catch { /* ignore */ }
+    return { 'Content-Type': 'application/json' };
+}
+
 export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setView: (v: any) => void, onOpenMenu?: () => void, authUser: any, editData?: any }) => {
     const brand = useBrand();
     const router = useRouter();
@@ -87,10 +101,11 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
             const isGuestOrMock = userId === 'guest' || (editData?.id && String(editData.id).startsWith('mock_'));
 
             if (!isGuestOrMock) {
-                // 서버 API 통해 저장 (RLS 우회)
+                // 서버 API 통해 저장 (RLS 우회) — Bearer 토큰 포함
+                const authHeaders = await getAuthHeaders();
                 const res = await fetch('/api/resumes/save', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authHeaders,
                     body: JSON.stringify({
                         action: editData?.id ? 'update' : 'insert',
                         resumeData,

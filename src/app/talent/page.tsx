@@ -30,8 +30,8 @@ export default function TalentPage() {
     const { isLoggedIn, user, userType } = useAuth();
     const [accessDeniedModal, setAccessDeniedModal] = React.useState(false);
 
-    // [New] Real DB Data + Mock Data State
-    const [talents, setTalents] = React.useState<any[]>(MOCK_TALENTS);
+    // [Fix] 초기 상태를 빈 배열로 — 실제 DB 데이터 fetch 전에 목업만 먼저 보이던 현상 해결
+    const [talents, setTalents] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
@@ -74,6 +74,8 @@ export default function TalentPage() {
 
             } catch (err: any) {
                 console.error("Talent list fetch error:", err.message);
+                // fetch 실패 시 목업만이라도 표시
+                setTalents(MOCK_TALENTS);
             } finally {
                 setLoading(false);
             }
