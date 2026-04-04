@@ -103,16 +103,18 @@ export function middleware(request: NextRequest) {
     if (pathname.startsWith('/admin')) {
         // 개발 환경에서는 mock 로그인(localStorage) 허용 — 클라이언트에서 역할 재검증
         if (process.env.NODE_ENV !== 'development') {
-            const sessionCookie =
-                request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
-                request.cookies.get('sb-access-token') ||
-                request.cookies.get('supabase-auth-token');
+            // [Fix] 특정 프로젝트 ID 종속성 제거 — 모든 sb-*-auth-token 또는 supabase-auth-token 감지
+            const allCookies = request.cookies.getAll();
+            const hasAuthCookie = allCookies.some(cookie => 
+                cookie.name.includes('auth-token') || 
+                cookie.name.includes('access-token') || 
+                cookie.name === 'supabase-auth-token'
+            );
 
-            if (!sessionCookie) {
+            if (!hasAuthCookie) {
                 return NextResponse.redirect(new URL('/?page=login', request.url));
             }
         }
-        // 세션 있음(또는 개발 환경) → 통과 (클라이언트에서 역할 재검증)
     }
 
     // [항목 11] 주요 보호 페이지 — 로그인 세션 필수
@@ -120,12 +122,14 @@ export function middleware(request: NextRequest) {
     const PROTECTED_AUTH_PATHS = ['/my-shop/dashboard'];
     const needsAuth = PROTECTED_AUTH_PATHS.some(p => pathname.startsWith(p));
     if (needsAuth) {
-        const sessionCookie =
-            request.cookies.get('sb-ronqwailyistjuyolmyh-auth-token') ||
-            request.cookies.get('sb-access-token') ||
-            request.cookies.get('supabase-auth-token');
+        const allCookies = request.cookies.getAll();
+        const hasAuthCookie = allCookies.some(cookie => 
+            cookie.name.includes('auth-token') || 
+            cookie.name.includes('access-token') || 
+            cookie.name === 'supabase-auth-token'
+        );
 
-        if (!sessionCookie) {
+        if (!hasAuthCookie) {
             return NextResponse.redirect(new URL('/?page=login', request.url));
         }
     }

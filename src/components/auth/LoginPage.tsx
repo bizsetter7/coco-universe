@@ -37,6 +37,9 @@ export const LoginPage = () => {
                 // [Fix] 전역 supabase 인스턴스를 사용하여 세션 무결성 보장
                 const { supabase: sharedSupabase } = await import('@/lib/supabase');
                 
+                // [Fix] 세션이 안정화될 때까지 아주 잠시 대기 (Race Condition 방지)
+                await sharedSupabase.auth.getSession();
+                
                 const { data: profile } = await sharedSupabase
                     .from('profiles')
                     .select('role')
@@ -44,13 +47,19 @@ export const LoginPage = () => {
                     .single();
                 
                 if (profile?.role === 'admin' || profile?.role === 'master') {
-                    window.location.href = '/admin';
+                    // [Fix] 쿠키가 브라우저에 구워질 시간을 벌기 위해 200ms 지연 후 이동
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 200);
                     return;
                 }
             } catch (err) {
                 console.error('Role check failed after login', err);
             }
-            window.location.href = '/';
+            // 일반 회원은 홈으로
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 200);
         } catch (err: any) {
             console.error('Login error:', err);
             const msg: string = err.message || '';
