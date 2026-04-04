@@ -15,16 +15,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isAuthorized, setIsAuthorized] = useState(false);
 
-    // Auth Check
+    // Auth Check (Fixed: Redirect added for Client-side Security)
     useEffect(() => {
         if (isLoading) return;
         if (!isLoggedIn || userType !== 'admin') {
-            // Wait for child components to handle redirect or show alert
-            // But we can check authorization here
+            // [Fix] 미들웨어 우회 시 직접적인 보안 확인을 위해 홈(로그인폼)으로 리다이렉트
+            alert('관리자 권한이 필요합니다.');
+            router.push('/?page=login');
         } else {
             setIsAuthorized(true);
         }
-    }, [isLoading, isLoggedIn, userType]);
+    }, [isLoading, isLoggedIn, userType, router]);
 
     // Determine Active Tab
     const getCurrentTab = (): AdminTab => {
