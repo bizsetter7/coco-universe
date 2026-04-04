@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
@@ -143,8 +143,9 @@ function AdminContent() {
             setPendingApplications(appCount || 0);
 
             // 4. Fetch Messages
+            // [Fix] 공백이 포함된 관리자 앨리어스(시스템 관리자 등)를 위해 따옴표(\") 처리 추가 (Supabase .or() 문법 준수)
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
-            const adminQuery = ADMIN_ALIASES.map(a => `sender_name.eq.${a},receiver_name.eq.${a}`).join(',');
+            const adminQuery = ADMIN_ALIASES.map(a => `sender_name.eq.\"${a}\",receiver_name.eq.\"${a}\"`).join(',');
             const { data: msgData } = await supabase
                 .from('messages')
                 .select('*')

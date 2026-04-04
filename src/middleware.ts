@@ -89,12 +89,14 @@ export function middleware(request: NextRequest) {
 
     // 0. non-www → www 301 리디렉션 (SEO 정규화) — Vercel 프리뷰 도메인은 제외
     if (process.env.NODE_ENV === 'production') {
-        const host = request.headers.get('host') || '';
-        // .vercel.app으로 끝나는 프리뷰/시스템 도메인과 localhost는 리다이렉트 제외
-        const isVercelDomain = host.endsWith('.vercel.app');
-        if (host && !host.startsWith('www.') && !host.startsWith('localhost') && !isVercelDomain) {
+        // [Fix] 도메인 및 쿠키 정규화 — www.cocoalba.kr 강제 (세션 공유 품질 확보)
+        const host = request.headers.get('host');
+        const isVercelDomain = host?.endsWith('.vercel.app');
+        const isMainDomain = host === 'cocoalba.kr';
+
+        if (isMainDomain || (host && !host.startsWith('www.') && !host.startsWith('localhost') && !isVercelDomain)) {
             const url = request.nextUrl.clone();
-            url.host = `www.${host}`;
+            url.host = `www.${isMainDomain ? 'cocoalba.kr' : host}`;
             return NextResponse.redirect(url, { status: 301 });
         }
     }

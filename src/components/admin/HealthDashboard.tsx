@@ -309,12 +309,12 @@ export const HealthDashboard = () => {
         } catch { /* ignore */ }
     };
 
-    // ── 헬스 요약 계산 ───────────────────────────────────────────────────────
-    const errorCount = status ? Object.values(status.components).filter(c => c.status === 'error').length : 0;
-    const warningCount = status ? Object.values(status.components).filter(c => c.status === 'warning').length : 0;
-    const totalChecks = status ? Object.keys(status.components).length : 0;
+    // ── 헬스 요약 계산 (Fixed: Optional Chaining 추가하여 Crash 방지)
+    const errorCount = status?.components ? Object.values(status.components).filter(c => c?.status === 'error').length : 0;
+    const warningCount = status?.components ? Object.values(status.components).filter(c => c?.status === 'warning').length : 0;
+    const totalChecks = status?.components ? Object.keys(status.components).length : 0;
     const healthyCount = totalChecks - errorCount - warningCount;
-    const unresolvedErrors = errorLogs.filter(e => !e.resolved).length;
+    const unresolvedErrors = (errorLogs || []).filter(e => !e?.resolved).length;
 
     // E2E 실패 집계 (헤더 경고 카운트에 포함)
     const e2eFailCount = e2eResult?.summary?.failed ?? 0;
