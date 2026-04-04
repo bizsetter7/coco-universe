@@ -261,7 +261,13 @@ function AdminContent() {
 
         const runHealthCheck = async () => {
             try {
-                const res = await fetch('/api/admin/health', { method: 'GET' });
+                // 실 세션 토큰 포함 (mock 세션이면 null → 쿠키로 통과)
+                const { data: sessionData } = await supabase.auth.getSession();
+                const token = sessionData.session?.access_token;
+                const headers: HeadersInit = token
+                    ? { Authorization: `Bearer ${token}` }
+                    : {};
+                const res = await fetch('/api/admin/health', { method: 'GET', headers });
                 const data = await res.json();
                 setHealthIssueCount(data.issueCount || 0);
             } catch {

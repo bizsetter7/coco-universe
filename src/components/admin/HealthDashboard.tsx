@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
     Activity, CheckCircle2, AlertCircle, XCircle, RefreshCw,
     Terminal, Database, Lock, Cpu, Server, FileText, Clock,
@@ -145,11 +146,28 @@ export const HealthDashboard = () => {
     const [perfStats, setPerfStats] = useState<PerfStat[]>([]);
     const [perfLoading, setPerfLoading] = useState(false);
 
+    // 세션 토큰 캐시 (매 요청마다 getSession 호출 최소화)
+    const tokenRef = useRef<string | null>(null);
+
+    /** Supabase 세션 토큰 반환 — mock 세션이면 null (쿠키로 통과) */
+    const getAuthHeaders = useCallback(async (): Promise<HeadersInit> => {
+        try {
+            if (!tokenRef.current) {
+                const { data } = await supabase.auth.getSession();
+                tokenRef.current = data.session?.access_token || null;
+            }
+        } catch { /* ignore */ }
+        return tokenRef.current
+            ? { 'Content-Type': 'application/json', Authorization: `Bearer ${tokenRef.current}` }
+            : { 'Content-Type': 'application/json' };
+    }, []);
+
     // ── 헬스체크 ────────────────────────────────────────────────────────────
     const fetchHealth = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/health', { method: 'POST' });
+            const headers = await getAuthHeaders();
+            const res = await fetch('/api/admin/health', { method: 'POST', headers });
             const data = await res.json();
             setStatus(data);
             setLastChecked(new Date());
@@ -158,7 +176,7 @@ export const HealthDashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [getAuthHeaders]);
 
     // 5분마다 자동 갱신
     useEffect(() => {
@@ -175,11 +193,12 @@ export const HealthDashboard = () => {
     const fetchErrors = useCallback(async () => {
         setErrorLoading(true);
         try {
-            const res = await fetch('/api/monitor/errors');
+            const headers = await getAuthHeaders();
+            const res = await fetch('/api/monitor/errors', { headers });
             const data = await res.json();
             setErrorLogs(data.logs || []);
         } catch { setErrorLogs([]); } finally { setErrorLoading(false); }
-    }, []);
+    }, [getAuthHeaders]);
 
     // ── 성능 통계 조회 ───────────────────────────────────────────────────────
     const fetchPerf = useCallback(async () => {
@@ -199,7 +218,8 @@ export const HealthDashboard = () => {
     // ── 에러 해결 처리 ───────────────────────────────────────────────────────
     const resolveError = async (id: string) => {
         try {
-            await fetch('/api/monitor/errors', { method: 'PATCH', body: JSON.stringify({ id }), headers: { 'Content-Type': 'application/json' } });
+            const headers = await getAuthHeaders();
+            await fetch('/api/monitor/errors', { method: 'PATCH', body: JSON.stringify({ id }), headers });
             setErrorLogs(prev => prev.map(e => e.id === id ? { ...e, resolved: true } : e));
         } catch { /* ignore */ }
     };

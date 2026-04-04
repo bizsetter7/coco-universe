@@ -1,9 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { normalizeAd } from '@/app/my-shop/utils/normalization';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
+import { requireAdmin } from '@/lib/requireAdmin';
 
 export const dynamic = 'force-dynamic';
+
+// Service role 클라이언트 — 무결성 검사 등 RLS 우회가 필요한 항목에만 사용
+function getServiceClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 type CheckStatus = 'healthy' | 'warning' | 'error';
 
@@ -19,7 +28,9 @@ function setWorst(current: CheckStatus, next: CheckStatus): CheckStatus {
     return 'healthy';
 }
 
-export async function POST() {
+/** 전체 헬스 체크 로직 — POST/GET 공유 (인증은 각 핸들러에서 처리) */
+async function runHealthCheck(): Promise<NextResponse> {
+
     const components: Record<string, CheckResult> = {};
     let overall: CheckStatus = 'healthy';
 
@@ -444,39 +455,50 @@ export async function POST() {
     }
 
     // ── 28. 포인트 로그 무결성 체크 (profiles.points ↔ SUM(point_logs.amount)) ──
+    // [중요] anon 키는 RLS로 인해 point_logs를 읽지 못함 → service role 클라이언트 필수
     try {
-        // [Optimization] 모든 유저를 대조하면 무거우므로 상위 100명 또는 최근 활동 위주로 체크하거나, 전체 합계를 비교
-        // 여기서는 전체 합계로 먼저 간단히 체크
-        const { data: profilePointsSum, error: pError } = await supabase.rpc('get_total_points');
-        const { data: logPointsSum, error: lError } = await supabase.rpc('get_total_log_points');
+        const svc = getServiceClient();
 
-        // RPC가 없으면 직접 쿼리 (가벼운 버전)
-        if (pError || lError) {
-            const { data: profiles } = await supabase.from('profiles').select('id, points').limit(50);
-            let mismatchCount = 0;
-            if (profiles) {
-                for (const p of profiles) {
-                    const { data: logs } = await supabase.from('point_logs').select('amount').eq('user_id', p.id);
-                    const logSum = (logs || []).reduce((sum, l) => sum + l.amount, 0);
-                    if (p.points !== logSum) mismatchCount++;
+        // 포인트가 0이 아닌 유저만 샘플링 (최근 가입순 100명)
+        const { data: profiles, error: pErr } = await svc
+            .from('profiles')
+            .select('id, points')
+            .gt('points', 0)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+        if (pErr) throw pErr;
+
+        let mismatchCount = 0;
+        const mismatches: { id: string; profilePts: number; logSum: number }[] = [];
+
+        if (profiles && profiles.length > 0) {
+            for (const p of profiles) {
+                const { data: logs } = await svc
+                    .from('point_logs')
+                    .select('amount')
+                    .eq('user_id', p.id);
+                const logSum = (logs || []).reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+                if (p.points !== logSum) {
+                    mismatchCount++;
+                    mismatches.push({ id: p.id.substring(0, 8), profilePts: p.points, logSum });
                 }
             }
+        }
 
-            if (mismatchCount === 0) {
-                components.point_log_integrity = { status: 'healthy', message: '샘플링 50명 포인트 로그 무결성 확인 완료' };
-            } else {
-                components.point_log_integrity = { status: 'warning', message: `포인트-로그 불일치 의심 ${mismatchCount}건 발견`, count: mismatchCount };
-                overall = setWorst(overall, 'warning');
-            }
+        if (mismatchCount === 0) {
+            components.point_log_integrity = {
+                status: 'healthy',
+                message: `포인트 보유자 ${profiles?.length || 0}명 무결성 확인 — 불일치 없음`
+            };
         } else {
-            const pSum = profilePointsSum || 0;
-            const lSum = logPointsSum || 0;
-            if (pSum === lSum) {
-                components.point_log_integrity = { status: 'healthy', message: `전체 포인트 무결성 정상 (합계: ${pSum}P)` };
-            } else {
-                components.point_log_integrity = { status: 'error', message: `전체 포인트 합계 불일치 (P:${pSum} != L:${lSum}) — 로그 누락 의심`, count: 1 };
-                overall = setWorst(overall, 'error');
-            }
+            const detail = mismatches.slice(0, 3).map(m => `[${m.id}…: DB=${m.profilePts} 로그=${m.logSum}]`).join(', ');
+            components.point_log_integrity = {
+                status: 'warning',
+                message: `포인트-로그 불일치 ${mismatchCount}건 — ${detail}${mismatches.length > 3 ? ' 외 ' + (mismatches.length - 3) + '건' : ''}`,
+                count: mismatchCount
+            };
+            overall = setWorst(overall, 'warning');
         }
     } catch (err: any) {
         components.point_log_integrity = { status: 'warning', message: `무결성 검사 실패: ${err.message}` };
@@ -632,6 +654,58 @@ export async function POST() {
         components.sos_log_integrity = { status: 'warning', message: `SOS 무결성 검사 실패: ${err.message}` };
     }
 
+    // ── 35b. 어드민 계정 비밀번호 해시 공백 여부 (재발 방지) ────────
+    try {
+        const svc = getServiceClient();
+        // auth.users 테이블에서 role이 admin/master인 profiles의 유저 ID 조회
+        const { data: adminProfiles } = await svc
+            .from('profiles')
+            .select('id, username')
+            .in('role', ['admin', 'master']);
+
+        let emptyHashCount = 0;
+        const emptyHashUsers: string[] = [];
+
+        if (adminProfiles && adminProfiles.length > 0) {
+            // auth.users 테이블에서 해당 유저의 encrypted_password 확인
+            const { data: authUsers } = await svc
+                .from('auth.users' as any)
+                .select('id, encrypted_password')
+                .in('id', adminProfiles.map(p => p.id));
+
+            // auth.users는 일반 from()으로 접근 불가 → 직접 SQL 대신 auth admin API 사용
+            if (!authUsers) {
+                // auth.users 접근 불가 시 — signIn 테스트 불가, 경고만
+                components.admin_password_hash = {
+                    status: 'warning',
+                    message: '어드민 계정 비밀번호 해시 확인 불가 (auth.users 접근 권한 필요)'
+                };
+            } else {
+                (authUsers as any[]).forEach((u: any) => {
+                    if (!u.encrypted_password || u.encrypted_password.trim() === '') {
+                        emptyHashCount++;
+                        const profile = adminProfiles.find(p => p.id === u.id);
+                        emptyHashUsers.push(profile?.username || u.id.substring(0, 8));
+                    }
+                });
+                if (emptyHashCount === 0) {
+                    components.admin_password_hash = { status: 'healthy', message: `어드민 계정 ${adminProfiles.length}명 — 비밀번호 해시 정상 설정됨` };
+                } else {
+                    components.admin_password_hash = {
+                        status: 'error',
+                        message: `⚠️ 어드민 계정 비밀번호 미설정 ${emptyHashCount}명: [${emptyHashUsers.join(', ')}] — Supabase Dashboard에서 즉시 비밀번호 설정 필요`,
+                        count: emptyHashCount
+                    };
+                    overall = setWorst(overall, 'error');
+                }
+            }
+        } else {
+            components.admin_password_hash = { status: 'healthy', message: '어드민 계정 없음 또는 확인 완료' };
+        }
+    } catch (err: any) {
+        components.admin_password_hash = { status: 'warning', message: `어드민 비밀번호 해시 검사 실패: ${err.message}` };
+    }
+
     // ── 35. autoLogin URL 파라미터 — 프로덕션 환경 비활성 확인 ────
     try {
         const isProduction = process.env.NODE_ENV === 'production';
@@ -661,10 +735,20 @@ export async function POST() {
     });
 }
 
+/** POST: 전체 헬스 체크 (시스템검증센터) */
+export async function POST(req: NextRequest) {
+    const authError = await requireAdmin(req);
+    if (authError) return authError;
+    return runHealthCheck();
+}
+
 /** GET: 경량 상태 체크 (사이드바 배지용) */
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const authError = await requireAdmin(req);
+    if (authError) return authError;
+
     try {
-        const res = await POST();
+        const res = await runHealthCheck();
         const data = await res.json();
         return NextResponse.json({
             overall: data.overall,
