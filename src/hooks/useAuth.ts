@@ -60,25 +60,30 @@ export function useAuth() {
         if (session?.user) {
             try {
                 const { user: authUser } = session;
+                
+                // [Fix] 하드코딩된 마스터 어드민 이메일 체크 (DB 조회 실패 대비 비상구)
+                const MASTER_EMAILS = ['bizsetter7@gmail.com', 'admin@cocoalba.kr'];
+                const isMasterEmail = authUser.email && MASTER_EMAILS.includes(authUser.email);
+
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', authUser.id)
                     .single();
 
-                if (profile) {
-                    const userType = profile.role === 'admin' ? 'admin' :
-                        (profile.role === 'corporate' ? 'corporate' : 'individual');
+                if (profile || isMasterEmail) {
+                    const userType = (isMasterEmail || profile?.role === 'admin') ? 'admin' :
+                        (profile?.role === 'corporate' ? 'corporate' : 'individual');
 
                     let newUser: UserSession = {
                         type: userType as UserSession['type'],
                         id: authUser.id,
-                        name: profile.full_name || authUser.email?.split('@')[0] || '회원',
-                        nickname: profile.nickname || profile.full_name || '닉네임',
-                        credit: profile.credit_balance || 0,
-                        points: profile.points || 0, // [Fix] 자산 독립 분리 (v1.0 약속 이행)
-                        jump_balance: profile.jump_balance || 0, // [New] 유료 점프 횟수 연동
-                        isVerifiedPartnerVerified: profile.role === 'corporate' ? !!profile.business_verified : !!profile.is_adult_verified, // [Fix] 업체회원은 사업자인증, 개인은 본인인증 반영
+                        name: profile?.full_name || authUser.email?.split('@')[0] || '회원',
+                        nickname: profile?.nickname || profile?.full_name || '닉네임',
+                        credit: profile?.credit_balance || 0,
+                        points: profile?.points || 0, // [Fix] 자산 독립 분리 (v1.0 약속 이행)
+                        jump_balance: profile?.jump_balance || 0, // [New] 유료 점프 횟수 연동
+                        isVerifiedPartnerVerified: profile ? (profile.role === 'corporate' ? !!profile.business_verified : !!profile.is_adult_verified) : false, // [Fix] 업체회원은 사업자인증, 개인은 본인인증 반영
                         email: authUser.email
                     };
 

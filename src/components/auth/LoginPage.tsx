@@ -42,15 +42,19 @@ export const LoginPage = () => {
                 const { supabase: sharedSupabase } = await import('@/lib/supabase');
                 
                 // [Fix] 세션이 안정화될 때까지 아주 잠시 대기 (Race Condition 방지)
-                await sharedSupabase.auth.getSession();
+                const { data: { session: currentSession } } = await sharedSupabase.auth.getSession();
                 
+                // [Fix] 하드코딩된 마스터 어드민 이메일 체크 (비상구)
+                const MASTER_EMAILS = ['bizsetter7@gmail.com', 'admin@cocoalba.kr'];
+                const isMasterEmail = currentSession?.user?.email && MASTER_EMAILS.includes(currentSession.user.email);
+
                 const { data: profile } = await sharedSupabase
                     .from('profiles')
                     .select('role')
                     .eq('id', authResult?.user?.id)
                     .single();
                 
-                if (profile?.role === 'admin' || profile?.role === 'master') {
+                if (profile?.role === 'admin' || profile?.role === 'master' || isMasterEmail) {
                     // [Fix] 쿠키가 브라우저에 구워질 시간을 벌기 위해 200ms 지연 후 이동
                     setTimeout(() => {
                         window.location.href = '/admin';
