@@ -87,14 +87,8 @@ export function middleware(request: NextRequest) {
     const ua = (request.headers.get('user-agent') || '').toLowerCase();
     const ip = getClientIp(request);
 
-    // 0. 도메인 정규화 (www → non-www 301 리디렉션)
-    // [Fix] 현대적 트렌드에 맞춰 'www.' 없이 접속하도록 통일하여 쿠키 도메인 파편화(로그인 루프)를 원천 해결합니다.
-    const host = request.headers.get('host') || '';
-    if (host === 'www.cocoalba.kr') {
-        const url = request.nextUrl.clone();
-        url.host = 'cocoalba.kr';
-        return NextResponse.redirect(url, { status: 301 });
-    }
+    // 0. 도메인 정규화 중단 (Vercel 도메인 설정과 충돌 방지)
+    // 인프라 설정을 따르도록 리다이렉트 로직을 제거합니다.
 
     // 1. 관리자 페이지 — 보안 이관 (미들웨어 간섭 제거)
     // [Fix] Vercel 배포 환경에서 쿠키 감지 실패로 인한 무한 루프 방지를 위해 미들웨어 강제 리다이렉트 비활성화
