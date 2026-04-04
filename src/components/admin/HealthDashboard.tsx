@@ -215,6 +215,24 @@ export const HealthDashboard = () => {
         if (activeTab === 'performance') fetchPerf();
     }, [activeTab, fetchErrors, fetchPerf]);
 
+    // ── 포인트 무결성 수복 ────────────────────────────────────────────────────
+    const fixPointIntegrity = async () => {
+        if (!confirm('포인트-로그 불일치를 자동 수복하시겠습니까?\n(point_logs에 보정 항목이 INSERT됩니다)')) return;
+        try {
+            const headers = await getAuthHeaders();
+            const res = await fetch('/api/admin/fix-integrity', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ mode: 'fix' }),
+            });
+            const data = await res.json();
+            alert(data.message || (data.success ? '수복 완료' : '수복 실패'));
+            if (data.success) fetchHealth(); // 헬스체크 재실행
+        } catch (err) {
+            alert('수복 요청 실패');
+        }
+    };
+
     // ── 에러 해결 처리 ───────────────────────────────────────────────────────
     const resolveError = async (id: string) => {
         try {
@@ -343,6 +361,13 @@ export const HealthDashboard = () => {
                                                     </div>
                                                 </div>
                                                 <p className="text-[10px] font-bold text-slate-500 leading-relaxed">{item.message}</p>
+                                                {/* 포인트 무결성 불일치 시 수복 버튼 */}
+                                                {item.id === 'point_log_integrity' && item.status === 'warning' && (
+                                                    <button onClick={fixPointIntegrity}
+                                                        className="mt-2 mr-2 px-2.5 py-1 text-[9px] font-black text-amber-700 bg-amber-100 hover:bg-amber-200 rounded-lg transition-colors border border-amber-200">
+                                                        🔧 자동 수복
+                                                    </button>
+                                                )}
                                                 <button onClick={() => setShowLogId(showLogId === item.id ? null : item.id)}
                                                     className="mt-2 flex items-center gap-1 text-[9px] font-black text-slate-300 hover:text-slate-500 transition-colors uppercase tracking-widest">
                                                     <Terminal size={10} /> {showLogId === item.id ? 'CLOSE LOG' : 'DIAG LOG'}
