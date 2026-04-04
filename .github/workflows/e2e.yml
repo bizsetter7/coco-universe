@@ -1,8 +1,8 @@
 name: E2E Playwright Tests
 
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
     inputs:
       base_url:

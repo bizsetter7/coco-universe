@@ -230,9 +230,11 @@ export const HealthDashboard = () => {
     }, [getAuthHeaders]);
 
     // 5분마다 자동 갱신
+    // [수정] 무한 루프 방지: 첫 마운트 시에만 1회 호출
     useEffect(() => {
         fetchHealth();
-    }, [fetchHealth]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); 
 
     useEffect(() => {
         if (!autoRefresh) return;

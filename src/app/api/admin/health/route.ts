@@ -7,6 +7,10 @@ import { requireAdmin } from '@/lib/requireAdmin';
 
 export const dynamic = 'force-dynamic'; // v2.1.0 — service role integrity, requireAdmin
 
+// [성능 최적화] 동일 페이지 내 중복 호출 방지를 위한 15초 캐시
+let cachedHealth: { data: any; timestamp: number } | null = null;
+const CACHE_TTL = 15000; // 15초
+
 // Service role 클라이언트 — 무결성 검사 등 RLS 우회가 필요한 항목에만 사용
 function getServiceClient() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -29,7 +33,11 @@ function setWorst(current: CheckStatus, next: CheckStatus): CheckStatus {
 }
 
 /** 전체 헬스 체크 로직 — POST/GET 공유 (인증은 각 핸들러에서 처리) */
-async function runHealthCheck(): Promise<NextResponse> {
+async function runHealthCheck(): Promise<any> {
+    const now = Date.now();
+    if (cachedHealth && (now - cachedHealth.timestamp < CACHE_TTL)) {
+        return cachedHealth.data;
+    }
 
     const components: Record<string, CheckResult> = {};
     let overall: CheckStatus = 'healthy';
@@ -79,7 +87,8 @@ async function runHealthCheck(): Promise<NextResponse> {
         const { data: shops, error } = await supabase
             .from('shops')
             .select('id, title, name')
-            .not('status', 'eq', 'CLOSED');
+            .not('status', 'eq', 'CLOSED')
+            .limit(1000);
         if (error) throw error;
 
         const violations = (shops || []).filter(s => {
@@ -107,7 +116,7 @@ async function runHealthCheck(): Promise<NextResponse> {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
             .from('shops')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('status', 'PENDING_REVIEW')
             .lt('created_at', since);
         if (error) throw error;
@@ -131,7 +140,7 @@ async function runHealthCheck(): Promise<NextResponse> {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
             .from('inquiries')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .neq('status', 'completed')
             .lt('created_at', since);
         if (error) throw error;
@@ -155,7 +164,7 @@ async function runHealthCheck(): Promise<NextResponse> {
         const since = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
             .from('payments')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('status', 'pending')
             .lt('created_at', since);
         if (error) throw error;
@@ -283,7 +292,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 17. 포인트 음수 회원 ─────────────────────────────────────
     try {
         const { count, error } = await supabase
-            .from('profiles').select('*', { count: 'exact', head: true }).lt('points', 0);
+            .from('profiles').select('id', { count: 'exact', head: true }).lt('points', 0);
         if (error) throw error;
         if (!count || count === 0) {
             components.negative_points = { status: 'healthy', message: '포인트 음수 회원 없음' };
@@ -298,7 +307,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 18. 고아 공고 (user_id 없음) ────────────────────────────
     try {
         const { count, error } = await supabase
-            .from('shops').select('*', { count: 'exact', head: true }).is('user_id', null);
+            .from('shops').select('id', { count: 'exact', head: true }).is('user_id', null);
         if (error) throw error;
         if (!count || count === 0) {
             components.orphaned_shops = { status: 'healthy', message: '고아 공고(user_id 없음) 없음' };
@@ -339,7 +348,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     try {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
-            .from('profiles').select('*', { count: 'exact', head: true })
+            .from('profiles').select('id', { count: 'exact', head: true })
             .gte('created_at', since)
             .eq('role', 'individual') // 개인 회원만 포인트 적립 대상
             .eq('points', 0);
@@ -362,7 +371,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 21. 어드민 권한 동기화 (role=admin 인데 is_admin=false) ──
     try {
         const { count, error } = await supabase
-            .from('profiles').select('*', { count: 'exact', head: true })
+            .from('profiles').select('id', { count: 'exact', head: true })
             .eq('role', 'admin').eq('is_admin', false);
         if (error) throw error;
         if (!count || count === 0) {
@@ -378,7 +387,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 22. 무승인 활성 공고 ─────────────────────────────────────
     try {
         const { count, error } = await supabase
-            .from('shops').select('*', { count: 'exact', head: true })
+            .from('shops').select('id', { count: 'exact', head: true })
             .eq('status', 'active').is('approved_at', null);
         if (error) throw error;
         if (!count || count === 0) {
@@ -423,7 +432,7 @@ async function runHealthCheck(): Promise<NextResponse> {
         const soonStr = sevenDaysLater.toISOString().split('T')[0];
         const todayStr = new Date().toISOString().split('T')[0];
         const { count, error } = await supabase
-            .from('shops').select('*', { count: 'exact', head: true })
+            .from('shops').select('id', { count: 'exact', head: true })
             .eq('status', 'active').lte('deadline', soonStr).gte('deadline', todayStr);
         if (error) throw error;
         if (!count || count === 0) {
@@ -449,7 +458,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 27. 읽지 않은 알림 누적 (100건 초과 = 운영 경고) ────────
     try {
         const { count, error } = await supabase
-            .from('notifications').select('*', { count: 'exact', head: true }).eq('read', false);
+            .from('notifications').select('id', { count: 'exact', head: true }).eq('read', false);
         if (error) throw error;
         if (!count || count < 100) {
             components.unread_notifications = { status: 'healthy', message: `미읽 알림 ${count ?? 0}건 — 정상 범위` };
@@ -480,12 +489,19 @@ async function runHealthCheck(): Promise<NextResponse> {
         const mismatches: { id: string; profilePts: number; logSum: number }[] = [];
 
         if (profiles && profiles.length > 0) {
+            const userIds = profiles.map(p => p.id);
+            const { data: allLogs } = await svc
+                .from('point_logs')
+                .select('user_id, amount')
+                .in('user_id', userIds);
+
+            const logSums: Record<string, number> = {};
+            (allLogs || []).forEach(l => {
+                logSums[l.user_id] = (logSums[l.user_id] || 0) + (l.amount || 0);
+            });
+
             for (const p of profiles) {
-                const { data: logs } = await svc
-                    .from('point_logs')
-                    .select('amount')
-                    .eq('user_id', p.id);
-                const logSum = (logs || []).reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+                const logSum = logSums[p.id] || 0;
                 if (p.points !== logSum) {
                     mismatchCount++;
                     mismatches.push({ id: p.id.substring(0, 8), profilePts: p.points, logSum });
@@ -528,7 +544,7 @@ async function runHealthCheck(): Promise<NextResponse> {
     try {
         const { count, error } = await supabase
             .from('profiles')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('role', 'corporate')
             .eq('business_verified', false);
         if (error) throw error;
@@ -731,19 +747,26 @@ async function runHealthCheck(): Promise<NextResponse> {
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 
-    return NextResponse.json({
+    const result = {
         timestamp: new Date().toISOString(),
         overall,
         issueCount,
         components,
-    });
+    };
+
+    // 캐시 저장
+    cachedHealth = { data: result, timestamp: Date.now() };
+
+    return result;
 }
 
 /** POST: 전체 헬스 체크 (시스템검증센터) */
 export async function POST(req: NextRequest) {
     const authError = await requireAdmin(req);
     if (authError) return authError;
-    return runHealthCheck();
+
+    const data = await runHealthCheck();
+    return NextResponse.json(data);
 }
 
 /** GET: 경량 상태 체크 (사이드바 배지용) */
@@ -752,8 +775,7 @@ export async function GET(req: NextRequest) {
     if (authError) return authError;
 
     try {
-        const res = await runHealthCheck();
-        const data = await res.json();
+        const data = await runHealthCheck();
         return NextResponse.json({
             overall: data.overall,
             issueCount: data.issueCount,
