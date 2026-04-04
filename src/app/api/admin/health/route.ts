@@ -203,11 +203,18 @@ async function runHealthCheck(): Promise<NextResponse> {
 
     // ── 11. 포트원 결제 설정 ─────────────────────────────────────
     // storeId/channelKey는 클라이언트 코드에 하드코딩됨 — 서버 시크릿만 확인
+    // NOTE: Vercel 프로덕션에서 경고가 뜨면 다음 3개를 Vercel 대시보드 > Settings > Environment Variables에 추가하세요:
+    //   PORTONE_API_SECRET          (encrypted, production+preview)
+    //   NEXT_PUBLIC_PORTONE_STORE_ID      (plain, all)
+    //   NEXT_PUBLIC_PORTONE_CHANNEL_KEY   (plain, all)
     const portoneSecret = process.env.PORTONE_API_SECRET;
     if (portoneSecret) {
         components.portone = { status: 'healthy', message: '포트원 API 자격증명 설정 완료 (storeId·channelKey 하드코딩)' };
     } else {
-        components.portone = { status: 'warning', message: `포트원 미설정: PORTONE_API_SECRET — 본인인증 서버 검증 불가` };
+        components.portone = {
+            status: 'warning',
+            message: `포트원 미설정: PORTONE_API_SECRET 없음 — 본인인증 서버 검증 불가. Vercel 대시보드 > Settings > Environment Variables에 PORTONE_API_SECRET / NEXT_PUBLIC_PORTONE_STORE_ID / NEXT_PUBLIC_PORTONE_CHANNEL_KEY 3개를 추가하세요.`
+        };
         overall = setWorst(overall, 'warning');
     }
 

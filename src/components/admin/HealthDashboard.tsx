@@ -13,6 +13,31 @@ import {
 // ── 타입 ──────────────────────────────────────────────────────────────────────
 type Severity = 'healthy' | 'warning' | 'error' | 'loading';
 
+// E2E 타입
+type E2ETestStatus = 'pass' | 'fail' | 'warn';
+
+interface E2ETestResult {
+    name: string;
+    label: string;
+    status: E2ETestStatus;
+    message: string;
+    duration_ms: number;
+}
+
+interface E2EGroupResult {
+    tests: E2ETestResult[];
+    passed: number;
+    failed: number;
+    warnings: number;
+}
+
+interface E2EResponse {
+    success: boolean;
+    results: Record<string, E2EGroupResult>;
+    summary: { total: number; passed: number; failed: number; warnings: number };
+    error?: string;
+}
+
 interface ComponentResult {
     status: Severity;
     message: string;
@@ -126,8 +151,16 @@ const CATEGORY_MAP: Record<string, string[]> = {
     '환경변수': ['env_sms', 'env_kakao', 'portone'],
 };
 
+// ── E2E 그룹 한글 레이블 ────────────────────────────────────────────────────────
+const E2E_GROUP_LABELS: Record<string, string> = {
+    api_security: 'API 보안',
+    api_availability: 'API 가용성',
+    db_flows: 'DB 흐름',
+    critical_flows: '핵심 기능',
+};
+
 // ── 메인 컴포넌트 ──────────────────────────────────────────────────────────────
-type TabId = 'health' | 'errors' | 'performance';
+type TabId = 'health' | 'errors' | 'performance' | 'e2e';
 
 export const HealthDashboard = () => {
     const [activeTab, setActiveTab] = useState<TabId>('health');
@@ -145,6 +178,10 @@ export const HealthDashboard = () => {
     // 성능 통계
     const [perfStats, setPerfStats] = useState<PerfStat[]>([]);
     const [perfLoading, setPerfLoading] = useState(false);
+
+    // E2E 자동 테스트
+    const [e2eResult, setE2eResult] = useState<E2EResponse | null>(null);
+    const [e2eLoading, setE2eLoading] = useState(false);
 
     // 세션 토큰 캐시 (매 요청마다 getSession 호출 최소화)
     const tokenRef = useRef<string | null>(null);
@@ -215,6 +252,22 @@ export const HealthDashboard = () => {
         if (activeTab === 'performance') fetchPerf();
     }, [activeTab, fetchErrors, fetchPerf]);
 
+    // ── E2E 자동 테스트 실행 ──────────────────────────────────────────────────
+    const runE2E = useCallback(async () => {
+        setE2eLoading(true);
+        try {
+            const headers = await getAuthHeaders();
+            const res = await fetch('/api/admin/e2e', { method: 'POST', headers });
+            const data: E2EResponse = await res.json();
+            setE2eResult(data);
+        } catch (err) {
+            console.error('E2E fetch error:', err);
+            setE2eResult({ success: false, results: {}, summary: { total: 0, passed: 0, failed: 0, warnings: 0 }, error: '요청 실패' });
+        } finally {
+            setE2eLoading(false);
+        }
+    }, [getAuthHeaders]);
+
     // ── 포인트 무결성 수복 ────────────────────────────────────────────────────
     const fixPointIntegrity = async () => {
         if (!confirm('포인트-로그 불일치를 자동 수복하시겠습니까?\n(point_logs에 보정 항목이 INSERT됩니다)')) return;
@@ -249,11 +302,15 @@ export const HealthDashboard = () => {
     const healthyCount = totalChecks - errorCount - warningCount;
     const unresolvedErrors = errorLogs.filter(e => !e.resolved).length;
 
+    // E2E 실패 집계 (헤더 경고 카운트에 포함)
+    const e2eFailCount = e2eResult?.summary?.failed ?? 0;
+
     // ── 탭 메뉴 ─────────────────────────────────────────────────────────────
     const tabs: { id: TabId; label: string; badge?: number }[] = [
-        { id: 'health', label: '🛡️ DB·규칙 감시', badge: errorCount + warningCount },
+        { id: 'health', label: '🛡️ DB·규칙 감시', badge: errorCount + warningCount + e2eFailCount },
         { id: 'errors', label: '🔴 실시간 에러', badge: unresolvedErrors },
         { id: 'performance', label: '⚡ 성능 지표' },
+        { id: 'e2e', label: '🧪 E2E 자동 테스트', badge: e2eFailCount > 0 ? e2eFailCount : undefined },
     ];
 
     return (
@@ -272,6 +329,7 @@ export const HealthDashboard = () => {
                         </div>
                         <p className="text-xs font-bold text-slate-500">
                             {loading ? '진단 중...' : status?.overall === 'healthy' ? '✅ 모든 시스템 정상' : status?.overall === 'warning' ? `⚠️ 주의 ${warningCount}건` : `🔴 에러 ${errorCount}건`}
+                            {e2eFailCount > 0 && <span className="text-rose-500 ml-2">· 🧪 E2E 실패 {e2eFailCount}건</span>}
                             {lastChecked && !loading && <span className="text-slate-400 ml-2">· {lastChecked.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 기준</span>}
                         </p>
                     </div>
@@ -449,6 +507,165 @@ export const HealthDashboard = () => {
                                         </div>
                                     </div>
                                 ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ── 탭 4: E2E 자동 테스트 ── */}
+            {activeTab === 'e2e' && (
+                <div className="space-y-5">
+                    {/* 실행 버튼 + 요약 */}
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div>
+                            <h3 className="text-sm font-black text-slate-800 mb-0.5">E2E 자동 테스트</h3>
+                            <p className="text-[10px] text-slate-400">API 보안, 가용성, DB 흐름, 핵심 기능 — 회귀 오류를 자동 탐지합니다.</p>
+                        </div>
+                        <button
+                            onClick={runE2E}
+                            disabled={e2eLoading}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-slate-950 text-white rounded-xl font-black text-xs hover:bg-black transition-all active:scale-95 disabled:opacity-50 shadow-lg shrink-0"
+                        >
+                            <Zap size={13} className={e2eLoading ? 'animate-pulse' : ''} />
+                            {e2eLoading ? '테스트 실행 중...' : 'E2E 전체 실행'}
+                        </button>
+                    </div>
+
+                    {/* 결과 요약 뱃지 */}
+                    {e2eResult && (
+                        <div className={`p-4 rounded-2xl border flex flex-wrap gap-3 items-center ${e2eResult.summary.failed > 0 ? 'bg-rose-50/60 border-rose-100' : e2eResult.summary.warnings > 0 ? 'bg-amber-50/60 border-amber-100' : 'bg-emerald-50/60 border-emerald-100'}`}>
+                            <div className="flex items-center gap-2 mr-1">
+                                {e2eResult.summary.failed > 0
+                                    ? <XCircle size={18} className="text-rose-500" />
+                                    : e2eResult.summary.warnings > 0
+                                    ? <AlertCircle size={18} className="text-amber-500" />
+                                    : <CheckCircle2 size={18} className="text-emerald-500" />}
+                                <span className="text-xs font-black text-slate-700">
+                                    {e2eResult.summary.failed > 0
+                                        ? `실패 ${e2eResult.summary.failed}건 발견`
+                                        : e2eResult.summary.warnings > 0
+                                        ? `경고 ${e2eResult.summary.warnings}건`
+                                        : '전체 통과'}
+                                </span>
+                            </div>
+                            <div className="flex gap-2 ml-auto">
+                                <div className="text-center px-3 py-1 bg-slate-100 rounded-xl">
+                                    <div className="text-base font-black text-slate-600">{e2eResult.summary.total}</div>
+                                    <div className="text-[9px] font-black text-slate-400">전체</div>
+                                </div>
+                                <div className="text-center px-3 py-1 bg-emerald-100 rounded-xl">
+                                    <div className="text-base font-black text-emerald-700">{e2eResult.summary.passed}</div>
+                                    <div className="text-[9px] font-black text-emerald-500">통과</div>
+                                </div>
+                                <div className="text-center px-3 py-1 bg-rose-100 rounded-xl">
+                                    <div className="text-base font-black text-rose-700">{e2eResult.summary.failed}</div>
+                                    <div className="text-[9px] font-black text-rose-500">실패</div>
+                                </div>
+                                <div className="text-center px-3 py-1 bg-amber-100 rounded-xl">
+                                    <div className="text-base font-black text-amber-700">{e2eResult.summary.warnings}</div>
+                                    <div className="text-[9px] font-black text-amber-500">경고</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 에러 메시지 */}
+                    {e2eResult && !e2eResult.success && e2eResult.error && (
+                        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700">
+                            오류: {e2eResult.error}
+                        </div>
+                    )}
+
+                    {/* 테스트 결과 테이블 */}
+                    {e2eResult && e2eResult.success && (
+                        <div className="space-y-4">
+                            {Object.entries(e2eResult.results).map(([groupKey, group]) => (
+                                <div key={groupKey}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                            {E2E_GROUP_LABELS[groupKey] || groupKey}
+                                        </h4>
+                                        {group.failed > 0 && <span className="text-[9px] font-black text-rose-500 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded-full">{group.failed} 실패</span>}
+                                        {group.warnings > 0 && <span className="text-[9px] font-black text-amber-500 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">{group.warnings} 경고</span>}
+                                        {group.failed === 0 && group.warnings === 0 && <span className="text-[9px] font-black text-emerald-500 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">전체 통과</span>}
+                                    </div>
+                                    <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                                        <table className="w-full text-xs">
+                                            <thead>
+                                                <tr className="bg-slate-50 border-b border-slate-100">
+                                                    <th className="text-left px-3 py-2 font-black text-slate-500 text-[10px]">테스트명</th>
+                                                    <th className="text-center px-3 py-2 font-black text-slate-500 text-[10px] whitespace-nowrap">상태</th>
+                                                    <th className="text-left px-3 py-2 font-black text-slate-500 text-[10px]">메시지</th>
+                                                    <th className="text-right px-3 py-2 font-black text-slate-500 text-[10px] whitespace-nowrap">소요시간</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {group.tests.map(test => (
+                                                    <tr
+                                                        key={test.name}
+                                                        className={`border-b border-slate-50 last:border-0 transition-colors ${
+                                                            test.status === 'fail' ? 'bg-rose-50/50' :
+                                                            test.status === 'warn' ? 'bg-amber-50/50' :
+                                                            'bg-white hover:bg-slate-50/50'
+                                                        }`}
+                                                    >
+                                                        <td className="px-3 py-2.5 align-top">
+                                                            <div className="font-black text-slate-800 text-[10px] leading-tight">{test.label}</div>
+                                                            <div className="font-mono text-[9px] text-slate-400 mt-0.5">{test.name}</div>
+                                                        </td>
+                                                        <td className="px-3 py-2.5 text-center align-top">
+                                                            {test.status === 'pass' && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-black">
+                                                                    <CheckCircle2 size={9} /> PASS
+                                                                </span>
+                                                            )}
+                                                            {test.status === 'fail' && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[9px] font-black">
+                                                                    <XCircle size={9} /> FAIL
+                                                                </span>
+                                                            )}
+                                                            {test.status === 'warn' && (
+                                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-black">
+                                                                    <AlertCircle size={9} /> WARN
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-3 py-2.5 align-top">
+                                                            <span className={`text-[10px] font-bold leading-snug ${
+                                                                test.status === 'fail' ? 'text-rose-700' :
+                                                                test.status === 'warn' ? 'text-amber-700' :
+                                                                'text-slate-500'
+                                                            }`}>{test.message}</span>
+                                                        </td>
+                                                        <td className="px-3 py-2.5 text-right align-top">
+                                                            <span className="text-[10px] font-mono text-slate-400">{test.duration_ms}ms</span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* 미실행 상태 */}
+                    {!e2eResult && !e2eLoading && (
+                        <div className="text-center py-16">
+                            <Zap size={40} className="text-slate-200 mx-auto mb-3" />
+                            <p className="font-black text-slate-400 text-sm">아직 실행 전입니다</p>
+                            <p className="text-xs text-slate-400 mt-1">위 버튼을 눌러 E2E 전체 테스트를 실행하세요.</p>
+                        </div>
+                    )}
+
+                    {/* 로딩 스켈레톤 */}
+                    {e2eLoading && (
+                        <div className="space-y-3">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="h-12 bg-slate-50 border border-slate-100 rounded-xl animate-pulse" />
+                            ))}
+                            <p className="text-center text-[10px] text-slate-400 font-bold animate-pulse">API 및 DB 테스트 실행 중... (최대 30초)</p>
                         </div>
                     )}
                 </div>
