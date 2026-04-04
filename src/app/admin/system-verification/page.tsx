@@ -27,7 +27,7 @@ export default function SystemVerificationPage() {
 
     useEffect(() => { fetchShops(); }, []);
 
-    const checkTitleIssue = (title: string, name: string) => (title || name).length > 26;
+    const checkTitleIssue = (title: string | null | undefined, name: string | null | undefined) => (title || name || '').length > 26;
     const filteredShops = filter === 'issue'
         ? shops.filter(s => checkTitleIssue(s.title || '', s.name))
         : shops;

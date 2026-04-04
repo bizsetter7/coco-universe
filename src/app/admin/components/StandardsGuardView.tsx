@@ -34,7 +34,8 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
             }
 
             // [Check 2] 광고 등급 약속 준수 (T1~T7)
-            if (tier && !AD_TIER_STANDARDS.find(s => s.id === tier || s.altId === tier)) {
+            const tierStr = String(tier || '').toLowerCase();
+            if (tierStr && !AD_TIER_STANDARDS.find(s => s.id === tierStr || s.altId === tierStr)) {
                 violations.push({ id: p.id, type: 'SYSTEM_MAPPING', message: `결제 #${p.id}: 정의되지 않은 결제 등급 타입 '${tier}' 탐지 ('AD' 배지 노출 위험)`, severity: 'error' });
             }
 
@@ -146,7 +147,8 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
     }, [runAudit]);
 
     useEffect(() => {
-        fetchHealth();
+        const timer = setTimeout(fetchHealth, 500); // [Fix] 초기 로딩 시 레이아웃 튀는 현상 방지
+        return () => clearTimeout(timer);
     }, [fetchHealth]);
 
     useEffect(() => {

@@ -13,6 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
 import B2BAuditPage from "@/components/audit/B2BAuditPage";
+import { AuthProvider } from '@/components/auth/AuthProvider';
 
 import { getCurrentSEO } from "@/lib/metadata-config";
 import { AUDIT_MODE, ADULT_GATE_DISABLED } from "@/lib/brand-config";
@@ -167,20 +168,22 @@ export default function RootLayout({
           <SEOInjection />
         </Suspense>
 
-        <BrandProvider>
-          {/* 전역 감시 훅 — JS에러/DeadClick/WebVitals/LongTask 수집 */}
-          <MonitorProvider />
-          <div className="flex flex-col h-auto">
-            <Suspense fallback={<div className="min-h-screen bg-white" />}>
-              <LayoutWrapper sideAds={sideAds}>
-                <Suspense fallback={null}>
-                  {children}
-                </Suspense>
-              </LayoutWrapper>
-            </Suspense>
-          </div>
-          <ScrollToTop />
-        </BrandProvider>
+        <AuthProvider>
+          <BrandProvider>
+            {/* 전역 감시 훅 — JS에러/DeadClick/WebVitals/LongTask 수집 */}
+            <MonitorProvider />
+            <div className="flex flex-col h-auto">
+              <Suspense fallback={<div className="min-h-screen bg-white" />}>
+                <LayoutWrapper sideAds={sideAds}>
+                  <Suspense fallback={null}>
+                    {children}
+                  </Suspense>
+                </LayoutWrapper>
+              </Suspense>
+            </div>
+            <ScrollToTop />
+          </BrandProvider>
+        </AuthProvider>
       </body>
     </html>
   );
