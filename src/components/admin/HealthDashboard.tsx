@@ -171,6 +171,8 @@ const E2E_GROUP_LABELS: Record<string, string> = {
     api_availability: 'API 가용성',
     db_flows: 'DB 흐름',
     critical_flows: '핵심 기능',
+    SOS_SEND_XLARGE: 'SOS 긴급 알림',
+    admin_grant: '포인트 지급 로직',
 };
 
 // ── 메인 컴포넌트 ──────────────────────────────────────────────────────────────
@@ -555,39 +557,41 @@ export const HealthDashboard = () => {
 
                     {/* 결과 요약 뱃지 */}
                     {e2eResult && (
-                        <div className={`p-4 rounded-2xl border flex flex-wrap gap-3 items-center ${e2eResult.summary.failed > 0 ? 'bg-rose-50/60 border-rose-100' : e2eResult.summary.warnings > 0 ? 'bg-amber-50/60 border-amber-100' : 'bg-emerald-50/60 border-emerald-100'}`}>
+                        <div className={`p-4 rounded-2xl border flex flex-wrap gap-3 items-center ${e2eResult.summary?.failed && e2eResult.summary.failed > 0 ? 'bg-rose-50/60 border-rose-100' : e2eResult.summary?.warnings && e2eResult.summary.warnings > 0 ? 'bg-amber-50/60 border-amber-100' : 'bg-emerald-50/60 border-emerald-100'}`}>
                             <div className="flex items-center gap-2 mr-1">
-                                {e2eResult.summary.failed > 0
+                                {e2eResult.summary?.failed && e2eResult.summary.failed > 0
                                     ? <XCircle size={18} className="text-rose-500" />
-                                    : e2eResult.summary.warnings > 0
+                                    : e2eResult.summary?.warnings && e2eResult.summary.warnings > 0
                                     ? <AlertCircle size={18} className="text-amber-500" />
                                     : <CheckCircle2 size={18} className="text-emerald-500" />}
                                 <span className="text-xs font-black text-slate-700">
-                                    {e2eResult.summary.failed > 0
+                                    {e2eResult.summary?.failed && e2eResult.summary.failed > 0
                                         ? `실패 ${e2eResult.summary.failed}건 발견`
-                                        : e2eResult.summary.warnings > 0
+                                        : e2eResult.summary?.warnings && e2eResult.summary.warnings > 0
                                         ? `경고 ${e2eResult.summary.warnings}건`
-                                        : '전체 통과'}
+                                        : e2eResult.success ? '전체 통과' : '테스트 오류'}
                                 </span>
                             </div>
-                            <div className="flex gap-2 ml-auto">
-                                <div className="text-center px-3 py-1 bg-slate-100 rounded-xl">
-                                    <div className="text-base font-black text-slate-600">{e2eResult.summary.total}</div>
-                                    <div className="text-[9px] font-black text-slate-400">전체</div>
+                            {e2eResult.summary && (
+                                <div className="flex gap-2 ml-auto">
+                                    <div className="text-center px-3 py-1 bg-slate-100 rounded-xl">
+                                        <div className="text-base font-black text-slate-600">{e2eResult.summary.total}</div>
+                                        <div className="text-[9px] font-black text-slate-400">전체</div>
+                                    </div>
+                                    <div className="text-center px-3 py-1 bg-emerald-100 rounded-xl">
+                                        <div className="text-base font-black text-emerald-700">{e2eResult.summary.passed}</div>
+                                        <div className="text-[9px] font-black text-emerald-500">통과</div>
+                                    </div>
+                                    <div className="text-center px-3 py-1 bg-rose-100 rounded-xl">
+                                        <div className="text-base font-black text-rose-700">{e2eResult.summary.failed}</div>
+                                        <div className="text-[9px] font-black text-rose-500">실패</div>
+                                    </div>
+                                    <div className="text-center px-3 py-1 bg-amber-100 rounded-xl">
+                                        <div className="text-base font-black text-amber-700">{e2eResult.summary.warnings}</div>
+                                        <div className="text-[9px] font-black text-amber-500">경고</div>
+                                    </div>
                                 </div>
-                                <div className="text-center px-3 py-1 bg-emerald-100 rounded-xl">
-                                    <div className="text-base font-black text-emerald-700">{e2eResult.summary.passed}</div>
-                                    <div className="text-[9px] font-black text-emerald-500">통과</div>
-                                </div>
-                                <div className="text-center px-3 py-1 bg-rose-100 rounded-xl">
-                                    <div className="text-base font-black text-rose-700">{e2eResult.summary.failed}</div>
-                                    <div className="text-[9px] font-black text-rose-500">실패</div>
-                                </div>
-                                <div className="text-center px-3 py-1 bg-amber-100 rounded-xl">
-                                    <div className="text-base font-black text-amber-700">{e2eResult.summary.warnings}</div>
-                                    <div className="text-[9px] font-black text-amber-500">경고</div>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     )}
 
@@ -599,7 +603,7 @@ export const HealthDashboard = () => {
                     )}
 
                     {/* 테스트 결과 테이블 */}
-                    {e2eResult && e2eResult.success && (
+                    {e2eResult && e2eResult.success && e2eResult.results && (
                         <div className="space-y-4">
                             {Object.entries(e2eResult.results).map(([groupKey, group]) => (
                                 <div key={groupKey}>
@@ -728,8 +732,8 @@ export const HealthDashboard = () => {
                             <p className="text-xs text-slate-400 mt-1">실회원이 페이지를 방문하면 자동으로 측정됩니다.</p>
                         </div>
                     ) : (
-                        <div className="space-y-2">
-                            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">페이지별 LCP</h4>
+                        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest sticky top-0 bg-white/90 backdrop-blur-sm py-1 z-10">페이지별 LCP</h4>
                             {[...perfStats].sort((a, b) => b.avg_lcp - a.avg_lcp).map(stat => (
                                 <div key={stat.path} className={`flex items-center gap-3 p-3 rounded-xl border ${stat.avg_lcp > 2500 ? 'bg-rose-50 border-rose-100' : stat.avg_lcp > 1800 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
                                     <div className="flex-1 min-w-0">

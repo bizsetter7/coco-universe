@@ -33,9 +33,10 @@ function setWorst(current: CheckStatus, next: CheckStatus): CheckStatus {
 }
 
 /** 전체 헬스 체크 로직 — POST/GET 공유 (인증은 각 핸들러에서 처리) */
-async function runHealthCheck(): Promise<any> {
+async function runHealthCheck(force = false): Promise<any> {
     const now = Date.now();
-    if (cachedHealth && (now - cachedHealth.timestamp < CACHE_TTL)) {
+    // [성능 최적화] GET 요청(사이드바 등) 시에만 캐시 사용. 재진단(POST) 시에는 최신 데이터 강제 수집.
+    if (!force && cachedHealth && (now - cachedHealth.timestamp < CACHE_TTL)) {
         return cachedHealth.data;
     }
 
@@ -765,7 +766,8 @@ export async function POST(req: NextRequest) {
     const authError = await requireAdmin(req);
     if (authError) return authError;
 
-    const data = await runHealthCheck();
+    // POST 요청은 항상 최신 데이터를 읽어옴 (재진단 버튼용)
+    const data = await runHealthCheck(true);
     return NextResponse.json(data);
 }
 
@@ -775,7 +777,8 @@ export async function GET(req: NextRequest) {
     if (authError) return authError;
 
     try {
-        const data = await runHealthCheck();
+        // GET 요청(사이드바 배지 등)은 캐시를 적극 활용하여 DB 부하 방지
+        const data = await runHealthCheck(false);
         return NextResponse.json({
             overall: data.overall,
             issueCount: data.issueCount,

@@ -340,13 +340,11 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cocoalba.kr';
 
     try {
-        // 모든 그룹 병렬 실행
-        const [securityTests, availabilityTests, dbTests, criticalTests] = await Promise.all([
-            runApiSecurity(siteUrl),
-            runApiAvailability(siteUrl),
-            runDbFlows(),
-            runCriticalFlows(siteUrl),
-        ]);
+        // 모든 그룹 순차 실행 (동시 접속 부하 방지)
+        const securityTests = await runApiSecurity(siteUrl);
+        const availabilityTests = await runApiAvailability(siteUrl);
+        const dbTests = await runDbFlows();
+        const criticalTests = await runCriticalFlows(siteUrl);
 
         const results: Record<string, TestGroupResult> = {
             api_security: summarizeGroup(securityTests),
