@@ -146,14 +146,20 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
         }
     }, [runAudit]);
 
+    // [재검증] fetchHealth는 초기 마운트 시에만 실행하여 무한 루프 차단
     useEffect(() => {
-        const timer = setTimeout(fetchHealth, 500); // [Fix] 초기 로딩 시 레이아웃 튀는 현상 방지
+        const timer = setTimeout(() => {
+            fetchHealth();
+        }, 500); 
         return () => clearTimeout(timer);
-    }, [fetchHealth]);
+    }, []); // 의존성 비움: 초기 1회만 실행
 
+
+    // ads나 payments 데이터가 변경될 때만 감사 실행
     useEffect(() => {
         runAudit();
     }, [ads, payments, runAudit]);
+
 
 
     return (

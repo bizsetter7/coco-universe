@@ -76,12 +76,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (session?.user) {
+            setIsLoading(true); // [Safety] 세션이 있으면 프로필 조회 완료 전까지 로딩 상태 유지
             try {
                 const { user: authUser } = session;
                 const MASTER_EMAILS = ['bizsetter7@gmail.com', 'admin@cocoalba.kr'];
                 const isMasterEmail = authUser.email && MASTER_EMAILS.includes(authUser.email);
 
-                const { data: profile } = await supabase
+                const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', authUser.id)
@@ -121,6 +122,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setIsLoggedIn(true);
                     setIsLoading(false);
                     return;
+                } else if (profileError) {
+                    console.warn('Profile single check error:', profileError);
                 }
             } catch (err) {
                 console.warn('Real profile fetch failed, checking mock...', err);
@@ -147,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (e) { }
         }
 
+        // 모든 조회가 끝났을 때만 게스트 처리
         setUser({ type: 'guest', id: 'guest', name: '게스트', nickname: '게스트', credit: 0, points: 0, jump_balance: 0 });
         setIsLoggedIn(false);
         setIsLoading(false);

@@ -9,6 +9,9 @@ import {
 import { HealthDashboard } from '@/components/admin/HealthDashboard';
 import { StandardsGuardView } from '@/app/admin/components/StandardsGuardView';
 
+const EMPTY_COMP_VAL: any[] = []; // [재검증] 무한 루프 방지용 고정 상수
+
+
 export default function SystemVerificationPage() {
     const [shops, setShops] = useState<Shop[]>([]);
     const [loading, setLoading] = useState(true);
@@ -27,7 +30,11 @@ export default function SystemVerificationPage() {
 
     useEffect(() => { fetchShops(); }, []);
 
-    const checkTitleIssue = (title: string | null | undefined, name: string | null | undefined) => (title || name || '').length > 26;
+    const checkTitleIssue = (title: string | null | undefined, name: string | null | undefined) => {
+        const text = title || name || '';
+        return text.length > 26;
+    };
+
     const filteredShops = filter === 'issue'
         ? shops.filter(s => checkTitleIssue(s.title || '', s.name))
         : shops;
@@ -44,7 +51,7 @@ export default function SystemVerificationPage() {
 
             {/* [NEW] 통합 기술 표준 정보 (v2.0.6) */}
             <div className="mb-10">
-                <StandardsGuardView ads={[]} payments={[]} />
+                <StandardsGuardView ads={EMPTY_COMP_VAL} payments={EMPTY_COMP_VAL} />
             </div>
 
             {/* 실시간 헬스 대시보드 */}
@@ -64,11 +71,11 @@ export default function SystemVerificationPage() {
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="flex-1 bg-red-50 p-4 rounded-xl border border-red-100">
-                            <h3 className="text-red-700 font-black text-lg mb-1">규격 위반 의심 ({shops.filter(s => checkTitleIssue(s.title || '', s.name)).length}건)</h3>
+                            <h3 className="text-red-700 font-black text-lg mb-1">규격 위반 의심 {(shops || []).filter(s => checkTitleIssue(s.title || '', s.name)).length}건)</h3>
                             <p className="text-red-900/70 text-sm font-bold">제목 길이 26자 초과 (모바일/PC 1줄 초과 위험)</p>
                         </div>
                         <div className="flex-1 bg-green-50 p-4 rounded-xl border border-green-100">
-                            <h3 className="text-green-700 font-black text-lg mb-1">정상 규격 ({shops.filter(s => !checkTitleIssue(s.title || '', s.name)).length}건)</h3>
+                            <h3 className="text-green-700 font-black text-lg mb-1">정상 규격 {(shops || []).filter(s => !checkTitleIssue(s.title || '', s.name)).length}건)</h3>
                             <p className="text-green-900/70 text-sm font-bold">제목 길이 26자 이내 안전</p>
                         </div>
                     </div>
@@ -109,8 +116,8 @@ export default function SystemVerificationPage() {
                                                     <div className="text-[10px] text-gray-400 font-mono">{String(shop.id).split('-')[0]}...</div>
                                                 </td>
                                                 <td className="p-3">
-                                                    <div className={`font-bold text-sm mb-0.5 line-clamp-1 break-all ${isIssue ? 'text-red-600' : 'text-gray-700'}`}>{title}</div>
-                                                    <div className={`text-[10px] font-mono font-bold ${isIssue ? 'text-red-500' : 'text-gray-400'}`}>Length: {title.length} / 26</div>
+                                                    <div className={`font-bold text-sm mb-0.5 line-clamp-1 break-all ${isIssue ? 'text-red-600' : 'text-gray-700'}`}>{title || '제목 없음'}</div>
+                                                    <div className={`text-[10px] font-mono font-bold ${isIssue ? 'text-red-500' : 'text-gray-400'}`}>Length: {title?.length || 0} / 26</div>
                                                 </td>
                                                 <td className="p-3">
                                                     <a href={`/shop/${shop.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition">
