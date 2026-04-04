@@ -105,10 +105,10 @@ export function middleware(request: NextRequest) {
         if (process.env.NODE_ENV !== 'development') {
             // [Fix] 특정 프로젝트 ID 종속성 제거 — 모든 sb-*-auth-token 또는 supabase-auth-token 감지
             const allCookies = request.cookies.getAll();
-            const hasAuthCookie = allCookies.some(cookie => 
-                cookie.name.includes('auth-token') || 
-                cookie.name.includes('access-token') || 
-                cookie.name === 'supabase-auth-token'
+            const hasAuthCookie = allCookies.some(cookieObj => 
+                cookieObj.name.includes('auth-token') || 
+                cookieObj.name === 'sb-access-token' ||
+                cookieObj.name === 'supabase-auth-token'
             );
 
             if (!hasAuthCookie) {

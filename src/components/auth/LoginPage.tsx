@@ -30,6 +30,10 @@ export const LoginPage = () => {
             // 아이디만 입력한 경우 @cocoalba.kr 이메일 형식으로 변환
             const email = id.includes('@') ? id : `${id}@cocoalba.kr`;
             const authResult = await signIn(email, pw);
+            // [Fix] 로그인 성공 시 기존의 모든 시뮬레이션 모드 초기화 (어드민 진입 보장)
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('coco_sim_mode');
+            }
             alert('로그인에 성공했습니다.');
             
             // role 체크를 통해 어드민이면 /admin, 아니면 / 로 이동

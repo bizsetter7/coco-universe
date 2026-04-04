@@ -83,7 +83,10 @@ export function useAuth() {
                     };
 
                     // [Simulation Check] 어드민인 경우 유지된 시뮬레이션 상태 확인
-                    if (newUser.type === 'admin') {
+                    // [Fix] /admin 경로에 있을 때는 시뮬레이션 모드를 무시하고 실제 권한 강제 (대시보드 튕김 방지)
+                    const isAdminPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+                    
+                    if (newUser.type === 'admin' && !isAdminPath) {
                         const simType = typeof window !== 'undefined' ? localStorage.getItem('coco_sim_mode') : null;
                         if (simType === 'corporate' || simType === 'individual') {
                             newUser = {
