@@ -101,6 +101,34 @@ export default function RootLayout({
 
   return (
     <html lang="ko" className="notranslate" translate="no" suppressHydrationWarning>
+      <head>
+        {/* ── 폰트 비차단 로딩 (LCP 렌더 블로킹 해소) ── */}
+        {/* preconnect: DNS + TLS 핸드셰이크 선행 처리 */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Pretendard — media="print" onload 트릭으로 비차단 로딩 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+          media="print"
+          // @ts-ignore
+          onLoad="this.media='all'"
+        />
+        {/* Google Fonts (나눔체 등) — display=swap으로 비차단 */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=Hahmlet:wght@100..900&family=Gowun+Batang:wght@400;700&display=swap"
+          media="print"
+          // @ts-ignore
+          onLoad="this.media='all'"
+        />
+        {/* noscript 폴백 — JS 비활성 환경 */}
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-css-tags */}
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+        </noscript>
+      </head>
       <body className={`${inter.className} notranslate`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>

@@ -61,6 +61,8 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
                         src={shop.options!.mediaUrl}
                         alt={shop.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                         onError={() => setImgError(true)}
                     />
                 ) : (

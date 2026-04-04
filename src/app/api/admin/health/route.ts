@@ -5,7 +5,7 @@ import { normalizeAd } from '@/app/my-shop/utils/normalization';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { requireAdmin } from '@/lib/requireAdmin';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'; // v2.1.0 — service role integrity, requireAdmin
 
 // Service role 클라이언트 — 무결성 검사 등 RLS 우회가 필요한 항목에만 사용
 function getServiceClient() {
