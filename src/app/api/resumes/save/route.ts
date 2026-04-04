@@ -31,6 +31,12 @@ async function getRequestUserId(request: NextRequest): Promise<string | null> {
 }
 
 export async function POST(request: NextRequest) {
+    // 인증 먼저 확인 — body 파싱 전 (미인증 시 json() 예외로 500 반환되는 버그 방지)
+    const requesterId = await getRequestUserId(request);
+    if (!requesterId) {
+        return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+    }
+
     try {
         const { action, resumeData, resumeId } = await request.json();
 
@@ -39,10 +45,6 @@ export async function POST(request: NextRequest) {
         }
 
         // 요청자 본인 소유 여부 검증
-        const requesterId = await getRequestUserId(request);
-        if (!requesterId) {
-            return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-        }
         if (requesterId !== resumeData.user_id) {
             return NextResponse.json({ error: '본인의 이력서만 저장할 수 있습니다.' }, { status: 403 });
         }
