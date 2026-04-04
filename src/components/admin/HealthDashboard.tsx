@@ -309,12 +309,18 @@ export const HealthDashboard = () => {
         } catch { /* ignore */ }
     };
 
-    // ── 헬스 요약 계산 (Fixed: Optional Chaining 추가하여 Crash 방지)
-    const errorCount = status?.components ? Object.values(status.components).filter(c => c?.status === 'error').length : 0;
-    const warningCount = status?.components ? Object.values(status.components).filter(c => c?.status === 'warning').length : 0;
-    const totalChecks = status?.components ? Object.keys(status.components).length : 0;
-    const healthyCount = totalChecks - errorCount - warningCount;
-    const unresolvedErrors = (errorLogs || []).filter(e => !e?.resolved).length;
+    // ── 헬스 요약 계산 (Fixed: 3중 안전장치 추가하여 런타임 크래시 완전 차단)
+    const getComponents = () => {
+        if (!status?.components || typeof status.components !== 'object') return [];
+        return Object.values(status.components);
+    };
+
+    const componentValues = getComponents();
+    const errorCount = componentValues.filter(c => c?.status === 'error').length;
+    const warningCount = componentValues.filter(c => c?.status === 'warning').length;
+    const totalChecks = componentValues.length;
+    const healthyCount = Math.max(0, totalChecks - errorCount - warningCount);
+    const unresolvedErrors = Array.isArray(errorLogs) ? errorLogs.filter(e => e && !e.resolved).length : 0;
 
     // E2E 실패 집계 (헤더 경고 카운트에 포함)
     const e2eFailCount = e2eResult?.summary?.failed ?? 0;
@@ -398,8 +404,8 @@ export const HealthDashboard = () => {
                 <div className="space-y-6">
                     {Object.entries(CATEGORY_MAP).map(([category, keys]) => {
                         const items = keys
-                            .filter(k => status?.components[k])
-                            .map(k => ({ id: k, ...status!.components[k] }));
+                            .filter(k => status?.components && status.components[k])
+                            .map(k => ({ id: k, ...status!.components![k] }));
                         if (items.length === 0 && !loading) return null;
 
                         const catError = items.filter(i => i.status === 'error').length;

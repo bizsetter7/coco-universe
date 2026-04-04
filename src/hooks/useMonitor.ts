@@ -103,105 +103,13 @@ export function useMonitor(userId?: string) {
         return () => {};
     }, [pathname, userId]);
 
-    // ── 3. Web Vitals 수집 ─────────────────────────────────────────────────
+    // ── 3. Web Vitals 수집 (수정: 대규모 테스트 기간 중 CPU 점유율 최소화를 위해 중단) ───────
     useEffect(() => {
-        hasReportedVitals.current = false;
-        vitalsRef.current = {};
-
-        const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
-
-        // PerformanceObserver로 LCP, FID, CLS, FCP 수집
-        const observers: PerformanceObserver[] = [];
-
-        try {
-            // LCP
-            const lcpObs = new PerformanceObserver((list) => {
-                const entries = list.getEntries();
-                if (entries.length > 0) {
-                    vitalsRef.current.lcp = entries[entries.length - 1].startTime;
-                }
-            });
-            lcpObs.observe({ type: 'largest-contentful-paint', buffered: true });
-            observers.push(lcpObs);
-        } catch { /* 브라우저 미지원 무시 */ }
-
-        try {
-            // FID (First Input Delay)
-            const fidObs = new PerformanceObserver((list) => {
-                const entry = list.getEntries()[0] as any;
-                if (entry) vitalsRef.current.fid = entry.processingStart - entry.startTime;
-            });
-            fidObs.observe({ type: 'first-input', buffered: true });
-            observers.push(fidObs);
-        } catch { /* 무시 */ }
-
-        try {
-            // CLS (Cumulative Layout Shift)
-            let clsTotal = 0;
-            const clsObs = new PerformanceObserver((list) => {
-                list.getEntries().forEach((entry: any) => {
-                    if (!entry.hadRecentInput) clsTotal += entry.value;
-                });
-                vitalsRef.current.cls = clsTotal;
-            });
-            clsObs.observe({ type: 'layout-shift', buffered: true });
-            observers.push(clsObs);
-        } catch { /* 무시 */ }
-
-        // FCP & TTFB — navigation timing에서 추출
-        try {
-            const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-            if (navEntries.length > 0) {
-                vitalsRef.current.ttfb = navEntries[0].responseStart - navEntries[0].requestStart;
-            }
-            const paintEntries = performance.getEntriesByName('first-contentful-paint');
-            if (paintEntries.length > 0) {
-                vitalsRef.current.fcp = paintEntries[0].startTime;
-            }
-        } catch { /* 무시 */ }
-
-        // 페이지 숨겨질 때 / 5초 후 최종 전송
-        const reportVitals = () => {
-            if (hasReportedVitals.current) return;
-            hasReportedVitals.current = true;
-            const v = vitalsRef.current;
-            if (Object.keys(v).length === 0) return;
-            sendVitals({ path: pathname || '/', user_id: userId, device, ...v });
-        };
-
-        const timer = setTimeout(reportVitals, 5000);
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') reportVitals();
-        }, { once: true });
-
-        return () => {
-            clearTimeout(timer);
-            observers.forEach(obs => { try { obs.disconnect(); } catch { /* 무시 */ } });
-        };
+        return () => {};
     }, [pathname, userId]);
 
-    // ── 4. 렌더링 버벅임 (Long Task) 감지 ────────────────────────────────
+    // ── 4. 렌더링 버벅임 (Long Task) 감지 (수정: 부하 방지를 위해 일시 중단) ─────────────
     useEffect(() => {
-        let obs: PerformanceObserver | null = null;
-        try {
-            obs = new PerformanceObserver((list) => {
-                list.getEntries().forEach((entry) => {
-                    if (entry.duration > 100) { // 100ms 이상 블로킹
-                        sendError({
-                            tier: 'browser',
-                            error_type: 'long_task',
-                            severity: entry.duration > 300 ? 'warning' : 'info',
-                            path: pathname || '/',
-                            message: `렌더링 버벅임: ${Math.round(entry.duration)}ms 블로킹`,
-                            meta: { duration_ms: Math.round(entry.duration), start: Math.round(entry.startTime) },
-                            user_id: userId,
-                        });
-                    }
-                });
-            });
-            obs.observe({ type: 'longtask', buffered: false });
-        } catch { /* longtask 미지원 브라우저 무시 */ }
-
-        return () => { if (obs) try { obs.disconnect(); } catch { /* 무시 */ } };
+        return () => {};
     }, [pathname, userId]);
 }

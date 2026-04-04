@@ -280,43 +280,57 @@ function AdminContent() {
         return () => clearInterval(interval);
     }, [isAuthorized]);
 
-    useEffect(() => {
+    // ── 1. 데이터 초기 및 주기적 수동 갱신 ──
+    const fetchAllData = React.useCallback(() => {
         if (isAuthorized) {
             fetchData();
-
-            window.addEventListener('notes-updated', fetchData);
-
-            // Debounce: Realtime 이벤트가 연속 발생해도 1초에 한 번만 fetchData 실행
-            let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-            const debouncedFetch = () => {
-                if (debounceTimer) clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(fetchData, 1000);
-            };
-
-            const channel = supabase
-                .channel('admin-realtime')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'shops' }, debouncedFetch)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, debouncedFetch)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, debouncedFetch)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, debouncedFetch)
-                .subscribe();
-
-            return () => {
-                if (debounceTimer) clearTimeout(debounceTimer);
-                window.removeEventListener('notes-updated', fetchData);
-                supabase.removeChannel(channel);
-            };
         }
     }, [isAuthorized, fetchData]);
 
     useEffect(() => {
+        fetchAllData();
+        window.addEventListener('notes-updated', fetchAllData);
+        return () => window.removeEventListener('notes-updated', fetchAllData);
+    }, [fetchAllData]);
+
+    // ── 2. 리얼타임 구독 전용 (데이터 변경 시 디바운스된 갱신 수행) ──
+    useEffect(() => {
+        if (!isAuthorized) return;
+
+        let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+        const debouncedFetch = () => {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchData, 2000); // 부하 방지용 2초 디바운스
+        };
+
+        const channel = supabase
+            .channel('admin-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'shops' }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, debouncedFetch)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, debouncedFetch)
+            .subscribe();
+
+        return () => {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            supabase.removeChannel(channel);
+        };
+    }, [isAuthorized, fetchData]);
+
+    // ── 3. 보안 권한 지연 확인 (세션 동기화 대기) ──
+    useEffect(() => {
         if (isLoading) return;
 
         if (!isLoggedIn || userType !== 'admin') {
-            alert('관리자 권한이 필요합니다.');
-            router.push('/');
-            return;
+            const timer = setTimeout(() => {
+                if (!isLoggedIn || userType !== 'admin') {
+                    alert('관리자 권한이 필요합니다. 메인화면으로 이동합니다.');
+                    router.push('/');
+                }
+            }, 500);
+            return () => clearTimeout(timer);
         }
+        
         setIsAuthorized(true);
     }, [isLoggedIn, userType, router, isLoading]);
 
