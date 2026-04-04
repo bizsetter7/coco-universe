@@ -13,7 +13,7 @@ const REGIONS = [
 ];
 
 const STORAGE_KEY = 'push_permission_dismissed';
-const DISMISS_EXPIRE_MS = 7 * 24 * 60 * 60 * 1000; // 7일 후 재표시
+const DISMISS_EXPIRE_MS = 1 * 24 * 60 * 60 * 1000; // 1일 후 재표시
 
 export const PushPermission = () => {
     const { user, userType } = useAuth();
@@ -32,7 +32,7 @@ export const PushPermission = () => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored === 'subscribed') return;
 
-        // "나중에" 클릭한 경우 7일 후 재표시 (타임스탬프 기록)
+        // "오늘 하루 보지 않기" 클릭한 경우 1일 후 재표시 (타임스탬프 기록)
         if (stored && stored !== 'dismissed') {
             // 레거시 값 호환: 숫자 타임스탬프
             const dismissedAt = parseInt(stored, 10);
@@ -165,7 +165,7 @@ export const PushPermission = () => {
                                     onClick={handleDismiss}
                                     className="py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition"
                                 >
-                                    나중에
+                                    오늘 하루 보지 않기
                                 </button>
                                 <button
                                     onClick={handleAllow}
