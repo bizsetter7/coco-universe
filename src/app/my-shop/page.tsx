@@ -93,10 +93,11 @@ function MyShopContent() {
         setMounted(true);
     }, []);
 
-    // [Dev/Test Only] ?autoLogin=corporate|shop|individual URL 파라미터로 mock 세션 자동 설정
-    // TestSprite E2E 테스트 전용 — 비밀번호 없이 지정 회원 유형으로 진입 가능
+    // [Dev Only] ?autoLogin=corporate|shop|individual URL 파라미터로 mock 세션 자동 설정
+    // TestSprite E2E 테스트 전용 — 개발 환경에서만 동작 (프로덕션 비활성)
     useEffect(() => {
         if (typeof window === 'undefined') return;
+        if (process.env.NODE_ENV === 'production') return; // 프로덕션 차단
         const autoLogin = searchParams.get('autoLogin');
         if (autoLogin) {
             const existing = localStorage.getItem('coco_mock_session');

@@ -7,11 +7,11 @@ import {
     Terminal, Database, Lock, Cpu, Server, FileText, Clock,
     MessageSquare, CreditCard, Phone, MessageCircle, Tag,
     ShieldCheck, Zap, Bug, BarChart2, Eye, EyeOff, Wifi,
-    AlertTriangle, MousePointerClick, TrendingUp, Package, Layout
+    AlertTriangle, MousePointerClick, TrendingUp, Package, Layout, Info
 } from 'lucide-react';
 
 // ── 타입 ──────────────────────────────────────────────────────────────────────
-type Severity = 'healthy' | 'warning' | 'error' | 'loading';
+type Severity = 'healthy' | 'warning' | 'error' | 'info' | 'loading';
 
 // E2E 타입
 type E2ETestStatus = 'pass' | 'fail' | 'warn';
@@ -78,6 +78,7 @@ const getStatusIcon = (s: string, size = 20) => {
         case 'healthy': return <CheckCircle2 className="text-emerald-500 shrink-0" size={size} />;
         case 'warning': return <AlertCircle className="text-amber-500 shrink-0" size={size} />;
         case 'error':   return <XCircle className="text-rose-500 shrink-0" size={size} />;
+        case 'info':    return <Info className="text-sky-500 shrink-0" size={size} />;
         default:        return <RefreshCw className="text-slate-300 animate-spin shrink-0" size={size} />;
     }
 };
@@ -87,6 +88,7 @@ const getStatusBg = (s: string) => {
         case 'healthy': return 'bg-emerald-50/60 border-emerald-100';
         case 'warning': return 'bg-amber-50/60 border-amber-100';
         case 'error':   return 'bg-rose-50/60 border-rose-100';
+        case 'info':    return 'bg-sky-50/60 border-sky-100';
         default:        return 'bg-slate-50/60 border-slate-100';
     }
 };

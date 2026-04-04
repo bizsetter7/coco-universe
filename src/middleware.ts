@@ -108,10 +108,7 @@ export function middleware(request: NextRequest) {
                 request.cookies.get('sb-access-token') ||
                 request.cookies.get('supabase-auth-token');
 
-            // mock admin 로그인 쿠키 (테스트 계정용 — 클라이언트에서 역할 재검증)
-            const mockAdminCookie = request.cookies.get('coco_admin_mock');
-
-            if (!sessionCookie && !mockAdminCookie) {
+            if (!sessionCookie) {
                 return NextResponse.redirect(new URL('/?page=login', request.url));
             }
         }
