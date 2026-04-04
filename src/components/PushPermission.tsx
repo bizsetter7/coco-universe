@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, BellOff, X, Shield, Eye } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { UI_Z_INDEX } from '@/constants/ui';
@@ -102,7 +103,10 @@ export const PushPermission = () => {
 
     if (!show) return null;
 
-    return (
+    // [BUG-FIX] createPortal → document.body 직접 마운트
+    // StickyWrapper의 willChange:transform이 새 stacking context를 만들어
+    // position:fixed 요소의 z-index가 사이드바 뒤에 묻히는 문제 근본 해결
+    return createPortal(
         <div className="fixed bottom-24 left-4 right-4 md:bottom-4 md:left-auto md:right-6 md:w-96 animate-slide-up" style={{ zIndex: UI_Z_INDEX.FLOATING }}>
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                 {/* 헤더 */}
@@ -207,7 +211,8 @@ export const PushPermission = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
