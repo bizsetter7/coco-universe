@@ -1,5 +1,3 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Nanum+Myeongjo:wght@400;700;800&family=Hahmlet:wght@100..900&family=Gowun+Batang:wght@400;700&display=swap');
 @import "tailwindcss";
 
 /* ── Keyword Marquee Animation ───────────────────────────────────────── */

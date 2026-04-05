@@ -7,8 +7,13 @@ import { Shop } from "@/types/shop";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import { MonitorProvider } from "@/components/MonitorProvider";
+import { Nanum_Gothic, Nanum_Myeongjo, Hahmlet, Gowun_Batang } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
+const nanumGothic = Nanum_Gothic({ weight: ["400", "700", "800"], subsets: ["latin"], display: 'swap' });
+const nanumMyeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], display: 'swap' });
+const hahmlet = Hahmlet({ subsets: ["latin"], display: 'swap' });
+const gowunBatang = Gowun_Batang({ weight: ["400", "700"], subsets: ["latin"], display: 'swap' });
 
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
@@ -102,7 +107,7 @@ export default function RootLayout({
 
   return (
     <html lang="ko" className="notranslate" translate="no" suppressHydrationWarning>
-      <body className={`${inter.className} notranslate`}>
+      <body className={`${inter.className} ${nanumGothic.className} ${nanumMyeongjo.className} ${hahmlet.className} ${gowunBatang.className} notranslate`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

@@ -64,7 +64,22 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 1. 현재 포인트 조회
+        // 1. 포인트 로그 먼저 기록 (중복 방지 및 무결성 최우선)
+        // [중요] 포인트 로그가 먼저 생겨야 나중에 중계/정산 시 누락이 없음
+        const { error: logError } = await supabaseAdmin
+            .from('point_logs')
+            .insert({ user_id: userId, amount, reason });
+
+        if (logError) {
+            console.error('[award-points] Log insert error:', logError.message);
+            // 이미 출석한 경우 (Unique Constraint 위반 등 대응)
+            if (logError.code === '23505') {
+                return NextResponse.json({ error: '데이터 처리 중 오류가 발생했습니다. (중복)' }, { status: 409 });
+            }
+            return NextResponse.json({ error: '포인트 기록 저장에 실패했습니다.' }, { status: 500 });
+        }
+
+        // 2. 현재 포인트 조회 및 업데이트
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('profiles')
             .select('points')
@@ -78,7 +93,6 @@ export async function POST(request: NextRequest) {
 
         const newTotal = (profile?.points || 0) + amount;
 
-        // 2. 포인트 업데이트
         const { error: updateError } = await supabaseAdmin
             .from('profiles')
             .update({ points: newTotal, updated_at: new Date().toISOString() })
@@ -86,28 +100,9 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
             console.error('[award-points] Profile update error:', updateError.message);
+            // 포인트 업데이트 실패 시 로그 롤백 (데이터 정합성 사수)
+            await supabaseAdmin.from('point_logs').delete().eq('user_id', userId).eq('reason', reason).limit(1);
             return NextResponse.json({ error: updateError.message }, { status: 500 });
-        }
-
-        // 3. 포인트 로그 기록 (service role → RLS 우회)
-        const { error: logError } = await supabaseAdmin
-            .from('point_logs')
-            .insert({ user_id: userId, amount, reason });
-
-        if (logError) {
-            console.error('[award-points] Log insert error:', logError.message);
-
-            // [ATTENDANCE_CHECK] 로그 없으면 중복 체크 불가 → 포인트 롤백 후 에러 반환
-            if (reason === 'ATTENDANCE_CHECK') {
-                await supabaseAdmin
-                    .from('profiles')
-                    .update({ points: profile?.points || 0, updated_at: new Date().toISOString() })
-                    .eq('id', userId);
-                return NextResponse.json({ error: '출석 기록 저장에 실패했습니다. 다시 시도해주세요.' }, { status: 500 });
-            }
-
-            // 다른 reason은 경고만 (기존 동작 유지)
-            return NextResponse.json({ success: true, newTotal, warning: 'Log failed: ' + logError.message });
         }
 
         return NextResponse.json({ success: true, newTotal });
