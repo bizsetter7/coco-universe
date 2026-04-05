@@ -42,23 +42,23 @@ export const Footer = () => {
             <footer className="border-t border-gray-200 bg-gray-50 font-sans text-gray-500">
                 <div className="w-full max-w-5xl mx-auto px-6">
 
-                    {/* ── 인기 지역 바로가기 (SEO 최적화) ─────────────────────── */}
-                    <div className="py-8 border-b border-gray-200">
-                        <div className="flex flex-col md:flex-row md:items-start gap-4">
-                            <span className="text-[12px] font-black text-gray-900 shrink-0 mt-1">인기 지역 알바 :</span>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-2.5">
+                    {/* ── 지역 알바 정보 (중앙 정렬 수복) ─────────────────────── */}
+                    <div className="py-10 border-b border-gray-200">
+                        <div className="flex flex-col items-center text-center gap-6">
+                            <span className="text-[14px] md:text-[16px] font-black text-gray-900 tracking-tight">전국지역 알바정보</span>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-3.5 max-w-4xl mx-auto">
                                 {POPULAR_REGIONS.map((region) => (
                                     <Link
                                         key={region.href}
                                         href={region.href}
-                                        className="text-[11px] text-gray-500 hover:text-[#f82b60] hover:font-bold transition-all truncate"
+                                        className="text-[11.5px] md:text-[12.5px] text-gray-500 hover:text-[#f82b60] hover:font-bold transition-all whitespace-nowrap"
                                     >
                                         {region.label}
                                     </Link>
                                 ))}
                                 <Link
                                     href="/region/all"
-                                    className="text-[11px] font-black text-[#f82b60] hover:underline flex items-center"
+                                    className="text-[11.5px] md:text-[12.5px] font-black text-[#f82b60] hover:underline flex items-center justify-center"
                                 >
                                     더보기 +
                                 </Link>
