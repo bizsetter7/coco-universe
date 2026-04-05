@@ -7,21 +7,15 @@ import { Shop } from "@/types/shop";
 import { LayoutWrapper } from "@/components/LayoutWrapper";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import { MonitorProvider } from "@/components/MonitorProvider";
-import { Nanum_Gothic, Nanum_Myeongjo, Hahmlet, Gowun_Batang } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
-const nanumGothic = Nanum_Gothic({ weight: ["400", "700", "800"], subsets: ["latin"], display: 'swap' });
-const nanumMyeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], display: 'swap' });
-const hahmlet = Hahmlet({ subsets: ["latin"], display: 'swap' });
-const gowunBatang = Gowun_Batang({ weight: ["400", "700"], subsets: ["latin"], display: 'swap' });
+const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
-import B2BAuditPage from "@/components/audit/B2BAuditPage";
 import { AuthProvider } from '@/components/auth/AuthProvider';
 
 import { getCurrentSEO } from "@/lib/metadata-config";
-import { AUDIT_MODE, ADULT_GATE_DISABLED } from "@/lib/brand-config";
+import { AUDIT_MODE } from "@/lib/brand-config";
 
 /**
  * generateMetadata — 도메인/브랜드별 타이틀 동적 분기
@@ -106,8 +100,9 @@ export default function RootLayout({
   const sideAds = [...grandAds, ...premiumAds];
 
   return (
-    <html lang="ko" className="notranslate" translate="no" suppressHydrationWarning>
-      <body className={`${inter.className} ${nanumGothic.className} ${nanumMyeongjo.className} ${hahmlet.className} ${gowunBatang.className} notranslate`}>
+    <html lang="ko">
+      <head />
+      <body className={`${inter.className} notranslate`}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
@@ -166,6 +161,13 @@ export default function RootLayout({
               }
             })
           }}
+        />
+
+        {/* [v2.8.0] Pretendard 폰트 디자인 원복 — 최적화 로드 */}
+        <link 
+          rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" 
+          crossOrigin="anonymous"
         />
 
         <Suspense fallback={null}>

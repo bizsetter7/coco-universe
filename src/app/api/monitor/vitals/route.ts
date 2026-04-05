@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
             .from('performance_logs')
             .select('path, lcp, fid, cls, fcp, ttfb')
             .gte('created_at', since)
+            .lt('lcp', 15000) // 15초(15,000ms) 초과 이상치(Outlier)는 통계 왜곡 방지를 위해 제외
             .limit(2000);
 
         if (error) throw error;

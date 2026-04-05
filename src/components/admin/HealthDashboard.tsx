@@ -762,7 +762,15 @@ export const HealthDashboard = () => {
                                 {[...perfStats].sort((a, b) => b.avg_lcp - a.avg_lcp).map(stat => (
                                     <div key={stat.path} className={`flex items-center gap-3 p-3 rounded-xl border ${stat.avg_lcp > 2500 ? 'bg-rose-50 border-rose-100' : stat.avg_lcp > 1800 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
                                         <div className="flex-1 min-w-0">
-                                            <span className="text-xs font-bold text-slate-700 truncate block">{stat.path}</span>
+                                            <span className="text-xs font-bold text-slate-700 truncate block">
+                                                {(() => {
+                                                    try {
+                                                        return decodeURIComponent(stat.path);
+                                                    } catch {
+                                                        return stat.path;
+                                                    }
+                                                })()}
+                                            </span>
                                             <span className="text-[9px] text-slate-400">{stat.count}회 측정</span>
                                         </div>
                                         <div className={`text-sm font-black ${stat.avg_lcp > 2500 ? 'text-rose-600' : stat.avg_lcp > 1800 ? 'text-amber-600' : 'text-emerald-600'}`}>
