@@ -194,6 +194,7 @@ export const HealthDashboard = () => {
     // 성능 통계
     const [perfStats, setPerfStats] = useState<PerfStat[]>([]);
     const [perfLoading, setPerfLoading] = useState(false);
+    const [perfPeriod, setPerfPeriod] = useState<'24h' | '7d'>('7d');
 
     // E2E 자동 테스트
     const [e2eResult, setE2eResult] = useState<E2EResponse | null>(null);
@@ -259,11 +260,11 @@ export const HealthDashboard = () => {
     const fetchPerf = useCallback(async () => {
         setPerfLoading(true);
         try {
-            const res = await fetch('/api/monitor/vitals');
+            const res = await fetch(`/api/monitor/vitals?period=${perfPeriod}`);
             const data = await res.json();
             setPerfStats(data.stats || []);
         } catch { setPerfStats([]); } finally { setPerfLoading(false); }
-    }, []);
+    }, [perfPeriod]);
 
     useEffect(() => {
         if (activeTab === 'errors') fetchErrors();
@@ -732,20 +733,45 @@ export const HealthDashboard = () => {
                             <p className="text-xs text-slate-400 mt-1">실회원이 페이지를 방문하면 자동으로 측정됩니다.</p>
                         </div>
                     ) : (
-                        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest sticky top-0 bg-white/90 backdrop-blur-sm py-1 z-10">페이지별 LCP</h4>
-                            {[...perfStats].sort((a, b) => b.avg_lcp - a.avg_lcp).map(stat => (
-                                <div key={stat.path} className={`flex items-center gap-3 p-3 rounded-xl border ${stat.avg_lcp > 2500 ? 'bg-rose-50 border-rose-100' : stat.avg_lcp > 1800 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-xs font-bold text-slate-700 truncate block">{stat.path}</span>
-                                        <span className="text-[9px] text-slate-400">{stat.count}회 측정</span>
-                                    </div>
-                                    <div className={`text-sm font-black ${stat.avg_lcp > 2500 ? 'text-rose-600' : stat.avg_lcp > 1800 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                                        {Math.round(stat.avg_lcp)}ms
-                                    </div>
-                                    {getStatusIcon(stat.avg_lcp > 2500 ? 'error' : stat.avg_lcp > 1800 ? 'warning' : 'healthy', 16)}
+                        <div className="space-y-4">
+                            {/* 기간 필터 토글 (최근 배포 효과 확인용) */}
+                            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                                        기록 범위: {perfPeriod === '24h' ? '최근 24시간 실시간' : '최근 7일 전체 평균'}
+                                    </h3>
                                 </div>
-                            ))}
+                                <div className="flex bg-slate-200/50 p-1 rounded-xl">
+                                    <button
+                                        onClick={() => setPerfPeriod('24h')}
+                                        className={`px-3 py-1.5 text-[10px] font-black rounded-lg transition-all ${perfPeriod === '24h' ? 'bg-white shadow-sm text-rose-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        최근 24시간
+                                    </button>
+                                    <button
+                                        onClick={() => setPerfPeriod('7d')}
+                                        className={`px-3 py-1.5 text-[10px] font-black rounded-lg transition-all ${perfPeriod === '7d' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        7일 전체
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                {[...perfStats].sort((a, b) => b.avg_lcp - a.avg_lcp).map(stat => (
+                                    <div key={stat.path} className={`flex items-center gap-3 p-3 rounded-xl border ${stat.avg_lcp > 2500 ? 'bg-rose-50 border-rose-100' : stat.avg_lcp > 1800 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-xs font-bold text-slate-700 truncate block">{stat.path}</span>
+                                            <span className="text-[9px] text-slate-400">{stat.count}회 측정</span>
+                                        </div>
+                                        <div className={`text-sm font-black ${stat.avg_lcp > 2500 ? 'text-rose-600' : stat.avg_lcp > 1800 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                                            {Math.round(stat.avg_lcp)}ms
+                                        </div>
+                                        {getStatusIcon(stat.avg_lcp > 2500 ? 'error' : stat.avg_lcp > 1800 ? 'warning' : 'healthy', 16)}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

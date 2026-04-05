@@ -38,12 +38,17 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/monitor/vitals
- * 어드민용 성능 통계 — 페이지별 평균 (최근 7일)
+ * 어드민용 성능 통계 — 페이지별 평균 (기간별: 24h, 7d)
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
         const supabase = getAdmin();
-        const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { searchParams } = new URL(req.url);
+        const period = searchParams.get('period') || '7d';
+
+        // 기간 설정: 24시간(1일) 혹은 7일 (기본값)
+        const hours = period === '24h' ? 24 : 168;
+        const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 
         const { data, error } = await supabase
             .from('performance_logs')
