@@ -44,8 +44,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const seoConfig = getCurrentSEO();
   const ogImage = 'https://www.cocoalba.kr/og-image.jpg';
+  const safeSiteUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+  let metadataBase: URL;
+  try {
+    metadataBase = new URL(safeSiteUrl);
+  } catch (e) {
+    metadataBase = new URL('https://www.cocoalba.kr');
+  }
+
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase,
     alternates: {
       canonical: '/',
     },
