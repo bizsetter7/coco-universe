@@ -44,7 +44,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const seoConfig = getCurrentSEO();
   const ogImage = 'https://www.cocoalba.kr/og-image.jpg';
-  return {
+    alternates: {
+      canonical: siteUrl,
+    },
     title: seoConfig.metadata.title,
     description: seoConfig.metadata.description,
     keywords: seoConfig.metadata.keywords,

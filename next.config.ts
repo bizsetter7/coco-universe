@@ -20,11 +20,17 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
         source: "/region/:path*",
-        destination: "/coco/:path*",
+        destination: "https://region.cocoalba.kr/:path*",
+        permanent: true,
+      },
+      {
+        source: "/coco/:path*",
+        destination: "https://region.cocoalba.kr/:path*",
+        permanent: true,
       },
     ];
   },

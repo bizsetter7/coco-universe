@@ -114,9 +114,19 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const pathParts = decodedPath.split('/');
     const isGuidePage = pathParts.length === 4 && pathParts[1] === 'coco' && isWorkTypeSlug(pathParts[3]);
 
-    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우·가이드페이지 제외)
+    // [SEO Enhancement] Bot Detection — Googlebot 등 검색 크롤러는 성인인증 게이트 제약(Blur, Scroll Lock) 없이 전체 내용을 읽을 수 있도록 허용
+    const [isBot, setIsBot] = React.useState(false);
+    React.useEffect(() => {
+        const ua = navigator.userAgent.toLowerCase();
+        const botKeywords = ['googlebot', 'bingbot', 'yeti', 'naverbot', 'daum'];
+        if (botKeywords.some(keyword => ua.includes(keyword))) {
+            setIsBot(true);
+        }
+    }, []);
+
+    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우·가이드페이지·봇 제외)
     // [Soft Gate Strategy] — SEO를 위해 children을 DOM에 남겨두고 오버레이만 씌움
-    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage;
+    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 
     if (isLoading) {
@@ -129,7 +139,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     return (
         <React.Fragment>
-            {/* [Soft Gate Overlay] — 미인증 시에만 노출 */}
+            {/* [Soft Gate Overlay] — 미인증 시에만 노출 (봇 제외) */}
             {showAdultGate && (
                 <div className="fixed inset-0 z-[20000] bg-white/40 backdrop-blur-xl flex items-center justify-center p-4">
                     <AdultVerificationGate onVerify={handleVerify} onSkip={handleSkip} />
