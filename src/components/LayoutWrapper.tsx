@@ -32,6 +32,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const { user: authUser, isLoading, isLoggedIn, logout } = useAuth();
+    
+    // [Safety] Hydration Guard — 서버/클라이언트 렌더링 불일치 원천 차단
+    const [isMounted, setIsMounted] = React.useState(false);
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // ── [Idle Logout Setup] ───────────────────────────────────────────────────
     const { showWarning, secondsLeft, keepAlive } = useIdleLogout({
@@ -126,10 +132,10 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우·가이드페이지·봇 제외)
     // [Soft Gate Strategy] — SEO를 위해 children을 DOM에 남겨두고 오버레이만 씌움
-    const showAdultGate = !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
+    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
     // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
 
-    if (isLoading) {
+    if (!isMounted || isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-white">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>

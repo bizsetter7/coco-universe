@@ -123,21 +123,21 @@ const CLEAN_SEO: SEOConfig = {
 
 const getShadowSEO = (): SEOConfig => ({
   theme: {
-    colorScheme: shadowSEO.themes.colorScheme,
-    supportedColorSchemes: shadowSEO.themes.supportedColorSchemes,
+    colorScheme: shadowSEO?.themes?.colorScheme || 'light',
+    supportedColorSchemes: shadowSEO?.themes?.supportedColorSchemes || 'light',
   },
   metadata: {
-    title: shadowSEO.metadata.title,
-    description: shadowSEO.metadata.description,
-    keywords: shadowSEO.metadata.keywords,
-    verification: shadowSEO.metadata.verification,
+    title: shadowSEO?.metadata?.title || '코코알바',
+    description: shadowSEO?.metadata?.description || '여성알바 No.1 플랫폼',
+    keywords: shadowSEO?.metadata?.keywords || [],
+    verification: shadowSEO?.metadata?.verification,
   },
   schemas: [
     {
         ...BASE_ORGANIZATION_SCHEMA,
         name: "COCOALBA (코코알바)",
     },
-    ...shadowSEO.schemas,
+    ...(Array.isArray(shadowSEO?.schemas) ? shadowSEO.schemas : []),
   ]
 });
 

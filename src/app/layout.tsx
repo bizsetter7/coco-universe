@@ -45,25 +45,32 @@ export async function generateMetadata(): Promise<Metadata> {
   const seoConfig = getCurrentSEO();
   const ogImage = 'https://www.cocoalba.kr/og-image.jpg';
   const safeSiteUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
-  let metadataBase: URL;
+  
+  // [Safety] metadataBase Stringify — Next.js 14+ 런타임 안정성 확보
+  let metadataBase: URL | null = null;
   try {
     metadataBase = new URL(safeSiteUrl);
   } catch (e) {
     metadataBase = new URL('https://www.cocoalba.kr');
   }
 
+  // [Safety] SEO Config Null Check
+  const title = seoConfig?.metadata?.title || '코코알바';
+  const description = seoConfig?.metadata?.description || '여성알바 No.1 플랫폼';
+  const keywords = seoConfig?.metadata?.keywords || [];
+
   return {
     metadataBase,
     alternates: {
       canonical: '/',
     },
-    title: seoConfig.metadata.title,
-    description: seoConfig.metadata.description,
-    keywords: seoConfig.metadata.keywords,
-    verification: seoConfig.metadata.verification,
+    title,
+    description,
+    keywords,
+    verification: seoConfig?.metadata?.verification,
     openGraph: {
-      title: seoConfig.metadata.title,
-      description: seoConfig.metadata.description,
+      title,
+      description,
       url: siteUrl,
       siteName: '코코알바',
       images: [{ url: ogImage, width: 1200, height: 630, alt: '코코알바 - No.1 여성알바 매칭' }],
