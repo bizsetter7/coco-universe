@@ -76,14 +76,21 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
             }
 
             // 1. Update shops table - adId를 숫자로 변환하여 명시적 매칭 시도
-            const { error: shopError } = await supabase
+            const { error: shopError, count } = await supabase
                 .from('shops')
-                .update(updateData)
+                .update(updateData, { count: 'exact' })
                 .eq('id', Number(adId));
 
             if (shopError) {
                 console.error('Shops update error:', shopError);
                 throw shopError;
+            }
+
+            // [중요] 업데이트된 행이 0개라면 RLS나 ID 불일치 오류임
+            if (count === 0) {
+                const noRowErr = new Error('해당 공고를 찾을 수 없거나 수정 권한이 없습니다. (DB 미반영)');
+                console.error('No rows updated:', noRowErr);
+                throw noRowErr;
             }
 
             // 2. 승인 시 payments 레코드 생성/업데이트 (결제 내역 관리에 표시되도록)
@@ -189,7 +196,12 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
             ));
 
             const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
-            alert(`광고 ${statusMsg} 처리가 완료되었습니다. (DB 반영 완료)`);
+            alert(`광고 ${statusMsg} 처리가 완료되었습니다. (DB 반영 성공)`);
+
+            // [추가] 사이드바와 대시보드의 대기 수치를 즉시 갱신하기 위해 데이터 리프레시 호출
+            if (fetchData) {
+                fetchData();
+            }
 
             // Close modal if open
             setIsRejectModalOpen(false);
@@ -205,7 +217,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
                 return nextAds;
             });
-            alert('DB 업데이트 중 오류가 발생하여 로컬 상태만 변경되었습니다.');
+            alert(`DB 업데이트 실패: ${error?.message || '알 수 없는 오류'}\n(로컬 화면에서만 임시 변경되었습니다. 실서버 반영 여부를 확인하세요.)`);
         }
     };
 

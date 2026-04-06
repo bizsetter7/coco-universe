@@ -129,7 +129,12 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     infowindow.open(map, new kakao.maps.Marker({ map, position: coords }));
                 });
             })
-            .catch(() => setMapError('지도를 불러오지 못했습니다.'));
+            .catch(err => {
+                if (!cancelled) {
+                    console.error('Map loading error:', err);
+                    setMapError(err.message || '지도를 불러오지 못했습니다.');
+                }
+            });
         return () => { cancelled = true; };
     }, [bizAddress]);
     // [표준 규정] 광고 등급별 스타일 맵 (T1~T7 지원)
