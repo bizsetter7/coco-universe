@@ -34,12 +34,17 @@ const loadKakaoMapSdk = (): Promise<void> => {
         // 이미 스크립트가 로드되어 있으면 재사용
         const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
         if (existing) {
-            const kakao = (window as any).kakao;
-            if (kakao?.maps?.load) {
-                kakao.maps.load(() => resolve());
-            } else {
-                reject(new Error('카카오 지도 도메인 미등록 (플랫폼→웹 등록 필요)'));
-            }
+            const checkExisting = () => {
+                const kakao = (window as any).kakao;
+                if (kakao?.maps?.services) {
+                    resolve();
+                } else if (kakao?.maps?.load) {
+                    kakao.maps.load(() => resolve());
+                } else {
+                    setTimeout(checkExisting, 100);
+                }
+            };
+            checkExisting();
             return;
         }
         const script = document.createElement('script');
@@ -75,7 +80,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any, onClose: () => void })
 
     // 사업장 주소 로드 (profiles.business_address)
     useEffect(() => {
-        const userId = ad?.user_id || ad?.options?.user_id;
+        const userId = ad?.user_id || ad?.options?.user_id || ad?.ownerId;
         if (!userId) return;
         import('@/lib/supabase').then(({ supabase }) => {
             supabase.from('profiles')

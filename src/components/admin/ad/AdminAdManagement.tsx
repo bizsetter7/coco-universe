@@ -66,7 +66,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
             const updateData: any = { status: newStatus, updated_at: nowIso };
             if (newStatus === 'active') {
                 updateData.approved_at = nowIso;
-                updateData.pay_status = '결제완료';
+                // pay_status는 shops 테이블 스키마에 없으므로 제외 (결제 상태는 payments 테이블 및 로컬 UI 맵핑으로 관리)
             }
             if (reason) {
                 updateData.rejection_reason = reason;

@@ -59,6 +59,10 @@ export const Step4Extras: React.FC<Step4Props> = ({
     const handleTogglePaySuffix = (s: string) => {
         if (!checkEditMode()) return;
         if (!checkStep3()) return;
+        if (!paySuffixes.includes(s) && paySuffixes.length >= 6) {
+            alert('최대 6개까지만 선택가능합니다');
+            return;
+        }
         togglePaySuffix(s);
     };
 
@@ -88,6 +92,8 @@ export const Step4Extras: React.FC<Step4Props> = ({
         } else {
             if (selectedKeywords.length < 10) {
                 setSelectedKeywords([...selectedKeywords, kw]);
+            } else {
+                alert('최대 10개까지만 선택가능합니다');
             }
         }
     };
