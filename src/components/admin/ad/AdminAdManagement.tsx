@@ -59,8 +59,11 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
 
     const handleStatusUpdate = async (adId: string, newStatus: string, reason?: string) => {
         try {
-            // Get ad details for notification
-            const ad = mockAds.find(a => a.id === adId);
+            // Get ad details for notification - String 변환 후 비교하여 정확한 객체 탐색
+            const ad = mockAds.find(a => String(a.id) === String(adId));
+            if (!ad) {
+                console.error('Ad not found in local state:', adId);
+            }
 
             const nowIso = new Date().toISOString();
             const updateData: any = { status: newStatus, updated_at: nowIso };
@@ -72,13 +75,16 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 updateData.rejection_reason = reason;
             }
 
-            // 1. Update shops table
-            const { error } = await supabase
+            // 1. Update shops table - adId를 숫자로 변환하여 명시적 매칭 시도
+            const { error: shopError } = await supabase
                 .from('shops')
                 .update(updateData)
-                .eq('id', adId);
+                .eq('id', Number(adId));
 
-            if (error) throw error;
+            if (shopError) {
+                console.error('Shops update error:', shopError);
+                throw shopError;
+            }
 
             // 2. 승인 시 payments 레코드 생성/업데이트 (결제 내역 관리에 표시되도록)
             if (newStatus === 'active' && ad) {
@@ -91,21 +97,28 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                     await supabase
                         .from('payments')
                         .update({ status: 'completed', updated_at: nowIso })
-                        .eq('shop_id', adId);
+                        .eq('shop_id', Number(adId));
                 } else {
                     const adPrice = Number((ad as any).ad_price || (ad as any).adPrice || 0);
                     const userId = (ad as any).user_id || ad.ownerId;
+                    const shopName = (ad as any).shopName || ad.name || '';
+                    
                     await supabase.from('payments').insert([{
-                        shop_id: adId,
+                        shop_id: Number(adId),
                         user_id: userId,
                         amount: adPrice,
                         status: 'completed',
                         method: 'bank_transfer',
                         description: ad.title || '광고 결제',
-                        depositor_name: (ad as any).shopName || ad.name || '',
-                        metadata: { adTitle: ad.title, type: 'ad_payment' },
+                        // [주의] payments 테이블에 depositor_name 컬럼이 없으므로 metadata로 이동
+                        metadata: { 
+                            adTitle: ad.title, 
+                            type: 'ad_payment',
+                            depositor_name: shopName 
+                        },
                         created_at: nowIso,
                         updated_at: nowIso,
+                        pay_type: (ad as any).pay_type || (ad as any).payType || 'fixed'
                     }]);
                 }
             }

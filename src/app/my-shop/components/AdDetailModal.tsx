@@ -28,40 +28,71 @@ const TIER_GRADIENTS: Record<string, string> = {
 // 카카오맵 SDK 로드
 const loadKakaoMapSdk = (): Promise<void> => {
     return new Promise((resolve, reject) => {
-        if ((window as any).kakao?.maps?.services) { resolve(); return; }
+        const kakao = (window as any).kakao;
+        // 1. 이미 서비스 라이브러리까지 완벽히 로드된 경우 즉시 완료
+        if (kakao?.maps?.services) { resolve(); return; }
+
         const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
         if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
-        // 이미 스크립트가 로드되어 있으면 재사용
+
+        // 10초 타임아웃 설정
+        const timeoutId = setTimeout(() => {
+            reject(new Error('카카오 지도 로딩 시간 초과 (네트워크 상태 확인 필요)'));
+        }, 10000);
+
+        const checkInitialized = () => {
+            if ((window as any).kakao?.maps?.services) {
+                clearTimeout(timeoutId);
+                resolve();
+                return true;
+            }
+            return false;
+        };
+
+        // 2. 이미 스크립트 태그는 있으나 초기화 중인 경우
         const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
         if (existing) {
-            const checkExisting = () => {
-                const kakao = (window as any).kakao;
-                if (kakao?.maps?.services) {
-                    resolve();
-                } else if (kakao?.maps?.load) {
-                    kakao.maps.load(() => resolve());
+            const poll = () => {
+                if (checkInitialized()) return;
+                
+                const k = (window as any).kakao;
+                if (k?.maps?.load) {
+                    k.maps.load(() => {
+                        if (!checkInitialized()) {
+                            // load 후에도 services가 없으면 잠시 대기
+                            setTimeout(poll, 100);
+                        }
+                    });
                 } else {
-                    setTimeout(checkExisting, 100);
+                    setTimeout(poll, 100);
                 }
             };
-            checkExisting();
+            poll();
             return;
         }
+
+        // 3. 신규 스크립트 로드
         const script = document.createElement('script');
         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
         script.onload = () => {
-            try {
-                const kakao = (window as any).kakao;
-                if (!kakao?.maps?.load) {
-                    reject(new Error('카카오 지도 도메인 미등록'));
-                    return;
-                }
-                kakao.maps.load(() => resolve());
-            } catch (e) {
-                reject(e);
+            const k = (window as any).kakao;
+            if (k?.maps?.load) {
+                k.maps.load(() => {
+                    // 주기적으로 체크하여 services까지 로드되었는지 확인
+                    const finalPoll = () => {
+                        if (checkInitialized()) return;
+                        setTimeout(finalPoll, 100);
+                    };
+                    finalPoll();
+                });
+            } else {
+                reject(new Error('카카오 지도 객체 생성 실패 (도메인 확인 필요)'));
             }
         };
-        script.onerror = () => reject(new Error('카카오 지도 스크립트 로드 실패'));
+        script.onerror = () => {
+            clearTimeout(timeoutId);
+            reject(new Error('카카오 지도 스크립트 로드 실패'));
+        };
         document.head.appendChild(script);
     });
 };
