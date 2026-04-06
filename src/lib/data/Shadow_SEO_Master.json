@@ -5,7 +5,7 @@
   },
   "metadata": {
     "title": "룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바",
-    "description": "룸알바·노래방알바·노래빠알바·유흥알바·BJ알바·엔터알바 정보 플랫폼 코코알바. 대한민국 1등 고소득 여성알바 정보를 실시간 확인하세요.",
+    "description": "대한민국 1등 고수익 여성알바 코코알바. 룸알바, 노래방알바, 유흥알바, BJ알바, 엔터알바 정보를 실시간 확인하세요. 일급 50만원 이상, 당일지급 100% 보장!",
     "keywords": [
       "룸알바",
       "노래방알바",
@@ -18,15 +18,22 @@
       "고수익알바",
       "당일지급알바",
       "아가씨알바",
-      "전국여성알바",
-      "강남룸알바",
-      "부산여성알바",
+      "20대 여자알바",
+      "30대 여자알바",
+      "대학생알바",
+      "취준생알바",
+      "투잡알바",
+      "수원 인계동 고수익",
+      "강남 룸알바",
+      "부산 노래방알바",
       "코코알바"
     ],
     "verification": {
       "google": "enzbVhzoI9Bq9YzGqFaLghzkqVlFHwe-DBnnNajWC0Y",
       "other": {
-        "naver-site-verification": ["950201bcd2e28188884dfc9feeb6951a40c0887c"]
+        "naver-site-verification": [
+          "950201bcd2e28188884dfc9feeb6951a40c0887c"
+        ]
       }
     }
   },
@@ -35,7 +42,7 @@
       "@context": "https://schema.org",
       "@type": "EmploymentAgency",
       "name": "코코알바 (COCOALBA)",
-      "description": "룸알바, 노래방알바, 노래빠알바, 유흥알바, BJ알바, 엔터알바 등 대한민국 고소득 여성알바 정보 전문 플랫폼. 검증된 전국 업체 정보를 실시간 제공합니다.",
+      "description": "대한민국 1등 고수익 여성알바 코코알바. 룸알바, 노래방알바, 유흥알바, BJ알바, 엔터알바 정보를 실시간 확인하세요. 일급 50만원 이상, 당일지급 100% 보장!",
       "url": "https://cocoalba.kr",
       "logo": "https://cocoalba.kr/logo.png",
       "telephone": "+82-1877-1442",
@@ -43,7 +50,13 @@
         "@type": "Country",
         "name": "대한민국"
       },
-      "serviceType": ["룸알바 정보", "노래방알바 정보", "유흥알바 정보", "BJ알바 정보", "고소득 여성알바 매칭"],
+      "serviceType": [
+        "룸알바 정보",
+        "노래방알바 정보",
+        "유흥알바 정보",
+        "BJ알바 정보",
+        "고소득 여성알바 매칭"
+      ],
       "sameAs": "https://www.cocoalba.kr"
     }
   ]
