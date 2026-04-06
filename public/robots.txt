@@ -58,4 +58,5 @@ Disallow: /
 User-agent: DataForSeoBot
 Disallow: /
 
-Sitemap: https://cocoalba.kr/sitemap.xml
+Sitemap: https://www.cocoalba.kr/sitemap.xml
+Sitemap: https://region.cocoalba.kr/sitemap.xml
