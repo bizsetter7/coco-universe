@@ -31,35 +31,48 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const isMobile = useMobile();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const isAdminPage = pathname?.startsWith('/admin');
     const { user: authUser, isLoading, isLoggedIn, logout } = useAuth();
     
     // [Safety] Hydration Guard — 서버/클라이언트 렌더링 불일치 원천 차단
     const [isMounted, setIsMounted] = React.useState(false);
+    
+    // [SEO Enhancement] Bot Detection Hook — 최상단으로 이동 (Hook 순서 보장)
+    const [isBot, setIsBot] = React.useState(false);
+    
+    // [Gate State] 인증 상태 Hook — 최상단으로 이동
+    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+
     React.useEffect(() => {
         setIsMounted(true);
+        
+        // Bot Detection Logic
+        if (typeof navigator !== 'undefined') {
+            const ua = navigator.userAgent.toLowerCase();
+            const botKeywords = ['googlebot', 'bingbot', 'yeti', 'naverbot', 'daum'];
+            if (botKeywords.some(keyword => ua.includes(keyword))) {
+                setIsBot(true);
+            }
+        }
     }, []);
 
-    // ── [Idle Logout Setup] ───────────────────────────────────────────────────
+    // [Idle Logout Setup]
     const { showWarning, secondsLeft, keepAlive } = useIdleLogout({
         enabled: isLoggedIn && (authUser?.type === 'corporate' || authUser?.type === 'individual'),
         onLogout: logout,
     });
 
-    const isAdminPage = pathname?.startsWith('/admin');
+    // [Logic Flags] — Hooks 선언 완료 후 계산
+    const currentQueryPage = searchParams?.get('page');
+    const isPublicPage = ['signup', 'find-id', 'find-pw', 'support', 'faq', 'inquiry'].includes(currentQueryPage || '');
+    const isAuthPage = ['login', 'signup', 'find-id', 'find-pw', 'guest'].includes(currentQueryPage || '');
+    const isAuthFlowPage = pathname?.startsWith('/auth/');
 
-    // ── [1] Audit Mode: P4 심사용 B2B 랜딩 강제 노출 ────────────────────────────
-    if (AUDIT_MODE && !isAdminPage) {
-        return (
-            <div className="w-full min-h-screen bg-white">
-                <Suspense fallback={null}>
-                    <AuditLanding />
-                </Suspense>
-            </div>
-        );
-    }
+    const decodedPath = (pathname ? decodeURIComponent(pathname) : '').normalize('NFC');
+    const pathParts = decodedPath.split('/');
+    const isGuidePage = pathParts.length === 4 && pathParts[1] === 'coco' && isWorkTypeSlug(pathParts[3]);
 
-    // ── [2] 성인인증 게이트 (Adult Verification Gate) ──────────────────────────────
-    const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
 
     React.useEffect(() => {
         if (isLoading) return;
@@ -82,8 +95,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             return;
         }
 
-        const localVerified = localStorage.getItem('adult_verified') === 'true';
-        const sessionSkipped = sessionStorage.getItem('adult_gate_skipped') === 'true';
+        const localVerified = typeof window !== 'undefined' && localStorage.getItem('adult_verified') === 'true';
+        const sessionSkipped = typeof window !== 'undefined' && sessionStorage.getItem('adult_gate_skipped') === 'true';
         setIsVerified(localVerified || sessionSkipped);
     }, [isLoading, authUser, pathname]);
 
@@ -97,7 +110,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         setIsVerified(true);
     };
 
-    if (isLoading || isVerified === null) {
+    // ── [3] All Conditional Early Returns (Hooks 이후에 배치) ──────────────────
+    
+    if (!isMounted || isLoading || isVerified === null) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-white">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -105,40 +120,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
         );
     }
 
-    // ── [Public Page Check] ───────────────────────────────────────────────────
-    const currentQueryPage = searchParams?.get('page');
-    const isPublicPage = ['signup', 'find-id', 'find-pw', 'support', 'faq', 'inquiry'].includes(currentQueryPage || '');
-    // 로그인 전 인증 관련 페이지 — 사이드 배너 미노출
-    const isAuthPage = ['login', 'signup', 'find-id', 'find-pw', 'guest'].includes(currentQueryPage || '');
-
-    // /auth/ 하위 경로 (비밀번호 재설정 등) — 성인인증 게이트 없이 접근 가능해야 함
-    const isAuthFlowPage = pathname?.startsWith('/auth/');
-
-    // 가이드 페이지 여부 확인 (예: /coco/서울/룸알바)
-    // 실서버(Vercel) 및 브라우저 환경에 따라 다르게 들어올 수 있는 pathname을 정규화
-    const decodedPath = (pathname ? decodeURIComponent(pathname) : '').normalize('NFC');
-    const pathParts = decodedPath.split('/');
-    const isGuidePage = pathParts.length === 4 && pathParts[1] === 'coco' && isWorkTypeSlug(pathParts[3]);
-
-    // [SEO Enhancement] Bot Detection — Googlebot 등 검색 크롤러는 성인인증 게이트 제약(Blur, Scroll Lock) 없이 전체 내용을 읽을 수 있도록 허용
-    const [isBot, setIsBot] = React.useState(false);
-    React.useEffect(() => {
-        const ua = navigator.userAgent.toLowerCase();
-        const botKeywords = ['googlebot', 'bingbot', 'yeti', 'naverbot', 'daum'];
-        if (botKeywords.some(keyword => ua.includes(keyword))) {
-            setIsBot(true);
-        }
-    }, []);
-
-    // 미인증 상태이고 게이트가 활성화된 경우 게이트 노출 (단, 공개 페이지·인증플로우·가이드페이지·봇 제외)
-    // [Soft Gate Strategy] — SEO를 위해 children을 DOM에 남겨두고 오버레이만 씌움
-    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
-    // ── [/GATE_LOCKED] ─────────────────────────────────────────────────────────
-
-    if (!isMounted || isLoading) {
+    if (AUDIT_MODE && !isAdminPage) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-white">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="w-full min-h-screen bg-white">
+                <Suspense fallback={null}>
+                    <AuditLanding />
+                </Suspense>
             </div>
         );
     }
