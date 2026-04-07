@@ -61,10 +61,17 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
         try {
             const ad = mockAds.find(a => String(a.id) === String(adId));
             
+            // [Auth Fix] 현재 세션 토큰 가져오기 (인증 헤더용)
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
             // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출
             const res = await fetch('/api/admin/update-shop-status', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     adId,
                     status: newStatus,

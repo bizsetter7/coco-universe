@@ -12,10 +12,17 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
         if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
 
         try {
+            // [Auth Fix] 현재 세션 토큰 가져오기 (인증 헤더용)
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
             // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출 (Status API가 payments 테이블 동기화도 함께 수행)
             const res = await fetch('/api/admin/update-shop-status', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     adId: shopId,
                     status: 'active',
@@ -54,9 +61,15 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
             if (payError) throw payError;
 
             // 2+3. 포인트/점프 지급 — 서버 API 라우트 경유 (RLS 우회, point_logs 무결성 보장)
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
             const grantRes = await fetch('/api/admin/grant-balance', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     userId,
                     amount: Number(amount),
