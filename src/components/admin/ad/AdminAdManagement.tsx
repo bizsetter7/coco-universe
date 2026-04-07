@@ -59,165 +59,38 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
 
     const handleStatusUpdate = async (adId: string, newStatus: string, reason?: string) => {
         try {
-            // Get ad details for notification - String 변환 후 비교하여 정확한 객체 탐색
             const ad = mockAds.find(a => String(a.id) === String(adId));
-            if (!ad) {
-                console.error('Ad not found in local state:', adId);
+            
+            // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출
+            const res = await fetch('/api/admin/update-shop-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adId,
+                    status: newStatus,
+                    rejectionReason: reason || '',
+                    adData: ad // 결제 내역 생성을 위한 메타데이터 전달
+                })
+            });
+
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                throw new Error(result.error || '상태 업데이트 실패');
             }
-
-            const nowIso = new Date().toISOString();
-            const updateData: any = { status: newStatus, updated_at: nowIso };
-            if (newStatus === 'active') {
-                updateData.approved_at = nowIso;
-                // pay_status는 shops 테이블 스키마에 없으므로 제외 (결제 상태는 payments 테이블 및 로컬 UI 맵핑으로 관리)
-            }
-            if (reason) {
-                updateData.rejection_reason = reason;
-            }
-
-            // 1. Update shops table - adId를 숫자로 변환하여 명시적 매칭 시도
-            const { error: shopError, count } = await supabase
-                .from('shops')
-                .update(updateData, { count: 'exact' })
-                .eq('id', Number(adId));
-
-            if (shopError) {
-                console.error('Shops update error:', shopError);
-                throw shopError;
-            }
-
-            // [중요] 업데이트된 행이 0개라면 RLS나 ID 불일치 오류임
-            if (count === 0) {
-                const noRowErr = new Error('해당 공고를 찾을 수 없거나 수정 권한이 없습니다. (DB 미반영)');
-                console.error('No rows updated:', noRowErr);
-                throw noRowErr;
-            }
-
-            // 2. 승인 시 payments 레코드 생성/업데이트 (결제 내역 관리에 표시되도록)
-            if (newStatus === 'active' && ad) {
-                const { data: existingPayments } = await supabase
-                    .from('payments')
-                    .select('id')
-                    .eq('shop_id', adId);
-
-                if (existingPayments && existingPayments.length > 0) {
-                    await supabase
-                        .from('payments')
-                        .update({ status: 'completed', updated_at: nowIso })
-                        .eq('shop_id', Number(adId));
-                } else {
-                    const adPrice = Number((ad as any).ad_price || (ad as any).adPrice || 0);
-                    const userId = (ad as any).user_id || ad.ownerId;
-                    const shopName = (ad as any).shopName || ad.name || '';
-                    
-                    await supabase.from('payments').insert([{
-                        shop_id: Number(adId),
-                        user_id: userId,
-                        amount: adPrice,
-                        status: 'completed',
-                        method: 'bank_transfer',
-                        description: ad.title || '광고 결제',
-                        // [주의] payments 테이블에 depositor_name 컬럼이 없으므로 metadata로 이동
-                        metadata: { 
-                            adTitle: ad.title, 
-                            type: 'ad_payment',
-                            depositor_name: shopName 
-                        },
-                        created_at: nowIso,
-                        updated_at: nowIso,
-                        pay_type: (ad as any).pay_type || (ad as any).payType || 'fixed'
-                    }]);
-                }
-            }
-
-            // 승인 시 알림쪽지
-            if (newStatus === 'active' && ad) {
-                try {
-                    const rawUserId = (ad as any).user_id || ad.ownerId;
-                    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawUserId || '');
-                    if (isUuid) {
-                        await supabase.from('notifications').insert({
-                            user_id: rawUserId,
-                            type: 'AD_APPROVED',
-                            title: '광고가 승인되었습니다 ✅',
-                            message: `'${ad.title || ad.shopName}' 공고가 심사를 통과하여 정상 게재 중입니다. 마이샵에서 확인하세요.`,
-                            read: false,
-                            link: '/my-shop?view=dashboard',
-                            created_at: new Date().toISOString(),
-                        });
-                    }
-                } catch (notifError) {
-                    console.error('Approval notification failed:', notifError);
-                }
-            }
-
-            // [New] Create notification and update history for rejected ads
-            if (newStatus === 'rejected' && ad) {
-                // Update rejection history
-                const currentHistory = (ad as any).rejection_history || [];
-                const newHistoryItem = {
-                    reason: reason || '심사 기준 미달',
-                    date: new Date().toISOString(),
-                    index: currentHistory.length + 1
-                };
-                updateData.rejection_history = [...currentHistory, newHistoryItem];
-
-                try {
-                    const rawUserId = (ad as any).user_id || ad.ownerId;
-                    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawUserId || '');
-
-                    if (isUuid) {
-                        await supabase.from('notifications').insert({
-                            user_id: rawUserId,
-                            type: 'AD_REJECTED',
-                            title: '광고 심사 거절',
-                            message: reason
-                                ? `'${ad.title || ad.shopName}' 광고가 거절되었습니다. 사유: ${reason}`
-                                : `'${ad.title || ad.shopName}' 광고가 심사에서 거절되었습니다. 관리자에게 문의하세요.`,
-                            read: false,
-                            link: '/my-shop?view=dashboard',
-                            created_at: new Date().toISOString()
-                        });
-                    }
-                } catch (notifError) {
-                    console.error('Notification creation failed:', notifError);
-                }
-            }
-
-            // Update UI state
-            setMockAds((prev: Shop[]) => prev.map((ad: Shop) =>
-                ad.id === adId ? ({
-                    ...ad,
-                    status: newStatus as Shop['status'],
-                    rejection_reason: reason,
-                    rejection_history: updateData.rejection_history || (ad as any).rejection_history,
-                    ...(newStatus === 'active' ? { payStatus: '결제완료', paid_at: nowIso } : {}),
-                } as Shop) : ad
-            ));
 
             const statusMsg = newStatus === 'active' ? '승인' : (newStatus === 'rejected' ? '거절' : '변경');
             alert(`광고 ${statusMsg} 처리가 완료되었습니다. (DB 반영 성공)`);
+            
+            // UI 데이터 갱신
+            if (fetchData) fetchData();
 
-            // [추가] 사이드바와 대시보드의 대기 수치를 즉시 갱신하기 위해 데이터 리프레시 호출
-            if (fetchData) {
-                fetchData();
-            }
-
-            // Close modal if open
+            // 리모달 닫기 및 상태 초기화
             setIsRejectModalOpen(false);
             setRejectingAdId(null);
             setRejectionReason('');
         } catch (error: any) {
-            console.error('Error updating status:', error?.message || error);
-            // Local fallback for demo
-            setMockAds((prev: Shop[]) => {
-                const nextAds = prev.map((ad: Shop) =>
-                    ad.id === adId ? ({ ...ad, status: newStatus as any, rejection_reason: reason } as Shop) : ad
-                );
-                localStorage.setItem('coco_admin_mockAds', JSON.stringify(nextAds));
-                return nextAds;
-            });
-            alert(`DB 업데이트 실패: ${error?.message || '알 수 없는 오류'}\n(로컬 화면에서만 임시 변경되었습니다. 실서버 반영 여부를 확인하세요.)`);
+            console.error('Status update error:', error);
+            alert(`DB 업데이트 실패: ${error.message || '알 수 없는 오류'}\n(관리자 권한 및 네트워크를 확인하세요)`);
         }
     };
 
@@ -678,6 +551,12 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                     managerPhone: (selectedAdForModal as any).managerPhone || (selectedAdForModal as any).manager_phone || (selectedAdForModal.options as any)?.managerPhone || ''
                                 }}
                                 brand={brand}
+                                bizAddressOverride={
+                                    // [관리자 RLS 우회] options에 스냅샷된 사업장 주소를 우선 전달
+                                    (selectedAdForModal.options as any)?.businessAddress ||
+                                    (selectedAdForModal.options as any)?.business_address ||
+                                    undefined
+                                }
                             />
 
                         </div>

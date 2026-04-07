@@ -693,7 +693,9 @@ function MyShopContent() {
                     addressDetail: formState.addressDetail,
                     regionCity: formState.regionCity,
                     regionGu: formState.regionGu,
-                    mediaUrl: formState.mediaUrl
+                    mediaUrl: formState.mediaUrl,
+                    // [지도 스냅샷] 관리자 팝업 지도 표시용 — RLS 없이 주소 조회 가능하도록 저장
+                    businessAddress: bizAddress || (originalAd?.options as any)?.businessAddress || ''
                 }
             };
 

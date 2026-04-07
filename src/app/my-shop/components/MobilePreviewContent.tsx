@@ -81,15 +81,20 @@ const loadKakaoMapSdk = (): Promise<void> =>
 interface MobilePreviewContentProps {
     formData: any;
     brand?: any; // Optional, defaults used if missing
+    bizAddressOverride?: string; // [관리자 팝업용] RLS 우회: 이미 아는 주소를 직접 주입
 }
 
-export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ formData, brand }) => {
+export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ formData, brand, bizAddressOverride }) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const [bizAddress, setBizAddress] = useState<string | null>(null);
     const [mapError, setMapError] = useState<string | null>(null);
 
-    // 사업장 주소 로드 (user_id → profiles.business_address)
+    // 사업장 주소 로드 — override가 있으면 DB 조회 생략 (관리자 RLS 우회)
     useEffect(() => {
+        if (bizAddressOverride) {
+            setBizAddress(bizAddressOverride);
+            return;
+        }
         const userId = formData.user_id || formData.ownerId;
         if (!userId) return;
         import('@/lib/supabase').then(({ supabase }) => {
@@ -104,7 +109,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                     }
                 });
         });
-    }, [formData.user_id, formData.ownerId]);
+    }, [bizAddressOverride, formData.user_id, formData.ownerId]);
 
     // 카카오맵 렌더링
     useEffect(() => {

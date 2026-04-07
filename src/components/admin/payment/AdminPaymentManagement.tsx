@@ -12,25 +12,27 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
         if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
 
         try {
-            const { error: payError } = await supabase
-                .from('payments')
-                .update({ status: 'completed', updated_at: new Date().toISOString() })
-                .eq('id', paymentId);
-            if (payError) throw payError;
+            // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출 (Status API가 payments 테이블 동기화도 함께 수행)
+            const res = await fetch('/api/admin/update-shop-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adId: shopId,
+                    status: 'active',
+                    adData: { id: shopId } // 최소 데이터 전달
+                })
+            });
 
-            if (shopId) {
-                const { error: shopError } = await supabase
-                    .from('shops')
-                    .update({ status: 'active', approved_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-                    .eq('id', shopId);
-                if (shopError) console.error("Ad auto-approval failed:", shopError);
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                throw new Error(result.error || '결제 승인 실패');
             }
 
             alert('결제 승인 및 광고 게시 처리가 완료되었습니다.');
             fetchData();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Payment confirmation error:', err);
-            alert('오류가 발생했습니다.');
+            alert(`오류가 발생했습니다: ${err.message || '알 수 없는 오류'}`);
         }
     };
 
