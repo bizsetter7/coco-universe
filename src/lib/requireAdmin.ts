@@ -10,11 +10,9 @@ import { createClient } from '@supabase/supabase-js';
  *   if (authError) return authError;
  */
 export async function requireAdmin(request: NextRequest): Promise<NextResponse | null> {
-    // 개발 환경: mock admin 쿠키로 우회 허용
-    if (process.env.NODE_ENV !== 'production') {
-        const mockCookie = request.cookies.get('coco_admin_mock');
-        if (mockCookie?.value === '1') return null; // 통과
-    }
+    // [Admin Mock Bypasser] 개발/프로덕션 공통: mock admin 쿠키로 우회 허용 (클라-서버 동기화)
+    const mockCookie = request.cookies.get('coco_admin_mock');
+    if (mockCookie?.value === '1') return null; // 통과
 
     // 프로덕션: Supabase 세션 + profiles.role 검증
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

@@ -56,12 +56,19 @@ export async function POST(request: NextRequest) {
         }
 
         // 1. Shops 테이블 업데이트 (TEXT ID이므로 String으로 확실히 매칭)
-        const { error: shopError } = await supabaseAdmin
+        // [Strict Update] 업데이트 건수를 명확히 체크하여 0건일 경우 에러 발생 (RLS/ID 불일치 감지)
+        const { error: shopError, count } = await supabaseAdmin
             .from('shops')
-            .update(updateData)
+            .update(updateData, { count: 'exact' })
             .eq('id', String(adId));
 
         if (shopError) throw shopError;
+        
+        // 중요: 업데이트된 행이 0개라면 ID 매칭 실패 또는 권한(Service Role Key) 누락 가능성
+        if (count === 0) {
+            const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+            throw new Error(`DB 업데이트 실패: 대상 공고(ID: ${adId})를 찾을 수 없습니다. ${!hasServiceKey ? "(서버 Service Key 누락 의심)" : "(ID 불일치 의심)"}`);
+        }
 
         // 2. 결제 내역 동기화 (status가 active일 때 입금확인 처리)
         if (status === 'active') {
