@@ -131,7 +131,7 @@ function AdminContent() {
             // 3. Fetch Payments
             const { data: payData } = await supabase
                 .from('payments')
-                .select('*, profiles(nickname, full_name)')
+                .select('*, profiles(id, nickname, full_name, business_name, business_number, business_file_url)')
                 .order('created_at', { ascending: false })
                 .limit(2000);
 

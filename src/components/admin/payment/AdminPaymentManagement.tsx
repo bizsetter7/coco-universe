@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Search, Filter, FileText, ExternalLink, Calendar, CheckCircle2, Clock, AlertCircle, Layout, Zap } from 'lucide-react';
 
 interface AdminPaymentManagementProps {
     payments: any[];
@@ -7,16 +8,35 @@ interface AdminPaymentManagementProps {
 }
 
 export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentManagementProps) {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
+    const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION'>('all');
+
+    // [Filtering Logic]
+    const filteredPayments = useMemo(() => {
+        return payments.filter(pay => {
+            const matchesStatus = statusFilter === 'all' || pay.status === statusFilter;
+            const matchesType = typeFilter === 'all' || pay.type === typeFilter;
+            
+            const searchLower = searchTerm.toLowerCase();
+            const matchesSearch = !searchTerm || 
+                pay.id.toLowerCase().includes(searchLower) ||
+                pay.profiles?.full_name?.toLowerCase().includes(searchLower) ||
+                pay.profiles?.business_name?.toLowerCase().includes(searchLower) ||
+                pay.profiles?.business_number?.includes(searchLower) ||
+                pay.user_id.toLowerCase().includes(searchLower);
+
+            return matchesStatus && matchesType && matchesSearch;
+        });
+    }, [payments, searchTerm, statusFilter, typeFilter]);
 
     const handlePaymentConfirm = async (paymentId: string, shopId: string) => {
         if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
 
         try {
-            // [Auth Fix] 현재 세션 토큰 가져오기 (인증 헤더용)
             const { data: { session } } = await supabase.auth.getSession();
             const token = session?.access_token;
 
-            // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출 (Status API가 payments 테이블 동기화도 함께 수행)
             const res = await fetch('/api/admin/update-shop-status', {
                 method: 'POST',
                 headers: { 
@@ -26,14 +46,12 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                 body: JSON.stringify({
                     adId: shopId,
                     status: 'active',
-                    adData: { id: shopId } // 최소 데이터 전달
+                    adData: { id: shopId }
                 })
             });
 
             const result = await res.json();
-            if (!res.ok || !result.success) {
-                throw new Error(result.error || '결제 승인 실패');
-            }
+            if (!res.ok || !result.success) throw new Error(result.error || '결제 승인 실패');
 
             alert('결제 승인 및 광고 게시 처리가 완료되었습니다.');
             fetchData();
@@ -43,7 +61,6 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
         }
     };
 
-    // 포인트/점프 충전 지급 처리
     const handlePointGrant = async (paymentId: string, userId: string, metadata: any) => {
         const isPoint = metadata?.type === 'point_charge';
         const typeLabel = isPoint ? '포인트' : '점프 서비스';
@@ -52,15 +69,12 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
 
         try {
             const now = new Date().toISOString();
-
-            // 1. payments 완료 처리
             const { error: payError } = await supabase
                 .from('payments')
                 .update({ status: 'completed', updated_at: now })
                 .eq('id', paymentId);
             if (payError) throw payError;
 
-            // 2+3. 포인트/점프 지급 — 서버 API 라우트 경유 (RLS 우회, point_logs 무결성 보장)
             const { data: { session } } = await supabase.auth.getSession();
             const token = session?.access_token;
 
@@ -88,94 +102,155 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
     };
 
     const formatPrice = (priceInWon: number) => {
-        if (priceInWon >= 10000) {
-            return `${Math.floor(priceInWon / 10000)}만원`;
-        }
+        if (priceInWon >= 10000) return `${Math.floor(priceInWon / 10000)}만원`;
         return `${priceInWon.toLocaleString()}원`;
     };
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-            <div className="mb-2">
-                <h3 className="text-2xl font-black text-slate-950 tracking-tighter">결제 내역 관리 (Finance)</h3>
-                <p className="text-sm text-slate-400 font-bold mt-1">
-                    모든 결제 요청을 확인하고 승인 처리합니다.
-                </p>
+            {/* Header & Stats Summary */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h3 className="text-3xl font-black text-slate-950 tracking-tighter flex items-center gap-3">
+                        통합 결제 거버넌스 <span className="text-blue-600 text-sm font-black bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Finance Hub</span>
+                    </h3>
+                    <p className="text-sm text-slate-400 font-bold mt-1">
+                        광고, SOS, 점프 등 모든 유료 트래픽 결제 내역을 사업자 정보 기반으로 정밀 관리합니다.
+                    </p>
+                </div>
             </div>
 
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
-                <table className="w-full text-left border-collapse min-w-[800px]">
-                    <thead>
-                        <tr className="bg-slate-50/50 border-b border-slate-100">
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">결제정보</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">요청자</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">금액/유형</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">일시</th>
-                            <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">승인</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {payments.length > 0 ? (
-                            payments.map((pay) => (
-                                <tr key={pay.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-8 py-4">
-                                        <div className="flex items-center gap-2">
-                                            {(pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') && (
-                                                <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-purple-100 text-purple-600 shrink-0">
-                                                    {pay.metadata?.type === 'point_charge' ? '포인트충전' : '점프충전'}
-                                                </span>
+            {/* Filter Bar */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm shadow-slate-200/20">
+                <div className="md:col-span-2 relative">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="상호명, 사업자번호, 회원 ID로 검색..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    />
+                </div>
+                <div className="relative">
+                    <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <select 
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value as any)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 appearance-none"
+                    >
+                        <option value="all">모든 상태</option>
+                        <option value="pending">입금대기 / 검토</option>
+                        <option value="completed">결제 / 지급완료</option>
+                    </select>
+                </div>
+                <div className="relative">
+                    <Layout size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <select 
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value as any)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 appearance-none"
+                    >
+                        <option value="all">모든 유형</option>
+                        <option value="AD">일반 광고 (AD)</option>
+                        <option value="SOS">SOS 발송</option>
+                        <option value="JUMP">점프 서비스</option>
+                        <option value="OPTION">옵션 신청</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* List Table */}
+            <div className="bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/10 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                        <thead>
+                            <tr className="bg-slate-900 border-b border-slate-800">
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">유형 / 결제정보</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">사업자 / 요청자</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">금액 / 수단</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">일시</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {filteredPayments.length > 0 ? (
+                                filteredPayments.map((pay) => (
+                                    <tr key={pay.id} className="hover:bg-blue-50/20 transition-all group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                                                    pay.type === 'SOS' ? 'bg-orange-100 text-orange-600' :
+                                                    pay.type === 'JUMP' ? 'bg-purple-100 text-purple-600' :
+                                                    'bg-blue-100 text-blue-600'
+                                                }`}>
+                                                    {pay.type === 'SOS' ? <Zap size={14} /> : pay.type === 'JUMP' ? <Zap size={14} /> : <FileText size={14} />}
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-black text-slate-900">{pay.metadata?.adTitle || pay.metadata?.reason || pay.description || '시스템 결제'}</div>
+                                                    <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
+                                                        <span className="text-blue-500 font-black uppercase">{pay.type}</span> • {pay.id.substring(0, 8)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
+                                                {pay.profiles?.business_name || pay.profiles?.full_name || '미확인'}
+                                                {pay.profiles?.business_file_url && (
+                                                    <a href={pay.profiles.business_file_url} target="_blank" rel="noreferrer" title="사업자등록증 확인">
+                                                        <ExternalLink size={10} className="text-blue-400 hover:text-blue-600" />
+                                                    </a>
+                                                )}
+                                            </div>
+                                            <div className="text-[10px] text-slate-400 font-medium">
+                                                {pay.profiles?.business_number ? `사업자: ${pay.profiles.business_number}` : `ID: ${pay.profiles?.nickname || 'guest'}`}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="text-sm font-black text-slate-900 tabular-nums">{formatPrice(pay.amount)}</div>
+                                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{pay.method || 'Points/Manual'}</div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black ${
+                                                pay.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                            }`}>
+                                                {pay.status === 'completed' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
+                                                {pay.status === 'completed' ? '완료' : '대기중'}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+                                                <Calendar size={10} />
+                                                {new Date(pay.created_at).toLocaleDateString()}
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 text-right">
+                                            {pay.status !== 'completed' && (
+                                                <button
+                                                    onClick={() => (pay.type === 'JUMP' || pay.metadata?.type === 'point_charge') ? handlePointGrant(pay.id, pay.user_id, pay.metadata) : handlePaymentConfirm(pay.id, pay.shop_id)}
+                                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+                                                >
+                                                    승인 실행
+                                                </button>
                                             )}
-                                            <div className="text-sm font-black text-slate-900">{pay.metadata?.adTitle || pay.description || '광고 결제'}</div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6} className="px-8 py-32 text-center">
+                                        <div className="flex flex-col items-center gap-3 text-slate-300">
+                                            <AlertCircle size={40} strokeWidth={1} />
+                                            <p className="text-xs font-bold uppercase tracking-widest">No matching financial records found.</p>
                                         </div>
-                                        <div className="text-[10px] text-slate-400 font-bold">Ref: {pay.id.substring(0, 8)}</div>
-                                    </td>
-                                    <td className="px-8 py-4">
-                                        <div className="text-[11px] font-black text-slate-700">{pay.profiles?.full_name || pay.depositor_name || '-'}</div>
-                                        <div className="text-[10px] text-slate-400">{pay.profiles?.nickname || '-'}</div>
-                                    </td>
-                                    <td className="px-8 py-4">
-                                        <div className="text-sm font-black text-slate-900 tabular-nums">{formatPrice(pay.amount)}</div>
-                                        <div className="text-[9px] text-slate-500">{pay.method || '무통장입금'}</div>
-                                    </td>
-                                    <td className="px-8 py-4">
-                                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black ${pay.status === 'completed' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
-                                            {pay.status === 'completed' ? '결제완료' : '입금대기'}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-4">
-                                        <div className="text-[11px] font-bold text-slate-500">{new Date(pay.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="px-8 py-4 text-right">
-                                        {pay.status !== 'completed' && (
-                                            (pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') ? (
-                                                <button
-                                                    onClick={() => handlePointGrant(pay.id, pay.user_id, pay.metadata)}
-                                                    className="text-[10px] bg-purple-600 text-white px-3 py-1.5 rounded-lg font-black hover:bg-purple-700 transition"
-                                                >
-                                                    포인트 지급
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handlePaymentConfirm(pay.id, pay.shop_id)}
-                                                    className="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-lg font-black hover:bg-blue-700 transition"
-                                                >
-                                                    승인하기
-                                                </button>
-                                            )
-                                        )}
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={6} className="px-8 py-20 text-center text-slate-400 text-xs font-bold">
-                                    결제 내역이 없습니다.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

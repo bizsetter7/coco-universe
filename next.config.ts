@@ -21,18 +21,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   async redirects() {
-    return [
-      {
-        source: "/region/:path*",
-        destination: "https://region.cocoalba.kr/:path*",
-        permanent: true,
-      },
-      {
-        source: "/coco/:path*",
-        destination: "https://region.cocoalba.kr/:path*",
-        permanent: true,
-      },
-    ];
+    return [];
   },
 };
 

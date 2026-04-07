@@ -136,6 +136,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '발송 처리 중 오류가 발생했습니다. 다시 시도해주세요.' }, { status: 500 });
         }
 
+        // [New] 어드민 통합 결제 내역(payments)에도 기록 추가
+        try {
+            await supabaseAdmin.from('payments').insert([{
+                user_id: shopId,
+                amount: pointCost,
+                status: 'completed',
+                type: 'SOS',
+                method: 'points',
+                metadata: {
+                    reason: pointReason,
+                    recipient_count: recipientCount,
+                    shop_name: shopName
+                }
+            }]);
+        } catch (payErr) {
+            console.warn('[SOS/Send] payments 기록 실패 (무시하고 진행):', payErr);
+        }
+
         // 3. SOS 발송 이력 저장
         const { data: alertData, error: alertError } = await supabaseAdmin
             .from('sos_alerts')

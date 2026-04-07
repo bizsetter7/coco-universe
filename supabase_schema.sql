@@ -7,6 +7,23 @@ CREATE TABLE profiles (
   role TEXT DEFAULT 'individual', -- 'admin', 'corporate', 'individual'
   is_admin BOOLEAN DEFAULT FALSE,  -- [New] 어드민 여부
   points INTEGER DEFAULT 0,         -- [New] 코코 포인트
+  
+  -- [Business Verification Fields]
+  business_name TEXT,               -- 상호명
+  business_number TEXT,             -- 사업자등록번호 (10자리 숫자만)
+  business_type TEXT,               -- 업종
+  business_address TEXT,            -- 사업장 주소
+  business_address_detail TEXT,     -- 상세 주소
+  business_file_url TEXT,           -- 사업자등록증 파일 URL
+  business_verify_status TEXT DEFAULT 'none', -- none, pending, approved, rejected
+  business_verify_requested_at TIMESTAMP WITH TIME ZONE,
+  
+  -- [Staff Contact Fields]
+  manager_phone TEXT,               -- 담당자 연락처
+  manager_kakao TEXT,               -- 담당자 카카오톡 ID
+  manager_line TEXT,                -- 담당자 라인 ID
+  manager_telegram TEXT,            -- 담당자 텔레그램 ID
+  
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -72,6 +89,7 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE community_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE community_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- Basic Policies (Public read for now)
 -- Strict Security Policies (Privacy & Integrity)
@@ -85,7 +103,21 @@ CREATE POLICY "Profiles read policy" ON profiles FOR SELECT USING (
     (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true))
 );
 
--- 5. Auto-Join Points Trigger (The "Total Command" Core)
+-- 5. Payments Table (Unified Finance Tracking)
+CREATE TABLE payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  shop_id TEXT, -- Relation to shops.id (optional as some payments like SOS/Points don't have shop_id)
+  amount INTEGER NOT NULL DEFAULT 0,
+  status TEXT DEFAULT 'pending', -- pending, completed, rejected
+  type TEXT DEFAULT 'AD',        -- AD, JUMP, SOS, OPTION
+  method TEXT,                    -- card, bank, points
+  metadata JSONB DEFAULT '{}'::jsonb, -- Store snapshot info (e.g. ad period, SOS count)
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 6. Auto-Join Points Trigger (The "Total Command" Core)
 -- 신규 가입 시 profiles 생성 및 100P 지급 자동화
 CREATE OR REPLACE FUNCTION public.handle_new_user_setup()
 RETURNS TRIGGER AS $$

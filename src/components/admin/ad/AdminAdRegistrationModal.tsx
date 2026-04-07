@@ -69,47 +69,53 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
             const now = new Date();
             const deadline = new Date(now.getTime() + formData.duration * 24 * 60 * 60 * 1000);
 
+            const shopId = crypto.randomUUID();
+            
             const adData = {
+                id: shopId,
                 user_id: user.id,
                 name: formData.shopName,
                 title: formData.title,
                 region: formData.region,
-                work_region_sub: formData.regionGu,
-                category: formData.category,
-                category_sub: formData.categorySub,
                 phone: formData.managerPhone,
                 kakao: formData.kakao,
                 telegram: formData.telegram,
                 tier: formData.tier,
-                product_type: formData.tier,
                 pay_type: formData.payType,
                 pay: formData.payAmount,
-                pay_amount: parseInt(formData.payAmount.replace(/,/g, '') || '0'),
-                content: formData.content,
-                nickname: user.nickname || '관리자등록',
-                manager_name: formData.managerName,
-                manager_phone: formData.managerPhone,
-                media_url: formData.mediaUrl,
-                status: 'active', // Admin registration is active by default
+                status: 'active',
                 created_at: now.toISOString(),
                 updated_at: now.toISOString(),
-                approved_at: now.toISOString(),
-                deadline: deadline.toISOString().split('T')[0],
                 options: {
-                    product_type: formData.tier,
+                    ...formData,
                     product_period: formData.duration,
-                    managerName: formData.managerName,
-                    managerPhone: formData.managerPhone,
-                    payType: formData.payType,
-                    payAmount: parseInt(formData.payAmount.replace(/,/g, '') || '0'),
-                    regionCity: formData.region,
-                    regionGu: formData.regionGu,
-                    mediaUrl: formData.mediaUrl
+                    approved_at: now.toISOString(),
+                    deadline: deadline.toISOString().split('T')[0]
                 }
             };
 
-            const { error } = await supabase.from('shops').insert([adData]);
-            if (error) throw error;
+            // 1. 등록 (Shops 테이블)
+            const { error: shopError } = await supabase.from('shops').insert([adData]);
+            if (shopError) throw shopError;
+
+            // 2. 어드민 직접 등록에 따른 결제 내역 생성 (Finance 통합용)
+            const { error: payError } = await supabase.from('payments').insert([{
+                user_id: user.id,
+                shop_id: shopId,
+                amount: 0,
+                status: 'completed',
+                type: 'AD',
+                method: 'admin_manual',
+                metadata: {
+                    shop_name: formData.shopName,
+                    tier: formData.tier,
+                    duration: formData.duration,
+                    admin_id: 'internal_admin'
+                }
+            }]);
+            if (payError) {
+                console.warn('[Warning] Payment record creation failed but shop was created:', payError);
+            }
 
             alert('광고가 성공적으로 등록 및 활성화되었습니다.');
             fetchData();
