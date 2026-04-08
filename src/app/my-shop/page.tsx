@@ -795,6 +795,20 @@ function MyShopContent() {
                 }
             }
 
+            // [Fix] 무료 이벤트 광고(p7e 등 0원)도 관리자 텔레그램 알림 발송
+            if (!editingAdId && newShopId && !isTargetMock && formState.totalAmount === 0) {
+                fetch('/api/notify/new-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        shopName: formState.shopName,
+                        amount: 0,
+                        product: formState.selectedAdProduct,
+                        title: formState.title,
+                    }),
+                }).catch(() => {});
+            }
+
             if (!editingAdId && newShopId && formState.totalAmount > 0) {
                 const paymentData = {
                     user_id: isTargetMock ? null : authUser.id,

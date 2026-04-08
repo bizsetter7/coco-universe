@@ -382,7 +382,9 @@ function AdminContent() {
     const pendingAdsCount = mockAds.filter(a => a.status === 'pending').length;
     const pendingInquiriesCount = realInquiries.filter(i => i.status === 'new').length;
     const pendingPaymentsCount = payments.filter(p => p.status !== 'completed').length;
-    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount + pendingApplications;
+    // [Sync] layout.tsx counts와 동기화 — bizCount 포함 (사업자 인증 심사 대기)
+    const pendingBizCount = realUsers.filter((u: any) => u.business_verify_status === 'pending').length;
+    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount + pendingApplications + pendingBizCount;
 
     return (
         <div className="p-5 md:p-10 pb-20">
