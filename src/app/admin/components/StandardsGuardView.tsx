@@ -599,6 +599,39 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* 7.3 paySuffixes 급여추가옵션 표시 규칙 ⭐ PROTECTED */}
+                                    <div className="space-y-3 pt-4 border-t border-slate-50">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                            <h4 className="text-xs font-black text-slate-700">급여추가옵션 (paySuffixes) 표시 규칙</h4>
+                                        </div>
+                                        <div className="bg-blue-50/50 rounded-xl border border-blue-100 p-4 space-y-2">
+                                            <p className="text-[10px] font-black text-blue-700 uppercase tracking-wider mb-2">⭐ Row3 표시 기준 (ShopCard.tsx)</p>
+                                            <div className="space-y-1.5 text-[10px] font-bold text-slate-600 leading-relaxed">
+                                                <div className="flex items-start gap-2">
+                                                    <span className="text-blue-400 shrink-0">①</span>
+                                                    <span><b>step4 편의사항 선택값</b>을 카드 Row3에 표시 — DB 경로: <span className="font-mono bg-white px-1 rounded border border-blue-100">options.paySuffixes</span></span>
+                                                </div>
+                                                <div className="flex items-start gap-2">
+                                                    <span className="text-blue-400 shrink-0">②</span>
+                                                    <span><b>4개 이하</b>: 정적 가로 나열 (flex row)</span>
+                                                </div>
+                                                <div className="flex items-start gap-2">
+                                                    <span className="text-blue-400 shrink-0">③</span>
+                                                    <span><b>5개 이상</b>: <span className="font-mono bg-white px-1 rounded border border-blue-100">keyword-marquee</span> 클래스로 무한 슬라이드 애니메이션 (배열 2회 반복)</span>
+                                                </div>
+                                                <div className="flex items-start gap-2">
+                                                    <span className="text-blue-400 shrink-0">④</span>
+                                                    <span>광고 상세 팝업(JobDetailContent)에서도 동일 paySuffixes 값을 급여 우측 3열 그리드로 표시</span>
+                                                </div>
+                                                <div className="flex items-start gap-2 pt-1 border-t border-blue-100">
+                                                    <span className="text-rose-500 shrink-0">🚫</span>
+                                                    <span className="text-rose-600"><b>paySuffixes를 고정 텍스트로 대체하거나 제거 금지</b> — 업체가 step4에서 선택한 값이 반드시 리스트·팝업 양쪽에 노출되어야 함</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
