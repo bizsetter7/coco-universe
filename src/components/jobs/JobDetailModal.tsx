@@ -349,7 +349,7 @@ export const JobDetailContent = ({
                             <div>
                                 <div className="text-[12px] font-black text-gray-900">사업자 등록 주소</div>
                                 <div className="text-[11px] text-gray-500 font-medium">
-                                    {publisherAddress || shop.businessAddress || shop.region || '주소 정보 없음'}
+                                    {((shop.options?.regionCity && shop.options?.regionGu) ? `${shop.options.regionCity} ${shop.options.regionGu}` : shop.region) || publisherAddress || shop.businessAddress || '주소 정보 없음'}
                                 </div>
                             </div>
                         </div>
@@ -528,11 +528,11 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, i
             try {
                 const { data } = await supabase
                     .from('profiles')
-                    .select('address, address_detail')
+                    .select('business_address, business_address_detail')
                     .eq('id', targetId)
                     .single();
                 if (data) {
-                    const fullAddr = `${data.address || ''} ${data.address_detail || ''}`.trim();
+                    const fullAddr = `${data.business_address || ''} ${data.business_address_detail || ''}`.trim();
                     if (fullAddr) setPublisherAddress(fullAddr);
                 }
             } catch (err) {

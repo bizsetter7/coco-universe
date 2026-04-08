@@ -1,6 +1,6 @@
 'use client'; // Deploy Version: 2026-04-08 수복판
 
-import React, { useMemo, Suspense } from 'react';
+import React, { useMemo, Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import HomeClient from '@/components/home/HomeClient';
@@ -10,6 +10,7 @@ import { useLocation } from '@/hooks/useLocation';
 import { ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { enrichAdData } from '@/lib/adUtils';
+import { supabase } from '@/lib/supabase';
 
 const LoginPage = dynamic(() => import('@/components/auth/LoginPage').then(m => ({ default: m.LoginPage })));
 const SignupPage = dynamic(() => import('@/components/auth/SignupPage').then(m => ({ default: m.SignupPage })));
@@ -25,10 +26,33 @@ const HomeContent = () => {
   const page = searchParams.get('page');
   const { lat: userLat, lng: userLng, calculateDistance } = useLocation();
 
+  const [dbShops, setDbShops] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchShops = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('shops')
+          .select('*')
+          .eq('status', 'active')
+          .order('updated_at', { ascending: false });
+          
+        if (!error && data) {
+          setDbShops(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch shops:', err);
+      }
+    };
+    fetchShops();
+  }, []);
+
   const processedShops = useMemo(() => {
+    // DB 데이터가 없으면 shops.json을 fallback으로 사용
+    const dataSource = dbShops.length > 0 ? dbShops : shopsData;
+
     // 1. 데이터 통합 정제 (통합 어댑터 adUtils 적용)
-    // 실제 운영 시에는 여기서 Supabase API로 실데이터를 가져오나, 현재는 shopsData와 병합 구조
-    const allEnriched = (shopsData as any[]).map((ad: any) => enrichAdData(ad, []));
+    const allEnriched = dataSource.map((ad: any) => enrichAdData(ad, []));
 
     // 2. 정렬 로직 (티어순 -> 실데이터 우선 -> 최신순)
     const sorted = allEnriched.sort((a, b) => {
@@ -54,8 +78,8 @@ const HomeContent = () => {
     });
 
     // 3. 목업 정리 로직 (실제 공고 개수만큼 하단 목업 제거)
-    const reals = sorted.filter(s => !s.isMock);
-    const mocks = sorted.filter(s => s.isMock);
+    const reals = sorted.filter((s: any) => !s.isMock);
+    const mocks = sorted.filter((s: any) => s.isMock);
     const realCount = reals.length;
     
     if (realCount > 0) {
@@ -79,7 +103,7 @@ const HomeContent = () => {
     }
 
     return sorted;
-  }, [userLat, userLng]);
+  }, [userLat, userLng, dbShops]);
 
   if (page === 'login') return <LoginPage />;
   if (page === 'signup') return <SignupPage />;

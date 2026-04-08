@@ -53,12 +53,12 @@ export const normalizeAd = (ad: any) => {
         },
 
         // 지역
-        regionCity: getValid(ad.region || ad.regionCity || ad.work_region, opt.regionCity, '지역'),
-        work_region: getValid(ad.region || ad.regionCity || ad.work_region, opt.regionCity, '지역'),
-        regionGu: getValid(ad.regionGu || ad.work_region_sub, opt.regionGu, ''),
-        work_region_sub: getValid(ad.regionGu || ad.work_region_sub, opt.regionGu, ''),
-        addressDetail: getValid(ad.work_address || ad.addressDetail, opt.addressDetail, ''),
-        work_address: getValid(ad.work_address || ad.addressDetail, opt.addressDetail, ''),
+        regionCity: getValid(opt.regionCity, ad.regionCity || ad.work_region || (typeof ad.region === 'string' ? ad.region.split(' ')[0] : null), '지역'),
+        work_region: getValid(opt.regionCity, ad.regionCity || ad.work_region || (typeof ad.region === 'string' ? ad.region.split(' ')[0] : null), '지역'),
+        regionGu: getValid(opt.regionGu, ad.regionGu || ad.work_region_sub, ''),
+        work_region_sub: getValid(opt.regionGu, ad.regionGu || ad.work_region_sub, ''),
+        addressDetail: getValid(opt.addressDetail, ad.work_address || ad.addressDetail, ''),
+        work_address: getValid(opt.addressDetail, ad.work_address || ad.addressDetail, ''),
 
         // 업종
         category: getValid(ad.category || ad.industryMain, opt.category, '업종'),

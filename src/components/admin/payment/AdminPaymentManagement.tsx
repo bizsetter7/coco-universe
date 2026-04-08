@@ -52,7 +52,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                 body: JSON.stringify({
                     adId: shopId,
                     status: 'active',
-                    adData: { id: shopId }
+                    adData: ads.find((a: Shop) => String(a.id) === String(shopId)) || { id: shopId }
                 })
             });
 

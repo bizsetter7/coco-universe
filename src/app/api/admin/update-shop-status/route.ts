@@ -55,12 +55,12 @@ export async function POST(request: NextRequest) {
             };
         }
 
-        // 1. Shops 테이블 업데이트 (TEXT ID이므로 String으로 확실히 매칭)
+        // 1. Shops 테이블 업데이트 (int8 ID → Number로 매칭)
         // [Strict Update] 업데이트 건수를 명확히 체크하여 0건일 경우 에러 발생 (RLS/ID 불일치 감지)
         const { error: shopError, count } = await supabaseAdmin
             .from('shops')
             .update(updateData, { count: 'exact' })
-            .eq('id', String(adId));
+            .eq('id', Number(adId));
 
         if (shopError) throw shopError;
         
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
             const { data: existingPayment } = await supabaseAdmin
                 .from('payments')
                 .select('id')
-                .eq('shop_id', String(adId))
+                .eq('shop_id', Number(adId))
                 .maybeSingle();
 
             if (existingPayment) {
