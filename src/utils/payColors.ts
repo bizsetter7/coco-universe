@@ -31,5 +31,8 @@ export const getPayAbbreviation = (payType: string = '') => {
     if (type.includes('연봉') || type.includes('연')) return '연';
     if (type.includes('건별') || type.includes('건당') || type.includes('건')) return '건';
     if (type.includes('협의') || type.includes('협')) return '협';
+    // [Fix] 플레이스홀더가 들어온 경우 무작정 첫 글자('급')를 따지 않고 '협'으로 안전하게 매칭
+    if (type.includes('선택') || type.includes('종류')) return '협';
+    
     return type.substring(0, 1) || '협';
 };

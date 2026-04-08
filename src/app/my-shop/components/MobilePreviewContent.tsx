@@ -158,11 +158,13 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
     const normalizedProduct = (formData.selectedAdProduct || 'p7').toLowerCase();
     const tierKey = normalizedProduct.replace('t', 'p');
 
-    // 최종 스타일 추출 (Grand/Premium 등 텍스트 키 지원 포함)
+    // 최종 스타일 추출 (Grand/Premium/Deluxe/Special/Urgent 등 텍스트 키 지원 포함)
     const currentStyle = TIER_STYLE_MAP[tierKey] ||
         (normalizedProduct.includes('grand') ? TIER_STYLE_MAP.p1 :
             normalizedProduct.includes('premium') ? TIER_STYLE_MAP.p2 :
-                normalizedProduct.includes('deluxe') ? TIER_STYLE_MAP.p3 : TIER_STYLE_MAP.p7);
+                normalizedProduct.includes('deluxe') ? TIER_STYLE_MAP.p3 :
+                    normalizedProduct.includes('special') ? TIER_STYLE_MAP.p4 :
+                        normalizedProduct.includes('urgent') ? TIER_STYLE_MAP.p5 : TIER_STYLE_MAP.p7);
 
     const headerBg = currentStyle.header;
     const accentColor = currentStyle.accent;
@@ -287,7 +289,7 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                         <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50">
                             <MapPin size={32} className="opacity-50" />
                             <span className="text-xs font-bold">{formData.regionCity} {formData.regionGu}</span>
-                            <span className="text-[10px] opacity-60">{formData.user_id ? '주소 로딩 중...' : '사업장 주소 미등록'}</span>
+                            <span className="text-[10px] opacity-60">위치 정보가 등록되지 않았습니다.</span>
                         </div>
                     )}
                 </div>
@@ -295,31 +297,27 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                 <div className="space-y-2 pt-2">
                     <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
                         <Info size={12} />
-                        Keyword & Info
+                        Keyword & 정보
                     </h3>
                     <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
-                        <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
+                        <div className="flex flex-wrap gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
                             {(() => {
-                                const userKeywords = formData.selectedKeywords || [];
-                                const filterOut = ['숙식제공', '초보가능', '자유출퇴근', '텃세없음', '실장친절', '손님많음'];
-                                const forbidden = ['엔터프라이즈', '인재', '솔루션', '레이디알바', '전문'];
+                                const userKeywords = formData.selectedKeywords || formData.keywords || [];
                                 
+                                // [Standard Fix] 사용자가 선택한 모든 키워드를 그대로 노출 (임의 필터링 제거)
                                 const filteredKeywords = userKeywords.filter((kw: any) => {
                                     const cleanKw = String(kw).replace('#', '').trim();
-                                    if (!cleanKw) return false;
-                                    if (filterOut.includes(cleanKw)) return false;
-                                    if (forbidden.some(f => cleanKw.includes(f))) return false;
-                                    return true;
+                                    return !!cleanKw;
                                 });
-
+                                
                                 if (filteredKeywords.length > 0) {
                                     return filteredKeywords.map((kw: string, i: number) => (
-                                        <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-400 text-[10px] font-medium">
+                                        <span key={i} className="px-2 py-1 rounded bg-white border border-gray-200 text-gray-500 text-[10px] font-bold">
                                             #{String(kw).replace('#', '')}
                                         </span>
                                     ));
                                 } else {
-                                    return <span className="text-gray-300 text-[11px] font-bold">등록된 키워드가 없습니다.</span>;
+                                    return <span className="text-gray-300 text-[11px] font-bold italic">등록된 키워드가 없습니다.</span>;
                                 }
                             })()}
                         </div>

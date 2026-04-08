@@ -17,6 +17,7 @@ interface AdminAdManagementProps {
     mockAds: Shop[];
     setMockAds: React.Dispatch<React.SetStateAction<Shop[]>>;
     fetchData: () => void;
+    setSelectedAdForModal: (ad: Shop | null) => void;
 }
 
 // KST 날짜+시간 포맷 헬퍼 (ex. 26.03.27 오후 01:13)
@@ -46,11 +47,11 @@ function calcDeadline(baseIso: string | undefined | null, periodDays: number): s
         .replace(/\.$/, '');     // 끝 점만 제거 → "26.04.26"
 }
 
-export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdManagementProps) {
+export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedAdForModal }: AdminAdManagementProps) {
     const brand = useBrand();
     const [adFilter, setAdFilter] = useState<'all' | 'pending'>('pending');
+    const [searchTerm, setSearchTerm] = useState('');
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
-    const [selectedAdForModal, setSelectedAdForModal] = useState<Shop | null>(null);
 
     // Rejection State
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -110,12 +111,48 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                         심사 대기 건을 승인하고, 광고 가이드<br className="md:hidden" /> 준수 여부를 모니터링합니다.
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                        <input
+                            type="text"
+                            placeholder="광고 No, 상호명, 제목, ID 검색..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all"
+                        />
+                        {searchTerm && (
+                            <button 
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500"
+                            >
+                                <XCircle size={14} />
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        onClick={async () => {
+                            if (!confirm('143, 144, 145번 결제 내역을 0원으로 소급 적용하시겠습니까?')) return;
+                                const bfRes = await fetch('/api/admin/backfill-ads', { 
+                                    method: 'POST', 
+                                    body: JSON.stringify({ adIds: ['143', '144', '145'], amount: 0, userId: '4178455a-fc94-4be4-9d35-7eb02d0aa008' }),
+                                    headers: { 'Content-Type': 'application/json' }
+                                });
+                                const bfResult = await bfRes.json();
+                                if (bfResult.success) {
+                                fetchData();
+                            } else {
+                                alert('실패: ' + bfResult.error);
+                            }
+                        }}
+                        className="px-4 py-2.5 bg-blue-600 text-white rounded-2xl text-[10px] font-black shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
+                    >
+                        143-145 백필(0원)
+                    </button>
                     <button
                         onClick={() => setAdFilter(adFilter === 'all' ? 'pending' : 'all')}
-                        className={`px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 ${adFilter === 'all' ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-200' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}
+                        className={`px-4 py-2.5 rounded-2xl text-[10px] font-black border transition-all active:scale-95 shrink-0 shadow-sm ${adFilter === 'all' ? 'bg-amber-600 text-white border-amber-600 shadow-amber-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
                     >
-                        {adFilter === 'all' ? '승인완료 숨기기' : `전체 보기 (승인완료 포함 ${mockAds.length}건)`}
+                        {adFilter === 'all' ? '승인완료 숨기기' : `전체 보기 (${mockAds.length})`}
                     </button>
                 </div>
             </div>
@@ -138,9 +175,40 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                             {mockAds.length > 0 ? (
                                 mockAds
                                     .filter(ad => {
-                                        if (adFilter === 'all') return true;
-                                        // 기본: 승인완료(active) 광고는 결제 내역에서 관리
-                                        return ad.status !== 'active';
+                                        // 1. 상태 필터 (pending vs all)
+                                        // 'active' 또는 'completed' 상태는 게시중으로 간주하여 기본(pending) 필터에서 제외
+                                        const adStatus = String(ad.status || '').toLowerCase();
+                                        const statusMatch = adFilter === 'all' || (adStatus !== 'active' && adStatus !== 'completed' && adStatus !== 'approved');
+                                        
+                                        // 2. 검색어 필터 (ID, 상호명, 제목, 회원ID, 담당자명 등)
+                                        const s = searchTerm.toLowerCase().trim();
+                                        if (!s) return statusMatch;
+
+                                        const adNo = String(ad.id || '').toLowerCase();
+                                        const shopName = String((ad as any).shopName || ad.name || '').toLowerCase();
+                                        const title = String(ad.title || '').toLowerCase();
+                                        const username = String((ad as any).username || '').toLowerCase();
+                                        const nickname = String((ad as any).nickname || '').toLowerCase();
+                                        const fullName = String((ad as any).fullName || '').toLowerCase();
+                                        const userId = String(ad.user_id || (ad as any).userId || ad.ownerId || (ad as any).owner_id || '').toLowerCase();
+                                        const adId = String(ad.id || '').toLowerCase();
+                                        const managerName = String((ad as any).manager_name || (ad as any).managerName || '').toLowerCase();
+                                        const phone = String((ad as any).manager_phone || ad.phone || '').toLowerCase();
+
+                                        const searchMatch = 
+                                            adNo.includes(s) || 
+                                            shopName.includes(s) || 
+                                            title.includes(s) || 
+                                            username.includes(s) ||
+                                            nickname.includes(s) ||
+                                            fullName.includes(s) ||
+                                            userId.includes(s) ||
+                                            adId.includes(s) ||
+                                            managerName.includes(s) ||
+                                            phone.includes(s);
+
+                                        // [Rule] 검색어가 있으면 상태 필터를 무시하고 전체 검색 수행 (대장님 지시 사항: '안 보인다'는 오해 불식)
+                                        return s ? searchMatch : (statusMatch && searchMatch);
                                     })
                                     .map((ad) => (
                                         <React.Fragment key={ad.id}>
@@ -151,7 +219,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                 {/* 0. No. Column */}
                                                 <td className="pl-8 pr-2 py-6">
                                                     <span className="text-[10px] font-black text-slate-400 font-mono">
-                                                        {(ad as any).adNo || String(ad.id || '').substring(0, 8)}
+                                                        {ad.id || '—'}
                                                     </span>
                                                 </td>
 
@@ -166,8 +234,9 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                             {(ad as any).shopName || ad.name || '—'}
                                                         </div>
                                                         {/* 2) 회원ID (username 우선, 없으면 UUID 앞 8자) */}
-                                                        <div className="text-[10px] font-bold text-slate-400 font-mono">
-                                                            ID: {(ad as any).username || String((ad as any).user_id || ad.ownerId || '').slice(0, 8) + '…'}
+                                                        <div className="text-[10px] font-black text-blue-600 font-mono mt-0.5 flex items-center gap-1">
+                                                            <span className="bg-blue-50 px-1 rounded-sm text-[9px]">ID</span>
+                                                            {(ad as any).username || String((ad as any).user_id || ad.ownerId || '').slice(0, 8) + '…'}
                                                         </div>
                                                         {/* 3) 지역 / 직종 1차 / 직종 2차(상세) */}
                                                         <div className="flex gap-1 mt-0.5 flex-wrap">
@@ -250,23 +319,23 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                 {/* 4. Status — 단일 배지 */}
                                                 <td className="px-8 py-6">
                                                     {(() => {
-                                                        const isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
-                                                        const isActive = ad.status === 'active';
-                                                        const isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
+                                                        const audit_isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
+                                                        const audit_isActive = ad.status === 'active';
+                                                        const audit_isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
 
                                                         let label = '결제대기';
                                                         let cls = 'bg-amber-100 text-amber-700';
 
-                                                        if (isRejected) { label = '반려'; cls = 'bg-rose-100 text-rose-600'; }
-                                                        else if (isActive) { label = '게시중'; cls = 'bg-green-100 text-green-600'; }
-                                                        else if (isPaid) { label = '승인대기'; cls = 'bg-orange-100 text-orange-600'; }
+                                                        if (audit_isRejected) { label = '반려'; cls = 'bg-rose-100 text-rose-600'; }
+                                                        else if (audit_isActive) { label = '게시중'; cls = 'bg-green-100 text-green-600'; }
+                                                        else if (audit_isPaid) { label = '승인대기'; cls = 'bg-orange-100 text-orange-600'; }
 
                                                         return (
                                                             <div className="flex flex-col gap-1">
                                                                 <span className={`px-2 py-1 rounded-lg text-[10px] font-black w-fit ${cls}`}>
                                                                     {label}
                                                                 </span>
-                                                                {isRejected && (ad as any).rejection_reason && (
+                                                                {audit_isRejected && (ad as any).rejection_reason && (
                                                                     <div className="text-[9px] text-rose-400 font-bold max-w-[100px] leading-tight truncate" title={(ad as any).rejection_reason}>
                                                                         ↳ {(ad as any).rejection_reason}
                                                                     </div>
@@ -316,16 +385,16 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                                                 {/* 6. Actions — 결제 상태별 워크플로 */}
                                                 <td className="px-8 py-6 text-right">
                                                     {(() => {
-                                                        const isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
-                                                        const isActive = ad.status === 'active';
-                                                        const isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
+                                                        const action_isPaid = (ad as any).payStatus === '결제완료' || (ad as any).payStatus === 'success';
+                                                        const action_isActive = ad.status === 'active';
+                                                        const action_isRejected = ad.status === 'rejected' || (ad.status as string) === 'REJECTED';
 
-                                                        if (isActive) {
+                                                        if (action_isActive) {
                                                             // 게시중 — 자동 마감, 버튼 없음
                                                             return <div className="flex justify-end"><span className="text-[10px] text-slate-300 font-bold">자동마감</span></div>;
                                                         }
 
-                                                        if (isRejected) {
+                                                        if (action_isRejected) {
                                                             return <div className="flex justify-end"><span className="text-[10px] text-slate-300 font-bold">—</span></div>;
                                                         }
 
@@ -495,104 +564,6 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData }: AdminAdMan
                 </div>
             )}
 
-            {/* Ad Detail Modal */}
-            {selectedAdForModal && (
-                <div className="fixed inset-0 z-[10020] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-300"
-                        onClick={() => setSelectedAdForModal(null)}
-                    />
-                    <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-                        <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
-                            <div className="flex items-center gap-4">
-                                <div>
-                                    <span className="bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md font-black uppercase mb-2 inline-block">
-                                        Ad Preview Detail <span className="text-slate-400">|</span> No. {(selectedAdForModal as any).adNo || String(selectedAdForModal.id || '').substring(0, 8)}
-                                    </span>
-                                    <div className="flex items-center gap-2 md:gap-3">
-                                        <h3 className="text-2xl font-black text-slate-950 tracking-tighter line-clamp-2 max-w-[400px]">{selectedAdForModal.title}</h3>
-                                        {/* [규정] 결제 금액(Price)만 제목 옆에 노출 */}
-                                        <div className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl flex items-baseline gap-1 animate-in slide-in-from-left-2">
-                                            <span className="text-[10px] font-black text-blue-400 uppercase leading-none">Price</span>
-                                            <span className="text-lg font-black text-blue-600 leading-none">
-                                                {(Number(selectedAdForModal?.ad_price) || Number((selectedAdForModal as any)?.price) || Number((selectedAdForModal?.options as any)?.ad_price) || 0).toLocaleString()}
-                                            </span>
-                                            <span className="text-[10px] text-blue-400 font-bold">원</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button onClick={() => setSelectedAdForModal(null)} className="p-2 text-slate-300 hover:text-slate-950 transition-colors">
-                                <XCircle size={28} />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto bg-slate-50 relative">
-                            <MobilePreviewContent
-                                formData={{
-                                    ...selectedAdForModal,
-                                    // [표준 규정] 명시적 데이터 매핑 (Data Dictionary 준수)
-                                    industryMain: selectedAdForModal.category || (selectedAdForModal.options as any)?.industryMain || (selectedAdForModal.options as any)?.category || '업종미기재',
-                                    categorySub: (selectedAdForModal as any).categorySub || selectedAdForModal.category_sub || (selectedAdForModal.options as any)?.categorySub || '일반',
-
-                                    payType: (selectedAdForModal as any).payType || (selectedAdForModal as any).pay_type || (selectedAdForModal.options as any)?.payType || '협의',
-                                    payAmount: (selectedAdForModal as any).pay_amount || (selectedAdForModal.options as any)?.payAmount || 0,
-                                    regionCity: selectedAdForModal.region || (selectedAdForModal.options as any)?.regionCity || '',
-                                    regionGu: selectedAdForModal.work_region_sub || (selectedAdForModal.options as any)?.regionGu || '',
-
-                                    selectedKeywords: (selectedAdForModal as any).selectedKeywords || (selectedAdForModal.options as any)?.keywords || selectedAdForModal.keywords || [],
-                                    selectedIcon: (selectedAdForModal as any).selectedIcon || (selectedAdForModal.options as any)?.icon || (selectedAdForModal.options as any)?.selectedIcon,
-                                    selectedHighlighter: (selectedAdForModal as any).selectedHighlighter || (selectedAdForModal.options as any)?.highlighter || (selectedAdForModal.options as any)?.selectedHighlighter,
-
-                                    selectedAdProduct: selectedAdForModal.tier || (selectedAdForModal as any).productType || (selectedAdForModal as any).ad_type || (selectedAdForModal.options as any)?.product_type || 'p7',
-                                    paySuffixes: (selectedAdForModal as any).paySuffixes || (selectedAdForModal.options as any)?.pay_suffixes || (selectedAdForModal.options as any)?.paySuffixes || [],
-
-                                    // Price normalization
-                                    ad_price: Number(selectedAdForModal.ad_price) || Number((selectedAdForModal as any).price) || 0,
-
-                                    // Editor HTML
-                                    editorHtml: (selectedAdForModal as any).content || (selectedAdForModal as any).description || (selectedAdForModal.options as any)?.content || '',
-
-                                    // Shop Info
-                                    shopName: selectedAdForModal.shopName || (selectedAdForModal as any).shop_name || (selectedAdForModal.options as any)?.shopName || '',
-                                    managerName: selectedAdForModal.managerName || (selectedAdForModal as any).manager_name || (selectedAdForModal.options as any)?.managerName || '',
-                                    managerPhone: (selectedAdForModal as any).managerPhone || (selectedAdForModal as any).manager_phone || (selectedAdForModal.options as any)?.managerPhone || ''
-                                }}
-                                brand={brand}
-                                bizAddressOverride={
-                                    // [관리자 RLS 우회] options에 스냅샷된 사업장 주소를 우선 전달
-                                    (selectedAdForModal.options as any)?.businessAddress ||
-                                    (selectedAdForModal.options as any)?.business_address ||
-                                    undefined
-                                }
-                            />
-
-                        </div>
-
-                        {/* Footer Actions */}
-                        <div className="p-6 border-t border-slate-50 bg-white grid grid-cols-2 gap-4 shrink-0">
-                            <button
-                                onClick={() => {
-                                    handleStatusUpdate(selectedAdForModal.id, 'active');
-                                    setSelectedAdForModal(null);
-                                }}
-                                className="py-4 bg-blue-600 text-white rounded-2xl text-sm font-black shadow-lg shadow-blue-200 hover:bg-blue-700 transition active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <Check size={18} /> 광고 승인
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setRejectingAdId(selectedAdForModal.id);
-                                    setIsRejectModalOpen(true);
-                                    setSelectedAdForModal(null);
-                                }}
-                                className="py-4 bg-slate-100 text-slate-400 rounded-2xl text-sm font-black hover:bg-rose-50 hover:text-rose-500 transition active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <XCircle size={18} /> 반려 / 거절
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

@@ -2,12 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Search, Filter, FileText, ExternalLink, Calendar, CheckCircle2, Clock, AlertCircle, Layout, Zap } from 'lucide-react';
 
+import { Shop } from '@/types/shop';
+
 interface AdminPaymentManagementProps {
     payments: any[];
+    ads: Shop[];
     fetchData: () => void;
+    setSelectedAdForModal: (ad: Shop | null) => void;
 }
 
-export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentManagementProps) {
+export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAdForModal }: AdminPaymentManagementProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
     const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION'>('all');
@@ -20,11 +24,13 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
             
             const searchLower = searchTerm.toLowerCase();
             const matchesSearch = !searchTerm || 
-                pay.id.toLowerCase().includes(searchLower) ||
-                pay.profiles?.full_name?.toLowerCase().includes(searchLower) ||
-                pay.profiles?.business_name?.toLowerCase().includes(searchLower) ||
-                pay.profiles?.business_number?.includes(searchLower) ||
-                pay.user_id.toLowerCase().includes(searchLower);
+                (pay.id || '').toLowerCase().includes(searchLower) ||
+                (pay.profiles?.username || '').toLowerCase().includes(searchLower) ||
+                (pay.profiles?.nickname || '').toLowerCase().includes(searchLower) ||
+                (pay.profiles?.full_name || '').toLowerCase().includes(searchLower) ||
+                (pay.profiles?.business_name || '').toLowerCase().includes(searchLower) ||
+                (pay.profiles?.business_number || '').includes(searchLower) ||
+                (pay.user_id || '').toLowerCase().includes(searchLower);
 
             return matchesStatus && matchesType && matchesSearch;
         });
@@ -188,9 +194,21 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                                                     {pay.type === 'SOS' ? <Zap size={14} /> : pay.type === 'JUMP' ? <Zap size={14} /> : <FileText size={14} />}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-black text-slate-900">{pay.metadata?.adTitle || pay.metadata?.reason || pay.description || '시스템 결제'}</div>
+                                                    <div 
+                                                        className="text-sm font-black text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors decoration-blue-500/30 hover:underline underline-offset-4"
+                                                        onClick={() => {
+                                                            const adId = pay.shop_id || pay.metadata?.shop_id || pay.metadata?.ad_no;
+                                                            if (adId) {
+                                                                const ad = ads.find(a => String(a.id) === String(adId));
+                                                                if (ad) setSelectedAdForModal(ad);
+                                                                else alert('해당 광고의 상세 데이터를 찾을 수 없습니다.');
+                                                            }
+                                                        }}
+                                                    >
+                                                        {pay.metadata?.adTitle || pay.metadata?.reason || pay.description || '시스템 결제'}
+                                                    </div>
                                                     <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                                                        <span className="text-blue-500 font-black uppercase">{pay.type}</span> • {pay.id.substring(0, 8)}
+                                                        <span className="text-blue-500 font-black uppercase">{pay.type}</span> • No.{pay.shop_id || '—'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -204,8 +222,12 @@ export function AdminPaymentManagement({ payments, fetchData }: AdminPaymentMana
                                                     </a>
                                                 )}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 font-medium">
-                                                {pay.profiles?.business_number ? `사업자: ${pay.profiles.business_number}` : `ID: ${pay.profiles?.nickname || 'guest'}`}
+                                            <div className="text-[10px] text-blue-600 font-black font-mono mt-0.5 flex items-center gap-1">
+                                                <span className="bg-blue-50 px-1 rounded-sm text-[9px]">ID</span>
+                                                {pay.profiles?.username || pay.profiles?.nickname || 'guest'}
+                                            </div>
+                                            <div className="text-[9px] text-slate-400 font-medium">
+                                                {pay.profiles?.business_number ? `SN: ${pay.profiles.business_number}` : ''}
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">

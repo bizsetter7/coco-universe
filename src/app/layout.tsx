@@ -119,7 +119,7 @@ export default function RootLayout({
   const sideAds = [...grandAds, ...premiumAds];
 
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning={true}>
       <head />
       <body className={`${inter.className} notranslate`}>
         {/* Google Tag Manager (noscript) */}

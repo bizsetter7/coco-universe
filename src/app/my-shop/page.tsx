@@ -554,7 +554,7 @@ function MyShopContent() {
             if (!formState.title?.trim()) missingFields.push('공고 제목');
             if (!formState.industryMain) missingFields.push('업종 선택');
             if (!formState.regionCity) missingFields.push('지역 선택');
-            if (!formState.payType || formState.payType === '종류선택') missingFields.push('급여 방식');
+            if (!formState.payType || formState.payType === '종류선택' || formState.payType === '급여방식선택') missingFields.push('급여 방식');
             if (!formState.payAmount || Number(formState.payAmount) === 0) missingFields.push('급여 금액');
 
             if (missingFields.length > 0) {
@@ -639,6 +639,13 @@ function MyShopContent() {
             // [Fix] Remove forced sanitization - let user select what they want
             const cleanCategorySub = formState.industrySub || '';
 
+            // [Standard Fix] pay_type이 '급여방식선택'인 레거시 오류 방지
+            let finalPayType = formState.payType;
+            if (!finalPayType || finalPayType === '급여방식선택' || finalPayType === '종류선택') {
+                // 선택되지 않았을 경우 '협의'로 폴백하거나 에러 처리 (여기서는 협의로 유도)
+                finalPayType = '협의';
+            }
+
             const adData: any = {
                 // [Standard Root Columns] - V4 DB 컬럼명 100% 준수
                 name: formState.shopName,
@@ -650,7 +657,7 @@ function MyShopContent() {
                 tier: finalProductType,
                 pay: String(formState.payAmount),
                 pay_amount: parseInt(String(formState.payAmount).replace(/,/g, '') || '0'),
-                pay_type: formState.payType,
+                pay_type: finalPayType,
                 category: formState.industryMain,
                 category_sub: cleanCategorySub,
                 work_region_sub: formState.regionGu,
@@ -662,6 +669,7 @@ function MyShopContent() {
                 edit_count: editCount,
                 last_edit_month: currentMonth,
                 ad_price: formState.totalAmount,
+                ad_duration: Number(formState.selectedAdPeriod || 30),
                 updated_at: new Date().toISOString(),
                 status: 'pending',
                 user_id: authUser.id,
@@ -673,7 +681,7 @@ function MyShopContent() {
                     ...(originalAd?.options || {}),
                     managerName: formState.managerName,
                     managerPhone: formState.managerPhone,
-                    payType: formState.payType,
+                    payType: finalPayType,
                     payAmount: parseInt(String(formState.payAmount).replace(/,/g, '') || '0'),
                     product_type: finalProductType,
                     product_period: originalAd ? (originalAd.options?.product_period || originalAd.productPeriod) : formState.selectedAdPeriod,

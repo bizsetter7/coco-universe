@@ -72,6 +72,7 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
             const shopId = crypto.randomUUID();
             
             const adData = {
+                // [Standard Root Columns] - V4 DB 컬럼명 100% 준수 (Master Mapping)
                 id: shopId,
                 user_id: user.id,
                 name: formData.shopName,
@@ -83,11 +84,29 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                 tier: formData.tier,
                 pay_type: formData.payType,
                 pay: formData.payAmount,
+                pay_amount: parseInt(String(formData.payAmount).replace(/,/g, '') || '0'),
+                category: formData.category,
+                category_sub: formData.categorySub,
+                work_region_sub: formData.regionGu,
+                content: formData.content,
+                manager_name: formData.managerName,
+                manager_phone: formData.managerPhone,
+                media_url: formData.mediaUrl,
                 status: 'active',
+                ad_duration: formData.duration,
+                deadline: deadline.toISOString().split('T')[0],
+                product_type: formData.tier,
                 created_at: now.toISOString(),
                 updated_at: now.toISOString(),
+                
+                // [Snapshot Bucket] - UI용 매핑 규격 통일 (camelCase)
                 options: {
                     ...formData,
+                    regionCity: formData.region, // Fallback 용도
+                    regionGu: formData.regionGu,   // Fallback 용도
+                    industryMain: formData.category,
+                    industrySub: formData.categorySub,
+                    payAmount: parseInt(String(formData.payAmount).replace(/,/g, '') || '0'),
                     product_period: formData.duration,
                     approved_at: now.toISOString(),
                     deadline: deadline.toISOString().split('T')[0]
