@@ -74,6 +74,7 @@ function MyShopContent() {
     const [isSaving, setIsSaving] = useState(false);
     const isJustSaved = React.useRef(false); // [Ref] Prevent "ZOMBIE" data overwriting immediately after save
     const tabFocusRef = React.useRef(false); // [Fix] 탭 복귀 시 Next.js searchParams 재생성으로 인한 폼 리셋 방지
+    const initialLoadDoneRef = React.useRef(false); // [Fix] 초기 로드 완료 후 authLoading 재발동으로 스피너 노출 방지
 
     const [view, _setView] = useState<any>('dashboard');
     const [lastLoadedId, setLastLoadedId] = useState<string | null>(null); // [Fix] Prevent reload loop
@@ -155,6 +156,7 @@ function MyShopContent() {
             }
         } finally {
             setIsDataLoaded(true);
+            initialLoadDoneRef.current = true; // [Fix] 이후 authLoading 재발동 시 스피너 표시 안 함
         }
     };
 
@@ -333,11 +335,12 @@ function MyShopContent() {
         window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
-    // [Scroll Fix] Secondary guard to ensure scroll to top when view changes via URL or internal state
-    // requestAnimationFrame 으로 DOM 커밋 후 실행 보장 (브라우저 스크롤 복원 덮어쓰기)
+    // [Scroll Fix] view 변경 시 상단 고정 — rAF + setTimeout 이중 보장
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
-        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+        const raf = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+        const timer = setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 80);
+        return () => { cancelAnimationFrame(raf); clearTimeout(timer); };
     }, [view]);
 
     // Modal States
@@ -1141,7 +1144,9 @@ function MyShopContent() {
     });
 
     // [Flicker Guard] 마운트 전, 세션 로딩 중, 혹은 기업회원인데 아직 데이터가 로드되지 않은 경우 로딩 화면 유지
-    if (!mounted || userType === null || authLoading || (userType === 'corporate' && !isDataLoaded)) return (
+    // [Fix] initialLoadDoneRef: 초기 로드 완료 후 Supabase 토큰갱신으로 authLoading 재발동 시 스피너 표시 안 함
+    const showingLoader = !mounted || userType === null || (authLoading && !initialLoadDoneRef.current) || (userType === 'corporate' && !isDataLoaded);
+    if (showingLoader) return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
             <div className="w-10 h-10 border-4 border-[#f82b60] border-t-transparent rounded-full animate-spin" />
             <p className="text-sm font-bold text-gray-400 animate-pulse">정보를 안전하게 불러오는 중...</p>
