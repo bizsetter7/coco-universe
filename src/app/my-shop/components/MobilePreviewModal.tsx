@@ -17,10 +17,9 @@ export const MobilePreviewModal: React.FC<PreviewModalProps> = ({ brand, onClose
     if (typeof document === 'undefined') return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[20000] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
             <div
-                className={`bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]`}
-                style={{ width: '100%', maxWidth: '600px' }}
+                className={`bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 flex flex-col max-h-[92vh] w-full sm:max-w-[600px]`}
             >
                 {/* Close Button Overlay */}
                 <div className="relative h-0 z-50">
