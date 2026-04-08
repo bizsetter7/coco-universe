@@ -12,47 +12,85 @@ const getValid = (v1: any, v2: any, defaultValue: any = '') => {
     return defaultValue;
 };
 
+// ─── sessionStorage 드래프트 헬퍼 ───────────────────────────────────────────
+// 목적: 탭 전환/Suspense 리마운트/탭 Discard 등으로 컴포넌트가 재생성되어도 폼 복구
+const DRAFT_KEY = 'coco_ad_form_draft';
+
+const loadDraft = (): Record<string, any> | null => {
+    try {
+        if (typeof window === 'undefined') return null;
+        const raw = sessionStorage.getItem(DRAFT_KEY);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        return d?._active ? d : null;
+    } catch { return null; }
+};
+
+const saveDraft = (data: Record<string, any>) => {
+    try {
+        if (typeof window === 'undefined') return;
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, _active: true }));
+    } catch {}
+};
+
+const clearDraft = () => {
+    try {
+        if (typeof window !== 'undefined') sessionStorage.removeItem(DRAFT_KEY);
+    } catch {}
+};
+// ────────────────────────────────────────────────────────────────────────────
+
 export function useAdFormState() {
-    // ... (States remain same)
+    // --- Lazy 초기화: 컴포넌트 리마운트 시 sessionStorage 드래프트로 폼 복원 ---
+    const draft = loadDraft();
+
     // --- Form States ---
-    const [shopName, setShopName] = useState('');
-    const [shopAddress, setShopAddress] = useState('');
+    const [shopName, setShopName] = useState(() => draft?.shopName || '');
+    const [shopAddress, setShopAddress] = useState(() => draft?.shopAddress || '');
     const [isVerified, setIsVerified] = useState(false);
-    const [nickname, setNickname] = useState('');
+    const [nickname, setNickname] = useState(() => draft?.nickname || '');
 
     // Manager Info
-    const [managerName, setManagerName] = useState('');
-    const [managerPhone, setManagerPhone] = useState('');
-    const [messengers, setMessengers] = useState({ kakao: '', line: '', telegram: '' });
+    const [managerName, setManagerName] = useState(() => draft?.managerName || '');
+    const [managerPhone, setManagerPhone] = useState(() => draft?.managerPhone || '');
+    const [messengers, setMessengers] = useState(() => draft?.messengers || { kakao: '', line: '', telegram: '' });
 
     // Recruitment Info
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState(() => draft?.title || '');
 
     // Region
-    const [regionCity, setRegionCity] = useState('');
-    const [regionGu, setRegionGu] = useState('');
-    const [addressDetail, setAddressDetail] = useState('');
+    const [regionCity, setRegionCity] = useState(() => draft?.regionCity || '');
+    const [regionGu, setRegionGu] = useState(() => draft?.regionGu || '');
+    const [addressDetail, setAddressDetail] = useState(() => draft?.addressDetail || '');
 
     // Industry
-    const [industryMain, setIndustryMain] = useState('');
-    const [industrySub, setIndustrySub] = useState('');
+    const [industryMain, setIndustryMain] = useState(() => draft?.industryMain || '');
+    const [industrySub, setIndustrySub] = useState(() => draft?.industrySub || '');
 
     // Age
-    const [ageMin, setAgeMin] = useState(20);
-    const [ageMax, setAgeMax] = useState(35);
+    const [ageMin, setAgeMin] = useState(() => draft?.ageMin ?? 20);
+    const [ageMax, setAgeMax] = useState(() => draft?.ageMax ?? 35);
 
     // Pay
-    const [payType, setPayType] = useState('급여방식선택');
-    const [payAmount, setPayAmount] = useState('0');
-    const [mediaUrl, setMediaUrl] = useState('');
+    const [payType, setPayType] = useState(() => draft?.payType || '급여방식선택');
+    const [payAmount, setPayAmount] = useState(() => draft?.payAmount || '0');
+    const [mediaUrl, setMediaUrl] = useState(() => draft?.mediaUrl || '');
 
-    const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+    const [selectedKeywords, setSelectedKeywords] = useState<string[]>(() => draft?.selectedKeywords || []);
 
     // Editor State
     const editorRef = useRef<HTMLDivElement>(null);
     const selectionRange = useRef<Range | null>(null);
-    const [isEditorDirty, setIsEditorDirty] = useState(false);
-    const [editorHtml, setEditorHtml] = useState('');
+    const [isEditorDirty, setIsEditorDirty] = useState(() => !!(draft?.editorHtml));
+    const [editorHtml, setEditorHtml] = useState(() => draft?.editorHtml || '');
+
+    // 드래프트 editorHtml → editorRef DOM에 복원 (ref는 lazy 초기화 불가 → useEffect로 처리)
+    useEffect(() => {
+        if (draft?.editorHtml && editorRef.current && !editorRef.current.innerHTML) {
+            editorRef.current.innerHTML = draft.editorHtml;
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const [toolbarStatus, setToolbarStatus] = useState({
         isBold: false,
@@ -135,19 +173,20 @@ export function useAdFormState() {
         }
     };
 
-    // Ad Selection
-    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(null);
-    const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(30);
-    const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
-    const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(0);
-    const [selectedHighlighter, setSelectedHighlighter] = useState<number | null>(null);
-    const [highlighterPeriod, setHighlighterPeriod] = useState<30 | 60 | 90 | 0>(0);
-    const [paySuffixes, setPaySuffixes] = useState<string[]>([]);
-    const [borderOption, setBorderOption] = useState<'none' | 'color' | 'glow' | 'sparkle' | 'rainbow'>('none');
-    const [borderPeriod, setBorderPeriod] = useState<30 | 60 | 90 | 0>(0);
+    // Ad Selection (lazy 초기화로 드래프트 복원)
+    const [selectedAdProduct, setSelectedAdProduct] = useState<string | null>(() => draft?.selectedAdProduct || null);
+    const [selectedAdPeriod, setSelectedAdPeriod] = useState<30 | 60 | 90>(() => draft?.selectedAdPeriod || 30);
+    const [selectedIcon, setSelectedIcon] = useState<number | null>(() => draft?.selectedIcon || null);
+    const [iconPeriod, setIconPeriod] = useState<30 | 60 | 90 | 0>(() => draft?.iconPeriod || 0);
+    const [selectedHighlighter, setSelectedHighlighter] = useState<number | null>(() => draft?.selectedHighlighter || null);
+    const [highlighterPeriod, setHighlighterPeriod] = useState<30 | 60 | 90 | 0>(() => draft?.highlighterPeriod || 0);
+    const [paySuffixes, setPaySuffixes] = useState<string[]>(() => draft?.paySuffixes || []);
+    const [borderOption, setBorderOption] = useState<'none' | 'color' | 'glow' | 'sparkle' | 'rainbow'>(() => draft?.borderOption || 'none');
+    const [borderPeriod, setBorderPeriod] = useState<30 | 60 | 90 | 0>(() => draft?.borderPeriod || 0);
     const [totalAmount, setTotalAmount] = useState(0);
 
     const resetAdStates = () => {
+        clearDraft(); // [Fix] 저장/리셋 시 드래프트 삭제
         setShopName('');
         setIsVerified(false);
         setNickname('');
@@ -235,6 +274,33 @@ export function useAdFormState() {
         selectedIcon !== null ||
         selectedHighlighter !== null
     );
+
+    // [Fix] 폼이 dirty할 때 sessionStorage에 자동 저장 (탭 전환/리마운트 후 복원용)
+    useEffect(() => {
+        if (!isDirty) return;
+        saveDraft({
+            shopName, shopAddress, nickname, managerName, managerPhone, messengers,
+            title, regionCity, regionGu, addressDetail,
+            industryMain, industrySub, ageMin, ageMax,
+            payType, payAmount, mediaUrl, selectedKeywords,
+            editorHtml,
+            selectedAdProduct, selectedAdPeriod,
+            selectedIcon, iconPeriod,
+            selectedHighlighter, highlighterPeriod,
+            paySuffixes, borderOption, borderPeriod,
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        shopName, shopAddress, nickname, managerName, managerPhone, messengers,
+        title, regionCity, regionGu, addressDetail,
+        industryMain, industrySub, ageMin, ageMax,
+        payType, payAmount, mediaUrl, selectedKeywords,
+        editorHtml,
+        selectedAdProduct, selectedAdPeriod,
+        selectedIcon, iconPeriod,
+        selectedHighlighter, highlighterPeriod,
+        paySuffixes, borderOption, borderPeriod,
+    ]);
 
     const loadAdData = (ad: any) => {
         if (!ad) return;

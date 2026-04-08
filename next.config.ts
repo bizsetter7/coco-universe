@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
   // staleTimes.dynamic = 0 (기본값) → 탭복귀 시 즉시 Suspense fallback 노출 → 폼 리셋
   experimental: {
     staleTimes: {
-      dynamic: 30,   // 동적 라우트 30초간 캐시 유지 (탭 전환 보호)
-      static: 300,   // 정적 라우트 5분
+      dynamic: 3600, // 동적 라우트 1시간 캐시 유지 (탭 전환 보호 — 30초 부족하여 상향)
+      static: 3600,  // 정적 라우트 1시간
     },
   },
   // output: 'export', // API Route 사용을 위해 정적 추출 모드 비활성화

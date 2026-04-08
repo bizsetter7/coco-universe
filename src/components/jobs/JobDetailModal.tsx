@@ -269,16 +269,18 @@ export const JobDetailContent = ({
             {/* 1. HEADER SECTION */}
             <div className={`relative px-6 py-4 md:py-5 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
 
-                {/* [캡처 버튼] 팝업 화면 전체 저장 기능 */}
-                <button
-                    onClick={handleCapture}
-                    disabled={isCapturing}
-                    className="absolute top-4 right-14 px-3 py-2 bg-black/20 hover:bg-black/40 text-white text-[10px] font-black rounded-xl transition-all z-20 backdrop-blur-sm flex items-center gap-1.5 shadow-sm border border-white/10"
-                    aria-label="화면 캡처"
-                >
-                    {isCapturing ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
-                    <span className="hidden md:inline">{isCapturing ? '저장중...' : '이미지 저장'}</span>
-                </button>
+                {/* [캡처 버튼] 로컬(나만 쓰는 개발환경)에서만 노출되도록 숨김 처리 */}
+                {process.env.NODE_ENV === 'development' && (
+                    <button
+                        onClick={handleCapture}
+                        disabled={isCapturing}
+                        className="absolute top-4 right-14 px-3 py-2 bg-black/20 hover:bg-black/40 text-white text-[10px] font-black rounded-xl transition-all z-20 backdrop-blur-sm flex items-center gap-1.5 shadow-sm border border-white/10"
+                        aria-label="화면 캡처"
+                    >
+                        {isCapturing ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+                        <span className="hidden md:inline">{isCapturing ? '저장중...' : '이미지 저장'}</span>
+                    </button>
+                )}
 
                 {/* [Mod Moved] Close Button (Inside Header) */}
                 <button
@@ -379,10 +381,10 @@ export const JobDetailContent = ({
                         <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
                         <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
                     </div>
-                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm min-h-[150px]">
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm min-h-[150px] overflow-x-hidden">
                         <div
-                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm"
-                            dangerouslySetInnerHTML={{ 
+                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm [&>*:first-child]:mt-0 [&_*]:max-w-full [&_div]:!w-full [&_table]:w-full [&_img]:h-auto [&_p]:px-6 [&_ul]:px-6 [&_ol]:px-6 [&_h1]:px-6 [&_h2]:px-6 [&_h3]:px-6 [&_h4]:px-6"
+                            dangerouslySetInnerHTML={{
                                 __html: (shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>`)
                                     .replace(/foxalba\.com|queenalba\.net|ladyalba\.co\.kr/gi, 'cocoalba.kr')
                                     .replace(/여우알바|퀸알바|레이디알바|악녀알바|버블알바|슈슈알바/g, '코코알바')

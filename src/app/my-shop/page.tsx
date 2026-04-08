@@ -381,8 +381,10 @@ function MyShopContent() {
         // authLoading이 true인 동안 authUserType은 'guest' 초기값 → 리다이렉트 금지
         if (authLoading) return;
 
-        const simulate = searchParams.get('simulate');
-        const viewParam = searchParams.get('view');
+        // [Fix v3] window.location.search 직접 참조 (useSearchParams 재동기화 버그 방지)
+        const windowParams = new URLSearchParams(window.location.search);
+        const simulate = windowParams.get('simulate');
+        const viewParam = windowParams.get('view');
 
         // [Auth Guard] 비로그인(guest) 접근 차단 → 로그인 페이지로
         if (authUserType === 'guest') {
@@ -391,7 +393,7 @@ function MyShopContent() {
         }
         if (authUserType === 'admin' && !simulate) {
             // [Security] Only redirect if absolutely NO view context exists
-            if (!viewParam && !searchParams.has('view') && searchParams.toString() === '') {
+            if (!viewParam && windowParams.toString() === '') {
                 router.replace('/admin');
                 return;
             }
@@ -402,19 +404,20 @@ function MyShopContent() {
     }, [authUserType, authLoading, authUser.id, authUser.name, authUser.nickname, searchParams]);
 
     useEffect(() => {
-        // [Fix] 탭 복귀 시 Next.js가 searchParams 재생성해도 form 뷰 유지
-        if (tabFocusRef.current && (view === 'form' || (typeof view === 'object' && view?.id === 'form'))) return;
-
-        const viewParam = (searchParams.get('view') || 'dashboard') as any;
+        // [Fix v3] window.location.search 직접 참조로 근본 원인 해결
+        // 원인: replaceState는 window.location은 즉시 업데이트하지만,
+        //       useSearchParams()는 Next.js 내부 라우터 상태(서버 최초값)를 반환할 수 있음.
+        //       탭 복귀 시 Next.js가 router 재동기화 → searchParams가 서버 최초값(빈값)으로 리셋
+        //       → viewParam='dashboard' → 폼이 사라지는 버그.
+        // 해결: 항상 window.location.search에서 직접 읽어 실제 URL 기준으로 판단.
+        const windowParams = new URLSearchParams(window.location.search);
+        const viewParam = (windowParams.get('view') || 'dashboard') as any;
         const currentViewId = typeof view === 'object' ? view.id : view;
 
-        // [Critical Fix] If view is an object (contains edit data), don't overwrite it
-        // with a simple string from the URL if the IDs already match.
-        // [Sync Optimization] Only sync from URL if it's a fresh navigation.
         if (viewParam !== currentViewId) {
             _setView(viewParam);
         }
-    }, [searchParams]); // Remove 'view' from dependencies to prevent race condition revert
+    }, [searchParams]); // searchParams 변경 시 트리거, 하지만 읽기는 window.location에서
 
     useEffect(() => {
         const handleToggle = () => {
@@ -426,19 +429,18 @@ function MyShopContent() {
     }, []);
 
     useEffect(() => {
-        const adIdParam = searchParams.get('id');
-        const viewParam = searchParams.get('view');
-        const hasNewParam = searchParams.has('new');
-        const isNewParam = searchParams.get('new') === 'true';
+        // [Fix v3] window.location.search 직접 참조 (useSearchParams 라우터 재동기화 버그 방지)
+        const windowParams = new URLSearchParams(window.location.search);
+        const adIdParam = windowParams.get('id');
+        const viewParam = windowParams.get('view');
+        const hasNewParam = windowParams.has('new');
+        const isNewParam = windowParams.get('new') === 'true';
 
         // [Critical Fix] Only sync isNewEntry from URL if we are NOT in the middle of a view transition
         // or if the URL explicitly has the 'new' parameter.
         if (viewParam === 'form') {
             if (hasNewParam) {
                 setIsNewEntry(isNewParam);
-            } else if (!editingAdId && !adIdParam) {
-                // If we're in form but no ID and no 'new' param, it might be a weird state, 
-                // but we should default to what it was or true if it was triggered as new.
             }
         }
 
@@ -454,7 +456,6 @@ function MyShopContent() {
                 }
             }
         } else if (view !== 'form') {
-            // [Fix] 탭 복귀 시 lastLoadedId 리셋 방지 (폼 재로드 차단)
             if (lastLoadedId !== null && !tabFocusRef.current) setLastLoadedId(null);
         }
     }, [searchParams, view, isDataLoaded, registeredAds, lastLoadedId]);
