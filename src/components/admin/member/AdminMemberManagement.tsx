@@ -48,6 +48,31 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
             alert('상태 업데이트 실패: ' + (err.message || '알 수 없는 오류'));
         }
     };
+ 
+    const handleUserToggleType = async (userId: string, currentType: string) => {
+        const newType = currentType === 'corporate' ? 'individual' : 'corporate';
+        const confirmMsg = `회원 유형을 ${newType === 'corporate' ? '기업' : '개인'}회원으로 변경하시겠습니까?`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ user_type: newType, updated_at: new Date().toISOString() })
+                .eq('id', userId);
+
+            if (error) throw error;
+
+            alert(`회원 유형이 ${newType === 'corporate' ? '기업' : '개인'}회원으로 변경되었습니다.`);
+            fetchData(); // Refresh list
+            if (selectedUser?.id === userId) {
+                setSelectedUser((prev: any) => ({ ...prev, user_type: newType, type: newType }));
+            }
+        } catch (err: any) {
+            console.error('User type update error:', err);
+            alert('유형 업데이트 실패: ' + (err.message || '알 수 없는 오류'));
+        }
+    };
 
     const handleGrantPoint = async () => {
         if (!selectedUser?.id) return;
@@ -83,8 +108,14 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
 
     const effectiveUsers = (users && users.length > 0) ? users : mockUsers;
     const filteredUsers = effectiveUsers
-        .filter(u => filter === 'all' || u.role === filter || u.type === filter)
-        .filter(u => !search || (u.name || u.full_name || '').includes(search) || (u.username || u.loginId || u.email || '').includes(search) || (u.phone || '').includes(search));
+        .filter(u => filter === 'all' || u.role === filter || u.type === filter || u.user_type === filter)
+        .filter(u => !search ||
+            (u.name || u.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+            (u.business_name || '').toLowerCase().includes(search.toLowerCase()) ||
+            (u.username || u.loginId || u.email || '').toLowerCase().includes(search.toLowerCase()) ||
+            (u.phone || '').includes(search) ||
+            (u.business_number || '').includes(search)
+        );
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -108,7 +139,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
-                            placeholder="회원 이름, 아이디, 전화번호 검색..."
+                            placeholder="상호명, 실명, 아이디, 전화번호, 사업자번호 검색..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -136,8 +167,13 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                                     {user.status === 'blocked' ? '🚫' : '👤'}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-black text-slate-900">{user.name || user.full_name || '이름없음'}</div>
-                                                    <div className="text-[10px] font-bold text-slate-400">@{user.username || user.loginId || user.email?.split('@')[0] || '-'} ({user.nickname || '닉네임없음'})</div>
+                                                    <div className="text-sm font-black text-slate-900">
+                                                        {user.business_name || user.name || user.full_name || '이름없음'}
+                                                        {user.business_name && (user.name || user.full_name) && (
+                                                            <span className="ml-1 text-[10px] font-bold text-slate-400">({user.name || user.full_name})</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[10px] font-bold text-slate-400">@{user.username || user.loginId || user.email?.split('@')[0] || '-'} · {user.nickname || '닉네임없음'}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -179,6 +215,13 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                                     className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-black hover:bg-blue-700 transition active:scale-95 shadow-sm shadow-blue-100"
                                                 >
                                                     <Zap size={12} fill="currentColor" /> 광고등록
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUserToggleType(user.id, user.user_type || user.type || 'individual')}
+                                                    className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all"
+                                                    title="회원 유형 전환 (기업/개인)"
+                                                >
+                                                    <TrendingUp size={14} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleUserToggleStatus(user.id, user.status)}
@@ -318,14 +361,21 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                 <p className="text-[9px] text-amber-600 font-bold mt-2">* 양수는 지급, 음수는 차감으로 처리됩니다.</p>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-50">
+                            <div className="pt-4 border-t border-slate-50 space-y-3">
+                                <button
+                                    onClick={() => handleUserToggleType(selectedUser.id, selectedUser.user_type || selectedUser.type || 'individual')}
+                                    className="w-full py-3.5 rounded-2xl text-sm font-black bg-indigo-500 text-white shadow-lg shadow-indigo-100 hover:bg-indigo-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    <TrendingUp size={18} />
+                                    회원 유형 전환 ({ (selectedUser.user_type || selectedUser.type) === 'corporate' ? '기업 → 개인' : '개인 → 기업' })
+                                </button>
                                 <button
                                     onClick={() => handleUserToggleStatus(selectedUser.id, selectedUser.status)}
-                                    className={`w-full py-4 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${selectedUser.status === 'blocked' ? 'bg-green-500 text-white shadow-green-200 hover:bg-green-600' : 'bg-rose-500 text-white shadow-rose-200 hover:bg-rose-600'}`}
+                                    className={`w-full py-3.5 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${selectedUser.status === 'blocked' ? 'bg-green-500 text-white shadow-green-200 hover:bg-green-600' : 'bg-rose-500 text-white shadow-rose-200 hover:bg-rose-600'}`}
                                 >
                                     {selectedUser.status === 'blocked' ? <><Unlock size={18} /> 차단 해제 및 계정 복구</> : <><Lock size={18} /> 회원 영구 차단 및 접속 제한</>}
                                 </button>
-                                <p className="text-[10px] text-center text-slate-400 font-bold mt-4">
+                                <p className="text-[10px] text-center text-slate-400 font-bold mt-2">
                                     * 차단 시 해당 회원은 즉시 로그아웃되며 접속이 제한됩니다.
                                 </p>
                             </div>

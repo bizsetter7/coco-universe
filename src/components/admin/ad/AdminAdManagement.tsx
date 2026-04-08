@@ -130,25 +130,6 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                         )}
                     </div>
                     <button
-                        onClick={async () => {
-                            if (!confirm('143, 144, 145번 결제 내역을 0원으로 소급 적용하시겠습니까?')) return;
-                                const bfRes = await fetch('/api/admin/backfill-ads', { 
-                                    method: 'POST', 
-                                    body: JSON.stringify({ adIds: ['143', '144', '145'], amount: 0, userId: '4178455a-fc94-4be4-9d35-7eb02d0aa008' }),
-                                    headers: { 'Content-Type': 'application/json' }
-                                });
-                                const bfResult = await bfRes.json();
-                                if (bfResult.success) {
-                                fetchData();
-                            } else {
-                                alert('실패: ' + bfResult.error);
-                            }
-                        }}
-                        className="px-4 py-2.5 bg-blue-600 text-white rounded-2xl text-[10px] font-black shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
-                    >
-                        143-145 백필(0원)
-                    </button>
-                    <button
                         onClick={() => setAdFilter(adFilter === 'all' ? 'pending' : 'all')}
                         className={`px-4 py-2.5 rounded-2xl text-[10px] font-black border transition-all active:scale-95 shrink-0 shadow-sm ${adFilter === 'all' ? 'bg-amber-600 text-white border-amber-600 shadow-amber-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
                     >
