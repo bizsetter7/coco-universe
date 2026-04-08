@@ -276,19 +276,25 @@ export function useAdFormState() {
     );
 
     // [Fix] 폼이 dirty할 때 sessionStorage에 자동 저장 (탭 전환/리마운트 후 복원용)
+    // 300ms 디바운스: 한글 IME 조합 문자가 확정되기 전에 저장되는 문제 방지
+    const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => {
         if (!isDirty) return;
-        saveDraft({
-            shopName, shopAddress, nickname, managerName, managerPhone, messengers,
-            title, regionCity, regionGu, addressDetail,
-            industryMain, industrySub, ageMin, ageMax,
-            payType, payAmount, mediaUrl, selectedKeywords,
-            editorHtml,
-            selectedAdProduct, selectedAdPeriod,
-            selectedIcon, iconPeriod,
-            selectedHighlighter, highlighterPeriod,
-            paySuffixes, borderOption, borderPeriod,
-        });
+        if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+        draftTimerRef.current = setTimeout(() => {
+            saveDraft({
+                shopName, shopAddress, nickname, managerName, managerPhone, messengers,
+                title, regionCity, regionGu, addressDetail,
+                industryMain, industrySub, ageMin, ageMax,
+                payType, payAmount, mediaUrl, selectedKeywords,
+                editorHtml,
+                selectedAdProduct, selectedAdPeriod,
+                selectedIcon, iconPeriod,
+                selectedHighlighter, highlighterPeriod,
+                paySuffixes, borderOption, borderPeriod,
+            });
+        }, 300);
+        return () => { if (draftTimerRef.current) clearTimeout(draftTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         shopName, shopAddress, nickname, managerName, managerPhone, messengers,
