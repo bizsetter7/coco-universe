@@ -73,6 +73,7 @@ function MyShopContent() {
     const editingAdIdRef = React.useRef<string | null>(null); // [Ref Fix] Synchronous ID storage
     const [isSaving, setIsSaving] = useState(false);
     const isJustSaved = React.useRef(false); // [Ref] Prevent "ZOMBIE" data overwriting immediately after save
+    const tabFocusRef = React.useRef(false); // [Fix] 탭 복귀 시 Next.js searchParams 재생성으로 인한 폼 리셋 방지
 
     const [view, _setView] = useState<any>('dashboard');
     const [lastLoadedId, setLastLoadedId] = useState<string | null>(null); // [Fix] Prevent reload loop
@@ -274,6 +275,18 @@ function MyShopContent() {
         return () => window.removeEventListener('resume-updated', handleUpdate);
     }, [authUser?.id]);
 
+    // [Fix] 탭 복귀 시 Next.js searchParams 재생성으로 폼 리셋 방지
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                tabFocusRef.current = true;
+                setTimeout(() => { tabFocusRef.current = false; }, 1500);
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
+
     // SOS에서 공고등록 이동 이벤트
     useEffect(() => {
         const handleSetView = (e: any) => setView(e.detail);
@@ -321,8 +334,10 @@ function MyShopContent() {
     };
 
     // [Scroll Fix] Secondary guard to ensure scroll to top when view changes via URL or internal state
+    // requestAnimationFrame 으로 DOM 커밋 후 실행 보장 (브라우저 스크롤 복원 덮어쓰기)
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     }, [view]);
 
     // Modal States
@@ -384,6 +399,9 @@ function MyShopContent() {
     }, [authUserType, authLoading, authUser.id, authUser.name, authUser.nickname, searchParams]);
 
     useEffect(() => {
+        // [Fix] 탭 복귀 시 Next.js가 searchParams 재생성해도 form 뷰 유지
+        if (tabFocusRef.current && (view === 'form' || (typeof view === 'object' && view?.id === 'form'))) return;
+
         const viewParam = (searchParams.get('view') || 'dashboard') as any;
         const currentViewId = typeof view === 'object' ? view.id : view;
 
@@ -433,7 +451,8 @@ function MyShopContent() {
                 }
             }
         } else if (view !== 'form') {
-            if (lastLoadedId !== null) setLastLoadedId(null);
+            // [Fix] 탭 복귀 시 lastLoadedId 리셋 방지 (폼 재로드 차단)
+            if (lastLoadedId !== null && !tabFocusRef.current) setLastLoadedId(null);
         }
     }, [searchParams, view, isDataLoaded, registeredAds, lastLoadedId]);
 
