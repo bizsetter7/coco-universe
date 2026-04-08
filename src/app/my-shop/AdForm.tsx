@@ -130,8 +130,8 @@ export default function AdForm(props: AdFormProps) {
         props.title && props.title !== '제목 없음' &&
         props.industryMain && props.industryMain !== '업종' &&
         props.regionCity && props.regionCity !== '지역' &&
-        props.payType && props.payType !== '급여방식선택' && props.payType !== '시급' &&
-        props.payAmount && props.payAmount !== '0' && props.payAmount !== ''
+        props.payType && props.payType !== '급여방식선택' &&
+        (props.payType === '협의' || (props.payAmount && props.payAmount !== '0' && props.payAmount !== ''))
     );
 
     // Step 3: 상품 선택 (p1~p7 + p7e 이벤트 베이직 인정)

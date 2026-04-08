@@ -555,7 +555,7 @@ function MyShopContent() {
             if (!formState.industryMain) missingFields.push('업종 선택');
             if (!formState.regionCity) missingFields.push('지역 선택');
             if (!formState.payType || formState.payType === '종류선택' || formState.payType === '급여방식선택') missingFields.push('급여 방식');
-            if (!formState.payAmount || Number(formState.payAmount) === 0) missingFields.push('급여 금액');
+            if (formState.payType !== '협의' && (!formState.payAmount || Number(formState.payAmount) === 0)) missingFields.push('급여 금액');
 
             if (missingFields.length > 0) {
                 alert(`[필수 항목 누락]\n${missingFields.join(', ')} 항목을 입력해주세요.`);

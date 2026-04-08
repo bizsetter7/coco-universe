@@ -25,8 +25,8 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any; onClose: () => void })
             className="modal-overlay fixed inset-0 z-[20000] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm touch-none overscroll-contain animate-in fade-in duration-300"
             onClick={onClose}
         >
-            <div 
-                className="relative w-full max-w-lg md:max-w-xl max-h-[92vh] overflow-hidden rounded-t-[32px] md:rounded-[32px] bg-white z-10 animate-in slide-in-from-bottom duration-300"
+            <div
+                className="relative w-full md:max-w-[500px] lg:max-w-[600px] max-h-[92vh] overflow-hidden rounded-t-[32px] md:rounded-[32px] bg-white z-10 animate-in slide-in-from-bottom duration-300"
                 onClick={e => e.stopPropagation()}
             >
                 <JobDetailContent shop={shop} onClose={onClose} />
