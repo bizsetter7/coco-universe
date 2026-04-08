@@ -8,7 +8,6 @@ import {
     Bell,
     CreditCard,
     MessageSquare,
-    XCircle,
     Check
 } from 'lucide-react';
 
@@ -28,9 +27,9 @@ import { AdminPaymentManagement } from '@/components/admin/payment/AdminPaymentM
 import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
-import { MobilePreviewContent } from '@/app/my-shop/components/MobilePreviewContent';
 import { useBrand } from '@/components/BrandProvider';
-import { enrichAdData } from '@/lib/adUtils';
+import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
+import { JobDetailContent } from '@/components/jobs/JobDetailModal';
 
 export default function AdminPage() {
     return (
@@ -623,68 +622,16 @@ function AdminContent() {
 
             {/* Global Ad Detail Modal (Accessible from all tabs) */}
             {selectedAdForModal && (
-                <div className="fixed inset-0 z-[10020] flex items-center justify-center p-4">
-                    <div
-                        className="absolute inset-0 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-300"
-                        onClick={() => setSelectedAdForModal(null)}
-                    />
-                    <div className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-                        <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center shrink-0">
-                            <div className="flex items-center gap-4">
-                                <div>
-                                    <span className="bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md font-black uppercase mb-2 inline-block">
-                                        Ad Preview Detail <span className="text-slate-400">|</span> No. {(selectedAdForModal as any).adNo || String(selectedAdForModal.id || '').substring(0, 8)}
-                                    </span>
-                                    <div className="flex items-center gap-2 md:gap-3">
-                                        <h3 className="text-2xl font-black text-slate-950 tracking-tighter line-clamp-2 max-w-[400px]">{selectedAdForModal.title}</h3>
-                                        <div className="bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl flex items-baseline gap-1 animate-in slide-in-from-left-2">
-                                            <span className="text-[10px] font-black text-blue-400 uppercase leading-none">Price</span>
-                                            <span className="text-lg font-black text-blue-600 leading-none">
-                                                {(Number(selectedAdForModal?.ad_price) || Number((selectedAdForModal as any)?.price) || Number((selectedAdForModal?.options as any)?.ad_price) || 0).toLocaleString()}
-                                            </span>
-                                            <span className="text-[10px] text-blue-400 font-bold">원</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button onClick={() => setSelectedAdForModal(null)} className="p-2 text-slate-300 hover:text-slate-950 transition-colors">
-                                <XCircle size={28} />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto bg-slate-50 relative">
-                            <MobilePreviewContent
-                                formData={{
-                                    ...selectedAdForModal!,
-                                    industryMain: selectedAdForModal!.category || (selectedAdForModal!.options as any)?.industryMain || (selectedAdForModal!.options as any)?.category || (selectedAdForModal!.options as any)?.jobCategory || '업종미기재',
-                                    categorySub: (selectedAdForModal as any).categorySub || selectedAdForModal!.category_sub || (selectedAdForModal!.options as any)?.categorySub || (selectedAdForModal!.options as any)?.industrySub || '일반',
-                                    payType: (selectedAdForModal as any).payType || (selectedAdForModal as any).pay_type || (selectedAdForModal!.options as any)?.payType || '협의',
-                                    payAmount: Number((selectedAdForModal as any).pay_amount) || Number((selectedAdForModal!.options as any)?.payAmount) || Number(selectedAdForModal!.pay) || 0,
-                                    regionCity: (selectedAdForModal as any).regionCity || selectedAdForModal!.region || (selectedAdForModal!.options as any)?.regionCity || (selectedAdForModal!.options as any)?.region || '',
-                                    regionGu: (selectedAdForModal as any).regionGu || selectedAdForModal!.work_region_sub || (selectedAdForModal!.options as any)?.regionGu || '',
-                                    selectedKeywords: (selectedAdForModal as any).selectedKeywords || (selectedAdForModal!.options as any)?.keywords || (selectedAdForModal!.options as any)?.selectedKeywords || selectedAdForModal!.keywords || [],
-                                    selectedIcon: (selectedAdForModal as any).selectedIcon || (selectedAdForModal!.options as any)?.icon || (selectedAdForModal!.options as any)?.selectedIcon,
-                                    selectedHighlighter: (selectedAdForModal as any).selectedHighlighter || (selectedAdForModal!.options as any)?.highlighter || (selectedAdForModal!.options as any)?.selectedHighlighter,
-                                    selectedAdProduct: selectedAdForModal!.tier || (selectedAdForModal as any).productType || (selectedAdForModal as any).ad_type || (selectedAdForModal!.options as any)?.product_type || 'p7',
-                                    paySuffixes: (selectedAdForModal as any).paySuffixes || (selectedAdForModal!.options as any)?.pay_suffixes || (selectedAdForModal!.options as any)?.paySuffixes || [],
-                                    ad_price: Number(selectedAdForModal!.ad_price) || Number((selectedAdForModal as any).price) || Number((selectedAdForModal!.options as any)?.ad_price) || 0,
-                                    editorHtml: (selectedAdForModal as any).content || (selectedAdForModal as any).description || (selectedAdForModal!.options as any)?.content || (selectedAdForModal!.options as any)?.editorHtml || '',
-                                    nickname: (selectedAdForModal as any).nickname || selectedAdForModal.shopName || (selectedAdForModal as any).shop_name || '비즈니스 파트너',
-                                    shopName: selectedAdForModal.shopName || (selectedAdForModal as any).shop_name || (selectedAdForModal.options as any)?.shopName || '',
-                                    managerName: (selectedAdForModal as any).managerName || (selectedAdForModal as any).manager_name || (selectedAdForModal.options as any)?.managerName || '',
-                                    managerPhone: (selectedAdForModal as any).managerPhone || (selectedAdForModal as any).manager_phone || (selectedAdForModal.options as any)?.managerPhone || ''
-                                }}
-                                brand={brand}
-                                bizAddressOverride={(selectedAdForModal.options as any)?.businessAddress || (selectedAdForModal.options as any)?.business_address || undefined}
-                            />
-                        </div>
-                        <div className="p-6 border-t border-slate-50 bg-white flex justify-end shrink-0">
-                            <button
-                                onClick={() => setSelectedAdForModal(null)}
-                                className="px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-black hover:bg-black transition active:scale-95"
-                            >
-                                닫기
-                            </button>
-                        </div>
+                <div
+                    className="fixed inset-0 z-[10020] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
+                    onClick={() => setSelectedAdForModal(null)}
+                >
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <JobDetailContent
+                            shop={anyAdToShop(selectedAdForModal)}
+                            publisherAddress={(selectedAdForModal.options as any)?.businessAddress || (selectedAdForModal.options as any)?.business_address || undefined}
+                            onClose={() => setSelectedAdForModal(null)}
+                        />
                     </div>
                 </div>
             )}

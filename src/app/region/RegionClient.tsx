@@ -137,56 +137,36 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
             return true;
         });
 
-        // [Sorting Policy] 1. Tier Rank -> 2. Real Ads (DB) first -> 3. Newest first
-        filtered.sort((a, b) => {
-            const TIER_ORDER = ['vip', 'grand', 't1', 'premium', 't2', 'deluxe', 't3', 'special', 't4', 'urgent', '급구', 't5', 'recommended', '추천', 't6', 'basic', '일반', 't7', 'common'];
-            const getRank = (tier: string) => {
-                const idx = TIER_ORDER.indexOf((tier || '').toLowerCase());
-                return idx === -1 ? 99 : idx;
-            };
-            const aRank = getRank(a.tier!);
-            const bRank = getRank(b.tier!);
-            
-            // 1. 티어 등급 순
-            if (aRank !== bRank) return aRank - bRank;
+        // [Fix] isMock 판별 — Supabase 레코드는 isMock 컬럼 없으므로 user_id로 구분
+        const isMockAd = (s: any) =>
+            s.isMock === true ||
+            String(s.user_id || '').startsWith('6fc68887') ||
+            String(s.id || '').startsWith('AD_MOCK_');
 
-            // 2. 실제 공고(DB 데이터) 우선
-            const aIsMock = (a as any).isMock || false;
-            const bIsMock = (b as any).isMock || false;
-            if (aIsMock !== bIsMock) return aIsMock ? 1 : -1;
+        // [Fix] p1~p7 실제 tier 기준 (구버전 grand/premium 호환 포함)
+        const getTierRank = (tier: string): number => {
+            const t = (tier || '').toLowerCase();
+            const O: Record<string, number> = { p1:1,grand:1,vip:1, p2:2,premium:2, p3:3,deluxe:3, p4:4,special:4, p5:5,urgent:5,recommended:5, p6:6,native:6, p7:7,basic:7,common:7 };
+            return O[t] ?? 99;
+        };
 
-            // 3. 최신 순
-            const aTime = new Date((a as any).created_at || (a as any).date || 0).getTime();
-            const bTime = new Date((b as any).created_at || (b as any).date || 0).getTime();
-            return bTime - aTime;
+        const realsOnly = filtered.filter(s => !isMockAd(s));
+        const mocksOnly = filtered.filter(s => isMockAd(s));
+        const realCount = realsOnly.length;
+
+        // 실제 광고 수만큼 목업 뒤에서 제거
+        const visibleMocks = realCount > 0
+            ? mocksOnly.slice(0, Math.max(0, mocksOnly.length - realCount))
+            : mocksOnly;
+
+        const sortByTierDate = (arr: any[]) => arr.sort((a: any, b: any) => {
+            const rA = getTierRank(a.tier), rB = getTierRank(b.tier);
+            if (rA !== rB) return rA - rB;
+            return new Date(b.created_at || b.date || 0).getTime() - new Date(a.created_at || a.date || 0).getTime();
         });
 
-        // [Mockup Cleanup] 실제 공고 개수만큼 하위 목업 데이터 제거
-        const realAdsCount = filtered.filter(s => !(s as any).isMock).length;
-        if (realAdsCount > 0) {
-            const mocksOnly = filtered.filter(s => (s as any).isMock);
-            const realsOnly = filtered.filter(s => !(s as any).isMock);
-            const reducedMocks = mocksOnly.slice(0, Math.max(0, mocksOnly.length - realAdsCount));
-            return [...realsOnly, ...reducedMocks].sort((a, b) => {
-                // 재정렬 고정
-                const getRank = (tier: string) => {
-                    const TIER_ORDER = ['vip', 'grand', 't1', 'premium', 't2', 'deluxe', 't3', 'special', 't4', 'urgent', '급구', 't5', 'recommended', '추천', 't6', 'basic', '일반', 't7', 'common'];
-                    const idx = TIER_ORDER.indexOf((tier || '').toLowerCase());
-                    return idx === -1 ? 99 : idx;
-                };
-                const aRank = getRank(a.tier!);
-                const bRank = getRank(b.tier!);
-                if (aRank !== bRank) return aRank - bRank;
-                const aIsMock = (a as any).isMock || false;
-                const bIsMock = (b as any).isMock || false;
-                if (aIsMock !== bIsMock) return aIsMock ? 1 : -1;
-                const aTime = new Date((a as any).created_at || (a as any).date || 0).getTime();
-                const bTime = new Date((b as any).created_at || (b as any).date || 0).getTime();
-                return bTime - aTime;
-            });
-        }
-
-        return filtered;
+        // 실제광고는 tier 무관하게 목업보다 항상 앞에
+        return [...sortByTierDate(realsOnly), ...sortByTierDate(visibleMocks)];
     }, [shops, selectedRegion, selectedSubRegion, selectedJobType, selectedSubJobType, activeSearchQuery, homeRegion]);
 
     // [BUG-04 FIX] LeftSidebar에서 직종 변경 시 subJobType도 함께 리셋

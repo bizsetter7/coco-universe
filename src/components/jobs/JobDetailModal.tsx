@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag, ClipboardList, CheckCircle, Loader2, Camera } from 'lucide-react';
 import { toPng } from 'html-to-image';
@@ -16,6 +16,38 @@ import { AD_TIER_STANDARDS } from '@/constants/standards';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
 import { useAuth } from '@/hooks/useAuth';
+
+// [Fix 5] MobilePreviewContent.tsx와 동일한 Kakao Map SDK 로더 (검증된 패턴 재사용)
+const loadKakaoMapSdk = (): Promise<void> =>
+    new Promise((resolve, reject) => {
+        if ((window as any).kakao?.maps?.services) { resolve(); return; }
+        const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
+        if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
+        const timeoutId = setTimeout(() => reject(new Error('카카오 지도 로딩 시간 초과')), 10000);
+        const checkInitialized = () => {
+            if ((window as any).kakao?.maps?.services) { clearTimeout(timeoutId); resolve(); return true; }
+            return false;
+        };
+        const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
+        if (existing) {
+            const poll = () => {
+                if (checkInitialized()) return;
+                const k = (window as any).kakao;
+                if (k?.maps?.load) { k.maps.load(() => { if (!checkInitialized()) setTimeout(poll, 100); }); }
+                else { setTimeout(poll, 100); }
+            };
+            poll(); return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
+        script.onload = () => {
+            const k = (window as any).kakao;
+            if (k?.maps?.load) { k.maps.load(() => { const p = () => { if (!checkInitialized()) setTimeout(p, 100); }; p(); }); }
+            else { reject(new Error('카카오 지도 객체 생성 실패')); }
+        };
+        script.onerror = () => { clearTimeout(timeoutId); reject(new Error('카카오 지도 스크립트 로드 실패')); };
+        document.head.appendChild(script);
+    });
 
 interface JobDetailModalProps {
     shop: Shop;
@@ -49,6 +81,50 @@ export const JobDetailContent = ({
     const [applied, setApplied] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
     const modalRef = React.useRef<HTMLDivElement>(null);
+
+    // [Fix 5] Kakao Map — address 해소 + 지도 렌더링
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const [mapError, setMapError] = useState<string | null>(null);
+    const [resolvedAddress, setResolvedAddress] = useState<string | null>(publisherAddress || null);
+
+    useEffect(() => {
+        if (publisherAddress) { setResolvedAddress(publisherAddress); return; }
+        const userId = (shop as any).user_id;
+        if (!userId) return;
+        supabase.from('profiles')
+            .select('business_address, business_address_detail')
+            .eq('id', userId)
+            .single()
+            .then(({ data }) => {
+                if (data?.business_address) {
+                    const detail = (data as any).business_address_detail;
+                    setResolvedAddress(detail ? `${data.business_address} ${detail}` : data.business_address);
+                }
+            });
+    }, [(shop as any).user_id, publisherAddress]);
+
+    useEffect(() => {
+        if (!resolvedAddress || !mapContainerRef.current) return;
+        let cancelled = false;
+        loadKakaoMapSdk()
+            .then(() => {
+                if (cancelled || !mapContainerRef.current) return;
+                const kakao = (window as any).kakao;
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(resolvedAddress, (result: any[], status: string) => {
+                    if (cancelled || !mapContainerRef.current) return;
+                    if (status !== kakao.maps.services.Status.OK || !result[0]) {
+                        setMapError('주소를 지도에서 찾을 수 없습니다.'); return;
+                    }
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    const map = new kakao.maps.Map(mapContainerRef.current, { center: coords, level: 4 });
+                    new kakao.maps.Marker({ map, position: coords });
+                });
+            })
+            .catch(err => { if (!cancelled) setMapError(err.message || '지도를 불러오지 못했습니다.'); });
+        return () => { cancelled = true; };
+    }, [resolvedAddress]);
+
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
@@ -59,16 +135,17 @@ export const JobDetailContent = ({
         : (AD_TIER_STANDARDS.find(s => pt.includes(s.id) || pt.includes(s.altId)) || AD_TIER_STANDARDS[6]);
 
     // v2.0 — AD_TIER_STANDARDS 동기화 + 배지 흰색 통일 (2026-03-22)
+    // [Fix 6] MobilePreviewContent.tsx TIER_STYLE_MAP 기준으로 통일 (2026-04-09)
     const getHeaderTheme = (tid: string) => {
         switch (tid) {
-            case 'p1':     return { bg: "from-amber-500 to-amber-600",     accent: "text-amber-500",   badge: "bg-white/20" }; // Grand
-            case 'p2':     return { bg: "from-red-600 to-red-700",         accent: "text-red-600",     badge: "bg-white/20" }; // Premium
-            case 'p3':     return { bg: "from-blue-600 to-blue-700",       accent: "text-blue-600",    badge: "bg-white/20" }; // Deluxe
-            case 'p4':     return { bg: "from-emerald-600 to-emerald-700", accent: "text-emerald-600", badge: "bg-white/20" }; // Special
-            case 'p5':     return { bg: "from-purple-600 to-purple-700",   accent: "text-purple-500",  badge: "bg-white/20" }; // Urgent/Recommended 🟣
-            case 'p6':     return { bg: "from-slate-600 to-slate-700",     accent: "text-slate-500",   badge: "bg-white/20" }; // Native
-            case 'urgent': return { bg: "from-purple-600 to-purple-700",   accent: "text-purple-500",  badge: "bg-white/20" }; // Urgent 🟣
-            default:       return { bg: "from-stone-700 to-stone-800",     accent: "text-stone-400",   badge: "bg-white/20" }; // Basic
+            case 'p1':     return { bg: "from-amber-400 via-orange-500 to-amber-600", accent: "text-amber-500",   badge: "bg-white/20" }; // Grand
+            case 'p2':     return { bg: "from-red-500 to-rose-700",                   accent: "text-red-600",     badge: "bg-white/20" }; // Premium
+            case 'p3':     return { bg: "from-blue-500 to-indigo-600",                accent: "text-blue-600",    badge: "bg-white/20" }; // Deluxe
+            case 'p4':     return { bg: "from-emerald-400 to-teal-600",               accent: "text-emerald-600", badge: "bg-white/20" }; // Special
+            case 'p5':     return { bg: "from-purple-500 to-violet-600",              accent: "text-purple-500",  badge: "bg-white/20" }; // Recommended 🟣
+            case 'p6':     return { bg: "from-slate-400 to-gray-600",                 accent: "text-slate-500",   badge: "bg-white/20" }; // Native
+            case 'urgent': return { bg: "from-purple-500 to-violet-600",              accent: "text-purple-500",  badge: "bg-white/20" }; // Urgent 🟣
+            default:       return { bg: "from-slate-500 via-blue-600 to-slate-700",    accent: "text-blue-300",    badge: "bg-white/20" }; // Basic (p7)
         }
     };
 
@@ -221,9 +298,15 @@ export const JobDetailContent = ({
                     <Star size={20} className={isFavorite ? "fill-yellow-400 text-yellow-400" : "text-white group-hover:scale-110 transition-transform"} />
                 </button>
 
-                {/* Region | Industry Badge */}
+                {/* Region | Industry Badge (1차+2차 모두 표시) */}
                 <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white mt-2">
-                    <MapPin size={10} /> {shop.region} | <Briefcase size={10} /> {shop.category || shop.workType || '업종미기재'}
+                    <MapPin size={10} />
+                    {shop.region}
+                    {' | '}
+                    <Briefcase size={10} />
+                    {shop.category || shop.workType || '업종미기재'}
+                    {((shop as any).categorySub || (shop as any).industrySub || (shop as any).category_sub) &&
+                        ` | ${(shop as any).categorySub || (shop as any).industrySub || (shop as any).category_sub}`}
                 </div>
 
                 {/* Ad Title White Box Layout (CENTERED) */}
@@ -307,29 +390,6 @@ export const JobDetailContent = ({
                         />
                     </div>
 
-                    {/* [v3.2] 대장님 요청: 상세 팝업 하단 지역 맞춤 키워드 주입 */}
-                    <div className="mt-4 pt-4 border-t border-dashed border-gray-100">
-                        <div className="flex flex-wrap gap-1.5">
-                            {(() => {
-                                // 지역 및 업종 정보 추출
-                                const city = shop.city || shop.region?.split(' ')[0] || '';
-                                const district = shop.district || shop.region?.split(' ')[1] || '';
-                                const category = shop.workType || shop.category || '룸알바';
-                                
-                                // 대장님 지시 키워드 조합 생성
-                                const targetKeywords = [
-                                    `${city} ${category}`, `${city} 노래방알바`, `${city} 유흥알바`,
-                                    `${city} ${district} ${category}`, `${city} ${district} 노래방알바`, `${city} ${district} 유흥알바`
-                                ].filter(k => k.trim().length > 2);
-
-                                return targetKeywords.map((kw, i) => (
-                                    <span key={`target-${i}`} className="px-2.5 py-1.5 bg-pink-50/50 text-[#f82b60] text-[10.5px] font-black rounded-xl border border-pink-100/50 shadow-sm transition-all hover:bg-pink-100/50 uppercase">
-                                        #{kw.replace(/\s+/g, '')}
-                                    </span>
-                                ));
-                            })()}
-                        </div>
-                    </div>
                 </div>
 
                 {/* 위치 정보 */}
@@ -338,18 +398,28 @@ export const JobDetailContent = ({
                         <span className="w-1 h-4 bg-green-500 rounded-full"></span>
                         위치 정보
                     </h3>
-                    <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 flex-col gap-2 border border-gray-50 overflow-hidden relative">
-                        <img
-                            src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff4444(${shop.lng || 126.9780},${shop.lat || 37.5665})/${shop.lng || 126.9780},${shop.lat || 37.5665},15,0/600x300?access_token=pk.eyJ1IjoibW9ja3VzaGVyIiwiYSI6ImNrNzh6Zzh6ejAwMXAzZHBkbmR6Zzh6ejAifQ`}
-                            alt="Map"
-                            className="absolute inset-0 w-full h-full object-cover grayscale-[20%]"
-                        />
-                        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm p-3 border-t border-gray-100 flex items-center gap-3">
-                            <MapPin size={24} className="text-gray-400" />
+                    <div className="aspect-video rounded-xl bg-gray-100 border border-gray-50 overflow-hidden relative">
+                        {resolvedAddress ? (
+                            mapError ? (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-400">
+                                    <MapPin size={28} className="opacity-40" />
+                                    <span className="text-xs font-medium">{mapError}</span>
+                                </div>
+                            ) : (
+                                <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+                            )
+                        ) : (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-400">
+                                <MapPin size={28} className="opacity-40" />
+                                <span className="text-xs font-medium">위치 정보를 불러오는 중...</span>
+                            </div>
+                        )}
+                        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm p-3 border-t border-gray-100 flex items-center gap-3 z-10">
+                            <MapPin size={24} className="text-gray-400 shrink-0" />
                             <div>
                                 <div className="text-[12px] font-black text-gray-900">사업자 등록 주소</div>
                                 <div className="text-[11px] text-gray-500 font-medium">
-                                    {((shop.options?.regionCity && shop.options?.regionGu) ? `${shop.options.regionCity} ${shop.options.regionGu}` : shop.region) || publisherAddress || shop.businessAddress || '주소 정보 없음'}
+                                    {resolvedAddress || '주소 정보 없음'}
                                 </div>
                             </div>
                         </div>
@@ -360,18 +430,40 @@ export const JobDetailContent = ({
                 <div className="space-y-2 pt-2">
                     <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5 opacity-80">
                         <Info size={12} />
-                        추가 태그정보
+                        Keyword & 정보
                     </h3>
                     <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
                         <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
                             {(() => {
-                                const autoKeywords = generateSEOKeywords(shop.region);
-                                const userKeywords = shop.options?.keywords || [];
-                                
-                                // [2026-04-01] 대장님 피드백 반영: 필터링 조건 완화 및 AI 용어 배제
-                                const forbidden = ['레이디알바', '여우알바', '퀸알바', '악녀알바']; 
-                                
-                                const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords]))
+                                const userKeywords: string[] = Array.isArray(shop.options?.keywords) ? shop.options.keywords : [];
+
+                                // 지역+업종 자동 키워드 (구 붉은 키워드 블록 통합)
+                                const opt = (shop.options || {}) as any;
+                                const city = opt.regionCity || shop.city || (typeof shop.region === 'string' ? shop.region.split(' ')[0] : '');
+                                const district = opt.regionGu || shop.district || (typeof shop.region === 'string' ? shop.region.split(' ')[1] : '') || '';
+                                const category = shop.workType || shop.category || '룸알바';
+                                const targetKeywords: string[] = [
+                                    `${city}${category}`, `${city}노래방알바`, `${city}유흥알바`,
+                                    district ? `${city}${district}${category}` : '',
+                                    district ? `${city}${district}노래방알바` : '',
+                                ].filter(k => k.trim().length > 2);
+
+                                // 사용자 키워드 없을 때만 업체명 조합으로 자동생성
+                                const autoKeywords: string[] = (() => {
+                                    if (userKeywords.length > 0) return [];
+                                    const nm = (shop.name || shop.shopName || '').trim();
+                                    const combos: string[] = [];
+                                    if (city && nm)             combos.push(`${city}${nm}`);
+                                    if (city && district && nm) combos.push(`${city}${district}${nm}`);
+                                    if (city && category)       combos.push(`${city}${category}알바`);
+                                    if (district && nm)         combos.push(`${district}${nm}`);
+                                    if (city)                   combos.push(`${city}여자알바`);
+                                    return combos.filter(k => k.trim().length > 2);
+                                })();
+
+                                const forbidden = ['레이디알바', '여우알바', '퀸알바', '악녀알바'];
+
+                                const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords, ...targetKeywords]))
                                     .filter((kw: any) => {
                                         const cleanKw = String(kw).replace('#', '').trim();
                                         if (!cleanKw) return false;

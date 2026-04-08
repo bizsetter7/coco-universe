@@ -1,6 +1,6 @@
 # CLAUDE_P2.md — P2 코코알바 에이전트 핸드오버 가이드
 
-> **최종 업데이트**: 2026-04-08
+> **최종 업데이트**: 2026-04-09
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
@@ -98,7 +98,7 @@ src/
 | SEO STEP 1~3 (noindex, 가이드 564페이지, JobPosting 스키마) | `c7bcb96`, `0542f5f` | GSC 738페이지 색인 중 |
 | 광고 승인/반려 시스템 (update-shop-status API) | `db7b661` | service_role 사용 |
 | 결제내역관리 고도화 | `feb2909` | AdminPaymentManagement 개선 |
-| 광고상세팝업 타입별 매핑 | `bd4b9a1` | AdDetailModal, MobilePreviewContent |
+| 광고상세팝업 5개 통합 (JobDetailContent 단일화) | `2026-04-09` | anyAdToShop() 어댑터, 지역중복·닉네임·업종 버그 전체 해소 |
 | 포인트 무결성 자동 수복 | `cfb0240` | fix-integrity API + UI 버튼 |
 | 어드민 E2E 자동 테스트 (16개) | `c6b44cc` | HealthDashboard E2E 탭 |
 | GitHub Actions Playwright E2E | `e890ac7` | push 트리거 비활성, 수동 실행만 |
@@ -145,12 +145,31 @@ AD_TIER_STANDARDS:
 
 ---
 
+## 🏛️ 광고 상세 팝업 아키텍처 (2026-04-09 확정)
+
+> ⚠️ 팝업 관련 수정은 반드시 이 구조를 지킬 것
+
+| 진입점 | 컴포넌트 | 데이터 변환 |
+|--------|---------|-----------|
+| 퍼블릭 광고 목록 | `JobDetailContent` | `Shop` 타입 직접 전달 |
+| my-shop 진행중공고 | `AdDetailModal` → `JobDetailContent` | `anyAdToShop(ad)` 경유 |
+| my-shop 결제내역 | `AdDetailModal` → `JobDetailContent` | `anyAdToShop(ad)` 경유 |
+| admin 광고심사 | `admin/page.tsx` → `JobDetailContent` | `anyAdToShop(selectedAdForModal)` 경유 |
+| admin 결제내역 | `admin/page.tsx` → `JobDetailContent` | `anyAdToShop(selectedAdForModal)` 경유 |
+
+- **정규화 함수**: `src/lib/adUtils.ts` → `anyAdToShop()` (지역중복 방지, INVALID_NICK 필터 포함)
+- **`MobilePreviewContent`**: 광고 등록 step4 미리보기 **전용** — 팝업 표시 용도 재사용 금지
+- **버그 수정 원칙**: `JobDetailContent` 또는 `anyAdToShop()` 1곳만 수정하면 5개 팝업 전체 자동 반영
+
+---
+
 ## 🐛 현재 알려진 이슈
 
 | 코드 | 내용 | 상태 |
 |------|------|------|
 | - | 어드민 헬스체크 `admin_password_hash` 항목 → 권한 부족으로 확인 불가 (info 처리됨, 정상) | 오탐 확인 |
 | - | GitHub Actions E2E — Secrets 미등록 시 auth 테스트 skip (conftest.py에서 graceful skip 처리) | 정상 |
+| - | Supabase 목업 96개 (`user_id LIKE '6fc68887%'`) 미삭제 → 프론트에서 isMockAd()로 필터링 중 | 삭제 예정 |
 
 ---
 

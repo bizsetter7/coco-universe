@@ -11,7 +11,7 @@ export const AD_TIER_STANDARDS = [
     { name: 'T4 (Special)', id: 'p4', altId: 'special', tw: 'bg-emerald-600', hex: '#059669' },
     { name: 'T5 (Urgent/Recommended)', id: 'p5', altId: 'recommended', tw: 'bg-purple-600', hex: '#9333EA' },
     { name: 'T6 (Native)', id: 'p6', altId: 'native', tw: 'bg-slate-600', hex: '#475569' },
-    { name: 'T7 (Basic)', id: 'p7', altId: 'basic', tw: 'bg-stone-700', hex: '#44403C' },
+    { name: 'T7 (Basic)', id: 'p7', altId: 'basic', tw: 'bg-sky-600',   hex: '#0284C7' },
 ];
 
 // 2. 급여 배지 약어 및 컬러 표준 (Pay Badge Standards v2.0 — 2026-03-22 확정)

@@ -45,7 +45,25 @@ export default async function JobPage() {
 
     const { data: userData } = await supabase.from('profiles').select('*');
 
-    const shops: Shop[] = (data || []).map((ad: any) => enrichAdData(ad, userData || []));
+    const rawShops: Shop[] = (data || []).map((ad: any) => enrichAdData(ad, userData || []));
+
+    // [Fix 2] 메인 페이지와 동일한 정렬 기준 (p1~p7 tier, 실제광고 우선)
+    const getTierRank = (tier: string): number => {
+        const t = (tier || '').toLowerCase();
+        const O: Record<string, number> = { p1:1,grand:1,vip:1, p2:2,premium:2, p3:3,deluxe:3, p4:4,special:4, p5:5,urgent:5,recommended:5, p6:6,native:6, p7:7,basic:7,common:7 };
+        return O[t] ?? 99;
+    };
+    const isMockAd = (ad: any) => ad.isMock === true || String(ad.user_id||'').startsWith('6fc68887') || String(ad.id||'').startsWith('AD_MOCK_');
+    const reals = rawShops.filter(s => !isMockAd(s));
+    const mocks = rawShops.filter(s => isMockAd(s));
+    const visibleMocks = reals.length > 0 ? mocks.slice(0, Math.max(0, mocks.length - reals.length)) : mocks;
+    const sortByTierDate = (arr: any[]) => arr.sort((a: any, b: any) => {
+        const rA = getTierRank(a.tier), rB = getTierRank(b.tier);
+        if (rA !== rB) return rA - rB;
+        return new Date(b.created_at||0).getTime() - new Date(a.created_at||0).getTime();
+    });
+    // 실제광고는 tier 무관하게 목업보다 항상 앞에 표시
+    const shops: Shop[] = [...sortByTierDate(reals), ...sortByTierDate(visibleMocks)];
 
     const faqSchema = {
         "@context": "https://schema.org",

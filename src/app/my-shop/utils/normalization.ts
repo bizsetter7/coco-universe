@@ -31,9 +31,9 @@ export const normalizeAd = (ad: any) => {
         title: getValid(ad.title, opt.title, '제목 없음'),
         jobTitle: getValid(ad.title, opt.title, '제목 없음'),
 
-        // 닉네임 / 관리자명
-        nickname: getValid(ad.nickname, opt.nickname, '관리자'),
-        managerNickname: getValid(ad.nickname, opt.nickname, '관리자'),
+        // 닉네임 / 관리자명 — 기본값은 상호명으로 폴백 (절대 '관리자' 노출 금지)
+        nickname: getValid(ad.nickname, opt.nickname, ad.name || opt.shopName || ''),
+        managerNickname: getValid(ad.nickname, opt.nickname, ad.name || opt.shopName || ''),
         managerName: getValid(ad.manager_name || ad.managerName, opt.managerName, ''),
 
         // 상호명

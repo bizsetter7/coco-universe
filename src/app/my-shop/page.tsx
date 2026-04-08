@@ -454,7 +454,7 @@ function MyShopContent() {
         const newAd = {
             id: 'preview',
             title: formState.title || '제목을 입력해주세요',
-            nickname: formState.nickname || '관리자',
+            nickname: (['닉네임','관리자',''].includes(formState.nickname) ? null : formState.nickname) || bizShopName || authUser.name || '',
             managerName: formState.managerName,
             managerPhone: formState.managerPhone,
             messengers: formState.messengers || [],
@@ -623,7 +623,14 @@ function MyShopContent() {
             const isTargetMock = editingAdId ? String(editingAdId).startsWith('AD_MOCK_') : isMockUser;
 
             const cleanContent = formState.editorRef.current?.innerHTML || formState.editorHtml;
-            const cleanNickname = formState.nickname || authUser.nickname || '관리자';
+            // 플레이스홀더('닉네임', '관리자')는 무효 처리 → 상호명으로 폴백
+            const INVALID_NICK_VALS = ['닉네임', '관리자', ''];
+            const rawFormNick = formState.nickname;
+            const cleanNickname = (!INVALID_NICK_VALS.includes(rawFormNick) ? rawFormNick : null)
+                || (!INVALID_NICK_VALS.includes(authUser.nickname) ? authUser.nickname : null)
+                || bizShopName  // 업체회원의 경우 상호명
+                || authUser.name
+                || '';
 
             // [Strategy] Reject if payload contains massive Base64 images
             if (cleanContent.includes('data:image/') && cleanContent.length > 800000) {

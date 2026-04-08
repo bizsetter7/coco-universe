@@ -112,11 +112,11 @@ const JobRow = React.memo(({
                 </button>
             </td>
 
-            {/* 3. 업소명 */}
+            {/* 3. 업소명 — 공고닉네임 우선, 없으면 상호명 */}
             <td className="py-4 px-2 text-center">
                 <div className="flex items-center justify-center gap-1.5 w-full">
                     <span className={`font-black text-[14px] truncate max-w-full ${brandTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                        {cleanShopTitle(undefined, shop.name)}
+                        {shop.nickname || cleanShopTitle(undefined, shop.name)}
                     </span>
                 </div>
             </td>
