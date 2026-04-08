@@ -74,8 +74,9 @@ export const normalizeAd = (ad: any) => {
         pay: getValidNum(ad.pay_amount || ad.payAmount || ad.pay, opt.payAmount, 0),
 
         // 본문 및 기타
-        content: getValid(ad.content, opt.content || ad.jobContent, ''),
-        jobContent: getValid(ad.content, opt.content || ad.jobContent, ''),
+        content: getValid(ad.content, opt.content || opt.editorHtml || ad.jobContent, ''),
+        jobContent: getValid(ad.content, opt.content || opt.editorHtml || ad.jobContent, ''),
+        description: getValid(ad.content, opt.content || opt.editorHtml || ad.jobContent, ''),
         deadline: ad.deadline || opt.deadline || '',
         status: ad.status || opt.status || '진행중',
         rejection_reason: ad.rejection_reason || opt.rejection_reason || '',
@@ -137,7 +138,7 @@ export const normalizePayment = (p: any, defaultUserName: string = '관리자') 
         name: opt.shopName || adMetadata.shopName || p.shopName || defaultUserName,
         payType: opt.payType || adMetadata.pay_type || adMetadata.payType || '시급',
         payAmount: opt.payAmount || adMetadata.pay_amount || adMetadata.payAmount || 0,
-        content: opt.content || adMetadata.content || '',
+        content: opt.content || opt.editorHtml || adMetadata.content || adMetadata.editorHtml || '',
         regionCity: opt.regionCity || adMetadata.work_region || '지역',
         regionGu: opt.regionGu || adMetadata.work_region_sub || '',
         category: opt.category || adMetadata.category || '업종',
