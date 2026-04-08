@@ -124,6 +124,7 @@ export function anyAdToShop(ad: any): Shop {
         tier: ad?.tier || opt?.selectedAdProduct || ad?.productType || ad?.product_type || 'p7',
         title: ad?.title || opt?.title || '',
         content: ad?.content || ad?.description || opt?.content || opt?.editorHtml || '',
+        description: ad?.content || ad?.description || opt?.content || opt?.editorHtml || '',
         options: {
             ...opt,
             paySuffixes: ad?.paySuffixes || opt?.paySuffixes || opt?.pay_suffixes || [],
