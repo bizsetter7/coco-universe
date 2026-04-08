@@ -42,18 +42,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 3. Shop Detail Pages — 콘텐츠 있는 광고만 포함 (thin content 제외)
     // title 또는 description 중 하나라도 있어야 sitemap에 포함
     // → 빈 UUID 광고 제외로 크롤 예산 보호
+    // [Fix] shop.region에 '[서울]' 등 대괄호 포함된 경우 slugify로 정규화 (M-020 참조)
+    const cleanRegionSlug = (region: string) =>
+        slugify(region.replace(/\[|\]/g, '').trim());
+
     const shopRoutes = shopsData
         .filter((shop: any) => {
             const hasTitle = ((shop.title as string) || '').trim().length > 4;
             const hasDesc = ((shop.description as string) || '').trim().length > 20;
             return hasTitle || hasDesc;
         })
-        .map((shop) => ({
-            url: `${baseUrl}/coco/${shop.region}/${shop.id}`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly' as const,
-            priority: 0.7,
-        }));
+        .map((shop) => {
+            const regionSlug = cleanRegionSlug(shop.region || '');
+            if (!regionSlug) return null; // 지역 없는 광고는 사이트맵 제외
+            return {
+                url: `${baseUrl}/coco/${regionSlug}/${shop.id}`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly' as const,
+                priority: 0.7,
+            };
+        })
+        .filter(Boolean) as MetadataRoute.Sitemap;
 
     // 4-A. 지역×업종 가이드 랜딩 페이지 (예: /coco/서울/룸알바)
     // 실제 회원 없어도 색인 가능한 정보성 고품질 콘텐츠 페이지
