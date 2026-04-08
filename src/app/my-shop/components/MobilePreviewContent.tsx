@@ -218,7 +218,11 @@ export const MobilePreviewContent: React.FC<MobilePreviewContentProps> = ({ form
                 </div>
 
                 <div className="flex items-center gap-2 opacity-95 font-black text-[12px] md:text-[13px] bg-black/10 px-3 py-1 rounded-full">
-                    {cleanShopTitle(undefined, formData.nickname || formData.shopName || '비즈니스 파트너')}
+                    {(() => {
+                        const displayNickname = formData.nickname || formData.shopName || '비즈니스 파트너';
+                        // [Fix] 만약 전달된 닉네임이 '닉네임'이라는 문자열이면 상호명으로 대체
+                        return cleanShopTitle(undefined, displayNickname === '닉네임' ? (formData.shopName || '비즈니스 파트너') : displayNickname);
+                    })()}
                 </div>
             </div>
 

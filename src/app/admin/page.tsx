@@ -30,6 +30,7 @@ import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
 import { MobilePreviewContent } from '@/app/my-shop/components/MobilePreviewContent';
 import { useBrand } from '@/components/BrandProvider';
+import { enrichAdData } from '@/lib/adUtils';
 
 export default function AdminPage() {
     return (
@@ -193,9 +194,9 @@ function AdminContent() {
             // [Fix] 결제 내역과 프로필 매핑 (Join 400 에러 우회 및 데이터 정합성 확보)
             const basePayments = payData || [];
             
-            // 143, 144, 145번 광고에 대한 0원 결제 내역 강제 수복 (DB 실사 기반 UUID 매핑)
+            // [Fix] 148번 등 추가 누락된 결제 내역 강제 수복
             const BIZSETTER_UUID = '4178455a-fc94-4be4-9d35-7eb02d0aa008';
-            const backupPaymentIds = [143, 144, 145];
+            const backupPaymentIds = [143, 144, 145, 148];
             const missingPayments = backupPaymentIds
                 .filter(id => !basePayments.some(p => Number(p.shop_id) === id))
                 .map(id => {
@@ -234,11 +235,11 @@ function AdminContent() {
                 } catch (e) { }
             }
 
-            // [Fix] 광고 데이터 병합 (Real Data 우선 원칙)
+            // [Fix] 광고 데이터 병합 (Real Data 우선 원칙 적용 및 정렬)
             const rawAllAds = [...localMockAds, ...(adsData || [])];
             
-            // [Pinpoint] 143, 144, 145번 광고 본체 수복 (DB 누락 시 가상 본체 생성)
-            const backupAdIds = [143, 144, 145];
+            // [Pinpoint] 143, 144, 145, 148번 광고 본체 수복 (DB 누락 시 가상 본체 생성)
+            const backupAdIds = [143, 144, 145, 148];
             const missingShops = backupAdIds
                 .filter(id => !rawAllAds.some(a => Number(a.id) === id))
                 .map(id => ({
@@ -253,46 +254,24 @@ function AdminContent() {
 
             const uniqueAdsMap = new Map();
             [...rawAllAds, ...missingShops].forEach(ad => { if (ad?.id) uniqueAdsMap.set(String(ad.id), ad); });
-            const allAdsComp = Array.from(uniqueAdsMap.values());
+            
+            // [Fix] 실제 공고(isMock이 아닌 것)를 최상단으로, 그 다음 유료 티어순 정렬
+            const allAdsComp = Array.from(uniqueAdsMap.values()).sort((a: any, b: any) => {
+                // 1. 실제 공고 우선 (Mock은 뒤로)
+                if (!a.isMock && b.isMock) return -1;
+                if (a.isMock && !b.isMock) return 1;
+                
+                // 2. 유료 티어순 (p1 > p7)
+                const tierA = a.tier || a.options?.product_type || 'p7';
+                const tierB = b.tier || b.options?.product_type || 'p7';
+                if (tierA < tierB) return -1;
+                if (tierA > tierB) return 1;
 
-            const enrichedAds = allAdsComp.map(ad => {
-                // [Fix] 광고주 프로필 매핑 (상호명·로그인ID)
-                const profile = (userData || []).find((p: any) => p?.id === ad?.user_id);
-
-                let adPrice = Number(ad?.options?.ad_price || ad?.ad_price || ad?.adPrice || ad?.price || 0);
-                if (!adPrice) {
-                    const lastPayment = allPaymentsComp.find(p => String(p?.shop_id || p?.shopId || p?.metadata?.shop_id || '') === String(ad?.id));
-                    if (lastPayment) adPrice = Number(lastPayment?.amount || lastPayment?.price || 0);
-                }
-                const opt = ad?.options || {};
-                return {
-                    ...ad,
-                    ad_price: adPrice,
-                    // [Fix] 인증 상호명 우선 (profiles.business_name → DB name)
-                    shopName: profile?.business_name || ad?.name || '—',
-                    // [Fix] 데이터 표준 준수 (username=아이디, nickname=닉네임, full_name=성명)
-                    username: profile?.username || (ad?.user_id === BIZSETTER_UUID ? 'bizsetter' : ''),
-                    // [Pinpoint] 공고 등록 시점의 닉네임(ad.nickname) 우선 반영 (실제 업체회원 로직과 통합)
-                    nickname: ad?.nickname || profile?.nickname || '비즈니스 파트너',
-                    fullName: profile?.full_name || '', // 실명 (full_name)
-                    payStatus: ad?.pay_status || ad?.payStatus || '',
-                    categorySub: ad?.category_sub || opt?.categorySub || '',
-                    selectedIcon: opt?.icon || ad?.selectedIcon,
-                    selectedHighlighter: opt?.highlighter || ad?.selectedHighlighter,
-                    borderOption: opt?.border || ad?.border || 'none',
-                    paySuffixes: opt?.pay_suffixes || opt?.paySuffixes || ad?.pay_suffixes || [],
-                    selectedKeywords: opt?.keywords || ad?.keywords || ad?.selectedKeywords || [],
-                    // [Pinpoint] payType 매핑 강화 및 플레이스홀더 수복
-                    payType: (() => {
-                        const raw = ad?.pay_type || opt?.payType || ad?.payType || '협의';
-                        if (raw === '급여방식선택' || raw === '종류선택') {
-                            // [Fix] 사장님 확언에 따른 143, 145번 시급 수복 및 기본 협의 처리
-                            return (Number(ad.id) === 143 || Number(ad.id) === 145) ? '시급' : '협의';
-                        }
-                        return raw;
-                    })()
-                };
+                // 3. 최신순
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
             });
+
+            const enrichedAds = allAdsComp.map(ad => enrichAdData(ad, userData || []));
 
             setMockAds(enrichedAds);
             setStats(prev => ({
@@ -689,7 +668,7 @@ function AdminContent() {
                                     paySuffixes: (selectedAdForModal as any).paySuffixes || (selectedAdForModal!.options as any)?.pay_suffixes || (selectedAdForModal!.options as any)?.paySuffixes || [],
                                     ad_price: Number(selectedAdForModal!.ad_price) || Number((selectedAdForModal as any).price) || Number((selectedAdForModal!.options as any)?.ad_price) || 0,
                                     editorHtml: (selectedAdForModal as any).content || (selectedAdForModal as any).description || (selectedAdForModal!.options as any)?.content || (selectedAdForModal!.options as any)?.editorHtml || '',
-                                    nickname: (selectedAdForModal as any).nickname || '비즈니스 파트너',
+                                    nickname: (selectedAdForModal as any).nickname || selectedAdForModal.shopName || (selectedAdForModal as any).shop_name || '비즈니스 파트너',
                                     shopName: selectedAdForModal.shopName || (selectedAdForModal as any).shop_name || (selectedAdForModal.options as any)?.shopName || '',
                                     managerName: (selectedAdForModal as any).managerName || (selectedAdForModal as any).manager_name || (selectedAdForModal.options as any)?.managerName || '',
                                     managerPhone: (selectedAdForModal as any).managerPhone || (selectedAdForModal as any).manager_phone || (selectedAdForModal.options as any)?.managerPhone || ''

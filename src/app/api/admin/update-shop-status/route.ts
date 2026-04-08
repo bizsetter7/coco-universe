@@ -72,38 +72,47 @@ export async function POST(request: NextRequest) {
 
         // 2. 결제 내역 동기화 (status가 active일 때 입금확인 처리)
         if (status === 'active') {
-            // 기존 결제 시도 내역이 있는지 확인
-            const { data: existingPayments } = await supabaseAdmin
+            const adPrice = Number(adData?.ad_price || adData?.adPrice || 0);
+            const userId = adData?.user_id || adData?.ownerId;
+
+            // [Important] 기존 결제 내역(status='pending')이 있는지 확인 후 업데이트 또는 신규 삽입
+            const { data: existingPayment } = await supabaseAdmin
                 .from('payments')
                 .select('id')
-                .eq('shop_id', String(adId));
+                .eq('shop_id', String(adId))
+                .maybeSingle();
 
-            if (existingPayments && existingPayments.length > 0) {
-                // 기존 내역 승인
+            if (existingPayment) {
+                // 기존 내역이 있으면 'completed'로 상태 업데이트 및 금액 최종 동기화
                 await supabaseAdmin
                     .from('payments')
-                    .update({ status: 'completed', updated_at: nowIso })
-                    .eq('shop_id', String(adId));
-            } else if (adData) {
-                // 내역이 없으면 새로 생성 (AdManagement에서 넘겨준 adData 기반)
-                const adPrice = Number(adData.ad_price || adData.adPrice || 0);
-                const userId = adData.user_id || adData.ownerId;
-                
-                if (userId) {
-                    await supabaseAdmin.from('payments').insert([{
-                        shop_id: String(adId),
-                        user_id: userId,
+                    .update({ 
+                        status: 'completed', 
                         amount: adPrice,
-                        status: 'completed',
-                        method: 'bank_transfer',
-                        description: `[시스템승인] ${adData.name || '공고'} 결제 완료`,
-                        metadata: {
-                            shopName: adData.name,
-                            adTitle: adData.title,
-                            product_type: adData.tier || adData.product_type
-                        }
-                    }]);
-                }
+                        updated_at: nowIso,
+                        description: `[시스템승인] ${adData?.name || '공고'} 결제 승인 완료`
+                    })
+                    .eq('id', existingPayment.id);
+            } else if (userId) {
+                // 내역이 전혀 없으면 강제로 'completed' 내역 생성 (관리자 리스트 노출용)
+                const shopName = adData?.shopName || adData?.name || adData?.shop_name || '비즈니스 업체';
+                const adTitle = adData?.title || adData?.adTitle || '공고 내역';
+                
+                await supabaseAdmin.from('payments').insert([{
+                    shop_id: String(adId),
+                    user_id: userId,
+                    amount: adPrice,
+                    status: 'completed',
+                    method: 'bank_transfer',
+                    description: `[관리자강제승인] ${shopName} 결제 완료`,
+                    created_at: nowIso,
+                    updated_at: nowIso,
+                    metadata: {
+                        shopName: shopName,
+                        adTitle: adTitle,
+                        product_type: adData?.tier || adData?.product_type || 'p7'
+                    }
+                }]);
             }
 
             // 3. 알림 쪽지 발송 (status === 'active')

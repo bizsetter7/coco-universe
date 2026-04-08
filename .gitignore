@@ -55,3 +55,21 @@ testsprite_tests/*.html
 
 # 임시 작업 파일
 /tmp/
+
+# 안티그래비티 디버깅 임시 파일 (DB 스키마/응답 스냅샷 — 절대 커밋 금지)
+keys.json
+err.json
+dev_data.json
+dev_pay.json
+dev_profile.json
+dev_*.json
+full_schema_check.json
+full_schema_check.cjs
+check_schema.cjs
+check_schema.mjs
+fetch_dev.cjs
+output.txt
+output2.txt
+payload.json
+test_update_status.json
+*.snap.json

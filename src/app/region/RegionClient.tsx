@@ -137,12 +137,52 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
             return true;
         });
 
-        // [GeoTargeting] 전체 뷰 + 홈 지역 감지된 경우 → 홈 지역 광고를 tier 내 상단으로 boost
-        if (selectedRegion === '전체' && homeRegion) {
-            filtered.sort((a, b) => {
-                const aMatch = a.region?.includes(homeRegion) ? 0 : 1;
-                const bMatch = b.region?.includes(homeRegion) ? 0 : 1;
-                return aMatch - bMatch;
+        // [Sorting Policy] 1. Tier Rank -> 2. Real Ads (DB) first -> 3. Newest first
+        filtered.sort((a, b) => {
+            const TIER_ORDER = ['vip', 'grand', 't1', 'premium', 't2', 'deluxe', 't3', 'special', 't4', 'urgent', '급구', 't5', 'recommended', '추천', 't6', 'basic', '일반', 't7', 'common'];
+            const getRank = (tier: string) => {
+                const idx = TIER_ORDER.indexOf((tier || '').toLowerCase());
+                return idx === -1 ? 99 : idx;
+            };
+            const aRank = getRank(a.tier!);
+            const bRank = getRank(b.tier!);
+            
+            // 1. 티어 등급 순
+            if (aRank !== bRank) return aRank - bRank;
+
+            // 2. 실제 공고(DB 데이터) 우선
+            const aIsMock = (a as any).isMock || false;
+            const bIsMock = (b as any).isMock || false;
+            if (aIsMock !== bIsMock) return aIsMock ? 1 : -1;
+
+            // 3. 최신 순
+            const aTime = new Date((a as any).created_at || (a as any).date || 0).getTime();
+            const bTime = new Date((b as any).created_at || (b as any).date || 0).getTime();
+            return bTime - aTime;
+        });
+
+        // [Mockup Cleanup] 실제 공고 개수만큼 하위 목업 데이터 제거
+        const realAdsCount = filtered.filter(s => !(s as any).isMock).length;
+        if (realAdsCount > 0) {
+            const mocksOnly = filtered.filter(s => (s as any).isMock);
+            const realsOnly = filtered.filter(s => !(s as any).isMock);
+            const reducedMocks = mocksOnly.slice(0, Math.max(0, mocksOnly.length - realAdsCount));
+            return [...realsOnly, ...reducedMocks].sort((a, b) => {
+                // 재정렬 고정
+                const getRank = (tier: string) => {
+                    const TIER_ORDER = ['vip', 'grand', 't1', 'premium', 't2', 'deluxe', 't3', 'special', 't4', 'urgent', '급구', 't5', 'recommended', '추천', 't6', 'basic', '일반', 't7', 'common'];
+                    const idx = TIER_ORDER.indexOf((tier || '').toLowerCase());
+                    return idx === -1 ? 99 : idx;
+                };
+                const aRank = getRank(a.tier!);
+                const bRank = getRank(b.tier!);
+                if (aRank !== bRank) return aRank - bRank;
+                const aIsMock = (a as any).isMock || false;
+                const bIsMock = (b as any).isMock || false;
+                if (aIsMock !== bIsMock) return aIsMock ? 1 : -1;
+                const aTime = new Date((a as any).created_at || (a as any).date || 0).getTime();
+                const bTime = new Date((b as any).created_at || (b as any).date || 0).getTime();
+                return bTime - aTime;
             });
         }
 

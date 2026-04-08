@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag, ClipboardList, CheckCircle, Loader2 } from 'lucide-react';
+import { X, Star, MapPin, Briefcase, Info, MessageSquare, Phone, MessageCircle, Flag, ClipboardList, CheckCircle, Loader2, Camera } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabase';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { Shop } from '@/types/shop';
@@ -46,6 +47,8 @@ export const JobDetailContent = ({
     const [applyMsg, setApplyMsg] = useState('');
     const [applying, setApplying] = useState(false);
     const [applied, setApplied] = useState(false);
+    const [isCapturing, setIsCapturing] = useState(false);
+    const modalRef = React.useRef<HTMLDivElement>(null);
     // CENTRALIZED THEME LOGIC
     const productType = shop.productType || shop.tier || 'p7';
     const pt = String(productType).toLowerCase();
@@ -72,8 +75,112 @@ export const JobDetailContent = ({
     const themeConfig = getHeaderTheme(tierStandard.id);
     const headerBg = themeConfig.bg;
 
+    const handleCapture = async () => {
+        if (!modalRef.current) return;
+        setIsCapturing(true);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        try {
+            const el = modalRef.current;
+            const originStyle = el.style.cssText;
+            
+            // [중요 로직 추가] 캡처 전, 사용자가 내렸던 내부 스크롤을 맨 위로 롤백 (안 그러면 윗부분이 잘림)
+            const oldScrollTop = el.scrollTop;
+            el.scrollTop = 0;
+            
+            const innerScrolls = el.querySelectorAll('.overflow-y-auto, .overflow-hidden');
+            const innerOldData: { el: HTMLElement, css: string, scrollTop: number }[] = [];
+            
+            // 1. 내부 컨테이너 스크롤/높이제한 해제 전 스크롤 원위치
+            innerScrolls.forEach(child => {
+                const target = child as HTMLElement;
+                innerOldData.push({ el: target, css: target.style.cssText, scrollTop: target.scrollTop });
+                target.scrollTop = 0; // 스크롤 맨 위로 고정
+                target.style.setProperty('overflow', 'visible', 'important');
+                target.style.setProperty('max-height', 'none', 'important');
+                target.style.setProperty('height', 'auto', 'important');
+            });
+
+            // 2. 바깥 껍데기 제한 해제 (가로폭 고정하여 글씨 배열 틀어짐 방지)
+            const elWidth = el.offsetWidth;
+            el.style.setProperty('width', elWidth + 'px', 'important');
+            el.style.setProperty('max-height', 'none', 'important');
+            el.style.setProperty('height', 'auto', 'important');
+            el.style.setProperty('overflow', 'visible', 'important');
+
+            // 3. [보안(CORS) 회피] 외부 이미지 URL을 내부 프록시로 임시 치환
+            const images = el.querySelectorAll('img');
+            const originalSrcs: { img: HTMLImageElement, src: string }[] = [];
+
+            images.forEach(img => {
+                const src = img.src;
+                // 외부 사이트(여우알바 등)의 이미지만 골라내어 프록시 통과 (Mapbox 제외)
+                if (src && src.startsWith('http') && !src.includes(window.location.host) && !src.includes('mapbox.com') && !src.includes('api.mapbox')) {
+                    originalSrcs.push({ img, src });
+                    img.src = `/api/proxy-image?url=${encodeURIComponent(src)}`;
+                }
+            });
+
+            // 레이아웃이 펴지고 프록시 이미지가 다운로드될 수 있는 시간 대기 (안정적으로 1초)
+            await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+            const totalHeight = el.scrollHeight;
+
+            const dataUrl = await toPng(el, {
+                cacheBust: true,
+                // skipFonts: true, <- 텍스트 배열 틀어짐의 핵심 주범 (제거하여 폰트 정상 내장)
+                pixelRatio: 1.5, 
+                backgroundColor: '#ffffff',
+                imagePlaceholder: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+                filter: (node) => {
+                    if (node && (node as HTMLElement).tagName === 'IMG') {
+                        const imgSrc = (node as HTMLImageElement).src || '';
+                        if (imgSrc.includes('mapbox.com') || imgSrc.includes('api.mapbox')) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                style: {
+                    margin: '0', 
+                    padding: '0',
+                    top: '0',
+                    bottom: 'auto',
+                    right: 'auto',
+                    left: '0',
+                    transform: 'none',
+                    width: elWidth + 'px',
+                    height: totalHeight + 'px',
+                }
+            });
+
+            // 4. 원래 상태(스크롤 위치, CSS, 이미지 URL)로 원복
+            originalSrcs.forEach(item => {
+                item.img.src = item.src;
+            });
+            innerOldData.forEach(item => {
+                item.el.style.cssText = item.css;
+                item.el.scrollTop = item.scrollTop;
+            });
+            el.style.cssText = originStyle;
+            el.scrollTop = oldScrollTop;
+
+            const link = document.createElement('a');
+            link.download = `광고캡처_${cleanShopTitle(shop.title, shop.name) || '공고'}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (error: any) {
+            console.error('캡처 렌더링 심각한 오류:', error);
+            if (modalRef.current) modalRef.current.style.cssText = '';
+            alert('외부 사이트의 이미지가 지나치게 많아 브라우저 보안 제한으로 캡처할 수 없습니다.');
+        } finally {
+            setIsCapturing(false);
+        }
+    };
+
     return (
         <div
+            ref={modalRef}
             className={`
                 bg-white shadow-2xl overflow-hidden flex flex-col
                 fixed bottom-0 inset-x-0 w-full h-[95dvh] rounded-t-[32px] rounded-b-none
@@ -85,13 +192,24 @@ export const JobDetailContent = ({
             {/* 1. HEADER SECTION */}
             <div className={`relative px-6 py-4 md:py-5 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
 
+                {/* [캡처 버튼] 팝업 화면 전체 저장 기능 */}
+                <button
+                    onClick={handleCapture}
+                    disabled={isCapturing}
+                    className="absolute top-4 right-14 px-3 py-2 bg-black/20 hover:bg-black/40 text-white text-[10px] font-black rounded-xl transition-all z-20 backdrop-blur-sm flex items-center gap-1.5 shadow-sm border border-white/10"
+                    aria-label="화면 캡처"
+                >
+                    {isCapturing ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+                    <span className="hidden md:inline">{isCapturing ? '저장중...' : '이미지 저장'}</span>
+                </button>
+
                 {/* [Mod Moved] Close Button (Inside Header) */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/30 text-white rounded-full transition-all z-20 backdrop-blur-sm"
+                    className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/30 text-white rounded-xl transition-all z-20 backdrop-blur-sm border border-white/10"
                     aria-label="닫기"
                 >
-                    <X size={20} />
+                    <X size={18} />
                 </button>
 
                 {/* [Mod Moved] Favorite Button (Inside Header) */}

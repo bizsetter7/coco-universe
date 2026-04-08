@@ -215,7 +215,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
-                                                {pay.profiles?.business_name || pay.profiles?.full_name || '미확인'}
+                                                {pay.profiles?.business_name || pay.profiles?.full_name || pay.metadata?.shopName || pay.metadata?.shop_name || pay.metadata?.adTitle?.split('] ')[1] || '업체명 미확인'}
                                                 {pay.profiles?.business_file_url && (
                                                     <a href={pay.profiles.business_file_url} target="_blank" rel="noreferrer" title="사업자등록증 확인">
                                                         <ExternalLink size={10} className="text-blue-400 hover:text-blue-600" />
@@ -224,7 +224,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                             </div>
                                             <div className="text-[10px] text-blue-600 font-black font-mono mt-0.5 flex items-center gap-1">
                                                 <span className="bg-blue-50 px-1 rounded-sm text-[9px]">ID</span>
-                                                {pay.profiles?.username || pay.profiles?.nickname || 'guest'}
+                                                {pay.profiles?.username || pay.profiles?.nickname || pay.metadata?.username || 'bizsetter'}
                                             </div>
                                             <div className="text-[9px] text-slate-400 font-medium">
                                                 {pay.profiles?.business_number ? `SN: ${pay.profiles.business_number}` : ''}
