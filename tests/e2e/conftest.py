@@ -74,6 +74,8 @@ def fresh_page(page: Page) -> Page:
 @pytest.fixture
 def individual_page(page: Page) -> Page:
     """개인회원(test_user)으로 로그인된 페이지"""
+    if not SECRETS_CONFIGURED:
+        pytest.skip("GitHub Secrets 미설정 — TEST_USER_ID / TEST_USER_PW 필요")
     login(page, TEST_USER_ID, TEST_USER_PW)
     return page
 
@@ -81,5 +83,7 @@ def individual_page(page: Page) -> Page:
 @pytest.fixture
 def corporate_page(page: Page) -> Page:
     """업체회원(test_shop)으로 로그인된 페이지"""
+    if not SECRETS_CONFIGURED:
+        pytest.skip("GitHub Secrets 미설정 — TEST_SHOP_ID / TEST_SHOP_PW 필요")
     login(page, TEST_SHOP_ID, TEST_SHOP_PW)
     return page
