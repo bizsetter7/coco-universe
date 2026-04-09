@@ -167,7 +167,6 @@ export const ResumeForm = ({ setView, onOpenMenu, authUser, editData }: { setVie
                     // If count is 1 (the one we just inserted), award points
                     if (count === 1) {
                         await updatePoints(userId, 'RESUME_UPLOAD');
-                        console.log("Points awarded for first-time resume registration");
                     }
                 } catch (e) {
                     console.error("Failed to award points:", e);

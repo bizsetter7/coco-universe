@@ -61,7 +61,6 @@ export async function GET(request: NextRequest) {
             let displayName = '회원';
             if (profile) {
                 displayName = profile.nickname || profile.full_name || profile.username || '회원';
-                console.log(`[talent/list] Successfully mapped: ${r.user_id} -> ${displayName}`);
             } else {
                 // 프로필을 못 찾은 경우
                 if (r.user_id && r.user_id.length > 5) {

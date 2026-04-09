@@ -506,8 +506,8 @@ export const JobDetailContent = ({
 
             {showReport && <ReportAdModal onClose={() => setShowReport(false)} />}
 
-            {/* 온라인 지원 섹션 (개인회원만) */}
-            {isLoggedIn && userType === 'individual' && (
+            {/* 온라인 지원 섹션 (로그인 회원 전체) */}
+            {isLoggedIn && (
                 <div className="mx-6 mb-2 p-3 rounded-2xl border border-blue-100 bg-blue-50/50">
                     {applied ? (
                         <div className="flex items-center gap-2 text-green-600 font-black text-sm justify-center py-2">

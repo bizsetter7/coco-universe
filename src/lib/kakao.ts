@@ -57,10 +57,6 @@ export async function sendKakaoAlimtalk(
 
     // ── Mock 모드 ────────────────────────────────────────────────
     if (isKakaoMock) {
-        console.log(`[Kakao Mock] ${messages.length}건 발송 시뮬레이션`);
-        messages.forEach((m, i) => {
-            console.log(`  [${i + 1}] to=${m.to} | ${m.content.slice(0, 30)}...`);
-        });
         return { success: true, type: 'mock', successCount: messages.length, failCount: 0 };
     }
 

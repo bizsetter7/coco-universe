@@ -243,7 +243,6 @@ export const updateMarketingTarget = async (id: string, updates: Partial<Marketi
  * Mock Sending Function (To be replaced with Solapi/CoolSMS)
  */
 export const sendCampaignMessage = async (campaignData: Partial<Campaign>, targets: MarketingTarget[]) => {
-    console.log(`[Marketing] Sending ${campaignData.channel} to ${targets.length} recipients...`);
 
     // 1. Create Campaign Record
     const { data: campaign, error: campaignError } = await supabase
@@ -439,8 +438,6 @@ export const uploadMarketingTargets = async (file: File) => {
                 if (finalTargets.length === 0) {
                     throw new Error('No valid targets found (Check phone numbers)');
                 }
-
-                console.log(`Attempting to upsert ${finalTargets.length} aggregated rows (from ${targetsToInsert.length} total valid)...`);
 
                 // 3. Bulk Upsert
                 const { data, error } = await supabase

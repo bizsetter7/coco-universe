@@ -76,7 +76,6 @@ export async function GET(request: Request) {
             }
         }
 
-        console.log(`[expire-ads] ${expiredCount}건 만료 처리 완료 (${todayKST})`);
         return NextResponse.json({ success: true, expiredCount, date: todayKST });
     } catch (err: any) {
         console.error('[expire-ads] Cron error:', err);
