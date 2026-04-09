@@ -310,6 +310,10 @@ export function useAdFormState() {
 
     const loadAdData = (ad: any) => {
         if (!ad) return;
+        // [Fix] 기존 광고 수정 시 이전 세션 드래프트가 덮어쓰는 버그 방지
+        // 드래프트는 신규 등록용 — 기존 광고 수정은 항상 DB 데이터를 기준으로 시작
+        clearDraft();
+
         const opts = ad.options || {};
 
         // [Total Reset] Robust Loading Logic using getValid
@@ -321,7 +325,7 @@ export function useAdFormState() {
             kakao: getValid(ad.kakao_id || ad.kakao, opts.kakao || opts.messengers?.kakao, ''),
             telegram: getValid(ad.telegram_id || ad.telegram, opts.telegram || opts.messengers?.telegram, ''),
             line: getValid(ad.line_id || ad.line, opts.line || opts.messengers?.line, ''),
-            content: getValid(ad.content, opts.content || ad.jobContent, ''),
+            content: getValid(ad.content, opts.content || opts.editorHtml || ad.jobContent, ''),
             title: getValid(ad.title, opts.title || ad.jobTitle, ''),
             regionCity: getValid(ad.region || ad.regionCity || ad.work_region, opts.regionCity, ''),
             regionGu: getValid(ad.regionGu || ad.work_region_sub, opts.regionGu, ''),

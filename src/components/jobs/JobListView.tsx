@@ -14,6 +14,19 @@ import { saveShopSnapshot } from '@/utils/favorites';
 // Use Shop type directly
 type Job = Shop;
 
+// border 옵션 → 클래스 변환
+// [Rule] border_period > 0 인 경우에만 적용 (결제된 광고만)
+const getBorderClass = (opt?: string, period?: number): string => {
+    if (!opt || opt === 'none' || !period || period <= 0) return '';
+    switch (opt) {
+        case 'color':    return 'border-2 border-blue-400 shadow-md shadow-blue-100';
+        case 'glow':     return 'border-2 border-yellow-400 shadow-md shadow-yellow-100';
+        case 'sparkle':  return 'border-2 border-pink-400 shadow-md shadow-pink-100';
+        case 'rainbow':  return 'border-2 animate-rainbow-border shadow-lg';
+        default:         return '';
+    }
+};
+
 interface Brand {
     theme: 'dark' | 'light';
     primaryColor?: string;
@@ -93,10 +106,11 @@ const JobRow = React.memo(({
 }) => {
     const { badgeLabel, badgeColor, amount } = getPayBadgeInfo(shop);
 
+    const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
     return (
         <tr
             onClick={() => onSelect(shop)}
-            className={`transition-colors cursor-pointer group ${brandTheme === 'dark' ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'}`}
+            className={`transition-colors cursor-pointer group ${brandTheme === 'dark' ? 'hover:bg-gray-800/50' : 'hover:bg-gray-50'} ${borderCls}`}
         >
             {/* 1. 지역 */}
             <td className="py-4 px-2 text-center whitespace-nowrap truncate">
@@ -131,7 +145,7 @@ const JobRow = React.memo(({
                 {/* 5. 공고제목 (1줄 제한 - Flex Refactor for PC Table) */}
                 <div className="flex items-center justify-center gap-1 w-full px-2">
                     {shop.options?.blink && <span className="text-[10px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shrink-0 shadow-sm">NEW</span>}
-                    <IconBadge iconId={shop.options?.icon} className="text-[14px] shrink-0" />
+                    <IconBadge iconId={shop.options?.icon} className="text-[14px] shrink-0" textOnly={true} />
                     <div
                         className={`text-[14px] font-bold ${brandTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} truncate text-center leading-snug max-w-[300px]`}
                     >
@@ -206,6 +220,7 @@ const MobileJobRow = React.memo(({
     onToggleFav: (e: React.MouseEvent, id: string) => void
 }) => {
     const { badgeLabel, badgeColor, amount } = getPayBadgeInfo(shop);
+    const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
 
     return (
         <div
@@ -213,15 +228,15 @@ const MobileJobRow = React.memo(({
             className={`p-1 flex flex-col border-b last:border-0 relative !bg-white border-gray-100 shadow-sm shadow-gray-100`}
             style={{ mixBlendMode: 'normal' }}
         >
-            <div className="w-full bg-white rounded-lg p-3 flex justify-between items-start gap-1 relative shadow-sm border border-gray-100">
+            <div className={`w-full bg-white rounded-lg p-3 flex justify-between items-start gap-1 relative shadow-sm border border-gray-100 ${borderCls}`}>
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5 pr-2 pt-1">
 
                     {/* Line 1: IconOption + Highlighter + Title (2줄까지) */}
                     {/* Line 1: IconOption + Highlighter + Title (1줄 제한 - Flex Refactor) */}
                     <div className="flex items-center gap-1 mb-0.5 min-w-0">
                         {shop.options?.blink && <span className="text-[9px] bg-red-600 !text-white px-1.5 py-0.5 rounded font-black whitespace-nowrap shadow-sm shrink-0">NEW</span>}
-                        <IconBadge iconId={shop.options?.icon} className="shrink-0" />
-                        <h3 className={`text-[15px] font-bold !text-gray-900 force-dark-text leading-snug line-clamp-2 break-all w-full`}>
+                        <IconBadge iconId={shop.options?.icon} className="shrink-0" textOnly={true} />
+                        <h3 className={`text-[15px] font-bold text-gray-900 leading-snug line-clamp-2 break-all w-full`}>
                             <span
                                 style={getHighlighterStyle(shop.options?.highlighter)}
                             >

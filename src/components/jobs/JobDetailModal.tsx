@@ -381,9 +381,9 @@ export const JobDetailContent = ({
                         <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
                         <h3 className="text-[17px] font-black text-gray-800">상세 모집내용</h3>
                     </div>
-                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm min-h-[150px] overflow-x-hidden">
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm min-h-[150px] overflow-hidden">
                         <div
-                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm [&>*:first-child]:mt-0 [&_*]:max-w-full [&_div]:!w-full [&_table]:w-full [&_img]:h-auto [&_p]:px-6 [&_ul]:px-6 [&_ol]:px-6 [&_h1]:px-6 [&_h2]:px-6 [&_h3]:px-6 [&_h4]:px-6"
+                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm [&>*:first-child]:mt-0 [&_*]:max-w-full [&_img]:h-auto"
                             dangerouslySetInnerHTML={{
                                 __html: (shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>`)
                                     .replace(/foxalba\.com|queenalba\.net|ladyalba\.co\.kr/gi, 'cocoalba.kr')

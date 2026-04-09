@@ -29,6 +29,18 @@ interface ShopCardProps {
  * [이미지 없는 카드 - Urgent/Recommended]
  *   이미지 섹션 없음, 텍스트 위주 레이아웃 유지
  */
+// border 옵션 → 클래스 (border_period > 0 인 경우만)
+const getBorderClass = (opt?: string, period?: number): string => {
+    if (!opt || opt === 'none' || !period || period <= 0) return '';
+    switch (opt) {
+        case 'color':   return 'border-2 border-blue-400 shadow-md shadow-blue-100';
+        case 'glow':    return 'border-2 border-yellow-400 shadow-md shadow-yellow-100';
+        case 'sparkle': return 'border-2 border-pink-400 shadow-md shadow-pink-100';
+        case 'rainbow': return 'border-2 animate-rainbow-border shadow-lg';
+        default:        return '';
+    }
+};
+
 export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hideImage }: ShopCardProps) => {
     const isMobile = useMobile();
     const [imgError, setImgError] = React.useState(false);
@@ -39,6 +51,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
     const paySuffixes: string[] = shop.options?.paySuffixes || (shop.options as any)?.pay_suffixes || (shop as any).paySuffixes || [];
     const badgeChar = shop.payType?.substring(0, 1) || '시';
+    const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
 
     // AD_TIER_STANDARDS 동기화 — 이미지 없을 때 등급별 고정 그라디언트 (2026-03-22)
     const getTierGradient = (tid: string): string => {
@@ -64,7 +77,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
             }}
             className={`h-full flex flex-col group relative rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200
             ${!isMobile ? 'hover:scale-[1.01] active:scale-95' : 'active:scale-95'}
-            !bg-white border border-gray-200 shadow-md shadow-gray-200/50 pb-2 overflow-hidden`}
+            !bg-white border border-gray-200 shadow-md shadow-gray-200/50 pb-2 overflow-hidden ${borderCls}`}
         >
             {/* NEW 배지 - 상단 좌측 */}
             {shop.options?.blink && (
@@ -162,12 +175,12 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                 ) : (
                     // ── [Urgent/Recommended] 새 레이아웃: 1줄 제목 + 3-Row ──
                     <>
-                        {/* 공고제목 (1줄 고정 · NEW 배지 충돌 방지 pl-6) */}
-                        <div className="flex items-center gap-1 w-full min-w-0 pl-6 pt-0.5">
+                        {/* 공고제목 */}
+                        <div className="flex items-center gap-1 w-full min-w-0 pt-0.5">
                             <IconBadge
                                 iconId={shop.options?.icon}
                                 className="text-[11px] shrink-0"
-                                textOnly={isMobile}
+                                textOnly={true}
                             />
                             <h3
                                 className="text-[12px] font-black leading-tight line-clamp-1 w-full break-all"

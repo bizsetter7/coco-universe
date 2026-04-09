@@ -19,6 +19,18 @@ interface AdBannerCardProps {
  *   Row2: 급여종류배지+급여(좌) | 업종정보(우)
  *   Row3: 추가급여옵션(paySuffixes)
  */
+// border 옵션 → 클래스 (border_period > 0 인 경우만)
+const getBorderClass = (opt?: string, period?: number): string => {
+    if (!opt || opt === 'none' || !period || period <= 0) return '';
+    switch (opt) {
+        case 'color':   return 'border-2 border-blue-400 shadow-md shadow-blue-100';
+        case 'glow':    return 'border-2 border-yellow-400 shadow-md shadow-yellow-100';
+        case 'sparkle': return 'border-2 border-pink-400 shadow-md shadow-pink-100';
+        case 'rainbow': return 'border-2 animate-rainbow-border shadow-lg';
+        default:        return '';
+    }
+};
+
 export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => {
     const isMobile = useMobile();
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
@@ -27,6 +39,7 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
     const hasImage = !!shop.options?.mediaUrl && !imgError;
     const paySuffixes: string[] = shop.options?.paySuffixes || (shop.options as any)?.pay_suffixes || (shop as any).paySuffixes || [];
     const badgeChar = shop.payType?.substring(0, 1) || '시';
+    const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
 
     // AD_TIER_STANDARDS 동기화 — 이미지 없을 때 등급별 고정 그라디언트 (2026-03-22)
     // tierId(섹션 기준) 우선, 없으면 shop.tier fallback
@@ -42,6 +55,7 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
             h-full flex flex-col group relative rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200
             ${!isMobile ? 'hover:scale-[1.02] active:scale-95' : 'active:scale-95'}
             bg-white overflow-hidden border border-gray-200 shadow-md shadow-gray-200/50 pb-2
+            ${borderCls}
         `}>
 
             {/* NEW 배지 */}

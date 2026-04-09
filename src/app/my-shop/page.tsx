@@ -336,7 +336,10 @@ function MyShopContent() {
     };
 
     // [Scroll Fix] view 변경 시 상단 고정 — rAF + setTimeout 이중 보장
+    // [Fix] 탭 복귀 시 form 뷰에서는 스크롤 방지 (탭 전환 후 상단으로 올라가는 현상)
     useEffect(() => {
+        const isFormView = view === 'form' || (typeof view === 'object' && (view as any)?.id === 'form');
+        if (tabFocusRef.current && isFormView) return;
         window.scrollTo({ top: 0, behavior: 'instant' });
         const raf = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
         const timer = setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 80);

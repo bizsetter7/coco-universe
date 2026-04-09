@@ -300,8 +300,7 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                                         placeholder="0"
                                         value={payAmount ? Number(payAmount).toLocaleString() : ''}
                                         onChange={handlePayAmountChange}
-                                        disabled={payType === '협의'}
-                                        className={`flex-1 p-2.5 text-base font-black outline-none bg-transparent disabled:bg-gray-50 h-[42px] placeholder:text-gray-200 text-left`}
+                                        className={`flex-1 p-2.5 text-base font-black outline-none bg-transparent h-[42px] placeholder:text-gray-200 text-left`}
                                     />
                                     <span className={`pr-3 pl-1 text-sm font-black shrink-0 ${payAmount ? 'text-gray-900' : 'text-gray-300'}`}>원</span>
                                 </div>
@@ -420,10 +419,10 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                         <div
                             ref={editorRef}
                             contentEditable
-                            onKeyUp={() => { handleEditorInteract(); syncEditorHtml(); }}
+                            onKeyUp={() => { handleEditorInteract(); saveSelection(); }}
                             onMouseUp={() => { handleEditorInteract(); saveSelection(); }}
                             onSelect={() => { handleEditorInteract(); saveSelection(); }}
-                            onBlur={() => { saveSelection(); }}
+                            onBlur={() => { saveSelection(); syncEditorHtml(); }}
                             onInput={() => { setIsEditorDirty(true); syncEditorHtml(); }}
                             className={`w-full min-h-[400px] lg:min-h-[500px] p-4 md:p-6 border-2 rounded-b-2xl outline-none overflow-y-auto ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-100 text-gray-900'}`}
                             style={{ lineHeight: '1.6' }}
