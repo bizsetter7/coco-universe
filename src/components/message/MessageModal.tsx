@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { NoteService, Note } from '@/lib/noteService';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
-import { UI_Z_INDEX } from '@/constants/ui';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MessageModalProps {
     isOpen: boolean;
@@ -18,10 +18,17 @@ type Tab = 'inbox' | 'unread' | 'sent' | 'write';
 export default function MessageModal({ isOpen, onClose, initialReceiver }: MessageModalProps) {
     const [mounted, setMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>('inbox');
-    const [userName, setUserName] = useState('회원');
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
     const [writeContent, setWriteContent] = useState('');
     const [receiver, setReceiver] = useState(''); // Dynamic receiver
+
+    // [Fix] Supabase Auth 기반 실제 유저 정보 사용
+    const { user, userType, isLoggedIn } = useAuth();
+
+    // 닉네임 결정: 업체회원 → '사장님', 개인회원 → 설정 닉네임
+    const userName = isLoggedIn
+        ? (userType === 'corporate' ? '사장님' : (user?.nickname || user?.name || '회원'))
+        : '회원';
 
     // Body Scroll Lock
     useBodyScrollLock(isOpen);
@@ -33,43 +40,6 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
 
     useEffect(() => {
         setMounted(true);
-
-        // Robust Name Fetching — coco_mock_session 우선 탐색 (mock 로그인 지원)
-        let name = '회원';
-
-        // 0. [Priority] Mock 세션 우선 확인 (admin_user, test_shop, test_user 등)
-        const mockSessionStr = localStorage.getItem('coco_mock_session');
-        if (mockSessionStr) {
-            try {
-                const mock = JSON.parse(mockSessionStr);
-                name = mock.nickname || mock.name || '회원';
-            } catch (e) { /* ignore */ }
-        }
-
-        // 1. Try 'user_name' direct key (실서비스 호환)
-        if (name === '회원') {
-            const directName = localStorage.getItem('user_name');
-            if (directName) name = directName;
-        }
-
-        // 2. Try Parsing 'user_session' (JSON)
-        if (name === '회원') {
-            const sessionStr = localStorage.getItem('user_session');
-            if (sessionStr) {
-                try {
-                    const session = JSON.parse(sessionStr);
-                    name = session.name || session.userName || session.user_name || session.title || session.shop_title || '회원';
-                } catch (e) { /* ignore */ }
-            }
-        }
-
-        // 3. Fallback to 'shop_title'
-        if (name === '회원') {
-            const shopTitle = localStorage.getItem('shop_title');
-            if (shopTitle) name = shopTitle;
-        }
-
-        setUserName(name);
     }, []);
 
     useEffect(() => {
@@ -139,7 +109,7 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
     `;
 
     return createPortal(
-        <div className={`fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4`} style={{ zIndex: UI_Z_INDEX.MODAL }}>
+        <div className={`fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4`} style={{ zIndex: 150000 }}>
             {/* Main Container */}
             <div className="w-full sm:w-[95%] max-w-[850px] h-full sm:h-[650px] bg-white rounded-none sm:rounded-lg shadow-xl flex flex-col overflow-hidden relative transition-transform">
 

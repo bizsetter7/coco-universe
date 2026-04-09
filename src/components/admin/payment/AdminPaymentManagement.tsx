@@ -118,7 +118,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h3 className="text-3xl font-black text-slate-950 tracking-tighter flex items-center gap-3">
-                        통합 결제 거버넌스 <span className="text-blue-600 text-sm font-black bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Finance Hub</span>
+                        통합결제내역관리 <span className="text-blue-600 text-sm font-black bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Finance Hub</span>
                     </h3>
                     <p className="text-sm text-slate-400 font-bold mt-1">
                         광고, SOS, 점프 등 모든 유료 트래픽 결제 내역을 사업자 정보 기반으로 정밀 관리합니다.
@@ -172,30 +172,30 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                     <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                             <tr className="bg-slate-900 border-b border-slate-800">
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">유형 / 결제정보</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">사업자 / 요청자</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">금액 / 수단</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">일시</th>
-                                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">관리</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] w-[220px]">유형 / 결제정보</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">사업자</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">금액 / 수단</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">상태</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">일시</th>
+                                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">관리</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredPayments.length > 0 ? (
                                 filteredPayments.map((pay) => (
                                     <tr key={pay.id} className="hover:bg-blue-50/20 transition-all group">
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                                        <td className="px-4 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
                                                     pay.type === 'SOS' ? 'bg-orange-100 text-orange-600' :
                                                     pay.type === 'JUMP' ? 'bg-purple-100 text-purple-600' :
                                                     'bg-blue-100 text-blue-600'
                                                 }`}>
-                                                    {pay.type === 'SOS' ? <Zap size={14} /> : pay.type === 'JUMP' ? <Zap size={14} /> : <FileText size={14} />}
+                                                    {pay.type === 'SOS' ? <Zap size={13} /> : pay.type === 'JUMP' ? <Zap size={13} /> : <FileText size={13} />}
                                                 </div>
-                                                <div>
-                                                    <div 
-                                                        className="text-sm font-black text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors decoration-blue-500/30 hover:underline underline-offset-4"
+                                                <div className="min-w-0">
+                                                    <div
+                                                        className="text-[12px] font-black text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors hover:underline underline-offset-2 line-clamp-2 break-all"
                                                         onClick={() => {
                                                             const adId = pay.shop_id || pay.metadata?.shop_id || pay.metadata?.ad_no;
                                                             if (adId) {
@@ -213,7 +213,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
+                                        <td className="px-4 py-4">
                                             <div className="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
                                                 {pay.profiles?.business_name || pay.profiles?.full_name || pay.metadata?.shopName || pay.metadata?.shop_name || pay.metadata?.adTitle?.split('] ')[1] || '업체명 미확인'}
                                                 {pay.profiles?.business_file_url && (
@@ -230,25 +230,35 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                 {pay.profiles?.business_number ? `SN: ${pay.profiles.business_number}` : ''}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className="text-sm font-black text-slate-900 tabular-nums">{formatPrice(pay.amount)}</div>
-                                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{pay.method || 'Points/Manual'}</div>
+                                        <td className="px-4 py-4">
+                                            <div className="text-sm font-black text-slate-900 tabular-nums whitespace-nowrap">{formatPrice(pay.amount)}</div>
+                                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider whitespace-nowrap">{pay.method || 'Points/Manual'}</div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black ${
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black whitespace-nowrap ${
                                                 pay.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                                             }`}>
                                                 {pay.status === 'completed' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
                                                 {pay.status === 'completed' ? '완료' : '대기중'}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 whitespace-nowrap">
                                                 <Calendar size={10} />
-                                                {new Date(pay.created_at).toLocaleDateString()}
+                                                {new Date(pay.created_at).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
+                                                {' '}
+                                                {new Date(pay.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                             </div>
+                                            {pay.status === 'completed' && pay.updated_at && (
+                                                <div className="text-[10px] text-green-600 font-bold flex items-center gap-1 whitespace-nowrap mt-0.5">
+                                                    <CheckCircle2 size={9} />
+                                                    승인 {new Date(pay.updated_at).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
+                                                    {' '}
+                                                    {new Date(pay.updated_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            )}
                                         </td>
-                                        <td className="px-8 py-5 text-right">
+                                        <td className="px-4 py-4 text-right">
                                             {pay.status !== 'completed' && (
                                                 <button
                                                     onClick={() => (pay.type === 'JUMP' || pay.metadata?.type === 'point_charge') ? handlePointGrant(pay.id, pay.user_id, pay.metadata) : handlePaymentConfirm(pay.id, pay.shop_id)}

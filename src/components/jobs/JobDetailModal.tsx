@@ -267,7 +267,7 @@ export const JobDetailContent = ({
             onClick={e => e.stopPropagation()}
         >
             {/* 1. HEADER SECTION */}
-            <div className={`relative px-6 py-4 md:py-5 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-3 shrink-0 shadow-lg`}>
+            <div className={`relative px-6 py-3 md:py-4 bg-gradient-to-br ${headerBg} text-white flex flex-col items-center text-center gap-2 shrink-0 shadow-lg`}>
 
                 {/* [캡처 버튼] 로컬(나만 쓰는 개발환경)에서만 노출되도록 숨김 처리 */}
                 {process.env.NODE_ENV === 'development' && (
@@ -301,7 +301,7 @@ export const JobDetailContent = ({
                 </button>
 
                 {/* Region | Industry Badge (1차+2차 모두 표시) */}
-                <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white mt-2">
+                <div className="bg-black/40 px-3 py-1 rounded-full border border-white/20 text-[10px] font-black tracking-widest flex items-center gap-1.5 shadow-sm text-white mt-1">
                     <MapPin size={10} />
                     {shop.region}
                     {' | '}
@@ -312,22 +312,23 @@ export const JobDetailContent = ({
                 </div>
 
                 {/* Ad Title White Box Layout (CENTERED) */}
-                <div className="w-full bg-white px-4 md:px-6 py-3 rounded-[24px] shadow-xl border border-white/50 flex flex-col items-center justify-center gap-2">
-                    <div className="flex flex-wrap items-center justify-center gap-2 w-full">
+                <div className="w-full bg-white px-3 md:px-5 py-2 rounded-[20px] shadow-xl border border-white/50 flex items-center justify-center">
+                    {/* 아이콘+제목 한 덩어리 중앙정렬 */}
+                    <div className="inline-flex items-center justify-center gap-2 flex-wrap max-w-full">
                         {/* Icon Logic */}
                         {(shop.options?.icon) && (() => {
                             const iconId = Number(shop.options.icon);
                             const iconObj = ICONS.find((i) => i.id === iconId);
                             return iconObj ? (
-                                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 shadow-sm shrink-0">
-                                    <span className="text-lg">{iconObj.icon}</span>
-                                    <span className="text-[10px] font-black uppercase tracking-tight">{iconObj.name}</span>
+                                <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-lg border border-blue-100 shadow-sm shrink-0">
+                                    <span className="text-base">{iconObj.icon}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-tight">{iconObj.name}</span>
                                 </div>
                             ) : null;
                         })()}
 
                         {/* Title Logic */}
-                        <h2 className="text-[15px] md:text-[16px] font-black leading-tight text-gray-900 truncate text-center break-keep">
+                        <h2 className="text-[14px] md:text-[15px] font-black leading-tight text-gray-900 line-clamp-2 text-center break-keep">
                             <span style={getHighlighterStyle(shop.options?.highlighter)}>
                                 {cleanShopTitle(shop.title, shop.name)}
                             </span>
@@ -336,7 +337,7 @@ export const JobDetailContent = ({
                 </div>
 
                 {/* Nickname Badge */}
-                <div className="flex items-center gap-2 opacity-95 font-black text-[12px] md:text-[13px] bg-black/10 px-3 py-1 rounded-full">
+                <div className="flex items-center gap-2 opacity-90 font-black text-[11px] md:text-[12px] bg-black/10 px-3 py-0.5 rounded-full">
                     {cleanShopTitle(undefined, shop.nickname || shop.name)}
                 </div>
             </div>
@@ -383,7 +384,7 @@ export const JobDetailContent = ({
                     </div>
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm min-h-[150px] overflow-hidden">
                         <div
-                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm [&>*:first-child]:mt-0 [&_*]:max-w-full [&_img]:h-auto"
+                            className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed break-words prose-img:rounded-2xl prose-img:shadow-sm [&>*:first-child]:mt-0 [&_*]:max-w-full [&_img]:h-auto pt-4 pb-2"
                             dangerouslySetInnerHTML={{
                                 __html: (shop.description || `<p>${shop.name}에서 열정적인 분을 모십니다!</p>`)
                                     .replace(/foxalba\.com|queenalba\.net|ladyalba\.co\.kr/gi, 'cocoalba.kr')
@@ -569,7 +570,7 @@ export const JobDetailContent = ({
             )}
 
             {/* 3. FOOTER SECTION */}
-            <div className="px-4 py-3 bg-white border-t border-gray-100 grid grid-cols-4 gap-2 shrink-0 safe-area-bottom">
+            <div className="px-4 py-2 md:py-3 bg-white border-t border-gray-100 grid grid-cols-4 gap-2 shrink-0 safe-area-bottom">
                 <button
                     onClick={() => {
                         const event = new CustomEvent('open-note-modal', {
@@ -577,7 +578,7 @@ export const JobDetailContent = ({
                         });
                         window.dispatchEvent(event);
                     }}
-                    className="col-span-1 py-3 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
+                    className="col-span-1 py-2 md:py-3 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
                 >
                     <MessageSquare size={18} className="text-gray-400" />
                     <span className="text-[10px] font-black">쪽지문의</span>
@@ -592,14 +593,14 @@ export const JobDetailContent = ({
                             alert('등록된 메신저 ID가 없습니다.');
                         }
                     }}
-                    className="col-span-1 py-3 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
+                    className="col-span-1 py-2 md:py-3 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
                 >
                     <MessageCircle size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px]">카톡문의</span>
                 </button>
                 <a
                     href={`tel:${shop.phone}`}
-                    className="col-span-2 py-3 bg-[#f82b60] text-white rounded-2xl flex items-center justify-center gap-2 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
+                    className="col-span-2 py-2 md:py-3 bg-[#f82b60] text-white rounded-2xl flex items-center justify-center gap-2 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
                 >
                     <Phone size={17} fill="currentColor" className="group-hover:animate-bounce shrink-0" />
                     <span className="text-[13px] font-black">전화/문자문의</span>
