@@ -31,14 +31,17 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
     return {
         title,
         description,
+        alternates: {
+            canonical: `https://www.cocoalba.kr/coco/${region}`,
+        },
         openGraph: {
             title,
             description,
-            url: `https://cocoalba.kr/region/${region}`,
+            url: `https://www.cocoalba.kr/coco/${region}`,
             siteName: '코코알바',
             images: [
                 {
-                    url: 'https://cocoalba.kr/og-image.png',
+                    url: 'https://www.cocoalba.kr/og-image.png',
                     width: 1200,
                     height: 630,
                     alt: `${regionName} 여자밤알바 정보`,
@@ -96,8 +99,8 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         "@type": "WebPage",
         "name": `${regionName} 여자밤알바·여자유흥알바 전문 - 코코알바`,
         "description": `${regionName} 지역 검증된 ${kw0}, ${kw1} 상세정보를 실시간으로 확인하세요.`,
-        "url": `https://cocoalba.kr/region/${region}`,
-        "publisher": { "@type": "Organization", "name": "코코알바", "url": "https://cocoalba.kr" }
+        "url": `https://www.cocoalba.kr/coco/${region}`,
+        "publisher": { "@type": "Organization", "name": "코코알바", "url": "https://www.cocoalba.kr" }
     };
 
     // [JSON-LD 2] BreadcrumbList
@@ -105,9 +108,9 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "홈", "item": "https://cocoalba.kr" },
-            { "@type": "ListItem", "position": 2, "name": "지역별 채용", "item": "https://cocoalba.kr/region" },
-            { "@type": "ListItem", "position": 3, "name": `${regionName} 채용`, "item": `https://cocoalba.kr/region/${region}` }
+            { "@type": "ListItem", "position": 1, "name": "홈", "item": "https://www.cocoalba.kr" },
+            { "@type": "ListItem", "position": 2, "name": "지역별 채용", "item": "https://www.cocoalba.kr/region" },
+            { "@type": "ListItem", "position": 3, "name": `${regionName} 채용`, "item": `https://www.cocoalba.kr/coco/${region}` }
         ]
     };
 

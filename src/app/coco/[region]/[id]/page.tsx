@@ -35,9 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             openGraph: {
                 title,
                 description,
-                url: `https://cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}`,
+                url: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}`,
                 siteName: '코코알바',
-                images: [{ url: 'https://cocoalba.kr/og-image.jpg', width: 1200, height: 630, alt: '코코알바' }],
+                images: [{ url: 'https://www.cocoalba.kr/og-image.jpg', width: 1200, height: 630, alt: '코코알바' }],
                 type: 'website',
             },
         };
@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title,
             description,
-            url: `https://cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`,
+            url: `https://www.cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`,
             images: shop.options?.mediaUrl ? [
                 {
                     url: shop.options.mediaUrl,
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 },
             ] : [
                 {
-                    url: 'https://cocoalba.kr/og-image.png',
+                    url: 'https://www.cocoalba.kr/og-image.png',
                     width: 1200,
                     height: 630,
                     alt: '코코알바',
@@ -145,9 +145,9 @@ export default async function ShopDetailPage({ params }: Props) {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-                { '@type': 'ListItem', position: 1, name: '홈', item: 'https://cocoalba.kr' },
-                { '@type': 'ListItem', position: 2, name: `${regionName} 알바`, item: `https://cocoalba.kr/coco/${decodedRegionSlug}` },
-                { '@type': 'ListItem', position: 3, name: `${regionName} ${workTypeInfo.name}`, item: `https://cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}` },
+                { '@type': 'ListItem', position: 1, name: '홈', item: 'https://www.cocoalba.kr' },
+                { '@type': 'ListItem', position: 2, name: `${regionName} 알바`, item: `https://www.cocoalba.kr/coco/${decodedRegionSlug}` },
+                { '@type': 'ListItem', position: 3, name: `${regionName} ${workTypeInfo.name}`, item: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}` },
             ],
         };
 
@@ -243,7 +243,7 @@ export default async function ShopDetailPage({ params }: Props) {
         "hiringOrganization": {
             "@type": "Organization",
             "name": shop.name,
-            "sameAs": `https://cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`
+            "sameAs": `https://www.cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`
         },
         "employmentType": employmentType,
         "datePosted": datePosted,

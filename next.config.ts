@@ -29,7 +29,15 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   async redirects() {
-    return [];
+    return [
+      // [SEO] non-www → www 정규화 (Google 리다이렉션 포함된 페이지 오류 해소)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'cocoalba.kr' }],
+        destination: 'https://www.cocoalba.kr/:path*',
+        permanent: true, // 301
+      },
+    ];
   },
 };
 
