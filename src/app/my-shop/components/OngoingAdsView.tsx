@@ -226,7 +226,7 @@ export const OngoingAdsView = ({
 
     const getTierLabel = (ad: any) => {
         if (!ad) return 'T7';
-        const pt = (ad.productType || ad.tier || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+        const pt = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
         if (pt.includes('grand') || pt === 'p1') return 'T1';
         if (pt.includes('premium') || pt === 'p2') return 'T2';
         if (pt === 'p3' || pt.includes('deluxe')) return 'T3';
@@ -238,7 +238,7 @@ export const OngoingAdsView = ({
 
     // 배너 등록 가능 여부: T1~T4 + active 상태
     const isBannerEligible = (ad: any) => {
-        const tier = (ad.productType || ad.tier || ad.ad_type || ad.options?.product_type || '').toLowerCase();
+        const tier = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || '').toLowerCase();
         const isEligibleTier = BANNER_ELIGIBLE_TIERS.includes(tier);
         const isActive = ad.status !== 'rejected' && ad.status !== 'REJECTED'
             && ad.status !== 'PENDING_REVIEW' && ad.status !== 'pending';
@@ -306,7 +306,7 @@ export const OngoingAdsView = ({
                         const isExhausted = remainCount <= 0;
 
                         const eligibleForBanner = isBannerEligible(ad);
-                        const tierText = TIER_LABEL_MAP[(ad.productType || ad.tier || ad.ad_type || '').toLowerCase()] || '';
+                        const tierText = TIER_LABEL_MAP[(ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || '').toLowerCase()] || '';
                         const bannerStatus = ad.banner_status;
                         const bannerImgUrl = bannerUpdates[ad.id] || ad.banner_image_url;
                         const isPanelOpen = !!bannerPanelOpen[ad.id];

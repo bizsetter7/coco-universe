@@ -144,7 +144,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                             {/* Tier Code Badge (Mirroring Payments: bg-gray-900) */}
                                             <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap">
                                                 {(() => {
-                                                    const pt = (ad?.productType || ad?.ad_type || ad?.options?.product_type || 'p7').toLowerCase();
+                                                    const pt = (ad?.productType || ad?.tier || ad?.product_type || ad?.ad_type || ad?.options?.product_type || 'p7').toLowerCase();
                                                     const adProduct = [
                                                         { id: 'p1', code: 'T1' }, { id: 'p2', code: 'T2' }, { id: 'p3', code: 'T3' },
                                                         { id: 'p4', code: 'T4' }, { id: 'p5', code: 'T5' }, { id: 'p6', code: 'T6' }, { id: 'p7', code: 'T7' }
@@ -217,7 +217,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
 
                                     // 잔여 수동 점프 횟수 계산
                                     const todayKST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
-                                    const tierKey = (ad.productType || ad.tier || ad.ad_type || 'p7').toLowerCase();
+                                    const tierKey = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
                                     const jumpCfg = getJumpConfig(tierKey);
                                     const usedManual = ad.options?.last_manual_jump_date === todayKST
                                         ? (ad.options?.daily_manual_jump_count || 0) : 0;

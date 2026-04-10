@@ -17,7 +17,7 @@ export function ExtendAdModal({ ad, brand, onConfirm, onClose }: ExtendAdModalPr
     const isDark = brand?.theme === 'dark';
 
     // 광고 등급 → DETAILED_PRICING 매칭 (p1~p7, grand/premium/... altId, 한글 tier명 모두 대응)
-    const rawTier = (ad?.productType || ad?.tier || ad?.ad_type || 'p7').toLowerCase();
+    const rawTier = (ad?.productType || ad?.tier || ad?.product_type || ad?.ad_type || ad?.options?.product_type || 'p7').toLowerCase();
     const pricing =
         DETAILED_PRICING.find(p =>
             rawTier === p.id ||

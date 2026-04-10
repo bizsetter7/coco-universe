@@ -242,7 +242,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                                                     <div className="flex flex-col gap-1.5">
                                                         <div className="flex items-center gap-1 flex-nowrap overflow-hidden">
                                                             {(() => {
-                                                                const pt = String((ad as any).productType || (ad as any).ad_type || ad.options?.product_type || ad.tier || 'p7').toLowerCase();
+                                                                const pt = String((ad as any).productType || (ad as any).tier || (ad as any).product_type || (ad as any).ad_type || ad.options?.product_type || 'p7').toLowerCase();
                                                                 let badgeColor = 'bg-slate-900';
                                                                 let label = 'T7';
 

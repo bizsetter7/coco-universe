@@ -956,7 +956,7 @@ function MyShopContent() {
             }
 
             // [Fix] getJumpConfig로 tier 매핑 통일 (p1~p7, altId, 레거시 한글명 모두 대응)
-            const tierKey = (ad.productType || ad.tier || ad.ad_type || 'p7').toLowerCase();
+            const tierKey = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
             const { manual: maxJumps } = getJumpConfig(tierKey);
             
             const options = ad.options || {};

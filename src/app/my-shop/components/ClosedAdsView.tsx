@@ -34,7 +34,7 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
                                             {/* Tier Code Badge (Standard: bg-gray-900) */}
                                             <span className="bg-gray-900 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black shadow-sm shrink-0 whitespace-nowrap">
                                                 {(() => {
-                                                    const pt = (ad.productType || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
+                                                    const pt = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
                                                     if (pt.includes('grand')) return 'T1';
                                                     if (pt.includes('premium')) return 'T2';
                                                     if (pt === 'p3') return 'T3';

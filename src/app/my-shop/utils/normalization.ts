@@ -98,9 +98,9 @@ export const normalizeAd = (ad: any) => {
         banner_status: ad.banner_status || null,
 
         // 상품 및 디자인 옵션
-        productType: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
-        tier: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
-        ad_type: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',
+        productType: ad.tier || ad.productType || ad.product_type || opt.product_type || ad.ad_type || 'p1',
+        tier: ad.tier || ad.productType || ad.product_type || opt.product_type || ad.ad_type || 'p1',
+        ad_type: ad.tier || ad.productType || ad.product_type || opt.product_type || ad.ad_type || 'p1',
 
         selectedIcon: opt.icon || ad.selectedIcon || ad.icon || null,
         selectedHighlighter: opt.highlighter || ad.selectedHighlighter || ad.highlighter || null,

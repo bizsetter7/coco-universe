@@ -51,7 +51,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
             const adTitle = ad.title || '제목 없음';
 
             // [Check 1] 지능형 광고 등급 필터 (P1~P7 외 가짜 등급/P8 등 탐지)
-            const pt = String(ad.productType || ad.ad_type || opt.product_type || ad.selectedAdProduct || '').toLowerCase();
+            const pt = String(ad.productType || ad.tier || ad.product_type || ad.ad_type || opt.product_type || ad.selectedAdProduct || '').toLowerCase();
             const isValidTier = AD_TIER_STANDARDS.some(s => pt.includes(s.id) || pt.includes(s.altId));
 
             if (pt && !isValidTier) {
