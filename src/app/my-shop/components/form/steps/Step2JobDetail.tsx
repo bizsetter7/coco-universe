@@ -309,8 +309,8 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                     </div>
                 </div>
 
-                {/* Editor & Preview Split View for PC */}
-                <div className="lg:grid lg:grid-cols-2 lg:gap-6 items-start">
+                {/* Editor */}
+                <div className="items-start">
                     {/* Editor Side */}
                     <div className={`p-5 md:p-6 rounded-[32px] border shadow-sm ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'} h-full flex flex-col`}>
                         <div className="flex items-center justify-between mb-3">
@@ -427,37 +427,10 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                             className={`w-full min-h-[400px] lg:min-h-[500px] p-4 md:p-6 border-2 rounded-b-2xl outline-none overflow-y-auto ${brand.theme === 'dark' ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-100 text-gray-900'}`}
                             style={{ lineHeight: '1.6' }}
                         ></div>
-                        <p className="text-[11px] mt-2 font-bold text-gray-400 px-1">* 팁: 에디터 높이가 충분히 확보되었습니다. PC와 모바일 모두 실시간 미리보기가 지원됩니다.</p>
-                    </div>
-
-                    {/* Preview Side (Desktop Only) */}
-                    <div className="hidden lg:flex flex-col h-full">
-                        <div className="flex items-center gap-2 mb-3">
-                            <h2 className="font-black text-gray-800 flex items-center gap-2 text-sm"><span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>실시간 미리보기</h2>
-                            <span className="px-2 py-0.5 bg-blue-50 text-blue-500 text-[10px] font-black rounded-full border border-blue-100">PREVIEW</span>
-                        </div>
-                        <div className={`flex-1 p-6 border-2 rounded-[24px] overflow-y-auto max-h-[600px] bg-white border-gray-100 shadow-inner relative ${brand.theme === 'dark' ? 'bg-gray-950/50 border-gray-800' : ''}`}>
-                            <div className="mb-4 pb-4 border-b border-gray-100">
-                                <h3 className="text-xl font-black text-gray-900 break-all">{title || "공고 제목이 여기에 표시됩니다."}</h3>
-                            </div>
-                            <div
-                                className="description-preview text-gray-800 prose prose-sm max-w-none"
-                                dangerouslySetInnerHTML={{ __html: editorHtml || '<p class="text-gray-300">상세 내용이 아직 입력되지 않았습니다.</p>' }}
-                            />
-                            {!editorHtml && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                                    <Edit3 size={64} className="text-gray-400" />
-                                </div>
-                            )}
-                        </div>
+                        <p className="text-[11px] mt-2 font-bold text-gray-400 px-1">* 팁: 에디터에서 작성한 내용이 공고에 그대로 반영됩니다.</p>
                     </div>
                 </div>
             </div>
-            <style jsx global>{`
-                .description-preview p { margin-bottom: 0.5rem; }
-                .description-preview strong { font-weight: 900; }
-                .description-preview img { max-width: 100%; border-radius: 8px; }
-            `}</style>
         </section>
     );
 };

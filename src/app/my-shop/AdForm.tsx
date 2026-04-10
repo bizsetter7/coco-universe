@@ -290,9 +290,6 @@ export default function AdForm(props: AdFormProps) {
                 </div>
             </div>
             <style jsx global>{`
-                .description-preview p { margin-bottom: 0.5rem; }
-                .description-preview strong { font-weight: 900; }
-                .description-preview img { max-width: 100%; border-radius: 8px; }
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
                 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
