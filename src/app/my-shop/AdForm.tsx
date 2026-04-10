@@ -232,8 +232,6 @@ export default function AdForm(props: AdFormProps) {
                 selectedAdProduct={props.selectedAdProduct}
                 setExampleType={props.setExampleType}
                 setShowExampleModal={props.setShowExampleModal}
-                mediaUrl={props.mediaUrl}
-                setMediaUrl={props.setMediaUrl}
             />
 
             {/* Total Amount Display (Redesigned matching Capture 1/2) */}

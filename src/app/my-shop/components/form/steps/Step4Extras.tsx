@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PlusCircle, Sparkles, Box, ChevronDown, Check, MousePointer2, Highlighter, Palette, Play, Zap, Radio, XCircle, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Sparkles, MousePointer2, Highlighter, Palette, Zap, Radio } from 'lucide-react';
 import { ICONS, HIGHLIGHTERS, PAY_SUFFIX_OPTIONS, STEP4_CONVENIENCE_KEYWORDS } from '../../../constants';
 
 interface Step4Props {
@@ -25,8 +25,6 @@ interface Step4Props {
     selectedAdProduct: string | null;
     setExampleType: (v: any) => void;
     setShowExampleModal: (v: boolean) => void;
-    mediaUrl: string;
-    setMediaUrl: (v: string) => void;
     isNewEntry?: boolean;
 }
 
@@ -36,10 +34,8 @@ export const Step4Extras: React.FC<Step4Props> = ({
     selectedHighlighter, setSelectedHighlighter, highlighterPeriod, setHighlighterPeriod,
     selectedKeywords, setSelectedKeywords,
     selectedAdProduct, setExampleType, setShowExampleModal,
-    mediaUrl, setMediaUrl, isNewEntry
+    isNewEntry
 }) => {
-    const [isUploading, setIsUploading] = React.useState(false);
-
     const checkStep3 = () => {
         if (!selectedAdProduct) {
             alert("STEP 3의 광고 타입을 먼저 선택해야 신청 가능합니다!");
@@ -103,51 +99,6 @@ export const Step4Extras: React.FC<Step4Props> = ({
         setShowExampleModal(true);
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!checkEditMode(true)) {
-            e.target.value = ''; // Reset input
-            return;
-        }
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        // [New] File Size Check (5MB Limit)
-        const MAX_SIZE = 5 * 1024 * 1024;
-        if (file.size > MAX_SIZE) {
-            alert('파일 크기가 너무 큽니다. 5MB 이하의 이미지만 업로드 가능합니다.');
-            return;
-        }
-
-        try {
-            setIsUploading(true);
-            const { supabase } = await import('@/lib/supabase');
-            const fileExt = file.name.split('.').pop();
-            const fileName = `ad-cards/${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('job-images')
-                .upload(fileName, file);
-
-            if (uploadError) {
-                if (uploadError.message.includes('fetch')) {
-                    throw new Error('네트워크 연결이 불안정합니다. 잠시 후 다시 시도해주세요.');
-                }
-                throw uploadError;
-            }
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('job-images')
-                .getPublicUrl(fileName);
-
-            setMediaUrl(publicUrl);
-        } catch (error: any) {
-            console.error('Upload error:', error);
-            alert(`이미지 업로드 실패: ${error.message || '알 수 없는 오류가 발생했습니다.'}`);
-        } finally {
-            setIsUploading(false);
-        }
-    };
-
     const renderPeriodSelector = (current: number, setter: (v: number) => void, noneLabel: string = "안함") => (
         <div className="grid grid-cols-4 gap-1 w-full">
             {[0, 30, 60, 90].map(p => (
@@ -209,80 +160,6 @@ export const Step4Extras: React.FC<Step4Props> = ({
             </div>
 
             <div className="space-y-6 md:space-y-10">
-                {/* [New] Card Ad Main Image Section (Conditional) */}
-                {(selectedAdProduct === 'p1' || selectedAdProduct === 'p2' || selectedAdProduct === 'p3' || selectedAdProduct === 'p4') && (
-                    <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-[13px] md:text-[16px] font-black text-gray-700 flex items-center gap-2">
-                                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600"><PlusCircle size={14} fill="currentColor" /></div>
-                                카드 광고 메인 이미지
-                            </h3>
-                            <span className="text-[10px] md:text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">필수</span>
-                        </div>
-                        <div className={`p-4 md:p-6 rounded-3xl border-2 border-dashed transition-all ${mediaUrl ? 'bg-blue-50/30 border-blue-200' : 'bg-gray-50 border-gray-200 shadow-inner'}`}>
-                            <div className="flex flex-col md:flex-row gap-6 items-center">
-                                <div className="w-full md:w-64 h-40 md:h-44 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative group">
-                                    {mediaUrl ? (
-                                        <>
-                                            <img src={mediaUrl} alt="Ad Preview" className="w-full h-full object-cover" />
-                                            <button
-                                                onClick={() => {
-                                                    if (!checkEditMode(true)) return;
-                                                    setMediaUrl('');
-                                                }}
-                                                className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                <XCircle size={16} />
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                                            <Palette size={32} strokeWidth={1.5} />
-                                            <span className="text-[10px] md:text-xs font-bold">이미지 미리보기</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex-1 space-y-3 w-full">
-                                    <p className="text-[11px] md:text-[13px] text-gray-500 font-bold leading-relaxed">
-                                        그랜드~스페셜 광고는 리스트 상단 카드 영역에 <span className="text-blue-600 font-black">대표 이미지</span>가 노출됩니다. <br />
-                                        업소를 가장 잘 나타내는 사진을 올리거나 인터넷 주소(URL)를 입력해주세요.
-                                    </p>
-                                    <div className="flex gap-1.5 md:gap-2">
-                                        <input
-                                            type="text"
-                                            value={mediaUrl}
-                                            onChange={(e) => {
-                                                if (!checkEditMode(true)) return;
-                                                setMediaUrl(e.target.value);
-                                            }}
-                                            placeholder="예: https://mysite.com/image.jpg"
-                                            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 bg-white border border-gray-200 rounded-2xl text-[10px] md:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                            disabled={isUploading}
-                                        />
-                                        <label className={`px-3 py-2.5 md:px-4 md:py-3 bg-gray-900 text-white rounded-2xl text-[10px] md:text-sm font-black hover:bg-black transition active:scale-95 shadow-lg whitespace-nowrap cursor-pointer flex items-center gap-1.5 md:gap-2 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                            {isUploading ? (
-                                                <><Loader2 size={12} className="animate-spin" /> 업로드 중...</>
-                                            ) : (
-                                                <><ImageIcon size={14} /> 내 PC에서 불러오기</>
-                                            )}
-                                            <input
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={handleImageUpload}
-                                                disabled={isUploading}
-                                            />
-                                        </label>
-                                    </div>
-                                    <p className="text-[9px] md:text-[11px] text-gray-400 font-bold">
-                                        * 권장: 800x600 (4:3 비율) | 파일 크기: 5MB 이하 | 포맷: JPG, PNG, GIF
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* 1. 급여 추가 옵션 (4열 그리드) */}
                 <div>
                     <div className="flex items-center justify-between mb-3">

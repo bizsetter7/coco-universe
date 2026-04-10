@@ -60,6 +60,7 @@ const CATEGORY_LINKS = [
 
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
+import { InnerSidebarCarousel } from '@/components/InnerSidebarCarousel';
 
 export default function LeftSidebar({
     selectedRegion,
@@ -494,6 +495,10 @@ export default function LeftSidebar({
                 </div>
             </div>
 
+
+            {/* 7-A. 디럭스/스페셜 내부 사이드바 슬롯 — 캐러셀 */}
+            {/* 광고상품 바로가기 아래 2슬롯: 디럭스(p3) → 스페셜(p4) 랜덤 슬라이드 */}
+            <InnerSidebarCarousel />
 
             {/* 8. 광고 슬롯 2 - 코코알바 광고입전상담 */}
             <div

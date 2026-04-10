@@ -23,6 +23,11 @@ interface User {
     full_name?: string;
     phone?: string;
     nickname?: string;
+    // 사업자 정보 (프로필에서 자동반영)
+    business_name?: string;
+    business_number?: string;
+    manager_kakao?: string;
+    manager_telegram?: string;
 }
 
 interface AdminAdRegistrationModalProps {
@@ -34,15 +39,16 @@ interface AdminAdRegistrationModalProps {
 export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRegistrationModalProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [isContentOpen, setIsContentOpen] = useState(false); // 공고 상세내용 접기/펼치기
 
-    // Form State
+    // Form State — 사업자 정보 자동반영
     const [formData, setFormData] = useState({
-        shopName: '',
+        shopName: user.business_name || '',                      // ← 상호명 자동
         title: '',
         managerName: user.name || user.full_name || '',
         managerPhone: user.phone || '',
-        kakao: '',
-        telegram: '',
+        kakao: user.manager_kakao || '',                         // ← 카카오 자동
+        telegram: user.manager_telegram || '',                   // ← 텔레그램 자동
         region: '서울',
         regionGu: '강남구',
         category: '룸알바',
@@ -52,7 +58,8 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
         payAmount: '100,000',
         content: '',
         mediaUrl: '',
-        duration: 30
+        duration: 30,
+        banner_position: 'none' as 'none' | 'left' | 'right' | 'both' | 'inner', // ← 배너 슬롯
     });
 
     const categories = Object.keys(JOB_CATEGORY_MAP);
@@ -98,6 +105,11 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                 product_type: formData.tier,
                 created_at: now.toISOString(),
                 updated_at: now.toISOString(),
+                // 배너 슬롯 배정 (migration 06 적용 시 반영)
+                ...(formData.banner_position !== 'none' ? {
+                    banner_position: formData.banner_position,
+                    banner_status: 'approved',  // 관리자 직접 등록 = 즉시 승인
+                } : {}),
                 
                 // [Snapshot Bucket] - UI용 매핑 규격 통일 (camelCase)
                 options: {
@@ -431,18 +443,60 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                         </div>
                     </div>
 
-                    {/* Section 4: Content */}
-                    <div className="space-y-4 pb-10">
+                    {/* Section 4: Banner Slot */}
+                    <div className="space-y-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <FileText size={16} className="text-blue-600" />
-                            <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">공고 상세 내용</h4>
+                            <Layout size={16} className="text-blue-600" />
+                            <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">배너 슬롯 배정</h4>
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">관리자 직접 배정 시 즉시 활성화</span>
                         </div>
-                        <textarea
-                            value={formData.content}
-                            onChange={e => setFormData({ ...formData, content: e.target.value })}
-                            placeholder="공고 내용을 입력해 주세요 (HTML 사용 가능)"
-                            className="w-full h-48 px-6 py-5 bg-white border border-slate-200 rounded-3xl text-sm font-medium leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none shadow-inner"
-                        />
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                            {[
+                                { value: 'none',  label: '배정 안함', desc: '목록만 노출' },
+                                { value: 'left',  label: '좌측 사이드', desc: '그랜드/프리미엄' },
+                                { value: 'right', label: '우측 사이드', desc: '그랜드/프리미엄' },
+                                { value: 'both',  label: '좌+우 세트', desc: '그랜드 전용' },
+                                { value: 'inner', label: '내부 사이드바', desc: '디럭스/스페셜' },
+                            ].map(opt => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, banner_position: opt.value as any })}
+                                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all text-center ${
+                                        formData.banner_position === opt.value
+                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                            : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                                    }`}
+                                >
+                                    <span className="text-[11px] font-black">{opt.label}</span>
+                                    <span className="text-[9px] mt-0.5 opacity-70">{opt.desc}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Section 5: Content (선택사항 — 접기/펼치기) */}
+                    <div className="space-y-3 pb-10">
+                        <button
+                            type="button"
+                            onClick={() => setIsContentOpen(v => !v)}
+                            className="flex items-center gap-2 w-full text-left group"
+                        >
+                            <FileText size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                            <h4 className="text-sm font-black text-slate-500 uppercase tracking-tight group-hover:text-slate-900 transition-colors">
+                                공고 상세 내용
+                            </h4>
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">선택사항 — 나중에 수정 가능</span>
+                            <span className={`ml-auto text-slate-400 transition-transform duration-200 ${isContentOpen ? 'rotate-180' : ''}`}>▼</span>
+                        </button>
+                        {isContentOpen && (
+                            <textarea
+                                value={formData.content}
+                                onChange={e => setFormData({ ...formData, content: e.target.value })}
+                                placeholder="공고 내용을 입력해 주세요 (HTML 사용 가능). 비워두면 클릭 시 기본 정보만 표시됩니다."
+                                className="w-full h-40 px-6 py-5 bg-white border border-slate-200 rounded-3xl text-sm font-medium leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none shadow-inner"
+                            />
+                        )}
                     </div>
                 </div>
 
