@@ -100,9 +100,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
 
                 if (profile || isMasterEmail) {
-                    // [호환성] 라이브 DB 트리거는 user_type 컬럼에 역할을 쓰고 role은 기본값으로 방치
-                    // user_type 우선 → role fallback 순으로 읽어야 corporate 회원이 individual로 보이지 않음
-                    const liveRole = profile?.user_type || profile?.role || 'individual';
+                    // [호환성] role 컬럼 우선 사용. 단 role이 개인회원계열(employee/individual/null)일 때만
+                    // user_type이 corporate/admin이면 그걸로 보정 (최근 트리거가 user_type에 올바른 값 쓰는 경우 대응)
+                    // 옛날 계정: user_type='employee'(레거시 고정값), role에 실제 역할 → role 신뢰
+                    // 신규 계정: user_type=role=corporate → 동일하여 문제 없음
+                    const roleVal = profile?.role || '';
+                    const userTypeVal = profile?.user_type || '';
+                    const liveRole = (roleVal === 'admin' || roleVal === 'corporate')
+                        ? roleVal  // role이 명시적으로 corporate/admin → 그대로 신뢰
+                        : (userTypeVal === 'admin' || userTypeVal === 'corporate')
+                            ? userTypeVal  // role이 employee/individual/없음이고 user_type이 명확한 경우 보정
+                            : roleVal || 'individual';
                     const userType = (isMasterEmail || liveRole === 'admin') ? 'admin' :
                         (liveRole === 'corporate' ? 'corporate' : 'individual');
 
@@ -142,8 +150,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         console.warn('[AuthProvider] Profile query error:', profileError.message);
                     }
                     const meta = authUser.user_metadata || {};
-                    // user_metadata.role 에 가입 시 선택한 역할이 저장됨
-                    const metaRole = meta.role || meta.user_type || 'individual';
+                    // user_metadata.role 에 가입 시 선택한 역할이 저장됨 (corporate/individual/employee)
+                    const metaRoleRaw = meta.role || '';
+                    const metaRole = (metaRoleRaw === 'corporate' || metaRoleRaw === 'admin')
+                        ? metaRoleRaw
+                        : 'individual';
                     const fallbackType = (metaRole === 'admin' || isMasterEmail) ? 'admin' :
                         metaRole === 'corporate' ? 'corporate' : 'individual';
                     const fallbackUser: UserSession = {
