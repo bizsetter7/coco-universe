@@ -42,10 +42,12 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     
     // [Gate State] 인증 상태 Hook — 최상단으로 이동
     const [isVerified, setIsVerified] = React.useState<boolean | null>(null);
+    // [External Entry] 검색엔진 유입 시 진입 페이지 저장 (해당 페이지만 게이트 면제)
+    const [externalEntryPage, setExternalEntryPage] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         setIsMounted(true);
-        
+
         // Bot Detection Logic
         if (typeof navigator !== 'undefined') {
             const ua = navigator.userAgent.toLowerCase();
@@ -53,6 +55,21 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             if (botKeywords.some(keyword => ua.includes(keyword))) {
                 setIsBot(true);
             }
+        }
+
+        // [External Entry Detection] 검색엔진·외부 링크로 유입된 경우 진입 페이지 기억
+        if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+            const ref = document.referrer;
+            const SEARCH_ENGINES = ['google.', 'naver.com', 'daum.net', 'bing.com', 'yahoo.com', 'zum.com'];
+            const isFromSearch = ref !== '' && SEARCH_ENGINES.some(se => ref.includes(se));
+            const isDirectExternal = ref !== '' && !ref.includes('cocoalba.kr') && !ref.includes('localhost');
+            if (isFromSearch || isDirectExternal) {
+                const entry = sessionStorage.getItem('external_entry_page');
+                if (!entry) {
+                    sessionStorage.setItem('external_entry_page', pathname || '/');
+                }
+            }
+            setExternalEntryPage(sessionStorage.getItem('external_entry_page'));
         }
     }, []);
 
@@ -72,7 +89,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const pathParts = decodedPath.split('/');
     const isGuidePage = pathParts.length === 4 && pathParts[1] === 'coco' && isWorkTypeSlug(pathParts[3]);
 
-    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot;
+    // 검색엔진 외부 유입 시: 최초 진입 페이지만 게이트 면제 (다른 페이지 이동 시 게이트 재표시)
+    const isOnExternalEntryPage = !!(externalEntryPage && pathname === externalEntryPage);
+    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot && !isOnExternalEntryPage;
 
     React.useEffect(() => {
         if (isLoading) return;
@@ -95,9 +114,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             return;
         }
 
+        // adult_gate_skipped 제거 — "나가기" 는 Google로 이탈하므로 skip으로 진입 허용 안 함
         const localVerified = typeof window !== 'undefined' && localStorage.getItem('adult_verified') === 'true';
-        const sessionSkipped = typeof window !== 'undefined' && sessionStorage.getItem('adult_gate_skipped') === 'true';
-        setIsVerified(localVerified || sessionSkipped);
+        setIsVerified(localVerified);
     }, [isLoading, authUser, pathname]);
 
     const handleVerify = () => {
@@ -106,8 +125,9 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     };
 
     const handleSkip = () => {
-        sessionStorage.setItem('adult_gate_skipped', 'true');
-        setIsVerified(true);
+        // 나가기 = Google로 이탈 (AdultVerificationGate에서 직접 처리)
+        // 이 콜백은 더 이상 skip 권한을 부여하지 않음
+        window.location.href = 'https://www.google.com';
     };
 
     // ── [3] All Conditional Early Returns (Hooks 이후에 배치) ──────────────────

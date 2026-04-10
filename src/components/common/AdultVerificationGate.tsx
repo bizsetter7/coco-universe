@@ -94,12 +94,8 @@ export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGat
     const [isAuthenticating, setIsAuthenticating] = useState(false);
 
     const handleExit = () => {
-        sessionStorage.setItem('adult_gate_skipped', 'true');
-        if (onSkip) {
-            onSkip();
-        } else {
-            router.push('/');
-        }
+        // 나가기 = 사이트 이탈 → Google로 이동 (접근 권한 부여 안 함)
+        window.location.href = 'https://www.google.com';
     };
     
     const handleNonMemberAuth = async (type: string) => {

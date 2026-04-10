@@ -1,6 +1,6 @@
 # CLAUDE_P2.md — P2 코코알바 에이전트 핸드오버 가이드
 
-> **최종 업데이트**: 2026-04-09
+> **최종 업데이트**: 2026-04-11
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
@@ -89,7 +89,7 @@ src/
 
 ---
 
-## 📊 현재 진행 상태 (2026-04-08 기준)
+## 📊 현재 진행 상태 (2026-04-11 기준)
 
 ### ✅ 완료된 주요 기능
 
@@ -105,16 +105,27 @@ src/
 | SOS 배너 1일 재표시 | `3322791` | '오늘 하루 보지 않기' |
 | 보안 패치 (mock쿠키/autoLogin 우회 제거) | `2e4498a` | my-shop production 분기 |
 | 출석체크 KST/중복 버그 수정 | `52af366` | |
+| **Tier 판별 로직 강화** (product_type snake_case 추가) | `2026-04-11` | 8개 파일 전수 수정 — 아래 PATTERN-07 필독 |
+| **배너 슬롯 시스템 완성** | `2026-04-11` | Migration06 4컬럼, BannerSidebar, InnerSidebarCarousel, AdminAdRegistrationModal |
+| **성인 게이트 행동 변경** | `2026-04-11` | "나가기" → Google 리다이렉트, adult_gate_skipped 제거, 외부 유입 진입 페이지 면제 |
+| **Step2 에디터 툴바 단일 행** | `2026-04-11` | flex-col 2줄 → flex-row 1줄 통합 |
+| **Step2 실시간 미리보기 제거** | `2026-04-11` | Preview Side 블록 + description-preview CSS 완전 제거 |
+| **Step4 카드광고 메인이미지 업로드 제거** | `2026-04-11` | Step4Extras.tsx handleImageUpload 로직 완전 제거 |
+| **드래프트 세션 오염 방지** | `2026-04-11` | useAdFormState(userId) + loadShopName 명시적 초기화 |
+| **normalization.ts 매핑 강화** | `2026-04-11` | workType, region, mediaUrl, banner_* 전체 필드 추가 |
+| **types/shop.ts 확장** | `2026-04-11` | options 인터페이스 20여 필드 + banner 컬럼 타입 추가 |
 
 ### 🔴 미완료 / 진행 중
 
 | 항목 | 우선순위 | 메모 |
 |------|---------|------|
-| SMS 연동 (아톡비즈) | 높음 | API 문서 요청 필요 (1877-8280) — 4/6(월) 이후 |
+| **Admin 배너 슬롯 관리 탭** | 높음 | `banner_status='pending_banner'` 광고 목록 + 승인/반려 UI (신규 탭) |
+| SMS 연동 (아톡비즈) | 높음 | API 문서 요청 필요 (1877-8280) |
+| GitHub Actions Secrets 등록 | 중간 | `TEST_USER_ID`, `TEST_USER_PW`, `TEST_SHOP_ID`, `TEST_SHOP_PW` 4개 |
 | GSC 가이드 페이지 URL 색인 수동 요청 3건 | 중간 | 대표님 GSC 직접 진행 |
+| 중앙 컨테이너 배너 슬롯 | 낮음 | Phase 5 — 계획 단계 |
 | 텔레그램 실제 ID 확정 | 낮음 | 현재 `@cocoalba` 플레이스홀더 |
 | 토스 비즈니스 웹훅 연동 | 낮음 | 계정 전환 후 |
-| GitHub Actions Secrets 등록 | 중간 | 설정 경로: repo → Settings → Security → Secrets |
 
 ---
 
@@ -163,6 +174,135 @@ AD_TIER_STANDARDS:
 
 ---
 
+## 🖼️ 배너 슬롯 시스템 아키텍처 (2026-04-11 확정)
+
+### Migration 06 — shops 테이블 추가 컬럼
+
+```sql
+banner_position    TEXT    -- 'sidebar_left' | 'sidebar_right' | 'inner_top' | 'inner_bottom'
+banner_image_url   TEXT    -- Supabase Storage 업로드 URL
+banner_media_type  TEXT    -- 'image' | 'video' (기본 'image')
+banner_status      TEXT    -- 'none' | 'pending_banner' | 'approved_banner' | 'rejected_banner'
+```
+
+### 배너 등록 가능 Tier
+
+```ts
+const BANNER_ELIGIBLE_TIERS = ['grand', 'premium', 'deluxe'];
+// 이하 tier(special/urgent/standard/p7 등)는 배너 등록 불가
+```
+
+### 배너 등록 플로우
+
+```
+업체회원 마이샵 OngoingAdsView
+  → isBannerEligible 체크 (tier: grand/premium/deluxe + banner_status='none')
+  → "배너 등록" 버튼 노출
+  → BannerUploadPanel (이미지 업로드 + 위치 선택)
+  → PATCH /api/ad/banner-upload (banner_image_url, banner_position, banner_status='pending_banner' 저장)
+  → 어드민 배너 슬롯 관리 탭에서 승인 → banner_status='approved_banner'
+  → BannerSidebar에서 approved_banner 상태의 광고만 노출
+```
+
+### 배너 노출 컴포넌트
+
+| 컴포넌트 | 위치 | 역할 |
+|---------|------|------|
+| `BannerSidebar` | LayoutWrapper 좌우 사이드 | approved_banner 광고 슬라이드 |
+| `InnerSidebarCarousel` | 메인 컨텐츠 내부 | 내부 배너 영역 (신규) |
+| `AdminAdRegistrationModal` | 어드민 광고등록 모달 | banner_position 자동입력 |
+
+> ⚠️ **어드민 배너 승인 탭 미구현** — `banner_status='pending_banner'` 광고가 쌓여도 현재 어드민에서 승인 UI 없음. 최우선 구현 필요.
+
+---
+
+## 🔞 성인 게이트 아키텍처 (2026-04-11 변경)
+
+### 게이트 통과 조건 (우선순위 순)
+
+```ts
+// 1. ADULT_GATE_DISABLED=true (brand-config)
+// 2. authUser.type === 'admin'
+// 3. authUser.isVerifiedPartnerVerified === true (로그인된 파트너)
+// 4. localStorage.adult_verified === 'true' (이전에 성인인증 완료)
+// 5. isBot (봇 감지)
+// 6. isOnExternalEntryPage (검색엔진/외부 직접 유입 페이지 — 첫 페이지만)
+// 7. isGuidePage (/coco/지역/업종 가이드 페이지)
+// 8. isAuthFlowPage (/auth/* 경로)
+// 9. isPublicPage (signup/find-id/find-pw/support/faq/inquiry)
+```
+
+### "나가기" 버튼 동작 변경 (2026-04-11)
+
+```ts
+// ❌ 이전 (잘못된 동작): adult_gate_skipped 저장 → 게이트 우회 허용
+// ✅ 현재: Google로 이탈 (접근 권한 부여 안 함)
+window.location.href = 'https://www.google.com';
+```
+
+### 외부 유입 면제 (검색엔진/외부 링크)
+
+```ts
+// LayoutWrapper.tsx useEffect
+const ref = document.referrer;
+const SEARCH_ENGINES = ['google.', 'naver.com', 'daum.net', 'bing.com', 'yahoo.com', 'zum.com'];
+const isFromSearch = ref !== '' && SEARCH_ENGINES.some(se => ref.includes(se));
+const isDirectExternal = ref !== '' && !ref.includes('cocoalba.kr') && !ref.includes('localhost');
+if (isFromSearch || isDirectExternal) {
+    // 첫 진입 페이지만 sessionStorage에 저장 (덮어쓰기 금지)
+    if (!sessionStorage.getItem('external_entry_page')) {
+        sessionStorage.setItem('external_entry_page', pathname);
+    }
+}
+// isOnExternalEntryPage: 현재 pathname === 저장된 진입 페이지일 때만 면제
+// 다른 페이지 이동 시 게이트 재표시
+```
+
+> ⚠️ `adult_gate_skipped` sessionStorage 키는 **완전 제거됨**. 코드에서 재사용 금지.
+
+---
+
+## ⚡ PATTERN-07 — product_type 이중 체크 필수 (2026-04-11 확정)
+
+> 이 규칙을 모르면 배너 버튼/Tier 라벨이 안 보이는 버그 재발. M-014급 중요도.
+
+### 문제 원인
+
+Supabase `shops` 테이블 원시 데이터(raw DB response)는 **snake_case** 반환:
+- `ad.product_type` ✅ (DB 원시값)
+- `ad.productType` ❌ (camelCase — 원시 DB 응답에는 없음, normalization 후에만 존재)
+
+`my-shop/page.tsx`의 `registeredAds`는 `supabase.from('shops').select('*')` 원시 결과 → `productType` undefined → Tier 판별 실패 → 배너 버튼 안 보임.
+
+### 표준 Tier 판별 체인
+
+```ts
+// ✅ 모든 Tier 판별 코드에서 이 체인 사용 (camelCase + snake_case 동시 체크)
+const tier = (
+    ad.productType ||
+    ad.tier ||
+    ad.product_type ||
+    ad.ad_type ||
+    ad.options?.product_type ||
+    ''
+).toLowerCase();
+```
+
+### 적용된 파일 목록 (2026-04-11 전수 수정)
+
+1. `src/app/my-shop/page.tsx`
+2. `src/app/my-shop/components/OngoingAdsView.tsx` (getTierLabel, isBannerEligible, tierText — 3곳)
+3. `src/app/my-shop/components/ClosedAdsView.tsx`
+4. `src/app/my-shop/components/ExtendAdModal.tsx`
+5. `src/app/my-shop/components/dashboard/BusinessDashboard.tsx`
+6. `src/app/my-shop/utils/normalization.ts` (productType, tier, ad_type 3줄)
+7. `src/app/admin/components/StandardsGuardView.tsx`
+8. `src/components/admin/ad/AdminAdManagement.tsx`
+
+> ⚠️ 신규 파일에서 `ad.productType`만 체크하는 코드 작성 시 반드시 `|| ad.product_type` 추가.
+
+---
+
 ## 🐛 현재 알려진 이슈
 
 | 코드 | 내용 | 상태 |
@@ -171,6 +311,8 @@ AD_TIER_STANDARDS:
 | - | GitHub Actions E2E — Secrets 미등록 시 auth 테스트 skip (conftest.py에서 graceful skip 처리) | 정상 |
 | - | Supabase 목업 96개 (`user_id LIKE '6fc68887%'`) 미삭제 → 프론트에서 isMockAd()로 필터링 중 | 삭제 예정 |
 | M-014 | profiles.role ↔ user_type 불일치 — DB 트리거가 user_type만 쓰고 role은 default('individual') 방치 → 업체회원이 개인회원으로 오처리. 2026-04-10 migration 05 + AuthProvider 로직으로 봉합. 헬스체크 #36~39 추가 | **완료(모니터링 중)** |
+| M-015 | `ad.productType` only 체크 → raw DB 응답에서 undefined → Tier 판별 실패 → 배너 버튼/라벨 안 보임. 2026-04-11 8개 파일 전수 수정 (PATTERN-07) | **완료** |
+| - | Admin 배너 슬롯 관리 탭 미구현 — `banner_status='pending_banner'` 광고 승인 UI 없음. pending 광고가 표시 안 됨 | **구현 필요 (최우선)** |
 
 ---
 
