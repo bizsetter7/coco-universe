@@ -27,9 +27,48 @@ const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Sh
         }
     };
 
+    // [Banner v1] 어드민 승인된 배너 이미지가 있으면 카드 전체를 이미지로 꽉 채움
+    const bannerImageUrl: string | null = (ad as any).banner_image_url || null;
+    const bannerStatus: string | null = (ad as any).banner_status || null;
+    const hasBannerImage = !!bannerImageUrl && bannerStatus === 'approved';
+    const isVideo = (ad as any).banner_media_type === 'video';
+
     const hasImage = !!ad.options?.mediaUrl;
     const badgeChar = ad.payType?.substring(0, 1) || (String(ad.pay) === '면접후결정' ? '면' : '시');
     const paySuffixes: string[] = ad.options?.paySuffixes || (ad.options as any)?.pay_suffixes || (ad as any).paySuffixes || [];
+
+    // [Banner v1] 배너 이미지 전체 채움 카드 — 클릭 시 광고상세 팝업 유지
+    if (hasBannerImage) {
+        return (
+            <div
+                onClick={() => onSelect(ad)}
+                className="group relative w-full h-[140px] bg-black rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all"
+            >
+                {isVideo ? (
+                    <video
+                        src={bannerImageUrl!}
+                        className="w-full h-full object-cover"
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                    />
+                ) : (
+                    <img
+                        src={bannerImageUrl!}
+                        alt={ad.name}
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                    />
+                )}
+                {/* 하단 업체명 오버레이 */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5">
+                    <p className="text-white text-[9px] font-black truncate drop-shadow-md">
+                        {ad.nickname || ad.name}
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

@@ -18,7 +18,8 @@ import {
     Lock,
     Eye,
     EyeOff,
-    CheckCircle
+    CheckCircle,
+    Image as ImageIcon,
 } from 'lucide-react';
 // ── 비밀번호 변경 모달 ─────────────────────────────────────────
 function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
@@ -156,7 +157,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'banner';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -167,6 +168,7 @@ interface AdminSidebarProps {
         business?: number;
         applications?: number;
         health?: number;
+        banner?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -267,6 +269,13 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'applications'}
                     badge={counts?.applications}
                     onClick={() => handleNav('applications')}
+                />
+                <NavItem
+                    icon={<ImageIcon size={20} className="text-purple-400" />}
+                    label="배너 슬롯 관리"
+                    active={activeTab === 'banner'}
+                    badge={counts?.banner}
+                    onClick={() => handleNav('banner')}
                 />
                 <NavItem
                     icon={<Megaphone size={20} />}
@@ -373,6 +382,13 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'business'}
                         badge={counts?.business}
                         onClick={() => handleNav('business')}
+                    />
+                    <NavItem
+                        icon={<ImageIcon size={20} className="text-purple-400" />}
+                        label="배너 슬롯 관리"
+                        active={activeTab === 'banner'}
+                        badge={counts?.banner}
+                        onClick={() => handleNav('banner')}
                     />
                     <NavItem
                         icon={<Megaphone size={20} />}

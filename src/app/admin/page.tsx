@@ -27,6 +27,7 @@ import { AdminPaymentManagement } from '@/components/admin/payment/AdminPaymentM
 import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
+import { AdminBannerManagement } from '@/components/admin/banner/AdminBannerManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
 import { JobDetailContent } from '@/components/jobs/JobDetailModal';
@@ -49,6 +50,7 @@ function AdminContent() {
     const [realUsers, setRealUsers] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
     const [pendingApplications, setPendingApplications] = useState(0);
+    const [pendingBannerCount, setPendingBannerCount] = useState(0);
     const [healthIssueCount, setHealthIssueCount] = useState(0);
     const [stats, setStats] = useState({
         totalRevenue: 124030000,
@@ -147,6 +149,13 @@ function AdminContent() {
                 .select('id', { count: 'exact', head: true })
                 .eq('status', 'pending');
             setPendingApplications(appCount || 0);
+
+            // 3-2. Fetch pending banner count
+            const { count: bannerCount } = await supabase
+                .from('shops')
+                .select('id', { count: 'exact', head: true })
+                .eq('banner_status', 'pending_banner');
+            setPendingBannerCount(bannerCount || 0);
 
             // 4. Fetch Messages
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
@@ -601,6 +610,14 @@ function AdminContent() {
             {activeTab === 'applications' && (
                 <AdminApplicationManagement fetchData={fetchData} />
             )}
+
+            {/* Tab: Banner Slot Management */}
+            {activeTab === 'banner' && (
+                <AdminBannerManagement
+                    onCountChange={(count) => setPendingBannerCount(count)}
+                />
+            )}
+
             {/* Tab 7: 시스템 설정 */}
             {activeTab === 'seo' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
