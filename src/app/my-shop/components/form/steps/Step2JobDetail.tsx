@@ -326,94 +326,84 @@ export const Step2JobDetail: React.FC<Step2Props> = ({
                             </div>
                         </div>
 
-                        {/* Sticky Toolbar */}
-                        <div id="editor-toolbar" className="sticky top-0 z-[60] p-0.5 md:p-1 border-2 border-b-0 rounded-t-2xl flex flex-col gap-1 bg-white border-gray-200 text-gray-900 shadow-sm">
-                            <div className="flex items-center flex-wrap gap-1 md:gap-1.5 p-1 pb-0">
-                                <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('bold'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('italic'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('underline'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
-                                </div>
-                                <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyLeft'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyCenter'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
-                                    <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyRight'); }} className={`p-1.5 md:p-2 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
-                                </div>
-
-                                {/* Media Upload Moved Here */}
-                                <label className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0 h-[34px] md:h-[38px] w-[34px] md:w-[38px] relativeoverflow-hidden" title="이미지 업로드">
-                                    {isUploading ? (
-                                        <div className="animate-spin text-blue-500"><svg className="w-5 h-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
-                                    ) : (
-                                        <ImageIcon size={18} />
-                                    )}
-                                    <input
-                                        type="file"
-                                        accept="image/*,image/gif"
-                                        className="hidden"
-                                        disabled={isUploading}
-                                        onChange={(e) => {
-                                            if (e.target.files?.[0]) {
-                                                insertImage(e.target.files[0]);
-                                            }
-                                        }}
-                                    />
-                                </label>
+                        {/* Sticky Toolbar — 단일 행 */}
+                        <div id="editor-toolbar" className="editor-toolbar sticky top-0 z-[60] px-2 py-1.5 border-2 border-b-0 rounded-t-2xl flex flex-row items-center flex-wrap gap-1 md:gap-1.5 bg-white border-gray-200 text-gray-900 shadow-sm">
+                            {/* 서식 */}
+                            <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('bold'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isBold ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Bold size={16} /></button>
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('italic'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isItalic ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Italic size={16} /></button>
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('underline'); }} className={`p-2 rounded hover:bg-white transition ${toolbarStatus.isUnderline ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><Underline size={16} /></button>
                             </div>
-
-                            <div className="flex items-center flex-wrap gap-1 md:gap-1.5">
-                                <div className="relative font-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('font'); }} className="h-8 min-w-[110px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
-                                        <span className="truncate">{FONT_DISPLAY_NAMES[toolbarStatus.currentFont] || toolbarStatus.currentFont}</span>
-                                        <ChevronDown size={14} className="shrink-0 text-gray-400" />
-                                    </button>
-                                    {showFontMenu && (
-                                        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[180px] py-1 overflow-hidden animate-in fade-in zoom-in duration-150">
-                                            {Object.entries(FONT_DISPLAY_NAMES).map(([id, name]) => (
-                                                <button key={id} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('fontName', id); setShowFontMenu(false); }} className="w-full px-3 py-2 text-left hover:bg-gray-100 text-[13px] font-bold" style={{ fontFamily: id }}>{name}</button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative size-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('fontSize'); }} className="h-8 min-w-[55px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
-                                        {toolbarStatus.currentFontSize.replace('px', '').replace('pt', '') || '16'}pt
-                                        <ChevronDown size={14} className="shrink-0 text-gray-400" />
-                                    </button>
-                                    {showFontSizeMenu && (
-                                        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[80px] py-1 animate-in fade-in zoom-in duration-150">
-                                            {FONT_SIZES.map(s => <button key={s} onMouseDown={(e) => { e.preventDefault(); applyPxFontSize(s); }} className="w-full px-3 py-2 text-left text-[12px] font-black hover:bg-gray-100">{s.replace('px', '')}</button>)}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative color-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('foreColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Text Color"><Type size={16} style={{ color: toolbarStatus.currentForeColor }} /></button>
-                                    {showForeColorMenu && (
-                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {TEXT_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('foreColor', c.value); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative highlight-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('hiliteColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="Highlight Color"><Palette size={16} style={{ backgroundColor: toolbarStatus.currentHiliteColor === 'transparent' ? 'transparent' : toolbarStatus.currentHiliteColor }} /></button>
-                                    {showHiliteColorMenu && (
-                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
-                                            {BG_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('hiliteColor', c.value); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative emoji-menu">
-                                    <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('emoji'); }} className="p-1.5 md:p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm"><Smile size={18} /></button>
-                                    {showEmojiMenu && (
-                                        <div className="absolute top-full right-0 mt-1 grid grid-cols-6 gap-2 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[210px] max-h-48 overflow-y-auto animate-in fade-in zoom-in duration-150">
-                                            {['😊', '😂', '😍', '👍', '🔥', '✨', '💖', '⭐', '🎈', '🍺', '🎁', '🍭', '🤣', '😉', '😜', '🤩', '🥳', '😭', '😱', '😡', '✅', '🌈', '💎', '💰', '👑'].map(emoji => (
-                                                <button key={emoji} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); insertEmoji(emoji); setShowEmojiMenu(false); }} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-xl transition active:scale-90">{emoji}</button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
+                            {/* 정렬 */}
+                            <div className="flex bg-gray-50 rounded-lg p-0.5 border border-gray-100">
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyLeft'); }} className={`p-1.5 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'left' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignLeft size={16} /></button>
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyCenter'); }} className={`p-1.5 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'center' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignCenter size={16} /></button>
+                                <button onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('justifyRight'); }} className={`p-1.5 rounded hover:bg-white transition ${toolbarStatus.textAlign === 'right' ? 'text-blue-500 bg-white shadow-sm' : 'text-gray-500'}`}><AlignRight size={16} /></button>
                             </div>
+                            {/* 폰트 */}
+                            <div className="relative font-menu">
+                                <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('font'); }} className="h-8 min-w-[100px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
+                                    <span className="truncate">{FONT_DISPLAY_NAMES[toolbarStatus.currentFont] || toolbarStatus.currentFont}</span>
+                                    <ChevronDown size={14} className="shrink-0 text-gray-400" />
+                                </button>
+                                {showFontMenu && (
+                                    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[180px] py-1 overflow-hidden animate-in fade-in zoom-in duration-150">
+                                        {Object.entries(FONT_DISPLAY_NAMES).map(([id, name]) => (
+                                            <button key={id} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('fontName', id); setShowFontMenu(false); }} className="w-full px-3 py-2 text-left hover:bg-gray-100 text-[13px] font-bold" style={{ fontFamily: id }}>{name}</button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            {/* 폰트 크기 */}
+                            <div className="relative size-menu">
+                                <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('fontSize'); }} className="h-8 min-w-[52px] text-[11px] font-black px-2 rounded-lg border border-gray-200 flex items-center justify-between gap-1 transition bg-white text-gray-900 shadow-sm hover:border-blue-300">
+                                    {toolbarStatus.currentFontSize.replace('px', '').replace('pt', '') || '16'}pt
+                                    <ChevronDown size={14} className="shrink-0 text-gray-400" />
+                                </button>
+                                {showFontSizeMenu && (
+                                    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[80px] py-1 animate-in fade-in zoom-in duration-150">
+                                        {FONT_SIZES.map(s => <button key={s} onMouseDown={(e) => { e.preventDefault(); applyPxFontSize(s); }} className="w-full px-3 py-2 text-left text-[12px] font-black hover:bg-gray-100">{s.replace('px', '')}</button>)}
+                                    </div>
+                                )}
+                            </div>
+                            {/* 텍스트 색상 */}
+                            <div className="relative color-menu">
+                                <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('foreColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="글자색"><Type size={16} style={{ color: toolbarStatus.currentForeColor }} /></button>
+                                {showForeColorMenu && (
+                                    <div className="absolute top-full left-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
+                                        {TEXT_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('foreColor', c.value); setShowForeColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                    </div>
+                                )}
+                            </div>
+                            {/* 형광펜 */}
+                            <div className="relative highlight-menu">
+                                <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('hiliteColor'); }} className="p-2 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm" title="형광펜"><Palette size={16} style={{ backgroundColor: toolbarStatus.currentHiliteColor === 'transparent' ? 'transparent' : toolbarStatus.currentHiliteColor }} /></button>
+                                {showHiliteColorMenu && (
+                                    <div className="absolute top-full left-0 mt-1 grid grid-cols-5 gap-1 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[160px] animate-in fade-in zoom-in duration-150">
+                                        {BG_COLORS.map((c: any) => <button key={c.value} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); execCmd('hiliteColor', c.value); setShowHiliteColorMenu(false); }} className="w-6 h-6 rounded-md border border-gray-100" style={{ backgroundColor: c.value }} title={c.label} />)}
+                                    </div>
+                                )}
+                            </div>
+                            {/* 이모지 */}
+                            <div className="relative emoji-menu">
+                                <button onMouseDown={(e) => { e.preventDefault(); toggleMenu('emoji'); }} className="p-1.5 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm"><Smile size={18} /></button>
+                                {showEmojiMenu && (
+                                    <div className="absolute top-full left-0 mt-1 grid grid-cols-6 gap-2 p-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] w-[210px] max-h-48 overflow-y-auto animate-in fade-in zoom-in duration-150">
+                                        {['😊', '😂', '😍', '👍', '🔥', '✨', '💖', '⭐', '🎈', '🍺', '🎁', '🍭', '🤣', '😉', '😜', '🤩', '🥳', '😭', '😱', '😡', '✅', '🌈', '💎', '💰', '👑'].map(emoji => (
+                                            <button key={emoji} onMouseDown={(e) => { e.preventDefault(); editorRef.current?.focus(); restoreSelection(); insertEmoji(emoji); setShowEmojiMenu(false); }} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-xl transition active:scale-90">{emoji}</button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            {/* 이미지 업로드 */}
+                            <label className="p-1.5 text-gray-500 hover:bg-gray-100 bg-white rounded-lg border border-gray-200 transition shadow-sm cursor-pointer flex items-center justify-center shrink-0" title="이미지 삽입">
+                                {isUploading ? (
+                                    <div className="animate-spin text-blue-500"><svg className="w-[18px] h-[18px]" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                                ) : (
+                                    <ImageIcon size={18} />
+                                )}
+                                <input type="file" accept="image/*,image/gif" className="hidden" disabled={isUploading} onChange={(e) => { if (e.target.files?.[0]) insertImage(e.target.files[0]); }} />
+                            </label>
                         </div>
 
                         <div
