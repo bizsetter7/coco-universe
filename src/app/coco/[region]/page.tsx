@@ -193,8 +193,10 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             "@type": "Place",
             "address": {
                 "@type": "PostalAddress",
+                "streetAddress": `${regionName} 일대`,
                 "addressLocality": regionName,
                 "addressRegion": "KR",
+                "postalCode": "00000",
                 "addressCountry": "KR"
             }
         },
