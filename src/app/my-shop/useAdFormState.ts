@@ -16,20 +16,31 @@ const getValid = (v1: any, v2: any, defaultValue: any = '') => {
 // 목적: 탭 전환/Suspense 리마운트/탭 Discard 등으로 컴포넌트가 재생성되어도 폼 복구
 const DRAFT_KEY = 'coco_ad_form_draft';
 
-const loadDraft = (): Record<string, any> | null => {
+// userId를 넘기면 다른 사용자의 draft는 자동 파기 (상호명 등 타 계정 데이터 오염 방지)
+const loadDraft = (userId?: string): Record<string, any> | null => {
     try {
         if (typeof window === 'undefined') return null;
         const raw = sessionStorage.getItem(DRAFT_KEY);
         if (!raw) return null;
         const d = JSON.parse(raw);
-        return d?._active ? d : null;
+        if (!d?._active) return null;
+        // userId가 있으면 draft 소유자 검증 — 다른 사용자 draft는 파기
+        if (userId && d._userId && d._userId !== userId) {
+            sessionStorage.removeItem(DRAFT_KEY);
+            return null;
+        }
+        return d;
     } catch { return null; }
 };
 
-const saveDraft = (data: Record<string, any>) => {
+const saveDraft = (data: Record<string, any>, userId?: string) => {
     try {
         if (typeof window === 'undefined') return;
-        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, _active: true }));
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+            ...data,
+            _active: true,
+            ...(userId ? { _userId: userId } : {}),
+        }));
     } catch {}
 };
 
@@ -40,9 +51,10 @@ const clearDraft = () => {
 };
 // ────────────────────────────────────────────────────────────────────────────
 
-export function useAdFormState() {
+export function useAdFormState(userId?: string) {
     // --- Lazy 초기화: 컴포넌트 리마운트 시 sessionStorage 드래프트로 폼 복원 ---
-    const draft = loadDraft();
+    // userId가 있으면 다른 사용자의 draft는 자동 파기
+    const draft = loadDraft(userId);
 
     // --- Form States ---
     const [shopName, setShopName] = useState(() => draft?.shopName || '');
@@ -292,7 +304,7 @@ export function useAdFormState() {
                 selectedIcon, iconPeriod,
                 selectedHighlighter, highlighterPeriod,
                 paySuffixes, borderOption, borderPeriod,
-            });
+            }, userId);
         }, 300);
         return () => { if (draftTimerRef.current) clearTimeout(draftTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps

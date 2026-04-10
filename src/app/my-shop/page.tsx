@@ -242,6 +242,10 @@ function MyShopContent() {
                     if (verified && (profile as any).business_name) {
                         formState.setShopName((profile as any).business_name);
                         setBizShopName((profile as any).business_name);
+                    } else {
+                        // 미인증 회원: sessionStorage draft에 남아있을 타 계정 상호명 초기화
+                        formState.setShopName('');
+                        setBizShopName('');
                     }
                     // 사업장 주소 로드
                     const addr = (profile as any).business_address || '';
@@ -356,8 +360,8 @@ function MyShopContent() {
     const [selectedAdForModal, setSelectedAdForModal] = useState<any>(null);
     const [selectedResumeForModal, setSelectedResumeForModal] = useState<any>(null);
 
-    // Form State (Hook)
-    const formState = useAdFormState();
+    // Form State (Hook) — userId 전달로 타 계정의 sessionStorage draft 오염 방지
+    const formState = useAdFormState(authUser?.id);
 
     useBodyScrollLock(!!selectedAdForModal || !!selectedResumeForModal || showDesignModal || showMobileMenu || showExampleModal);
     usePreventLeave(formState.isDirty && view === 'form');
