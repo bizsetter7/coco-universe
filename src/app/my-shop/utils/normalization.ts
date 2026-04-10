@@ -60,11 +60,14 @@ export const normalizeAd = (ad: any) => {
         addressDetail: getValid(opt.addressDetail, ad.work_address || ad.addressDetail, ''),
         work_address: getValid(opt.addressDetail, ad.work_address || ad.addressDetail, ''),
 
-        // 업종
-        category: getValid(ad.category || ad.industryMain, opt.category, '업종'),
-        industryMain: getValid(ad.category || ad.industryMain, opt.category, '업종'),
-        categorySub: getValid(ad.category_sub || ad.categorySub || ad.industrySub, opt.categorySub, ''),
-        industrySub: getValid(ad.category_sub || ad.categorySub || ad.industrySub, opt.categorySub, ''),
+        // 업종 — workType은 category_sub(세부업종)로 매핑 (SideAdCard Row2 우측에 표시됨)
+        category: getValid(ad.category || ad.industryMain, opt.category || opt.industryMain, '업종'),
+        industryMain: getValid(ad.category || ad.industryMain, opt.category || opt.industryMain, '업종'),
+        categorySub: getValid(ad.category_sub || ad.categorySub || ad.industrySub, opt.categorySub || opt.industrySub, ''),
+        industrySub: getValid(ad.category_sub || ad.categorySub || ad.industrySub, opt.categorySub || opt.industrySub, ''),
+        // workType — BannerSidebar SideAdCard/InnerSidebarCarousel CarouselCard에서 사용
+        workType: getValid(ad.work_type || ad.workType || ad.category_sub, opt.industrySub || opt.categorySub || opt.workType, ''),
+        work_type: getValid(ad.work_type || ad.workType || ad.category_sub, opt.industrySub || opt.categorySub || opt.workType, ''),
 
         // 급여
         payType: getValid(ad.pay_type || ad.payType, opt.payType, '시급'),
@@ -80,6 +83,19 @@ export const normalizeAd = (ad: any) => {
         deadline: ad.deadline || opt.deadline || '',
         status: ad.status || opt.status || '진행중',
         rejection_reason: ad.rejection_reason || opt.rejection_reason || '',
+
+        // region — BannerSidebar SideAdCard에서 ad.region으로 직접 사용
+        region: getValid(ad.region, opt.regionCity, ''),
+
+        // 미디어 URL — 카드 썸네일용 (banner_image_url과 별도)
+        mediaUrl: getValid(ad.media_url || ad.mediaUrl, opt.mediaUrl, ''),
+        media_url: getValid(ad.media_url || ad.mediaUrl, opt.mediaUrl, ''),
+
+        // 배너 슬롯 (migration 06 이후 반영)
+        banner_position: ad.banner_position || null,
+        banner_image_url: ad.banner_image_url || null,
+        banner_media_type: ad.banner_media_type || 'image',
+        banner_status: ad.banner_status || null,
 
         // 상품 및 디자인 옵션
         productType: ad.tier || ad.productType || opt.product_type || ad.ad_type || 'p1',

@@ -739,6 +739,11 @@ function MyShopContent() {
                     regionCity: formState.regionCity,
                     regionGu: formState.regionGu,
                     mediaUrl: formState.mediaUrl,
+                    // [스냅샷] 업종 정보 — normalizeAd workType 복원용
+                    shopName: formState.shopName,
+                    category: formState.industryMain,
+                    industrySub: cleanCategorySub,
+                    categorySub: cleanCategorySub,
                     // [지도 스냅샷] 관리자 팝업 지도 표시용 — RLS 없이 주소 조회 가능하도록 저장
                     businessAddress: bizAddress || (originalAd?.options as any)?.businessAddress || ''
                 }
@@ -755,7 +760,8 @@ function MyShopContent() {
                         'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
-                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url'
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url',
+                        'banner_position', 'banner_image_url', 'banner_media_type', 'banner_status',
                     ];
                     const dbPayload: any = {};
                     validColumns.forEach(col => {
@@ -799,7 +805,8 @@ function MyShopContent() {
                         'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
-                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url'
+                        'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url',
+                        'banner_position', 'banner_image_url', 'banner_media_type', 'banner_status',
                     ];
                     const dbPayload: any = {};
                     validColumns.forEach(col => {

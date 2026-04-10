@@ -11,11 +11,12 @@
  * - 이미지/GIF/영상(MP4) 지원
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { Shop } from '@/types/shop';
+import { normalizeAd } from '@/app/my-shop/utils/normalization';
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────────
 function shuffle<T>(arr: T[]): T[] {
@@ -141,16 +142,20 @@ export function InnerSidebarCarousel({ onAdSelect }: InnerSidebarCarouselProps) 
                     .limit(30);
 
                 if (data && data.length > 0) {
-                    // banner_position='inner' 또는 tier 기준으로 필터
+                    // banner_position='inner' 또는 tier 기준 필터
+                    // migration 06 이전: banner_position 컬럼 없음 → tier만으로 표시
+                    // migration 06 이후: banner_position='inner' + banner_status='approved'
                     const innerAds = data.filter((s: any) => {
                         const pos = s.banner_position;
                         const bStatus = s.banner_status;
-                        // migration 06 적용 전: tier 기준으로 모두 표시
-                        // migration 06 적용 후: banner_position='inner' + approved만
-                        if (pos === null || pos === undefined) return true;
+                        if (pos === null || pos === undefined) return true; // migration 06 이전 호환
                         return pos === 'inner' && (bStatus === 'approved' || bStatus === null);
                     });
-                    setAds(shuffle(innerAds));
+                    // normalizeAd로 camelCase/snake_case 불일치 완전 해소
+                    const normalized = (innerAds
+                        .map((s: any) => normalizeAd(s))
+                        .filter(Boolean) as unknown) as Shop[];
+                    setAds(shuffle(normalized));
                 }
             } catch (err) {
                 console.warn('[InnerSidebarCarousel] 광고 로드 실패:', err);

@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
             if (profileErr) {
                 // 컬럼 미존재 시 반드시 존재하는 최소 필드로 재시도
-                await supabaseAdmin.from('profiles').upsert({
+                const { error: fallbackErr } = await supabaseAdmin.from('profiles').upsert({
                     id: data.user.id,
                     username: finalUsername,
                     full_name: name || '',
@@ -126,9 +126,8 @@ export async function POST(req: NextRequest) {
                     role: finalRole,
                     user_type: finalRole,
                     points: 100,
-                }, { onConflict: 'id' }).catch((e: any) =>
-                    console.warn('[signup] profiles 기본 삽입 실패:', e?.message)
-                );
+                }, { onConflict: 'id' });
+                if (fallbackErr) console.warn('[signup] profiles 기본 삽입 실패:', fallbackErr.message);
             }
         }
 

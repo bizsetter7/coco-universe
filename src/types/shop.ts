@@ -38,12 +38,41 @@ export interface Shop {
         icons?: string[];
         mediaUrl?: string;
         paySuffixes?: string[];
+        pay_suffixes?: string[];
         icon?: number | string;
+        icon_period?: number;
         highlighter?: number | string;
+        highlighter_period?: number;
         keywords?: string[];
-        border?: 'none' | 'color' | 'glow';
+        border?: 'none' | 'color' | 'glow' | 'sparkle' | 'rainbow';
+        border_period?: number;
         effect?: 'neon' | 'none' | 'rainbow' | 'bounce' | 'disco' | 'flash';
         product_type?: string;
+        product_period?: number;
+        regionCity?: string;
+        regionGu?: string;
+        shopName?: string;
+        category?: string;
+        industrySub?: string;
+        categorySub?: string;
+        workType?: string;
+        managerName?: string;
+        managerPhone?: string;
+        payType?: string;
+        payAmount?: number;
+        editorHtml?: string;
+        content?: string;
+        deadline?: string;
+        status?: string;
+        ad_price?: number;
+        ageMin?: number;
+        ageMax?: number;
+        addressDetail?: string;
+        businessAddress?: string;
+        approved_at?: string;
+        edit_count?: number;
+        last_edit_month?: string;
+        [key: string]: any; // 확장 필드 허용 (DB 스냅샷 폴백용)
     };
     // [Added] Admin/Ad Management
     status?: 'pending' | 'approved' | 'rejected' | 'active' | 'expired';
@@ -83,4 +112,16 @@ export interface Shop {
     city?: string;
     district?: string;
     content?: string;
+    media_url?: string;     // DB root 컬럼 (snake_case)
+    mediaUrl?: string;      // options 스냅샷 / normalizeAd camelCase
+    manager_phone?: string; // DB root 컬럼
+    manager_name?: string;  // DB root 컬럼
+    pay_type?: string;      // DB root 컬럼
+    work_type?: string;     // DB root 컬럼 (= category_sub 동의어)
+    isMock?: boolean;       // 목업 광고 여부
+    // 배너 슬롯 (migration 06)
+    banner_position?: 'left' | 'right' | 'both' | 'inner' | null;
+    banner_image_url?: string | null;
+    banner_media_type?: 'image' | 'gif' | 'video';
+    banner_status?: 'pending_banner' | 'approved' | 'rejected' | null;
 }

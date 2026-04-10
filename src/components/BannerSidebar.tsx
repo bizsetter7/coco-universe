@@ -127,16 +127,45 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
     const grandAds = useMemo(() => {
         if (isMobile) return [];
-        // tier: 'grand'(샘플/altId) 또는 'p1'(실제 등록) 양쪽 지원 (2026-03-22)
-        const gr = allShops.filter(s => s.tier === 'grand' || s.tier === 'p1');
+        const isGrandTier = (s: Shop) => s.tier === 'grand' || s.tier === 'p1';
+        const gr = allShops.filter(isGrandTier);
+
+        // migration 06 이후: banner_position 기준 정확 배분
+        // migration 06 이전: banner_position 없음 → 인덱스 짝수=좌, 홀수=우 기존 방식 유지
+        const hasBannerPos = gr.some(s => (s as any).banner_position != null);
+        if (hasBannerPos) {
+            if (isLeft) return gr.filter(s => {
+                const pos = (s as any).banner_position;
+                return pos === 'left' || pos === 'both';
+            }).slice(0, 4);
+            return gr.filter(s => {
+                const pos = (s as any).banner_position;
+                return pos === 'right' || pos === 'both';
+            }).slice(0, 4);
+        }
+        // migration 06 이전 호환 — 기존 인덱스 방식
         if (isLeft) return [gr[0], gr[2]].filter(Boolean);
         return [gr[1], gr[3]].filter(Boolean);
     }, [allShops, isLeft, isMobile]);
 
     const premiumAds = useMemo(() => {
         if (isMobile) return [];
-        // tier: 'premium'(샘플/altId) 또는 'p2'(실제 등록) 양쪽 지원 (2026-03-22)
-        const pr = allShops.filter(s => s.tier === 'premium' || s.tier === 'p2' || s.is_premium);
+        const isPremiumTier = (s: Shop) => s.tier === 'premium' || s.tier === 'p2' || (s as any).is_premium;
+        const pr = allShops.filter(isPremiumTier);
+
+        // migration 06 이후: banner_position 기준
+        const hasBannerPos = pr.some(s => (s as any).banner_position != null);
+        if (hasBannerPos) {
+            if (isLeft) return pr.filter(s => {
+                const pos = (s as any).banner_position;
+                return pos === 'left' || pos === 'both';
+            }).slice(0, 4);
+            return pr.filter(s => {
+                const pos = (s as any).banner_position;
+                return pos === 'right' || pos === 'both';
+            }).slice(0, 4);
+        }
+        // migration 06 이전 호환
         if (isLeft) return pr.slice(0, 2);
         return pr.slice(2, 4);
     }, [allShops, isLeft, isMobile]);
