@@ -170,6 +170,7 @@ AD_TIER_STANDARDS:
 | - | 어드민 헬스체크 `admin_password_hash` 항목 → 권한 부족으로 확인 불가 (info 처리됨, 정상) | 오탐 확인 |
 | - | GitHub Actions E2E — Secrets 미등록 시 auth 테스트 skip (conftest.py에서 graceful skip 처리) | 정상 |
 | - | Supabase 목업 96개 (`user_id LIKE '6fc68887%'`) 미삭제 → 프론트에서 isMockAd()로 필터링 중 | 삭제 예정 |
+| M-014 | profiles.role ↔ user_type 불일치 — DB 트리거가 user_type만 쓰고 role은 default('individual') 방치 → 업체회원이 개인회원으로 오처리. 2026-04-10 migration 05 + AuthProvider 로직으로 봉합. 헬스체크 #36~39 추가 | **완료(모니터링 중)** |
 
 ---
 
@@ -177,7 +178,7 @@ AD_TIER_STANDARDS:
 
 | 테이블 | 역할 |
 |--------|------|
-| `profiles` | 회원 (user_type: individual/corporate/admin) |
+| `profiles` | 회원 프로필 (아래 ⚠️ role 매핑 규칙 필독) |
 | `shops` | 광고 공고 (status: pending/approved/rejected) |
 | `payments` | 결제 내역 (metadata.type: point_charge/jump_charge) |
 | `point_logs` | 포인트 변동 이력 |
@@ -185,6 +186,81 @@ AD_TIER_STANDARDS:
 | `resumes` | 이력서 |
 | `notifications` | 알림 |
 | `sos_logs` | SOS 알림 이력 |
+
+---
+
+## ⚠️ profiles 테이블 — role 매핑 규칙 (CRITICAL, 반드시 읽을 것)
+
+> 이 규칙을 모르면 업체회원이 개인회원으로 오처리됩니다. 2026-04-10 반복 발생한 이슈.
+
+### 컬럼 구조
+
+| 컬럼 | 실제 값 | 용도 |
+|------|---------|------|
+| `role` | `admin` / `corporate` / `employee` / `individual` | **AuthProvider가 읽는 기준 컬럼** |
+| `user_type` | `employee`(레거시 고정) / `corporate` / `admin` | 옛날 트리거가 쓰던 컬럼. 신규 계정은 role과 동일 |
+
+### 개인회원 role 값이 2가지인 이유
+
+- **`employee`** → 초창기 DB 트리거가 모든 개인회원에게 하드코딩한 레거시 값
+- **`individual`** → 현재 SignupPage/API가 전송하는 신규 표준 값
+- **둘 다 개인회원으로 처리해야 함**. `role === 'individual'`로만 체크하면 구형 회원 오탐!
+
+### AuthProvider의 역할 판별 로직 (2026-04-10 확정)
+
+```ts
+// ✅ 올바른 판별 — role 우선, user_type 보조
+const roleVal = profile?.role || '';
+const userTypeVal = profile?.user_type || '';
+const liveRole = (roleVal === 'admin' || roleVal === 'corporate')
+    ? roleVal                                          // role이 명시적 → 신뢰
+    : (userTypeVal === 'admin' || userTypeVal === 'corporate')
+        ? userTypeVal                                  // role이 employee/없음이고 user_type이 명확 → 보정
+        : roleVal || 'individual';                     // 나머지 → 개인회원
+
+// ❌ 절대 이렇게 쓰지 말 것
+profile?.role === 'individual'   // employee 타입 개인회원 누락
+profile?.user_type === 'corporate' // user_type='employee' 고정인 구형 계정 오인
+```
+
+### API/쿼리 작성 규칙
+
+```ts
+// 업체회원 조회: OR 조건 필수
+.or('role.eq.corporate,user_type.eq.corporate')
+
+// 개인회원 조회: NOT IN 방식 (employee + individual 둘 다 포함)
+.not('role', 'in', '("corporate","admin")')
+
+// ❌ 잘못된 패턴
+.eq('role', 'individual')   // employee 누락
+.eq('role', 'corporate')    // user_type 기반 구형 업체회원 누락
+```
+
+### Signup API 필수 규칙
+
+`/api/auth/signup/route.ts`에서 createUser 후 반드시 profiles upsert 직접 실행:
+- `role: finalRole` AND `user_type: finalRole` **둘 다 설정** (DB 트리거 미적용 환경 대응)
+- `username: email.split('@')[0]` 반드시 설정
+
+### 이상 감지
+
+시스템검증센터(헬스체크) 항목 `role_usertype_mismatch`, `username_empty`, `new_member_data_integrity`가
+**error/warning** 상태이면 즉시 아래 SQL 실행:
+
+```sql
+-- role 보정
+UPDATE public.profiles
+SET role = user_type
+WHERE user_type IN ('corporate', 'admin')
+  AND role NOT IN ('corporate', 'admin');
+
+-- username 보정
+UPDATE public.profiles p
+SET username = split_part(u.email, '@', 1)
+FROM auth.users u
+WHERE p.id = u.id AND (p.username IS NULL OR p.username = '');
+```
 
 ---
 

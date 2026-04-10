@@ -346,12 +346,13 @@ async function runHealthCheck(force = false): Promise<any> {
     }
 
     // ── 20. 최근 24h 가입자 중 포인트 0 (개인 회원 보너스 미적립 체크) ─────
+    // [주의] role 값은 'individual' 또는 'employee'(레거시) 둘 다 개인회원 — NOT IN('corporate','admin')으로 체크
     try {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { count, error } = await supabase
             .from('profiles').select('id', { count: 'exact', head: true })
             .gte('created_at', since)
-            .eq('role', 'individual') // 개인 회원만 포인트 적립 대상
+            .not('role', 'in', '("corporate","admin")') // 개인회원 계열 전체 (individual + employee)
             .eq('points', 0);
         if (error) throw error;
 
@@ -542,11 +543,12 @@ async function runHealthCheck(force = false): Promise<any> {
     }
 
     // ── 30. 사업자 미인증 업체회원 현황 ─────────────────────────
+    // [주의] role='corporate' OR user_type='corporate' 둘 다 업체회원으로 간주 (레거시 호환)
     try {
         const { count, error } = await supabase
             .from('profiles')
             .select('id', { count: 'exact', head: true })
-            .eq('role', 'corporate')
+            .or('role.eq.corporate,user_type.eq.corporate')
             .eq('business_verified', false);
         if (error) throw error;
         if (!count || count === 0) {
@@ -743,6 +745,124 @@ async function runHealthCheck(force = false): Promise<any> {
         }
     } catch (err: any) {
         components.autologin_security = { status: 'warning', message: `autoLogin 보안 검사 실패: ${err.message}` };
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // 회원 데이터 매핑 무결성 검사 (36~39)
+    // 실제 회원 피해 발생 전 데이터 불일치를 사전 감지
+    // [배경] 라이브 DB 트리거가 user_type만 설정하고 role을 default('individual')로 방치하는
+    //        이슈가 반복 발생함 → 업체회원이 개인회원으로 오인 → 공고등록/이력서/커뮤니티 오작동
+    // ════════════════════════════════════════════════════════════
+
+    // ── 36. role ↔ user_type 매핑 불일치 회원 ──────────────────
+    // user_type=corporate 인데 role이 corporate가 아닌 경우 → 업체회원이 개인회원으로 처리됨
+    try {
+        const svc = getServiceClient();
+        const { data: mismatchProfiles, error } = await svc
+            .from('profiles')
+            .select('id, username, role, user_type')
+            .eq('user_type', 'corporate')
+            .not('role', 'eq', 'corporate')
+            .limit(50);
+        if (error) throw error;
+
+        const count = mismatchProfiles?.length || 0;
+        if (count === 0) {
+            components.role_usertype_mismatch = {
+                status: 'healthy',
+                message: 'role ↔ user_type 매핑 불일치 없음 — 모든 업체회원 정상 분류'
+            };
+        } else {
+            const names = (mismatchProfiles || []).slice(0, 3).map(p => p.username || p.id.substring(0, 8)).join(', ');
+            components.role_usertype_mismatch = {
+                status: 'error',
+                message: `user_type=corporate인데 role이 다른 회원 ${count}명: [${names}${count > 3 ? ' 외' : ''}] — 즉시 SQL 보정 필요: UPDATE profiles SET role=user_type WHERE user_type='corporate' AND role!='corporate'`,
+                count
+            };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.role_usertype_mismatch = { status: 'warning', message: `role↔user_type 검사 실패: ${err.message}` };
+    }
+
+    // ── 37. username(로그인ID) 빈값 회원 ────────────────────────
+    // username이 비어있으면 관리자 화면 식별 불가 + 로그인 ID 표시 오류
+    try {
+        const svc = getServiceClient();
+        const { count, error } = await svc
+            .from('profiles')
+            .select('id', { count: 'exact', head: true })
+            .or('username.is.null,username.eq.');
+        if (error) throw error;
+
+        if (!count || count === 0) {
+            components.username_empty = { status: 'healthy', message: 'username(로그인ID) 빈값 회원 없음' };
+        } else {
+            components.username_empty = {
+                status: 'warning',
+                message: `username 미설정 회원 ${count}명 — DB 트리거 미적용 흔적. SQL 보정: UPDATE profiles p SET username=split_part(u.email,'@',1) FROM auth.users u WHERE p.id=u.id AND (p.username IS NULL OR p.username='')`,
+                count
+            };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.username_empty = { status: 'warning', message: `username 빈값 검사 실패: ${err.message}` };
+    }
+
+    // ── 38. 신규 회원 기본 데이터 완전성 (최근 48h) ──────────────
+    // role 빈값 또는 full_name+nickname 모두 비어있는 최근 가입자 → 가입 데이터 매핑 실패 징후
+    try {
+        const svc = getServiceClient();
+        const since48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+        const { data: recentProfiles, error } = await svc
+            .from('profiles')
+            .select('id, username, role, user_type, full_name, nickname, created_at')
+            .gte('created_at', since48h)
+            .limit(100);
+        if (error) throw error;
+
+        const broken = (recentProfiles || []).filter(p => {
+            const hasNoRole = !p.role || p.role === '';
+            const hasNoName = (!p.full_name || p.full_name === '') && (!p.nickname || p.nickname === '');
+            return hasNoRole || hasNoName;
+        });
+
+        if (broken.length === 0) {
+            components.new_member_data_integrity = {
+                status: 'healthy',
+                message: `최근 48h 신규 가입자 ${recentProfiles?.length || 0}명 — 기본 데이터 정상 매핑`
+            };
+        } else {
+            const names = broken.slice(0, 3).map(p => p.username || p.id.substring(0, 8)).join(', ');
+            components.new_member_data_integrity = {
+                status: 'error',
+                message: `최근 48h 신규 가입자 중 데이터 불완전 ${broken.length}명: [${names}] — role/이름 누락. 가입 API 또는 DB 트리거 점검 필요`,
+                count: broken.length
+            };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.new_member_data_integrity = { status: 'warning', message: `신규 회원 데이터 무결성 검사 실패: ${err.message}` };
+    }
+
+    // ── 39. migration 05 필수 컬럼 존재 확인 ────────────────────
+    // 탈퇴 기능, 중복가입 방지, 본인인증 CI 저장에 필요한 컬럼들
+    try {
+        const { error } = await supabase
+            .from('profiles')
+            .select('phone, gender, is_withdrawn, withdrawn_at, identity_ci, credit_balance, jump_balance')
+            .limit(1);
+        if (error) throw error;
+        components.migration_05_columns = {
+            status: 'healthy',
+            message: 'migration 05 컬럼 전체 존재 — 탈퇴/중복가입방지/CI 기능 정상'
+        };
+    } catch {
+        components.migration_05_columns = {
+            status: 'error',
+            message: 'migration 05 컬럼 미적용 — 탈퇴 시 오류 발생, 중복가입 방지 불가. Supabase SQL Editor에서 05_add_missing_profile_columns.sql 실행 필요'
+        };
+        overall = setWorst(overall, 'error');
     }
 
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
