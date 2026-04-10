@@ -37,8 +37,22 @@ export async function POST(req: NextRequest) {
             .eq('id', userId);
 
         if (profileError) {
-            console.error('[withdraw] profiles 익명화 실패:', profileError.message);
-            return NextResponse.json({ error: '회원 정보 처리 중 오류가 발생했습니다.' }, { status: 500 });
+            // 컬럼 미존재 시 (마이그레이션 05 미적용 환경) 최소 컬럼으로 재시도
+            const { error: fallbackError } = await supabaseAdmin
+                .from('profiles')
+                .update({
+                    full_name: null,
+                    nickname: '탈퇴회원',
+                    birth_date: null,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('id', userId);
+
+            if (fallbackError) {
+                console.error('[withdraw] profiles 익명화 실패 (fallback):', fallbackError.message);
+                return NextResponse.json({ error: '회원 정보 처리 중 오류가 발생했습니다.' }, { status: 500 });
+            }
+            console.warn('[withdraw] 일부 컬럼 미존재로 최소 익명화 처리 (migration 05 미적용):', profileError.message);
         }
 
         // 2. Supabase Auth 계정 삭제 (service role 필요)

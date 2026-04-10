@@ -361,10 +361,13 @@ export const SignupPage = () => {
         } catch (err: any) {
             const msg = err.message || '다시 시도해주세요.';
             const isAlreadyRegistered = msg.includes('이미 사용 중인 아이디') || msg.toLowerCase().includes('already registered');
+            const isDuplicateIdentity = msg.includes('동일한 회원정보로');
             if (isAlreadyRegistered) {
                 alert('이미 사용 중인 아이디입니다. 다른 아이디를 선택해주세요.');
                 if (role === 'individual') { setIId(''); setIIdChecked(false); }
                 else { setCId(''); setCIdChecked(false); }
+            } else if (isDuplicateIdentity) {
+                alert('동일한 회원정보로 이미 가입되어있습니다.\n기존 계정으로 로그인하거나 아이디찾기를 이용해주세요.');
             } else {
                 alert(`회원가입 실패: ${msg}`);
             }

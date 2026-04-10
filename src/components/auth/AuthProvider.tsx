@@ -88,9 +88,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     .eq('id', authUser.id)
                     .single();
 
+                // 신규 사용자 또는 다른 사용자 로그인 시 이전 프로필 이미지 캐시 완전 초기화
+                // cachedUserId 없음(= 처음 로그인 or 신규가입) 포함하여 항상 초기화
+                if (typeof window !== 'undefined') {
+                    const cachedUserId = localStorage.getItem('_auth_user_id');
+                    if (!cachedUserId || cachedUserId !== authUser.id) {
+                        localStorage.removeItem('personal_profile_image');
+                        localStorage.removeItem('business_profile_image');
+                    }
+                    localStorage.setItem('_auth_user_id', authUser.id);
+                }
+
                 if (profile || isMasterEmail) {
-                    const userType = (isMasterEmail || profile?.role === 'admin') ? 'admin' :
-                        (profile?.role === 'corporate' ? 'corporate' : 'individual');
+                    // [호환성] 라이브 DB 트리거는 user_type 컬럼에 역할을 쓰고 role은 기본값으로 방치
+                    // user_type 우선 → role fallback 순으로 읽어야 corporate 회원이 individual로 보이지 않음
+                    const liveRole = profile?.user_type || profile?.role || 'individual';
+                    const userType = (isMasterEmail || liveRole === 'admin') ? 'admin' :
+                        (liveRole === 'corporate' ? 'corporate' : 'individual');
 
                     let newUser: UserSession = {
                         type: userType as UserSession['type'],
@@ -100,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         credit: profile?.credit_balance || 0,
                         points: profile?.points || 0,
                         jump_balance: profile?.jump_balance || 0,
-                        isVerifiedPartnerVerified: profile ? (profile.role === 'corporate' ? !!profile.business_verified : !!profile.is_adult_verified) : false,
+                        isVerifiedPartnerVerified: profile ? (liveRole === 'corporate' ? !!profile.business_verified : !!profile.is_adult_verified) : false,
                         email: authUser.email
                     };
 
@@ -122,8 +136,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setIsLoggedIn(true);
                     setIsLoading(false);
                     return;
-                } else if (profileError) {
-                    console.warn('Profile single check error:', profileError);
+                } else {
+                    // profiles 행 미존재 (DB 트리거 미적용 등) — auth 메타데이터로 fallback 로그인 처리
+                    if (profileError) {
+                        console.warn('[AuthProvider] Profile query error:', profileError.message);
+                    }
+                    const meta = authUser.user_metadata || {};
+                    // user_metadata.role 에 가입 시 선택한 역할이 저장됨
+                    const metaRole = meta.role || meta.user_type || 'individual';
+                    const fallbackType = (metaRole === 'admin' || isMasterEmail) ? 'admin' :
+                        metaRole === 'corporate' ? 'corporate' : 'individual';
+                    const fallbackUser: UserSession = {
+                        type: fallbackType as UserSession['type'],
+                        id: authUser.id,
+                        name: meta.full_name || authUser.email?.split('@')[0] || '회원',
+                        nickname: meta.nickname || meta.full_name || '닉네임',
+                        credit: 0,
+                        points: 0,
+                        jump_balance: 0,
+                        isVerifiedPartnerVerified: false,
+                        email: authUser.email
+                    };
+                    setUser(fallbackUser);
+                    setIsLoggedIn(true);
+                    setIsLoading(false);
+                    return;
                 }
             } catch (err) {
                 console.warn('Real profile fetch failed, checking mock...', err);
@@ -237,6 +274,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem('favorites');
             localStorage.removeItem('favorites_timestamps');
             localStorage.removeItem('viewed_shops');
+            localStorage.removeItem('personal_profile_image');
+            localStorage.removeItem('business_profile_image');
+            localStorage.removeItem('_auth_user_id');
             document.cookie = 'coco_admin_mock=; path=/; max-age=0';
         }
 
@@ -312,6 +352,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     phone: metadata.phone,
                     birthdate: metadata.birthdate,
                     gender: metadata.gender,
+                    contact_email: metadata.contact_email,
+                    identity_ci: metadata.identity_ci,
                 }),
             });
             const json = await res.json();
