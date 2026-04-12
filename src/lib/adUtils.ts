@@ -76,6 +76,8 @@ export function enrichAdData(ad: any, userData: any[] = []): Shop {
         businessAddress: ad?.business_address || profile?.business_address || ad?.businessAddress || '',
         managerName: ad?.manager_name || profile?.full_name || ad?.managerName || '',
         managerPhone: ad?.manager_phone || profile?.phone || ad?.managerPhone || ad?.phone || '',
+        // 어드민 회원ID 표시용 — username 우선, 없으면 이메일 앞자리, 없으면 빈값
+        username: profile?.username || ad?.username || profile?.email?.split('@')[0] || '',
         isMock: !!ad.isMock || !!ad.isRecovered
     };
 }

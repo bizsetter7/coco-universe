@@ -230,7 +230,7 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
                                     ) : (
                                         <img
                                             src={ad.banner_image_url}
-                                            alt={ad.title || ad.shop_name || '배너'}
+                                            alt={ad.title || ad.name || '배너'}
                                             className="w-full h-full object-cover"
                                         />
                                     )}
