@@ -10,7 +10,7 @@ type FilterTab = 'all' | BannerStatus;
 
 interface BannerAd {
     id: number;
-    shop_name: string | null;
+    name: string | null;
     title: string | null;
     banner_image_url: string;
     banner_media_type: string | null;
@@ -85,7 +85,7 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
         try {
             const { data, error } = await supabase
                 .from('shops')
-                .select('id, shop_name, title, banner_image_url, banner_media_type, banner_status, banner_position, product_type, tier, created_at, user_id')
+                .select('id, name, title, banner_image_url, banner_media_type, banner_status, banner_position, product_type, tier, created_at, user_id')
                 .not('banner_image_url', 'is', null)
                 .not('banner_status', 'eq', 'none')
                 .order('created_at', { ascending: false });
@@ -247,7 +247,7 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
                                 <div className="p-3 flex flex-col gap-2 flex-1">
                                     <div>
                                         <p className="text-[12px] font-black text-slate-900 truncate leading-tight">
-                                            {ad.shop_name || ad.title || `ID ${ad.id}`}
+                                            {ad.name || ad.title || `ID ${ad.id}`}
                                         </p>
                                         <p className="text-[10px] text-slate-400 font-bold truncate mt-0.5">
                                             {ad.title || '제목 없음'}

@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
                 // role + user_type 둘 다 설정 (라이브 DB 트리거는 user_type만 쓰는 경우 대응)
                 role: finalRole,
                 user_type: finalRole,
-                points: 100, // 가입 축하 포인트
+                points: finalRole === 'individual' ? 100 : 0, // 가입 축하 포인트 — 개인회원만 지급
             };
             // migration 05 컬럼 (있으면 삽입, 없으면 fallback에서 제외)
             if (phone) profilePayload.phone = phone;
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
                     nickname: nickname || name || finalUsername,
                     role: finalRole,
                     user_type: finalRole,
-                    points: 100,
+                    points: finalRole === 'individual' ? 100 : 0,
                 }, { onConflict: 'id' });
                 if (fallbackErr) console.warn('[signup] profiles 기본 삽입 실패:', fallbackErr.message);
             }
