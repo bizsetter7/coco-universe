@@ -72,39 +72,49 @@ export async function POST(request: NextRequest) {
 
         // 2. 결제 내역 동기화 (status가 active일 때 입금확인 처리)
         if (status === 'active') {
-            const adPrice = Number(adData?.ad_price || adData?.adPrice || 0);
+            // [M-015 Fix] ad_price: shops 루트 컬럼 → options.ad_price → price 순 폴백
+            const adPrice = Number(
+                adData?.ad_price ||
+                adData?.adPrice ||
+                (adData?.options as any)?.ad_price ||
+                adData?.price ||
+                0
+            );
             const userId = adData?.user_id || adData?.ownerId;
 
-            // [Important] 기존 결제 내역(status='pending')이 있는지 확인 후 업데이트 또는 신규 삽입
+            // [M-015 Fix] shop_id는 payments 테이블에서 TEXT 타입 → String()으로 통일
             const { data: existingPayment } = await supabaseAdmin
                 .from('payments')
                 .select('id')
-                .eq('shop_id', Number(adId))
+                .eq('shop_id', String(adId))
                 .maybeSingle();
 
             if (existingPayment) {
                 // 기존 내역이 있으면 'completed'로 상태 업데이트 및 금액 최종 동기화
-                await supabaseAdmin
+                const { error: updatePayErr } = await supabaseAdmin
                     .from('payments')
-                    .update({ 
-                        status: 'completed', 
+                    .update({
+                        status: 'completed',
+                        type: 'AD',
                         amount: adPrice,
                         updated_at: nowIso,
                         description: `[시스템승인] ${adData?.name || '공고'} 결제 승인 완료`
                     })
                     .eq('id', existingPayment.id);
+                if (updatePayErr) console.error('[update-shop-status] 결제 업데이트 실패:', updatePayErr.message);
             } else if (userId) {
                 // 내역이 전혀 없으면 강제로 'completed' 내역 생성 (관리자 리스트 노출용)
                 const shopName = adData?.shopName || adData?.name || adData?.shop_name || '비즈니스 업체';
                 const adTitle = adData?.title || adData?.adTitle || '공고 내역';
                 
-                await supabaseAdmin.from('payments').insert([{
+                const { error: insertPayErr } = await supabaseAdmin.from('payments').insert([{
                     shop_id: String(adId),
                     user_id: userId,
                     amount: adPrice,
                     status: 'completed',
+                    type: 'AD',
                     method: 'bank_transfer',
-                    description: `[관리자강제승인] ${shopName} 결제 완료`,
+                    description: `[관리자승인] ${shopName} 결제 완료`,
                     created_at: nowIso,
                     updated_at: nowIso,
                     metadata: {
@@ -113,6 +123,7 @@ export async function POST(request: NextRequest) {
                         product_type: adData?.tier || adData?.product_type || 'p7'
                     }
                 }]);
+                if (insertPayErr) console.error('[update-shop-status] 결제 생성 실패:', insertPayErr.message);
             }
 
             // 3. 알림 쪽지 발송 (status === 'active')

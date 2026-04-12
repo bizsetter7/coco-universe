@@ -865,6 +865,54 @@ async function runHealthCheck(force = false): Promise<any> {
         overall = setWorst(overall, 'error');
     }
 
+    // ── 40. 승인 광고↔결제 연결 무결성 (M-020 재발 방지) ────────
+    // 최근 7일 내 active 전환된 광고 중 payments 레코드가 전혀 없는 건 카운트
+    // 0 = healthy, 1+ = warning (결제 생성 로직 실패 징후)
+    try {
+        const svc = getServiceClient();
+        const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+        // 최근 7일 내 active 전환된 공고 목록 (approved_at 기준)
+        const { data: recentActive, error: activeErr } = await svc
+            .from('shops')
+            .select('id')
+            .eq('status', 'active')
+            .gte('approved_at', since7d)
+            .limit(200);
+
+        if (activeErr) throw activeErr;
+
+        let missingPaymentCount = 0;
+        if (recentActive && recentActive.length > 0) {
+            const shopIds = recentActive.map(s => String(s.id));
+            // payments 테이블에서 해당 shop_id가 존재하는 건 조회
+            const { data: existingPays } = await svc
+                .from('payments')
+                .select('shop_id')
+                .in('shop_id', shopIds)
+                .eq('type', 'AD');
+
+            const paidIds = new Set((existingPays || []).map((p: any) => String(p.shop_id)));
+            missingPaymentCount = shopIds.filter(id => !paidIds.has(id)).length;
+        }
+
+        if (missingPaymentCount === 0) {
+            components.approved_ad_payment_integrity = {
+                status: 'healthy',
+                message: `최근 7일 승인 광고 ${recentActive?.length || 0}건 — 결제 레코드 모두 정상 연결`
+            };
+        } else {
+            components.approved_ad_payment_integrity = {
+                status: 'warning',
+                message: `최근 7일 승인 광고 중 결제 미연결 ${missingPaymentCount}건 — update-shop-status 결제 생성 로직 점검 필요 (M-020 재발 가능성)`,
+                count: missingPaymentCount
+            };
+            overall = setWorst(overall, 'warning');
+        }
+    } catch (err: any) {
+        components.approved_ad_payment_integrity = { status: 'warning', message: `승인-결제 무결성 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 
