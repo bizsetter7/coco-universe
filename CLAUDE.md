@@ -1,6 +1,6 @@
 # CLAUDE_P2.md — P2 코코알바 에이전트 핸드오버 가이드
 
-> **최종 업데이트**: 2026-04-11
+> **최종 업데이트**: 2026-04-13
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
@@ -312,6 +312,8 @@ const tier = (
 | - | Supabase 목업 96개 (`user_id LIKE '6fc68887%'`) 미삭제 → 프론트에서 isMockAd()로 필터링 중 | 삭제 예정 |
 | M-014 | profiles.role ↔ user_type 불일치 — DB 트리거가 user_type만 쓰고 role은 default('individual') 방치 → 업체회원이 개인회원으로 오처리. 2026-04-10 migration 05 + AuthProvider 로직으로 봉합. 헬스체크 #36~39 추가 | **완료(모니터링 중)** |
 | M-015 | `ad.productType` only 체크 → raw DB 응답에서 undefined → Tier 판별 실패 → 배너 버튼/라벨 안 보임. 2026-04-11 8개 파일 전수 수정 (PATTERN-07) | **완료** |
+| M-020 | payments 스키마 미확인 — type/updated_at 컬럼 없음, shop_id=bigint, pay_type=NULL insert → 결제내역 미생성. 2026-04-12 전수 수정 | **완료** |
+| M-022 | JUMP충전 승인 버튼이 `handlePaymentConfirm`으로 잘못 라우팅 → jump_balance 미지급. 2026-04-13 조건에 `metadata.type==='jump_charge'` 추가 | **완료** |
 | - | Admin 배너 슬롯 관리 탭 미구현 — `banner_status='pending_banner'` 광고 승인 UI 없음. pending 광고가 표시 안 됨 | **구현 필요 (최우선)** |
 
 ---
@@ -431,11 +433,26 @@ const tier = (
 | ~~`updated_at`~~ | — | — | **존재하지 않음** |
 
 **결제 흐름:**
-1. 공고등록 → `status:'pending'`, `pay_type:NULL` insert
+1. 공고등록 → `status:'pending'`, `pay_type:NULL` insert (my-shop/page.tsx)
 2. 어드민 승인 → 기존 레코드(shop_id 조회) UPDATE: `status:'completed'`, `pay_type:'AD'`
 3. 기존 없으면 → INSERT (shop_id=Number, pay_type='AD')
 
+**SOS/JUMP 충전 흐름 (PointShopView.tsx):**
+- SOS포인트 충전 → `pay_type:NULL`, `metadata.type:'point_charge'`, `metadata.points:N`
+- JUMP충전 → `pay_type:NULL`, `metadata.type:'jump_charge'`, `metadata.count:N`
+- 어드민 승인 시 `handlePointGrant` 호출 → `grant-balance` API로 잔액 지급
+
 **어드민 조회:** anon client RLS 막힘 → `/api/admin/get-payments` (service role) 사용
+
+**AdminPaymentManagement 승인 버튼 라우팅 규칙 (M-022):**
+```ts
+// 포인트/점프 지급 라우팅 — 반드시 3가지 조건 모두 포함
+(pay.pay_type === 'JUMP'
+  || pay.metadata?.type === 'point_charge'   // SOS포인트 충전
+  || pay.metadata?.type === 'jump_charge')   // 점프 충전 ← 누락 시 광고승인으로 잘못 분기
+  ? handlePointGrant(...)
+  : handlePaymentConfirm(...)                // 광고 승인(AD/연장 등)
+```
 
 ---
 
@@ -538,7 +555,31 @@ const tier = (
 | `pay_amount` | numeric | | 희망 급여 |
 | `contact_method` | text | | |
 | `contact_value` | text | | |
-| `created_at/updated_at` | timestamptz | | |
+| `created_at` | timestamptz | | |
+| `updated_at` | timestamptz | | **컬럼 존재함** (저장 API에서 UPDATE 시 제외 중 — 실제로는 존재) |
+
+> `/api/resumes/save/route.ts` UPDATE 시 `updated_at` 제외 처리 중. 필요 시 추가 가능.
+
+---
+
+### 📋 community_posts
+> ⚠️ **이 테이블은 제공된 CSV 스키마 목록에 미포함.** 실 DB에는 존재하며 기능 정상 동작 중.
+> 아래 컬럼은 `/api/community/post/route.ts` 코드 기준으로 추출한 것임. 변경 전 Supabase Editor에서 재확인 필수.
+
+| 컬럼 | 타입 추정 | 비고 |
+|------|---------|------|
+| `id` | uuid/bigint | PK |
+| `author_id` | uuid/text | 작성자 profiles.id |
+| `author` | text | 닉네임 우선 (실명 차단) |
+| `author_name` | text | **항상 '익명' 고정** (서버에서 강제) |
+| `author_nickname` | text | |
+| `category` | text | |
+| `title` | text | |
+| `content` | text | |
+| `password` | text | 비밀글 비밀번호 |
+| `is_secret` | boolean | |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | PATCH 시 사용 |
 
 ---
 
