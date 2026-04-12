@@ -3,7 +3,7 @@ import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { getHighlighterStyle } from '@/utils/highlighter';
-import { cleanShopTitle } from '@/utils/shopUtils';
+import { cleanShopTitle, slugify } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
 import { useMobile } from '@/hooks/useMobile';
 
@@ -68,7 +68,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
 
     return (
         <a
-            href={`/shop/${shop.id}`}
+            href={`/coco/${slugify(shop.region)}/${shop.id}`}
             onClick={(e) => {
                 if (onClick) {
                     e.preventDefault();

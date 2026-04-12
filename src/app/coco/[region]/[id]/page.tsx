@@ -40,6 +40,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 images: [{ url: 'https://www.cocoalba.kr/og-image.jpg', width: 1200, height: 630, alt: '코코알바' }],
                 type: 'website',
             },
+            alternates: {
+                canonical: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}`,
+            },
         };
     }
 
@@ -97,6 +100,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 },
             ],
             type: 'website',
+        },
+        alternates: {
+            canonical: `https://www.cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`,
         },
         keywords: [shop.name || '', ...shadowRegionData.keywords, '여성알바', '고수익알바', '당일지급', '밤알바', '텐프로'],
     };

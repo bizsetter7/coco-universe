@@ -19,7 +19,15 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/api/', '/admin/', '/my-shop/dashboard/'],
+            disallow: [
+                '/api/',
+                '/admin/',
+                '/my-shop/dashboard/',
+                '/static/media/',
+                '/_next/static/', // Next.js 내부 정적 자산 404 방지
+                '/fonts/',         // 폰트 파일 해시 변경 대응
+                '/shop/',          // 레거시 URL 크롤링 중복 방지 (리다이렉트 처리됨)
+            ],
         },
         sitemap: `${siteUrl}/sitemap.xml`,
     };

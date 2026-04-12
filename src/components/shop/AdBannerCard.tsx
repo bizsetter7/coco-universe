@@ -3,11 +3,12 @@ import { Shop } from '@/types/shop';
 import { useMobile } from '@/hooks/useMobile';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
-import { cleanShopTitle } from '@/utils/shopUtils';
+import { cleanShopTitle, slugify } from '@/utils/shopUtils';
 
 interface AdBannerCardProps {
     shop: Shop;
     tierId?: string; // 섹션 기준 등급 (grand | premium) — AD_TIER_STANDARDS 동기화용
+    onClick?: (e: React.MouseEvent) => void;
 }
 
 /**
@@ -31,7 +32,7 @@ const getBorderClass = (opt?: string, period?: number): string => {
     }
 };
 
-export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => {
+export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardProps) => {
     const isMobile = useMobile();
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
     const [imgError, setImgError] = React.useState(false);
@@ -51,7 +52,15 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
     };
 
     return (
-        <div className={`
+        <a 
+            href={`/coco/${slugify(shop.region)}/${shop.id}`}
+            onClick={(e) => {
+                if (onClick) {
+                    e.preventDefault();
+                    onClick(e);
+                }
+            }}
+            className={`
             h-full flex flex-col group relative rounded-2xl cursor-pointer transition-[transform,box-shadow] duration-200
             ${!isMobile ? 'hover:scale-[1.02] active:scale-95' : 'active:scale-95'}
             bg-white overflow-hidden border border-gray-200 shadow-md shadow-gray-200/50 pb-2
@@ -145,7 +154,7 @@ export const AdBannerCard = React.memo(({ shop, tierId }: AdBannerCardProps) => 
                     </div>
                 )}
             </div>
-        </div>
+        </a>
     );
 });
 

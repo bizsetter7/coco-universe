@@ -6,10 +6,13 @@ import CommunityContent from './CommunityContent';
 export const metadata: Metadata = {
     title: '커뮤니티 & 후기 - 코코알바 (룸알바·노래방알바·유흥알바·고소득 여성알바 꿀팁)',
     description: '코코알바 커뮤니티 그녀들의수다. 고수익 여성알바, 유흥알바, 노래방알바 등의 생생한 후기와 밤알바 정보를 공유하세요.',
+    alternates: {
+        canonical: 'https://www.cocoalba.kr/community',
+    },
     openGraph: {
         title: '커뮤니티 & 후기 - 코코알바',
         description: '언니들의 솔직한 알바 후기와 꿀팁, 고민상담. 익명 보장, 100% 리얼 후기.',
-        url: 'https://cocoalba.kr/community',
+        url: 'https://www.cocoalba.kr/community',
         siteName: '코코알바',
         type: 'website',
     },

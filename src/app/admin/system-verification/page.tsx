@@ -6,6 +6,7 @@ import { Shop } from '@/types/shop';
 import {
     AlertTriangle, CheckCircle, RefreshCcw, ExternalLink, Shield
 } from 'lucide-react';
+import { slugify } from '@/utils/shopUtils';
 import { HealthDashboard } from '@/components/admin/HealthDashboard';
 import { StandardsGuardView } from '@/app/admin/components/StandardsGuardView';
 
@@ -120,7 +121,7 @@ export default function SystemVerificationPage() {
                                                     <div className={`text-[10px] font-mono font-bold ${isIssue ? 'text-red-500' : 'text-gray-400'}`}>Length: {title?.length || 0} / 26</div>
                                                 </td>
                                                 <td className="p-3">
-                                                    <a href={`/shop/${shop.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition">
+                                                    <a href={`/coco/${slugify(shop.region)}/${shop.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition">
                                                         <ExternalLink size={14} /> 확인
                                                     </a>
                                                 </td>

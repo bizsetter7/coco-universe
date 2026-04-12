@@ -62,7 +62,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase,
     alternates: {
-      canonical: '/',
     },
     title,
     description,

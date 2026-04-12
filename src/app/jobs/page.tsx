@@ -13,10 +13,13 @@ export const metadata: Metadata = {
     title: '업종별 채용 - 룸알바·노래방알바·노래빠알바·유흥알바 1위 코코알바',
     description: '룸알바, 노래방알바(노래빠알바), 노래주점, 텐프로, 바(Bar) 등 업종별 여성알바 정보. 전국 당일지급·숙식제공 검증 업체만 모았습니다.',
     keywords: ['노래빠알바', '노래방알바', '노래주점알바', '룸알바', '유흥알바', '밤알바', '텐프로알바', '여성알바', '고소득알바', '당일지급알바', '업종별알바'],
+    alternates: {
+        canonical: 'https://www.cocoalba.kr/jobs',
+    },
     openGraph: {
         title: '룸알바·노래방알바·노래빠알바 1위 - 코코알바',
         description: '룸알바, 노래방알바(노래빠), 노래주점, 텐프로 업종별 여성알바. 당일지급·숙식제공 보장.',
-        url: 'https://cocoalba.kr/jobs',
+        url: 'https://www.cocoalba.kr/jobs',
         siteName: '코코알바',
         images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: '코코알바 업종별 채용' }],
         type: 'website',
