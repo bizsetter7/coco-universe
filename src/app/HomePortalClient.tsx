@@ -14,7 +14,7 @@ import { supabase } from '@/lib/supabase';
 const LoginPage = dynamic(() => import('@/components/auth/LoginPage').then(m => ({ default: m.LoginPage })));
 const SignupPage = dynamic(() => import('@/components/auth/SignupPage').then(m => ({ default: m.SignupPage })));
 const FindAccountPage = dynamic(() => import('@/components/auth/FindAccountPage').then(m => ({ default: m.FindAccountPage })));
-const CustomerCenterContent = dynamic(() => import('@/app/customer-center/page').then(m => ({ default: m.CustomerCenterContent })));
+const CustomerCenterContent = dynamic(() => import('@/app/customer-center/CustomerCenterClient').then(m => ({ default: m.CustomerCenterContent })));
 
 export default function HomePortalClient() {
   const router = useRouter();
