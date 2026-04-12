@@ -889,8 +889,7 @@ async function runHealthCheck(force = false): Promise<any> {
             const { data: existingPays } = await svc
                 .from('payments')
                 .select('shop_id')
-                .in('shop_id', shopIds)
-                .eq('type', 'AD');
+                .in('shop_id', shopIds); // pay_type 필터 없음 — 등록 시 NULL로 생성됨
 
             const paidIds = new Set((existingPays || []).map((p: any) => String(p.shop_id)));
             missingPaymentCount = shopIds.filter(id => !paidIds.has(id)).length;

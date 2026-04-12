@@ -20,7 +20,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
     const filteredPayments = useMemo(() => {
         return payments.filter(pay => {
             const matchesStatus = statusFilter === 'all' || pay.status === statusFilter;
-            const matchesType = typeFilter === 'all' || pay.type === typeFilter;
+            const matchesType = typeFilter === 'all' || pay.pay_type === typeFilter;
             
             const searchLower = searchTerm.toLowerCase();
             const matchesSearch = !searchTerm || 
@@ -77,7 +77,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
             const now = new Date().toISOString();
             const { error: payError } = await supabase
                 .from('payments')
-                .update({ status: 'completed', updated_at: now })
+                .update({ status: 'completed' }) // payments 테이블에 updated_at 컬럼 없음
                 .eq('id', paymentId);
             if (payError) throw payError;
 
@@ -187,11 +187,11 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                         <td className="px-4 py-4">
                                             <div className="flex items-center gap-2">
                                                 <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
-                                                    pay.type === 'SOS' ? 'bg-orange-100 text-orange-600' :
-                                                    pay.type === 'JUMP' ? 'bg-purple-100 text-purple-600' :
+                                                    pay.pay_type === 'SOS' ? 'bg-orange-100 text-orange-600' :
+                                                    pay.pay_type === 'JUMP' ? 'bg-purple-100 text-purple-600' :
                                                     'bg-blue-100 text-blue-600'
                                                 }`}>
-                                                    {pay.type === 'SOS' ? <Zap size={13} /> : pay.type === 'JUMP' ? <Zap size={13} /> : <FileText size={13} />}
+                                                    {pay.pay_type === 'SOS' ? <Zap size={13} /> : pay.pay_type === 'JUMP' ? <Zap size={13} /> : <FileText size={13} />}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div
@@ -208,7 +208,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                         {pay.metadata?.adTitle || pay.metadata?.reason || pay.description || '시스템 결제'}
                                                     </div>
                                                     <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                                                        <span className="text-blue-500 font-black uppercase">{pay.type}</span> • No.{pay.shop_id || '—'}
+                                                        <span className="text-blue-500 font-black uppercase">{pay.pay_type}</span> • No.{pay.shop_id || '—'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -249,19 +249,17 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                 {' '}
                                                 {new Date(pay.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                             </div>
-                                            {pay.status === 'completed' && pay.updated_at && (
+                                            {pay.status === 'completed' && (
                                                 <div className="text-[10px] text-green-600 font-bold flex items-center gap-1 whitespace-nowrap mt-0.5">
                                                     <CheckCircle2 size={9} />
-                                                    승인 {new Date(pay.updated_at).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
-                                                    {' '}
-                                                    {new Date(pay.updated_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                    승인완료
                                                 </div>
                                             )}
                                         </td>
                                         <td className="px-4 py-4 text-right">
                                             {pay.status !== 'completed' && (
                                                 <button
-                                                    onClick={() => (pay.type === 'JUMP' || pay.metadata?.type === 'point_charge') ? handlePointGrant(pay.id, pay.user_id, pay.metadata) : handlePaymentConfirm(pay.id, pay.shop_id)}
+                                                    onClick={() => (pay.pay_type === 'JUMP' || pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') ? handlePointGrant(pay.id, pay.user_id, pay.metadata) : handlePaymentConfirm(pay.id, pay.shop_id)}
                                                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100"
                                                 >
                                                     승인 실행

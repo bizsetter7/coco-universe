@@ -5,6 +5,20 @@ import { requireAdmin } from '@/lib/requireAdmin';
 /**
  * [Admin API] /api/admin/update-shop-status
  * 공고 승인/반려 상태 변경 및 결제 내역 동기화 (service_role 사용으로 RLS 우회)
+ *
+ * ── payments 테이블 실제 스키마 (2026-04-12 확인) ──────────────────
+ * id: bigint NOT NULL
+ * created_at: timestamptz NOT NULL
+ * user_id: text
+ * shop_id: bigint   ← TEXT 아님! Number()로 통일
+ * amount: integer
+ * method: text
+ * status: text
+ * description: text
+ * metadata: jsonb
+ * pay_type: text    ← 'type' 컬럼 없음! pay_type 사용
+ * (updated_at 컬럼 없음)
+ * ──────────────────────────────────────────────────────────────────
  */
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,14 +47,13 @@ export async function POST(request: NextRequest) {
             updateData.approved_at = nowIso;
         } else if (status === 'rejected') {
             updateData.rejection_reason = rejectionReason;
-            
-            // 반려 히스토리 추가를 위해 현재 데이터 조회
+
             const { data: currentShop } = await supabaseAdmin
                 .from('shops')
                 .select('options')
-                .eq('id', String(adId))
+                .eq('id', Number(adId))
                 .single();
-            
+
             const currentOptions = currentShop?.options || {};
             const currentHistory = (currentOptions as any).rejection_history || [];
             const newHistoryItem = {
@@ -48,31 +61,29 @@ export async function POST(request: NextRequest) {
                 date: nowIso,
                 index: currentHistory.length + 1
             };
-            
+
             updateData.options = {
                 ...currentOptions,
                 rejection_history: [...currentHistory, newHistoryItem]
             };
         }
 
-        // 1. Shops 테이블 업데이트 (int8 ID → Number로 매칭)
-        // [Strict Update] 업데이트 건수를 명확히 체크하여 0건일 경우 에러 발생 (RLS/ID 불일치 감지)
+        // 1. Shops 테이블 업데이트
         const { error: shopError, count } = await supabaseAdmin
             .from('shops')
             .update(updateData, { count: 'exact' })
             .eq('id', Number(adId));
 
         if (shopError) throw shopError;
-        
-        // 중요: 업데이트된 행이 0개라면 ID 매칭 실패 또는 권한(Service Role Key) 누락 가능성
+
         if (count === 0) {
             const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
             throw new Error(`DB 업데이트 실패: 대상 공고(ID: ${adId})를 찾을 수 없습니다. ${!hasServiceKey ? "(서버 Service Key 누락 의심)" : "(ID 불일치 의심)"}`);
         }
 
-        // 2. 결제 내역 동기화 (status가 active일 때 입금확인 처리)
+        // 2. 결제 내역 동기화 (status === 'active' 승인 시)
         if (status === 'active') {
-            // [M-015 Fix] ad_price: shops 루트 컬럼 → options.ad_price → price 순 폴백
+            // ad_price: shops 루트 컬럼 → options.ad_price → price 순 폴백
             const adPrice = Number(
                 adData?.ad_price ||
                 adData?.adPrice ||
@@ -80,54 +91,71 @@ export async function POST(request: NextRequest) {
                 adData?.price ||
                 0
             );
-            const userId = adData?.user_id || adData?.ownerId;
 
-            // [M-015 Fix] shop_id는 payments 테이블에서 TEXT 타입 → String()으로 통일
-            const { data: existingPayment } = await supabaseAdmin
+            // userId: adData에 없으면 DB에서 직접 조회 (null silent skip 방지)
+            let userId: string | undefined = adData?.user_id || adData?.ownerId;
+            if (!userId) {
+                const { data: shopRow } = await supabaseAdmin
+                    .from('shops')
+                    .select('user_id')
+                    .eq('id', Number(adId))
+                    .single();
+                userId = shopRow?.user_id;
+                if (!userId) {
+                    console.error(`[update-shop-status] ⚠️ shop(${adId}) user_id 없음 — 결제 레코드 생성 불가`);
+                }
+            }
+
+            // 기존 결제 레코드 확인
+            // shop_id = bigint. pay_type 필터 제거 — 공고등록 시 pay_type=NULL로 생성되므로
+            // 'AD'로 필터하면 기존 레코드를 못 찾아 중복 insert 발생
+            const { data: existingRows, error: existingErr } = await supabaseAdmin
                 .from('payments')
                 .select('id')
-                .eq('shop_id', String(adId))
-                .maybeSingle();
+                .eq('shop_id', Number(adId))
+                .limit(1);
+            if (existingErr) console.error('[update-shop-status] 결제 조회 실패:', existingErr.message);
+            const existingPayment = existingRows?.[0] || null;
 
             if (existingPayment) {
-                // 기존 내역이 있으면 'completed'로 상태 업데이트 및 금액 최종 동기화
+                // 기존 내역 → status + 금액 업데이트 (updated_at 컬럼 없음)
                 const { error: updatePayErr } = await supabaseAdmin
                     .from('payments')
                     .update({
                         status: 'completed',
-                        type: 'AD',
+                        pay_type: 'AD',
                         amount: adPrice,
-                        updated_at: nowIso,
                         description: `[시스템승인] ${adData?.name || '공고'} 결제 승인 완료`
                     })
                     .eq('id', existingPayment.id);
                 if (updatePayErr) console.error('[update-shop-status] 결제 업데이트 실패:', updatePayErr.message);
+                else console.log(`[update-shop-status] 결제 업데이트 완료 (id: ${existingPayment.id})`);
             } else if (userId) {
-                // 내역이 전혀 없으면 강제로 'completed' 내역 생성 (관리자 리스트 노출용)
+                // 결제 레코드 없음 → 신규 생성
                 const shopName = adData?.shopName || adData?.name || adData?.shop_name || '비즈니스 업체';
                 const adTitle = adData?.title || adData?.adTitle || '공고 내역';
-                
+
                 const { error: insertPayErr } = await supabaseAdmin.from('payments').insert([{
-                    shop_id: String(adId),
-                    user_id: userId,
-                    amount: adPrice,
+                    shop_id: Number(adId),   // bigint
+                    user_id: userId,          // text
+                    amount: adPrice,          // integer
                     status: 'completed',
-                    type: 'AD',
+                    pay_type: 'AD',           // pay_type (type 컬럼 없음)
                     method: 'bank_transfer',
                     description: `[관리자승인] ${shopName} 결제 완료`,
                     created_at: nowIso,
-                    updated_at: nowIso,
                     metadata: {
-                        shopName: shopName,
-                        adTitle: adTitle,
+                        shopName,
+                        adTitle,
                         product_type: adData?.tier || adData?.product_type || 'p7'
                     }
                 }]);
                 if (insertPayErr) console.error('[update-shop-status] 결제 생성 실패:', insertPayErr.message);
+                else console.log(`[update-shop-status] 결제 생성 완료 (shop: ${adId}, user: ${userId})`);
             }
 
-            // 3. 알림 쪽지 발송 (status === 'active')
-            const targetUserId = adData?.user_id || adData?.ownerId;
+            // 3. 알림 쪽지 발송
+            const targetUserId = userId || adData?.user_id || adData?.ownerId;
             if (targetUserId) {
                 const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetUserId);
                 if (isUuid) {
@@ -135,7 +163,7 @@ export async function POST(request: NextRequest) {
                         user_id: targetUserId,
                         type: 'AD_APPROVED',
                         title: '광고가 승인되었습니다 ✅',
-                        message: `'${adData.title || adData.name || '공고'}'가 심사를 통과하여 정상 게재 중입니다.`,
+                        message: `'${adData?.title || adData?.name || '공고'}'가 심사를 통과하여 정상 게재 중입니다.`,
                         read: false,
                         link: '/my-shop?view=dashboard',
                         created_at: nowIso,

@@ -316,18 +316,243 @@ const tier = (
 
 ---
 
-## 🗄️ DB 주요 테이블
+## 🗄️ DB 실제 스키마 전체 (2026-04-12 라이브 DB 직접 확인 — 절대 기준)
 
-| 테이블 | 역할 |
-|--------|------|
-| `profiles` | 회원 프로필 (아래 ⚠️ role 매핑 규칙 필독) |
-| `shops` | 광고 공고 (status: pending/approved/rejected) |
-| `payments` | 결제 내역 (metadata.type: point_charge/jump_charge) |
-| `point_logs` | 포인트 변동 이력 |
-| `applications` | 지원 내역 |
-| `resumes` | 이력서 |
-| `notifications` | 알림 |
-| `sos_logs` | SOS 알림 이력 |
+> ⚠️ **이 섹션이 유일한 진실의 원천(Single Source of Truth).** migration 파일은 구버전이라 신뢰 금지.
+> 코드 작성 전 반드시 여기서 컬럼 타입/유무 확인. 모르면 먼저 SQL로 확인:
+> ```sql
+> SELECT column_name, data_type, is_nullable FROM information_schema.columns
+> WHERE table_name = '테이블명' ORDER BY ordinal_position;
+> ```
+
+---
+
+### 📋 profiles
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `username` | text | | 로그인 아이디 |
+| `full_name` | text | | 실명 |
+| `nickname` | text | | 닉네임 |
+| `role` | text | | **admin/corporate/individual/employee** — AuthProvider 기준 |
+| `user_type` | text | | 레거시. role과 병행 관리 |
+| `points` | integer | | 포인트 |
+| `jump_balance` | integer | | 점프 잔여 횟수 |
+| `credit_balance` | integer | | 크레딧 |
+| `is_admin` | boolean | | 어드민 여부 |
+| `is_adult_verified` | boolean | | 성인인증 여부 |
+| `marketing_email` | boolean | **NN** | 기본값 필요 |
+| `marketing_sms` | boolean | **NN** | 기본값 필요 |
+| `can_write` | boolean | **NN** | 기본값 필요 |
+| `sms_consent` | boolean | | |
+| `phone` | text | | |
+| `gender` | text | | |
+| `birth_date` | text | | |
+| `contact_email` | text | | |
+| `identity_ci` | text | | 본인인증 CI |
+| `address` | text | | |
+| `business_name` | text | | 상호명 |
+| `business_number` | text | | 사업자등록번호 |
+| `business_type` | text | | |
+| `business_file_url` | text | | 사업자등록증 파일 |
+| `business_address` | text | | |
+| `business_address_detail` | text | | |
+| `business_verified` | boolean | | 사업자인증 여부 |
+| `business_verify_status` | text | | pending/approved/rejected |
+| `business_verified_at` | timestamptz | | |
+| `business_verify_requested_at` | timestamptz | | |
+| `manager_phone` | text | | |
+| `manager_kakao` | text | | |
+| `manager_line` | text | | |
+| `manager_telegram` | text | | |
+| `is_withdrawn` | boolean | | 탈퇴 여부 |
+| `withdrawn_at` | timestamptz | | |
+| `user_id` | text | | **레거시 중복 컬럼. profiles.id(uuid)가 실제 PK** |
+| `referrer_id` | text | | |
+| `created_at` | timestamptz | | |
+| `updated_at` | timestamptz | | |
+| `nickname_updated_at` | timestamptz | | |
+
+---
+
+### 📋 shops
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | **bigint** | ✅ | PK — Number() 사용 |
+| `user_id` | text | | 업체 profiles.id (UUID를 text로 저장) |
+| `name` | text | | 상호명 |
+| `title` | text | | 공고 제목 |
+| `content` | text | | 상세내용 (HTML) |
+| `status` | text | | PENDING_REVIEW/active/rejected/CLOSED |
+| `tier` | text | | p1~p7e |
+| `product_type` | text | | p1~p7e (tier와 동일) |
+| `ad_price` | **bigint** | | 광고 금액 |
+| `pay` | text | | 급여 문자열 |
+| `pay_amount` | integer | | 급여 숫자 |
+| `pay_type` | text | | **급여 방식** (시급/일급/월급 등) — payments.pay_type과 전혀 다른 용도 |
+| `region` | text | | 지역 |
+| `work_region_sub` | text | | 세부 지역 |
+| `category` | text | | 업종 |
+| `category_sub` | text | | 세부 업종 |
+| `deadline` | text | | 마감일 (YYYY-MM-DD 문자열) |
+| `approved_at` | timestamptz | | 승인일시 |
+| `rejection_reason` | text | | 거절 사유 |
+| `rejection_history` | jsonb | | 거절 이력 |
+| `options` | jsonb | | 추가 옵션 스냅샷 |
+| `banner_position` | text | | |
+| `banner_image_url` | text | | |
+| `banner_media_type` | text | | |
+| `banner_status` | text | | none/pending_banner/approved/rejected_banner |
+| `media_url` | text | | |
+| `phone/kakao/telegram` | text | | |
+| `manager_name/manager_phone` | text | | |
+| `nickname` | text | | |
+| `view_count/applicant_count/edit_count` | integer | | |
+| `is_closed` | boolean | | |
+| `created_at` | timestamptz | ✅ | |
+| `updated_at` | timestamptz | | |
+
+---
+
+### 📋 payments
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | **bigint** | ✅ | PK |
+| `created_at` | timestamptz | ✅ | |
+| `user_id` | text | | 회원 UUID를 text로 저장 |
+| `shop_id` | **bigint** | | **Number(adId) 사용. String() 금지** |
+| `amount` | integer | | |
+| `method` | text | | bank_transfer 등 |
+| `status` | text | | pending/completed |
+| `description` | text | | |
+| `metadata` | jsonb | | |
+| `pay_type` | text | | 결제 분류 (AD/SOS/JUMP 등) |
+| ~~`type`~~ | — | — | **존재하지 않음** |
+| ~~`updated_at`~~ | — | — | **존재하지 않음** |
+
+**결제 흐름:**
+1. 공고등록 → `status:'pending'`, `pay_type:NULL` insert
+2. 어드민 승인 → 기존 레코드(shop_id 조회) UPDATE: `status:'completed'`, `pay_type:'AD'`
+3. 기존 없으면 → INSERT (shop_id=Number, pay_type='AD')
+
+**어드민 조회:** anon client RLS 막힘 → `/api/admin/get-payments` (service role) 사용
+
+---
+
+### 📋 applications
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `shop_id` | **uuid** | | ⚠️ shops.id는 bigint인데 이 컬럼은 uuid — 직접 join 불가 |
+| `user_id` | uuid | | 지원자 profiles.id |
+| `applicant_name` | text | | |
+| `applicant_phone` | text | | |
+| `message` | text | | |
+| `status` | text | | pending/accepted/rejected |
+| `is_flagged` | boolean | | |
+| `flag_reason` | text | | |
+| `created_at/updated_at` | timestamptz | | |
+
+> ⚠️ **알려진 스키마 이슈**: `applications.shop_id`(uuid) ↔ `shops.id`(bigint) 타입 불일치. 현재 join 쿼리는 Supabase FK 관계 없이 동작 중. 추후 shops.uuid 컬럼 추가 또는 applications.shop_id → bigint 변경 필요.
+
+---
+
+### 📋 messages
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `sender_id` | text | | |
+| `sender_name` | text | | |
+| `receiver_id` | text | | |
+| `receiver_name` | text | | |
+| `content` | text | ✅ | |
+| `status` | text | | normal/deleted 등 |
+| `is_read` | boolean | | |
+| `created_at` | timestamptz | | |
+
+---
+
+### 📋 inquiries
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `type` | text | ✅ | 문의 유형 |
+| `contact` | text | ✅ | |
+| `title` | text | ✅ | |
+| `content` | text | ✅ | |
+| `user_id` | uuid | | 로그인 회원 |
+| `writer_name` | text | | 비로그인 작성자 |
+| `password` | text | | 비밀글 비밀번호 |
+| `is_secret` | boolean | | |
+| `status` | text | | new/completed |
+| `reply_content` | text | | |
+| `replied_at` | timestamptz | | |
+| `parent_id` | uuid | | 답변 연결 |
+| `shop_name` | text | | |
+| `file_url` | text | | 첨부파일 |
+| `views` | integer | | |
+| `created_at` | timestamptz | | |
+
+---
+
+### 📋 notifications
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `user_id` | **text** | ✅ | UUID를 text로 저장 |
+| `type` | text | ✅ | AD_APPROVED/AD_REJECTED/AD_EXPIRED 등 |
+| `title` | text | ✅ | |
+| `message` | text | ✅ | |
+| `read` | boolean | | **`is_read` 아님. `read`가 정확한 컬럼명** |
+| `link` | text | | |
+| `created_at` | timestamptz | | |
+
+---
+
+### 📋 point_logs
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | bigint | ✅ | PK |
+| `user_id` | **uuid** | ✅ | profiles.id와 타입 일치 |
+| `amount` | integer | ✅ | |
+| `reason` | text | ✅ | SIGNUP_BONUS/ADMIN_GRANT/ATTENDANCE_CHECK 등 |
+| `created_at` | timestamptz | | |
+| ~~`note`~~ | — | — | **존재하지 않음** |
+| ~~`description`~~ | — | — | **존재하지 않음** |
+
+---
+
+### 📋 resumes
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `user_id` | **text** | ✅ | profiles.id UUID를 text로 저장 |
+| `owner_id` | uuid | | 레거시 중복 필드 |
+| `title` | text | ✅ | |
+| `content` | text | ✅ | |
+| `gender` | text | | |
+| `birth_date` | text | | |
+| `industry_main/sub` | text | | 업종 |
+| `region_main/sub` | text | | 지역 |
+| `pay_type` | text | | 희망 급여 방식 |
+| `pay_amount` | numeric | | 희망 급여 |
+| `contact_method` | text | | |
+| `contact_value` | text | | |
+| `created_at/updated_at` | timestamptz | | |
+
+---
+
+### 📋 sos_alerts
+| 컬럼 | 타입 | NN | 비고 |
+|------|------|----|------|
+| `id` | uuid | ✅ | PK |
+| `shop_id` | **uuid** | ✅ | ⚠️ shops.id(bigint)와 타입 불일치 |
+| `shop_name` | text | ✅ | |
+| `message` | text | ✅ | |
+| `target_regions` | ARRAY | | |
+| `point_deducted` | integer | ✅ | |
+| `recipient_count` | integer | ✅ | |
+| `sent_at` | timestamptz | | |
 
 ---
 

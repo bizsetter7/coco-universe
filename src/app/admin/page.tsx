@@ -136,12 +136,25 @@ function AdminContent() {
                 }));
             }
 
-            // 3. Fetch Payments (Join 없이 단순 조회로 400 에러 방지)
-            const { data: payData } = await supabase
-                .from('payments')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(2000);
+            // 3. Fetch Payments — [M-020 Fix] service role API 사용 (anon client RLS 우회)
+            // anon client로 직접 조회 시 RLS 정책에 의해 다른 유저의 결제 내역이 차단됨
+            const { data: { session: adminSession } } = await supabase.auth.getSession();
+            const adminToken = adminSession?.access_token;
+            let payData: any[] = [];
+            try {
+                const payRes = await fetch('/api/admin/get-payments', {
+                    headers: adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {}
+                });
+                if (payRes.ok) {
+                    const payJson = await payRes.json();
+                    payData = payJson.data || [];
+                }
+            } catch (e) {
+                console.warn('[admin/page] payments fetch 실패, fallback anon 조회:', e);
+                const { data: fallback } = await supabase.from('payments').select('*')
+                    .order('created_at', { ascending: false }).limit(2000);
+                payData = fallback || [];
+            }
 
             // 3-1. Fetch Applications count (pending) [Fix] 400 에러 방지를 위해 '*' 대신 'id' 사용
             const { count: appCount } = await supabase
