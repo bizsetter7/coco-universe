@@ -73,3 +73,5 @@ output2.txt
 payload.json
 test_update_status.json
 *.snap.json
+
+coco-universe/
