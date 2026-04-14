@@ -296,11 +296,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                             </div>
                                             <div className="text-[10px] text-blue-600 font-black font-mono mt-0.5 flex items-center gap-1">
                                                 <span className="bg-blue-50 px-1 rounded-sm text-[9px]">ID</span>
-                                                {(() => {
-                                                    const adId = pay.shop_id || pay.metadata?.shop_id || pay.metadata?.ad_no;
-                                                    const matchedAd = ads.find(a => String(a.id) === String(adId));
-                                                    return matchedAd?.nickname || pay.profiles?.username || pay.profiles?.nickname || pay.metadata?.nickname || 'user';
-                                                })()}
+                                                {pay.profiles?.username || pay.metadata?.username || '계정 미확인'}
                                             </div>
                                             <div className="text-[9px] text-slate-400 font-medium">
                                                 {pay.profiles?.business_number ? `SN: ${pay.profiles.business_number}` : ''}
