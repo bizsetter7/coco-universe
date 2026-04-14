@@ -4,10 +4,10 @@
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
-> 1. `C:\My-site\p1.choco-idea\MISTAKES_LOG.md` — 공통 실수 방지 체크리스트 ⭐
-> 2. `C:\My-site\p1.choco-idea\AI_SOP.md` — 전사 운영 철학 + 절대 수칙
-> 3. `C:\My-site\p1.choco-idea\SEO_GEO_MASTERY_LOG.md` — SEO/GEO 베스트프랙티스
-> 4. `C:\My-site\p2.브랜드_통합_시스템\CLAUDE.md` — 이 파일 (P2 기술 가이드)
+> 1. `D:\토탈프로젝트\My-site\p1.choco-idea\MISTAKES_LOG.md` — 공통 실수 방지 체크리스트 ⭐
+> 2. `D:\토탈프로젝트\My-site\p1.choco-idea\AI_SOP.md` — 전사 운영 철학 + 절대 수칙
+> 3. `D:\토탈프로젝트\My-site\p1.choco-idea\SEO_GEO_MASTERY_LOG.md` — SEO/GEO 베스트프랙티스
+> 4. `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템\CLAUDE.md` — 이 파일 (P2 기술 가이드)
 
 ---
 
@@ -16,7 +16,7 @@
 | 항목 | 값 |
 |------|-----|
 | 코드명 | P2 코코알바 |
-| 경로 | `C:\My-site\p2.브랜드_통합_시스템` |
+| 경로 | `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템` |
 | GitHub | `bizsetter7/coco-universe` |
 | 프로덕션 도메인 | `www.cocoalba.kr` |
 | 프레임워크 | Next.js 15 (App Router) + Supabase + Vercel |
@@ -141,7 +141,7 @@ AD_TIER_STANDARDS:
   (순서, 색상, 라벨 모두 고정)
 ```
 
-> 📎 상세 기준: `C:\Users\K\.claude\projects\...\memory\sop_protected.md`
+> 📎 상세 기준: `D:\토탈프로젝트\My-site\p1.choco-idea\AI_SOP.md`
 
 ---
 
@@ -676,8 +676,8 @@ WHERE p.id = u.id AND (p.username IS NULL OR p.username = '');
 
 | 코드명 | 경로 | 도메인 |
 |--------|------|--------|
-| P1 본사(공통) | `C:\My-site\p1.choco-idea` | chocoidea.vercel.app |
-| P2 코코알바 | `C:\My-site\p2.브랜드_통합_시스템` | www.cocoalba.kr |
-| P3 랜딩(73기지) | `C:\My-site\p3.코코 랜딩페이지` | region.cocoalba.kr |
-| P4 파트너스 | `C:\My-site\p4.파트너스_사이트` | partners-credit.vercel.app |
-| P7 PRICESHOT | `C:\My-site\p7.PRICESHOT` | (개발 중) |
+| P1 본사(공통) | `D:\토탈프로젝트\My-site\p1.choco-idea` | chocoidea.vercel.app |
+| P2 코코알바 | `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템` | www.cocoalba.kr |
+| P3 랜딩(73기지) | `D:\토탈프로젝트\My-site\p3.코코 랜딩페이지` | region.cocoalba.kr |
+| P4 파트너스 | `D:\토탈프로젝트\My-site\p4.파트너스_사이트` | partners-credit.vercel.app |
+| P7 PRICESHOT | `D:\토탈프로젝트\My-site\p7.PRICESHOT` | (개발 중) |

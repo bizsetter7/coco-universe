@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     if (authError) return authError;
 
     try {
+        // payments 전체 조회 (service_role — RLS 우회)
         const { data: payData, error } = await supabaseAdmin
             .from('payments')
             .select('*')
@@ -27,7 +28,23 @@ export async function GET(request: NextRequest) {
 
         if (error) throw error;
 
-        return NextResponse.json({ data: payData || [] });
+        // profiles join: anon client는 auth.users 조회 불가 → service_role로 별도 조회 후 매핑
+        const userIds = [...new Set((payData || []).map((p: any) => p.user_id).filter(Boolean))];
+        let profilesMap: Record<string, any> = {};
+        if (userIds.length > 0) {
+            const { data: profilesData } = await supabaseAdmin
+                .from('profiles')
+                .select('id, username, nickname, full_name, business_name, business_number, business_file_url')
+                .in('id', userIds);
+            (profilesData || []).forEach((p: any) => { profilesMap[p.id] = p; });
+        }
+
+        const enriched = (payData || []).map((pay: any) => ({
+            ...pay,
+            profiles: profilesMap[pay.user_id] || null
+        }));
+
+        return NextResponse.json({ data: enriched });
     } catch (err: any) {
         console.error('[get-payments] Error:', err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });

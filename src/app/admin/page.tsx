@@ -400,8 +400,11 @@ function AdminContent() {
 
     if (!isAuthorized) return null;
 
-    // --- [New] Badge Counter Calculations ---
-    const pendingAdsCount = mockAds.filter(a => a.status === 'pending').length;
+    // shops.status = PENDING_REVIEW / active / rejected / CLOSED (CLAUDE.md DB 스키마 기준)
+    const pendingAdsCount = mockAds.filter(a => {
+        const s = String(a.status || '').toUpperCase();
+        return s === 'PENDING_REVIEW' || s === 'PENDING';
+    }).length;
     const pendingInquiriesCount = realInquiries.filter(i => i.status === 'new').length;
     const pendingPaymentsCount = payments.filter(p => p.status !== 'completed').length;
     // [Sync] layout.tsx counts와 동기화 — bizCount 포함 (사업자 인증 심사 대기)
