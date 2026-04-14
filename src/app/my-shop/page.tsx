@@ -846,25 +846,25 @@ function MyShopContent() {
                 }).catch(() => {});
             }
 
-            if (!editingAdId && newShopId && formState.totalAmount > 0) {
+            if (!editingAdId && newShopId && !isTargetMock) {
+                // [CLAUDE.md 결제흐름 기준] 신규 공고 등록 시 항상 payments row 생성 (0원 포함)
+                // 어드민 승인 시 update-shop-status가 이 row를 찾아 UPDATE함
                 const paymentData = {
-                    user_id: isTargetMock ? null : authUser.id,
+                    user_id: authUser.id,
                     shop_id: newShopId,
-                    amount: formState.totalAmount,
-                    // pay_type removed - stored in metadata.product_type
-                    method: 'bank_transfer',               // [Standard] V4 스키마 준수 (method)
+                    amount: formState.totalAmount || 0,
+                    method: 'bank_transfer',
                     status: 'pending',
                     description: `[${formState.selectedAdProduct}] ${formState.shopName} 공고 결제`,
                     metadata: {
                         nickname: cleanNickname,
                         shopName: formState.shopName,
                         adTitle: formState.title,
-                        product_type: finalProductType // Legacy/Audit compat
+                        product_type: finalProductType
                     },
                     created_at: new Date().toISOString()
                 };
-                if (!isTargetMock) {
-                    const { error } = await supabase.from('payments').insert([paymentData]);
+                const { error } = await supabase.from('payments').insert([paymentData]);
                     if (error) {
                         console.error("Payment log failed", error);
                         alert(`결제 내역 생성 실패: ${error.message}`);
@@ -881,15 +881,8 @@ function MyShopContent() {
                             }),
                         }).catch(() => {});
                     }
-                }
-                // [Fix] 실제 회원은 localStorage 저장 안 함 (중복 방지)
-                if (isTargetMock) {
-                    const localPayments = JSON.parse(localStorage.getItem('my_site_payment_history') || '[]');
-                    localStorage.setItem('my_site_payment_history', JSON.stringify([{ ...paymentData, id: `PAY_MOCK_${Date.now()}` }, ...localPayments]));
-                } else {
-                    // 실제 회원은 DB에서 다시 읽어 최신 결제 상태 반영
-                    fetchPaymentHistory();
-                }
+                // DB에서 다시 읽어 최신 결제 상태 반영
+                fetchPaymentHistory();
             }
 
             // [무통장 입금 안내] 신규 공고 등록 시 입금 안내 모달 표시, 수정 시 바로 대시보드

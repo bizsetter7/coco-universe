@@ -56,7 +56,10 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
             
             const searchLower = searchTerm.toLowerCase();
             const matchesSearch = !searchTerm || 
-                (pay.id || '').toLowerCase().includes(searchLower) ||
+                (String(pay.id) || '').toLowerCase().includes(searchLower) ||
+                (String(pay.shop_id) || '').toLowerCase().includes(searchLower) ||
+                (pay.metadata?.adTitle || '').toLowerCase().includes(searchLower) ||
+                (pay.metadata?.shopName || '').toLowerCase().includes(searchLower) ||
                 (pay.profiles?.username || '').toLowerCase().includes(searchLower) ||
                 (pay.profiles?.nickname || '').toLowerCase().includes(searchLower) ||
                 (pay.profiles?.full_name || '').toLowerCase().includes(searchLower) ||
