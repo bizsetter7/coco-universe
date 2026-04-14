@@ -15,6 +15,38 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
     const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION'>('all');
+    const [recoverShopId, setRecoverShopId] = useState('');
+    const [recoverResult, setRecoverResult] = useState<string | null>(null);
+    const [isRecovering, setIsRecovering] = useState(false);
+
+    const handleRecoverPayment = async () => {
+        if (!recoverShopId.trim()) return;
+        setIsRecovering(true);
+        setRecoverResult(null);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            const res = await fetch('/api/admin/recover-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ shopId: recoverShopId.trim() })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setRecoverResult(`✅ ${data.message || data.action}`);
+                fetchData();
+            } else {
+                setRecoverResult(`❌ ${data.error || '실패'}`);
+            }
+        } catch (e: any) {
+            setRecoverResult(`❌ 네트워크 오류: ${e.message}`);
+        } finally {
+            setIsRecovering(false);
+        }
+    };
 
     // [Filtering Logic]
     const filteredPayments = useMemo(() => {
@@ -123,6 +155,35 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                     <p className="text-sm text-slate-400 font-bold mt-1">
                         광고, SOS, 점프 등 모든 유료 트래픽 결제 내역을 사업자 정보 기반으로 정밀 관리합니다.
                     </p>
+                </div>
+            </div>
+
+            {/* 긴급 결제 수복 패널 */}
+            <div className="bg-amber-50 border border-amber-200 rounded-[24px] px-6 py-4 flex flex-col md:flex-row items-start md:items-center gap-3">
+                <div className="flex items-center gap-2 shrink-0">
+                    <AlertCircle size={14} className="text-amber-600" />
+                    <span className="text-[11px] font-black text-amber-700 uppercase tracking-widest">결제수복</span>
+                </div>
+                <div className="flex items-center gap-2 flex-1 w-full">
+                    <input
+                        type="number"
+                        placeholder="공고 No. 입력 (예: 149)"
+                        value={recoverShopId}
+                        onChange={(e) => setRecoverShopId(e.target.value)}
+                        className="pl-3 pr-2 py-2 bg-white border border-amber-200 rounded-xl text-xs font-bold w-40 focus:ring-2 focus:ring-amber-300 outline-none"
+                    />
+                    <button
+                        onClick={handleRecoverPayment}
+                        disabled={isRecovering || !recoverShopId}
+                        className="px-4 py-2 bg-amber-500 text-white text-[10px] font-black rounded-xl hover:bg-amber-600 transition disabled:opacity-40"
+                    >
+                        {isRecovering ? '수복 중...' : '수복 실행'}
+                    </button>
+                    {recoverResult && (
+                        <span className={`text-[11px] font-bold ${recoverResult.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>
+                            {recoverResult}
+                        </span>
+                    )}
                 </div>
             </div>
 
