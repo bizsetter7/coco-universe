@@ -41,22 +41,27 @@ interface AdminAdRegistrationModalProps {
 }
 
 const TIER_LABEL: Record<string, string> = {
-    grand: '그랜드',
-    premium: '프리미엄',
-    deluxe: '디럭스',
-    special: '스페셜',
-    urgent: '급구/추천',
+    // altId 형식 (grand/premium/...)
+    grand: '그랜드',   premium: '프리미엄', deluxe: '디럭스',
+    special: '스페셜', urgent: '급구/추천', recommended: '급구/추천',
+    native: '네이티브', basic: '베이직',
+    // DB 저장 형식 (p1/p2/...)
+    p1: '그랜드',  p2: '프리미엄', p3: '디럭스',
+    p4: '스페셜',  p5: '급구/추천', p6: '네이티브',
+    p7: '베이직',  p7e: '베이직',
 };
 
 const TIER_COLOR: Record<string, string> = {
-    grand: 'bg-yellow-100 text-yellow-700',
-    premium: 'bg-blue-100 text-blue-700',
-    deluxe: 'bg-purple-100 text-purple-700',
-    special: 'bg-green-100 text-green-700',
-    urgent: 'bg-red-100 text-red-700',
+    grand: 'bg-yellow-100 text-yellow-700',   p1: 'bg-yellow-100 text-yellow-700',
+    premium: 'bg-blue-100 text-blue-700',     p2: 'bg-blue-100 text-blue-700',
+    deluxe: 'bg-purple-100 text-purple-700',  p3: 'bg-purple-100 text-purple-700',
+    special: 'bg-green-100 text-green-700',   p4: 'bg-green-100 text-green-700',
+    urgent: 'bg-orange-100 text-orange-700',  p5: 'bg-orange-100 text-orange-700',
+    recommended: 'bg-orange-100 text-orange-700',
 };
 
-const BANNER_ELIGIBLE = ['grand', 'premium', 'deluxe'];
+// OngoingAdsView.tsx의 BANNER_ELIGIBLE_TIERS와 동일하게 유지 (PATTERN-07 기준)
+const BANNER_ELIGIBLE = ['grand', 'premium', 'deluxe', 'special', 'p1', 'p2', 'p3', 'p4'];
 
 const POSITION_OPTIONS = [
     { value: 'sidebar_left',   label: '좌측 사이드바',  desc: '그랜드/프리미엄' },
@@ -155,14 +160,12 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
         }
     };
 
-    const eligibleShops = shops.filter(s => {
-        const tier = (s.tier || s.product_type || '').toLowerCase();
-        return BANNER_ELIGIBLE.includes(tier);
-    });
-    const ineligibleShops = shops.filter(s => {
-        const tier = (s.tier || s.product_type || '').toLowerCase();
-        return !BANNER_ELIGIBLE.includes(tier);
-    });
+    // PATTERN-07: DB raw값 기준 tier 추출 (p1~p7e 또는 altId 형식 모두 대응)
+    const getTier = (s: Shop) =>
+        (s.tier || s.product_type || '').toLowerCase();
+
+    const eligibleShops   = shops.filter(s => BANNER_ELIGIBLE.includes(getTier(s)));
+    const ineligibleShops = shops.filter(s => !BANNER_ELIGIBLE.includes(getTier(s)));
 
     return (
         <div className="fixed inset-0 z-[10030] flex items-center justify-center p-4">
@@ -216,7 +219,7 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                         {eligibleShops.length > 0 && (
                             <div className="space-y-2">
                                 {eligibleShops.map(shop => {
-                                    const tier = (shop.tier || shop.product_type || '').toLowerCase();
+                                    const tier = getTier(shop);
                                     const isSelected = selectedShopId === shop.id;
                                     const hasBanner = shop.banner_status === 'approved';
                                     return (
