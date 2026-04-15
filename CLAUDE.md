@@ -1,6 +1,6 @@
 # CLAUDE_P2.md — P2 코코알바 에이전트 핸드오버 가이드
 
-> **최종 업데이트**: 2026-04-13
+> **최종 업데이트**: 2026-04-16
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
@@ -8,6 +8,37 @@
 > 2. `D:\토탈프로젝트\My-site\p1.choco-idea\AI_SOP.md` — 전사 운영 철학 + 절대 수칙
 > 3. `D:\토탈프로젝트\My-site\p1.choco-idea\SEO_GEO_MASTERY_LOG.md` — SEO/GEO 베스트프랙티스
 > 4. `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템\CLAUDE.md` — 이 파일 (P2 기술 가이드)
+
+---
+
+## 🚨 안티그래비티 전용 — 완료 보고 필수 기준 [M-026]
+
+> [!CAUTION]
+> **"완료"는 `npm run build` 성공을 확인한 후에만 선언할 수 있다.**
+> 빌드 에러가 있는 상태에서 완료 보고 = 허위 보고. 재발 시 보고서 신뢰도 0으로 간주.
+
+### 신규 API 파일 작성 시 필수 체크리스트
+
+- [ ] `requireAdmin()` import + 첫 줄 호출 필수
+  ```ts
+  import { requireAdmin } from '@/lib/requireAdmin';
+  // ...
+  const authError = await requireAdmin(req);
+  if (authError) return authError;
+  ```
+- [ ] service_role 클라이언트는 **반드시 로컬 선언** (존재하지 않는 공용 모듈 import 금지)
+  ```ts
+  // ✅ 올바른 방법
+  import { createClient } from '@supabase/supabase-js';
+  const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+  // ❌ 금지 — @/lib/supabase-admin 같은 존재하지 않는 파일 import
+  ```
+- [ ] 작업 완료 후 `npm run build` 실행 → **빌드 성공 메시지 캡처 후 보고**
+- [ ] 표준 참고 파일: `src/app/api/admin/banner-approve/route.ts`
 
 ---
 
@@ -483,9 +514,11 @@ const tier = (
 | `receiver_id` | text | | |
 | `receiver_name` | text | | |
 | `content` | text | ✅ | |
-| `status` | text | | normal/deleted 등 |
+| `status` | text | | normal/deleted/report 등 |
 | `is_read` | boolean | | |
 | `created_at` | timestamptz | | |
+
+> ⚠️ **존재하지 않는 컬럼**: `from`, `to` — 절대 사용 금지. `sender_name`/`receiver_name` 사용.
 
 ---
 

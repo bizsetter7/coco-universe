@@ -48,12 +48,14 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
             if (error) throw error;
             if (!users || users.length === 0) { alert('발송할 회원이 없습니다.'); return; }
 
+            // messages 실제 컬럼: sender_id/sender_name/receiver_id/receiver_name/content/status/is_read/created_at
+            // from/to 컬럼 없음 — sender_name/receiver_name 사용
             const msgs = users.map(u => ({
-                from: '운영팀',
-                to: u.username || u.id,
-                receiver_id: u.id,
-                content: broadcastMsg,
+                sender_id: 'admin',
                 sender_name: '운영팀',
+                receiver_id: u.id,
+                receiver_name: u.username || u.id,
+                content: broadcastMsg,
                 is_read: false,
                 created_at: new Date().toISOString(),
             }));

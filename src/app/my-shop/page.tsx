@@ -984,12 +984,11 @@ function MyShopContent() {
                 
                 if (deductError) throw deductError;
 
-                // 점프 로그 (이유를 SHOP_JUMP로 유지하되 노트에 유료권 명시)
+                // 점프 로그 — point_logs 실제 컬럼: id/user_id/amount/reason/created_at 만 존재 (note/description 없음)
                 await supabase.from('point_logs').insert({
                     user_id: authUser.id,
-                    amount: 0,
-                    reason: 'SHOP_JUMP',
-                    note: `유료 점프이용권 1회 차감 (공고 ID: ${adId})`,
+                    amount: -1,
+                    reason: `SHOP_JUMP_PAID:${adId}`,
                 });
                 
                 isPaidJump = true;
