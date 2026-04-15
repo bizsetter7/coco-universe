@@ -142,8 +142,9 @@ export async function POST(request: NextRequest) {
                 user_id: shopId,
                 amount: pointCost,
                 status: 'completed',
-                type: 'SOS',
+                pay_type: 'SOS',        // ✅ pay_type (type 컬럼 없음)
                 method: 'points',
+                description: `[SOS] ${shopName} — ${recipientCount}명 발송`,
                 metadata: {
                     reason: pointReason,
                     recipient_count: recipientCount,
