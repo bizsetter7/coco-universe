@@ -165,17 +165,26 @@ export const AdultVerificationGate = ({ onVerify, onSkip }: AdultVerificationGat
             const email = targetId.includes('@') ? targetId : `${targetId}@cocoalba.kr`;
             await signIn(email, pw);
 
-            // 로그인 타입 불일치 경고
+            // 회원 유형 불일치 검사 — 불일치 시 로그아웃 후 차단
             try {
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 if (authUser) {
                     const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
-                    const actualRole = profile?.role || 'individual';
-                    if (loginType !== actualRole) {
-                        alert(`로그인은 성공했지만, 회원 구분이 다릅니다.\n선택: ${loginType === 'corporate' ? '기업회원' : '개인회원'} / 실제: ${actualRole === 'corporate' ? '기업회원' : '개인회원'}\n올바른 탭을 선택해주세요.`);
+                    const rawRole = profile?.role || 'individual';
+
+                    // M-014: employee(구형) + individual(신형) 모두 개인회원 — 정규화 필수
+                    const isCorporate = rawRole === 'corporate' || rawRole === 'admin';
+                    const selectedIsCorporate = loginType === 'corporate';
+
+                    if (isCorporate !== selectedIsCorporate) {
+                        // 타입 불일치 → 즉시 로그아웃 후 차단 (경고만 하고 통과시키지 않음)
+                        await supabase.auth.signOut();
+                        alert(`회원유형을 확인해주세요.\n선택: ${selectedIsCorporate ? '기업회원' : '개인회원'} / 실제: ${isCorporate ? '기업회원' : '개인회원'}`);
+                        setIsAuthenticating(false);
+                        return;
                     }
                 }
-            } catch (_) { /* 경고 실패 시 로그인은 계속 진행 */ }
+            } catch (_) { /* 유형 검사 실패 시 로그인 허용 */ }
 
             onVerify();
         } catch (err: any) {

@@ -229,8 +229,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                         setInquiryTitle('');
                                         setInquiryContent('');
                                         setPasswordInput('');
-                                        // Set default nickname if logged in, otherwise '익명'
-                                        const nickname = currentUser?.user_metadata?.nickname || currentUser?.nickname || '익명';
+                                        // authUser에 profiles.nickname이 포함됨 (AuthProvider가 select('*')로 가져옴)
+                                        const nickname = authUser?.nickname || currentUser?.user_metadata?.nickname || currentUser?.nickname || '익명';
                                         setInquiryContact(`|${nickname}`);
 
                                         setInquiryMode('write');
@@ -476,7 +476,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
                                     <input
                                         type="text"
-                                        value={isLoggedIn ? (currentUser?.nickname || '회원') : (inquiryContact.split('|')[1] || '')}
+                                        value={isLoggedIn ? (authUser?.nickname || currentUser?.nickname || '회원') : (inquiryContact.split('|')[1] || '')}
                                         onChange={(e) => !isLoggedIn && setInquiryContact(prev => `${prev.split('|')[0]}|${e.target.value}`)}
                                         readOnly={isLoggedIn}
                                         className={`w-full border-2 rounded-2xl p-4 text-sm font-black outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'} ${isLoggedIn ? 'opacity-50' : ''}`}
@@ -597,7 +597,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     disabled={isInquirySubmitting}
                                     onClick={async () => {
                                         const contact = inquiryContact.split('|')[0];
-                                        const writer = isLoggedIn ? (currentUser?.nickname || '회원') : inquiryContact.split('|')[1];
+                                        const writer = isLoggedIn ? (authUser?.nickname || currentUser?.nickname || '회원') : inquiryContact.split('|')[1];
 
                                         if (!contact || !writer || !inquiryTitle || !inquiryContent) {
                                             alert('필수 항목(*)을 모두 입력해주세요.');
