@@ -45,7 +45,7 @@ const TIER_LABEL: Record<string, string> = {
     premium: '프리미엄',
     deluxe: '디럭스',
     special: '스페셜',
-    urgent: '오늘의공고',
+    urgent: '급구/추천',
 };
 
 const TIER_COLOR: Record<string, string> = {
