@@ -166,20 +166,23 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
 
         try {
             setIsUploading(true);
-            const fileExt = file.name.split('.').pop();
-            const fileName = `banners/${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('bucket', 'job-images');
+            formData.append('folder', 'banners');
 
-            const { error: uploadError } = await supabase.storage
-                .from('job-images')
-                .upload(fileName, file);
+            const res = await fetch('/api/admin/upload-image', {
+                method: 'POST',
+                body: formData
+            });
 
-            if (uploadError) throw uploadError;
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || 'API 업로드 실패');
+            }
 
-            const { data: { publicUrl } } = supabase.storage
-                .from('job-images')
-                .getPublicUrl(fileName);
-
-            setFormData(prev => ({ ...prev, mediaUrl: publicUrl }));
+            const data = await res.json();
+            setFormData(prev => ({ ...prev, mediaUrl: data.publicUrl }));
         } catch (error: unknown) {
             console.error('Upload error:', error);
             const message = error instanceof Error ? error.message : '알 수 없는 오류';
