@@ -108,7 +108,15 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
 
     const effectiveUsers = (users && users.length > 0) ? users : mockUsers;
     const filteredUsers = effectiveUsers
-        .filter(u => filter === 'all' || u.role === filter || u.type === filter || u.user_type === filter)
+        .filter(u => {
+            if (filter === 'all') return true;
+            const role = u.role || '';
+            const userType = u.user_type || '';
+            if (filter === 'corporate') return role === 'corporate' || userType === 'corporate';
+            // 개인회원: 신규(individual) + 구형(employee) 둘 다 포함, admin 제외
+            if (filter === 'individual') return (role === 'individual' || role === 'employee') && role !== 'admin';
+            return false;
+        })
         .filter(u => !search ||
             (u.name || u.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
             (u.business_name || '').toLowerCase().includes(search.toLowerCase()) ||
