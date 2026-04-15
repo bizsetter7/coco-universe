@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import shopsData from '@/lib/data/shops.json';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
+import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 import { MOCK_POSTS } from '@/constants/community';
 import { supabase } from '@/lib/supabase';
 import { WORK_TYPE_SLUGS } from '@/lib/data/work-type-guide';
@@ -33,8 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // 2. Region Pages (SEO Landing Pages) - High Priority
+    // [Fix] slugify 적용 — generateStaticParams와 동일한 경로 생성
     const regionRoutes = seoRegionsMaster.map((region) => ({
-        url: `${baseUrl}/coco/${region.id}`,
+        url: `${baseUrl}/coco/${slugify(region.id)}`,
         lastModified: new Date(),
         changeFrequency: 'daily' as const,
         priority: 0.9,
@@ -66,8 +68,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .filter(Boolean) as MetadataRoute.Sitemap;
 
     // 4-A. 지역×업종 가이드 랜딩 페이지 (예: /coco/서울/룸알바)
-    // 실제 회원 없어도 색인 가능한 정보성 고품질 콘텐츠 페이지
-    const guideRoutes = seoRegionsMaster.flatMap((region) =>
+    // [Fix] shadowRegionsData 기준 사용 — generateStaticParams와 동일한 데이터소스
+    const guideRoutes = shadowRegionsData.flatMap((region) =>
         WORK_TYPE_SLUGS.map((workType) => ({
             url: `${baseUrl}/coco/${slugify(region.id)}/${workType}`,
             lastModified: new Date(),
