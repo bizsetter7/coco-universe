@@ -124,14 +124,15 @@ export default function TalentPage() {
                     .from('shops')
                     .select('tier, status, product_type, options, deadline')
                     .eq('user_id', user.id)
-                    .in('status', ['published', 'pending', 'PENDING_REVIEW']);
+                    .in('status', ['active']);
 
                 if (error) throw error;
 
-                // Check if any ad is a "paid" tier and not expired
+                // Check if any ad is a "paid" tier (not free/event) and not expired
+                const FREE_TIERS = ['p7', 'p7e', 'event_basic', 't7', 'basic', 'common', '일반'];
                 const hasPaid = (data || []).some(ad => {
                     const pt = String(ad.tier || ad.product_type || ad.options?.product_type || 'p7').toLowerCase();
-                    const isFree = pt === 'p7' || pt === 't7' || pt === 'common' || pt === '일반';
+                    const isFree = FREE_TIERS.includes(pt);
                     const isExpired = new Date(ad.deadline || '2099-01-01') < new Date();
                     return !isFree && !isExpired;
                 });

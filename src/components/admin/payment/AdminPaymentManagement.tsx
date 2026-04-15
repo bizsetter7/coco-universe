@@ -143,7 +143,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
     };
 
     const formatPrice = (priceInWon: number) => {
-        if (priceInWon >= 10000) return `${Math.floor(priceInWon / 10000)}만원`;
+        if (priceInWon >= 10000 && priceInWon % 10000 === 0) return `${priceInWon / 10000}만원`;
         return `${priceInWon.toLocaleString()}원`;
     };
 

@@ -93,6 +93,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
 
     // Admin & Session State
     const [currentUser, setCurrentUser] = useState<any>(null);
+    const [profileBusinessName, setProfileBusinessName] = useState<string>('');
     const isAdmin = !!(
         authUser?.email === 'admin_user' ||
         authUser?.type === 'admin' ||
@@ -101,10 +102,19 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
     );
 
     useEffect(() => {
-        supabase.auth.getUser().then(({ data: { user } }) => {
+        supabase.auth.getUser().then(async ({ data: { user } }) => {
             setCurrentUser(user);
+            if (user && authUser?.type === 'corporate') {
+                // 업체회원: writer_name에 쓸 business_name 추가 조회
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('business_name')
+                    .eq('id', user.id)
+                    .single();
+                if (profile?.business_name) setProfileBusinessName(profile.business_name);
+            }
         });
-    }, []);
+    }, [authUser?.type]);
 
     // 1:1 문의 상태 변경 시 자동 상단 스크롤
     useEffect(() => {
@@ -229,9 +239,11 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                         setInquiryTitle('');
                                         setInquiryContent('');
                                         setPasswordInput('');
-                                        // authUser에 profiles.nickname이 포함됨 (AuthProvider가 select('*')로 가져옴)
-                                        const nickname = authUser?.nickname || currentUser?.user_metadata?.nickname || currentUser?.nickname || '익명';
-                                        setInquiryContact(`|${nickname}`);
+                                        // 업체회원 → business_name, 개인회원 → nickname
+                                        const writerLabel = authUser?.type === 'corporate'
+                                            ? (profileBusinessName || authUser?.name || '업체회원')
+                                            : (authUser?.nickname || currentUser?.user_metadata?.nickname || currentUser?.nickname || '익명');
+                                        setInquiryContact(`|${writerLabel}`);
 
                                         setInquiryMode('write');
                                     }}
@@ -346,7 +358,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                     </td>
                                                     <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>{isNotice ? '운영팀' : inq.writer_name}</td>
                                                     <td className="px-0.5 py-1.5 md:py-3.5 text-[9px] md:text-[10.5px] text-center font-medium text-gray-400 tabular-nums whitespace-nowrap">
-                                                        {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/-/g, '.').replace(/\.$/, '')}
+                                                        {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', timeZone: 'Asia/Seoul' }).replace(/-/g, '.').replace(/\.$/, '')}
                                                     </td>
                                                 </tr>
                                             );
@@ -476,7 +488,11 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     <label className="block text-xs font-black mb-2 ml-2 text-gray-400 uppercase tracking-widest">작성자 닉네임</label>
                                     <input
                                         type="text"
-                                        value={isLoggedIn ? (authUser?.nickname || currentUser?.nickname || '회원') : (inquiryContact.split('|')[1] || '')}
+                                        value={isLoggedIn
+                                            ? (authUser?.type === 'corporate'
+                                                ? (profileBusinessName || authUser?.name || '업체회원')
+                                                : (authUser?.nickname || currentUser?.nickname || '회원'))
+                                            : (inquiryContact.split('|')[1] || '')}
                                         onChange={(e) => !isLoggedIn && setInquiryContact(prev => `${prev.split('|')[0]}|${e.target.value}`)}
                                         readOnly={isLoggedIn}
                                         className={`w-full border-2 rounded-2xl p-4 text-sm font-black outline-none ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900/50 text-white' : 'border-gray-100 bg-gray-50 text-gray-900'} ${isLoggedIn ? 'opacity-50' : ''}`}
@@ -597,7 +613,12 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     disabled={isInquirySubmitting}
                                     onClick={async () => {
                                         const contact = inquiryContact.split('|')[0];
-                                        const writer = isLoggedIn ? (authUser?.nickname || currentUser?.nickname || '회원') : inquiryContact.split('|')[1];
+                                        // 업체회원 → business_name, 개인회원 → nickname, 비로그인 → 입력값
+                                        const writer = isLoggedIn
+                                            ? (authUser?.type === 'corporate'
+                                                ? (profileBusinessName || authUser?.name || '업체회원')
+                                                : (authUser?.nickname || currentUser?.nickname || '회원'))
+                                            : inquiryContact.split('|')[1];
 
                                         if (!contact || !writer || !inquiryTitle || !inquiryContent) {
                                             alert('필수 항목(*)을 모두 입력해주세요.');

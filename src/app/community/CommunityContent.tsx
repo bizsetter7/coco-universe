@@ -91,7 +91,7 @@ function CommunityContentInner() {
                     ...p,
                     // 실명이나 ID가 아닌 닉네임을 우선적으로 표시
                     author: p.author_nickname || p.author_name || p.author || '익명회원',
-                    time: p.created_at ? new Date(p.created_at).toLocaleDateString('ko-KR') : '방금 전'
+                    time: p.created_at ? new Date(p.created_at).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' }) : '방금 전'
                 })).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
                 
                 finalPosts = [...mappedDbData, ...nonDupMocks]; // DB 최신글이 무조건 최상단

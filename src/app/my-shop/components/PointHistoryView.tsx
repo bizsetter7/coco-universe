@@ -177,8 +177,8 @@ export function PointHistoryView({ userId }: { userId: string }) {
                                                 <p className="text-[10px] font-bold text-gray-400 leading-tight">
                                                     {(() => {
                                                         const d = new Date(log.created_at);
-                                                        const dateStr = d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                                                        const timeStr = d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                                        const dateStr = d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Asia/Seoul' });
+                                                        const timeStr = d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Seoul' });
                                                         return (
                                                             <>
                                                                 {dateStr} <br /> {timeStr}
