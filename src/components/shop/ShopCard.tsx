@@ -45,7 +45,13 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
     const isMobile = useMobile();
     const [imgError, setImgError] = React.useState(false);
 
-    const hasImage = !!shop.options?.mediaUrl && !imgError;
+    // [배너→카드 폴백] 어드민 승인된 배너 이미지를 카드 썸네일로 사용 (media_url 없을 때)
+    const bannerImageUrl: string | null = (shop as any).banner_image_url || null;
+    const bannerStatus: string | null = (shop as any).banner_status || null;
+    const hasBannerApproved = !!bannerImageUrl && bannerStatus === 'approved';
+    const displayImageUrl = shop.options?.mediaUrl || (hasBannerApproved ? bannerImageUrl : null);
+
+    const hasImage = !!displayImageUrl && !imgError;
     const isUrgentType = tierId === 'urgent' || tierId === 'recommended';
     const showImage = !isUrgentType && !hideImage;
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
@@ -94,7 +100,7 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                     {hasImage ? (
                         // 이미지 있을 경우: 이미지 표시
                         <img
-                            src={shop.options!.mediaUrl}
+                            src={displayImageUrl!}
                             alt={shop.name}
                             className="w-full h-full object-cover"
                             loading={rank && rank <= 2 ? 'eager' : 'lazy'}
@@ -113,6 +119,13 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                     {rank && (
                         <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-20">
                             <span className="text-[10px] font-black text-black">{rank}</span>
+                        </div>
+                    )}
+                    {/* [배너 LIVE 뱃지] 어드민 승인 배너 게재 중일 때 표시 */}
+                    {hasBannerApproved && (
+                        <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md pointer-events-none z-20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
+                            <span className="text-[8px] font-black text-white tracking-tighter uppercase">배너게재중</span>
                         </div>
                     )}
                 </div>

@@ -186,6 +186,12 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
     // [Fix] grand+premium 합산 최대 4개 — 각각 4개씩 렌더하던 버그 수정
     // 우선순위: grand(p1) > premium(p2). banner_position 명시 없으면(NULL) 양쪽 모두 표시.
+    // [Fix2] 목업 광고(user_id: 6fc68887...) 필터링 — 실제 광고 우선
+    const isMockAd = (s: any) =>
+        s.isMock === true ||
+        String(s.user_id || '').startsWith('6fc68887') ||
+        String(s.id || '').startsWith('AD_MOCK_');
+
     const sidebarAds = useMemo(() => {
         if (isMobile) return [];
         const TIER_PRIORITY: Record<string, number> = { grand: 1, p1: 1, premium: 2, p2: 2 };
@@ -194,15 +200,30 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             s.tier === 'premium' || s.tier === 'p2' ||
             (s as any).is_premium;
         const sideKey = isLeft ? 'left' : 'right';
-        return allShops
+
+        const realAds = allShops
+            .filter(s => !isMockAd(s))  // 실제 광고 우선
             .filter(isEligible)
             .filter(s => {
                 const pos = (s as any).banner_position;
                 // NULL = 양쪽 모두, 'both' = 양쪽, 'left'/'right' = 해당 사이드만
                 return pos == null || pos === 'both' || pos === sideKey;
             })
-            .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99))
-            .slice(0, 4); // 합산 최대 4개
+            .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99));
+
+        // 실제 광고가 4개 미만이면 목업으로 채움
+        if (realAds.length >= 4) return realAds.slice(0, 4);
+
+        const mockAds = allShops
+            .filter(isMockAd)
+            .filter(isEligible)
+            .filter(s => {
+                const pos = (s as any).banner_position;
+                return pos == null || pos === 'both' || pos === sideKey;
+            })
+            .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99));
+
+        return [...realAds, ...mockAds].slice(0, 4);
     }, [allShops, isLeft, isMobile]);
 
     // [Optimization] Valid Return for Mobile after hooks are called

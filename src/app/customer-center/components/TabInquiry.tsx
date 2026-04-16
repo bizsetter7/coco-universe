@@ -646,10 +646,11 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                     onClick={async () => {
                                         const contact = inquiryContact.split('|')[0];
                                         // 업체회원 → business_name, 개인회원 → nickname, 비로그인 → 입력값
+                                        // [Fix] authUser.nickname(UserSession/DB기반) 1순위 — currentUser는 auth객체라 nickname 없음
                                         const writer = isLoggedIn
                                             ? (authUser?.type === 'corporate'
                                                 ? (profileBusinessName || authUser?.name || '업체회원')
-                                                : (authUser?.nickname || currentUser?.nickname || '회원'))
+                                                : (authUser?.nickname || authUser?.name || currentUser?.user_metadata?.nickname || '닉네임'))
                                             : inquiryContact.split('|')[1];
 
                                         if (!contact || !writer || !inquiryTitle || !inquiryContent) {
