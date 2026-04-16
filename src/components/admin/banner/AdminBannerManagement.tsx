@@ -34,14 +34,12 @@ const TIER_LABEL: Record<string, { label: string; color: string }> = {
     p4:      { label: 'Special(T4)', color: 'bg-emerald-600' },
 };
 
+// DB 허용값 기준: left / right / both / inner (chk_banner_position)
 const POSITION_LABEL: Record<string, string> = {
-    left:  '좌측 사이드',
-    right: '우측 사이드',
-    both:  '좌우 사이드',
-    sidebar_left:  '좌측 사이드',
-    sidebar_right: '우측 사이드',
-    inner_top:     '내부 상단',
-    inner_bottom:  '내부 하단',
+    left:  '좌측 사이드바',
+    right: '우측 사이드바',
+    both:  '양쪽 사이드바 (좌+우)',
+    inner: '내부 사이드바',
 };
 
 const STATUS_INFO: Record<FilterTab, { label: string; color: string; icon: React.ReactNode }> = {
@@ -266,7 +264,7 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
                                     </div>
 
                                     <p className="text-[9px] text-slate-300 font-bold">
-                                        {new Date(ad.created_at).toLocaleDateString('ko-KR')} 등록
+                                        {new Date(ad.created_at).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })} 등록
                                     </p>
 
                                     {/* 반려 사유 입력 (반려 버튼 클릭 시 인라인 표시) */}
