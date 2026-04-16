@@ -197,6 +197,139 @@ const BannerUploadPanel = ({ adId, currentBannerUrl, currentBannerStatus, onSucc
     );
 };
 
+// ─── 카드 이미지 업로드 패널 ────────────────────────────────────────────────────
+// 등급별 리스트 카드 썸네일(options.mediaUrl + shops.media_url) 변경용
+// 사이드바 배너(banner_image_url)와 별개 — 승인 불필요, 즉시 반영
+interface CardImageUploadPanelProps {
+    adId: string;
+    currentImageUrl?: string | null;
+    onSuccess: (url: string) => void;
+}
+
+const CardImageUploadPanel = ({ adId, currentImageUrl, onSuccess }: CardImageUploadPanelProps) => {
+    const [isUploading, setIsUploading] = React.useState(false);
+    const [previewUrl, setPreviewUrl] = React.useState<string>(currentImageUrl || '');
+    const [urlInput, setUrlInput] = React.useState('');
+    const [msg, setMsg] = React.useState('');
+
+    const saveToDb = async (url: string) => {
+        // options JSONB의 mediaUrl도 함께 업데이트 (카드 렌더링 기준 컬럼)
+        const { data: shopData, error: fetchErr } = await supabase
+            .from('shops')
+            .select('options')
+            .eq('id', Number(adId))
+            .single();
+        if (fetchErr) throw fetchErr;
+        const newOptions = { ...(shopData?.options || {}), mediaUrl: url };
+        const { error } = await supabase
+            .from('shops')
+            .update({
+                media_url: url,
+                options: newOptions,
+                updated_at: new Date().toISOString(),
+            })
+            .eq('id', Number(adId));
+        return error;
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const MAX_SIZE = 10 * 1024 * 1024;
+        if (file.size > MAX_SIZE) { setMsg('❌ 파일 크기 10MB 이하만 가능합니다.'); return; }
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        const allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!allowed.includes(ext)) { setMsg('❌ JPG/PNG/GIF/WebP만 가능합니다.'); return; }
+        setIsUploading(true); setMsg('');
+        try {
+            const fileName = `card-images/${adId}_${Date.now()}.${ext}`;
+            const { error: upErr } = await supabase.storage
+                .from('job-images')
+                .upload(fileName, file, { upsert: true });
+            if (upErr) throw upErr;
+            const { data: { publicUrl } } = supabase.storage
+                .from('job-images')
+                .getPublicUrl(fileName);
+            const dbErr = await saveToDb(publicUrl);
+            if (dbErr) throw dbErr;
+            setPreviewUrl(publicUrl);
+            setMsg('✅ 카드 이미지 변경 완료! 목록에 즉시 반영됩니다.');
+            onSuccess(publicUrl);
+        } catch (err: any) {
+            setMsg(`❌ 업로드 실패: ${err.message || '알 수 없는 오류'}`);
+        } finally {
+            setIsUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleUrlSave = async () => {
+        if (!urlInput.trim()) return;
+        setIsUploading(true); setMsg('');
+        try {
+            const dbErr = await saveToDb(urlInput.trim());
+            if (dbErr) throw dbErr;
+            setPreviewUrl(urlInput.trim());
+            setMsg('✅ 카드 이미지 URL 저장 완료!');
+            onSuccess(urlInput.trim());
+            setUrlInput('');
+        } catch (err: any) {
+            setMsg(`❌ 저장 실패: ${err.message || '알 수 없는 오류'}`);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    return (
+        <div className="mt-3 p-4 rounded-2xl border-2 border-dashed border-green-200 bg-green-50/30 space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+                <ImageIcon size={14} className="text-green-600" />
+                <span className="text-[11px] font-black text-green-700 uppercase tracking-wide">카드 리스트 이미지 변경</span>
+                <span className="text-[9px] text-gray-400 font-bold">· 권장 800×600px (4:3) · 승인 불필요 즉시 반영</span>
+            </div>
+            {previewUrl && (
+                <div className="w-full h-20 rounded-xl overflow-hidden border border-green-100 bg-white shadow-sm">
+                    <img src={previewUrl} alt="카드 이미지 미리보기" className="w-full h-full object-cover" />
+                </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <label className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black cursor-pointer transition-all active:scale-95 border ${isUploading ? 'bg-gray-100 text-gray-400 border-gray-200 pointer-events-none' : 'bg-green-700 text-white border-transparent hover:bg-green-800 shadow-md'}`}>
+                    {isUploading
+                        ? <><Loader2 size={12} className="animate-spin" />업로드 중...</>
+                        : <><ImageIcon size={12} />파일 선택 (JPG/PNG/GIF/WebP)</>
+                    }
+                    <input type="file" className="hidden" accept="image/jpeg,image/png,image/gif,image/webp" onChange={handleFileUpload} disabled={isUploading} />
+                </label>
+                <div className="flex gap-1.5">
+                    <input
+                        type="text"
+                        value={urlInput}
+                        onChange={e => setUrlInput(e.target.value)}
+                        placeholder="이미지 URL 직접 입력"
+                        className="flex-1 px-3 py-2 text-[11px] font-bold bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-300/30"
+                        disabled={isUploading}
+                        onKeyDown={e => e.key === 'Enter' && handleUrlSave()}
+                    />
+                    <button
+                        onClick={handleUrlSave}
+                        disabled={!urlInput.trim() || isUploading}
+                        className="px-3 py-2 bg-green-600 text-white text-[11px] font-black rounded-xl hover:bg-green-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        등록
+                    </button>
+                </div>
+            </div>
+            <p className="text-[9px] text-gray-400 font-bold">
+                * 권장: 800×600px (4:3 비율) | 최대 10MB | JPG·PNG·GIF·WebP 지원<br />
+                * 변경 즉시 카드 목록에 반영됩니다. (별도 관리자 승인 불필요)
+            </p>
+            {msg && (
+                <p className={`text-[11px] font-bold ${msg.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>
+            )}
+        </div>
+    );
+};
+
 // ─── 메인 컴포넌트 ──────────────────────────────────────────────────────────────
 export const OngoingAdsView = ({
     setView, ads = [], userName = '', jumpBalance = 0,
@@ -219,6 +352,10 @@ export const OngoingAdsView = ({
     const [bannerPanelOpen, setBannerPanelOpen] = React.useState<Record<string, boolean>>({});
     // 배너 업로드 성공 후 URL 업데이트 (로컬 반영용)
     const [bannerUpdates, setBannerUpdates] = React.useState<Record<string, string>>({});
+    // 카드 이미지 업로드 패널 열림 상태
+    const [cardImagePanelOpen, setCardImagePanelOpen] = React.useState<Record<string, boolean>>({});
+    // 카드 이미지 업로드 성공 후 로컬 반영용
+    const [cardImageUpdates, setCardImageUpdates] = React.useState<Record<string, string>>({});
 
     React.useEffect(() => { setIsMounted(true); }, []);
 
@@ -403,7 +540,7 @@ export const OngoingAdsView = ({
                                             })()}
                                         </div>
 
-                                        {/* ── 배너 이미지 등록 버튼 (T1~T4 활성 광고만) ── */}
+                                        {/* ── 사이드바 배너 이미지 등록 버튼 (T1~T4) ── */}
                                         {eligibleForBanner && (
                                             <button
                                                 onClick={() => setBannerPanelOpen(prev => ({ ...prev, [ad.id]: !prev[ad.id] }))}
@@ -417,15 +554,33 @@ export const OngoingAdsView = ({
                                                 }`}
                                             >
                                                 <ImageIcon size={12} />
-                                                {bannerStatus === 'approved' ? '배너 활성화 중 (수정)' :
-                                                 bannerStatus === 'pending_banner' ? '배너 승인 대기 중 (수정)' :
-                                                 tierText ? `${tierText} 배너 이미지 등록` : '배너 이미지 등록'}
+                                                {bannerStatus === 'approved' ? '사이드 배너 활성화 중 (수정)' :
+                                                 bannerStatus === 'pending_banner' ? '사이드 배너 승인 대기 (수정)' :
+                                                 tierText ? `${tierText} 사이드 배너 등록` : '사이드 배너 등록'}
+                                            </button>
+                                        )}
+
+                                        {/* ── 카드 리스트 이미지 변경 버튼 (T1~T4) ── */}
+                                        {eligibleForBanner && (
+                                            <button
+                                                onClick={() => setCardImagePanelOpen(prev => ({ ...prev, [ad.id]: !prev[ad.id] }))}
+                                                className={`w-full flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-black transition-all active:scale-95 border ${cardImagePanelOpen[ad.id]
+                                                    ? 'bg-green-600 text-white border-green-600 shadow-md shadow-green-100'
+                                                    : (cardImageUpdates[ad.id] || ad.options?.mediaUrl || ad.mediaUrl)
+                                                        ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        : 'bg-white text-green-600 border-green-200 hover:bg-green-50'
+                                                }`}
+                                            >
+                                                <ImageIcon size={12} />
+                                                {(cardImageUpdates[ad.id] || ad.options?.mediaUrl || ad.mediaUrl)
+                                                    ? '카드 이미지 변경'
+                                                    : '카드 이미지 등록'}
                                             </button>
                                         )}
                                     </div>
                                 </div>
 
-                                {/* ── 배너 업로드 패널 (펼침) ── */}
+                                {/* ── 사이드바 배너 업로드 패널 (펼침) ── */}
                                 {eligibleForBanner && isPanelOpen && (
                                     <BannerUploadPanel
                                         adId={ad.id}
@@ -433,7 +588,17 @@ export const OngoingAdsView = ({
                                         currentBannerStatus={bannerStatus}
                                         onSuccess={(url) => {
                                             setBannerUpdates(prev => ({ ...prev, [ad.id]: url }));
-                                            // 패널은 닫지 않고 상태 메시지 유지
+                                        }}
+                                    />
+                                )}
+
+                                {/* ── 카드 이미지 업로드 패널 (펼침) ── */}
+                                {eligibleForBanner && cardImagePanelOpen[ad.id] && (
+                                    <CardImageUploadPanel
+                                        adId={String(ad.id)}
+                                        currentImageUrl={cardImageUpdates[ad.id] || ad.options?.mediaUrl || ad.mediaUrl || null}
+                                        onSuccess={(url) => {
+                                            setCardImageUpdates(prev => ({ ...prev, [ad.id]: url }));
                                         }}
                                     />
                                 )}
