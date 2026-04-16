@@ -119,7 +119,12 @@ export const JobDetailContent = ({
     const [resolvedAddress, setResolvedAddress] = useState<string | null>(publisherAddress || null);
 
     useEffect(() => {
+        // 1순위: 상위 컴포넌트가 넘긴 주소 (profiles 직접 조회 결과)
         if (publisherAddress) { setResolvedAddress(publisherAddress); return; }
+        // 2순위: shop.businessAddress (enrichAdData 또는 anyAdToShop이 options.businessAddress 포함하여 정제한 값)
+        const shopAddr = (shop as any).businessAddress || (shop as any).options?.businessAddress;
+        if (shopAddr) { setResolvedAddress(shopAddr); return; }
+        // 3순위: profiles 직접 조회 fallback
         const userId = (shop as any).user_id;
         if (!userId) return;
         supabase.from('profiles')
@@ -132,7 +137,7 @@ export const JobDetailContent = ({
                     setResolvedAddress(detail ? `${data.business_address} ${detail}` : data.business_address);
                 }
             });
-    }, [(shop as any).user_id, publisherAddress]);
+    }, [(shop as any).user_id, publisherAddress, (shop as any).businessAddress]);
 
     useEffect(() => {
         if (!resolvedAddress || !mapContainerRef.current) return;
