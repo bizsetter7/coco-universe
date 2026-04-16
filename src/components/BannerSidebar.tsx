@@ -185,22 +185,17 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
         const isGrandTier = (s: Shop) => s.tier === 'grand' || s.tier === 'p1';
         const gr = allShops.filter(isGrandTier);
 
-        // migration 06 이후: banner_position 기준 정확 배분
-        // migration 06 이전: banner_position 없음 → 인덱스 짝수=좌, 홀수=우 기존 방식 유지
-        const hasBannerPos = gr.some(s => (s as any).banner_position != null);
-        if (hasBannerPos) {
-            if (isLeft) return gr.filter(s => {
-                const pos = (s as any).banner_position;
-                return pos === 'left' || pos === 'both';
-            }).slice(0, 4);
-            return gr.filter(s => {
-                const pos = (s as any).banner_position;
-                return pos === 'right' || pos === 'both';
-            }).slice(0, 4);
-        }
-        // migration 06 이전 호환 — 기존 인덱스 방식
-        if (isLeft) return [gr[0], gr[2]].filter(Boolean);
-        return [gr[1], gr[3]].filter(Boolean);
+        // banner_position NULL = 기본값(양쪽 모두 표시)
+        // banner_position='both' → 양쪽, 'left' → 좌만, 'right' → 우만
+        // [Fix] NULL인 광고를 필터에서 제외하던 버그 수정 — NULL은 both와 동일하게 양쪽 표시
+        if (isLeft) return gr.filter(s => {
+            const pos = (s as any).banner_position;
+            return pos == null || pos === 'left' || pos === 'both';
+        }).slice(0, 4);
+        return gr.filter(s => {
+            const pos = (s as any).banner_position;
+            return pos == null || pos === 'right' || pos === 'both';
+        }).slice(0, 4);
     }, [allShops, isLeft, isMobile]);
 
     const premiumAds = useMemo(() => {
@@ -208,21 +203,15 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
         const isPremiumTier = (s: Shop) => s.tier === 'premium' || s.tier === 'p2' || (s as any).is_premium;
         const pr = allShops.filter(isPremiumTier);
 
-        // migration 06 이후: banner_position 기준
-        const hasBannerPos = pr.some(s => (s as any).banner_position != null);
-        if (hasBannerPos) {
-            if (isLeft) return pr.filter(s => {
-                const pos = (s as any).banner_position;
-                return pos === 'left' || pos === 'both';
-            }).slice(0, 4);
-            return pr.filter(s => {
-                const pos = (s as any).banner_position;
-                return pos === 'right' || pos === 'both';
-            }).slice(0, 4);
-        }
-        // migration 06 이전 호환
-        if (isLeft) return pr.slice(0, 2);
-        return pr.slice(2, 4);
+        // [Fix] NULL인 premium 광고도 양쪽 기본 표시 (grand와 동일 규칙)
+        if (isLeft) return pr.filter(s => {
+            const pos = (s as any).banner_position;
+            return pos == null || pos === 'left' || pos === 'both';
+        }).slice(0, 4);
+        return pr.filter(s => {
+            const pos = (s as any).banner_position;
+            return pos == null || pos === 'right' || pos === 'both';
+        }).slice(0, 4);
     }, [allShops, isLeft, isMobile]);
 
     // [Optimization] Valid Return for Mobile after hooks are called
