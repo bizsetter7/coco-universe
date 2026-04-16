@@ -95,6 +95,8 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
     // Admin & Session State
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [profileBusinessName, setProfileBusinessName] = useState<string>('');
+    // [닉네임 실시간 조회] user_id → {nickname, business_name, role} 캐시 맵 (관리자탭과 동일 방식)
+    const [writerProfileMap, setWriterProfileMap] = useState<Record<string, any>>({});
     const isAdmin = !!(
         authUser?.email === 'admin_user' ||
         authUser?.type === 'admin' ||
@@ -129,9 +131,10 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
         setIsSearching(true);
         try {
             // [OPTIMIZATION] Select only necessary fields for list view to prevent timeout
+            // user_id 추가 — 닉네임 실시간 조회용 (writer_name 저장 오류 대응)
             let query = supabase
                 .from('inquiries')
-                .select('id, type, title, writer_name, created_at, status, parent_id, is_secret, file_url', { count: 'exact' });
+                .select('id, type, title, writer_name, user_id, created_at, status, parent_id, is_secret, file_url', { count: 'exact' });
 
             if (activeCategory !== '전체') {
                 query = query.eq('type', activeCategory);
@@ -170,6 +173,26 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                     return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
                 });
                 setInquiries(sortedData);
+
+                // [닉네임 실시간 조회] user_id 있는 항목만 배치로 프로필 조회
+                const userIds = [...new Set(
+                    sortedData
+                        .map((inq: any) => inq.user_id)
+                        .filter((id: any) => !!id)
+                )];
+                if (userIds.length > 0) {
+                    supabase
+                        .from('profiles')
+                        .select('id, nickname, business_name, role')
+                        .in('id', userIds)
+                        .then(({ data: profiles }) => {
+                            if (profiles) {
+                                const map: Record<string, any> = {};
+                                profiles.forEach((p: any) => { map[p.id] = p; });
+                                setWriterProfileMap(map);
+                            }
+                        });
+                }
             }
             if (count !== null) setTotalCount(count);
 
@@ -374,7 +397,14 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>{isNotice ? '운영팀' : inq.writer_name}</td>
+                                                    <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        {isNotice ? '운영팀' : (() => {
+                                                            if (inq.writer_name === '운영팀') return '운영팀';
+                                                            const p = inq.user_id ? writerProfileMap[inq.user_id] : null;
+                                                            if (!p) return inq.writer_name;
+                                                            return (p.role === 'corporate' ? p.business_name : p.nickname) || inq.writer_name;
+                                                        })()}
+                                                    </td>
                                                     <td className="px-0.5 py-1.5 md:py-3.5 text-[9px] md:text-[10.5px] text-center font-medium text-gray-400 tabular-nums whitespace-nowrap relative">
                                                         <span className="group-hover:hidden">
                                                             {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', timeZone: 'Asia/Seoul' }).replace(/-/g, '.').replace(/\.$/, '')}

@@ -70,7 +70,14 @@ export function enrichAdData(ad: any, userData: any[] = []): Shop {
         options: {
             ...(ad?.options || {}),
             keywords: keywords,
-            mediaUrl: ad?.options?.mediaUrl || (ad?.tier === 'grand' || ad?.tier === 'premium' ? `https://picsum.photos/400/300?random=${ad.id}` : undefined)
+            // [우선순위] 1. options.mediaUrl (별도 카드이미지) 2. media_url (DB root) 3. 배너이미지(승인됨) 4. 목업 전용 picsum
+            mediaUrl:
+                ad?.options?.mediaUrl ||
+                ad?.media_url ||
+                (ad?.banner_status === 'approved' && ad?.banner_image_url ? ad.banner_image_url : undefined) ||
+                ((ad?.isMock || ad?.isRecovered) && (ad?.tier === 'grand' || ad?.tier === 'premium')
+                    ? `https://picsum.photos/400/300?random=${ad.id}`
+                    : undefined),
         },
         // 상세 팝업 바인딩용 필드 추가
         businessAddress: ad?.business_address || profile?.business_address || ad?.businessAddress || '',

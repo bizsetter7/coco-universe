@@ -37,13 +37,8 @@ export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardP
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
     const [imgError, setImgError] = React.useState(false);
 
-    // [배너→카드 폴백] 어드민 승인된 배너 이미지를 카드 썸네일로 사용 (media_url 없을 때)
-    const bannerImageUrl: string | null = (shop as any).banner_image_url || null;
-    const bannerStatus: string | null = (shop as any).banner_status || null;
-    const hasBannerApproved = !!bannerImageUrl && bannerStatus === 'approved';
-    const displayImageUrl = shop.options?.mediaUrl || (hasBannerApproved ? bannerImageUrl : null);
-
-    const hasImage = !!displayImageUrl && !imgError;
+    // enrichAdData가 media_url → banner_image_url(approved) → picsum(mock only) 순으로 options.mediaUrl 설정
+    const hasImage = !!shop.options?.mediaUrl && !imgError;
     const paySuffixes: string[] = shop.options?.paySuffixes || (shop.options as any)?.pay_suffixes || (shop as any).paySuffixes || [];
     const badgeChar = shop.payType?.substring(0, 1) || '시';
     const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
@@ -87,7 +82,7 @@ export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardP
                 {hasImage ? (
                     // 이미지 있을 경우: 이미지 표시
                     <img
-                        src={displayImageUrl!}
+                        src={shop.options!.mediaUrl}
                         alt={shop.name}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -105,13 +100,6 @@ export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardP
                             {cleanTitle}
                         </h2>
                         <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
-                    </div>
-                )}
-                {/* [배너 LIVE 뱃지] 어드민 승인 배너 게재 중일 때 표시 */}
-                {hasBannerApproved && (
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md pointer-events-none">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
-                        <span className="text-[8px] font-black text-white tracking-tighter uppercase">배너게재중</span>
                     </div>
                 )}
             </div>
