@@ -72,6 +72,7 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
     const [rejectTarget, setRejectTarget] = useState<number | null>(null);
     const [rejectReason, setRejectReason] = useState('');
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+    const [savingPositionId, setSavingPositionId] = useState<number | null>(null);
 
     const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
         setToast({ msg, type });
@@ -128,6 +129,23 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
             showToast(`오류: ${err.message}`, 'error');
         } finally {
             setProcessingId(null);
+        }
+    };
+
+    const handlePositionChange = async (adId: number, newPosition: string) => {
+        setSavingPositionId(adId);
+        try {
+            const { error } = await supabase
+                .from('shops')
+                .update({ banner_position: newPosition, updated_at: new Date().toISOString() })
+                .eq('id', adId);
+            if (error) throw error;
+            setAds(prev => prev.map(a => a.id === adId ? { ...a, banner_position: newPosition } : a));
+            showToast(`위치 변경: ${POSITION_LABEL[newPosition] || newPosition} ✅`);
+        } catch (err: any) {
+            showToast(`위치 변경 실패: ${err.message}`, 'error');
+        } finally {
+            setSavingPositionId(null);
         }
     };
 
@@ -258,9 +276,24 @@ export const AdminBannerManagement = ({ onCountChange }: AdminBannerManagementPr
                                                 <Tag size={8} /> {tierInfo.label}
                                             </span>
                                         )}
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-slate-100 text-slate-600">
-                                            <MapPin size={8} /> {posLabel}
-                                        </span>
+                                        <div className="flex items-center gap-1 min-w-0">
+                                            <MapPin size={8} className="text-slate-400 shrink-0" />
+                                            <select
+                                                value={ad.banner_position || ''}
+                                                onChange={e => handlePositionChange(ad.id, e.target.value)}
+                                                disabled={savingPositionId === ad.id}
+                                                className="text-[9px] font-black bg-slate-100 text-slate-600 border-0 rounded-lg px-1.5 py-0.5 outline-none cursor-pointer hover:bg-slate-200 transition disabled:opacity-50"
+                                            >
+                                                <option value="">미지정</option>
+                                                <option value="both">양쪽 사이드바</option>
+                                                <option value="left">좌측 사이드바</option>
+                                                <option value="right">우측 사이드바</option>
+                                                <option value="inner">내부 배너</option>
+                                            </select>
+                                            {savingPositionId === ad.id && (
+                                                <span className="text-[8px] text-slate-400 animate-pulse">저장 중...</span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <p className="text-[9px] text-slate-300 font-bold">

@@ -17,13 +17,13 @@ import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
 import { useAuth } from '@/hooks/useAuth';
 
-// [Fix 5] MobilePreviewContent.tsx와 동일한 Kakao Map SDK 로더 (검증된 패턴 재사용)
+// [Mobile Fix] autoload=false 방식이 일부 모바일에서 onerror 발생 → autoload 생략(기본 true)
 const loadKakaoMapSdk = (): Promise<void> =>
     new Promise((resolve, reject) => {
         if ((window as any).kakao?.maps?.services) { resolve(); return; }
         const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
         if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
-        const timeoutId = setTimeout(() => reject(new Error('카카오 지도 로딩 시간 초과')), 10000);
+        const timeoutId = setTimeout(() => reject(new Error('카카오 지도 로딩 시간 초과')), 15000);
         const checkInitialized = () => {
             if ((window as any).kakao?.maps?.services) { clearTimeout(timeoutId); resolve(); return true; }
             return false;
@@ -34,18 +34,25 @@ const loadKakaoMapSdk = (): Promise<void> =>
                 if (checkInitialized()) return;
                 const k = (window as any).kakao;
                 if (k?.maps?.load) { k.maps.load(() => { if (!checkInitialized()) setTimeout(poll, 100); }); }
-                else { setTimeout(poll, 100); }
+                else { setTimeout(poll, 200); }
             };
             poll(); return;
         }
         const script = document.createElement('script');
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
+        // autoload 기본값(true) — SDK가 로드 시 자동 초기화. 모바일 호환성 향상.
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services`;
+        script.async = true;
         script.onload = () => {
-            const k = (window as any).kakao;
-            if (k?.maps?.load) { k.maps.load(() => { const p = () => { if (!checkInitialized()) setTimeout(p, 100); }; p(); }); }
-            else { reject(new Error('카카오 지도 객체 생성 실패')); }
+            // autoload=true 시 로드 완료 후 kakao.maps 자동 초기화됨
+            const poll = () => {
+                if (checkInitialized()) return;
+                const k = (window as any).kakao;
+                if (k?.maps?.load) { k.maps.load(() => { if (!checkInitialized()) setTimeout(poll, 100); }); }
+                else { setTimeout(poll, 200); }
+            };
+            poll();
         };
-        script.onerror = () => { clearTimeout(timeoutId); reject(new Error('카카오 지도 스크립트 로드 실패')); };
+        script.onerror = () => { clearTimeout(timeoutId); reject(new Error('카카오 지도를 불러올 수 없습니다')); };
         document.head.appendChild(script);
     });
 
@@ -404,9 +411,19 @@ export const JobDetailContent = ({
                     <div className="aspect-video rounded-xl bg-gray-100 border border-gray-50 overflow-hidden relative">
                         {resolvedAddress ? (
                             mapError ? (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-400">
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-400 px-4">
                                     <MapPin size={28} className="opacity-40" />
-                                    <span className="text-xs font-medium">{mapError}</span>
+                                    <span className="text-xs font-medium text-center">{mapError}</span>
+                                    {resolvedAddress && (
+                                        <a
+                                            href={`https://map.kakao.com/link/search/${encodeURIComponent(resolvedAddress)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-4 py-2 bg-yellow-400 text-yellow-900 text-[11px] font-black rounded-xl hover:bg-yellow-300 transition-all active:scale-95 shadow-sm"
+                                        >
+                                            카카오맵에서 열기 →
+                                        </a>
+                                    )}
                                 </div>
                             ) : (
                                 <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />

@@ -690,6 +690,7 @@ function MyShopContent() {
                 region: formState.regionCity,
                 phone: formState.managerPhone,
                 kakao: formState.messengers.kakao,
+                line: formState.messengers.line,
                 telegram: formState.messengers.telegram,
                 tier: finalProductType,
                 pay: String(formState.payAmount),
@@ -761,7 +762,7 @@ function MyShopContent() {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     // [Critical Fix] Strictly filter payload for 'shops' table update
                     const validColumns = [
-                        'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
+                        'name', 'title', 'region', 'phone', 'kakao', 'line', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
                         'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url',
@@ -806,7 +807,7 @@ function MyShopContent() {
                 if (!isTargetMock) {
                     // [Critical Fix] Payload Sanitization - Filter only valid shops table columns
                     const validColumns = [
-                        'name', 'title', 'region', 'phone', 'kakao', 'telegram', 'tier',
+                        'name', 'title', 'region', 'phone', 'kakao', 'line', 'telegram', 'tier',
                         'pay', 'pay_amount', 'pay_type', 'category', 'category_sub',
                         'work_region_sub', 'content', 'nickname', 'manager_name', 'manager_phone',
                         'edit_count', 'last_edit_month', 'ad_price', 'updated_at', 'status', 'user_id', 'deadline', 'options', 'product_type', 'media_url',
