@@ -63,11 +63,13 @@ const TIER_COLOR: Record<string, string> = {
 // OngoingAdsView.tsx의 BANNER_ELIGIBLE_TIERS와 동일하게 유지 (PATTERN-07 기준)
 const BANNER_ELIGIBLE = ['grand', 'premium', 'deluxe', 'special', 'p1', 'p2', 'p3', 'p4'];
 
+// DB chk_banner_position 허용값: 'left' | 'right' | 'both' | 'inner' (NULL 포함)
+// BannerSidebar.tsx도 동일 값 기준으로 필터링 중 — 반드시 일치시킬 것
 const POSITION_OPTIONS = [
-    { value: 'sidebar_left',   label: '좌측 사이드바',  desc: '그랜드/프리미엄' },
-    { value: 'sidebar_right',  label: '우측 사이드바',  desc: '그랜드/프리미엄' },
-    { value: 'inner_top',      label: '내부 상단',      desc: '디럭스 이상' },
-    { value: 'inner_bottom',   label: '내부 하단',      desc: '디럭스 이상' },
+    { value: 'both',  label: '양쪽 사이드바 동시', desc: '그랜드 전용 (좌+우)' },
+    { value: 'left',  label: '좌측 사이드바',       desc: '그랜드/프리미엄' },
+    { value: 'right', label: '우측 사이드바',        desc: '그랜드/프리미엄' },
+    { value: 'inner', label: '내부 사이드바',        desc: '디럭스/스페셜' },
 ];
 
 export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRegistrationModalProps) {

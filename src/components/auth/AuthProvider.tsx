@@ -288,6 +288,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem('personal_profile_image');
             localStorage.removeItem('business_profile_image');
             localStorage.removeItem('_auth_user_id');
+            // 계정 전환 시 이전 유저 데이터 오염 방지 — 드래프트/이력서 로컬 캐시 전부 초기화
+            localStorage.removeItem('coco_mock_ads');
+            localStorage.removeItem('coco_mock_resumes');
+            localStorage.removeItem('coco_ad_draft');
             document.cookie = 'coco_admin_mock=; path=/; max-age=0';
         }
 

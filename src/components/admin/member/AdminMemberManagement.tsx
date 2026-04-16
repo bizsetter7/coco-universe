@@ -106,7 +106,9 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
         }
     };
 
-    const effectiveUsers = (users && users.length > 0) ? users : mockUsers;
+    // mockUsers 폴백 완전 제거 — DB 로딩 중 유령 데이터 노출 방지
+    // users가 비어있을 때는 빈 배열 유지 (로딩 스피너 또는 "데이터 없음" 표시)
+    const effectiveUsers = users || [];
     const filteredUsers = effectiveUsers
         .filter(u => {
             if (filter === 'all') return true;
@@ -186,7 +188,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                             </div>
                                         </td>
                                         <td className="px-8 py-4">
-                                            <div className="text-xs font-bold text-slate-600">{user.phone || '010-0000-0000'}</div>
+                                            <div className="text-xs font-bold text-slate-600">{user.phone || '-'}</div>
                                             <div className="text-[10px] text-slate-400">{user.email}</div>
                                             <div className="text-[9px] text-blue-400 mt-1">유입: {user.referrer || '직접'}</div>
                                         </td>
