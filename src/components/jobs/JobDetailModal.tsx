@@ -17,42 +17,66 @@ import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
 import { useAuth } from '@/hooks/useAuth';
 
-// [Mobile Fix] autoload=false 방식이 일부 모바일에서 onerror 발생 → autoload 생략(기본 true)
+/**
+ * Kakao Maps SDK 로더 — autoload=false + 명시적 kakao.maps.load() 패턴
+ *
+ * [autoload=true 폐기 이유]
+ *   autoload=true 상태에서 kakao.maps.load()는 no-op → 콜백 미실행 → Promise 무한 대기
+ *   → 지도 미표시(에러도 없음). PC/모바일 공통 발생. autoload=false만 안정적.
+ *
+ * [기존 script 존재 시]
+ *   setInterval 100ms 폴링으로 maps.services 초기화 대기 (무한루프 안전)
+ */
 const loadKakaoMapSdk = (): Promise<void> =>
     new Promise((resolve, reject) => {
+        // 이미 초기화 완료
         if ((window as any).kakao?.maps?.services) { resolve(); return; }
+
         const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
         if (!key) { reject(new Error('NEXT_PUBLIC_KAKAO_MAP_KEY 미설정')); return; }
-        const timeoutId = setTimeout(() => reject(new Error('카카오 지도 로딩 시간 초과')), 15000);
-        const checkInitialized = () => {
-            if ((window as any).kakao?.maps?.services) { clearTimeout(timeoutId); resolve(); return true; }
-            return false;
-        };
+
+        const TIMEOUT_MS = 15000;
+        let settled = false;
+        const settle = (fn: () => void) => { if (!settled) { settled = true; fn(); } };
+        const timeoutId = setTimeout(() => settle(() => reject(new Error('카카오 지도 로딩 시간 초과'))), TIMEOUT_MS);
+
         const existing = document.querySelector(`script[src*="dapi.kakao.com"]`);
         if (existing) {
-            const poll = () => {
-                if (checkInitialized()) return;
-                const k = (window as any).kakao;
-                if (k?.maps?.load) { k.maps.load(() => { if (!checkInitialized()) setTimeout(poll, 100); }); }
-                else { setTimeout(poll, 200); }
-            };
-            poll(); return;
+            // 스크립트는 있지만 아직 초기화 안 됨 → setInterval 폴링
+            const poll = setInterval(() => {
+                if ((window as any).kakao?.maps?.services) {
+                    clearTimeout(timeoutId);
+                    clearInterval(poll);
+                    settle(resolve);
+                }
+            }, 100);
+            return;
         }
+
+        // 신규 스크립트 삽입 — autoload=false로 controlled 초기화
         const script = document.createElement('script');
-        // autoload 기본값(true) — SDK가 로드 시 자동 초기화. 모바일 호환성 향상.
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services`;
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`;
         script.async = true;
         script.onload = () => {
-            // autoload=true 시 로드 완료 후 kakao.maps 자동 초기화됨
-            const poll = () => {
-                if (checkInitialized()) return;
-                const k = (window as any).kakao;
-                if (k?.maps?.load) { k.maps.load(() => { if (!checkInitialized()) setTimeout(poll, 100); }); }
-                else { setTimeout(poll, 200); }
-            };
-            poll();
+            const kakao = (window as any).kakao;
+            if (!kakao?.maps?.load) {
+                settle(() => reject(new Error('kakao.maps.load 없음 — SDK 로드 실패')));
+                return;
+            }
+            // autoload=false: maps.load() 호출 시 services 포함 초기화
+            kakao.maps.load(() => {
+                clearTimeout(timeoutId);
+                if ((window as any).kakao?.maps?.services) {
+                    settle(resolve);
+                } else {
+                    settle(() => reject(new Error('카카오 지도 서비스 초기화 실패')));
+                }
+            });
         };
-        script.onerror = () => { clearTimeout(timeoutId); reject(new Error('카카오 지도를 불러올 수 없습니다')); };
+        script.onerror = () => {
+            clearTimeout(timeoutId);
+            settle(() => reject(new Error('카카오 지도 스크립트 로드 실패 (네트워크/도메인 인증 확인)')));
+        };
         document.head.appendChild(script);
     });
 
