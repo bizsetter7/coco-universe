@@ -107,7 +107,7 @@ export const TabNotice = () => {
     const [expandedNotice, setExpandedNotice] = useState<number | null>(null);
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-2 md:space-y-3">
             <div className="flex items-center gap-3 mb-6 bg-slate-50/10 dark:bg-white/5 p-2 rounded-xl md:bg-white/40 md:p-4 md:rounded-2xl md:border md:border-gray-100/50 md:dark:border-gray-800/50">
                 <div className="w-2 h-8 bg-[#f82b60] rounded-full"></div>
                 <div className="flex items-center justify-between flex-1">
@@ -119,7 +119,7 @@ export const TabNotice = () => {
                 <div key={notice.id} className={`${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
                     <div
                         onClick={() => setExpandedNotice(expandedNotice === notice.id ? null : notice.id)}
-                        className={`p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
+                        className={`p-3 md:p-4 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
                     >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             <span className={`w-12 h-6 flex items-center justify-center shrink-0 rounded text-[10px] font-black ${notice.category === '필독' ? 'bg-red-600 text-white' : notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-[#f82b60] text-white'}`}>

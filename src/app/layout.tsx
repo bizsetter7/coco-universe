@@ -120,7 +120,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning={true}>
       <head />
-      <body className={`${inter.className} notranslate`}>
+      <body className={`${inter.className} notranslate`} suppressHydrationWarning={true}>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

@@ -379,6 +379,7 @@ function MainHeaderContent({ showBackButton, title: propTitle }: MainHeaderProps
                             {(pathname?.startsWith('/customer-center') || page === 'support' || page === 'faq' || page === 'inquiry') && (
                                 <div className="space-y-1">
                                     {[
+                                        { label: '센터 홈', id: 'dashboard' },
                                         { label: '공지사항', id: 'notice' },
                                         { label: '광고안내', id: 'ad' },
                                         { label: '이용방법', id: 'guide' },

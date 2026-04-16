@@ -334,7 +334,7 @@ export function PersonalDashboardHome({ setView, resumeCount = 0 }: { setView: (
                     <div className="flex items-center gap-3">
                         <span className="text-2xl">📅</span>
                         <div className="text-left">
-                            <p className="font-black text-sm">오늘 출석체크 안 하셨네요!</p>
+                            <p className="font-black text-sm whitespace-nowrap">오늘 출석체크 안 하셨네요!</p>
                             <p className="text-white/80 text-xs font-bold">지금 체크하면 +3P 즉시 적립</p>
                         </div>
                     </div>

@@ -553,8 +553,8 @@ export const JobDetailContent = ({
                             })()}
                         </div>
                         <p className="mt-3 text-[10px] text-gray-400 font-medium leading-relaxed">
-                            * 본 상세내용은 {shop.city} {shop.district} 지역의 실제 정보를 바탕으로 구성되었습니다. 
-                            코코알바는 검증된 {shop.city} 지역의 여자유흥알바 정보를 제공합니다.
+                            * 본 상세내용은 지역의 실제 정보를 바탕으로 구성되었습니다.<br />
+                            코코알바는 검증된 지역의 여자유흥알바 정보를 제공합니다.
                         </p>
                     </div>
                 </div>
