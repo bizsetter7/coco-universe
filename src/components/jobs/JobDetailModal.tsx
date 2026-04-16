@@ -147,14 +147,35 @@ export const JobDetailContent = ({
                 if (cancelled || !mapContainerRef.current) return;
                 const kakao = (window as any).kakao;
                 const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(resolvedAddress, (result: any[], status: string) => {
+
+                const renderMap = (y: string, x: string) => {
                     if (cancelled || !mapContainerRef.current) return;
-                    if (status !== kakao.maps.services.Status.OK || !result[0]) {
-                        setMapError('주소를 지도에서 찾을 수 없습니다.'); return;
-                    }
-                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    const coords = new kakao.maps.LatLng(y, x);
                     const map = new kakao.maps.Map(mapContainerRef.current, { center: coords, level: 4 });
                     new kakao.maps.Marker({ map, position: coords });
+                };
+
+                geocoder.addressSearch(resolvedAddress, (result: any[], status: string) => {
+                    if (cancelled || !mapContainerRef.current) return;
+                    if (status === kakao.maps.services.Status.OK && result[0]) {
+                        renderMap(result[0].y, result[0].x);
+                        return;
+                    }
+                    // [Fix] 상세호수 제거 후 재시도 — "302,303호" 같은 쉼표 포함 상세주소는 geocoder 실패 유발
+                    // 패턴: 마지막 공백+숫자(쉼표 포함)+한국어 단위(호/층/동/관/실) 제거
+                    const baseAddr = resolvedAddress.replace(/\s+[\d,]+[호층동관실]+[\d,호층]*\s*$/, '').trim();
+                    if (baseAddr && baseAddr !== resolvedAddress) {
+                        geocoder.addressSearch(baseAddr, (result2: any[], status2: string) => {
+                            if (cancelled || !mapContainerRef.current) return;
+                            if (status2 === kakao.maps.services.Status.OK && result2[0]) {
+                                renderMap(result2[0].y, result2[0].x);
+                            } else {
+                                setMapError('주소를 지도에서 찾을 수 없습니다.');
+                            }
+                        });
+                    } else {
+                        setMapError('주소를 지도에서 찾을 수 없습니다.');
+                    }
                 });
             })
             .catch(err => { if (!cancelled) setMapError(err.message || '지도를 불러오지 못했습니다.'); });
