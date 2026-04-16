@@ -739,6 +739,10 @@ function MyShopContent() {
                     regionCity: formState.regionCity,
                     regionGu: formState.regionGu,
                     mediaUrl: formState.mediaUrl,
+                    // 메신저 ID 스냅샷 (shops 테이블에 line 루트 컬럼 미존재 → options에 저장)
+                    kakao: formState.messengers.kakao,
+                    line: formState.messengers.line,
+                    telegram: formState.messengers.telegram,
                     // [스냅샷] 업종 정보 — normalizeAd workType 복원용
                     shopName: formState.shopName,
                     category: formState.industryMain,

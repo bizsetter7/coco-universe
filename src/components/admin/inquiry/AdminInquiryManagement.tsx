@@ -17,9 +17,15 @@ interface AdminInquiryManagementProps {
     inquiries: any[];
     messages: any[];
     fetchData: () => Promise<void>;
+    profiles?: any[]; // profiles 배열로 UUID → 닉네임 매핑
 }
 
-export function AdminInquiryManagement({ inquiries, messages, fetchData }: AdminInquiryManagementProps) {
+export function AdminInquiryManagement({ inquiries, messages, fetchData, profiles = [] }: AdminInquiryManagementProps) {
+    // profiles 배열에서 userId로 프로필 빠르게 조회
+    const getProfileByUserId = (userId: string | undefined) => {
+        if (!userId) return null;
+        return profiles.find(p => p.id === userId) || null;
+    };
     const [activeTab, setActiveTab] = useState<'all' | 'inquiry' | 'message'>('all');
     const [inquiryFilter, setInquiryFilter] = useState<string>('전체');
     const [selectedInquiry, setSelectedInquiry] = useState<any | null>(null);
@@ -78,6 +84,9 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
 
     const handleViewMember = async (userId: string) => {
         if (!userId) return;
+        // profiles prop 배열 우선 조회 (빠름), 없으면 DB 조회
+        const cached = getProfileByUserId(userId);
+        if (cached) { setMemberProfile(cached); return; }
         const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
         if (data) setMemberProfile(data);
         else alert('회원 정보를 찾을 수 없습니다.');
@@ -368,21 +377,29 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                     </div>
 
                                     {/* 2. Info Row */}
-                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-medium pl-1">
-                                        <span className="font-bold text-slate-700">{item.shop_name || item.sender || '정보 없음'}</span>
-                                        <span className="w-px h-3 bg-slate-200" />
-                                        {(item.user_id || item.sender_id) ? (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleViewMember(item.user_id || item.sender_id); }}
-                                                className="text-blue-500 hover:text-blue-700 hover:underline font-bold flex items-center gap-1"
-                                            >
-                                                <User size={10} />
-                                                {item.user_id?.substring(0, 8) || item.sender_id?.substring(0, 8)}...
-                                            </button>
-                                        ) : <span>-</span>}
-                                        <span className="w-px h-3 bg-slate-200" />
-                                        <span>{item.contact || item.sender || '-'}</span>
-                                    </div>
+                                    {(() => {
+                                        const userId = item.user_id || item.sender_id;
+                                        const profile = getProfileByUserId(userId);
+                                        const displayNick = profile?.nickname || profile?.full_name || item.writer_name || item.sender || '정보 없음';
+                                        const displayId = profile?.username || (userId ? `${userId.substring(0, 8)}…` : '-');
+                                        return (
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-medium pl-1">
+                                                <span className="font-bold text-slate-700">{displayNick}</span>
+                                                <span className="w-px h-3 bg-slate-200" />
+                                                {userId ? (
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleViewMember(userId); }}
+                                                        className="text-blue-500 hover:text-blue-700 hover:underline font-bold flex items-center gap-1"
+                                                    >
+                                                        <User size={10} />
+                                                        {displayId}
+                                                    </button>
+                                                ) : <span className="text-slate-400">-</span>}
+                                                <span className="w-px h-3 bg-slate-200" />
+                                                <span>{item.contact || '-'}</span>
+                                            </div>
+                                        );
+                                    })()}
 
                                     {/* Absolute Right */}
                                     <div className="absolute top-4 right-4 text-right">
@@ -452,7 +469,16 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                                                                 onClick={() => handleViewMember(selectedInquiry.user_id || selectedInquiry.targetUserId)}
                                                                 className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-indigo-400 transition-colors underline-offset-2 hover:underline"
                                                             >
-                                                                {selectedInquiry.writer_name || selectedInquiry.sender || 'Unknown'}
+                                                                {(() => {
+                                                                    const uid = selectedInquiry.user_id || selectedInquiry.targetUserId;
+                                                                    const p = getProfileByUserId(uid);
+                                                                    return p?.nickname || p?.full_name || selectedInquiry.writer_name || selectedInquiry.sender || 'Unknown';
+                                                                })()}
+                                                                {(() => {
+                                                                    const uid = selectedInquiry.user_id || selectedInquiry.targetUserId;
+                                                                    const p = getProfileByUserId(uid);
+                                                                    return p?.username ? <span className="text-indigo-400/60 ml-1 normal-case tracking-normal">@{p.username}</span> : null;
+                                                                })()}
                                                             </button>
                                                             <button
                                                                 onClick={() => {
@@ -635,8 +661,12 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                     </div>
                     <div className="p-6 grid grid-cols-2 gap-3">
                         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">닉네임</p>
+                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.nickname || memberProfile.full_name || '-'}</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Login ID</p>
-                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.username || memberProfile.email || '-'}</p>
+                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.username || '-'}</p>
                         </div>
                         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone</p>
@@ -654,7 +684,11 @@ export function AdminInquiryManagement({ inquiries, messages, fetchData }: Admin
                         </div>
                         <div className="col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Email</p>
-                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.email || '-'}</p>
+                            <p className="text-sm font-bold text-slate-900 break-all">{memberProfile.contact_email || memberProfile.email || '-'}</p>
+                        </div>
+                        <div className="col-span-2 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                            <p className="text-[10px] font-black text-blue-400 uppercase mb-1 tracking-widest">UUID</p>
+                            <p className="text-[11px] font-mono text-blue-700 break-all">{memberProfile.id}</p>
                         </div>
                     </div>
                 </div>

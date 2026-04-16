@@ -615,6 +615,7 @@ function AdminContent() {
                         inquiries={realInquiries}
                         messages={allMessages}
                         fetchData={fetchData}
+                        profiles={realUsers}
                     />
                 )
             }
