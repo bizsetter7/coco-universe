@@ -45,7 +45,9 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
     const isMobile = useMobile();
     const [imgError, setImgError] = React.useState(false);
 
-    // enrichAdData가 media_url → banner_image_url(approved) → picsum(mock only) 순으로 options.mediaUrl 설정
+    // mediaUrl이 바뀌면 imgError 초기화 (URL 교체 후 깜빡임 방지)
+    React.useEffect(() => { setImgError(false); }, [shop.options?.mediaUrl]);
+    // enrichAdData: approved배너 → options.mediaUrl → media_url → picsum(mock only) 순 우선순위
     const hasImage = !!shop.options?.mediaUrl && !imgError;
     const isUrgentType = tierId === 'urgent' || tierId === 'recommended';
     const showImage = !isUrgentType && !hideImage;

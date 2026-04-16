@@ -289,6 +289,28 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                             <h4 className={`text-sm font-black ${selectedShopId ? 'text-slate-900' : 'text-slate-400'}`}>배너 이미지 / 영상 업로드</h4>
                         </div>
 
+                        {/* 슬롯별 권장 사이즈 안내 */}
+                        <div className="grid grid-cols-2 gap-2">
+                            {[
+                                { pos: '좌/우 사이드바',   size: '320 × 280px',  ratio: '8:5', desc: '풀 오버레이 (그랜드/프리미엄)' },
+                                { pos: '사이드바 이미지',  size: '320 × 160px',  ratio: '2:1', desc: '이미지 섹션만 (그랜드/프리미엄)' },
+                                { pos: '그랜드/프리미엄 카드', size: '800 × 600px', ratio: '4:3', desc: '등급별 리스트 카드 썸네일' },
+                                { pos: '디럭스/스페셜 카드',   size: '600 × 450px', ratio: '4:3', desc: '등급별 리스트 카드 썸네일' },
+                                { pos: '내부 배너',        size: '800 × 200px',  ratio: '4:1', desc: '메인 컨텐츠 내부 배너' },
+                            ].map(item => (
+                                <div key={item.pos} className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 space-y-0.5">
+                                    <p className="text-[10px] font-black text-slate-700">{item.pos}</p>
+                                    <p className="text-[12px] font-black text-blue-600 tracking-tight">{item.size}</p>
+                                    <p className="text-[9px] text-slate-400 font-bold">비율 {item.ratio} · {item.desc}</p>
+                                </div>
+                            ))}
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 space-y-0.5 flex flex-col justify-center">
+                                <p className="text-[10px] font-black text-amber-700">포맷 안내</p>
+                                <p className="text-[10px] text-amber-600 font-bold">JPG · PNG · GIF · MP4</p>
+                                <p className="text-[9px] text-amber-500 font-bold">MP4 권장 5MB 이하</p>
+                            </div>
+                        </div>
+
                         <div className={`rounded-2xl border-2 border-dashed p-5 transition-all ${mediaUrl ? 'border-blue-300 bg-blue-50/30' : 'border-slate-200 bg-slate-50'} ${!selectedShopId ? 'opacity-40 pointer-events-none' : ''}`}>
                             <div className="flex gap-5 items-center">
                                 {/* 프리뷰 */}
@@ -315,7 +337,7 @@ export function AdminAdRegistrationModal({ user, onClose, fetchData }: AdminAdRe
                                             disabled={isUploading}
                                         />
                                     </label>
-                                    <p className="text-[10px] text-slate-400 font-medium">GIF · JPG · PNG · MP4 모두 지원 | 사이드 배너: 가로 200px 권장</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">위 슬롯 사이즈에 맞게 제작 후 업로드 · 승인 즉시 활성화</p>
                                 </div>
                             </div>
                         </div>

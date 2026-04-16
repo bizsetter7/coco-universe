@@ -70,11 +70,15 @@ export function enrichAdData(ad: any, userData: any[] = []): Shop {
         options: {
             ...(ad?.options || {}),
             keywords: keywords,
-            // [우선순위] 1. options.mediaUrl (별도 카드이미지) 2. media_url (DB root) 3. 배너이미지(승인됨) 4. 목업 전용 picsum
+            // [우선순위]
+            // 1. 어드민 승인 배너 (사이드바와 동일한 이미지를 등급별 리스트에도 표시 — 최우선)
+            // 2. options.mediaUrl (별도 카드이미지 업로드)
+            // 3. media_url (DB root 컬럼)
+            // 4. 목업 전용 picsum (실제 광고에는 절대 미적용)
             mediaUrl:
+                (ad?.banner_status === 'approved' && ad?.banner_image_url ? ad.banner_image_url : undefined) ||
                 ad?.options?.mediaUrl ||
                 ad?.media_url ||
-                (ad?.banner_status === 'approved' && ad?.banner_image_url ? ad.banner_image_url : undefined) ||
                 ((ad?.isMock || ad?.isRecovered) && (ad?.tier === 'grand' || ad?.tier === 'premium')
                     ? `https://picsum.photos/400/300?random=${ad.id}`
                     : undefined),

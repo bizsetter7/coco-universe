@@ -37,7 +37,9 @@ export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardP
     const cleanTitle = cleanShopTitle(shop.title, shop.name);
     const [imgError, setImgError] = React.useState(false);
 
-    // enrichAdData가 media_url → banner_image_url(approved) → picsum(mock only) 순으로 options.mediaUrl 설정
+    // mediaUrl이 바뀌면 imgError 초기화 (URL 교체 후 깜빡임 방지)
+    React.useEffect(() => { setImgError(false); }, [shop.options?.mediaUrl]);
+    // enrichAdData: approved배너 → options.mediaUrl → media_url → picsum(mock only) 순 우선순위
     const hasImage = !!shop.options?.mediaUrl && !imgError;
     const paySuffixes: string[] = shop.options?.paySuffixes || (shop.options as any)?.pay_suffixes || (shop as any).paySuffixes || [];
     const badgeChar = shop.payType?.substring(0, 1) || '시';
