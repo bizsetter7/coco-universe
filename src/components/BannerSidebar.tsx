@@ -11,6 +11,7 @@ import { getPayColor } from '@/utils/payColors';
 import JobDetailModal from './jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
 import { supabase } from '@/lib/supabase';
+import { enrichAdData } from '@/lib/adUtils';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
@@ -164,7 +165,10 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             .in('tier', ['grand', 'p1', 'premium', 'p2'])
             .order('updated_at', { ascending: false })
             .then(({ data }) => {
-                if (data && data.length > 0) setDbShops(data);
+                if (data && data.length > 0) {
+                    // enrichAdData로 정규화 — JobDetailModal 팝업에서 필드 동기화 보장
+                    setDbShops(data.map(shop => enrichAdData(shop, [])));
+                }
             });
     }, []);
 
