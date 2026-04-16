@@ -17,7 +17,8 @@ import {
     Paperclip,
     Lock,
     ChevronLeft,
-    Megaphone
+    Megaphone,
+    Trash2
 } from 'lucide-react';
 
 interface TabInquiryProps {
@@ -195,6 +196,23 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
         fetchInquiries();
     };
 
+    // 문의 삭제 — 작성자 본인 또는 관리자만 가능
+    const handleDeleteInquiry = async (inquiryId: string) => {
+        if (!confirm('정말 삭제하시겠습니까? 삭제 후 복구가 불가합니다.')) return;
+        try {
+            // 답변 댓글(parent_id=inquiryId)도 함께 삭제
+            await supabase.from('inquiries').delete().eq('parent_id', inquiryId);
+            const { error } = await supabase.from('inquiries').delete().eq('id', inquiryId);
+            if (error) throw error;
+            alert('삭제되었습니다.');
+            setInquiryMode('list');
+            setViewingInquiry(null);
+            fetchInquiries();
+        } catch (err: any) {
+            alert('삭제 중 오류가 발생했습니다: ' + err.message);
+        }
+    };
+
     usePreventLeave(isDirty);
 
     // [SCROLL FIX] Force unlock body scroll when entering detail view
@@ -327,7 +345,7 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                             window.scrollTo({ top: 0, behavior: 'instant' });
                                                         }
                                                     }}
-                                                    className={`cursor-pointer border-b last:border-0 transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-rose-50/30'}`}
+                                                    className={`group cursor-pointer border-b last:border-0 transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-rose-50/30'}`}
                                                 >
                                                     <td className="px-1 py-1.5 md:py-3.5 text-center text-[9px] md:text-[10px] font-bold text-gray-400 italic">
                                                         {isNotice ? <Megaphone size={11} className="text-[#f82b60] mx-auto" /> : (totalCount - ((currentPage - 1) * itemsPerPage + idx))}
@@ -357,8 +375,22 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                         </div>
                                                     </td>
                                                     <td className={`px-0.5 py-1.5 md:py-3.5 text-[10px] md:text-[11.5px] text-center font-black truncate ${isReply ? 'text-gray-400' : 'text-gray-500'}`}>{isNotice ? '운영팀' : inq.writer_name}</td>
-                                                    <td className="px-0.5 py-1.5 md:py-3.5 text-[9px] md:text-[10.5px] text-center font-medium text-gray-400 tabular-nums whitespace-nowrap">
-                                                        {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', timeZone: 'Asia/Seoul' }).replace(/-/g, '.').replace(/\.$/, '')}
+                                                    <td className="px-0.5 py-1.5 md:py-3.5 text-[9px] md:text-[10.5px] text-center font-medium text-gray-400 tabular-nums whitespace-nowrap relative">
+                                                        <span className="group-hover:hidden">
+                                                            {new Date(inq.created_at).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', timeZone: 'Asia/Seoul' }).replace(/-/g, '.').replace(/\.$/, '')}
+                                                        </span>
+                                                        {/* 본인 글: hover 시 삭제 버튼 표시 */}
+                                                        {(isAdmin || (currentUser?.id && currentUser.id === (inq as any).user_id)) && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteInquiry(inq.id);
+                                                                }}
+                                                                className="hidden group-hover:inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-400 rounded-lg text-[9px] font-black hover:bg-red-100 transition border border-red-100"
+                                                            >
+                                                                <Trash2 size={9} /> 삭제
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             );
@@ -691,13 +723,24 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
 
                 {inquiryMode === 'detail' && viewingInquiry && (
                     <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => {
-                                setInquiryMode('list');
-                                setIsPasswordVerified(false);
-                                setPasswordInput('');
-                            }} className="p-2 hover:bg-gray-100 rounded-full transition"><ChevronLeft /></button>
-                            <h4 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 내용 확인</h4>
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => {
+                                    setInquiryMode('list');
+                                    setIsPasswordVerified(false);
+                                    setPasswordInput('');
+                                }} className="p-2 hover:bg-gray-100 rounded-full transition"><ChevronLeft /></button>
+                                <h4 className={`text-xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>문의 내용 확인</h4>
+                            </div>
+                            {/* 삭제 버튼 — 본인 글이거나 관리자인 경우 표시 */}
+                            {(isAdmin || (currentUser?.id && currentUser.id === viewingInquiry.user_id)) && (
+                                <button
+                                    onClick={() => handleDeleteInquiry(viewingInquiry.id)}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-500 border border-red-100 rounded-xl text-[12px] font-black hover:bg-red-100 transition-all active:scale-95"
+                                >
+                                    <Trash2 size={13} /> 삭제
+                                </button>
+                            )}
                         </div>
 
                         {!isPasswordVerified ? (
