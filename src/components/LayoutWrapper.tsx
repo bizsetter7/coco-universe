@@ -173,7 +173,8 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
                     <div className={(isMobile || isAdminPage || isAuthPage) ? "block min-h-screen" : "grid grid-cols-1 xl:grid-cols-[160px_1fr_160px] xl:gap-8 xl:px-0 min-h-full items-stretch"}>
                         {/* Left Sidebar Spacer + Component - [Optimization] PC Only, 인증 페이지 제외 */}
-                        {(!isMobile && !isAdminPage && !isAuthPage) && (
+                        {/* [Fix] isMounted 조건 추가 — hydration 직후 isMobile=false 기본값으로 모바일에서도 마운트되던 버그 차단 */}
+                        {(isMounted && !isMobile && !isAdminPage && !isAuthPage) && (
                             <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                                 <StickyWrapper offsetTop={56} zIndex={10001}>
                                     <BannerSidebar side="left" shops={sideAds} />
@@ -187,7 +188,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
                         </main>
 
                         {/* Right Sidebar - [Optimization] PC Only, UI_Z_INDEX.SIDEBAR (10001) 표준 적용 */}
-                        {(!isMobile && !isAdminPage && !isAuthPage) && (
+                        {(isMounted && !isMobile && !isAdminPage && !isAuthPage) && (
                             <aside className="hidden xl:flex flex-col w-[160px] relative z-[10001] self-stretch">
                                 <StickyWrapper offsetTop={56} zIndex={10001}>
                                     <BannerSidebar side="right" shops={sideAds} />

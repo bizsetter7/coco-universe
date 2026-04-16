@@ -156,8 +156,10 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
 
     // [Banner v1] DB에서 실시간 배너 데이터 직접 조회 — layout.tsx 정적 JSON 한계 극복
     // shops prop(정적 JSON 기반)은 일반 광고카드 fallback으로 사용, DB fetch가 우선
+    // [Optimization] 모바일에서는 사이드바 미사용 → DB 조회 완전 차단 (불필요 리소스 제거)
     const [dbShops, setDbShops] = useState<any[]>([]);
     useEffect(() => {
+        if (isMobile) return; // 모바일 fetch 차단
         supabase
             .from('shops')
             .select('*')
@@ -170,7 +172,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                     setDbShops(data.map(shop => enrichAdData(shop, [])));
                 }
             });
-    }, []);
+    }, [isMobile]);
 
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();

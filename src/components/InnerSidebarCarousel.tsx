@@ -17,6 +17,7 @@ import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import { Shop } from '@/types/shop';
 import { normalizeAd } from '@/app/my-shop/utils/normalization';
+import { useMobile } from '@/hooks/useMobile';
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────────
 function shuffle<T>(arr: T[]): T[] {
@@ -120,12 +121,15 @@ interface InnerSidebarCarouselProps {
 }
 
 export function InnerSidebarCarousel({ onAdSelect }: InnerSidebarCarouselProps) {
+    const isMobile = useMobile();
     const [ads, setAds]           = useState<Shop[]>([]);
     const [currentIdx, setCurrentIdx] = useState(0);
     const [sliding, setSliding]   = useState(false);
 
     // 광고 데이터 fetch (자체 조회 — LeftSidebar props 불필요)
+    // [Optimization] 모바일에서는 내부 캐러셀 미사용 → DB 조회 + 타이머 완전 차단
     useEffect(() => {
+        if (isMobile) return; // 모바일 fetch 차단
         const fetchAds = async () => {
             try {
                 const { data } = await supabase
@@ -162,11 +166,11 @@ export function InnerSidebarCarousel({ onAdSelect }: InnerSidebarCarouselProps) 
             }
         };
         fetchAds();
-    }, []);
+    }, [isMobile]);
 
-    // 4초 자동 슬라이드
+    // 4초 자동 슬라이드 — 모바일에서는 타이머 실행 안 함
     useEffect(() => {
-        if (ads.length <= 1) return;
+        if (isMobile || ads.length <= 1) return;
         const timer = setInterval(() => {
             setSliding(true);
             setTimeout(() => {
@@ -175,9 +179,10 @@ export function InnerSidebarCarousel({ onAdSelect }: InnerSidebarCarouselProps) 
             }, 350);
         }, 4000);
         return () => clearInterval(timer);
-    }, [ads.length]);
+    }, [ads.length, isMobile]);
 
-    if (ads.length === 0) return null;
+    // [Optimization] 모바일에서는 캐러셀 미렌더 — 불필요 DOM + 타이머 완전 제거
+    if (isMobile || ads.length === 0) return null;
 
     return (
         <div className="space-y-1.5">
