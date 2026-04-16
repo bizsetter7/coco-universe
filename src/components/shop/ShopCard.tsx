@@ -93,15 +93,28 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
             {showImage && (
                 <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-900 border-b border-gray-100">
                     {hasImage ? (
-                        // 이미지 있을 경우: 이미지 표시
-                        <img
-                            src={shop.options!.mediaUrl}
-                            alt={shop.name}
-                            className="w-full h-full object-cover"
-                            loading={rank && rank <= 2 ? 'eager' : 'lazy'}
-                            decoding="async"
-                            onError={() => setImgError(true)}
-                        />
+                        // 미디어 타입에 따른 분기 (비디오/이미지)
+                        shop.options!.mediaUrl?.toLowerCase().match(/\.(mp4|webm|mov)$/i) ? (
+                            <video
+                                src={shop.options!.mediaUrl}
+                                className="w-full h-full object-cover"
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                onError={() => setImgError(true)}
+                            />
+                        ) : (
+                            // 이미지일 경우
+                            <img
+                                src={shop.options!.mediaUrl}
+                                alt={shop.name}
+                                className="w-full h-full object-cover"
+                                loading={rank && rank <= 2 ? 'eager' : 'lazy'}
+                                decoding="async"
+                                onError={() => setImgError(true)}
+                            />
+                        )
                     ) : (
                         // 이미지 없을 경우: 공고 제목만 중앙 표시
                         <div className={`absolute inset-0 flex items-center justify-center p-3 text-center bg-gradient-to-br ${getTierGradient(tierId || '')}`}>
