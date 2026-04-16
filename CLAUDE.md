@@ -1,6 +1,6 @@
 # CLAUDE_P2.md — P2 코코알바 에이전트 핸드오버 가이드
 
-> **최종 업데이트**: 2026-04-16
+> **최종 업데이트**: 2026-04-16 (2차)
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
@@ -143,6 +143,9 @@ src/
 | **Step2 실시간 미리보기 제거** | `2026-04-11` | Preview Side 블록 + description-preview CSS 완전 제거 |
 | **Step4 카드광고 메인이미지 업로드 제거** | `2026-04-11` | Step4Extras.tsx handleImageUpload 로직 완전 제거 |
 | **드래프트 세션 오염 방지** | `2026-04-11` | useAdFormState(userId) + loadShopName 명시적 초기화 |
+| **BannerSidebar DB 직접 조회** | `8c9ff0c`, `bac6096`, `4a8b469` | layout.tsx 정적 JSON 한계 극복 — Supabase 실시간 조회 + enrichAdData 정규화, banner_position=NULL 양쪽 표시 버그 수정, 팝업 필드 동기화 완료 |
+| **OngoingAdsView 카드 이미지 업로드** | `3cce806` | T1~T4 카드 썸네일 업로드 버튼(CardImageUploadPanel) 추가, media_url + options.mediaUrl 동시 업데이트 |
+| **usePreventLeave 경고 다이얼로그 복구** | `2c9466f` | pushState 중복 누적 버그 수정 — isGuardedRef로 가드 엔트리 1개만 유지, 뒤로가기/새로고침 경고 정상화 |
 | **normalization.ts 매핑 강화** | `2026-04-11` | workType, region, mediaUrl, banner_* 전체 필드 추가 |
 | **types/shop.ts 확장** | `2026-04-11` | options 인터페이스 20여 필드 + banner 컬럼 타입 추가 |
 
@@ -346,6 +349,7 @@ const tier = (
 | M-020 | payments 스키마 미확인 — type/updated_at 컬럼 없음, shop_id=bigint, pay_type=NULL insert → 결제내역 미생성. 2026-04-12 전수 수정 | **완료** |
 | M-022 | JUMP충전 승인 버튼이 `handlePaymentConfirm`으로 잘못 라우팅 → jump_balance 미지급. 2026-04-13 조건에 `metadata.type==='jump_charge'` 추가 | **완료** |
 | - | Admin 배너 슬롯 관리 탭 미구현 — `banner_status='pending_banner'` 광고 승인 UI 없음. pending 광고가 표시 안 됨 | **구현 필요 (최우선)** |
+| usePreventLeave pushState 중복 누적 — isDirty false→true 토글 시 가드 엔트리 누적 → confirm 영구 차단. 2026-04-16 isGuardedRef 추가로 수정 (`2c9466f`) | **완료** |
 
 ---
 
