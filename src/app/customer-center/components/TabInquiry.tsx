@@ -915,7 +915,13 @@ export const TabInquiry = ({ isLoggedIn, authUser }: TabInquiryProps) => {
                                                             currentUser?.user_metadata?.role === 'admin'
                                                         );
 
-                                                        const writerName = canBypass ? '운영팀' : (currentUser?.nickname || currentUser?.user_metadata?.nickname || '회원');
+                                                        // [Fix] authUser.nickname(UserSession, DB 프로필 기반)을 1순위로 사용
+                                                        // currentUser는 Supabase auth 객체라 nickname 필드 없음 → '회원' 오류 방지
+                                                        const writerName = canBypass ? '운영팀' : (
+                                                            authUser?.type === 'corporate'
+                                                                ? (profileBusinessName || authUser?.name || '업체')
+                                                                : (authUser?.nickname || currentUser?.user_metadata?.nickname || '회원')
+                                                        );
 
                                                         const { error } = await supabase.from('inquiries').insert([{
                                                             type: viewingInquiry.type,
