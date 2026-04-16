@@ -560,8 +560,8 @@ export const OngoingAdsView = ({
                                             </button>
                                         )}
 
-                                        {/* ── 카드 리스트 이미지 변경 버튼 (T1~T4) ── */}
-                                        {eligibleForBanner && (
+                                        {/* ── 카드 리스트 이미지 변경 버튼 (전 등급 — 반려/종료 제외) ── */}
+                                        {ad.status !== 'rejected' && ad.status !== 'REJECTED' && ad.status !== 'CLOSED' && ad.status !== 'closed' && (
                                             <button
                                                 onClick={() => setCardImagePanelOpen(prev => ({ ...prev, [ad.id]: !prev[ad.id] }))}
                                                 className={`w-full flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-black transition-all active:scale-95 border ${cardImagePanelOpen[ad.id]
@@ -593,7 +593,7 @@ export const OngoingAdsView = ({
                                 )}
 
                                 {/* ── 카드 이미지 업로드 패널 (펼침) ── */}
-                                {eligibleForBanner && cardImagePanelOpen[ad.id] && (
+                                {cardImagePanelOpen[ad.id] && (
                                     <CardImageUploadPanel
                                         adId={String(ad.id)}
                                         currentImageUrl={cardImageUpdates[ad.id] || ad.options?.mediaUrl || ad.mediaUrl || null}

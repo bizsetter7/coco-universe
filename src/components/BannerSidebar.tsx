@@ -184,38 +184,25 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     // [Optimization] DB fetch 우선, 없으면 props fallback
     const allShops = useMemo(() => dbShops.length > 0 ? dbShops : (shops || []), [dbShops, shops]);
 
-    const grandAds = useMemo(() => {
+    // [Fix] grand+premium 합산 최대 4개 — 각각 4개씩 렌더하던 버그 수정
+    // 우선순위: grand(p1) > premium(p2). banner_position 명시 없으면(NULL) 양쪽 모두 표시.
+    const sidebarAds = useMemo(() => {
         if (isMobile) return [];
-        const isGrandTier = (s: Shop) => s.tier === 'grand' || s.tier === 'p1';
-        const gr = allShops.filter(isGrandTier);
-
-        // banner_position NULL = 기본값(양쪽 모두 표시)
-        // banner_position='both' → 양쪽, 'left' → 좌만, 'right' → 우만
-        // [Fix] NULL인 광고를 필터에서 제외하던 버그 수정 — NULL은 both와 동일하게 양쪽 표시
-        if (isLeft) return gr.filter(s => {
-            const pos = (s as any).banner_position;
-            return pos == null || pos === 'left' || pos === 'both';
-        }).slice(0, 4);
-        return gr.filter(s => {
-            const pos = (s as any).banner_position;
-            return pos == null || pos === 'right' || pos === 'both';
-        }).slice(0, 4);
-    }, [allShops, isLeft, isMobile]);
-
-    const premiumAds = useMemo(() => {
-        if (isMobile) return [];
-        const isPremiumTier = (s: Shop) => s.tier === 'premium' || s.tier === 'p2' || (s as any).is_premium;
-        const pr = allShops.filter(isPremiumTier);
-
-        // [Fix] NULL인 premium 광고도 양쪽 기본 표시 (grand와 동일 규칙)
-        if (isLeft) return pr.filter(s => {
-            const pos = (s as any).banner_position;
-            return pos == null || pos === 'left' || pos === 'both';
-        }).slice(0, 4);
-        return pr.filter(s => {
-            const pos = (s as any).banner_position;
-            return pos == null || pos === 'right' || pos === 'both';
-        }).slice(0, 4);
+        const TIER_PRIORITY: Record<string, number> = { grand: 1, p1: 1, premium: 2, p2: 2 };
+        const isEligible = (s: Shop) =>
+            s.tier === 'grand' || s.tier === 'p1' ||
+            s.tier === 'premium' || s.tier === 'p2' ||
+            (s as any).is_premium;
+        const sideKey = isLeft ? 'left' : 'right';
+        return allShops
+            .filter(isEligible)
+            .filter(s => {
+                const pos = (s as any).banner_position;
+                // NULL = 양쪽 모두, 'both' = 양쪽, 'left'/'right' = 해당 사이드만
+                return pos == null || pos === 'both' || pos === sideKey;
+            })
+            .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99))
+            .slice(0, 4); // 합산 최대 4개
     }, [allShops, isLeft, isMobile]);
 
     // [Optimization] Valid Return for Mobile after hooks are called
@@ -246,10 +233,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                         </div>
 
                         <div className="flex flex-col gap-1 px-1">
-                            {grandAds.map((ad) => (
-                                <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
-                            ))}
-                            {premiumAds.map((ad) => (
+                            {sidebarAds.map((ad) => (
                                 <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
                             ))}
                         </div>
