@@ -7,6 +7,26 @@
     {
       "path": "/api/cron/expire-ads",
       "schedule": "30 15 * * *"
+    },
+    {
+      "path": "/api/cron/twitter-post",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/twitter-post",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/twitter-post",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/twitter-post",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/indexnow",
+      "schedule": "0 */6 * * *"
     }
   ]
 }

@@ -9,6 +9,7 @@ import {
     ShieldCheck,
     Zap,
     Megaphone,
+    Twitter,
     Database,
     CreditCard,
     XCircle,
@@ -157,7 +158,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'banner';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'banner' | 'sns';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -208,8 +209,8 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
     const handleNav = (tab: AdminTab) => {
         if (tab === 'marketing') {
             router.push('/admin/marketing');
-        } else if (tab === 'stats') {
-            onNavigate(tab);
+        } else if (tab === 'sns') {
+            router.push('/admin/sns');
         } else {
             onNavigate(tab);
         }
@@ -284,6 +285,12 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     onClick={() => router.push('/admin/marketing')}
                 />
                 <NavItem
+                    icon={<Twitter size={20} className="text-sky-400" />}
+                    label="SNS 자동화"
+                    active={activeTab === 'sns'}
+                    onClick={() => router.push('/admin/sns')}
+                />
+                <NavItem
                     icon={<ShieldCheck size={20} className="text-emerald-500" />}
                     label="시스템 검증 센터"
                     active={activeTab === 'health'}
@@ -323,6 +330,8 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
     const handleNav = (tab: AdminTab) => {
         if (tab === 'marketing') {
             router.push('/admin/marketing');
+        } else if (tab === 'sns') {
+            router.push('/admin/sns');
         } else {
             onNavigate(tab);
         }
@@ -395,6 +404,12 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         label="마케팅 자동화"
                         active={activeTab === 'marketing'}
                         onClick={() => router.push('/admin/marketing')}
+                    />
+                    <NavItem
+                        icon={<Twitter size={20} className="text-sky-400" />}
+                        label="SNS 자동화"
+                        active={activeTab === 'sns'}
+                        onClick={() => { router.push('/admin/sns'); onClose(); }}
                     />
                     <NavItem
                         icon={<ShieldCheck size={20} className="text-emerald-500" />}
