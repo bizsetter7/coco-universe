@@ -10,6 +10,7 @@ import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor } from '@/utils/payColors';
 import JobDetailModal from './jobs/JobDetailModal';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
+import { supabase } from '@/lib/supabase';
 
 // [Optimization] Memoized Sub-component to prevent unnecessary re-renders
 const SideAdCard = React.memo(({ ad, onSelect }: { ad: Shop, onSelect: (shop: Shop) => void }) => {
@@ -152,6 +153,21 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const [selectedAd, setSelectedAd] = useState<Shop | null>(null);
     const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
 
+    // [Banner v1] DB에서 실시간 배너 데이터 직접 조회 — layout.tsx 정적 JSON 한계 극복
+    // shops prop(정적 JSON 기반)은 일반 광고카드 fallback으로 사용, DB fetch가 우선
+    const [dbShops, setDbShops] = useState<any[]>([]);
+    useEffect(() => {
+        supabase
+            .from('shops')
+            .select('*')
+            .eq('status', 'active')
+            .in('tier', ['grand', 'p1', 'premium', 'p2'])
+            .order('updated_at', { ascending: false })
+            .then(({ data }) => {
+                if (data && data.length > 0) setDbShops(data);
+            });
+    }, []);
+
     const toggleFavorite = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         if (selectedAd?.id === id) saveShopSnapshot(id, selectedAd);
@@ -161,8 +177,8 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
     const isLeft = side === 'left';
     const sideChar = isLeft ? 'L' : 'R';
 
-    // [Optimization] wrap external props to avoid dependency warnings
-    const allShops = useMemo(() => shops || [], [shops]);
+    // [Optimization] DB fetch 우선, 없으면 props fallback
+    const allShops = useMemo(() => dbShops.length > 0 ? dbShops : (shops || []), [dbShops, shops]);
 
     const grandAds = useMemo(() => {
         if (isMobile) return [];

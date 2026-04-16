@@ -236,13 +236,14 @@ export const OngoingAdsView = ({
         return 'T7';
     };
 
-    // 배너 등록 가능 여부: T1~T4 + active 상태
+    // 배너 등록 가능 여부: T1~T4 + 반려/종료 아닌 상태 (심사중·진행중 모두 허용)
     const isBannerEligible = (ad: any) => {
         const tier = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || '').toLowerCase();
         const isEligibleTier = BANNER_ELIGIBLE_TIERS.includes(tier);
-        const isActive = ad.status !== 'rejected' && ad.status !== 'REJECTED'
-            && ad.status !== 'PENDING_REVIEW' && ad.status !== 'pending';
-        return isEligibleTier && isActive;
+        // 반려됐거나 종료된 광고는 배너 등록 불가, 심사중이어도 미리 등록 가능
+        const isNotRejectedOrClosed = ad.status !== 'rejected' && ad.status !== 'REJECTED'
+            && ad.status !== 'CLOSED' && ad.status !== 'closed';
+        return isEligibleTier && isNotRejectedOrClosed;
     };
 
     if (!isMounted) return <div className="p-12 text-center text-gray-400 font-bold min-h-screen">로딩 중...</div>;
