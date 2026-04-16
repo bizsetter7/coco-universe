@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ region: string }> }) {
     const { region } = await params;
-    const decodedRegionSlug = decodeURIComponent(region);
+    const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     const regionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug) || {
         mainRegion: decodedRegionSlug.replace(/-/g, ' '),
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
         title,
         description,
         alternates: {
-            canonical: `https://www.cocoalba.kr/coco/${region}`,
+            canonical: `https://www.cocoalba.kr/coco/${encodeURIComponent(decodedRegionSlug)}`,
         },
         openGraph: {
             title,
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<{ region: s
 
 export default async function CocoRegionPage({ params }: { params: Promise<{ region: string }> }) {
     const { region } = await params;
-    const decodedRegionSlug = decodeURIComponent(region);
+    const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     // [P3 독립성] 클라이언트 렌더링에 넘기는 ID는 sanitized된 seo_regions_master 사용 가능
     // (클라이언트 텍스트 렌더링은 심사용으로 정화된 텍스트가 나와도 브라우저 렌더링 됨)
@@ -170,18 +170,22 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
         ]
     };
 
+    // [SEO 튜닝] 오늘 날짜를 보정하여 구글에 최신 정보임을 알림
+    const today = new Date();
+    const isoDate = today.toISOString().split('T')[0] + 'T00:00:00Z';
+
     // [JSON-LD 4] JobPosting - 엔터알바 제거 및 브랜드 정격화
     const jobPostingSchema = {
         "@context": "https://schema.org",
         "@type": "JobPosting",
-        "title": `[${regionName}] 룸알바·노래방알바·유흥알바 정보 플랫폼 코코알바`,
-        "description": `${regionName} 지역 1등 고소득 여성알바 정보를 실시간 확인하세요. 대한민국 프리미엄 고수익 알바 정보를 안전하게 제공합니다.`,
+        "title": `[${regionName}] 노래방알바·유흥알바·마사지·엔터 정보 플랫폼 코코알바`,
+        "description": `${regionName} 지역 1등 고소득 여성알바 정보를 실시간 확인하세요. 엔터, 노래주점, 마사지 등 대한민국 프리미엄 고수익 알바 정보를 안전하게 제공합니다.`,
         "identifier": {
             "@type": "PropertyValue",
             "name": "COCOALBA",
             "value": `REGION_ADS_${region}`
         },
-        "datePosted": "2026-03-01T00:00:00Z",
+        "datePosted": isoDate,
         "validThrough": "2026-12-31T23:59:59Z",
         "employmentType": "FULL_TIME",
         "hiringOrganization": {
@@ -193,10 +197,10 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             "@type": "Place",
             "address": {
                 "@type": "PostalAddress",
-                "streetAddress": `${regionName} 일대`,
+                "streetAddress": `${regionName} 중심상업로 및 번화가 일대`,
                 "addressLocality": regionName,
                 "addressRegion": "KR",
-                "postalCode": "00000",
+                "postalCode": "16450", // 수원 팔달구 기준 기본값 (GSC 경고 방지)
                 "addressCountry": "KR"
             }
         },

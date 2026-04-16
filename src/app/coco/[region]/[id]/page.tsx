@@ -6,6 +6,7 @@ import { slugify } from '@/utils/shopUtils';
 import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 import {
     isWorkTypeSlug,
+    getNormalizedWorkTypeSlug,
     WORK_TYPE_INFO,
     WORK_TYPE_SLUGS,
     getRegionPayData,
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     // ── 업종 가이드 페이지 메타데이터 ──
-    if (isWorkTypeSlug(decodedId)) {
-        const workTypeInfo = WORK_TYPE_INFO[decodedId];
+    const normalizedSlug = getNormalizedWorkTypeSlug(decodedId);
+    if (normalizedSlug) {
+        const workTypeInfo = WORK_TYPE_INFO[normalizedSlug];
         const regionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug);
         const regionName = regionData?.mainRegion ?? decodedRegionSlug;
         const title = `${regionName} ${workTypeInfo.name} 완전 가이드 2026 — 평균 급여·용어·FAQ | 코코알바`;
@@ -31,17 +33,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         return {
             title,
             description,
-            keywords: [`${regionName} ${decodedId}`, `${regionName} ${workTypeInfo.name}`, `${decodedId} 급여`, `${regionName} 유흥알바`, '여성알바', '밤알바', '고수익알바'],
+            keywords: [`${regionName} ${normalizedSlug}`, `${regionName} ${workTypeInfo.name}`, `${normalizedSlug} 급여`, `${regionName} 유흥알바`, '여성알바', '밤알바', '고수익알바'],
             openGraph: {
                 title,
                 description,
-                url: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}`,
+                url: `https://www.cocoalba.kr/coco/${encodeURIComponent(decodedRegionSlug)}/${encodeURIComponent(normalizedSlug)}`,
                 siteName: '코코알바',
                 images: [{ url: 'https://www.cocoalba.kr/og-image.jpg', width: 1200, height: 630, alt: '코코알바' }],
                 type: 'website',
             },
             alternates: {
-                canonical: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}`,
+                canonical: `https://www.cocoalba.kr/coco/${encodeURIComponent(decodedRegionSlug)}/${encodeURIComponent(normalizedSlug)}`,
             },
         };
     }
@@ -83,7 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title,
             description,
-            url: `https://www.cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`,
+            url: `https://www.cocoalba.kr/coco/${encodeURIComponent(slugify(shop.region))}/${shop.id}`,
             images: shop.options?.mediaUrl ? [
                 {
                     url: shop.options.mediaUrl,
@@ -102,7 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             type: 'website',
         },
         alternates: {
-            canonical: `https://www.cocoalba.kr/coco/${slugify(shop.region)}/${shop.id}`,
+            canonical: `https://www.cocoalba.kr/coco/${encodeURIComponent(slugify(shop.region))}/${shop.id}`,
         },
         keywords: [shop.name || '', ...shadowRegionData.keywords, '여성알바', '고수익알바', '당일지급', '밤알바', '텐프로'],
     };
@@ -132,28 +134,34 @@ export default async function ShopDetailPage({ params }: Props) {
     const decodedRegionSlug = decodeURIComponent(region).normalize('NFC');
 
     // ── 업종 가이드 페이지 렌더링 ──
-    if (isWorkTypeSlug(decodedId)) {
-        const workTypeInfo = WORK_TYPE_INFO[decodedId];
+    const normalizedId = getNormalizedWorkTypeSlug(decodedId);
+    if (normalizedId) {
+        const workTypeInfo = WORK_TYPE_INFO[normalizedId];
         const regionData = shadowRegionsData.find(r => slugify(r.id) === decodedRegionSlug);
         const regionName = regionData?.mainRegion ?? decodedRegionSlug;
         const regionPayData = getRegionPayData(decodedRegionSlug);
 
+        // [SEO 튜닝] FAQ와 Breadcrumb 등의 주소 포맷 일관성 유지
         const faqSchema = {
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: workTypeInfo.faqs.map(faq => ({
+            mainEntity: workTypeInfo.faqs.map((f) => ({
                 '@type': 'Question',
-                name: faq.q,
-                acceptedAnswer: { '@type': 'Answer', text: faq.a },
+                name: f.q.replace('{region}', regionName),
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: f.a.replace('{region}', regionName),
+                },
             })),
         };
+
         const breadcrumbSchema = {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
                 { '@type': 'ListItem', position: 1, name: '홈', item: 'https://www.cocoalba.kr' },
                 { '@type': 'ListItem', position: 2, name: `${regionName} 알바`, item: `https://www.cocoalba.kr/coco/${decodedRegionSlug}` },
-                { '@type': 'ListItem', position: 3, name: `${regionName} ${workTypeInfo.name}`, item: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${decodedId}` },
+                { '@type': 'ListItem', position: 3, name: `${regionName} ${workTypeInfo.name}`, item: `https://www.cocoalba.kr/coco/${decodedRegionSlug}/${normalizedId}` },
             ],
         };
 

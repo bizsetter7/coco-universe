@@ -13,10 +13,11 @@ export default function LegacyShopRedirect({ params }: Props) {
     const shop = (shopsData as any[]).find(s => s.id === id);
 
     if (shop && shop.region) {
-        // [Fix] 지역명 대괄호 제거 및 슬러그화
-        const regionSlug = slugify(shop.region.replace(/\[|\]/g, '').trim());
+        // [Fix] 지역명 대괄호 제거 및 슬러그화 + 한글 정규화(NFC) 필수 적용
+        const rawRegion = shop.region.replace(/\[|\]/g, '').trim();
+        const regionSlug = slugify(rawRegion.normalize('NFC'));
         if (regionSlug) {
-            permanentRedirect(`/coco/${regionSlug}/${id}`);
+            permanentRedirect(`/coco/${encodeURIComponent(regionSlug)}/${id}`);
         }
     }
 
