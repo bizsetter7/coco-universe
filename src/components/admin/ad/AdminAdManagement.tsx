@@ -61,10 +61,22 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
     const handleStatusUpdate = async (adId: string, newStatus: string, reason?: string) => {
         try {
             const ad = mockAds.find(a => String(a.id) === String(adId));
-            
-            // [Auth Fix] 현재 세션 토큰 가져오기 (인증 헤더용)
-            const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token;
+
+            // [Auth Fix] refreshSession()으로 만료된 토큰 갱신 후 사용
+            // getSession()은 캐시된 만료 토큰을 반환할 수 있어 401 발생 → refreshSession 우선 시도
+            let token: string | undefined;
+            try {
+                const { data: refreshed } = await supabase.auth.refreshSession();
+                token = refreshed.session?.access_token;
+            } catch {
+                // refresh 실패 시 기존 세션 fallback
+                const { data: { session } } = await supabase.auth.getSession();
+                token = session?.access_token;
+            }
+
+            if (!token) {
+                throw new Error('세션이 만료되었습니다. 페이지를 새로고침 후 다시 시도하세요.');
+            }
 
             // [RLS 우회 및 트랜잭션 보장] 서버 API 라우트 호출
             const res = await fetch('/api/admin/update-shop-status', {
