@@ -90,6 +90,8 @@ export async function generateMetadata(): Promise<Metadata> {
       "geo.placename": "Seoul",
       "geo.position": "37.4979;127.0276",
       "ICBM": "37.4979, 127.0276",
+      // Google Discover + 구글 이미지 검색 대형 썸네일 허용 — 미설정 시 Discover 제외
+      "robots": "max-image-preview:large",
     },
   };
 }

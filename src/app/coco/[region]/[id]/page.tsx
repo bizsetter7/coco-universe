@@ -3,6 +3,7 @@ import { Shop } from '@/types/shop';
 import JobDetailModal, { JobDetailContent } from '@/components/jobs/JobDetailModal';
 import { Metadata } from 'next';
 import { slugify } from '@/utils/shopUtils';
+import { generateShopImageAlt } from '@/lib/imageUtils';
 import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 import {
     isWorkTypeSlug,
@@ -285,7 +286,24 @@ export default async function ShopDetailPage({ params }: Props) {
                 "value": salaryValue,
                 "unitText": salaryUnit
             }
-        }
+        },
+        // [이미지 SEO] ImageObject — 구글 이미지 검색 + Discover 최적화
+        ...((shop.media_url || shop.banner_image_url) ? {
+            "image": {
+                "@type": "ImageObject",
+                "url": shop.banner_image_url || shop.media_url,
+                "width": 1200,
+                "height": 1200,
+                "caption": generateShopImageAlt({
+                    region:     shop.region,
+                    work_type:  shop.workType || shop.category,
+                    pay:        shop.pay,
+                    pay_type:   shop.payType,
+                    pay_amount: shop.payAmount,
+                }),
+                "representativeOfPage": true
+            }
+        } : {})
     };
 
     return (

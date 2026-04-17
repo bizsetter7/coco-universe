@@ -92,47 +92,61 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
             )}
 
             {/* ── 이미지 섹션 (Deluxe/Special만 표시) ── */}
-            {showImage && (
-                <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-900 border-b border-gray-100">
-                    {hasImage ? (
-                        // 미디어 타입에 따른 분기 (비디오/이미지)
-                        shop.options!.mediaUrl?.toLowerCase().match(/\.(mp4|webm|mov)$/i) ? (
-                            <video
-                                src={shop.options!.mediaUrl}
-                                className="w-full h-full object-cover"
-                                muted
-                                autoPlay
-                                loop
-                                playsInline
-                                onError={() => setImgError(true)}
-                            />
+            {showImage && (() => {
+                // [구글 이미지 SEO] alt/figcaption 자동 생성 패턴: {지역} {업종} {급여} 이상 초보환영 채용공고
+                const regionClean = (shop.region || '').replace(/[\[\]]/g, '').trim();
+                const imageAlt = [
+                    regionClean,
+                    shop.workType || shop.category,
+                    shop.pay ? `${shop.pay} 이상` : '',
+                    '초보환영 채용공고',
+                ].filter(Boolean).join(' ') + ' - 코코알바';
+
+                return (
+                    <figure className="relative w-full aspect-[4/3] overflow-hidden bg-slate-900 border-b border-gray-100 m-0">
+                        {hasImage ? (
+                            // 미디어 타입에 따른 분기 (비디오/이미지)
+                            shop.options!.mediaUrl?.toLowerCase().match(/\.(mp4|webm|mov)$/i) ? (
+                                <video
+                                    src={shop.options!.mediaUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    autoPlay
+                                    loop
+                                    playsInline
+                                    onError={() => setImgError(true)}
+                                />
+                            ) : (
+                                // 이미지일 경우
+                                <img
+                                    src={shop.options!.mediaUrl}
+                                    alt={imageAlt}
+                                    className="w-full h-full object-cover"
+                                    loading={rank && rank <= 2 ? 'eager' : 'lazy'}
+                                    decoding="async"
+                                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                    onError={() => setImgError(true)}
+                                />
+                            )
                         ) : (
-                            // 이미지일 경우
-                            <img
-                                src={shop.options!.mediaUrl}
-                                alt={shop.name}
-                                className="w-full h-full object-cover"
-                                loading={rank && rank <= 2 ? 'eager' : 'lazy'}
-                                decoding="async"
-                                onError={() => setImgError(true)}
-                            />
-                        )
-                    ) : (
-                        // 이미지 없을 경우: 공고 제목만 중앙 표시
-                        <div className={`absolute inset-0 flex items-center justify-center p-3 text-center bg-gradient-to-br ${getTierGradient(tierId || '')}`}>
-                            <h4 className="relative z-10 text-white font-black text-[12px] leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] break-keep text-center line-clamp-4 w-full">
-                                {cleanTitle}
-                            </h4>
-                        </div>
-                    )}
-                    {/* 순위 배지 */}
-                    {rank && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-20">
-                            <span className="text-[10px] font-black text-black">{rank}</span>
-                        </div>
-                    )}
-                </div>
-            )}
+                            // 이미지 없을 경우: 공고 제목만 중앙 표시
+                            <div className={`absolute inset-0 flex items-center justify-center p-3 text-center bg-gradient-to-br ${getTierGradient(tierId || '')}`}>
+                                <h4 className="relative z-10 text-white font-black text-[12px] leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] break-keep text-center line-clamp-4 w-full">
+                                    {cleanTitle}
+                                </h4>
+                            </div>
+                        )}
+                        {/* 순위 배지 */}
+                        {rank && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center shadow-md z-20">
+                                <span className="text-[10px] font-black text-black">{rank}</span>
+                            </div>
+                        )}
+                        {/* [구글 이미지 SEO] figcaption — 시각적으로 숨기되 크롤러/스크린리더 노출 */}
+                        {hasImage && <figcaption className="sr-only">{imageAlt}</figcaption>}
+                    </figure>
+                );
+            })()}
 
             {/* ── 컨텐츠 영역 ── */}
             <div className={`px-2 ${showImage ? 'pt-1.5' : 'pt-2'} flex flex-col gap-1 overflow-hidden font-medium flex-1 ${showImage ? 'justify-between' : ''}`}>

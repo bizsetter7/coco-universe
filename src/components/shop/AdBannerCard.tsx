@@ -80,44 +80,60 @@ export const AdBannerCard = React.memo(({ shop, tierId, onClick }: AdBannerCardP
             )}
 
             {/* ── 이미지 섹션 ── */}
-            <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 border-b border-gray-100">
-                {hasImage ? (
-                    // 미디어 타입에 따른 분기 (비디오/이미지)
-                    shop.options!.mediaUrl?.toLowerCase().match(/\.(mp4|webm|mov)$/i) ? (
-                        <video
-                            src={shop.options!.mediaUrl}
-                            className="w-full h-full object-cover"
-                            muted
-                            autoPlay
-                            loop
-                            playsInline
-                            onError={() => setImgError(true)}
-                        />
-                    ) : (
-                        // 이미지일 경우
-                        <img
-                            src={shop.options!.mediaUrl}
-                            alt={shop.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                            onError={() => setImgError(true)}
-                        />
-                    )
-                ) : (
-                    // 이미지 없을 경우: 공고 제목만 중앙 표시
-                    <div className={`absolute inset-0 flex items-center justify-center p-4 text-center bg-gradient-to-br ${getTierGradient()}`}>
-                        <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
-                            <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" />
-                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl animate-pulse" />
-                        </div>
-                        <h2 className="relative z-10 text-white font-black text-[13px] leading-snug drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] tracking-tighter break-keep line-clamp-5 w-full">
-                            {cleanTitle}
-                        </h2>
-                        <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
-                    </div>
-                )}
-            </div>
+            {(() => {
+                // [구글 이미지 SEO] alt/figcaption 자동 생성 패턴: {지역} {업종} {급여} 이상 초보환영 채용공고
+                const regionClean = (shop.region || '').replace(/[\[\]]/g, '').trim();
+                const imageAlt = [
+                    regionClean,
+                    shop.workType || shop.category,
+                    shop.pay ? `${shop.pay} 이상` : '',
+                    '초보환영 채용공고',
+                ].filter(Boolean).join(' ') + ' - 코코알바';
+
+                return (
+                    <figure className="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 border-b border-gray-100 m-0">
+                        {hasImage ? (
+                            // 미디어 타입에 따른 분기 (비디오/이미지)
+                            shop.options!.mediaUrl?.toLowerCase().match(/\.(mp4|webm|mov)$/i) ? (
+                                <video
+                                    src={shop.options!.mediaUrl}
+                                    className="w-full h-full object-cover"
+                                    muted
+                                    autoPlay
+                                    loop
+                                    playsInline
+                                    onError={() => setImgError(true)}
+                                />
+                            ) : (
+                                // 이미지일 경우
+                                <img
+                                    src={shop.options!.mediaUrl}
+                                    alt={imageAlt}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                    decoding="async"
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    onError={() => setImgError(true)}
+                                />
+                            )
+                        ) : (
+                            // 이미지 없을 경우: 공고 제목만 중앙 표시
+                            <div className={`absolute inset-0 flex items-center justify-center p-4 text-center bg-gradient-to-br ${getTierGradient()}`}>
+                                <div className="absolute inset-0 opacity-20 pointer-events-none overflow-hidden">
+                                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse" />
+                                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500 rounded-full blur-3xl animate-pulse" />
+                                </div>
+                                <h2 className="relative z-10 text-white font-black text-[13px] leading-snug drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] tracking-tighter break-keep line-clamp-5 w-full">
+                                    {cleanTitle}
+                                </h2>
+                                <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
+                            </div>
+                        )}
+                        {/* [구글 이미지 SEO] figcaption — 시각적으로 숨기되 크롤러/스크린리더 노출 */}
+                        {hasImage && <figcaption className="sr-only">{imageAlt}</figcaption>}
+                    </figure>
+                );
+            })()}
 
             {/* ── 하단 컨텐츠 섹션 (3-Row 고정 규칙) ── */}
             <div className="px-2 pt-1.5 pb-0 flex flex-col gap-1 overflow-hidden font-medium flex-1 justify-between">
