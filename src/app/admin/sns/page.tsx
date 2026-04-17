@@ -29,17 +29,90 @@ interface CronSlot {
 
 // ─── 업종/지역 선택 옵션 ─────────────────────────────────────────────────────
 
-const WORK_TYPES = ['룸알바', '텐프로', '쩜오알바', '텐카페', '노래주점', '노래빠알바', '바알바', '마사지'];
-const REGIONS = [
-    { slug: '서울-강남구',   name: '강남' },
-    { slug: '서울-마포구',   name: '홍대·마포' },
-    { slug: '부산-해운대구', name: '해운대' },
-    { slug: '대전-유성구',   name: '대전 유성' },
-    { slug: '경기-수원시',   name: '수원' },
-    { slug: '대구-수성구',   name: '대구 수성' },
-    { slug: '광주-서구',     name: '광주 상무' },
-    { slug: '서울',          name: '서울 전체' },
-    { slug: '부산',          name: '부산 전체' },
+const WORK_TYPES = ['룸알바', '텐프로', '쩜오알바', '텐카페', '노래주점', '노래빠알바', '바알바', '마사지', '엔터'];
+
+// 지역 그룹별 분류 (주요 유흥 상권 중심)
+const REGION_GROUPS = [
+    {
+        group: '서울',
+        regions: [
+            { slug: '서울-강남구',    name: '강남' },
+            { slug: '서울-서초구',    name: '서초·강남역' },
+            { slug: '서울-마포구',    name: '홍대·마포' },
+            { slug: '서울-영등포구',  name: '영등포·여의도' },
+            { slug: '서울-용산구',    name: '이태원·용산' },
+            { slug: '서울-중구',      name: '명동·을지로' },
+            { slug: '서울-송파구',    name: '송파·잠실' },
+            { slug: '서울-강서구',    name: '강서·발산' },
+            { slug: '서울-성동구',    name: '성수·왕십리' },
+            { slug: '서울-동대문구',  name: '동대문·청량리' },
+            { slug: '서울-종로구',    name: '종로·광화문' },
+            { slug: '서울-관악구',    name: '신림·관악' },
+        ],
+    },
+    {
+        group: '경기·인천',
+        regions: [
+            { slug: '경기-수원시',    name: '수원' },
+            { slug: '경기-성남시',    name: '성남·분당' },
+            { slug: '경기-부천시',    name: '부천' },
+            { slug: '경기-고양시',    name: '고양·일산' },
+            { slug: '경기-안양시',    name: '안양·평촌' },
+            { slug: '경기-의정부시',  name: '의정부' },
+            { slug: '경기-평택시',    name: '평택' },
+            { slug: '경기-안산시',    name: '안산' },
+            { slug: '경기-용인시',    name: '용인' },
+            { slug: '경기-화성시',    name: '화성·동탄' },
+            { slug: '인천',           name: '인천' },
+        ],
+    },
+    {
+        group: '부산·경남',
+        regions: [
+            { slug: '부산-해운대구',  name: '해운대' },
+            { slug: '부산-부산진구',  name: '서면' },
+            { slug: '부산-수영구',    name: '광안리' },
+            { slug: '부산-중구',      name: '남포·중구' },
+            { slug: '경남-창원시',    name: '창원' },
+            { slug: '경남-진주시',    name: '진주' },
+        ],
+    },
+    {
+        group: '대전·충청',
+        regions: [
+            { slug: '대전-유성구',    name: '대전 유성' },
+            { slug: '대전-중구',      name: '대전 중구' },
+            { slug: '충남-천안시',    name: '천안' },
+            { slug: '충북-청주시',    name: '청주' },
+        ],
+    },
+    {
+        group: '대구·경북',
+        regions: [
+            { slug: '대구-수성구',    name: '대구 수성' },
+            { slug: '대구-중구',      name: '대구 동성로' },
+            { slug: '경북-구미시',    name: '구미' },
+            { slug: '경북-포항시',    name: '포항' },
+        ],
+    },
+    {
+        group: '광주·전라',
+        regions: [
+            { slug: '광주-서구',      name: '광주 상무' },
+            { slug: '광주-동구',      name: '광주 충장로' },
+            { slug: '전북-전주시',    name: '전주' },
+            { slug: '전남-목포시',    name: '목포' },
+        ],
+    },
+    {
+        group: '기타',
+        regions: [
+            { slug: '울산',           name: '울산' },
+            { slug: '강원-강릉시',    name: '강릉' },
+            { slug: '강원-춘천시',    name: '춘천' },
+            { slug: '제주',           name: '제주' },
+        ],
+    },
 ];
 
 const TWEET_TYPES = [
@@ -64,6 +137,7 @@ export default function SnsManagementPage() {
     const [selectedType, setSelectedType] = useState('guide');
     const [selectedRegion, setSelectedRegion] = useState('서울-강남구');
     const [selectedWT, setSelectedWT]   = useState('룸알바');
+    const allRegions = REGION_GROUPS.flatMap(g => g.regions);
     const [generating, setGenerating]   = useState(false);
     const [posting, setPosting]         = useState(false);
     const [lastResult, setLastResult]   = useState<{ ok: boolean; id?: string; error?: string } | null>(null);
@@ -301,8 +375,12 @@ export default function SnsManagementPage() {
                                 onChange={e => setSelectedRegion(e.target.value)}
                                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white appearance-none"
                             >
-                                {REGIONS.map(r => (
-                                    <option key={r.slug} value={r.slug}>{r.name}</option>
+                                {REGION_GROUPS.map(g => (
+                                    <optgroup key={g.group} label={`── ${g.group} ──`}>
+                                        {g.regions.map(r => (
+                                            <option key={r.slug} value={r.slug}>{r.name}</option>
+                                        ))}
+                                    </optgroup>
                                 ))}
                             </select>
                         </div>

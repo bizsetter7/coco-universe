@@ -95,6 +95,81 @@ export const WORKTYPE_HASHTAGS: Record<string, string[]> = {
     '엔터':      ['엔터알바', '접객알바'],
 };
 
+// ─── 세부 지역 약칭 매핑 (해시태그용 롱테일 조합에 사용) ────────────────────
+
+export const REGION_SHORT_NAME: Record<string, string> = {
+    // 서울
+    '서울-강남구':    '강남',
+    '서울-서초구':    '서초',
+    '서울-마포구':    '홍대',
+    '서울-영등포구':  '영등포',
+    '서울-용산구':    '이태원',
+    '서울-중구':      '명동',
+    '서울-송파구':    '잠실',
+    '서울-강서구':    '강서',
+    '서울-성동구':    '성수',
+    '서울-동대문구':  '동대문',
+    '서울-종로구':    '종로',
+    '서울-관악구':    '신림',
+    '서울-구로구':    '구로',
+    '서울-강북구':    '강북',
+    '서울-강동구':    '강동',
+    '서울-노원구':    '노원',
+    '서울-은평구':    '은평',
+    '서울-서대문구':  '신촌',
+    // 경기
+    '경기-수원시':    '수원',
+    '경기-성남시':    '분당',
+    '경기-부천시':    '부천',
+    '경기-고양시':    '일산',
+    '경기-안양시':    '안양',
+    '경기-의정부시':  '의정부',
+    '경기-평택시':    '평택',
+    '경기-안산시':    '안산',
+    '경기-용인시':    '용인',
+    '경기-화성시':    '동탄',
+    '경기-파주시':    '파주',
+    '경기-남양주시':  '남양주',
+    // 인천
+    '인천':           '인천',
+    // 부산
+    '부산-해운대구':  '해운대',
+    '부산-부산진구':  '서면',
+    '부산-수영구':    '광안리',
+    '부산-중구':      '남포',
+    '부산-동래구':    '동래',
+    '부산-사상구':    '사상',
+    // 대전
+    '대전-유성구':    '유성',
+    '대전-중구':      '대전',
+    '대전-서구':      '대전서구',
+    // 대구
+    '대구-수성구':    '대구수성',
+    '대구-중구':      '동성로',
+    '대구-달서구':    '대구달서',
+    // 광주
+    '광주-서구':      '광주상무',
+    '광주-동구':      '충장로',
+    // 경남
+    '경남-창원시':    '창원',
+    '경남-진주시':    '진주',
+    // 충청
+    '충남-천안시':    '천안',
+    '충북-청주시':    '청주',
+    // 경북
+    '경북-구미시':    '구미',
+    '경북-포항시':    '포항',
+    // 전라
+    '전북-전주시':    '전주',
+    '전남-목포시':    '목포',
+    '전남-순천시':    '순천',
+    // 기타
+    '울산':           '울산',
+    '강원-강릉시':    '강릉',
+    '강원-춘천시':    '춘천',
+    '제주':           '제주',
+};
+
 // ─── 공통 브랜드 해시태그 ────────────────────────────────────────────────────
 
 export const BRAND_HASHTAGS = ['코코알바', '고수익알바'];
@@ -102,28 +177,38 @@ export const BRAND_HASHTAGS = ['코코알바', '고수익알바'];
 // ─── 해시태그 생성기 ──────────────────────────────────────────────────────────
 
 /**
- * 지역 + 업종 기반으로 최적 해시태그 조합 생성
- * @param regionSlug  예: "서울-강남구"
- * @param workType    예: "룸알바"
- * @returns           최대 4개 해시태그 문자열 배열
+ * 지역 + 업종 기반으로 최적 해시태그 조합 생성 (최대 5개)
+ *
+ * 우선순위:
+ *   1. 세부지역+업종 롱테일  (예: #강남룸알바)
+ *   2. 광역+업종 조합        (예: #서울룸알바)
+ *   3. 세부지역 대표태그     (예: #강남알바)
+ *   4. 업종 대표태그         (예: #룸알바)
+ *   5. 브랜드 태그           (예: #코코알바)
  */
 export function buildHashtags(regionSlug: string, workType: string): string[] {
-    const regionTags  = REGION_HASHTAGS[regionSlug]   ?? REGION_HASHTAGS[regionSlug.split('-')[0]] ?? [];
-    const worktypeTags = WORKTYPE_HASHTAGS[workType]  ?? [];
+    const shortName    = REGION_SHORT_NAME[regionSlug];                              // 예: "강남"
+    const mainRegion   = regionSlug.split('-')[0];                                   // 예: "서울"
+    const regionTags   = REGION_HASHTAGS[regionSlug] ?? REGION_HASHTAGS[mainRegion] ?? [];
+    const worktypeTags = WORKTYPE_HASHTAGS[workType] ?? [];
 
-    // 롱테일 조합 해시태그 생성 (지역+업종)
-    const mainRegion = regionSlug.split('-')[0]; // "서울-강남구" → "서울"
-    const combinedTag = mainRegion && workType ? `${mainRegion}${workType}` : null;
+    // 롱테일 1: 세부지역+업종 (예: 강남룸알바)
+    const detailTag = shortName && workType ? `${shortName}${workType}` : null;
+    // 롱테일 2: 광역+업종 (예: 서울룸알바) — detailTag와 다를 때만
+    const broadTag  = mainRegion && workType && mainRegion !== shortName
+        ? `${mainRegion}${workType}`
+        : null;
 
     const all = [
-        combinedTag,            // 1순위: 지역+업종 조합 (롱테일)
-        regionTags[0],          // 2순위: 지역 대표 해시태그
-        worktypeTags[0],        // 3순위: 업종 대표 해시태그
-        ...BRAND_HASHTAGS,      // 브랜드
+        detailTag,          // 1순위: 세부지역+업종 (가장 롱테일)
+        broadTag,           // 2순위: 광역+업종
+        regionTags[0],      // 3순위: 지역 대표 태그
+        worktypeTags[0],    // 4순위: 업종 대표 태그
+        ...BRAND_HASHTAGS,  // 브랜드
     ].filter((t): t is string => !!t);
 
-    // 중복 제거 후 최대 4개
-    return [...new Set(all)].slice(0, 4);
+    // 중복 제거 후 최대 5개
+    return [...new Set(all)].slice(0, 5);
 }
 
 /**
