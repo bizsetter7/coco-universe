@@ -24,6 +24,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             router.push('/?page=login');
         } else {
             setIsAuthorized(true);
+            // [Fix] 관리자 API 인증 쿠키 갱신 — requireAdmin 서버 체크용 (7일 유효)
+            // mock 로그인이든 실 Supabase 로그인이든 어드민 페이지 진입 시마다 갱신
+            if (typeof document !== 'undefined') {
+                document.cookie = 'coco_admin_mock=1; path=/; max-age=604800; SameSite=Lax';
+            }
         }
     }, [isLoading, isLoggedIn, userType, router]);
 
