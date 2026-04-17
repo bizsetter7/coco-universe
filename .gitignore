@@ -43,6 +43,9 @@ next-env.d.ts
 # Claude Code local tooling (worktrees, settings, cache)
 .claude/
 
+# 광고카드 샘플 이미지 (로컬 전용 — 레포 용량 관리)
+광고카드샘플/
+
 # TestSprite 임시 파일 (로그/락/캐시/생성 스크립트)
 testsprite_tests/tmp/mcp.log
 testsprite_tests/tmp/execution.lock
