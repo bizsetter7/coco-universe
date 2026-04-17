@@ -170,6 +170,6 @@ export const config = {
          * - favicon.ico, sitemap.xml, robots.txt
          * - public 폴더 파일
          */
-        '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff|woff2)).*)',
+        '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|image-sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff|woff2)).*)',
     ],
 };
