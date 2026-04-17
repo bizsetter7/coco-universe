@@ -15,8 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 import { slugify } from '@/utils/shopUtils';
 import { generateShopImageAlt } from '@/lib/imageUtils';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // 1시간 캐시
+export const dynamic = 'force-dynamic'; // 매 요청마다 새로 생성 (캐시 없음)
 
 const BASE_URL = 'https://www.cocoalba.kr';
 
