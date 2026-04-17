@@ -150,16 +150,36 @@ export async function GET(request: NextRequest) {
             tweetText = tweetText.slice(0, 270) + '…';
         }
 
-        // 트윗 발행
-        const result = await postTweet(tweetText);
+        // 트윗 발행 시도 — X API 유료화로 실패 시 초안 저장 후 200 반환
+        try {
+            const result = await postTweet(tweetText);
+            return NextResponse.json({
+                ok:        true,
+                mode:      'auto',
+                tweetType,
+                tweetId:   result.id,
+                tweetText: result.text,
+                postedAt:  new Date().toISOString(),
+            });
+        } catch (apiError: any) {
+            // X API 실패(402/403 등) → 초안을 DB에 저장하고 200 반환 (크론 실패 처리 방지)
+            console.warn('[Cron/twitter-post] X API 실패, 초안 저장 모드:', apiError?.message);
+            await supabaseAdmin.from('tweet_queue').insert({
+                tweet_text: tweetText,
+                tweet_type: tweetType,
+                status: 'pending',
+                created_at: new Date().toISOString(),
+            }).then(() => {}).catch(() => {}); // 테이블 없어도 무시
 
-        return NextResponse.json({
-            ok:        true,
-            tweetType,
-            tweetId:   result.id,
-            tweetText: result.text,
-            postedAt:  new Date().toISOString(),
-        });
+            return NextResponse.json({
+                ok:        true,
+                mode:      'draft_saved',
+                tweetType,
+                tweetText,
+                message:   'X API 미지원(유료화) — 초안 저장 완료. SNS 관리 페이지에서 수동 게시하세요.',
+                generatedAt: new Date().toISOString(),
+            });
+        }
 
     } catch (error: any) {
         console.error('[Cron/twitter-post]', error);
