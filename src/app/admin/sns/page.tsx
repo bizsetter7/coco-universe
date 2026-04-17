@@ -346,14 +346,41 @@ export default function SnsManagementPage() {
                         </span>
                     </div>
 
-                    {/* 발행 버튼 */}
+                    {/* 클립보드 복사 버튼 (수동 게시용) */}
+                    <button
+                        onClick={() => {
+                            if (!manualText.trim()) { toast.error('먼저 트윗을 생성하세요'); return; }
+                            navigator.clipboard.writeText(manualText).then(() => {
+                                toast.success('복사 완료! X(트위터) 앱에 붙여넣기 하세요 🐦');
+                            });
+                        }}
+                        disabled={!manualText.trim()}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-black text-white transition-colors shadow-lg shadow-emerald-500/20"
+                    >
+                        <Copy size={16} />
+                        📋 클립보드 복사 (X 앱에 붙여넣기)
+                    </button>
+
+                    {/* X 바로가기 */}
+                    {manualText.trim() && (
+                        <a
+                            href="https://twitter.com/intent/tweet"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center justify-center gap-2 py-2.5 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 rounded-xl text-sm font-bold text-sky-300 transition-colors"
+                        >
+                            <Send size={14} /> X(트위터) 열기 → 붙여넣기 후 게시
+                        </a>
+                    )}
+
+                    {/* 발행 버튼 (API 직접 발행 — 크레딧 필요) */}
                     <button
                         onClick={handlePost}
                         disabled={posting || !configured || isOver}
-                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-sky-500 hover:bg-sky-400 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-black text-white transition-colors shadow-lg shadow-sky-500/20"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-sm font-bold text-slate-300 transition-colors"
                     >
-                        {posting ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
-                        {posting ? '발행 중...' : 'Twitter에 즉시 발행'}
+                        {posting ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
+                        {posting ? '발행 중...' : 'API 직접 발행 (크레딧 필요)'}
                     </button>
 
                     {/* 결과 */}
