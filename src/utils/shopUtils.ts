@@ -67,6 +67,26 @@ export const getShopDefaultImage = (workType?: string): string => {
     return 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&q=80&w=800';
 };
 /**
+ * 🖼️ 광고카드/공고팝업 Row3 키워드 폴백 생성
+ * options.paySuffixes + options.keywords 가 없을 때 지역+업종 조합으로 자동 생성
+ * (광고카드 생성기 Row3, JobDetailModal 키워드 섹션 공통 사용)
+ */
+export const buildAdKeywordFallback = (region: string, workType: string): string[] => {
+    // region: "서울-강남구" | "[서울]강남구" | "강남구" 등 다양한 포맷 지원
+    const clean = region.replace(/[\[\]]/g, '').trim();
+    const parts = clean.split(/[-\s]+/);
+    const city = parts[0] || '';
+    const district = parts[1] || '';
+    const displayRegion = district || city;
+
+    return [
+        `${displayRegion}${workType}알바`,
+        `${displayRegion}여자유흥알바`,
+        `${displayRegion}여자고수익알바`,
+    ].filter(k => k.trim().length > 4);
+};
+
+/**
  * 🏷️ SEO 키워드 자동 생성 유틸리티
  * 지역명을 기반으로 검색 최적화된 고효율 키워드 배열을 반환합니다.
  * '엔터프라이즈', '인재', '솔루션' 등 불필요 단어 전수 제거 (2026-04-01)

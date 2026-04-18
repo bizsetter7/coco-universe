@@ -6,7 +6,9 @@ import { useAuth } from '@/hooks/useAuth';
 import {
     Twitter, Send, Eye, Clock, Zap, CheckCircle2,
     XCircle, AlertCircle, RefreshCw, Copy, Edit3,
-    Hash, MapPin, Briefcase, ChevronDown
+    Hash, MapPin, Briefcase, ChevronDown,
+    Image as ImageIcon, Download, Database, Keyboard,
+    Search,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -141,6 +143,88 @@ export default function SnsManagementPage() {
     const [generating, setGenerating]   = useState(false);
     const [posting, setPosting]         = useState(false);
     const [lastResult, setLastResult]   = useState<{ ok: boolean; id?: string; error?: string } | null>(null);
+
+    // ── 광고카드 생성기 상태 ──────────────────────────────────────────────────
+    const [cardMode, setCardMode]         = useState<'db' | 'manual'>('db');
+    const [cardTemplate, setCardTemplate] = useState<'A' | 'B' | 'C' | 'D'>('A');
+    const [cardBg, setCardBg]             = useState('white');
+    const [cardShopId, setCardShopId]     = useState('');
+    const [cardShopSearch, setCardShopSearch] = useState('');
+    const [cardShopList, setCardShopList] = useState<{ id: number; nickname: string; name: string; region: string }[]>([]);
+    const [cardSearching, setCardSearching] = useState(false);
+    const [cardPreviewUrl, setCardPreviewUrl] = useState('');
+    // 수동 입력 필드
+    const [cardFields, setCardFields] = useState({
+        nickname: '', region: '', subRegion: '', phone: '',
+        title: '', ageMin: '', ageMax: '',
+        payType: '일급', pay: '', category: '', categorySub: '', keywords: '',
+    });
+
+    const CARD_BG_PALETTE: { key: string; label: string; preview: string }[] = [
+        { key: 'white',          label: '화이트',     preview: '#FFFFFF' },
+        { key: 'light-gray',     label: '라이트그레이', preview: '#F4F4F5' },
+        { key: 'beige',          label: '베이지',     preview: '#F5F0E8' },
+        { key: 'cream',          label: '크림',       preview: '#FFF8E7' },
+        { key: 'light-pink',     label: '핑크(연)',   preview: '#FFF0F5' },
+        { key: 'light-purple',   label: '퍼플(연)',   preview: '#F8F0FF' },
+        { key: 'navy',           label: '네이비',     preview: '#1a1a2e' },
+        { key: 'black',          label: '블랙',       preview: '#0D0D0D' },
+        { key: 'grad-pink-purple', label: '핑크→퍼플', preview: 'linear-gradient(135deg,#FF6B9D,#9B59B6)' },
+        { key: 'grad-gold-orange', label: '골드→오렌지', preview: 'linear-gradient(135deg,#F39C12,#E74C3C)' },
+        { key: 'grad-navy-blue',   label: '네이비→블루', preview: 'linear-gradient(135deg,#1a1a2e,#0F3460)' },
+        { key: 'grad-emerald',     label: '에메랄드',  preview: 'linear-gradient(135deg,#00C853,#00BCD4)' },
+        { key: 'grad-rose-coral',  label: '로즈→코랄', preview: 'linear-gradient(135deg,#FF1744,#FF8A65)' },
+        { key: 'grad-dark-gray',   label: '다크그레이', preview: 'linear-gradient(135deg,#2D3436,#636E72)' },
+        { key: 'dark-black',     label: '딥블랙',     preview: '#0A0A0A' },
+        { key: 'dark-navy',      label: '다크네이비',  preview: '#0F1B35' },
+        { key: 'dark-purple',    label: '다크퍼플',   preview: '#1A0A2E' },
+        { key: 'charcoal',       label: '차콜',       preview: '#2C2C2C' },
+    ];
+
+    // 업소 검색 (DB 모드)
+    const searchShops = async () => {
+        if (!cardShopSearch.trim()) return;
+        setCardSearching(true);
+        try {
+            const res = await fetch(`/api/admin/shops/search?q=${encodeURIComponent(cardShopSearch)}`, {
+                headers: getAuthHeader(),
+            });
+            const data = await res.json();
+            if (data.ok) setCardShopList(data.shops ?? []);
+            else toast.error('업소 검색 실패');
+        } catch { toast.error('업소 검색 오류'); }
+        finally { setCardSearching(false); }
+    };
+
+    // 미리보기 URL 생성
+    const buildPreviewUrl = () => {
+        const params = new URLSearchParams({ template: cardTemplate, bg: cardBg });
+        if (cardMode === 'db' && cardShopId) {
+            params.set('shopId', cardShopId);
+        } else {
+            Object.entries(cardFields).forEach(([k, v]) => { if (v) params.set(k, v); });
+        }
+        return `/api/card/generate?${params.toString()}`;
+    };
+
+    const handleCardPreview = () => {
+        const url = buildPreviewUrl();
+        setCardPreviewUrl(url + `&_t=${Date.now()}`); // 캐시 방지
+    };
+
+    const handleCardDownload = async () => {
+        const url = buildPreviewUrl();
+        try {
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `cocoalba_card_${cardTemplate}_${Date.now()}.png`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            toast.success('카드 다운로드 완료!');
+        } catch { toast.error('다운로드 실패'); }
+    };
 
     // ── 인증 헤더 ──────────────────────────────────────────────────────────────
     const getAuthHeader = useCallback(() => {
@@ -502,6 +586,153 @@ export default function SnsManagementPage() {
                     >
                         <Zap size={14} /> IndexNow 지금 실행
                     </button>
+                </div>
+
+                {/* ──────────────────────────────────────────────────────────── */}
+                {/* 광고카드 생성기                                              */}
+                {/* ──────────────────────────────────────────────────────────── */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-5 space-y-5">
+                    <div className="flex items-center gap-2">
+                        <ImageIcon size={16} className="text-pink-400" />
+                        <h2 className="font-black text-sm text-slate-300">광고카드 생성기</h2>
+                        <span className="text-xs px-2 py-0.5 bg-pink-500/20 text-pink-400 rounded-full font-bold">1080×1080 PNG</span>
+                    </div>
+
+                    {/* 모드 토글 */}
+                    <div className="flex gap-2">
+                        {(['db', 'manual'] as const).map(m => (
+                            <button key={m} onClick={() => setCardMode(m)}
+                                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-colors ${cardMode === m ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                {m === 'db' ? <Database size={13} /> : <Keyboard size={13} />}
+                                {m === 'db' ? 'DB 자동' : '수동 입력'}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* DB 자동 모드 */}
+                    {cardMode === 'db' && (
+                        <div className="space-y-3">
+                            <div className="flex gap-2">
+                                <input
+                                    value={cardShopSearch}
+                                    onChange={e => setCardShopSearch(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && searchShops()}
+                                    placeholder="업소명으로 검색..."
+                                    className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500"
+                                />
+                                <button onClick={searchShops} disabled={cardSearching}
+                                    className="flex items-center gap-1 px-4 py-2 bg-slate-700 hover:bg-pink-600 rounded-xl text-sm font-bold text-slate-300 hover:text-white transition-colors disabled:opacity-50">
+                                    {cardSearching ? <RefreshCw size={13} className="animate-spin" /> : <Search size={13} />}
+                                    검색
+                                </button>
+                            </div>
+                            {cardShopList.length > 0 && (
+                                <div className="bg-slate-800 rounded-xl divide-y divide-slate-700 max-h-40 overflow-y-auto">
+                                    {cardShopList.map(s => (
+                                        <button key={s.id} onClick={() => { setCardShopId(String(s.id)); setCardShopList([]); setCardShopSearch(`[#${s.id}] ${s.nickname || s.name}`); toast.success(`${s.nickname || s.name} 선택됨`); }}
+                                            className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-700 text-left transition-colors">
+                                            <span className="text-sm text-white font-bold">{s.nickname || s.name}</span>
+                                            <span className="text-xs text-slate-400">{s.region} · #{s.id}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            {cardShopId && (
+                                <p className="text-xs text-emerald-400 font-bold">✅ Shop ID {cardShopId} 선택됨</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* 수동 입력 모드 */}
+                    {cardMode === 'manual' && (
+                        <div className="grid grid-cols-2 gap-3">
+                            {[
+                                { key: 'nickname',    label: '업소별칭', placeholder: '10자 이내 권장' },
+                                { key: 'region',      label: '지역',     placeholder: '서울-강남구' },
+                                { key: 'subRegion',   label: '부지역',   placeholder: '강남역 인근' },
+                                { key: 'phone',       label: '전화번호', placeholder: '010-0000-0000' },
+                                { key: 'title',       label: '공고제목', placeholder: '이번 주 신규 모집' },
+                                { key: 'category',    label: '업종',     placeholder: '룸알바' },
+                                { key: 'categorySub', label: '세부업종', placeholder: '풀살롱' },
+                                { key: 'pay',         label: '급여',     placeholder: '300000' },
+                            ].map(f => (
+                                <div key={f.key}>
+                                    <label className="text-xs text-slate-500 font-bold mb-1 block">{f.label}</label>
+                                    <input value={(cardFields as any)[f.key]} onChange={e => setCardFields(prev => ({ ...prev, [f.key]: e.target.value }))}
+                                        placeholder={f.placeholder}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                                </div>
+                            ))}
+                            <div>
+                                <label className="text-xs text-slate-500 font-bold mb-1 block">나이 범위</label>
+                                <div className="flex gap-2">
+                                    <input value={cardFields.ageMin} onChange={e => setCardFields(p => ({ ...p, ageMin: e.target.value }))} placeholder="20" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                                    <span className="text-slate-500 self-center">~</span>
+                                    <input value={cardFields.ageMax} onChange={e => setCardFields(p => ({ ...p, ageMax: e.target.value }))} placeholder="40" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-xs text-slate-500 font-bold mb-1 block">급여 방식</label>
+                                <select value={cardFields.payType} onChange={e => setCardFields(p => ({ ...p, payType: e.target.value }))} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                                    {['일급','시급','TC','월급','면접후결정'].map(t => <option key={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="col-span-2">
+                                <label className="text-xs text-slate-500 font-bold mb-1 block">키워드 (Row 3, 쉼표 구분 — 비우면 자동 생성)</label>
+                                <input value={cardFields.keywords} onChange={e => setCardFields(p => ({ ...p, keywords: e.target.value }))}
+                                    placeholder="당일지급, 초보환영, 숙식제공 (비우면 지역+업종 자동 생성)"
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500" />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 템플릿 선택 */}
+                    <div>
+                        <label className="text-xs text-slate-500 font-bold mb-2 block">템플릿</label>
+                        <div className="flex gap-2">
+                            {(['A','B','C','D'] as const).map(t => (
+                                <button key={t} onClick={() => setCardTemplate(t)}
+                                    className={`flex-1 py-3 rounded-xl font-black text-sm transition-colors ${cardTemplate === t ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                                    {t === 'A' ? '기본형' : t === 'B' ? '강조형' : t === 'C' ? '프리미엄' : '미니멀'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 배경 팔레트 */}
+                    <div>
+                        <label className="text-xs text-slate-500 font-bold mb-2 block">배경 ({cardBg})</label>
+                        <div className="flex flex-wrap gap-2">
+                            {CARD_BG_PALETTE.map(p => (
+                                <button key={p.key} onClick={() => setCardBg(p.key)} title={p.label}
+                                    className={`w-8 h-8 rounded-full transition-all ${cardBg === p.key ? 'ring-2 ring-pink-400 ring-offset-2 ring-offset-slate-900 scale-110' : 'hover:scale-105'}`}
+                                    style={{ background: p.preview }} />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 생성 / 다운로드 버튼 */}
+                    <div className="flex gap-3">
+                        <button onClick={handleCardPreview}
+                            className="flex-1 flex items-center justify-center gap-2 py-3 bg-pink-600 hover:bg-pink-500 rounded-xl font-black text-white transition-colors">
+                            <ImageIcon size={15} /> 미리보기 생성
+                        </button>
+                        {cardPreviewUrl && (
+                            <button onClick={handleCardDownload}
+                                className="flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-black text-white transition-colors shadow-lg shadow-emerald-500/20">
+                                <Download size={15} /> PNG 저장
+                            </button>
+                        )}
+                    </div>
+
+                    {/* 미리보기 */}
+                    {cardPreviewUrl && (
+                        <div className="space-y-2">
+                            <p className="text-xs text-slate-500 font-bold">미리보기 (실제 PNG 1080×1080)</p>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={cardPreviewUrl} alt="광고카드 미리보기" className="w-full rounded-2xl border border-slate-700" />
+                        </div>
+                    )}
                 </div>
 
                 {/* 전략 가이드 */}

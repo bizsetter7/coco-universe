@@ -505,40 +505,38 @@ export const JobDetailContent = ({
                     <div className="bg-gray-50/50 p-3 rounded-lg border border-gray-100">
                         <div className="flex flex-wrap gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
                             {(() => {
-                                const userKeywords: string[] = Array.isArray(shop.options?.keywords) ? shop.options.keywords : [];
-
-                                // 지역+업종 자동 키워드 (구 붉은 키워드 블록 통합)
+                                // ── 1. 사용자 등록 키워드 ────────────────────────────────
                                 const opt = (shop.options || {}) as any;
-                                const city = opt.regionCity || shop.city || (typeof shop.region === 'string' ? shop.region.split(' ')[0] : '');
-                                const district = opt.regionGu || shop.district || (typeof shop.region === 'string' ? shop.region.split(' ')[1] : '') || '';
-                                const category = shop.workType || shop.category || '룸알바';
-                                const targetKeywords: string[] = [
-                                    `${city}${category}`, `${city}노래방알바`, `${city}유흥알바`,
-                                    district ? `${city}${district}${category}` : '',
-                                    district ? `${city}${district}노래방알바` : '',
-                                ].filter(k => k.trim().length > 2);
+                                const userKeywords: string[] = [
+                                    ...(Array.isArray(opt.paySuffixes) ? opt.paySuffixes : []),
+                                    ...(Array.isArray(opt.keywords)    ? opt.keywords    : []),
+                                ].filter(Boolean);
 
-                                // 사용자 키워드 없을 때만 업체명 조합으로 자동생성
-                                const autoKeywords: string[] = (() => {
-                                    if (userKeywords.length > 0) return [];
-                                    const nm = (shop.name || shop.shopName || '').trim();
-                                    const combos: string[] = [];
-                                    if (city && nm)             combos.push(`${city}${nm}`);
-                                    if (city && district && nm) combos.push(`${city}${district}${nm}`);
-                                    if (city && category)       combos.push(`${city}${category}알바`);
-                                    if (district && nm)         combos.push(`${district}${nm}`);
-                                    if (city)                   combos.push(`${city}여자알바`);
-                                    return combos.filter(k => k.trim().length > 2);
-                                })();
+                                // ── 2. 폴백: 지역+업종 조합 자동 생성 ─────────────────────
+                                // options.paySuffixes / keywords 둘 다 없을 때 사용
+                                const regionRaw = typeof shop.region === 'string' ? shop.region : '';
+                                const workType  = shop.workType || shop.category || '룸알바';
+                                const fallbackKeywords: string[] = userKeywords.length === 0
+                                    ? (() => {
+                                        // region slug 형태(예: "서울-강남구") 또는 DB 형태("[서울]강남구") 처리
+                                        const clean = regionRaw.replace(/[\[\]]/g, '').trim();
+                                        const parts = clean.split(/[-\s]+/);
+                                        const city     = parts[0] || '';
+                                        const district = parts[1] || '';
+                                        const display  = district || city;
+                                        return [
+                                            `${display}${workType}알바`,
+                                            `${display}여자유흥알바`,
+                                            `${display}여자고수익알바`,
+                                        ].filter(k => k.trim().length > 4);
+                                    })()
+                                    : [];
 
                                 const forbidden = ['레이디알바', '여우알바', '퀸알바', '악녀알바'];
-
-                                const allKeywords = Array.from(new Set([...userKeywords, ...autoKeywords, ...targetKeywords]))
+                                const allKeywords = Array.from(new Set([...userKeywords, ...fallbackKeywords]))
                                     .filter((kw: any) => {
-                                        const cleanKw = String(kw).replace('#', '').trim();
-                                        if (!cleanKw) return false;
-                                        if (forbidden.some(f => cleanKw.includes(f))) return false;
-                                        return true;
+                                        const clean = String(kw).replace('#', '').trim();
+                                        return clean && !forbidden.some(f => clean.includes(f));
                                     });
 
                                 if (allKeywords.length > 0) {
@@ -547,9 +545,8 @@ export const JobDetailContent = ({
                                             #{String(kw).replace('#', '')}
                                         </span>
                                     ));
-                                } else {
-                                    return <span className="text-gray-300 text-[11px] font-bold">#여자밤알바정보</span>;
                                 }
+                                return <span className="text-gray-300 text-[11px] font-bold">#여자밤알바정보</span>;
                             })()}
                         </div>
                         <p className="mt-3 text-[10px] text-gray-400 font-medium leading-relaxed">
