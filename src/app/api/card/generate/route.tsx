@@ -447,12 +447,21 @@ export async function GET(request: NextRequest) {
 
     const fonts = [{ name: 'NotoSansKR', data: fontData, weight: 700 as const, style: 'normal' as const }];
 
-    // ?debug=1 → 최소 렌더 테스트 (Satori 동작 확인용)
-    const isDebug = searchParams.get('debug') === '1';
-    if (isDebug) {
+    // ?debug=1 → 폰트 없이 순색 박스 (Satori 기본 동작 확인)
+    // ?debug=2 → 폰트 포함 간단 텍스트 (폰트 파싱 확인)
+    const debugMode = searchParams.get('debug') ?? '';
+    if (debugMode === '1') {
+        // 텍스트·폰트 완전 제거 — 순색 박스만
         return new ImageResponse(
-            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#E91E8C', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 80, color: '#ffffff', fontWeight: 700 }}>COCO OK</span>
+            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#E91E8C' }} />,
+            { width: W, height: H, fonts: [] }
+        );
+    }
+    if (debugMode === '2') {
+        // 폰트 포함, 텍스트 포함
+        return new ImageResponse(
+            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#1a1a2e', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: 80, color: '#fff', fontWeight: 700 }}>COCO OK</span>
             </div>,
             { width: W, height: H, fonts }
         );
