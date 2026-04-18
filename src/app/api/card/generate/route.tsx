@@ -156,13 +156,16 @@ function ContactSection({ sectionBg, dividerC, textPrimary, textMuted }: {
 }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, marginRight: 44, marginBottom: 16, marginLeft: 44, padding: '16px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
-            <span style={{ fontSize: 22, color: BRAND_PINK, fontWeight: 700 }}>
-                코코알바 문의 {TELEGRAM_CS}
-            </span>
+            {/* 코코알바문의 + @계정 — 두 줄 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>코코알바문의</span>
+                <span style={{ fontSize: 22, color: BRAND_PINK, fontWeight: 800 }}>{TELEGRAM_CS}</span>
+            </div>
             <div style={{ display: 'flex', height: 1, backgroundColor: dividerC }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 14, color: textMuted }}>19세 미성년자 연락/출입금지 업소입니다.</span>
-                <span style={{ fontSize: 19, color: textPrimary, fontWeight: 600 }}>코코알바에서 보고 전화드렸어요</span>
+            {/* 우측 정렬: 경고 위 / 안내 문구 아래 */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
+                <span style={{ fontSize: 14, color: textMuted }}>19세 미성년자 연락/출입금지</span>
+                <span style={{ fontSize: 17, color: textPrimary, fontWeight: 700 }}>&apos;코코알바 통해 연락드렸어요&apos;라고 말씀해주세요</span>
             </div>
         </div>
     );
@@ -194,7 +197,7 @@ function InfoBlock({ label, value, labelColor, valueColor, blockBg, accentBg, ac
     const bg = accent && accentBg ? accentBg : blockBg;
     return (
         <div style={{
-            display: 'flex', flexDirection: 'column', flexGrow: 1,
+            display: 'flex', flexDirection: 'column', flexGrow: 1, flexBasis: '0',
             padding: '14px 20px', backgroundColor: bg, borderRadius: 14, gap: 3,
         }}>
             <span style={{ fontSize: 17, color: labelColor, fontWeight: 600 }}>{label}</span>
