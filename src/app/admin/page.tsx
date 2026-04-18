@@ -52,6 +52,7 @@ function AdminContent() {
     const [pendingApplications, setPendingApplications] = useState(0);
     const [pendingBannerCount, setPendingBannerCount] = useState(0);
     const [healthIssueCount, setHealthIssueCount] = useState(0);
+    const [liveVisitors, setLiveVisitors] = useState<number | null>(null);
     const [stats, setStats] = useState({
         totalRevenue: 124030000,
         activeAds: 0,
@@ -344,6 +345,28 @@ function AdminContent() {
         return () => clearInterval(interval);
     }, [isAuthorized]);
 
+    // 실시간 접속자 폴링 (30초마다)
+    useEffect(() => {
+        if (!isAuthorized) return;
+
+        const fetchVisitors = async () => {
+            try {
+                const { data: sessionData } = await supabase.auth.getSession();
+                const token = sessionData.session?.access_token;
+                const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+                const res = await fetch('/api/admin/visitors', { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    setLiveVisitors(data.count ?? 0);
+                }
+            } catch { /* silent */ }
+        };
+
+        fetchVisitors();
+        const iv = setInterval(fetchVisitors, 30_000);
+        return () => clearInterval(iv);
+    }, [isAuthorized]);
+
     // ── 1. 데이터 초기 및 주기적 수동 갱신 ──
     const fetchAllData = React.useCallback(() => {
         if (isAuthorized) {
@@ -415,9 +438,18 @@ function AdminContent() {
         <div className="p-5 md:p-10 pb-20">
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
                 <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-3">
-                        <span className="w-8 h-[2px] bg-blue-600 rounded-full"></span>
-                        CORE SYSTEM STABLE
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-[0.2em]">
+                            <span className="w-8 h-[2px] bg-blue-600 rounded-full"></span>
+                            CORE SYSTEM STABLE
+                        </div>
+                        {/* 실시간 접속자 배지 */}
+                        <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                            <span className="text-[10px] font-black text-emerald-700">
+                                {liveVisitors === null ? '...' : `${liveVisitors}명 접속중`}
+                            </span>
+                        </div>
                     </div>
                     <h2 className="text-3xl md:text-5xl font-black text-slate-950 tracking-tighter leading-none italic uppercase">
                         Dashboard <span className="text-blue-600">.</span>

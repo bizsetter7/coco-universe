@@ -13,6 +13,7 @@ const inter = Inter({ subsets: ["latin"], display: 'swap' });
 import { SEOManager } from "@/components/common/seo/SEOManager";
 import { SEOInjection } from "@/components/common/seo/SEOInjection";
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import VisitorTracker from '@/components/common/VisitorTracker';
 
 import { getCurrentSEO } from "@/lib/metadata-config";
 import { AUDIT_MODE } from "@/lib/brand-config";
@@ -199,6 +200,8 @@ export default function RootLayout({
           <BrandProvider>
             {/* 전역 감시 훅 — JS에러/DeadClick/WebVitals/LongTask 수집 */}
             <MonitorProvider />
+            {/* 방문자 추적 — 어드민 대시보드 실시간 접속자 표시용 */}
+            <VisitorTracker />
             <div className="flex flex-col h-auto">
               <Suspense fallback={<div className="min-h-screen bg-white" />}>
                 <LayoutWrapper sideAds={sideAds}>
