@@ -447,6 +447,17 @@ export async function GET(request: NextRequest) {
 
     const fonts = [{ name: 'NotoSansKR', data: fontData, weight: 700 as const, style: 'normal' as const }];
 
+    // ?debug=1 → 최소 렌더 테스트 (Satori 동작 확인용)
+    const isDebug = searchParams.get('debug') === '1';
+    if (isDebug) {
+        return new ImageResponse(
+            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#E91E8C', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: 80, color: '#ffffff', fontWeight: 700 }}>COCO OK</span>
+            </div>,
+            { width: W, height: H, fonts }
+        );
+    }
+
     return new ImageResponse(
         renderCard(cardData, template, bg),
         { width: W, height: H, fonts }
