@@ -1,10 +1,11 @@
 /**
  * [광고카드 이미지 생성기] /api/card/generate
  *
- * ⚠️ next/og(Satori)는 Edge Runtime 전용. Node.js runtime에서 렌더링 오류 발생.
- * ⚠️ supabase-js는 Edge runtime 미지원 → Supabase REST API 직접 fetch로 대체.
+ * ✅ Node.js runtime 사용 (Edge runtime → resvg-wasm 불안정 → 0 bytes 현상)
+ * ✅ 폰트: fs.readFileSync → public/fonts/NotoSansKR-Bold-Korean.woff2 (외부 CDN 의존 없음)
+ * ✅ DB: supabase-js (Node.js 호환)
  *
- * Satori CSS 제약:
+ * Satori CSS 제약 (변경 불가):
  *   - overflow:hidden 금지
  *   - border 단축형 금지 → borderWidth/Style/Color 개별 사용
  *   - Fragment(<>...</>) 금지 → <div> 래퍼 사용
@@ -13,9 +14,14 @@
  */
 
 import { ImageResponse } from 'next/og';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
-export const runtime = 'edge';
+// Node.js runtime (Edge 아님 — resvg-wasm Edge 불안정)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const W = 1080;
 const H = 1080;
@@ -23,39 +29,40 @@ const BRAND_PINK  = '#E91E8C';
 const GOLD        = '#F5C842';
 const TELEGRAM_CS = '@cocoalba_cs_bot';
 
-// ─── Supabase REST (Edge 호환 — supabase-js 대체) ────────────────────────────
+// ─── Supabase (Node.js runtime — supabase-js 정상 사용) ──────────────────────
+
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const key  = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+}
 
 async function fetchShopFromDB(shopId: string): Promise<Record<string, any> | null> {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!supabaseUrl || !serviceKey || !shopId) return null;
-
+    if (!shopId) return null;
     try {
-        const url = `${supabaseUrl}/rest/v1/shops?id=eq.${Number(shopId)}`
-            + `&select=id,nickname,name,region,work_region_sub,manager_phone,title,pay,pay_type,category,category_sub,options`
-            + `&limit=1`;
-        const res = await fetch(url, {
-            headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
-        });
-        if (!res.ok) return null;
-        const data: any[] = await res.json();
-        return data[0] ?? null;
+        const supabase = getSupabaseAdmin();
+        const { data, error } = await supabase
+            .from('shops')
+            .select('id,nickname,name,region,work_region_sub,manager_phone,title,pay,pay_type,category,category_sub,options')
+            .eq('id', Number(shopId))
+            .single();
+        if (error || !data) return null;
+        return data;
     } catch {
         return null;
     }
 }
 
-// ─── 폰트 로딩 (자체 서버 — public/fonts/ 번들, 외부 CDN 의존 제거) ──────────
-// Edge runtime에서 외부 CDN 차단 시 폰트 로딩 실패 → Satori crash → 0 bytes 응답
-// 해결: 폰트를 public/fonts/에 번들 → request.url 기반 자체 서버 fetch
+// ─── 폰트 로딩 (fs.readFileSync — 100% 신뢰, 외부 네트워크 의존 없음) ─────────
 
-async function loadFont(requestUrl: string): Promise<ArrayBuffer | null> {
+function loadFont(): Buffer | null {
     try {
-        const fontUrl = new URL('/fonts/NotoSansKR-Bold-Korean.woff2', requestUrl).toString();
-        const res = await fetch(fontUrl);
-        if (res.ok) return res.arrayBuffer();
-    } catch { /* 폰트 로딩 실패 시 Satori 빈 렌더링 */}
-    return null;
+        const fontPath = path.join(process.cwd(), 'public', 'fonts', 'NotoSansKR-Bold-Korean.woff2');
+        return fs.readFileSync(fontPath);
+    } catch (e) {
+        console.error('[card/generate] 폰트 로딩 실패:', e);
+        return null;
+    }
 }
 
 // ─── 배경 팔레트 (18종) ───────────────────────────────────────────────────────
@@ -146,7 +153,7 @@ function ContactSection({ sectionBg, dividerC, textPrimary, textMuted }: {
     sectionBg: string; dividerC: string; textPrimary: string; textMuted: string;
 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '8px 52px 20px', padding: '18px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8, marginRight: 52, marginBottom: 20, marginLeft: 52, padding: '18px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
             <span style={{ fontSize: 20, color: BRAND_PINK, fontWeight: 700 }}>
                 코코알바 문의 {TELEGRAM_CS}
             </span>
@@ -161,8 +168,8 @@ function TitleBox({ title, sectionBg, textPrimary, fontSize = 44 }: {
     title: string; sectionBg: string; textPrimary: string; fontSize?: number;
 }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 52px', padding: '28px 32px', backgroundColor: sectionBg, borderRadius: 20, flexGrow: 1 }}>
-            <span style={{ fontSize, fontWeight: 900, color: textPrimary, textAlign: 'center', lineHeight: 1.35 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 0, marginRight: 52, marginBottom: 0, marginLeft: 52, padding: '28px 32px', backgroundColor: sectionBg, borderRadius: 20, flexGrow: 1 }}>
+            <span style={{ fontSize, fontWeight: 900, color: textPrimary, textAlign: 'center' }}>
                 {title || '신규 구인 공고'}
             </span>
         </div>
@@ -211,32 +218,26 @@ function renderCard(data: CardData, template: string, bgKey: string) {
     const bgDef = BG_MAP[bgKey] ?? BG_MAP.white;
     const { dark: isDark } = bgDef;
     const t   = makeTheme(isDark);
-    const rootBg = bgDef.grad
-        ? { backgroundImage: bgDef.grad }
-        : { backgroundColor: bgDef.bg ?? '#FFFFFF' };
+    const rootStyle: React.CSSProperties = bgDef.grad
+        ? { display: 'flex', flexDirection: 'column', width: W, height: H, backgroundImage: bgDef.grad }
+        : { display: 'flex', flexDirection: 'column', width: W, height: H, backgroundColor: bgDef.bg ?? '#FFFFFF' };
 
     const WATERMARK = '여성 구인구직은 코코알바 cocoalba.kr';
 
     // ── Template A: 기본형 ────────────────────────────────────────────────────
     if (template === 'A') {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', width: W, height: H, ...rootBg }}>
+            <div style={rootStyle}>
                 <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
-                {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '32px 52px 20px' }}>
-                    <span style={{ fontSize: 54, fontWeight: 900, color: t.textPrimary, lineHeight: 1.1 }}>{data.nickname}</span>
+                    <span style={{ fontSize: 54, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                         <span style={{ fontSize: 20, fontWeight: 700, color: t.textPrimary }}>{data.region}</span>
-                        {data.subRegion
-                            ? <span style={{ fontSize: 17, color: t.textMuted }}>{data.subRegion}</span>
-                            : null}
-                        {data.phone
-                            ? <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>{data.phone}</span>
-                            : null}
+                        {data.subRegion ? <span style={{ fontSize: 17, color: t.textMuted }}>{data.subRegion}</span> : null}
+                        {data.phone ? <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>{data.phone}</span> : null}
                     </div>
                 </div>
                 <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} />
-                {/* Pills */}
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '20px 52px', gap: 12 }}>
                     <div style={{ display: 'flex', gap: 12 }}>
                         {data.age ? <AgePill text={data.age} /> : null}
@@ -246,7 +247,7 @@ function renderCard(data: CardData, template: string, bgKey: string) {
                         {data.category ? <CatPill text={data.category} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
                         {data.categorySub ? <CatPill text={data.categorySub} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
                         {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
                     </div>
                 </div>
@@ -259,11 +260,11 @@ function renderCard(data: CardData, template: string, bgKey: string) {
     // ── Template B: 강조형 (급여 대형) ────────────────────────────────────────
     if (template === 'B') {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', width: W, height: H, ...rootBg }}>
+            <div style={rootStyle}>
                 <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '28px 52px 16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontSize: 50, fontWeight: 900, color: t.textPrimary, lineHeight: 1.1 }}>{data.nickname}</span>
+                        <span style={{ fontSize: 50, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
                         <span style={{ fontSize: 18, color: t.textMuted }}>{data.region}{data.subRegion ? ` · ${data.subRegion}` : ''}</span>
                     </div>
                     {data.phone
@@ -286,7 +287,7 @@ function renderCard(data: CardData, template: string, bgKey: string) {
                         {data.category ? <CatPill text={data.category} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
                         {data.categorySub ? <CatPill text={data.categorySub} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
                         {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
                     </div>
                 </div>
@@ -299,17 +300,17 @@ function renderCard(data: CardData, template: string, bgKey: string) {
     // ── Template C: 프리미엄 (골드) ───────────────────────────────────────────
     if (template === 'C') {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', width: W, height: H, ...rootBg }}>
-                <TopBar bg={GOLD} text={`[ 여성 구인구직은 코코알바 cocoalba.kr ]`} textColor="#1a1a2e" />
+            <div style={rootStyle}>
+                <TopBar bg={GOLD} text="[ 여성 구인구직은 코코알바 cocoalba.kr ]" textColor="#1a1a2e" />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '28px 52px 16px' }}>
-                    <span style={{ fontSize: 52, fontWeight: 900, color: t.textPrimary, lineHeight: 1.1 }}>{data.nickname}</span>
+                    <span style={{ fontSize: 52, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
                         <span style={{ fontSize: 20, fontWeight: 700, color: t.textPrimary }}>{data.region}</span>
                         {data.subRegion ? <span style={{ fontSize: 16, color: t.textMuted }}>{data.subRegion}</span> : null}
                         {data.phone ? <span style={{ fontSize: 18, color: GOLD, fontWeight: 700 }}>{data.phone}</span> : null}
                     </div>
                 </div>
-                <div style={{ display: 'flex', height: 3, backgroundColor: GOLD, margin: '0 52px' }} />
+                <div style={{ display: 'flex', height: 3, backgroundColor: GOLD, marginTop: 0, marginRight: 52, marginBottom: 0, marginLeft: 52 }} />
                 <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} fontSize={42} />
                 <div style={{ display: 'flex', flexDirection: 'column', padding: '18px 52px', gap: 12 }}>
                     <div style={{ display: 'flex', gap: 12 }}>
@@ -328,37 +329,37 @@ function renderCard(data: CardData, template: string, bgKey: string) {
                               </div>
                             : null}
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
                         {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
                     </div>
                 </div>
                 <ContactSection sectionBg={t.sectionBg} dividerC={t.dividerC} textPrimary={t.textPrimary} textMuted={t.textMuted} />
-                <TopBar bg={GOLD} text={`[ 여성 구인구직은 코코알바 cocoalba.kr ]`} textColor="#1a1a2e" />
+                <TopBar bg={GOLD} text="[ 여성 구인구직은 코코알바 cocoalba.kr ]" textColor="#1a1a2e" />
             </div>
         );
     }
 
     // ── Template D: 미니멀 ────────────────────────────────────────────────────
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', width: W, height: H, ...rootBg }}>
+        <div style={rootStyle}>
             <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 52px 24px', gap: 8 }}>
-                <span style={{ fontSize: 58, fontWeight: 900, color: t.textPrimary, lineHeight: 1.0 }}>{data.nickname}</span>
+                <span style={{ fontSize: 58, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <span style={{ fontSize: 18, color: t.textMuted }}>{data.region}</span>
                     {data.subRegion ? <span style={{ fontSize: 17, color: t.textMuted }}>{data.subRegion}</span> : null}
                     {data.phone ? <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>{data.phone}</span> : null}
                 </div>
             </div>
-            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, margin: '0 80px' }} />
+            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1, padding: '32px 80px' }}>
-                <span style={{ fontSize: 46, fontWeight: 900, color: t.textPrimary, textAlign: 'center', lineHeight: 1.4 }}>
+                <span style={{ fontSize: 46, fontWeight: 900, color: t.textPrimary, textAlign: 'center' }}>
                     {data.title || '신규 구인 공고'}
                 </span>
             </div>
-            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, margin: '0 80px' }} />
+            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
             <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 80px', gap: 10 }}>
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                     {data.age ? <AgePill text={data.age} /> : null}
                     {data.payDisplay ? <PayPill text={data.payDisplay} size={17} /> : null}
                     {data.category
@@ -372,7 +373,7 @@ function renderCard(data: CardData, template: string, bgKey: string) {
                           </div>
                         : null}
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
                     {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
                 </div>
             </div>
@@ -429,46 +430,33 @@ export async function GET(request: NextRequest) {
     const template = (searchParams.get('template') ?? 'A').toUpperCase();
     const bg       = searchParams.get('bg')         ?? 'white';
 
-    // 폰트 + DB 병렬 로드 (폰트는 자체 서버 fetch — request.url 기반)
-    const [fontData, shopData] = await Promise.all([
-        loadFont(request.url),
-        shopId ? fetchShopFromDB(shopId) : Promise.resolve(null),
-    ]);
+    // 폰트 로딩 (fs.readFileSync — 동기, 100% 신뢰)
+    const fontBuffer = loadFont();
+    if (!fontBuffer) {
+        return NextResponse.json({ error: '폰트 로딩 실패 — public/fonts/NotoSansKR-Bold-Korean.woff2 확인 필요' }, { status: 500 });
+    }
 
+    // DB 조회
+    const shopData = shopId ? await fetchShopFromDB(shopId) : null;
     const cardData = buildCardData(searchParams, shopData ?? undefined);
 
-    // 폰트 로딩 실패 시 명시적 에러 반환 (0 bytes 응답 방지)
-    if (!fontData) {
-        return new Response(
-            JSON.stringify({ error: 'Font load failed', fontUrl: new URL('/fonts/NotoSansKR-Bold-Korean.woff2', request.url).toString() }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
-    }
+    const fonts = [{
+        name: 'NotoSansKR',
+        data: fontBuffer,
+        weight: 700 as const,
+        style: 'normal' as const,
+    }];
 
-    const fonts = [{ name: 'NotoSansKR', data: fontData, weight: 700 as const, style: 'normal' as const }];
-
-    // ?debug=1 → 폰트 없이 순색 박스 (Satori 기본 동작 확인)
-    // ?debug=2 → 폰트 포함 간단 텍스트 (폰트 파싱 확인)
-    const debugMode = searchParams.get('debug') ?? '';
-    if (debugMode === '1') {
-        // 텍스트·폰트 완전 제거 — 순색 박스만
+    try {
         return new ImageResponse(
-            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#E91E8C' }} />,
-            { width: W, height: H, fonts: [] }
-        );
-    }
-    if (debugMode === '2') {
-        // 폰트 포함, 텍스트 포함
-        return new ImageResponse(
-            <div style={{ display: 'flex', width: 1080, height: 1080, backgroundColor: '#1a1a2e', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 80, color: '#fff', fontWeight: 700 }}>COCO OK</span>
-            </div>,
+            renderCard(cardData, template, bg),
             { width: W, height: H, fonts }
         );
+    } catch (err: any) {
+        console.error('[card/generate] Satori 렌더링 실패:', err?.message ?? err);
+        return NextResponse.json(
+            { error: 'Satori 렌더링 실패', detail: err?.message ?? String(err) },
+            { status: 500 }
+        );
     }
-
-    return new ImageResponse(
-        renderCard(cardData, template, bg),
-        { width: W, height: H, fonts }
-    );
 }
