@@ -57,7 +57,9 @@ async function fetchShopFromDB(shopId: string): Promise<Record<string, any> | nu
 
 function loadFont(): Buffer | null {
     try {
-        const fontPath = path.join(process.cwd(), 'public', 'fonts', 'NotoSansKR-Bold-Korean.woff2');
+        // ⚠️ WOFF2 금지 — Next.js 15 번들 Satori가 'wOF2' 미지원 (Unsupported OpenType signature)
+        // WOFF 포맷만 지원됨 (로컬 테스트 확인: 13206 bytes PNG 정상 생성)
+        const fontPath = path.join(process.cwd(), 'public', 'fonts', 'NotoSansKR-Bold-Korean.woff');
         return fs.readFileSync(fontPath);
     } catch (e) {
         console.error('[card/generate] 폰트 로딩 실패:', e);
