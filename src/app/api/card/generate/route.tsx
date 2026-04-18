@@ -136,15 +136,15 @@ function buildKeywordFallback(region: string, workType: string): string[] {
 function TopBar({ bg, text, textColor }: { bg: string; text: string; textColor: string }) {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 32px', backgroundColor: bg }}>
-            <span style={{ fontSize: 20, color: textColor, fontWeight: 700 }}>{text}</span>
+            <span style={{ fontSize: 22, color: textColor, fontWeight: 700 }}>{text}</span>
         </div>
     );
 }
 
 function BottomBar({ bg, textColor }: { bg: string; textColor: string }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 32px', backgroundColor: bg }}>
-            <span style={{ fontSize: 17, color: textColor, fontWeight: 700 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 32px', backgroundColor: bg }}>
+            <span style={{ fontSize: 19, color: textColor, fontWeight: 700 }}>
                 여성 구인구직은 코코알바 cocoalba.kr
             </span>
         </div>
@@ -155,61 +155,64 @@ function ContactSection({ sectionBg, dividerC, textPrimary, textMuted }: {
     sectionBg: string; dividerC: string; textPrimary: string; textMuted: string;
 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8, marginRight: 52, marginBottom: 20, marginLeft: 52, padding: '18px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
-            <span style={{ fontSize: 20, color: BRAND_PINK, fontWeight: 700 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, marginRight: 44, marginBottom: 16, marginLeft: 44, padding: '16px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
+            <span style={{ fontSize: 22, color: BRAND_PINK, fontWeight: 700 }}>
                 코코알바 문의 {TELEGRAM_CS}
             </span>
             <div style={{ display: 'flex', height: 1, backgroundColor: dividerC }} />
-            <span style={{ fontSize: 13, color: textMuted }}>19세 미성년자 연락/출입금지 업소입니다.</span>
-            <span style={{ fontSize: 18, color: textPrimary, fontWeight: 600 }}>코코알바에서 보고 전화드렸어요</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 14, color: textMuted }}>19세 미성년자 연락/출입금지 업소입니다.</span>
+                <span style={{ fontSize: 19, color: textPrimary, fontWeight: 600 }}>코코알바에서 보고 전화드렸어요</span>
+            </div>
         </div>
     );
 }
 
-function TitleBox({ title, sectionBg, textPrimary, fontSize = 44 }: {
+function TitleBox({ title, sectionBg, textPrimary, fontSize = 42 }: {
     title: string; sectionBg: string; textPrimary: string; fontSize?: number;
 }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 0, marginRight: 52, marginBottom: 0, marginLeft: 52, padding: '28px 32px', backgroundColor: sectionBg, borderRadius: 20, flexGrow: 1 }}>
-            <span style={{ fontSize, fontWeight: 900, color: textPrimary, textAlign: 'center' }}>
+        <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginTop: 0, marginRight: 44, marginBottom: 0, marginLeft: 44,
+            padding: '24px 32px', backgroundColor: sectionBg, borderRadius: 20,
+            flexGrow: 1, maxHeight: 280,
+        }}>
+            <span style={{ fontSize, fontWeight: 900, color: textPrimary, textAlign: 'center', lineHeight: 1.35 }}>
                 {title || '신규 구인 공고'}
             </span>
         </div>
     );
 }
 
-function AgePill({ text }: { text: string }) {
-    return (
-        <div style={{ display: 'flex', padding: '8px 22px', backgroundColor: '#3B82F6', borderRadius: 100 }}>
-            <span style={{ fontSize: 20, color: '#FFFFFF', fontWeight: 700 }}>{text}</span>
-        </div>
-    );
-}
-
-function PayPill({ text, bg = BRAND_PINK, textColor = '#FFFFFF', size = 20 }: {
-    text: string; bg?: string; textColor?: string; size?: number;
+/** 2열 정보 블록 — 라벨 + 값을 세로로 쌓는 대형 카드 */
+function InfoBlock({ label, value, labelColor, valueColor, blockBg, accentBg, accent = false }: {
+    label: string; value: string;
+    labelColor: string; valueColor: string;
+    blockBg: string; accentBg?: string; accent?: boolean;
 }) {
+    const bg = accent && accentBg ? accentBg : blockBg;
     return (
-        <div style={{ display: 'flex', padding: '8px 22px', backgroundColor: bg, borderRadius: 100 }}>
-            <span style={{ fontSize: size, color: textColor, fontWeight: 700 }}>{text}</span>
+        <div style={{
+            display: 'flex', flexDirection: 'column', flexGrow: 1,
+            padding: '14px 20px', backgroundColor: bg, borderRadius: 14, gap: 3,
+        }}>
+            <span style={{ fontSize: 17, color: labelColor, fontWeight: 600 }}>{label}</span>
+            <span style={{ fontSize: 26, color: valueColor, fontWeight: 800, lineHeight: 1.2 }}>{value || '—'}</span>
         </div>
     );
 }
 
-function CatPill({ text, pillBg, borderColor, textColor }: {
-    text: string; pillBg: string; borderColor: string; textColor: string;
-}) {
+/** 해시태그 키워드 한 줄 row */
+function KwRow({ keywords, pillBg, textColor }: { keywords: string[]; pillBg: string; textColor: string }) {
+    if (!keywords.length) return null;
     return (
-        <div style={{ display: 'flex', padding: '6px 18px', backgroundColor: pillBg, borderRadius: 100, borderWidth: 2, borderStyle: 'solid', borderColor }}>
-            <span style={{ fontSize: 17, color: textColor, fontWeight: 600 }}>{text}</span>
-        </div>
-    );
-}
-
-function KwPill({ text, pillBg, textColor }: { text: string; pillBg: string; textColor: string }) {
-    return (
-        <div style={{ display: 'flex', padding: '4px 14px', backgroundColor: pillBg, borderRadius: 100 }}>
-            <span style={{ fontSize: 15, color: textColor }}>{`#${text.replace(/^#/, '')}`}</span>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', marginTop: 0, marginRight: 44, marginBottom: 0, marginLeft: 44 }}>
+            {keywords.slice(0, 5).map((kw, i) => (
+                <div key={i} style={{ display: 'flex', padding: '6px 18px', backgroundColor: pillBg, borderRadius: 100 }}>
+                    <span style={{ fontSize: 17, color: textColor, fontWeight: 600 }}>{`#${kw.replace(/^#/, '')}`}</span>
+                </div>
+            ))}
         </div>
     );
 }
@@ -226,33 +229,50 @@ function renderCard(data: CardData, template: string, bgKey: string) {
 
     const WATERMARK = '여성 구인구직은 코코알바 cocoalba.kr';
 
+    // 지역 한 줄 표시 (region · subRegion)
+    const regionLine = data.region + (data.subRegion ? ` · ${data.subRegion}` : '');
+
+    // InfoBlock 공통 색상
+    const ibLabelColor = t.textMuted;
+    const ibValueColor = t.textPrimary;
+    const ibBg         = t.sectionBg;
+    const ibAccentBg   = isDark ? 'rgba(233,30,140,0.22)' : 'rgba(233,30,140,0.09)';
+
     // ── Template A: 기본형 ────────────────────────────────────────────────────
     if (template === 'A') {
         return (
             <div style={rootStyle}>
                 <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '32px 52px 20px' }}>
-                    <span style={{ fontSize: 54, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
+
+                {/* 헤더: 업체명 + 지역·연락처 */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '28px 44px 18px' }}>
+                    <span style={{ fontSize: 66, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                        <span style={{ fontSize: 20, fontWeight: 700, color: t.textPrimary }}>{data.region}</span>
-                        {data.subRegion ? <span style={{ fontSize: 17, color: t.textMuted }}>{data.subRegion}</span> : null}
-                        {data.phone ? <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>{data.phone}</span> : null}
+                        <span style={{ fontSize: 22, fontWeight: 700, color: t.textPrimary }}>{regionLine}</span>
+                        {data.phone
+                            ? <span style={{ fontSize: 26, color: BRAND_PINK, fontWeight: 800 }}>{data.phone}</span>
+                            : null}
                     </div>
                 </div>
+
+                {/* 공고 제목 박스 */}
                 <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} />
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '20px 52px', gap: 12 }}>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        {data.age ? <AgePill text={data.age} /> : null}
-                        {data.payDisplay ? <PayPill text={data.payDisplay} /> : null}
+
+                {/* 정보 블록 2열 */}
+                <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 44px 10px', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        <InfoBlock label="나이" value={data.age} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="급여" value={data.payDisplay} labelColor={ibLabelColor} valueColor={BRAND_PINK} blockBg={ibBg} accentBg={ibAccentBg} accent />
                     </div>
                     <div style={{ display: 'flex', gap: 10 }}>
-                        {data.category ? <CatPill text={data.category} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
-                        {data.categorySub ? <CatPill text={data.categorySub} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
+                        <InfoBlock label="업종" value={data.category} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="세부업종" value={data.categorySub} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
                     </div>
                 </div>
+
+                {/* 해시태그 키워드 */}
+                <KwRow keywords={data.keywords} pillBg={t.pillBg} textColor={t.textMuted} />
+
                 <ContactSection sectionBg={t.sectionBg} dividerC={t.dividerC} textPrimary={t.textPrimary} textMuted={t.textMuted} />
                 <BottomBar bg={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} textColor={t.textMuted} />
             </div>
@@ -264,35 +284,40 @@ function renderCard(data: CardData, template: string, bgKey: string) {
         return (
             <div style={rootStyle}>
                 <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '28px 52px 16px' }}>
+
+                {/* 헤더 */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '26px 44px 16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span style={{ fontSize: 50, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
-                        <span style={{ fontSize: 18, color: t.textMuted }}>{data.region}{data.subRegion ? ` · ${data.subRegion}` : ''}</span>
+                        <span style={{ fontSize: 62, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
+                        <span style={{ fontSize: 22, color: t.textMuted }}>{regionLine}</span>
                     </div>
                     {data.phone
-                        ? <div style={{ display: 'flex', padding: '10px 24px', backgroundColor: BRAND_PINK, borderRadius: 100 }}>
-                            <span style={{ fontSize: 20, color: '#fff', fontWeight: 700 }}>{data.phone}</span>
+                        ? <div style={{ display: 'flex', padding: '12px 28px', backgroundColor: BRAND_PINK, borderRadius: 100 }}>
+                            <span style={{ fontSize: 26, color: '#fff', fontWeight: 800 }}>{data.phone}</span>
                           </div>
                         : null}
                 </div>
-                <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} fontSize={42} />
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '20px 52px', gap: 12 }}>
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        {data.age ? <AgePill text={data.age} /> : null}
-                        {data.payDisplay
-                            ? <div style={{ display: 'flex', padding: '12px 30px', backgroundColor: BRAND_PINK, borderRadius: 100, borderWidth: 3, borderStyle: 'solid', borderColor: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)' }}>
-                                <span style={{ fontSize: 28, color: '#FFFFFF', fontWeight: 900 }}>{data.payDisplay}</span>
-                              </div>
-                            : null}
-                    </div>
+
+                {/* 급여 대형 배너 */}
+                {data.payDisplay
+                    ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 0, marginRight: 44, marginBottom: 0, marginLeft: 44, padding: '18px 32px', backgroundColor: BRAND_PINK, borderRadius: 18 }}>
+                        <span style={{ fontSize: 38, color: '#FFFFFF', fontWeight: 900 }}>{data.payDisplay}</span>
+                      </div>
+                    : null}
+
+                {/* 공고 제목 */}
+                <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} fontSize={40} />
+
+                {/* 정보 블록 */}
+                <div style={{ display: 'flex', flexDirection: 'column', padding: '14px 44px 10px', gap: 10 }}>
                     <div style={{ display: 'flex', gap: 10 }}>
-                        {data.category ? <CatPill text={data.category} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
-                        {data.categorySub ? <CatPill text={data.categorySub} pillBg={t.pillBg} borderColor={t.pillBorderC} textColor={t.textPrimary} /> : null}
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
+                        <InfoBlock label="나이" value={data.age} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="업종" value={data.category} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="세부업종" value={data.categorySub} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
                     </div>
                 </div>
+
+                <KwRow keywords={data.keywords} pillBg={t.pillBg} textColor={t.textMuted} />
                 <ContactSection sectionBg={t.sectionBg} dividerC={t.dividerC} textPrimary={t.textPrimary} textMuted={t.textMuted} />
                 <BottomBar bg={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} textColor={t.textMuted} />
             </div>
@@ -304,37 +329,33 @@ function renderCard(data: CardData, template: string, bgKey: string) {
         return (
             <div style={rootStyle}>
                 <TopBar bg={GOLD} text="[ 여성 구인구직은 코코알바 cocoalba.kr ]" textColor="#1a1a2e" />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '28px 52px 16px' }}>
-                    <span style={{ fontSize: 52, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
-                        <span style={{ fontSize: 20, fontWeight: 700, color: t.textPrimary }}>{data.region}</span>
-                        {data.subRegion ? <span style={{ fontSize: 16, color: t.textMuted }}>{data.subRegion}</span> : null}
-                        {data.phone ? <span style={{ fontSize: 18, color: GOLD, fontWeight: 700 }}>{data.phone}</span> : null}
+
+                {/* 헤더 */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '28px 44px 16px' }}>
+                    <span style={{ fontSize: 64, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                        <span style={{ fontSize: 22, fontWeight: 700, color: t.textPrimary }}>{regionLine}</span>
+                        {data.phone ? <span style={{ fontSize: 26, color: GOLD, fontWeight: 800 }}>{data.phone}</span> : null}
                     </div>
                 </div>
-                <div style={{ display: 'flex', height: 3, backgroundColor: GOLD, marginTop: 0, marginRight: 52, marginBottom: 0, marginLeft: 52 }} />
-                <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} fontSize={42} />
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '18px 52px', gap: 12 }}>
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        {data.age ? <AgePill text={data.age} /> : null}
-                        {data.payDisplay ? <PayPill text={data.payDisplay} bg={GOLD} textColor="#1a1a2e" size={21} /> : null}
+
+                <div style={{ display: 'flex', height: 3, backgroundColor: GOLD, marginTop: 0, marginRight: 44, marginBottom: 0, marginLeft: 44 }} />
+
+                <TitleBox title={data.title} sectionBg={t.sectionBg} textPrimary={t.textPrimary} fontSize={40} />
+
+                {/* 정보 블록 (골드 테마) */}
+                <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 44px 10px', gap: 10 }}>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        <InfoBlock label="나이" value={data.age} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="급여" value={data.payDisplay} labelColor={'#1a1a2e'} valueColor={'#1a1a2e'} blockBg={GOLD} />
                     </div>
                     <div style={{ display: 'flex', gap: 10 }}>
-                        {data.category
-                            ? <div style={{ display: 'flex', padding: '6px 18px', backgroundColor: t.pillBg, borderRadius: 100, borderWidth: 2, borderStyle: 'solid', borderColor: GOLD }}>
-                                <span style={{ fontSize: 17, color: t.textPrimary, fontWeight: 600 }}>{data.category}</span>
-                              </div>
-                            : null}
-                        {data.categorySub
-                            ? <div style={{ display: 'flex', padding: '6px 18px', backgroundColor: t.pillBg, borderRadius: 100, borderWidth: 2, borderStyle: 'solid', borderColor: GOLD }}>
-                                <span style={{ fontSize: 17, color: t.textPrimary, fontWeight: 600 }}>{data.categorySub}</span>
-                              </div>
-                            : null}
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
+                        <InfoBlock label="업종" value={data.category} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                        <InfoBlock label="세부업종" value={data.categorySub} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
                     </div>
                 </div>
+
+                <KwRow keywords={data.keywords} pillBg={t.pillBg} textColor={t.textMuted} />
                 <ContactSection sectionBg={t.sectionBg} dividerC={t.dividerC} textPrimary={t.textPrimary} textMuted={t.textMuted} />
                 <TopBar bg={GOLD} text="[ 여성 구인구직은 코코알바 cocoalba.kr ]" textColor="#1a1a2e" />
             </div>
@@ -345,40 +366,37 @@ function renderCard(data: CardData, template: string, bgKey: string) {
     return (
         <div style={rootStyle}>
             <TopBar bg={BRAND_PINK} text={WATERMARK} textColor="#FFFFFF" />
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 52px 24px', gap: 8 }}>
-                <span style={{ fontSize: 58, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <span style={{ fontSize: 18, color: t.textMuted }}>{data.region}</span>
-                    {data.subRegion ? <span style={{ fontSize: 17, color: t.textMuted }}>{data.subRegion}</span> : null}
-                    {data.phone ? <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>{data.phone}</span> : null}
+
+            {/* 헤더 — 중앙 정렬 */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '36px 52px 20px', gap: 8 }}>
+                <span style={{ fontSize: 68, fontWeight: 900, color: t.textPrimary }}>{data.nickname}</span>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                    <span style={{ fontSize: 22, color: t.textMuted }}>{regionLine}</span>
+                    {data.phone ? <span style={{ fontSize: 24, color: BRAND_PINK, fontWeight: 800 }}>{data.phone}</span> : null}
                 </div>
             </div>
-            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1, padding: '32px 80px' }}>
-                <span style={{ fontSize: 46, fontWeight: 900, color: t.textPrimary, textAlign: 'center' }}>
+
+            <div style={{ display: 'flex', height: 2, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
+
+            {/* 타이틀 — 중앙 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1, maxHeight: 260, padding: '28px 80px' }}>
+                <span style={{ fontSize: 44, fontWeight: 900, color: t.textPrimary, textAlign: 'center', lineHeight: 1.35 }}>
                     {data.title || '신규 구인 공고'}
                 </span>
             </div>
-            <div style={{ display: 'flex', height: 1, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
-            <div style={{ display: 'flex', flexDirection: 'column', padding: '16px 80px', gap: 10 }}>
+
+            <div style={{ display: 'flex', height: 2, backgroundColor: t.dividerC, marginTop: 0, marginRight: 80, marginBottom: 0, marginLeft: 80 }} />
+
+            {/* 정보 블록 — 중앙 */}
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '14px 60px 10px', gap: 10 }}>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                    {data.age ? <AgePill text={data.age} /> : null}
-                    {data.payDisplay ? <PayPill text={data.payDisplay} size={17} /> : null}
-                    {data.category
-                        ? <div style={{ display: 'flex', padding: '6px 18px', backgroundColor: t.pillBg, borderRadius: 100, borderWidth: 1, borderStyle: 'solid', borderColor: t.pillBorderC }}>
-                            <span style={{ fontSize: 16, color: t.textPrimary, fontWeight: 500 }}>{data.category}</span>
-                          </div>
-                        : null}
-                    {data.categorySub
-                        ? <div style={{ display: 'flex', padding: '6px 18px', backgroundColor: t.pillBg, borderRadius: 100, borderWidth: 1, borderStyle: 'solid', borderColor: t.pillBorderC }}>
-                            <span style={{ fontSize: 16, color: t.textPrimary, fontWeight: 500 }}>{data.categorySub}</span>
-                          </div>
-                        : null}
-                </div>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-                    {data.keywords.slice(0, 5).map((kw, i) => <KwPill key={i} text={kw} pillBg={t.pillBg} textColor={t.textMuted} />)}
+                    <InfoBlock label="나이" value={data.age} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
+                    <InfoBlock label="급여" value={data.payDisplay} labelColor={ibLabelColor} valueColor={BRAND_PINK} blockBg={ibBg} accentBg={ibAccentBg} accent />
+                    <InfoBlock label="업종" value={data.category} labelColor={ibLabelColor} valueColor={ibValueColor} blockBg={ibBg} />
                 </div>
             </div>
+
+            <KwRow keywords={data.keywords} pillBg={t.pillBg} textColor={t.textMuted} />
             <ContactSection sectionBg={t.sectionBg} dividerC={t.dividerC} textPrimary={t.textPrimary} textMuted={t.textMuted} />
             <BottomBar bg={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'} textColor={t.textMuted} />
         </div>
