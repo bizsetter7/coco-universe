@@ -153,6 +153,7 @@ export default function SnsManagementPage() {
     const [cardShopList, setCardShopList] = useState<{ id: number; nickname: string; name: string; region: string }[]>([]);
     const [cardSearching, setCardSearching] = useState(false);
     const [cardPreviewUrl, setCardPreviewUrl] = useState('');
+    const [selectedShopData, setSelectedShopData] = useState<{ nickname: string; region: string } | null>(null);
     // 수동 입력 필드
     const [cardFields, setCardFields] = useState({
         nickname: '', region: '', subRegion: '', phone: '',
@@ -212,6 +213,31 @@ export default function SnsManagementPage() {
         setCardPreviewUrl(url + `&_t=${Date.now()}`); // 캐시 방지
     };
 
+    // SEO 파일명 생성 — 지역-업체명-업종-구인공고.png
+    const buildSeoFilename = (): string => {
+        const clean = (s: string) =>
+            s.replace(/[\[\]【】()（）#\s]/g, '-')
+             .replace(/-+/g, '-')
+             .replace(/^-|-$/g, '')
+             .trim();
+
+        let nickname = '';
+        let region   = '';
+        let category = '';
+
+        if (cardMode === 'db' && selectedShopData) {
+            nickname = clean(selectedShopData.nickname);
+            region   = clean(selectedShopData.region);
+        } else if (cardMode === 'manual') {
+            nickname = clean(cardFields.nickname);
+            region   = clean(cardFields.region);
+            category = clean(cardFields.category);
+        }
+
+        const parts = [region, nickname, category, '구인공고'].filter(Boolean);
+        return `${parts.join('-')}.png`;
+    };
+
     const handleCardDownload = async () => {
         const url = buildPreviewUrl();
         try {
@@ -219,7 +245,7 @@ export default function SnsManagementPage() {
             const blob = await res.blob();
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `cocoalba_card_${cardTemplate}_${Date.now()}.png`;
+            a.download = buildSeoFilename();
             a.click();
             URL.revokeObjectURL(a.href);
             toast.success('카드 다운로드 완료!');
@@ -629,7 +655,7 @@ export default function SnsManagementPage() {
                             {cardShopList.length > 0 && (
                                 <div className="bg-slate-800 rounded-xl divide-y divide-slate-700 max-h-40 overflow-y-auto">
                                     {cardShopList.map(s => (
-                                        <button key={s.id} onClick={() => { setCardShopId(String(s.id)); setCardShopList([]); setCardShopSearch(`[#${s.id}] ${s.nickname || s.name}`); toast.success(`${s.nickname || s.name} 선택됨`); }}
+                                        <button key={s.id} onClick={() => { setCardShopId(String(s.id)); setCardShopList([]); setCardShopSearch(`[#${s.id}] ${s.nickname || s.name}`); setSelectedShopData({ nickname: s.nickname || s.name, region: s.region }); toast.success(`${s.nickname || s.name} 선택됨`); }}
                                             className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-700 text-left transition-colors">
                                             <span className="text-sm text-white font-bold">{s.nickname || s.name}</span>
                                             <span className="text-xs text-slate-400">{s.region} · #{s.id}</span>
