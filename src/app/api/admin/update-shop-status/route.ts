@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/requireAdmin';
+import { sendJobsApprovalAlert, isJobsBotConfigured } from '@/lib/telegram';
 
 /**
  * [Admin API] /api/admin/update-shop-status
@@ -169,6 +170,19 @@ export async function POST(request: NextRequest) {
                         created_at: nowIso,
                     });
                 }
+            }
+        }
+
+        // 4. Jobs봇 채널 알림 (승인 시, 환경변수 설정된 경우)
+        if (status === 'active' && isJobsBotConfigured()) {
+            // 승인된 공고 정보 조회 (adData에 없을 수 있음)
+            const { data: shopRow } = await supabaseAdmin
+                .from('shops')
+                .select('id,nickname,name,title,region,category,pay,pay_type')
+                .eq('id', Number(adId))
+                .single();
+            if (shopRow) {
+                sendJobsApprovalAlert(shopRow).catch(() => {}); // 실패해도 승인은 완료
             }
         }
 
