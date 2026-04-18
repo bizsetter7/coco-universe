@@ -667,14 +667,14 @@ function AdminContent() {
                 />
             )}
 
-            {/* Tab 7: 시스템 설정 */}
+            {/* 헬스 모니터: 42개 API/DB 헬스체크 */}
             {activeTab === 'seo' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
                     <HealthDashboard />
                 </div>
             )}
 
-            {/* Tab 7: System Health / Verification Center */}
+            {/* 시스템 검증 센터: 데이터 품질·무결성 검증 */}
             {
                 activeTab === 'health' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">

@@ -299,7 +299,7 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                 />
                 <NavItem
                     icon={<Settings size={20} />}
-                    label="시스템 설정"
+                    label="헬스 모니터"
                     active={activeTab === 'seo'}
                     onClick={() => handleNav('seo')}
                 />
@@ -420,7 +420,7 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                     />
                     <NavItem
                         icon={<Settings size={20} />}
-                        label="시스템 설정"
+                        label="헬스 모니터"
                         active={activeTab === 'seo'}
                         onClick={() => handleNav('seo')}
                     />
