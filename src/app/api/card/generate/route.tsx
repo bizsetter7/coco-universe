@@ -45,15 +45,16 @@ async function fetchShopFromDB(shopId: string): Promise<Record<string, any> | nu
     }
 }
 
-// ─── 폰트 로딩 (jsDelivr CDN — Vercel 접근 확인됨) ─────────────────────────
+// ─── 폰트 로딩 (자체 서버 — public/fonts/ 번들, 외부 CDN 의존 제거) ──────────
+// Edge runtime에서 외부 CDN 차단 시 폰트 로딩 실패 → Satori crash → 0 bytes 응답
+// 해결: 폰트를 public/fonts/에 번들 → request.url 기반 자체 서버 fetch
 
-const FONT_URL = 'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-kr/files/noto-sans-kr-korean-700-normal.woff2';
-
-async function loadFont(): Promise<ArrayBuffer | null> {
+async function loadFont(requestUrl: string): Promise<ArrayBuffer | null> {
     try {
-        const res = await fetch(FONT_URL);
+        const fontUrl = new URL('/fonts/NotoSansKR-Bold-Korean.woff2', requestUrl).toString();
+        const res = await fetch(fontUrl);
         if (res.ok) return res.arrayBuffer();
-    } catch { /* 실패 시 시스템 폰트 폴백 */ }
+    } catch { /* 폰트 로딩 실패 시 Satori 빈 렌더링 */}
     return null;
 }
 
@@ -428,16 +429,23 @@ export async function GET(request: NextRequest) {
     const template = (searchParams.get('template') ?? 'A').toUpperCase();
     const bg       = searchParams.get('bg')         ?? 'white';
 
-    // 폰트 + DB 병렬 로드
+    // 폰트 + DB 병렬 로드 (폰트는 자체 서버 fetch — request.url 기반)
     const [fontData, shopData] = await Promise.all([
-        loadFont(),
+        loadFont(request.url),
         shopId ? fetchShopFromDB(shopId) : Promise.resolve(null),
     ]);
 
     const cardData = buildCardData(searchParams, shopData ?? undefined);
-    const fonts = fontData
-        ? [{ name: 'NotoSansKR', data: fontData, weight: 700 as const, style: 'normal' as const }]
-        : [];
+
+    // 폰트 로딩 실패 시 명시적 에러 반환 (0 bytes 응답 방지)
+    if (!fontData) {
+        return new Response(
+            JSON.stringify({ error: 'Font load failed', fontUrl: new URL('/fonts/NotoSansKR-Bold-Korean.woff2', request.url).toString() }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+
+    const fonts = [{ name: 'NotoSansKR', data: fontData, weight: 700 as const, style: 'normal' as const }];
 
     return new ImageResponse(
         renderCard(cardData, template, bg),
