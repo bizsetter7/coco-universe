@@ -421,7 +421,7 @@ function buildCardData(params: URLSearchParams, shop?: Record<string, any>): Car
 
     const ageMin = String(src.options?.ageMin || params.get('ageMin') || '');
     const ageMax = String(src.options?.ageMax || params.get('ageMax') || '');
-    const age    = ageMin && ageMax ? `${ageMin}~${ageMax}대` : ageMin ? `${ageMin}대 이상` : '';
+    const age    = ageMin && ageMax ? `${ageMin}~${ageMax}세` : ageMin ? `${ageMin}세 이상` : '';
 
     const payType = src.pay_type || params.get('payType') || '';
     const payRaw  = String(src.pay || params.get('pay') || '').trim();
