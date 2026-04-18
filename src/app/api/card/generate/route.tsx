@@ -155,17 +155,18 @@ function ContactSection({ sectionBg, dividerC, textPrimary, textMuted }: {
     sectionBg: string; dividerC: string; textPrimary: string; textMuted: string;
 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, marginRight: 44, marginBottom: 16, marginLeft: 44, padding: '16px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
-            {/* 코코알바문의 + @계정 — 두 줄 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>코코알바문의</span>
-                <span style={{ fontSize: 22, color: BRAND_PINK, fontWeight: 800 }}>{TELEGRAM_CS}</span>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, marginRight: 44, marginBottom: 16, marginLeft: 44, padding: '16px 24px', backgroundColor: sectionBg, borderRadius: 16 }}>
             <div style={{ display: 'flex', height: 1, backgroundColor: dividerC }} />
-            {/* 우측 정렬: 경고 위 / 안내 문구 아래 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
-                <span style={{ fontSize: 14, color: textMuted }}>19세 미성년자 연락/출입금지</span>
-                <span style={{ fontSize: 17, color: textPrimary, fontWeight: 700 }}>&apos;코코알바 통해 연락드렸어요&apos;라고 말씀해주세요</span>
+            {/* 좌: 코코알바문의/@bot  ↔  우: 경고/안내 — 같은 행, 세로 중앙 정렬 */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <span style={{ fontSize: 18, color: BRAND_PINK, fontWeight: 700 }}>코코알바문의</span>
+                    <span style={{ fontSize: 22, color: BRAND_PINK, fontWeight: 800 }}>{TELEGRAM_CS}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
+                    <span style={{ fontSize: 14, color: textMuted }}>19세 미성년자 연락/출입금지</span>
+                    <span style={{ fontSize: 17, color: textPrimary, fontWeight: 700 }}>&apos;코코알바 통해 연락드렸어요&apos;라고 말씀해주세요</span>
+                </div>
             </div>
         </div>
     );
