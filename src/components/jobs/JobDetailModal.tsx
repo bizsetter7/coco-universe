@@ -13,6 +13,8 @@ import { cleanShopTitle, generateSEOKeywords } from '@/utils/shopUtils';
 import { ICONS } from '@/constants/job-options';
 import { useBrand } from '@/components/BrandProvider';
 import { AD_TIER_STANDARDS } from '@/constants/standards';
+import { getCategoryWorkTypeSlugs, WORK_TYPE_INFO } from '@/lib/data/work-type-guide';
+import Link from 'next/link';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
 import { useAuth } from '@/hooks/useAuth';
@@ -556,6 +558,36 @@ export const JobDetailContent = ({
                     </div>
                 </div>
             </div>
+
+            {/* 지역+업종 가이드 링크 — 내부 링크 SEO + 구직자 편의 */}
+            {(() => {
+                const regionRaw = typeof shop.region === 'string' ? shop.region : '';
+                const category  = shop.category || shop.workType || '';
+                const cleanRegion = regionRaw.replace(/[\[\]]/g, '').trim();
+                const parts = cleanRegion.split(/[-\s]+/);
+                const regionName = parts[0] || cleanRegion;
+                const regionSlug = encodeURIComponent(cleanRegion);
+                const relatedSlugs = getCategoryWorkTypeSlugs(category);
+                if (!regionName || relatedSlugs.length === 0) return null;
+                return (
+                    <div className="px-6 py-3 bg-gray-50/60 border-t border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 mb-2">
+                            📍 {regionName} 관련 알바 가이드
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                            {relatedSlugs.map(slug => (
+                                <Link
+                                    key={slug}
+                                    href={`/coco/${regionSlug}/${slug}`}
+                                    className="px-2.5 py-1 rounded-full bg-white border border-pink-100 text-[10px] font-medium text-pink-500 hover:bg-pink-50 hover:border-pink-300 transition-colors"
+                                >
+                                    {regionName}{WORK_TYPE_INFO[slug].name.replace(/\s*\(.*\)/, '').replace('알바', '알바')}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* 신고 링크 */}
             <div className="px-6 py-2 bg-white flex justify-end">

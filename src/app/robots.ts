@@ -29,6 +29,11 @@ export default function robots(): MetadataRoute.Robots {
                 '/shop/',          // 레거시 URL 크롤링 중복 방지 (리다이렉트 처리됨)
             ],
         },
-        sitemap: `${siteUrl}/sitemap.xml`,
+        sitemap: [
+            `${siteUrl}/sitemap.xml`,
+            `${siteUrl}/image-sitemap.xml`,
+        ],
+        // AI 검색 최적화 (GEO)
+        // llms.txt: https://www.cocoalba.kr/llms.txt
     };
 }

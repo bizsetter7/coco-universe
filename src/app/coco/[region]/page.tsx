@@ -5,6 +5,8 @@ import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 import { Shop } from '@/types/shop';
 import { slugify } from '@/utils/shopUtils';
+import { WORK_TYPE_SLUGS, WORK_TYPE_INFO } from '@/lib/data/work-type-guide';
+import Link from 'next/link';
 
 export const revalidate = 300; // 5분마다 ISR 갱신
 
@@ -222,6 +224,27 @@ export default async function CocoRegionPage({ params }: { params: Promise<{ reg
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }} />
             <RegionClient shops={shops} initialRegion={initialRegion} regionSlug={decodedRegionSlug} />
+
+            {/* ── 지역×업종 가이드 링크 그리드 (서버사이드 렌더링 — 내부 링크 SEO) ── */}
+            <nav
+                aria-label={`${regionName} 업종별 알바 가이드`}
+                className="max-w-5xl mx-auto px-4 pb-10 pt-4"
+            >
+                <h2 className="text-sm font-bold text-gray-500 mb-3">
+                    📍 {regionName} 업종별 알바 가이드
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                    {WORK_TYPE_SLUGS.map((slug) => (
+                        <Link
+                            key={slug}
+                            href={`/coco/${encodeURIComponent(decodedRegionSlug)}/${slug}`}
+                            className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs text-gray-600 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50 transition-colors shadow-sm"
+                        >
+                            {regionName} {WORK_TYPE_INFO[slug].name.replace(/\s*\(.*\)$/, '')}
+                        </Link>
+                    ))}
+                </div>
+            </nav>
         </>
     );
 }

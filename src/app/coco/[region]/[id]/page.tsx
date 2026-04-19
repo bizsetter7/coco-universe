@@ -34,7 +34,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         return {
             title,
             description,
-            keywords: [`${regionName} ${normalizedSlug}`, `${regionName} ${workTypeInfo.name}`, `${normalizedSlug} 급여`, `${regionName} 유흥알바`, '여성알바', '밤알바', '고수익알바'],
+            keywords: [
+                `${regionName} ${normalizedSlug}`,
+                `${regionName} ${workTypeInfo.name}`,
+                `${normalizedSlug} 급여`,
+                `${regionName} 유흥알바`,
+                `${regionName} 밤알바`,
+                `${regionName} 당일지급알바`,
+                `${regionName} 여자알바`,
+                `${regionName} 고수익알바`,
+                '여성알바', '밤알바', '고수익알바', '당일지급', '유흥알바',
+                '20대여자알바', '30대여자알바', '단기알바', '주말알바',
+            ],
             openGraph: {
                 title,
                 description,
@@ -173,7 +184,7 @@ export default async function ShopDetailPage({ params }: Props) {
                 <WorkTypeGuidePage
                     regionSlug={decodedRegionSlug}
                     regionName={regionName}
-                    workTypeSlug={decodedId}
+                    workTypeSlug={normalizedId}
                     workTypeInfo={workTypeInfo}
                     regionPayData={regionPayData}
                 />

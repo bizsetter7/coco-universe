@@ -979,3 +979,73 @@ export function getNormalizedWorkTypeSlug(slug: string): WorkTypeSlug | undefine
     }
     return undefined;
 }
+
+// ─── 카테고리 → 관련 슬러그 매핑 ──────────────────────────────────────────────
+// 광고 상세 팝업 & 지역 페이지 내부 링크 자동 생성용
+// 업종 카테고리 키워드를 받아 관련 WorkTypeSlug 목록 반환
+
+const CATEGORY_SLUG_MAP: { keywords: string[]; slugs: WorkTypeSlug[] }[] = [
+    {
+        keywords: ['룸', '룸싸롱', '룸살롱', '룸알바'],
+        slugs: ['룸알바', '유흥알바', '밤알바', '여자알바', '여성알바', '20대여자알바', '당일지급알바'],
+    },
+    {
+        keywords: ['텐프로', '10프로', '텐프'],
+        slugs: ['텐프로', '유흥알바', '밤알바', '여자알바', '여성알바', '20대여자알바'],
+    },
+    {
+        keywords: ['쩜오', '0.5', '점오'],
+        slugs: ['쩜오알바', '유흥알바', '밤알바', '여자알바', '여성알바'],
+    },
+    {
+        keywords: ['텐카페', '카페'],
+        slugs: ['텐카페', '유흥알바', '밤알바', '여자알바', '여성알바', '대학생알바'],
+    },
+    {
+        keywords: ['노래주점', '노래빠', '단란주점'],
+        slugs: ['노래주점', '노래빠알바', '노래방알바', '유흥알바', '밤알바', '당일지급알바', '당일알바'],
+    },
+    {
+        keywords: ['노래방', '도우미'],
+        slugs: ['노래방알바', '노래빠알바', '유흥알바', '밤알바', '당일지급알바'],
+    },
+    {
+        keywords: ['마사지', '스웨디시', '아로마', '건마', '에스테'],
+        slugs: ['마사지', '여자알바', '여성알바', '단기알바', '당일지급알바'],
+    },
+    {
+        keywords: ['바', 'bar', '토킹바', '섹시바', '룸바'],
+        slugs: ['바알바', '유흥알바', '밤알바', '당일지급알바'],
+    },
+    {
+        keywords: ['엔터', 'bj', '인플루언서', '유튜브', '방송'],
+        slugs: ['엔터'],
+    },
+];
+
+// 항상 포함되는 공통 슬러그 (업종 무관)
+const COMMON_SLUGS: WorkTypeSlug[] = ['밤알바', '당일지급알바', '단기알바', '주말알바'];
+
+/**
+ * 업소 카테고리 문자열로 관련 WorkTypeSlug 목록을 자동 반환.
+ * 광고 상세 팝업 하단 & 지역 페이지 내부 링크 생성에 사용.
+ */
+export function getCategoryWorkTypeSlugs(category: string): WorkTypeSlug[] {
+    const lc = (category || '').toLowerCase();
+    const matched: WorkTypeSlug[] = [];
+
+    for (const entry of CATEGORY_SLUG_MAP) {
+        if (entry.keywords.some(kw => lc.includes(kw.toLowerCase()))) {
+            matched.push(...entry.slugs);
+        }
+    }
+
+    // 매핑된 게 없으면 유흥알바·여자알바 기본 포함
+    if (matched.length === 0) {
+        matched.push('유흥알바', '여자알바', '여성알바');
+    }
+
+    // 공통 슬러그 추가 후 중복 제거, 최대 8개
+    const all = Array.from(new Set([...matched, ...COMMON_SLUGS]));
+    return all.slice(0, 8) as WorkTypeSlug[];
+}
