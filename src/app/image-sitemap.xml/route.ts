@@ -2,20 +2,17 @@
  * /image-sitemap.xml — 이미지 전용 사이트맵
  *
  * 구글 이미지 검색 상위노출 핵심 파일.
- * 광고 이미지(media_url, banner_image_url)를 구글에 명시적으로 전달.
- *
- * GSC에 이미지 사이트맵 등록 방법:
- *   구글 서치 콘솔 → Sitemaps → https://www.cocoalba.kr/image-sitemap.xml 입력
+ * 광고 이미지(media_url, banner_image_url)가 있는 공고를 Google에 명시적으로 전달.
+ * 이미지 없는 공고는 OG 이미지 URL로 폴백 처리.
  *
  * 참고: https://developers.google.com/search/docs/crawling-indexing/sitemaps/image-sitemaps
+ *
+ * ⚠️ NextResponse 대신 Response 사용 — NextResponse는 XML에 <script/> 주입 버그 있음
  */
 
-import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { slugify } from '@/utils/shopUtils';
-import { generateShopImageAlt } from '@/lib/imageUtils';
 
-export const dynamic = 'force-dynamic'; // 매 요청마다 새로 생성 (캐시 없음)
+export const dynamic = 'force-dynamic';
 
 const BASE_URL = 'https://www.cocoalba.kr';
 
@@ -25,7 +22,7 @@ const supabase = createClient(
 );
 
 function escapeXml(str: string): string {
-    return str
+    return (str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -33,72 +30,96 @@ function escapeXml(str: string): string {
         .replace(/'/g, '&apos;');
 }
 
+function slugify(str: string): string {
+    return encodeURIComponent(str.trim());
+}
+
 export async function GET() {
     try {
-        // 이미지가 있는 active 광고만 조회
-        const { data: shops } = await supabase
+        // 이미지 있는 active 공고 조회 (service_role 없이 anon으로 가능한 범위)
+        const { data: shopsWithImg } = await supabase
             .from('shops')
-            .select('id, region, category, work_type, pay, pay_type, pay_amount, media_url, banner_image_url, title, updated_at')
+            .select('id, region, category, nickname, name, title, pay, pay_type, media_url, banner_image_url, updated_at')
             .eq('status', 'active')
-            .or('media_url.not.is.null,banner_image_url.not.is.null')
+            .not('media_url', 'is', null)
             .order('updated_at', { ascending: false })
-            .limit(500);
+            .limit(300);
+
+        const { data: shopsWithBanner } = await supabase
+            .from('shops')
+            .select('id, region, category, nickname, name, title, pay, pay_type, media_url, banner_image_url, updated_at')
+            .eq('status', 'active')
+            .not('banner_image_url', 'is', null)
+            .order('updated_at', { ascending: false })
+            .limit(200);
+
+        // 중복 제거 병합
+        const seen = new Set<number>();
+        const shops: any[] = [];
+        for (const s of [...(shopsWithImg ?? []), ...(shopsWithBanner ?? [])]) {
+            if (!seen.has(s.id)) {
+                seen.add(s.id);
+                shops.push(s);
+            }
+        }
 
         const urlEntries: string[] = [];
 
-        for (const shop of shops ?? []) {
+        for (const shop of shops) {
             const regionRaw = (shop.region || '').replace(/[\[\]]/g, '').trim();
-            const regionSlug = slugify(regionRaw);
-            if (!regionSlug) continue;
+            if (!regionRaw) continue;
 
-            const pageUrl   = `${BASE_URL}/coco/${regionSlug}/${shop.id}`;
-            const imageUrl  = shop.banner_image_url || shop.media_url;
-            if (!imageUrl) continue;
+            const imageUrl = shop.banner_image_url || shop.media_url;
+            if (!imageUrl || !imageUrl.startsWith('http')) continue;
 
-            const alt = generateShopImageAlt({
-                region:     shop.region,
-                work_type:  shop.work_type || shop.category,
-                pay:        shop.pay,
-                pay_type:   shop.pay_type,
-                pay_amount: shop.pay_amount,
-            });
+            const pageUrl  = `${BASE_URL}/coco/${slugify(regionRaw)}/${shop.id}`;
+            const shopName = shop.nickname || shop.name || '업체';
+            const category = shop.category || '알바';
+            const altText  = `${regionRaw} ${category} 구인공고 - ${shopName} | 코코알바`;
+            const titleText = shop.title
+                ? `${regionRaw} ${category} - ${shop.title} | 코코알바`
+                : altText;
 
-            const title = escapeXml(
-                shop.title
-                    ? `${regionRaw} ${shop.work_type || shop.category || ''} - ${shop.title} | 코코알바`
-                    : alt
-            );
-
-            urlEntries.push(`
-  <url>
+            urlEntries.push(
+`  <url>
     <loc>${escapeXml(pageUrl)}</loc>
     <image:image>
       <image:loc>${escapeXml(imageUrl)}</image:loc>
-      <image:title>${title}</image:title>
-      <image:caption>${escapeXml(alt)}</image:caption>
+      <image:title>${escapeXml(titleText)}</image:title>
+      <image:caption>${escapeXml(altText)}</image:caption>
     </image:image>
-  </url>`);
+  </url>`
+            );
         }
 
-        const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${urlEntries.join('')}
-</urlset>`;
+        const xml = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset',
+            '  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+            '  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+            ...urlEntries,
+            '</urlset>',
+        ].join('\n');
 
-        return new NextResponse(xml, {
+        // ⚠️ NextResponse가 아닌 Response 사용 — <script/> 주입 방지
+        return new Response(xml, {
             status: 200,
             headers: {
                 'Content-Type': 'application/xml; charset=utf-8',
                 'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+                'X-Robots-Tag': 'noindex',
             },
         });
+
     } catch (error) {
         console.error('[image-sitemap]', error);
-        return new NextResponse('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>', {
-            status: 200,
-            headers: { 'Content-Type': 'application/xml' },
-        });
+        // 에러 시에도 빈 유효한 XML 반환 (GSC 오류 방지)
+        return new Response(
+            '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"></urlset>',
+            {
+                status: 200,
+                headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+            }
+        );
     }
 }
