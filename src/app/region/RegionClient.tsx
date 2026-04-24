@@ -20,6 +20,7 @@ import { ListingPageLayout } from '@/components/ListingPageLayout';
 import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
+import { useAdultGate } from '@/hooks/useAdultGate';
 
 interface RegionClientProps {
     shops: Shop[];
@@ -31,6 +32,7 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType, userName, userCredit } = useAuth();
+    const { requireVerification } = useAdultGate();
 
     // -- State --
     const [selectedRegion, setSelectedRegion] = useState(initialRegion);
@@ -45,8 +47,12 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
 
     // Track viewed shops (타임스탬프 포함 저장 → 24시간 후 자동 만료)
     const handleSetSelectedShop = React.useCallback((shop: Shop | null) => {
-        setSelectedShop(shop);
-        if (shop) {
+        if (!shop) {
+            setSelectedShop(null);
+            return;
+        }
+        requireVerification(() => {
+            setSelectedShop(shop);
             const saved = localStorage.getItem('viewed_shops');
             const now = Date.now();
             const MS_24H = 86400000;
@@ -68,8 +74,8 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
                 ...entries.filter(e => e.shop?.id !== shop.id && (now - e.timestamp) < MS_24H),
             ].slice(0, 50);
             localStorage.setItem('viewed_shops', JSON.stringify(entries));
-        }
-    }, []);
+        });
+    }, [requireVerification]);
 
     const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -177,9 +183,11 @@ export default function RegionClient({ shops, initialRegion = '전체', regionSl
     }, []);
 
     const openPaymentPopup = React.useCallback((tier: string) => {
-        setSelectedTier(tier);
-        setShowPaymentPopup(true);
-    }, []);
+        requireVerification(() => {
+            setSelectedTier(tier);
+            setShowPaymentPopup(true);
+        });
+    }, [requireVerification]);
 
     return (
         <div className={`min-h-screen ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'} pb-24 lg:pb-0`}>

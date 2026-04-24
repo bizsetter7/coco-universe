@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { ReportAdModal } from '@/components/common/ReportAdModal';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdultGate } from '@/hooks/useAdultGate';
 
 /**
  * Kakao Maps SDK 로더 — autoload=false + 명시적 kakao.maps.load() 패턴
@@ -106,6 +107,7 @@ export const JobDetailContent = ({
 }: JobDetailContentProps) => {
     const [showReport, setShowReport] = useState(false);
     const { user, userType, isLoggedIn } = useAuth();
+    const { requireVerification } = useAdultGate();
     const [showApplyForm, setShowApplyForm] = useState(false);
     const [applyName, setApplyName] = useState('');
     const [applyPhone, setApplyPhone] = useState('');
@@ -611,11 +613,11 @@ export const JobDetailContent = ({
                         </div>
                     ) : !showApplyForm ? (
                         <button
-                            onClick={() => {
+                            onClick={() => requireVerification(() => {
                                 setApplyName((user as any)?.full_name || (user as any)?.nickname || '');
                                 setApplyPhone((user as any)?.phone || '');
                                 setShowApplyForm(true);
-                            }}
+                            })}
                             className="w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-black flex items-center justify-center gap-2 hover:bg-blue-700 transition"
                         >
                             <ClipboardList size={16} /> 온라인 지원하기
@@ -668,19 +670,19 @@ export const JobDetailContent = ({
             {/* 3. FOOTER SECTION */}
             <div className="px-4 py-2 md:py-3 bg-white border-t border-gray-100 grid grid-cols-4 gap-2 shrink-0 safe-area-bottom">
                 <button
-                    onClick={() => {
+                    onClick={() => requireVerification(() => {
                         const event = new CustomEvent('open-note-modal', {
                             detail: { receiver: shop.managerName || shop.nickname || `${shop.name} 사장님` }
                         });
                         window.dispatchEvent(event);
-                    }}
+                    })}
                     className="col-span-1 py-2 md:py-3 bg-gray-50 border border-gray-100 text-gray-600 rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-gray-100 transition shadow-sm group"
                 >
                     <MessageSquare size={18} className="text-gray-400" />
                     <span className="text-[10px] font-black">쪽지문의</span>
                 </button>
                 <button
-                    onClick={() => {
+                    onClick={() => requireVerification(() => {
                         const messengerId = shop.kakao || shop.telegram;
                         if (messengerId) {
                             navigator.clipboard.writeText(messengerId);
@@ -688,19 +690,21 @@ export const JobDetailContent = ({
                         } else {
                             alert('등록된 메신저 ID가 없습니다.');
                         }
-                    }}
+                    })}
                     className="col-span-1 py-2 md:py-3 bg-amber-400 text-black rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-amber-500 transition shadow-sm font-black group"
                 >
                     <MessageCircle size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
                     <span className="text-[10px]">카톡문의</span>
                 </button>
-                <a
-                    href={`tel:${shop.phone}`}
+                <button
+                    onClick={() => requireVerification(() => {
+                        window.location.href = `tel:${shop.phone}`;
+                    })}
                     className="col-span-2 py-2 md:py-3 bg-[#f82b60] text-white rounded-2xl flex items-center justify-center gap-2 hover:bg-[#db2456] transition shadow-lg shadow-[#f82b60]/30 group"
                 >
                     <Phone size={17} fill="currentColor" className="group-hover:animate-bounce shrink-0" />
                     <span className="text-[13px] font-black">전화/문자문의</span>
-                </a>
+                </button>
             </div>
         </div>
     );

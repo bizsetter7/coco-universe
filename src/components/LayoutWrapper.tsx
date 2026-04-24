@@ -45,6 +45,10 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     // [External Entry] 검색엔진 유입 시 진입 페이지 저장 (해당 페이지만 게이트 면제)
     const [externalEntryPage, setExternalEntryPage] = React.useState<string | null>(null);
 
+    // [CTA Trigger] CTA 클릭 시 성인게이트 강제 트리거 상태
+    const [forceShowGate, setForceShowGate] = React.useState(false);
+    const [pendingCallback, setPendingCallback] = React.useState<(() => void) | null>(null);
+
     React.useEffect(() => {
         setIsMounted(true);
 
@@ -71,6 +75,15 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
             }
             setExternalEntryPage(sessionStorage.getItem('external_entry_page'));
         }
+
+        // [CTA Trigger Listener]
+        const handleOpenGate = (e: Event) => {
+            const { onVerified } = (e as CustomEvent).detail;
+            setPendingCallback(() => onVerified);
+            setForceShowGate(true);
+        };
+        window.addEventListener('open-adult-gate', handleOpenGate);
+        return () => window.removeEventListener('open-adult-gate', handleOpenGate);
     }, []);
 
     // [Idle Logout Setup]
@@ -91,7 +104,7 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
 
     // 검색엔진 외부 유입 시: 최초 진입 페이지만 게이트 면제 (다른 페이지 이동 시 게이트 재표시)
     const isOnExternalEntryPage = !!(externalEntryPage && pathname === externalEntryPage);
-    const showAdultGate = isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot && !isOnExternalEntryPage;
+    const showAdultGate = forceShowGate || (isMounted && !isVerified && !ADULT_GATE_DISABLED && !isAdminPage && !isAuthFlowPage && !isPublicPage && !isGuidePage && !isBot && !isOnExternalEntryPage);
 
     React.useEffect(() => {
         if (isLoading) return;
@@ -122,7 +135,23 @@ export const LayoutWrapper = ({ children, sideAds }: LayoutWrapperProps) => {
     const handleVerify = () => {
         localStorage.setItem('adult_verified', 'true');
         setIsVerified(true);
+        setForceShowGate(false);
+        if (pendingCallback) {
+            pendingCallback();
+            setPendingCallback(null);
+        }
     };
+
+    // [Sync] 인증 상태가 외부에서 true가 된 경우(예: 로그인) 강제 게이트 해제 및 콜백 실행
+    React.useEffect(() => {
+        if (isVerified && forceShowGate) {
+            setForceShowGate(false);
+            if (pendingCallback) {
+                pendingCallback();
+                setPendingCallback(null);
+            }
+        }
+    }, [isVerified, forceShowGate, pendingCallback]);
 
     const handleSkip = () => {
         // 나가기 = Google로 이탈 (AdultVerificationGate에서 직접 처리)

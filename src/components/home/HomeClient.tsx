@@ -16,6 +16,7 @@ import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import JobListView from '@/components/jobs/JobListView';
 import { FloatingConversion } from './FloatingConversion';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
+import { useAdultGate } from '@/hooks/useAdultGate';
 
 // --- Type Definitions ---
 interface HomeClientProps {
@@ -25,6 +26,7 @@ interface HomeClientProps {
 export default function HomeClient({ shops }: HomeClientProps) {
     const brand = useBrand();
     const router = useRouter();
+    const { requireVerification } = useAdultGate();
 
     // -- State --
     const [visibleCount, setVisibleCount] = React.useState(20);
@@ -45,8 +47,10 @@ export default function HomeClient({ shops }: HomeClientProps) {
     };
 
     const handleAdRegister = (tier?: string) => {
-        setSelectedTier(tier || 'grand');
-        setShowPaymentPopup(true);
+        requireVerification(() => {
+            setSelectedTier(tier || 'grand');
+            setShowPaymentPopup(true);
+        });
     };
 
     return (
@@ -69,7 +73,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
             <UnifiedAdGrid
                 shops={shops}
                 onAdRegister={handleAdRegister}
-                onSelectShop={setSelectedShop}
+                onSelectShop={(shop) => requireVerification(() => setSelectedShop(shop))}
             />
 
             <div className="w-full h-px bg-slate-100 my-16 max-w-7xl mx-auto" />
@@ -80,7 +84,7 @@ export default function HomeClient({ shops }: HomeClientProps) {
                 brand={brand}
                 favorites={favorites}
                 toggleFavorite={toggleFavorite}
-                setSelectedShop={setSelectedShop}
+                setSelectedShop={(shop) => requireVerification(() => setSelectedShop(shop))}
                 visibleCount={visibleCount}
                 setVisibleCount={setVisibleCount}
                 onAdRegister={handleAdRegister}

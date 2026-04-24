@@ -20,6 +20,7 @@ import { UnifiedJobListing } from '@/components/listing/UnifiedJobListing';
 import { UnifiedAdGrid } from '@/components/common/UnifiedAdGrid';
 import { getFavorites, toggleFavorite as toggleFav, saveShopSnapshot } from '@/utils/favorites';
 import { JobTypeGuideLinks } from '@/components/guide/JobTypeGuideLinks';
+import { useAdultGate } from '@/hooks/useAdultGate';
 
 interface JobClientProps {
     shops: Shop[];
@@ -29,6 +30,7 @@ export default function JobClient({ shops }: JobClientProps) {
     const brand = useBrand();
     const router = useRouter();
     const { isLoggedIn, userType, userName, userCredit } = useAuth();
+    const { requireVerification } = useAdultGate();
 
     // -- State --
     const [selectedRegion, setSelectedRegion] = useState('전체');
@@ -46,8 +48,12 @@ export default function JobClient({ shops }: JobClientProps) {
 
     // Track viewed shops (타임스탬프 포함 저장 → 24시간 후 자동 만료)
     const handleSetSelectedShop = React.useCallback((shop: Shop | null) => {
-        setSelectedShop(shop);
-        if (shop) {
+        if (!shop) {
+            setSelectedShop(null);
+            return;
+        }
+        requireVerification(() => {
+            setSelectedShop(shop);
             const saved = localStorage.getItem('viewed_shops');
             const now = Date.now();
             const MS_24H = 86400000;
@@ -69,8 +75,8 @@ export default function JobClient({ shops }: JobClientProps) {
                 ...entries.filter(e => e.shop?.id !== shop.id && (now - e.timestamp) < MS_24H),
             ].slice(0, 50);
             localStorage.setItem('viewed_shops', JSON.stringify(entries));
-        }
-    }, []);
+        });
+    }, [requireVerification]);
 
     // Favorites State
     const [favorites, setFavorites] = useState<string[]>(() => getFavorites());
@@ -138,9 +144,11 @@ export default function JobClient({ shops }: JobClientProps) {
     }, []);
 
     const openPaymentPopup = React.useCallback((tier: string) => {
-        setSelectedTier(tier);
-        setShowPaymentPopup(true);
-    }, []);
+        requireVerification(() => {
+            setSelectedTier(tier);
+            setShowPaymentPopup(true);
+        });
+    }, [requireVerification]);
 
     return (
         <div className={`w-full h-auto ${brand.theme === 'dark' ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>

@@ -8,6 +8,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useBrand } from '@/components/BrandProvider';
 import { NoteService } from '@/lib/noteService';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdultGate } from '@/hooks/useAdultGate';
 import { UI_Z_INDEX } from '@/constants/ui';
 
 export const MobileBottomNav = () => {
@@ -24,6 +25,7 @@ const MobileBottomNavContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { userType, isLoggedIn, isLoading, user } = useAuth();
+    const { requireVerification } = useAdultGate();
     const [isExpanded, setIsExpanded] = useState(true);
     const [mounted, setMounted] = useState(false);
     const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -96,17 +98,19 @@ const MobileBottomNavContent = () => {
     const isDark = brand.theme === 'dark';
 
     const handleMainBtnClick = (e: React.MouseEvent) => {
-        if (mounted && userType === 'corporate') {
-            setIsExpanded(!isExpanded);
-        } else if (mounted && userType === 'admin') {
-            router.push('/admin?tab=users');
-        } else if (mounted && userType === 'individual') {
-            e.preventDefault();
-            router.push('/my-shop?view=resume-form');
-        } else {
-            e.preventDefault();
-            setShowPaymentPopup(true);
-        }
+        requireVerification(() => {
+            if (mounted && userType === 'corporate') {
+                setIsExpanded(!isExpanded);
+            } else if (mounted && userType === 'admin') {
+                router.push('/admin?tab=users');
+            } else if (mounted && userType === 'individual') {
+                e.preventDefault();
+                router.push('/my-shop?view=resume-form');
+            } else {
+                e.preventDefault();
+                setShowPaymentPopup(true);
+            }
+        });
     };
 
 
@@ -192,8 +196,10 @@ const MobileBottomNavContent = () => {
                                         key={index}
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            // Dispatch open note modal event
-                                            window.dispatchEvent(new CustomEvent('open-note-modal'));
+                                            requireVerification(() => {
+                                                // Dispatch open note modal event
+                                                window.dispatchEvent(new CustomEvent('open-note-modal'));
+                                            });
                                         }}
                                         className={`flex flex-col items-center justify-center gap-1 py-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}
                                     >
