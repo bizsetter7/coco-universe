@@ -49,8 +49,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const cleanRegionSlug = (region: string) =>
         slugify(region.replace(/\[|\]/g, '').trim());
 
+    // 목업(bait/premium-extra) ID는 사이트맵 제외 — mock 데이터로 색인 가치 없음
+    const MOCK_ID_PREFIXES = ['bait-', 'premium-extra-'];
+    const isMockShop = (id: string) => MOCK_ID_PREFIXES.some(p => String(id).startsWith(p));
+
     const shopRoutes = shopsData
         .filter((shop: any) => {
+            if (isMockShop(shop.id)) return false; // 목업 제외
             const hasTitle = ((shop.title as string) || '').trim().length > 4;
             const hasDesc = ((shop.description as string) || '').trim().length > 20;
             return hasTitle || hasDesc;
