@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { JobDetailContent } from '@/components/jobs/JobDetailModal';
+import ShopDetailView from '@/components/jobs/ShopDetailView';
 import { anyAdToShop } from '@/lib/adUtils';
 
 /**
@@ -29,7 +29,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any; onClose: () => void })
                 className="relative w-full md:max-w-[500px] lg:max-w-[600px] max-h-[92vh] overflow-hidden rounded-t-[32px] md:rounded-[32px] bg-white z-10 animate-in slide-in-from-bottom duration-300"
                 onClick={e => e.stopPropagation()}
             >
-                <JobDetailContent shop={shop} onClose={onClose} />
+                <ShopDetailView shop={shop} onClose={onClose} />
             </div>
         </div>,
         document.body

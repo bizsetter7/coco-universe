@@ -4,12 +4,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, MapPin, Phone, MessageCircle, Heart, Share2, 
   ChevronRight, CheckCircle2, ShieldCheck, Clock, 
-  Gift, Info, MessageSquare, Navigation
+  Gift, Info, MessageSquare, Navigation, Briefcase
 } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getPayColor, getPayAbbreviation } from '@/utils/payColors';
 import { useAdultGate } from '@/hooks/useAdultGate';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 interface ShopDetailViewProps {
@@ -28,6 +29,7 @@ export default function ShopDetailView({
   const [activeTab, setActiveTab] = useState<'content' | 'conditions' | 'welfare' | 'location'>('content');
   const { requireVerification } = useAdultGate();
   const [scrolled, setScrolled] = useState(false);
+  const [tier, setTier] = useState<string | null>(null);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +38,19 @@ export default function ShopDetailView({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // cocoalba_tier 배지 조회
+  useEffect(() => {
+    if (!shop.user_id) return;
+    supabase
+      .from('businesses')
+      .select('cocoalba_tier')
+      .eq('owner_id', shop.user_id)
+      .single()
+      .then(({ data }) => {
+        if (data?.cocoalba_tier) setTier(data.cocoalba_tier);
+      });
+  }, [shop.user_id]);
 
   const tabs = [
     { id: 'content', label: '공고내용' },
@@ -110,6 +125,16 @@ export default function ShopDetailView({
             <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
               {shop.name}
               <CheckCircle2 size={16} className="text-blue-500" />
+              {tier === 'premium' && (
+                <span className="text-[10px] bg-yellow-400 text-black font-black px-2 py-0.5 rounded-full">
+                  PREMIUM
+                </span>
+              )}
+              {tier === 'standard' && (
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  스탠다드
+                </span>
+              )}
             </h2>
             <div className="flex items-center gap-1.5 text-xs text-gray-500 font-bold">
               <MapPin size={12} />

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
 import { generateSEOKeywords } from '@/utils/shopUtils';
-import { JobDetailContent } from '@/components/jobs/JobDetailModal'; // Adjust import path if needed
+import ShopDetailView from '@/components/jobs/ShopDetailView';
 
 // Force dynamic rendering for now if data is mutable, or static params if static
 export const dynamic = 'force-dynamic';
@@ -129,7 +129,7 @@ export default function JobDetailPage({ params }: Props) {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }} />
             
             <div className="w-full max-w-2xl bg-white shadow-lg min-h-screen">
-                <JobDetailContent shop={shop} />
+                <ShopDetailView shop={shop} />
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import { toPng } from 'html-to-image';
 import { supabase } from '@/lib/supabase';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { Shop } from '@/types/shop';
+import ShopDetailView from './ShopDetailView';
 import { formatKoreanMoney } from '@/utils/formatMoney';
 import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle, generateSEOKeywords } from '@/utils/shopUtils';
@@ -750,9 +751,8 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, i
         >
             <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={onClose}>
                 {/* [Mod] Buttons moved inside Content */}
-                <JobDetailContent
+                <ShopDetailView
                     shop={shop}
-                    publisherAddress={publisherAddress}
                     onClose={onClose}
                     isFavorite={isFavorite}
                     onToggleFavorite={onToggleFavorite}

@@ -1,6 +1,6 @@
 import shopsData from '@/lib/data/shops.json';
 import { Shop } from '@/types/shop';
-import JobDetailModal, { JobDetailContent } from '@/components/jobs/JobDetailModal';
+// JobDetailContent replaced by ShopDetailView (imported below)
 import { Metadata } from 'next';
 import { slugify } from '@/utils/shopUtils';
 import { generateShopImageAlt } from '@/lib/imageUtils';

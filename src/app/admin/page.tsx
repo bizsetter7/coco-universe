@@ -30,7 +30,7 @@ import { AdminApplicationManagement } from '@/components/admin/applications/Admi
 import { AdminBannerManagement } from '@/components/admin/banner/AdminBannerManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
-import { JobDetailContent } from '@/components/jobs/JobDetailModal';
+import ShopDetailView from '@/components/jobs/ShopDetailView';
 
 export default function AdminPage() {
     return (
@@ -695,9 +695,8 @@ function AdminContent() {
                     onClick={() => setSelectedAdForModal(null)}
                 >
                     <div onClick={(e) => e.stopPropagation()}>
-                        <JobDetailContent
+                        <ShopDetailView
                             shop={anyAdToShop(selectedAdForModal)}
-                            publisherAddress={(selectedAdForModal.options as any)?.businessAddress || (selectedAdForModal.options as any)?.business_address || undefined}
                             onClose={() => setSelectedAdForModal(null)}
                         />
                     </div>
