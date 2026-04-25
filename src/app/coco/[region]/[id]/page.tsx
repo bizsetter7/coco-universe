@@ -13,6 +13,8 @@ import {
     getRegionPayData,
 } from '@/lib/data/work-type-guide';
 import WorkTypeGuidePage from '@/components/guide/WorkTypeGuidePage';
+import ShopDetailView from '@/components/jobs/ShopDetailView';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
     params: Promise<{ region: string; id: string }>;
@@ -61,7 +63,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     // ── 광고 상세 페이지 메타데이터 ──
-    const shop = (shopsData as Shop[]).find((s) => s.id === decodedId);
+    let shop: Shop | null = (shopsData as Shop[]).find((s) => s.id === decodedId) || null;
+
+    if (!shop) {
+        // Supabase에서 추가 확인
+        const { data } = await supabase
+            .from('shops')
+            .select('*, businesses(cocoalba_tier)')
+            .eq('id', decodedId)
+            .single();
+        
+        if (data) {
+            shop = {
+                ...data,
+                tier: data.businesses?.cocoalba_tier || data.tier || 'basic'
+            } as any;
+        }
+    }
 
     if (!shop) {
         return {
@@ -193,7 +211,36 @@ export default async function ShopDetailPage({ params }: Props) {
     }
 
     // ── 광고 상세 페이지 렌더링 ──
-    const shop = (shopsData as Shop[]).find((s) => s.id === decodedId);
+    let shop: Shop | null = (shopsData as Shop[]).find((s) => s.id === decodedId) || null;
+
+    if (!shop) {
+        // Supabase에서 추가 확인 (업체 티어 포함)
+        const { data, error } = await supabase
+            .from('shops')
+            .select(`
+                *,
+                businesses (
+                    cocoalba_tier
+                )
+            `)
+            .eq('id', decodedId)
+            .maybeSingle();
+        
+        if (data) {
+            shop = {
+                ...data,
+                tier: (data as any).businesses?.cocoalba_tier || data.tier || 'basic'
+            } as any;
+        } else if (!error) {
+            // businesses가 없는 레거시 또는 일반 광고 대응
+            const { data: legacyData } = await supabase
+                .from('shops')
+                .select('*')
+                .eq('id', decodedId)
+                .maybeSingle();
+            if (legacyData) shop = legacyData as any;
+        }
+    }
 
     if (!shop) {
         return (
@@ -318,12 +365,12 @@ export default async function ShopDetailPage({ params }: Props) {
     };
 
     return (
-        <div className="max-w-[800px] mx-auto min-h-screen bg-white shadow-lg">
+        <>
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <JobDetailContent shop={shop} />
-        </div>
+            <ShopDetailView shop={shop} />
+        </>
     );
 }

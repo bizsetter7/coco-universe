@@ -4,8 +4,15 @@ import RegionClient from '../../region/RegionClient';
 import seoRegionsMaster from '@/lib/data/seo_regions_master.json';
 import shadowRegionsData from '@/lib/data/Shadow_SEO_Regions.json';
 import { Shop } from '@/types/shop';
+import {
+    isWorkTypeSlug,
+    getNormalizedWorkTypeSlug,
+    WORK_TYPE_INFO,
+    WORK_TYPE_SLUGS,
+    getRegionPayData,
+} from '@/lib/data/work-type-guide';
+import WorkTypeGuidePage from '@/components/guide/WorkTypeGuidePage';
 import { slugify } from '@/utils/shopUtils';
-import { WORK_TYPE_SLUGS, WORK_TYPE_INFO } from '@/lib/data/work-type-guide';
 import Link from 'next/link';
 
 export const revalidate = 300; // 5분마다 ISR 갱신
