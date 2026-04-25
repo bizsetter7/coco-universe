@@ -649,6 +649,7 @@ export const JobDetailContent = ({
                                                 message: applyMsg.trim() || null,
                                                 status: 'pending',
                                                 created_at: new Date().toISOString(),
+                                                owner_user_id: shop.user_id || null,
                                             });
                                             setApplied(true);
                                             setShowApplyForm(false);

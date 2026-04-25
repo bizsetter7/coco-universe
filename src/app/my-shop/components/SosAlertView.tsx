@@ -163,7 +163,7 @@ export const SosAlertView = ({ brand }: { brand: any }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    shopId: user.id,
+                    shopId: user.id, // shopId = user.id (profiles.id, uuid) — shops 테이블의 id가 아님
                     shopName,
                     message: message.trim(),
                     regions: selectedRegions,

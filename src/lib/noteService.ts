@@ -29,7 +29,7 @@ const formatDate = (dateStr: string) => {
 };
 
 export const NoteService = {
-    getInbox: async (userName: string): Promise<Note[]> => {
+    getInbox: async (userName: string, userId?: string): Promise<Note[]> => {
         let query = supabase
             .from('messages')
             .select('*');
@@ -38,10 +38,9 @@ export const NoteService = {
 
         if (ADMIN_ALIASES.includes(userName)) {
             query = query.or(`receiver_name.eq.관리자,receiver_name.eq.시스템 관리자,receiver_name.eq.운영자,receiver_name.eq.admin,receiver_name.eq.마스터관리자,receiver_name.eq.admin_user`);
+        } else if (userId) {
+            query = query.or(`receiver_id.eq.${userId},receiver_name.eq.${userName}`);
         } else {
-            // [FIX] ID based query if possible, currently mixed usage so fallback to name + ID check could be better but sticking to name for consistency with current flow unless ID is available in args.
-            // Ideally we should pass userId to getInbox but signature is userName.
-            // For now, let's keep using userName but ensure RLS works by ensuring ID is inserted.
             query = query.eq('receiver_name', userName);
         }
 
@@ -87,7 +86,7 @@ export const NoteService = {
         }));
     },
 
-    getUnread: async (userName: string): Promise<Note[]> => {
+    getUnread: async (userName: string, userId?: string): Promise<Note[]> => {
         let query = supabase
             .from('messages')
             .select('*');
@@ -96,6 +95,8 @@ export const NoteService = {
 
         if (ADMIN_ALIASES.includes(userName)) {
             query = query.or(`receiver_name.eq.관리자,receiver_name.eq.시스템 관리자,receiver_name.eq.운영자,receiver_name.eq.admin,receiver_name.eq.마스터관리자,receiver_name.eq.admin_user`);
+        } else if (userId) {
+            query = query.or(`receiver_id.eq.${userId},receiver_name.eq.${userName}`);
         } else {
             query = query.eq('receiver_name', userName);
         }

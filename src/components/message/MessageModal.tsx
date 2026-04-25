@@ -57,8 +57,8 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
 
     const refreshData = async () => {
         const [inboxRes, unreadRes, sentRes] = await Promise.all([
-            NoteService.getInbox(userName),
-            NoteService.getUnread(userName),
+            NoteService.getInbox(userName, user?.id),
+            NoteService.getUnread(userName, user?.id),
             NoteService.getSent(userName)
         ]);
         setInbox(inboxRes);
@@ -72,7 +72,7 @@ export default function MessageModal({ isOpen, onClose, initialReceiver }: Messa
         const target = receiver.trim() || '[관리자]';
 
         try {
-            await NoteService.sendNote(writeContent, userName, target);
+            await NoteService.sendNote(writeContent, userName, target, user?.id || undefined);
             setWriteContent('');
             alert(`${target}님께 쪽지를 보냈습니다.`);
             setActiveTab('sent');

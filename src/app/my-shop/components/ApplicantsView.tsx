@@ -35,20 +35,19 @@ export const ApplicantsView = ({ setView, userName = '', userId = '', onOpenMenu
         setLoading(true);
         // 내 광고(shops)의 shop_id와 연결된 applications 조회
         const { data: shops } = await supabase.from('shops').select('id, name').eq('user_id', userId);
-        if (!shops || shops.length === 0) { setLoading(false); return; }
+        const shopNameMap = Object.fromEntries((shops || []).map(s => [String(s.id), s.name]));
 
-        const shopIds = shops.map(s => s.id);
         const { data } = await supabase
             .from('applications')
             .select('*')
-            .in('shop_id', shopIds)
+            .eq('owner_user_id', userId)
             .order('created_at', { ascending: false });
 
         if (data) {
             // shop 이름 매핑
             const enriched = data.map(app => ({
                 ...app,
-                shopName: shops.find(s => s.id === app.shop_id)?.name || '공고 없음',
+                shopName: shopNameMap[String(app.shop_id)] || app.shop_name || '공고 없음',
             }));
             setApplications(enriched);
         }

@@ -60,6 +60,8 @@ export async function POST(request: NextRequest) {
     webpush.setVapidDetails(vapidEmail, vapidPublic, vapidPrivate);
 
     try {
+        // ⚠️ 여기서 shopId = 발송자의 profiles.id (uuid)
+        //    shops.id(bigint)가 아님. sos_alerts.shop_id에 user uuid가 저장됨.
         const { shopId, shopName, message, regions } = await request.json();
 
         if (!shopId || !shopName || !message || !regions?.length) {
