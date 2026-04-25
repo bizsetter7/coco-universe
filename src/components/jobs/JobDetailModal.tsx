@@ -750,8 +750,11 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({ shop, onClose, i
             className="modal-overlay fixed inset-0 z-[99999] flex items-end md:items-center justify-center bg-black/90 md:bg-black/80 backdrop-blur-sm touch-none overscroll-contain"
             onClick={onClose}
         >
-            <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={onClose}>
-                {/* [Mod] Buttons moved inside Content */}
+            {/* 클릭 버블링 차단 — 내부 클릭은 모달 닫지 않음 */}
+            <div
+                className="relative w-full md:max-w-xl h-[92dvh] md:h-[88vh] md:rounded-3xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <ShopDetailView
                     shop={shop}
                     onClose={onClose}

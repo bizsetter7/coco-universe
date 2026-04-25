@@ -63,7 +63,7 @@ export default function ShopDetailView({
   const heroImage = shop.banner_image_url || shop.options?.mediaUrl || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=1200&auto=format&fit=crop';
 
   return (
-    <div className="flex flex-col w-full h-full max-h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col w-full h-full bg-gray-50 overflow-hidden">
       {/* 스크롤 가능한 컨텐츠 영역 */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
       {/* 2. Hero Section (헤더 버튼 포함 — 절대 오버레이) */}
