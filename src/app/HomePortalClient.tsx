@@ -4,8 +4,6 @@ import React, { useMemo, Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import HomeClient from '@/components/home/HomeClient';
-import shopsData from '@/lib/data/shops.json';
-import { Shop } from '@/types/shop';
 import { useLocation } from '@/hooks/useLocation';
 import { useRouter } from 'next/navigation';
 import { enrichAdData } from '@/lib/adUtils';
@@ -22,7 +20,8 @@ export default function HomePortalClient() {
   const page = searchParams.get('page');
   const { lat: userLat, lng: userLng, calculateDistance } = useLocation();
 
-  const [dbShops, setDbShops] = useState<any[]>([]);
+  // null = 아직 로딩 중, [] = 로딩 완료(데이터 없음)
+  const [dbShops, setDbShops] = useState<any[] | null>(null);
 
   useEffect(() => {
     const fetchShops = async () => {
@@ -32,19 +31,18 @@ export default function HomePortalClient() {
           .select('*')
           .eq('is_closed', false)
           .order('updated_at', { ascending: false });
-          
-        if (!error && data) {
-          setDbShops(data);
-        }
+
+        setDbShops(!error && data ? data : []);
       } catch (err) {
         console.error('Failed to fetch shops:', err);
+        setDbShops([]);
       }
     };
     fetchShops();
   }, []);
 
   const processedShops = useMemo(() => {
-    const dataSource = dbShops.length > 0 ? dbShops : shopsData;
+    const dataSource = dbShops ?? [];
     const allEnriched = dataSource.map((ad: any) => enrichAdData(ad, []));
 
     const getTierRank = (tier: string): number => {
@@ -86,6 +84,15 @@ export default function HomePortalClient() {
   if (page === 'signup') return <SignupPage />;
   if (page === 'find-id' || page === 'find-pw') return <FindAccountPage initialTab={page as 'find-id' | 'find-pw'} />;
   if (page === 'support' || page === 'faq' || page === 'inquiry') return <CustomerCenterContent />;
+
+  // DB 로딩 완료 후에만 렌더 (null이면 로딩 스피너)
+  if (dbShops === null) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return <HomeClient shops={processedShops} />;
 }
