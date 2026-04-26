@@ -111,57 +111,83 @@ export default function ShopDetailView({
       </div>
 
       {/* 3. Main Info Section */}
-      <div className="bg-white px-6 py-8 rounded-t-[2.5rem] -mt-8 relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-        <div className="flex justify-between items-start mb-6">
-          <div className="space-y-1">
-            <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
-              {shop.name}
-              <CheckCircle2 size={16} className="text-blue-500" />
+      <div className="bg-white px-5 pt-7 pb-8 rounded-t-[2.5rem] -mt-8 relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+
+        {/* 가게명 + 검증배지 */}
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap mb-1">
+              <h2 className="text-xl font-black text-gray-900 leading-tight break-keep">{shop.name}</h2>
+              <CheckCircle2 size={16} className="text-blue-500 shrink-0" />
               {tier === 'premium' && (
-                <span className="text-[10px] bg-yellow-400 text-black font-black px-2 py-0.5 rounded-full">
-                  PREMIUM
-                </span>
+                <span className="text-[9px] bg-yellow-400 text-black font-black px-1.5 py-0.5 rounded-full shrink-0">PREMIUM</span>
               )}
               {tier === 'standard' && (
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                  스탠다드
-                </span>
+                <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded-full border border-emerald-500/30 shrink-0">스탠다드</span>
               )}
-            </h2>
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-bold">
-              <MapPin size={12} />
-              {shop.region} · {shop.category || '업종'}
             </div>
-          </div>
-          <div className="text-right">
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-white font-black text-xs ${getPayColor(shop.payType || shop.pay)}`}>
-              <span>{getPayAbbreviation(shop.payType || shop.pay)}</span>
-              <span className="text-base">{formatKoreanMoney(shop.pay)}</span>
+            <div className="flex items-center gap-1 text-[11px] text-gray-400 font-bold">
+              <MapPin size={10} />
+              <span>{shop.region}</span>
+              {shop.category && <><span className="text-gray-200">·</span><span>{shop.category}</span></>}
             </div>
           </div>
         </div>
 
+        {/* 급여 — 크게 강조 */}
+        <div className={`w-full rounded-2xl px-5 py-4 mb-5 bg-gray-900 flex items-center justify-between`}>
+          <div>
+            <div className="text-[10px] text-gray-400 font-bold mb-0.5 uppercase tracking-widest">급여</div>
+            <div className="flex items-baseline gap-2">
+              <span className={`text-[11px] font-black px-2 py-0.5 rounded-md text-white ${getPayColor(shop.payType || shop.pay)}`}>
+                {getPayAbbreviation(shop.payType || shop.pay)}
+              </span>
+              <span className="text-2xl font-black text-white tracking-tighter">
+                {formatKoreanMoney(shop.pay)}
+              </span>
+            </div>
+          </div>
+          {(shop.options?.paySuffixes || []).length > 0 && (
+            <div className="flex flex-col gap-1 items-end">
+              {(shop.options?.paySuffixes || []).slice(0, 2).map((s: string, i: number) => (
+                <span key={i} className="text-[9px] px-2 py-0.5 bg-white/10 text-white/70 rounded font-bold whitespace-nowrap">{s}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 빠른 정보 칩 */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {[
+            { icon: <Clock size={10} />, label: shop.workTime || '시간 협의', color: 'bg-blue-50 text-blue-600 border-blue-100' },
+            { icon: <MapPin size={10} />, label: shop.region, color: 'bg-rose-50 text-rose-600 border-rose-100' },
+            { icon: <Info size={10} />, label: shop.age ? `${shop.age}대 지원` : '나이 무관', color: 'bg-purple-50 text-purple-600 border-purple-100' },
+            { icon: <Briefcase size={10} />, label: shop.payType || '파트타임', color: 'bg-amber-50 text-amber-600 border-amber-100' },
+          ].filter(c => c.label).map((chip, i) => (
+            <div key={i} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-bold border ${chip.color}`}>
+              {chip.icon}<span>{chip.label}</span>
+            </div>
+          ))}
+        </div>
+
         {/* Accordion: 안심지원보증 + 광고 펼쳐보기 */}
-        <div className="mb-8 rounded-3xl border border-rose-100 overflow-hidden">
+        <div className="mb-6 rounded-2xl border border-rose-100 overflow-hidden">
           <button
             onClick={() => setAccordionOpen(prev => !prev)}
-            className="w-full bg-rose-50 p-5 flex items-center justify-between text-left"
+            className="w-full bg-rose-50 px-4 py-3.5 flex items-center justify-between text-left"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm border border-rose-100">
-                <ShieldCheck size={24} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm border border-rose-100 shrink-0">
+                <ShieldCheck size={18} />
               </div>
               <div>
                 <div className="text-xs font-black text-rose-600">안심지원 보증</div>
-                <div className="text-[10px] text-rose-400 font-bold">허위공고 및 선금 사기 없는 검증된 업소</div>
+                <div className="text-[10px] text-rose-400 font-medium">허위공고·선금 사기 없는 검증 업소</div>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-rose-400">
-              <span className="text-[11px] font-black">{accordionOpen ? '접기' : '광고 펼쳐보기'}</span>
-              <ChevronDown
-                size={16}
-                className={`transition-transform duration-300 ${accordionOpen ? 'rotate-180' : ''}`}
-              />
+            <div className="flex items-center gap-1 text-rose-400 shrink-0">
+              <span className="text-[10px] font-black">{accordionOpen ? '접기' : '공고보기'}</span>
+              <ChevronDown size={14} className={`transition-transform duration-300 ${accordionOpen ? 'rotate-180' : ''}`} />
             </div>
           </button>
 
@@ -172,9 +198,9 @@ export default function ShopDetailView({
                 dangerouslySetInnerHTML={{ __html: shop.description || '상세 내용이 없습니다.' }}
               />
               {(shop.options?.keywords || []).length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-4">
+                <div className="flex flex-wrap gap-1.5 pt-4">
                   {(shop.options?.keywords || []).map((kw: string, i: number) => (
-                    <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-500 text-[10px] font-bold rounded-lg border border-gray-200">
+                    <span key={i} className="px-2.5 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-lg border border-gray-100">
                       #{kw}
                     </span>
                   ))}
@@ -185,13 +211,13 @@ export default function ShopDetailView({
         </div>
 
         {/* Tab Menu */}
-        <div className="sticky top-0 bg-white z-50 border-b border-gray-100 -mx-6 px-6 mb-6">
-          <div className="flex justify-between">
+        <div className="sticky top-0 bg-white z-50 -mx-5 px-5 mb-5" style={{ borderBottom: '1px solid #f3f4f6' }}>
+          <div className="flex">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 text-xs md:text-sm font-black transition-all relative ${
+                className={`flex-1 py-3.5 text-xs font-black transition-all relative ${
                   activeTab === tab.id ? 'text-gray-900' : 'text-gray-400'
                 }`}
               >
@@ -205,20 +231,22 @@ export default function ShopDetailView({
         </div>
 
         {/* Tab Content */}
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-3 pb-2">
           {activeTab === 'conditions' && (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-3">
               {[
-                { icon: <Clock size={16} />, label: '근무시간', value: shop.workTime || '협의' },
-                { icon: <MapPin size={16} />, label: '근무지역', value: shop.businessAddress || shop.region },
-                { icon: <Info size={16} />, label: '지원자격', value: shop.age ? `${shop.age}대 지원 가능` : '나이 무관' },
-                { icon: <Briefcase size={16} />, label: '고용형태', value: shop.payType || '파트타임' },
+                { icon: <Clock size={15} />, label: '근무시간', value: shop.workTime || '협의', accent: 'text-blue-500 bg-blue-50' },
+                { icon: <MapPin size={15} />, label: '근무지역', value: shop.businessAddress || shop.region, accent: 'text-rose-500 bg-rose-50' },
+                { icon: <Info size={15} />, label: '지원자격', value: shop.age ? `${shop.age}대 지원 가능` : '나이 무관', accent: 'text-purple-500 bg-purple-50' },
+                { icon: <Briefcase size={15} />, label: '고용형태', value: shop.payType || '파트타임', accent: 'text-amber-500 bg-amber-50' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div className="text-gray-400">{item.icon}</div>
-                  <div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{item.label}</div>
-                    <div className="text-sm font-black text-gray-800">{item.value}</div>
+                <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${item.accent}`}>
+                    {item.icon}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">{item.label}</div>
+                    <div className="text-sm font-black text-gray-800 truncate">{item.value}</div>
                   </div>
                 </div>
               ))}
@@ -226,37 +254,63 @@ export default function ShopDetailView({
           )}
 
           {activeTab === 'welfare' && (
-            <div className="grid grid-cols-2 gap-3">
-              {(shop.options?.icons || ['식사제공', '숙소제공', '차비지원', '당일지급']).map((item: string, i: number) => (
-                <div key={i} className="flex items-center gap-2.5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-blue-500 shadow-sm border border-blue-50">
-                    <Gift size={18} />
+            <div className="space-y-2">
+              <p className="text-[11px] text-gray-400 font-bold mb-3">제공 혜택</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(shop.options?.icons || ['식사제공', '숙소제공', '차비지원', '당일지급']).map((item: string, i: number) => (
+                  <div key={i} className="flex items-center gap-2.5 p-3.5 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-blue-50 hover:border-blue-100 transition-colors">
+                    <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-sm border border-blue-50 shrink-0">
+                      <Gift size={16} />
+                    </div>
+                    <span className="text-xs font-black text-gray-700 leading-tight">{item}</span>
                   </div>
-                  <span className="text-xs font-black text-gray-700">{item}</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
 
           {activeTab === 'location' && (
-            <div className="space-y-4">
-              <div className="aspect-video rounded-3xl bg-gray-100 border border-gray-100 overflow-hidden relative shadow-inner">
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <Navigation size={28} className="animate-pulse" />
-                  <span className="text-[10px] font-bold">지도 로딩 중...</span>
-                </div>
+            <div className="space-y-3">
+              {/* 지도 영역 */}
+              <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 relative" style={{ height: 200 }}>
+                {shop.businessAddress ? (
+                  <iframe
+                    title="지도"
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(shop.businessAddress)}&output=embed&z=15`}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-300">
+                    <Navigation size={32} />
+                    <span className="text-[11px] font-bold">문의 시 위치 안내</span>
+                  </div>
+                )}
               </div>
-              <div className="p-5 bg-white rounded-3xl border border-gray-100 shadow-sm flex items-start gap-4">
-                <div className="w-10 h-10 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 shrink-0 border border-gray-100">
-                  <MapPin size={20} />
+
+              {/* 주소 */}
+              <div className="p-4 bg-gray-50 rounded-2xl flex items-start gap-3">
+                <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center text-rose-500 shrink-0 border border-gray-100 shadow-sm">
+                  <MapPin size={18} />
                 </div>
-                <div>
-                  <div className="text-xs font-black text-gray-900 mb-1">근무 상세 주소</div>
-                  <div className="text-[11px] text-gray-500 font-medium leading-relaxed">
-                    {shop.businessAddress || '상세 주소는 문의 시 안내해 드립니다.'}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">근무 주소</div>
+                  <div className="text-sm font-black text-gray-800 break-keep leading-snug">
+                    {shop.businessAddress || '문의 시 상세 주소 안내'}
                   </div>
                 </div>
               </div>
+
+              {/* 채용 메시지 */}
+              {shop.options?.welcomeMessage && (
+                <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageSquare size={14} className="text-rose-500" />
+                    <span className="text-xs font-black text-rose-600">사장님 한마디</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed break-keep">{shop.options.welcomeMessage}</p>
+                </div>
+              )}
             </div>
           )}
         </div>

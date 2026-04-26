@@ -194,6 +194,8 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
         String(s.user_id || '').startsWith('6fc68887') ||
         String(s.id || '').startsWith('AD_MOCK_');
 
+    const SIDEBAR_SLOT_COUNT = 4;
+
     const sidebarAds = useMemo(() => {
         if (isMobile) return [];
         const TIER_PRIORITY: Record<string, number> = { grand: 1, p1: 1, premium: 2, p2: 2 };
@@ -203,21 +205,9 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             (s as any).is_premium;
         const sideKey = isLeft ? 'left' : 'right';
 
+        // 실제 광고만 — 목업 제거, 빈 슬롯은 "입점문의"로 표시
         const realAds = allShops
-            .filter(s => !isMockAd(s))  // 실제 광고 우선
-            .filter(isEligible)
-            .filter(s => {
-                const pos = (s as any).banner_position;
-                // NULL = 양쪽 모두, 'both' = 양쪽, 'left'/'right' = 해당 사이드만
-                return pos == null || pos === 'both' || pos === sideKey;
-            })
-            .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99));
-
-        // 실제 광고가 4개 미만이면 목업으로 채움
-        if (realAds.length >= 4) return realAds.slice(0, 4);
-
-        const mockAds = allShops
-            .filter(isMockAd)
+            .filter(s => !isMockAd(s))
             .filter(isEligible)
             .filter(s => {
                 const pos = (s as any).banner_position;
@@ -225,7 +215,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             })
             .sort((a, b) => (TIER_PRIORITY[a.tier || ''] ?? 99) - (TIER_PRIORITY[b.tier || ''] ?? 99));
 
-        return [...realAds, ...mockAds].slice(0, 4);
+        return realAds.slice(0, SIDEBAR_SLOT_COUNT);
     }, [allShops, isLeft, isMobile]);
 
     // [Optimization] Valid Return for Mobile after hooks are called
@@ -256,9 +246,21 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
                         </div>
 
                         <div className="flex flex-col gap-1 px-1">
-                            {sidebarAds.map((ad) => (
-                                <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
-                            ))}
+                            {Array.from({ length: SIDEBAR_SLOT_COUNT }, (_, i) => {
+                                const ad = sidebarAds[i];
+                                return ad ? (
+                                    <SideAdCard key={ad.id} ad={ad} onSelect={setSelectedAd} />
+                                ) : (
+                                    <div
+                                        key={`empty-${i}`}
+                                        onClick={() => router.push('/customer-center?tab=inquiry')}
+                                        className="w-full h-[140px] rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-amber-300 hover:bg-amber-50/60 transition-all"
+                                    >
+                                        <span className="text-[10px] font-black text-gray-300">광고 슬롯</span>
+                                        <span className="text-[12px] font-black text-amber-500">입점문의</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
