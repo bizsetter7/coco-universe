@@ -176,7 +176,8 @@ export default function ShopDetailView({
   const smsUrl = `sms:${managerPhone}?body=${encodeURIComponent(smsTemplate)}`;
 
   const heroImage = shop.banner_image_url || shop.options?.mediaUrl || null;
-  const hasRealImage = !!heroImage;
+  const [heroImgError, setHeroImgError] = useState(false);
+  const hasRealImage = !!heroImage && !heroImgError;
 
   return (
     <div className="flex flex-col w-full h-full bg-gray-50 overflow-hidden">
@@ -210,7 +211,12 @@ export default function ShopDetailView({
         {/* 사진 */}
         <div className="relative w-full bg-zinc-900" style={{ aspectRatio: '4/3' }}>
           {hasRealImage ? (
-            <img src={heroImage!} alt={shop.name} className="w-full h-full object-cover" />
+            <img
+              src={heroImage!}
+              alt={shop.name}
+              className="w-full h-full object-cover"
+              onError={() => setHeroImgError(true)}
+            />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex flex-col items-center justify-center gap-2 px-8">
               <p className="text-2xl font-black text-white/25 text-center break-keep leading-tight tracking-tight">
