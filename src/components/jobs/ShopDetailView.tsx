@@ -519,52 +519,55 @@ export default function ShopDetailView({
         </div>
 
         {/* ═══ 인근지역 채용정보 ═══ */}
-        {nearbyShops.length > 0 && (
-          <div className="mx-4 mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[14px] font-black text-gray-900">
-                {(shop.options?.regionGu || shop.region || '인근')} 채용정보
-              </h3>
-              <button className="text-[11px] text-blue-500 font-black">더보기</button>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {nearbyShops.slice(0, 4).map((s: any) => {
-                const img = s.banner_image_url || s.media_url || s.options?.mediaUrl;
-                const imgFailed = imgErrors.has(s.id);
-                return (
-                  <a
-                    key={s.id}
-                    href={`/shop/${s.id}`}
-                    className="bg-white rounded-xl border border-gray-100 overflow-hidden block active:scale-[0.98] transition-transform"
-                  >
-                    <div className="relative w-full bg-gray-100" style={{ aspectRatio: '4/3' }}>
-                      {img && !imgFailed ? (
-                        <img
-                          src={img}
-                          alt={s.name}
-                          className="w-full h-full object-cover"
-                          onError={() => setImgErrors(prev => new Set([...prev, s.id]))}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-                          <span className="text-[10px] text-gray-400 font-bold text-center px-2 leading-snug">{s.nickname || s.name}</span>
-                        </div>
-                      )}
-                      {(s.tier === 'premium' || s.tier === 'p2') && (
-                        <span className="absolute top-1.5 left-1.5 text-[8px] font-black bg-amber-500 text-white px-1.5 py-0.5 rounded">프리미엄</span>
-                      )}
-                    </div>
-                    <div className="p-2.5">
-                      <p className="text-[11px] font-black text-gray-900 truncate">{s.nickname || s.name}</p>
-                      <p className="text-[10px] text-gray-400 truncate">{s.region}</p>
-                      <p className="text-[11px] font-black text-gray-800 mt-0.5">{formatKoreanMoney(s.pay)}</p>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
+        <div className="mx-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[14px] font-black text-gray-900">
+              {(shop.options?.regionGu || shop.region || '인근')} 채용정보
+            </h3>
           </div>
-        )}
+          <div className="grid grid-cols-2 gap-2">
+            {Array.from({ length: 4 }, (_, i) => {
+              const s = nearbyShops[i];
+              if (!s) return (
+                <div key={`slot-${i}`} className="bg-white rounded-xl border border-dashed border-gray-200 overflow-hidden">
+                  <div className="w-full bg-gray-50 flex items-center justify-center" style={{ aspectRatio: '4/3' }}>
+                    <span className="text-[10px] text-gray-300 font-bold">입점문의</span>
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-[11px] text-gray-300 font-bold">광고 슬롯</p>
+                    <p className="text-[10px] text-gray-200 mt-0.5">-</p>
+                  </div>
+                </div>
+              );
+              const img = s.banner_image_url || s.media_url || s.options?.mediaUrl;
+              const imgFailed = imgErrors.has(s.id);
+              return (
+                <a key={s.id} href={`/shop/${s.id}`}
+                  className="bg-white rounded-xl border border-gray-100 overflow-hidden block active:scale-[0.98] transition-transform"
+                >
+                  <div className="relative w-full bg-gray-100" style={{ aspectRatio: '4/3' }}>
+                    {img && !imgFailed ? (
+                      <img src={img} alt={s.name} className="w-full h-full object-cover"
+                        onError={() => setImgErrors(prev => new Set([...prev, s.id]))} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
+                        <span className="text-[10px] text-gray-400 font-bold text-center px-2 leading-snug">{s.nickname || s.name}</span>
+                      </div>
+                    )}
+                    {(s.tier === 'premium' || s.tier === 'p2') && (
+                      <span className="absolute top-1.5 left-1.5 text-[8px] font-black bg-amber-500 text-white px-1.5 py-0.5 rounded">프리미엄</span>
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-[11px] font-black text-gray-900 truncate">{s.nickname || s.name}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{s.region}</p>
+                    <p className="text-[11px] font-black text-gray-800 mt-0.5">{formatKoreanMoney(s.pay)}</p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="h-4" />
       </div>{/* /스크롤 영역 끝 */}

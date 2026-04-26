@@ -45,7 +45,7 @@ export default function HomePortal() {
       </Suspense>
 
       {/* ── 지역×업종 가이드 내부 링크 (서버사이드 — 구글봇 크롤 경로 확보) ── */}
-      <nav aria-label="지역별 업종 가이드" className="max-w-5xl mx-auto px-4 py-8 border-t border-gray-100">
+      <nav aria-label="지역별 업종 가이드" className="sr-only">
         <h2 className="text-sm font-bold text-gray-400 mb-4">📍 지역별 알바 가이드</h2>
         <div className="space-y-3">
           {HOME_GUIDE_REGIONS.map(({ slug, name }) => (
