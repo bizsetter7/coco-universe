@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useBrand } from '@/components/BrandProvider';
-import { X, CheckCircle2, Info, Gift, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Check } from 'lucide-react';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 
 interface PaymentPopupProps {
@@ -12,136 +12,91 @@ interface PaymentPopupProps {
     initialTier?: string;
 }
 
-interface Package {
-    id: number;
-    tier: string;
-    name: string;
-    desc: React.ReactNode;
-    price: string;
-    originalPrice?: string;
-    isEvent?: boolean;
-}
-
-const PACKAGES: Package[] = [
+const PLANS = [
     {
-        id: 0,
-        tier: 'event_basic',
-        name: '오픈기념 무료 베이직',
-        desc: (
-            <>
-                최신 구인정보 리스트<br />
-                <span className="text-red-500 font-black">선착순 10개 업소 한정!</span>
-            </>
-        ),
-        price: '0원',
-        originalPrice: '60,000원',
-        isEvent: true,
+        id: 'basic',
+        name: '베이직',
+        price: 22000,
+        tag: null,
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: true },
+            { label: '코코알바 / 선수존', included: false },
+            { label: '강조효과 (인기 아이콘)', included: false },
+            { label: 'PC 사이드바 노출', included: false },
+            { label: 'PC/모바일 최상단 고정', included: false },
+        ],
     },
     {
-        id: 1,
-        tier: 'grand',
-        name: '타입1. 그랜드 (Grand)',
-        desc: (
-            <>
-                메인 최상단 노출 및<br />
-                압도적 광고 효과
-            </>
-        ),
-        price: '350,000원'
+        id: 'standard',
+        name: '스탠다드',
+        price: 66000,
+        tag: null,
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: false },
+            { label: '코코알바 OR 선수존 (택1)', included: true },
+            { label: '강조효과 (인기 아이콘)', included: false },
+            { label: 'PC 사이드바 노출', included: false },
+            { label: 'PC/모바일 최상단 고정', included: false },
+        ],
     },
     {
-        id: 2,
-        tier: 'premium',
-        name: '타입2. 프리미엄 (Premium)',
-        desc: (
-            <>
-                상단 시선 집중<br />
-                높은 효율성 노출
-            </>
-        ),
-        price: '200,000원'
+        id: 'special',
+        name: '스페셜',
+        price: 88000,
+        tag: '인기',
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: true },
+            { label: '코코알바 OR 선수존 (택1)', included: true },
+            { label: '강조효과 (인기 아이콘)', included: false },
+            { label: 'PC 사이드바 노출', included: false },
+            { label: 'PC/모바일 최상단 고정', included: false },
+        ],
     },
     {
-        id: 3,
-        tier: 'deluxe',
-        name: '타입3. 디럭스 (Deluxe)',
-        desc: (
-            <>
-                타겟 지역 집중<br />
-                전략적 배너 노출
-            </>
-        ),
-        price: '150,000원'
+        id: 'deluxe',
+        name: '디럭스',
+        price: 199000,
+        tag: null,
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: true },
+            { label: '코코알바 OR 선수존 (택1)', included: true },
+            { label: '강조효과 (인기 아이콘)', included: true },
+            { label: 'PC 사이드바 노출', included: true },
+            { label: 'PC/모바일 최상단 고정', included: false },
+        ],
     },
     {
-        id: 4,
-        tier: 'special',
-        name: '타입4. 스페셜 (Special)',
-        desc: (
-            <>
-                가성비 최우선<br />
-                실속형 배너 노출
-            </>
-        ),
-        price: '120,000원'
-    },
-    {
-        id: 5,
-        tier: 'urgent',
-        name: '타입5. 급구/추천 (Urgent)',
-        desc: (
-            <>
-                급구/추천 배지 노출로<br />
-                주목도 실속형
-            </>
-        ),
-        price: '100,000원'
-    },
-    {
-        id: 6,
-        tier: 'native',
-        name: '타입6. 네이티브 (Native)',
-        desc: (
-            <>
-                리스트 광고에 배치<br />
-                랜덤 상단노출효과
-            </>
-        ),
-        price: '80,000원'
-    },
-    {
-        id: 7,
-        tier: 'basic',
-        name: '타입7. 베이직/줄광고',
-        desc: (
-            <>
-                최신 구인정보 리스트<br />
-                (실속형 구인 상품)
-            </>
-        ),
-        price: '60,000원'
-    },
-    {
-        id: 8,
-        tier: 'extract',
-        name: '기타-강조옵션 (Emphasis)',
-        desc: (
-            <>
-                아이콘/형광펜<br />
-                테두리/급여추가<br />
-                (주목도 200% 상승)
-            </>
-        ),
-        price: '30,000원'
+        id: 'premium',
+        name: '프리미엄',
+        price: 399000,
+        tag: '최상위',
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: true },
+            { label: '코코알바 OR 선수존 (택1)', included: true },
+            { label: '강조효과 (인기 아이콘)', included: true },
+            { label: 'PC 사이드바 노출', included: true },
+            { label: 'PC/모바일 최상단 고정', included: true },
+        ],
     },
 ];
 
-export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, initialTier = 'event_basic' }) => {
+const PLATFORMS = [
+    { name: '밤길', desc: '지도 업소 홍보', emoji: '🗺️' },
+    { name: '웨이터존', desc: '웨이터 구인', emoji: '🤵' },
+    { name: '코코알바', desc: '아가씨 구인', emoji: '💼' },
+    { name: '선수존', desc: '선수 구인', emoji: '⚡' },
+];
+
+export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) => {
     const brand = useBrand();
-    const [selectedTier, setSelectedTier] = useState(initialTier);
+    const [selectedPlan, setSelectedPlan] = useState('special');
     const [mounted, setMounted] = useState(false);
 
-    // 전역 스크롤 관리자 연동
     useBodyScrollLock(isOpen);
 
     useEffect(() => {
@@ -149,7 +104,6 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
         return () => setMounted(false);
     }, []);
 
-    // SSR 환경에서 document.body 접근 에러 방지 및 컴포넌트 마운트 확인
     if (!mounted || !isOpen) return null;
 
     const handleApply = () => {
@@ -157,6 +111,8 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
         onClose();
     };
 
+    const currentPlan = PLANS.find(p => p.id === selectedPlan) ?? PLANS[2];
+    const isDark = brand.theme === 'dark';
     const primaryBgStyle = { backgroundColor: brand.primaryColor };
 
     return createPortal(
@@ -166,107 +122,139 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
         >
             <div
                 className={`
-                    w-full max-w-2xl rounded-t-2xl md:rounded-2xl shadow-2xl overflow-hidden relative flex flex-col 
+                    w-full max-w-lg rounded-t-2xl md:rounded-2xl shadow-2xl overflow-hidden relative flex flex-col
                     fixed bottom-0 md:static
-                    max-h-[85dvh] md:max-h-[90vh]
-                    ${brand.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}
+                    max-h-[90dvh] md:max-h-[88vh]
+                    ${isDark ? 'bg-gray-900' : 'bg-white'}
                     transform-gpu animate-in slide-in-from-bottom duration-300
                 `}
                 onClick={e => e.stopPropagation()}
             >
-
-                {/* Header - Centered as per user request */}
-                <div className={`p-6 border-b text-center relative shrink-0 ${brand.theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                        <h2 className={`text-xl md:text-2xl font-black tracking-tighter ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>사장님 전용 상품 안내</h2>
-                        <p className="text-xs md:text-sm text-gray-400 mt-2 font-bold">원하시는 광고 상품을 선택해주세요.</p>
-                    </div>
-                    <button onClick={onClose} className="absolute right-6 top-1/2 -translate-y-1/2 p-2 hover:bg-black/5 rounded-full transition-colors">
-                        <X size={24} className={brand.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} />
+                {/* 헤더 */}
+                <div className={`px-5 py-4 border-b text-center relative shrink-0 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+                    <h2 className={`text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        야사장 구독 플랜 안내
+                    </h2>
+                    <p className="text-xs text-gray-400 mt-1">한 번의 구독으로 여러 플랫폼에 동시 노출!</p>
+                    <button
+                        onClick={onClose}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/5 rounded-full transition-colors"
+                    >
+                        <X size={20} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
                     </button>
                 </div>
 
-                {/* Content - Scrollable */}
-                <div className="p-6 overflow-y-auto flex-1 touch-pan-y overscroll-contain">
-                    {/* 야사장 안내 배너 */}
-                    <div className="bg-indigo-50 text-indigo-700 text-xs md:text-sm p-3 rounded-xl mb-4 border border-indigo-200 flex items-start gap-2">
-                        <Info size={16} className="shrink-0 mt-0.5" />
-                        <p className="leading-tight break-keep">
-                            <span className="font-bold">광고 신청은 야사장에서 진행됩니다.</span><br />
-                            아래 상품을 확인하신 후 야사장 사이트에서 간편하게 신청하세요.
+                {/* 스크롤 영역 */}
+                <div className="overflow-y-auto flex-1 touch-pan-y overscroll-contain">
+
+                    {/* 여기에 노출됩니다 */}
+                    <div className={`px-5 pt-4 pb-3 ${isDark ? 'bg-gray-800/60' : 'bg-gray-50'}`}>
+                        <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
+                            여기에 노출됩니다
                         </p>
-                    </div>
-
-                    {/* 이벤트 배너 */}
-                    <div className="bg-red-50 text-red-600 text-center leading-relaxed p-4 rounded-xl mb-6 font-bold flex flex-col items-center justify-center gap-1 shadow-inner border border-red-100">
-                        <div className="flex items-center gap-1.5 text-sm md:text-base">
-                            <span className="animate-bounce">🎉</span>
-                            <span>한정 이벤트 · 선착순 100업소</span>
+                        <div className="grid grid-cols-4 gap-2">
+                            {PLATFORMS.map((p) => (
+                                <div key={p.name} className={`flex flex-col items-center gap-1 p-2 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-white'} border ${isDark ? 'border-gray-600' : 'border-gray-200'}`}>
+                                    <span className="text-xl">{p.emoji}</span>
+                                    <span className={`text-[10px] font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>{p.name}</span>
+                                    <span className="text-[9px] text-gray-400 text-center leading-tight">{p.desc}</span>
+                                </div>
+                            ))}
                         </div>
-                        <span className="block text-lg md:text-xl font-black text-red-600 tracking-tight">1개월 결제 시 1개월 추가 무료!</span>
                     </div>
 
-                    <div className="space-y-3">
-                        {PACKAGES.map((pkg) => (
-                            <label
-                                key={pkg.id}
-                                className={`block p-4 border rounded-xl cursor-pointer relative overflow-hidden transition-all
-                                    ${pkg.isEvent
-                                        ? (selectedTier === pkg.tier
-                                            ? 'border-emerald-500 ring-1 ring-emerald-500 bg-emerald-50/20'
-                                            : 'border-emerald-300 bg-emerald-50/10 hover:border-emerald-400')
-                                        : (selectedTier === pkg.tier
-                                            ? 'border-red-500 ring-1 ring-red-500 bg-red-50/10'
-                                            : (brand.theme === 'dark' ? 'border-gray-700 bg-gray-700/30' : 'border-gray-200 bg-white hover:border-gray-300'))
-                                    }
-                                `}
-                                onClick={() => setSelectedTier(pkg.tier)}
-                            >
-                                {/* 이벤트 상품 뱃지 */}
-                                {pkg.isEvent && (
-                                    <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter flex items-center gap-0.5">
-                                        <Gift size={9} />FREE
-                                    </div>
-                                )}
-                                {/* 기존 이벤트 뱃지 (id===1 → grand) */}
-                                {pkg.id === 1 && <div className="absolute top-0 right-0 bg-red-500 text-white text-[9px] px-2 py-0.5 font-bold uppercase tracking-tighter">Event</div>}
-                                <div className="flex justify-between items-start">
-                                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                                        <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedTier === pkg.tier ? (pkg.isEvent ? 'border-emerald-500' : 'border-red-500') : 'border-gray-300'}`}>
-                                            {selectedTier === pkg.tier && <div className={`w-2.5 h-2.5 rounded-full ${pkg.isEvent ? 'bg-emerald-500' : 'bg-red-500'}`} />}
-                                        </div>
-                                        <div className="flex-1 min-w-0 pr-2">
-                                            <span className={`block font-black text-sm md:text-base mb-1 ${pkg.isEvent ? 'text-emerald-700' : (brand.theme === 'dark' ? 'text-gray-100' : 'text-gray-900')}`}>{pkg.name}</span>
-                                            <span className="text-[12px] md:text-[13px] text-gray-500 font-medium block leading-snug break-keep">
-                                                {pkg.desc}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="text-right shrink-0 whitespace-nowrap">
-                                        {pkg.isEvent ? (
-                                            <div className="flex flex-col items-end gap-0.5">
-                                                <span className="text-[11px] text-gray-400 font-bold line-through">{pkg.originalPrice}</span>
-                                                <span className="text-base md:text-lg font-black text-emerald-600">{pkg.price}</span>
-                                            </div>
-                                        ) : (
-                                            <span className={`text-base md:text-lg font-black ${brand.theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{pkg.price}</span>
-                                        )}
+                    {/* 구독 플랜 탭 */}
+                    <div className="px-5 pt-4">
+                        <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
+                            구독 플랜 선택하기
+                        </p>
+                        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+                            {PLANS.map((plan) => (
+                                <button
+                                    key={plan.id}
+                                    onClick={() => setSelectedPlan(plan.id)}
+                                    className={`relative flex-shrink-0 px-3 py-2 rounded-xl text-xs font-black transition-all border ${
+                                        selectedPlan === plan.id
+                                            ? 'bg-pink-600 text-white border-pink-600 shadow-md'
+                                            : isDark
+                                                ? 'bg-gray-800 text-gray-300 border-gray-700 hover:border-gray-500'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                                    }`}
+                                >
+                                    {plan.tag && (
+                                        <span className="absolute -top-2 -right-1 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">
+                                            {plan.tag}
+                                        </span>
+                                    )}
+                                    {plan.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 선택된 플랜 상세 */}
+                    <div className="px-5 pt-3 pb-4">
+                        <div className={`rounded-2xl border p-4 ${
+                            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            {/* 플랜명 + 가격 */}
+                            <div className="flex items-end justify-between mb-4">
+                                <div>
+                                    <span className={`text-xs font-bold ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
+                                        월 기본가
+                                    </span>
+                                    <div className="flex items-baseline gap-1 mt-0.5">
+                                        <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                            {currentPlan.price.toLocaleString()}
+                                        </span>
+                                        <span className={`text-sm font-bold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>원/월</span>
                                     </div>
                                 </div>
-                            </label>
-                        ))}
+                                <span className="text-[10px] text-gray-400 font-medium">3개월↑ 최대 17% 할인</span>
+                            </div>
+
+                            {/* 포함 항목 체크리스트 */}
+                            <div className="space-y-2.5">
+                                {currentPlan.features.map((f) => (
+                                    <div key={f.label} className="flex items-center gap-2.5">
+                                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                                            f.included
+                                                ? 'bg-pink-500'
+                                                : isDark ? 'bg-gray-700' : 'bg-gray-100'
+                                        }`}>
+                                            {f.included
+                                                ? <Check size={11} className="text-white" strokeWidth={3} />
+                                                : <X size={9} className={isDark ? 'text-gray-500' : 'text-gray-400'} strokeWidth={2.5} />
+                                            }
+                                        </div>
+                                        <span className={`text-xs font-semibold ${
+                                            f.included
+                                                ? isDark ? 'text-white' : 'text-gray-800'
+                                                : isDark ? 'text-gray-500' : 'text-gray-400'
+                                        }`}>
+                                            {f.label}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 카드 자동결제 안내 */}
+                            <p className="text-[10px] text-gray-400 text-center mt-4">
+                                카드 자동결제 · 언제든 해지 가능
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className={`p-4 border-t shrink-0 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>
+                {/* 푸터 */}
+                <div className={`px-4 py-3 border-t shrink-0 ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>
                     <button
                         style={primaryBgStyle}
-                        className="w-full text-white font-bold py-4 rounded-xl text-lg shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2"
+                        className="w-full text-white font-black py-4 rounded-xl text-base shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2"
                         onClick={handleApply}
                     >
-                        <ExternalLink size={20} />
-                        야사장에서 광고 신청하기
+                        <ExternalLink size={18} />
+                        월 {currentPlan.price.toLocaleString()}원 · 야사장에서 신청하기
                     </button>
                 </div>
             </div>
