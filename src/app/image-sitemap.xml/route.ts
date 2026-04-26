@@ -40,7 +40,7 @@ export async function GET() {
         const { data: shopsWithImg } = await supabase
             .from('shops')
             .select('id, region, category, nickname, name, title, pay, pay_type, media_url, banner_image_url, updated_at')
-            .eq('status', 'active')
+            .eq('is_closed', false)
             .not('media_url', 'is', null)
             .order('updated_at', { ascending: false })
             .limit(300);
@@ -48,7 +48,7 @@ export async function GET() {
         const { data: shopsWithBanner } = await supabase
             .from('shops')
             .select('id, region, category, nickname, name, title, pay, pay_type, media_url, banner_image_url, updated_at')
-            .eq('status', 'active')
+            .eq('is_closed', false)
             .not('banner_image_url', 'is', null)
             .order('updated_at', { ascending: false })
             .limit(200);

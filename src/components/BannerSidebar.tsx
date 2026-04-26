@@ -163,7 +163,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
         supabase
             .from('shops')
             .select('*')
-            .eq('status', 'active')
+            .eq('is_closed', false)
             .in('tier', ['grand', 'p1', 'premium', 'p2'])
             .order('updated_at', { ascending: false })
             .then(({ data }) => {

@@ -140,7 +140,7 @@ export function InnerSidebarCarousel({ onAdSelect }: InnerSidebarCarouselProps) 
                         banner_position, banner_image_url, banner_media_type, banner_status,
                         options
                     `)
-                    .eq('status', 'active')
+                    .eq('is_closed', false)
                     .in('tier', ['deluxe', 'special', 'p3', 'p4'])
                     .order('created_at', { ascending: false })
                     .limit(30);
