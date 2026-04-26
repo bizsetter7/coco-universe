@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Trophy } from 'lucide-react';
+import { Trophy, Star } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { AdSection } from './AdSection';
 import { AdSectionSkeleton } from './AdSectionSkeleton';
@@ -37,29 +37,52 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, ha
         );
     }
 
+    const T1_T2 = new Set(['grand', 'p1', 'vip', 'premium', 'p2']);
+
     // T2: 야사장 프리미엄 구독자만 — 로드 전(null)은 tier 기반 임시 표시, 로드 후엔 정확히 필터
     const premiumShops = shops.filter(s => {
-        const t = s.tier ?? '';
+        const t = (s.tier ?? '').toLowerCase();
         if (t !== 'premium' && t !== 'p2') return false;
-        if (yajangPremiumIds === null) return true; // 로딩 중 임시 표시
+        if (yajangPremiumIds === null) return true;
         return yajangPremiumIds.has(String((s as any).user_id || ''));
     });
 
-    if (premiumShops.length === 0) return null;
+    // T3: 프리미엄/그랜드 제외한 모든 광고 (standard·special·deluxe·basic 등)
+    const t3Shops = shops.filter(s => {
+        const t = (s.tier ?? '').toLowerCase();
+        return !T1_T2.has(t);
+    });
+
+    if (premiumShops.length === 0 && t3Shops.length === 0) return null;
 
     return (
         <div className="w-full">
             {/* T2. 프리미엄 채용 — 야사장 프리미엄 구독 업체만 */}
-            <AdSection
-                title="프리미엄 채용"
-                icon={<Trophy className="text-slate-500" fill="currentColor" />}
-                shops={premiumShops}
-                tierId="premium"
-                rowCountPC={3}
-                onAdRegister={onAdRegister}
-                onSelectShop={onSelectShop}
-                hasSidebar={hasSidebar}
-            />
+            {premiumShops.length > 0 && (
+                <AdSection
+                    title="프리미엄 채용"
+                    icon={<Trophy className="text-slate-500" fill="currentColor" />}
+                    shops={premiumShops}
+                    tierId="premium"
+                    rowCountPC={3}
+                    onAdRegister={onAdRegister}
+                    onSelectShop={onSelectShop}
+                    hasSidebar={hasSidebar}
+                />
+            )}
+            {/* T3. 구인광고 — 프리미엄 외 전체 광고 */}
+            {t3Shops.length > 0 && (
+                <AdSection
+                    title="구인광고"
+                    icon={<Star className="text-amber-400" fill="currentColor" />}
+                    shops={t3Shops}
+                    tierId="standard"
+                    rowCountPC={3}
+                    onAdRegister={onAdRegister}
+                    onSelectShop={onSelectShop}
+                    hasSidebar={hasSidebar}
+                />
+            )}
         </div>
     );
 };
