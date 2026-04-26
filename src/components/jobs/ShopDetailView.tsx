@@ -27,6 +27,15 @@ const maskName = (name: string | null | undefined): string => {
   return name[0] + '○' + name[name.length - 1];
 };
 
+// 전화번호 하이픈 포맷
+const formatPhone = (phone: string | null | undefined): string => {
+  if (!phone) return '';
+  const d = phone.replace(/[^0-9]/g, '');
+  if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+  if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+  return phone;
+};
+
 // 사업자번호 마스킹: 2261391078 → 226-139-10**
 const maskBizNum = (num: string | null | undefined): string => {
   if (!num) return '-';
@@ -63,7 +72,8 @@ export default function ShopDetailView({
   onToggleFavorite = () => {},
 }: ShopDetailViewProps) {
   const { requireVerification } = useAdultGate();
-  const [descOpen, setDescOpen] = useState(false);
+  const [descOpen, setDescOpen] = useState(true);
+  const [imgErrors, setImgErrors] = useState<Set<number | string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const kakaoMapRef = useRef<HTMLDivElement>(null);
 
@@ -238,7 +248,9 @@ export default function ShopDetailView({
         <div className="px-4 pt-3 pb-1 bg-white flex items-center gap-1 text-[11px] text-gray-400 font-medium flex-wrap">
           <span>홈</span><ChevronRight size={10} />
           <span>{shop.region || '지역'}</span>
-          {shop.options?.regionGu && <><ChevronRight size={10} /><span>{shop.options.regionGu}</span></>}
+          {shop.options?.regionGu && !shop.region?.includes(shop.options.regionGu) && (
+            <><ChevronRight size={10} /><span>{shop.options.regionGu}</span></>
+          )}
           {catLabel && <><ChevronRight size={10} /><span>{catLabel}</span></>}
         </div>
 
@@ -250,7 +262,7 @@ export default function ShopDetailView({
               {managerName && <span className="text-[13px] text-gray-600 font-medium">{maskName(managerName)} 사장</span>}
               {managerPhone && (
                 <>
-                  <span className="text-[13px] text-gray-500">{managerPhone}</span>
+                  <span className="text-[13px] text-gray-500">{formatPhone(managerPhone)}</span>
                   <button
                     onClick={() => requireVerification(() => { window.location.href = `tel:${managerPhone}`; })}
                     className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded border border-blue-100"
@@ -375,7 +387,7 @@ export default function ShopDetailView({
                 value: openedAt ? `${openedAt}${yearsOpen ? `\n(${yearsOpen})` : ''}` : '-'
               },
               { label: '채용담당자', value: maskName(managerName) + ' 사장' },
-              { label: '연락처', value: managerPhone || '-' },
+              { label: '연락처', value: formatPhone(managerPhone) || '-' },
             ].map((cell, i) => (
               <div key={i} className="bg-white px-4 py-3">
                 <div className="text-[10px] text-gray-400 font-bold mb-1">{cell.label}</div>
@@ -512,17 +524,27 @@ export default function ShopDetailView({
             <div className="grid grid-cols-2 gap-2">
               {nearbyShops.slice(0, 4).map((s: any) => {
                 const img = s.banner_image_url || s.media_url || s.options?.mediaUrl;
+                const imgFailed = imgErrors.has(s.id);
                 return (
-                  <div key={s.id} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                  <a
+                    key={s.id}
+                    href={`/shop/${s.id}`}
+                    className="bg-white rounded-xl border border-gray-100 overflow-hidden block active:scale-[0.98] transition-transform"
+                  >
                     <div className="relative w-full bg-gray-100" style={{ aspectRatio: '4/3' }}>
-                      {img ? (
-                        <img src={img} alt={s.name} className="w-full h-full object-cover" />
+                      {img && !imgFailed ? (
+                        <img
+                          src={img}
+                          alt={s.name}
+                          className="w-full h-full object-cover"
+                          onError={() => setImgErrors(prev => new Set([...prev, s.id]))}
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-                          <span className="text-[10px] text-gray-400 font-bold">{s.name}</span>
+                          <span className="text-[10px] text-gray-400 font-bold text-center px-2 leading-snug">{s.nickname || s.name}</span>
                         </div>
                       )}
-                      {s.tier === 'premium' && (
+                      {(s.tier === 'premium' || s.tier === 'p2') && (
                         <span className="absolute top-1.5 left-1.5 text-[8px] font-black bg-amber-500 text-white px-1.5 py-0.5 rounded">프리미엄</span>
                       )}
                     </div>
@@ -531,7 +553,7 @@ export default function ShopDetailView({
                       <p className="text-[10px] text-gray-400 truncate">{s.region}</p>
                       <p className="text-[11px] font-black text-gray-800 mt-0.5">{formatKoreanMoney(s.pay)}</p>
                     </div>
-                  </div>
+                  </a>
                 );
               })}
             </div>
