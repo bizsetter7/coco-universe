@@ -55,11 +55,12 @@ const formatDate = (dt: string | null | undefined): string | null => {
 
 // 인증일: YYYY. M. D 형식 (예: 2026. 4. 26)
 const formatCertDate = (dt: string | null | undefined): string => {
-  const src = dt || new Date().toISOString();
+  if (!dt) return '';
   try {
-    const d = new Date(src);
+    const d = new Date(dt);
+    if (isNaN(d.getTime())) return '';
     return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}`;
-  } catch { return new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); }
+  } catch { return ''; }
 };
 
 // 개업일 기준 연차 계산
@@ -245,7 +246,7 @@ export default function ShopDetailView({
         <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center gap-2">
           <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
           <span className="text-[11px] text-emerald-700 font-medium">
-            {formatCertDate(bizInfo?.verified_at || (shop as any).approved_at)} 영업허가 확인 결과 정상영업 업체입니다.
+            {formatCertDate(bizInfo?.verified_at || (shop as any).approved_at || shop.created_at)} 영업허가 확인 결과 정상영업 업체입니다.
           </span>
         </div>
 
