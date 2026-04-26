@@ -168,7 +168,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) =
                         <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${isDark ? 'text-gray-400' : 'text-gray-400'}`}>
                             구독 플랜 선택하기
                         </p>
-                        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+                        <div className="flex gap-1.5 overflow-x-auto pt-3 pb-1 scrollbar-hide">
                             {PLANS.map((plan) => (
                                 <button
                                     key={plan.id}
@@ -240,7 +240,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) =
 
                             {/* 카드 자동결제 안내 */}
                             <p className="text-[10px] text-gray-400 text-center mt-4">
-                                카드 자동결제 · 언제든 해지 가능
+                                무통장 입금 · 언제든 해지 가능
                             </p>
                         </div>
                     </div>
