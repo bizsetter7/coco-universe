@@ -54,6 +54,8 @@ const calcYears = (dt: string | null | undefined): string | null => {
   } catch { return null; }
 };
 
+declare global { interface Window { kakao: any; } }
+
 export default function ShopDetailView({
   shop,
   onClose = () => window.history.back(),
@@ -63,6 +65,7 @@ export default function ShopDetailView({
   const { requireVerification } = useAdultGate();
   const [descOpen, setDescOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const kakaoMapRef = useRef<HTMLDivElement>(null);
 
   // businesses 테이블 — 인증/업체 정보
   const [bizInfo, setBizInfo] = useState<{
@@ -91,6 +94,40 @@ export default function ShopDetailView({
       .single()
       .then(({ data }) => { if (data) setBizInfo(data as any); });
   }, [shop.user_id]);
+
+  // 카카오맵 초기화
+  useEffect(() => {
+    const addr = shop.businessAddress;
+    if (!addr || !kakaoMapRef.current) return;
+    const mapEl = kakaoMapRef.current;
+
+    const initMap = () => {
+      if (!window.kakao?.maps) return;
+      const geocoder = new window.kakao.maps.services.Geocoder();
+      geocoder.addressSearch(addr, (result: any, status: any) => {
+        if (status === window.kakao.maps.services.Status.OK && mapEl) {
+          const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+          const map = new window.kakao.maps.Map(mapEl, { center: coords, level: 4 });
+          new window.kakao.maps.Marker({ map, position: coords });
+        }
+      });
+    };
+
+    if (window.kakao?.maps) {
+      initMap();
+    } else {
+      const existing = document.querySelector('script[data-kakao-map]');
+      if (existing) {
+        existing.addEventListener('load', () => window.kakao.maps.load(initMap));
+      } else {
+        const script = document.createElement('script');
+        script.setAttribute('data-kakao-map', '1');
+        script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`;
+        script.onload = () => window.kakao.maps.load(initMap);
+        document.head.appendChild(script);
+      }
+    }
+  }, [shop.businessAddress]);
 
   useEffect(() => {
     const regionPrefix = (shop.region || '').split(' ')[0];
@@ -128,8 +165,8 @@ export default function ShopDetailView({
   const smsTemplate = `안녕하세요:)\n코코알바 보고 연락드렸어요.\n\n이름:\n나이:\n경력:\n거주 지역:\n출근 가능 일:`;
   const smsUrl = `sms:${managerPhone}?body=${encodeURIComponent(smsTemplate)}`;
 
-  const heroImage = shop.banner_image_url || shop.options?.mediaUrl
-    || 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=1200&auto=format&fit=crop';
+  const heroImage = shop.banner_image_url || shop.options?.mediaUrl || null;
+  const hasRealImage = !!heroImage;
 
   return (
     <div className="flex flex-col w-full h-full bg-gray-50 overflow-hidden">
@@ -162,8 +199,19 @@ export default function ShopDetailView({
 
         {/* 사진 */}
         <div className="relative w-full bg-zinc-900" style={{ aspectRatio: '4/3' }}>
-          <img src={heroImage} alt={shop.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          {hasRealImage ? (
+            <img src={heroImage!} alt={shop.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex flex-col items-center justify-center gap-2 px-8">
+              <p className="text-2xl font-black text-white/25 text-center break-keep leading-tight tracking-tight">
+                {shop.name}
+              </p>
+              <p className="text-[11px] text-white/20 font-medium">
+                {catLabel}{shop.region ? ` · ${shop.region}` : ''}
+              </p>
+            </div>
+          )}
+          {hasRealImage && <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />}
           <div className="absolute bottom-3 right-3 bg-black/40 text-white text-[10px] font-mono px-2 py-0.5 rounded backdrop-blur-sm">
             No.{shop.id || '---'}
           </div>
@@ -400,6 +448,13 @@ export default function ShopDetailView({
                 {shop.businessAddress || '문의 시 상세 주소 안내'}
               </span>
             </div>
+            {shop.businessAddress && (
+              <div
+                ref={kakaoMapRef}
+                className="w-full rounded-xl overflow-hidden mb-3 bg-gray-100"
+                style={{ height: '180px' }}
+              />
+            )}
             {kakaoMapUrl && (
               <a
                 href={kakaoMapUrl}
