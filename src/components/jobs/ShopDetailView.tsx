@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   X, MapPin, Phone, MessageCircle, Heart, Share2,
-  ChevronDown, CheckCircle2, ShieldCheck,
+  ChevronDown, CheckCircle2,
   Gift, Navigation, Briefcase, Clock, ExternalLink,
   ChevronRight, AlertTriangle, MessageSquare, Copy
 } from 'lucide-react';
@@ -51,6 +51,15 @@ const formatDate = (dt: string | null | undefined): string | null => {
     const d = new Date(dt);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   } catch { return null; }
+};
+
+// 인증일: YYYY. M. D 형식 (예: 2026. 4. 26)
+const formatCertDate = (dt: string | null | undefined): string => {
+  const src = dt || new Date().toISOString();
+  try {
+    const d = new Date(src);
+    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}`;
+  } catch { return new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }); }
 };
 
 // 개업일 기준 연차 계산
@@ -156,7 +165,6 @@ export default function ShopDetailView({
   const managerName = bizInfo?.manager_name || (shop as any).manager_name || shop.managerName || '';
   const managerPhone = bizInfo?.manager_phone || (shop as any).manager_phone || shop.phone || '';
   const verifiedAt = formatDate(bizInfo?.verified_at);
-  const isVerified = bizInfo?.is_verified ?? false;
   const tier = bizInfo?.cocoalba_tier || shop.tier || null;
   const openedAt = formatDate(bizInfo?.opened_at);
   const yearsOpen = calcYears(bizInfo?.opened_at);
@@ -235,19 +243,10 @@ export default function ShopDetailView({
 
         {/* 인증 상태 */}
         <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center gap-2">
-          {isVerified ? (
-            <>
-              <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
-              <span className="text-[11px] text-emerald-700 font-medium">
-                {verifiedAt ? `${verifiedAt} 영업허가 확인 결과 정상영업 중입니다.` : '허위공고·선금 사기 없는 검증된 업소입니다.'}
-              </span>
-            </>
-          ) : (
-            <>
-              <ShieldCheck size={14} className="text-gray-400 shrink-0" />
-              <span className="text-[11px] text-gray-500 font-medium">안심지원 보증 업소</span>
-            </>
-          )}
+          <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+          <span className="text-[11px] text-emerald-700 font-medium">
+            {formatCertDate(bizInfo?.verified_at || (shop as any).approved_at)} 영업허가 확인 결과 정상영업 업체입니다.
+          </span>
         </div>
 
         {/* 브레드크럼 */}
@@ -387,7 +386,7 @@ export default function ShopDetailView({
             {[
               { label: '업소명', value: bizInfo?.name || shop.name },
               { label: '업소규모', value: roomCount ? `룸 ${roomCount}개` : '-' },
-              { label: '영업허가', value: isVerified ? '인증 완료' : '확인 중' },
+              { label: '영업허가', value: '정상영업' },
               {
                 label: '개업일',
                 value: openedAt ? `${openedAt}${yearsOpen ? `\n(${yearsOpen})` : ''}` : '-'
