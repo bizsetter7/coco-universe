@@ -3,11 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useBrand } from '@/components/BrandProvider';
-import { X, CheckCircle2, Info, Gift } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { X, CheckCircle2, Info, Gift, ExternalLink } from 'lucide-react';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
 
 interface PaymentPopupProps {
     isOpen: boolean;
@@ -141,11 +138,8 @@ const PACKAGES: Package[] = [
 
 export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, initialTier = 'event_basic' }) => {
     const brand = useBrand();
-    const router = useRouter();
-    const { isLoggedIn, userType } = useAuth();
     const [selectedTier, setSelectedTier] = useState(initialTier);
     const [mounted, setMounted] = useState(false);
-    const [applying, setApplying] = useState(false);
 
     // 전역 스크롤 관리자 연동
     useBodyScrollLock(isOpen);
@@ -158,43 +152,8 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
     // SSR 환경에서 document.body 접근 에러 방지 및 컴포넌트 마운트 확인
     if (!mounted || !isOpen) return null;
 
-    const handleApply = async () => {
-        // useAuth 훅 기반 인증 체크 (mock 세션 포함)
-        if (!isLoggedIn) {
-            if (confirm('광고를 신청하려면 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?')) {
-                onClose();
-                router.push('/?page=login');
-            }
-            return;
-        }
-        if (userType === 'individual') {
-            alert('업체회원만 이용 가능한 서비스입니다.');
-            return;
-        }
-        // corporate → 사업자인증 확인
-        if (userType === 'corporate') {
-            setApplying(true);
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('business_verified')
-                        .eq('id', user.id)
-                        .single();
-                    if (!profile?.business_verified) {
-                        alert('사업자 인증 후 광고를 등록하실 수 있습니다.\n마이페이지 > 회원정보수정 탭에서 사업자 인증을 완료해주세요.');
-                        onClose();
-                        router.push('/my-shop?view=member-info');
-                        return;
-                    }
-                }
-            } finally {
-                setApplying(false);
-            }
-        }
-        // 인증 완료 → 광고 신청 진행
-        router.push(`/my-shop?view=form&tier=${selectedTier}`);
+    const handleApply = () => {
+        window.open('https://yasajang.kr', '_blank', 'noopener,noreferrer');
         onClose();
     };
 
@@ -229,23 +188,16 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
 
                 {/* Content - Scrollable */}
                 <div className="p-6 overflow-y-auto flex-1 touch-pan-y overscroll-contain">
-                    {/* [NEW] Card Termination Warning */}
-                    <div className="bg-amber-50 text-amber-700 text-xs md:text-sm p-3 rounded-xl mb-4 border border-amber-200 flex items-start gap-2">
+                    {/* 야사장 안내 배너 */}
+                    <div className="bg-indigo-50 text-indigo-700 text-xs md:text-sm p-3 rounded-xl mb-4 border border-indigo-200 flex items-start gap-2">
                         <Info size={16} className="shrink-0 mt-0.5" />
                         <p className="leading-tight break-keep">
-                            <span className="font-bold">[중요] 카드 결제 서비스 종료 안내</span><br />
-                            2025년 6월 21일부터 카드 결제가 중단되며 무통장 입금으로 전환됩니다.
-                            <button
-                                onClick={() => {
-                                    router.push('/customer-center?tab=notice');
-                                    onClose();
-                                }}
-                                className="ml-1 underline font-bold"
-                            >자세히 보기</button>
+                            <span className="font-bold">광고 신청은 야사장에서 진행됩니다.</span><br />
+                            아래 상품을 확인하신 후 야사장 사이트에서 간편하게 신청하세요.
                         </p>
                     </div>
 
-                    {/* [UPDATE] 2-Line Banner */}
+                    {/* 이벤트 배너 */}
                     <div className="bg-red-50 text-red-600 text-center leading-relaxed p-4 rounded-xl mb-6 font-bold flex flex-col items-center justify-center gap-1 shadow-inner border border-red-100">
                         <div className="flex items-center gap-1.5 text-sm md:text-base">
                             <span className="animate-bounce">🎉</span>
@@ -309,13 +261,12 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose, ini
                 {/* Footer */}
                 <div className={`p-4 border-t shrink-0 ${brand.theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>
                     <button
-                        style={applying ? undefined : primaryBgStyle}
-                        className={`w-full text-white font-bold py-4 rounded-xl text-lg shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2 ${applying ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+                        style={primaryBgStyle}
+                        className="w-full text-white font-bold py-4 rounded-xl text-lg shadow-md hover:opacity-90 transition active:scale-[0.99] flex items-center justify-center gap-2"
                         onClick={handleApply}
-                        disabled={applying}
                     >
-                        <CheckCircle2 size={20} />
-                        {applying ? '확인 중...' : '선택한 상품 신청하기'}
+                        <ExternalLink size={20} />
+                        야사장에서 광고 신청하기
                     </button>
                 </div>
             </div>
