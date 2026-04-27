@@ -56,18 +56,25 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
     const badgeChar = shop.payType?.substring(0, 1) || '시';
     const borderCls = getBorderClass(shop.options?.border, shop.options?.border_period);
 
-    // AD_TIER_STANDARDS 동기화 — 이미지 없을 때 등급별 고정 그라디언트 (2026-03-22)
-    const getTierGradient = (tid: string): string => {
-        switch (tid) {
-            case 'deluxe':      return 'from-blue-600 to-blue-700';        // 🔵 Deluxe
-            case 'special':     return 'from-emerald-600 to-emerald-700';  // 🟢 Special
-            case 'urgent':      return 'from-purple-600 to-purple-700';     // 🟣 Urgent/Recommended
-            case 'recommended': return 'from-purple-600 to-purple-700';    // 🟣 Urgent/Recommended
-            case 'native':      return 'from-slate-600 to-slate-700';      // ⬛ Native
-            case 'basic':       return 'from-stone-700 to-stone-800';      // 🪨 Basic
-            default:            return 'from-stone-700 to-stone-800';
-        }
+    // 업종(workType/category) 기반 그라디언트 — 이미지 없을 때 업소 특성 시각화
+    const getCategoryGradient = (workType?: string, category?: string): string => {
+        const cat = (workType || category || '').toLowerCase();
+        if (cat.includes('룸') || cat.includes('room')) return 'from-rose-700 via-pink-800 to-zinc-900';
+        if (cat.includes('노래') || cat.includes('karaoke')) return 'from-purple-700 via-violet-800 to-zinc-900';
+        if (cat.includes('바') || cat.includes('bar') || cat.includes('주점')) return 'from-blue-700 via-indigo-800 to-zinc-900';
+        if (cat.includes('마사지') || cat.includes('massage')) return 'from-teal-700 via-emerald-800 to-zinc-900';
+        if (cat.includes('엔터') || cat.includes('enter')) return 'from-amber-700 via-orange-800 to-zinc-900';
+        if (cat.includes('다방')) return 'from-orange-700 via-amber-800 to-zinc-900';
+        if (cat.includes('카페') || cat.includes('cafe')) return 'from-amber-600 via-yellow-800 to-zinc-900';
+        if (cat.includes('요정')) return 'from-fuchsia-700 via-pink-800 to-zinc-900';
+        // 등급별 fallback
+        const tid = tierId || '';
+        if (tid === 'deluxe')      return 'from-blue-700 via-blue-800 to-zinc-900';
+        if (tid === 'special')     return 'from-emerald-700 via-teal-800 to-zinc-900';
+        if (tid === 'urgent' || tid === 'recommended') return 'from-purple-700 via-violet-800 to-zinc-900';
+        return 'from-zinc-700 via-zinc-800 to-zinc-950';
     };
+    const cardGradient = getCategoryGradient(shop.workType, shop.category);
 
     return (
         <a
@@ -129,11 +136,22 @@ export const ShopCard = React.memo(({ shop, rank, tierLabel, tierId, onClick, hi
                                 />
                             )
                         ) : (
-                            // 이미지 없을 경우: 공고 제목만 중앙 표시
-                            <div className={`absolute inset-0 flex items-center justify-center p-3 text-center bg-gradient-to-br ${getTierGradient(tierId || '')}`}>
-                                <h4 className="relative z-10 text-white font-black text-[12px] leading-snug drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] break-keep text-center line-clamp-4 w-full">
-                                    {cleanTitle}
-                                </h4>
+                            // 이미지 없을 경우: 업종 그라디언트 + 업소명 중앙 강조
+                            <div className={`absolute inset-0 bg-gradient-to-b ${cardGradient} overflow-hidden`}>
+                                <span className="absolute inset-0 flex items-center justify-center text-white/5 font-black select-none leading-none" style={{ fontSize: '5rem' }}>
+                                    {(shop.name || shop.nickname || cleanTitle)?.[0]}
+                                </span>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
+                                    <p className="text-white/40 text-[8px] font-black uppercase tracking-widest mb-1.5">
+                                        {shop.workType || shop.category || ''}
+                                    </p>
+                                    <h4 className="relative z-10 text-white font-black text-[14px] leading-snug drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] break-keep line-clamp-2 w-full">
+                                        {shop.name || shop.nickname || cleanTitle}
+                                    </h4>
+                                    <p className="text-white/30 text-[9px] font-bold mt-1.5 truncate max-w-full">
+                                        {shop.region || ''}
+                                    </p>
+                                </div>
                             </div>
                         )}
                         {/* 순위 배지 */}

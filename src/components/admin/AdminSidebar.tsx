@@ -158,7 +158,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'banner' | 'sns';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'banner' | 'sns' | 'yasajang';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -170,6 +170,7 @@ interface AdminSidebarProps {
         applications?: number;
         health?: number;
         banner?: number;
+        yasajang?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -277,6 +278,13 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'banner'}
                     badge={counts?.banner}
                     onClick={() => handleNav('banner')}
+                />
+                <NavItem
+                    icon={<Building2 size={20} className="text-pink-500" />}
+                    label="야사장 입점"
+                    active={activeTab === 'yasajang'}
+                    badge={counts?.yasajang}
+                    onClick={() => handleNav('yasajang')}
                 />
                 <NavItem
                     icon={<Megaphone size={20} />}
@@ -398,6 +406,13 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'banner'}
                         badge={counts?.banner}
                         onClick={() => handleNav('banner')}
+                    />
+                    <NavItem
+                        icon={<Building2 size={20} className="text-pink-500" />}
+                        label="야사장 입점"
+                        active={activeTab === 'yasajang'}
+                        badge={counts?.yasajang}
+                        onClick={() => handleNav('yasajang')}
                     />
                     <NavItem
                         icon={<Megaphone size={20} />}

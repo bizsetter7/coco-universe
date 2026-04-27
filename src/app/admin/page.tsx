@@ -28,6 +28,7 @@ import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
 import { AdminBannerManagement } from '@/components/admin/banner/AdminBannerManagement';
+import { AdminYasajangManagement } from '@/components/admin/yasajang/AdminYasajangManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
 import ShopDetailView from '@/components/jobs/ShopDetailView';
@@ -51,6 +52,7 @@ function AdminContent() {
     const [payments, setPayments] = useState<any[]>([]);
     const [pendingApplications, setPendingApplications] = useState(0);
     const [pendingBannerCount, setPendingBannerCount] = useState(0);
+    const [pendingYasajangCount, setPendingYasajangCount] = useState(0);
     const [healthIssueCount, setHealthIssueCount] = useState(0);
     const [liveVisitors, setLiveVisitors] = useState<number | null>(null);
     const [stats, setStats] = useState({
@@ -116,6 +118,7 @@ function AdminContent() {
             const { data: adsData } = await supabase
                 .from('shops')
                 .select('*')
+                .not('title', 'like', '[야사장]%')
                 .order('updated_at', { ascending: false })
                 .limit(500);
 
@@ -170,6 +173,13 @@ function AdminContent() {
                 .select('id', { count: 'exact', head: true })
                 .eq('banner_status', 'pending_banner');
             setPendingBannerCount(bannerCount || 0);
+
+            // 3-3. Fetch pending yasajang businesses
+            const { count: yasajangCount } = await supabase
+                .from('businesses')
+                .select('id', { count: 'exact', head: true })
+                .eq('status', 'pending');
+            setPendingYasajangCount(yasajangCount || 0);
 
             // 4. Fetch Messages
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
@@ -432,7 +442,7 @@ function AdminContent() {
     const pendingPaymentsCount = payments.filter(p => p.status !== 'completed').length;
     // [Sync] layout.tsx counts와 동기화 — bizCount 포함 (사업자 인증 심사 대기)
     const pendingBizCount = realUsers.filter((u: any) => u.business_verify_status === 'pending').length;
-    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount + pendingApplications + pendingBizCount;
+    const totalNotifications = pendingAdsCount + pendingInquiriesCount + pendingPaymentsCount + pendingApplications + pendingBizCount + pendingYasajangCount;
 
     return (
         <div className="p-5 md:p-10 pb-20">
@@ -667,6 +677,11 @@ function AdminContent() {
                 />
             )}
 
+            {/* Tab: Yasajang Management */}
+            {activeTab === 'yasajang' && (
+                <AdminYasajangManagement />
+            )}
+
             {/* 헬스 모니터: 42개 API/DB 헬스체크 */}
             {activeTab === 'seo' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -694,7 +709,10 @@ function AdminContent() {
                     className="fixed inset-0 z-[10020] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
                     onClick={() => setSelectedAdForModal(null)}
                 >
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="w-full max-w-md h-[90vh] md:h-[85vh] rounded-t-3xl md:rounded-3xl overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <ShopDetailView
                             shop={anyAdToShop(selectedAdForModal)}
                             onClose={() => setSelectedAdForModal(null)}
