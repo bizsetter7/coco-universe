@@ -57,7 +57,7 @@ export const UnifiedAdGrid = ({ shops, isLoading, onAdRegister, onSelectShop, ha
             {/* T3. 구인광고 — 프리미엄 외 전체 광고 */}
             {t3Shops.length > 0 && (
                 <AdSection
-                    title="구인광고"
+                    title="업체정보"
                     icon={<Star className="text-amber-400" fill="currentColor" />}
                     shops={t3Shops}
                     tierId="standard"
