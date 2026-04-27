@@ -26,7 +26,7 @@ export const AdDetailModal = ({ ad, onClose }: { ad: any; onClose: () => void })
             onClick={onClose}
         >
             <div
-                className="relative w-full md:max-w-[500px] lg:max-w-[600px] max-h-[92vh] overflow-hidden rounded-t-[32px] md:rounded-[32px] bg-white z-10 animate-in slide-in-from-bottom duration-300"
+                className="relative w-full md:max-w-[500px] lg:max-w-[600px] h-[92vh] md:h-[88vh] overflow-hidden rounded-t-[32px] md:rounded-[32px] bg-white z-10 animate-in slide-in-from-bottom duration-300"
                 onClick={e => e.stopPropagation()}
             >
                 <ShopDetailView shop={shop} onClose={onClose} />
