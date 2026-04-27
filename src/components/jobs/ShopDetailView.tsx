@@ -211,9 +211,14 @@ export default function ShopDetailView({
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
 
         {/* 등급 배지 바 */}
-        {tier === 'premium' && (
-          <div className="bg-amber-500 text-white text-center py-1.5 text-[11px] font-black tracking-widest uppercase">
-            PREMIUM
+        {tier && tier !== 'basic' && tier !== 'free' && (
+          <div className={`text-white text-center py-1.5 text-[11px] font-black tracking-widest uppercase ${
+            tier.includes('premium-extra') || tier === 'premium_extra' ? 'bg-rose-500' :
+            tier.includes('premium') ? 'bg-amber-500' :
+            tier.includes('standard') ? 'bg-blue-500' :
+            'bg-slate-800'
+          }`}>
+            {tier.replace('-', ' ').replace('_', ' ')}
           </div>
         )}
 
