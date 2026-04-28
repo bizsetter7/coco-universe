@@ -39,6 +39,7 @@ import { AdTemplateModal } from './components/AdTemplateModal';
 import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
 import { SosAlertView } from './components/SosAlertView';
+import { BoostingView } from './components/BoostingView';
 import { BankTransferModal } from './components/BankTransferModal';
 import { ExtendAdModal } from './components/ExtendAdModal';
 import { PointShopView } from './components/PointShopView';
@@ -1321,6 +1322,19 @@ function MyShopContent() {
                                             {view === 'member-info' && <MemberInfoForm {...formState} brand={brand} setView={setView} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'change-password' && (userType as any) === 'admin' && <ChangePasswordView setView={setView} />}
                                             {view === 'sos-alert' && <SosAlertView brand={brand} />}
+                                            {view === 'ad-boosting' && (
+                                                <BoostingView
+                                                    brand={brand}
+                                                    ads={(registeredAds || []).filter(ad => !ad?.isClosed)}
+                                                    onOpenBankModal={(amount, title) => {
+                                                        setBankModalAmount(amount);
+                                                        setBankModalTitle(title);
+                                                        setShowBankModal(true);
+                                                    }}
+                                                    setExampleType={setExampleType}
+                                                    setShowExampleModal={setShowExampleModal}
+                                                />
+                                            )}
                                             {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}
                                             {view === 'closed-ads' && <ClosedAdsView setView={setView} userName={bizShopName || formState.shopName} ads={(registeredAds || []).filter(ad => ad?.isClosed)} onShowAdDetail={setSelectedAdForModal} onOpenMenu={() => setShowMobileMenu(true)} onDeleteAd={handleDelete} />}
                                             {view === 'applicants' && <ApplicantsView setView={setView} userName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}

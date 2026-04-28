@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
-    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift, AlertTriangle, Briefcase, FileText, Shield, Lock, CalendarDays
+    List, LogOut, CreditCard, User, Settings, ShieldCheck, Home, Zap, Wallet, Coins, Star, Gift, AlertTriangle, Briefcase, FileText, Shield, Lock, CalendarDays, Sparkles
 } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -103,6 +103,9 @@ export const BusinessMobileMenu: React.FC<MobileMenuProps> = ({ brand, onClose, 
                             </div>
                             <div onClick={() => { setView('sos-alert'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-red-50 rounded-xl transition cursor-pointer text-red-500 font-black">
                                 <Zap size={18} /> SOS 긴급구인
+                            </div>
+                            <div onClick={() => { setView('ad-boosting'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-purple-50 rounded-xl transition cursor-pointer text-purple-500 font-black">
+                                <Sparkles size={18} /> 광고 부스팅
                             </div>
                             <div onClick={() => { setView('buy-points'); onClose(); }} className="px-3 py-2.5 flex items-center gap-3 hover:bg-blue-50 hover:text-blue-500 rounded-xl transition cursor-pointer">
                                 <Wallet size={18} /> 추가옵션안내
