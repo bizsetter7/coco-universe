@@ -28,6 +28,8 @@ export default function AuthCallbackPage() {
       // 세션 확인 후 리다이렉트
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        // 로그인 완료 → 성인게이트 자동 통과 (localStorage 플래그)
+        localStorage.setItem('adult_verified', 'true');
         window.location.href = '/';
       } else {
         router.replace('/');
