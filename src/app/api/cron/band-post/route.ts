@@ -103,6 +103,7 @@ export async function GET(request: NextRequest) {
     const { data: shops, error } = await supabaseAdmin
         .from('shops')
         .select('id, name, nickname, title, region, category, pay, pay_type')
+        .eq('platform', 'cocoalba')
         .eq('status', 'active')
         .gte('approved_at', since)
         .order('approved_at', { ascending: false })

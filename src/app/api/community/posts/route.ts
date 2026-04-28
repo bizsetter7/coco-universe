@@ -14,6 +14,7 @@ export async function GET() {
         const { data, error } = await supabaseAdmin
             .from('community_posts')
             .select('*')
+            .eq('platform', 'cocoalba')
             .order('created_at', { ascending: false })
             .limit(200);
 

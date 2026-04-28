@@ -29,6 +29,7 @@ export default function HomePortalClient() {
         const { data, error } = await supabase
           .from('shops')
           .select('*')
+          .eq('platform', 'cocoalba')
           .eq('is_closed', false)
           .order('updated_at', { ascending: false });
 

@@ -42,6 +42,7 @@ export default async function JobPage() {
     const { data } = await supabase
         .from('shops')
         .select('*')
+        .eq('platform', 'cocoalba')
         .eq('is_closed', false)
         .order('created_at', { ascending: false })
         .limit(500);

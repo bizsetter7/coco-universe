@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
             const { data: shops } = await supabaseAdmin
                 .from('shops')
                 .select('id, name, title, region, work_type, pay, pay_type, options, tier')
+                .eq('platform', 'cocoalba')
                 .eq('status', 'active')
                 .gte('created_at', since)
                 .order('created_at', { ascending: false })
