@@ -465,12 +465,14 @@ export default function ShopDetailView({
             )}
           </div>
           <div className="px-4 py-3">
+            {shop.businessAddress && (
             <div className="flex items-start gap-2 mb-3">
               <MapPin size={14} className="text-rose-500 shrink-0 mt-0.5" />
               <span className="text-[13px] font-bold text-gray-800 leading-snug break-keep flex-1">
-                {shop.businessAddress || '문의 시 상세 주소 안내'}
+                {shop.businessAddress}
               </span>
             </div>
+            )}
             {shop.businessAddress && (
               <div
                 ref={kakaoMapRef}
