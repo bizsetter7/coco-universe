@@ -55,14 +55,14 @@ function buildBandContent(shop: {
     pay?: string;
     pay_type?: string;
     id: number;
-}): string {
+}, baseUrl: string): string {
     const shopName  = shop.nickname || shop.name || '업체';
     const region    = (shop.region || '').replace(/[\[\]]/g, '').trim();
     const workType  = shop.category || '알바';
     const payStr    = shop.pay && shop.pay !== '면접후결정'
         ? `${shop.pay_type ?? ''} ${Number(String(shop.pay).replace(/[^0-9]/g, '')).toLocaleString()}원+α`
         : '면접 후 결정';
-    const url = `https://www.cocoalba.kr/coco/${encodeURIComponent(region)}/${shop.id}`;
+    const url = `${baseUrl}/coco/${encodeURIComponent(region)}/${shop.id}`;
     const hashtags = buildHashtags(region, workType);
 
     return [
@@ -80,7 +80,7 @@ function buildBandContent(shop: {
         ``,
         `─────────────────`,
         `🍫 코코알바 | 여성 유흥 구인구직 전문`,
-        `www.cocoalba.kr`,
+        `${baseUrl.replace(/^https?:\/\//, '')}`,
     ].filter(l => l !== null && l !== undefined).join('\n');
 }
 
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. 게시글 본문 생성
-    const content = buildBandContent(shop);
+    const content = buildBandContent(shop, baseUrl);
 
     // 4. 밴드에 이미지 + 게시글 발행
     try {

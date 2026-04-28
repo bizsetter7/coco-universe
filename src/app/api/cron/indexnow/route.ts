@@ -22,7 +22,8 @@ import { slugify } from '@/utils/shopUtils';
 
 export const dynamic = 'force-dynamic';
 
-const BASE_URL = 'https://www.cocoalba.kr';
+const BASE_URL  = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cocoalba.kr';
+const BASE_HOST  = BASE_URL.replace(/^https?:\/\//, '');
 const INDEXNOW_HOST = 'api.indexnow.org';
 
 const supabaseAdmin = createClient(
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
 
         // ── 3. IndexNow API 제출 ───────────────────────────────────────────
         const body = {
-            host:    'www.cocoalba.kr',
+            host:    BASE_HOST,
             key:     indexNowKey,
             keyLocation: `${BASE_URL}/${indexNowKey}.txt`,
             urlList: urls,
