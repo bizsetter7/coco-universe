@@ -152,6 +152,8 @@ src/
 | **Kakao geocoder 재시도** | `0caf031` | "302,303호" 쉼표 포함 상세주소 → 정규식 제거 후 기본 도로명으로 재시도 |
 | **SEO NFC 정규화** | `f546b7e`, `9a6d0c5` | 한글 슬러그 NFC 정규화, 캐노니컬 encodeURIComponent, Googlebot 미들웨어 허용, 엔터 업종 추가 |
 | **코드 다이어트** | `fe80375`, `03c52c1`, `95f2809` | 모바일 Supabase fetch 3건 차단, 유령파일 6종 + .bak 2개 + 임시스크립트 8개 제거 |
+| **야사장 회원 공고등록 UX** | `0a558c0` | STEP3 조건부 숨김(options.yasajang_business_id 감지), 총금액 배너 제거, StepIndicator 3단계 축약 |
+| **광고 부스팅 탭** | `b9002ec` | BoostingView 신규, 마이샵 사이드바/모바일메뉴 탭 추가, BankTransferModal 연동 |
 
 ### 🔴 미완료 / 진행 중
 
