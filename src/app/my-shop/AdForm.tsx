@@ -58,6 +58,7 @@ interface AdFormProps {
     selectedHighlighter: number | null; setSelectedHighlighter: (v: number | null) => void;
     highlighterPeriod: number; setHighlighterPeriod: (v: number) => void;
     totalAmount: number;
+    isYasajangMember?: boolean;
     setExampleType: (v: string) => void;
     setShowExampleModal: (v: boolean) => void;
     onSave?: () => void;
@@ -69,13 +70,14 @@ interface AdFormProps {
 }
 
 // --- Internal Components ---
-const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Done, isStep4Done }: { currentStep: number, brand: any, isStep1Done: boolean, isStep2Done: boolean, isStep3Done: boolean, isStep4Done: boolean }) => {
-    const steps = [
+const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Done, isStep4Done, isYasajangMember }: { currentStep: number, brand: any, isStep1Done: boolean, isStep2Done: boolean, isStep3Done: boolean, isStep4Done: boolean, isYasajangMember?: boolean }) => {
+    const allSteps = [
         { id: 1, label: '기본 정보', target: 'myshop-step-1', isDone: isStep1Done },
         { id: 2, label: '상세 내용', target: 'myshop-step-2', isDone: isStep2Done },
         { id: 3, label: '상품 선택', target: 'myshop-step-3', isDone: isStep3Done },
         { id: 4, label: '추가 옵션', target: 'myshop-step-4', isDone: isStep4Done },
     ];
+    const steps = isYasajangMember ? allSteps.filter(s => s.id !== 3) : allSteps;
 
     const scrollToStep = (id: string) => {
         const el = document.getElementById(id);
@@ -102,7 +104,7 @@ const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Do
                             <span className={`text-[10px] md:text-sm font-black whitespace-nowrap transition-colors ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-400'} group-hover:text-blue-500`}>
                                 {step.label}
                             </span>
-                            {step.id < 4 && <div className={`hidden md:block w-4 h-px ${isCompleted ? 'bg-green-200' : 'bg-gray-100'}`} />}
+                            {step.id < steps[steps.length - 1].id && <div className={`hidden md:block w-4 h-px ${isCompleted ? 'bg-green-200' : 'bg-gray-100'}`} />}
                         </button>
                     );
                 })}
@@ -204,6 +206,7 @@ export default function AdForm(props: AdFormProps) {
                 isStep2Done={isStep2Done}
                 isStep3Done={isStep3Done}
                 isStep4Done={isStep4Done}
+                isYasajangMember={props.isYasajangMember}
             />
 
             {/* Recruitment Registration Header */}
@@ -223,7 +226,9 @@ export default function AdForm(props: AdFormProps) {
             <Step1BasicInfo {...props} />
             <Step2JobDetail {...props} setShowTemplateModal={props.setShowTemplateModal} />
 
-            <Step3ProductSelect {...props} isNewEntry={props.isNewEntry} />
+            {!props.isYasajangMember && (
+                <Step3ProductSelect {...props} isNewEntry={props.isNewEntry} />
+            )}
             <Step4Extras
                 {...props}
                 isNewEntry={props.isNewEntry}
@@ -234,35 +239,9 @@ export default function AdForm(props: AdFormProps) {
                 setShowExampleModal={props.setShowExampleModal}
             />
 
-            {/* Total Amount Display (Redesigned matching Capture 1/2) */}
-            <div className="max-w-[900px] mx-auto w-full px-4 md:px-0 mt-5">
-                <div className="bg-[#e0007b] text-white py-3 px-4 md:p-8 rounded-[24px] shadow-xl flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                    <div className="text-center md:text-left z-10 shrink-0">
-                        <div className="font-black text-base md:text-xl">결제는 PC와 모바일 모두 가능합니다.</div>
-                        <div className="text-[10px] md:text-xs opacity-80 mt-1 font-bold">모든 광고 상품은 결제 및 심사 후 즉시 자동 적용되어 노출됩니다.</div>
-                    </div>
-                    <div className="flex flex-col md:flex-row items-center gap-2 md:gap-8 w-full md:w-auto z-10">
-                        <div className="font-black text-base md:text-lg whitespace-nowrap opacity-90">총 신청 금액</div>
-                        <div className="bg-white/20 border border-white/20 p-2 md:p-5 rounded-2xl min-w-[180px] md:min-w-[240px] text-center shadow-inner">
-                            <span className="text-2xl md:text-5xl font-black tracking-tighter">{props.totalAmount.toLocaleString()}원</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Sticky Bottom Navigation — 가격 포함 */}
+            {/* Sticky Bottom Navigation */}
             <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pointer-events-none" style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM + 20 }}>
                 <div className="max-w-[640px] mx-auto pointer-events-auto">
-                    {/* 가격 행 (상품 선택 시만 표시) */}
-                    {props.totalAmount > 0 && (
-                        <div className="flex items-center justify-between px-4 pt-2.5 pb-0">
-                            <span className="text-[10px] font-bold text-gray-400">총 신청 금액</span>
-                            <span className="text-base font-black text-[#e0007b] tracking-tight">
-                                {props.totalAmount.toLocaleString()}원
-                            </span>
-                        </div>
-                    )}
                     {/* 버튼 행 */}
                     <div className="flex flex-row gap-2 p-3">
                         <button

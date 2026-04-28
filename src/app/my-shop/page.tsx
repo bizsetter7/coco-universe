@@ -80,6 +80,7 @@ function MyShopContent() {
     const [lastLoadedId, setLastLoadedId] = useState<string | null>(null); // [Fix] Prevent reload loop
     // Business Data States
     const [registeredAds, setRegisteredAds] = useState<any[]>([]);
+    const [isYasajangMember, setIsYasajangMember] = useState(false);
     const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -146,6 +147,12 @@ function MyShopContent() {
             }
 
             setRegisteredAds(finalAds);
+
+            // 야사장 회원 감지: 등록된 공고 중 yasajang_business_id 옵션이 있으면 야사장 구독 회원
+            const hasYasajang = finalAds.some(
+                ad => ad?.options?.yasajang_business_id || ad?.rawOptions?.yasajang_business_id
+            );
+            setIsYasajangMember(hasYasajang);
 
         } catch (err: any) {
             console.warn("Fetch ads failed, falling back to local mocks:", err);
@@ -1337,7 +1344,7 @@ function MyShopContent() {
 
             {view === 'form' && (userType === 'corporate' || userType === 'admin') && (
                 <div className="w-full">
-                    <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} brand={brand} setShowDesignModal={setShowDesignModal} setShowTemplateModal={setShowTemplateModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
+                    <AdForm {...formState} isSaving={isSaving} isNewEntry={isNewEntry} isYasajangMember={isYasajangMember} brand={brand} setShowDesignModal={setShowDesignModal} setShowTemplateModal={setShowTemplateModal} handleEditorInteract={formState.updateToolbarStatus} saveSelection={formState.saveSelection} execCmd={execCmd} insertEmoji={insertEmoji} handlePayTypeChange={handlePayTypeChange} handlePayAmountChange={handlePayAmountChange} togglePaySuffix={togglePaySuffix} setExampleType={setExampleType} setShowExampleModal={setShowExampleModal} onSave={handleSave} onBack={handleBack} onPreview={onPreview} setSelectedAdPeriod={(v: any) => formState.setSelectedAdPeriod(v)} setBorderOption={(v: any) => formState.setBorderOption(v)} setBorderPeriod={(v: any) => formState.setBorderPeriod(v)} setIconPeriod={(v: any) => formState.setIconPeriod(v)} setHighlighterPeriod={(v: any) => formState.setHighlighterPeriod(v)} />
                 </div>
             )}
         </div>
