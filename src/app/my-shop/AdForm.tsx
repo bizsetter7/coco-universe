@@ -77,7 +77,7 @@ const StepIndicator = ({ currentStep, brand, isStep1Done, isStep2Done, isStep3Do
         { id: 3, label: '상품 선택', target: 'myshop-step-3', isDone: isStep3Done },
         { id: 4, label: '추가 옵션', target: 'myshop-step-4', isDone: isStep4Done },
     ];
-    const steps = isYasajangMember ? allSteps.filter(s => s.id !== 3) : allSteps;
+    const steps = isYasajangMember ? allSteps.filter(s => s.id !== 3 && s.id !== 4) : allSteps;
 
     const scrollToStep = (id: string) => {
         const el = document.getElementById(id);
@@ -229,15 +229,17 @@ export default function AdForm(props: AdFormProps) {
             {!props.isYasajangMember && (
                 <Step3ProductSelect {...props} isNewEntry={props.isNewEntry} />
             )}
-            <Step4Extras
-                {...props}
-                isNewEntry={props.isNewEntry}
-                selectedKeywords={props.selectedKeywords}
-                setSelectedKeywords={props.setSelectedKeywords}
-                selectedAdProduct={props.selectedAdProduct}
-                setExampleType={props.setExampleType}
-                setShowExampleModal={props.setShowExampleModal}
-            />
+            {!props.isYasajangMember && (
+                <Step4Extras
+                    {...props}
+                    isNewEntry={props.isNewEntry}
+                    selectedKeywords={props.selectedKeywords}
+                    setSelectedKeywords={props.setSelectedKeywords}
+                    selectedAdProduct={props.selectedAdProduct}
+                    setExampleType={props.setExampleType}
+                    setShowExampleModal={props.setShowExampleModal}
+                />
+            )}
 
             {/* Sticky Bottom Navigation */}
             <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pointer-events-none" style={{ zIndex: UI_Z_INDEX.NAV_BOTTOM + 20 }}>
