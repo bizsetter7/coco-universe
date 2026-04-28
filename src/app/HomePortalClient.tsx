@@ -31,6 +31,7 @@ export default function HomePortalClient() {
           .select('*')
           .eq('platform', 'cocoalba')
           .eq('is_closed', false)
+          .eq('status', 'active')  // 승인된 공고만 노출 (PENDING_REVIEW 제외)
           .order('updated_at', { ascending: false });
 
         setDbShops(!error && data ? data : []);

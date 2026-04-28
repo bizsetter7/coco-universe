@@ -164,6 +164,7 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             .from('shops')
             .select('*')
             .eq('is_closed', false)
+            .eq('status', 'active')  // 승인된 광고만 표시 (PENDING_REVIEW/rejected 제외)
             .in('tier', ['grand', 'p1', 'premium', 'p2'])
             .order('updated_at', { ascending: false })
             .then(({ data }) => {
