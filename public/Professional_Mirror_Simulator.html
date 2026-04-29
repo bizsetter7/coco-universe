@@ -73,8 +73,18 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
         @media (max-width: 800px) {
-            .control-sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); height: 100%; }
+            .control-sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); height: 100%; box-shadow: 4px 0 24px rgba(0,0,0,0.6); }
             .control-sidebar.open { transform: translateX(0); }
+            /* 사이드바 열렸을 때 어두운 백드롭 — 클릭하면 닫힘 */
+            .control-sidebar.open::after {
+                content: ''; position: fixed; top: 0; right: 0; bottom: 0; left: 280px;
+                background: rgba(0,0,0,0.5); z-index: -1;
+            }
+            #sidebar-backdrop {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+                z-index: 90; display: none;
+            }
+            #sidebar-backdrop.visible { display: block; }
         }
 
         .iphone-container {
@@ -157,17 +167,36 @@
             background: #334155; border-radius: 2px; cursor: pointer;
         }
 
-        /* Quick Nav chips */
-        .quick-chip {
-            display: inline-flex; align-items: center; gap: 4px;
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
-            padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800;
-            cursor: pointer; transition: all 0.15s; white-space: nowrap;
+        /* 헬스체크 점 */
+        .health-dot {
+            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            background: #475569; flex-shrink: 0;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
-        .quick-chip:hover { background: #3b82f622; border-color: #3b82f6; color: #60a5fa; }
-        .quick-chip:active { transform: scale(0.95); }
-        .quick-chip.admin { border-color: #7c3aed44; color: #a78bfa; }
-        .quick-chip.admin:hover { background: #7c3aed22; border-color: #7c3aed; }
+        .health-dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+        .health-dot.offline { background: #ef4444; box-shadow: 0 0 6px #ef444488; }
+        .health-dot.checking { background: #f59e0b; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .health-ms { font-size: 8px; color: #64748b; font-weight: 700; }
+
+        /* QR 모달 */
+        #qr-modal {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        #qr-modal.visible { display: flex; }
+        #qr-card {
+            background: white; border-radius: 24px; padding: 24px;
+            max-width: 360px; width: 100%; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        #qr-img { width: 280px; height: 280px; margin: 0 auto; display: block; }
+        #qr-url-text {
+            font-size: 11px; color: #475569; word-break: break-all;
+            margin-top: 16px; font-family: ui-monospace, monospace;
+            background: #f1f5f9; padding: 8px 10px; border-radius: 8px;
+        }
 
         /* Page title strip */
         #page-title-strip {
@@ -233,8 +262,9 @@
                 <button onclick="updateMirror()" class="absolute right-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-[10px] font-black transition-all shadow-lg shadow-blue-500/20">GO</button>
             </div>
 
-            <!-- Copy URL + Page Title -->
+            <!-- Copy URL + QR + Page Title -->
             <button onclick="copyCurrentUrl()" class="btn-nav shrink-0" title="URL 복사">⎘</button>
+            <button onclick="showQR()" class="btn-nav shrink-0" title="QR 코드 (모바일 실기기 테스트)">📱</button>
             <span id="page-title-strip" class="hidden lg:block">로딩 중...</span>
         </div>
 
@@ -251,57 +281,11 @@
 
     <div class="main-wrapper">
         <button id="sidebar-toggle" onclick="toggleSidebar()" class="btn-action">☰</button>
+        <div id="sidebar-backdrop" onclick="closeSidebarOnMobile()"></div>
 
         <!-- 📑 Compact Control Panel -->
         <aside class="control-sidebar shrink-0" id="sidebar">
             <div class="sidebar-scroll-area">
-
-                <!-- ⚡ Quick Nav -->
-                <div class="accordion-header active" onclick="toggleAccordion(this)">
-                    <span>⚡ Quick Nav</span>
-                    <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <div class="accordion-content open" style="max-height:1200px">
-                    <div class="accordion-inner">
-                        <!-- 주요 페이지 -->
-                        <p class="text-[8px] text-slate-600 font-black uppercase tracking-widest mb-2">주요 페이지</p>
-                        <div class="flex flex-wrap gap-1.5 mb-4">
-                            <button class="quick-chip" onclick="goPage('/')">🏠 홈</button>
-                            <button class="quick-chip" onclick="goPage('/jobs')">💼 채용</button>
-                            <button class="quick-chip" onclick="goPage('/community')">💬 커뮤니티</button>
-                            <button class="quick-chip" onclick="goPage('/region')">📍 지역</button>
-                            <button class="quick-chip" onclick="goPage('/guide')">📖 가이드</button>
-                            <button class="quick-chip" onclick="goPage('/customer-center')">📞 고객센터</button>
-                        </div>
-                        <!-- 회원 -->
-                        <p class="text-[8px] text-slate-600 font-black uppercase tracking-widest mb-2">회원 영역</p>
-                        <div class="flex flex-wrap gap-1.5 mb-4">
-                            <button class="quick-chip" onclick="goPage('/my-shop')">👤 마이샵</button>
-                            <button class="quick-chip" onclick="goPage('/my-shop?view=resume-form')">📄 이력서</button>
-                            <button class="quick-chip" onclick="goPage('/my-shop?view=point-shop')">💰 포인트</button>
-                            <button class="quick-chip" onclick="goPage('/?page=login')">🔑 로그인</button>
-                        </div>
-                        <!-- 어드민 -->
-                        <p class="text-[8px] text-slate-600 font-black uppercase tracking-widest mb-2">어드민</p>
-                        <div class="flex flex-wrap gap-1.5 mb-4">
-                            <button class="quick-chip admin" onclick="goPage('/admin')">🛡 어드민 홈</button>
-                            <button class="quick-chip admin" onclick="goPage('/admin?tab=users')">👥 회원관리</button>
-                            <button class="quick-chip admin" onclick="goPage('/admin?tab=ad-audit')">📋 광고심사</button>
-                            <button class="quick-chip admin" onclick="goPage('/admin?tab=payments')">💳 결제내역</button>
-                            <button class="quick-chip admin" onclick="goPage('/admin?tab=marketing')">📣 마케팅</button>
-                            <button class="quick-chip admin" onclick="goPage('/admin/system-verification')">🔍 헬스체크</button>
-                        </div>
-                        <!-- 지역 채용 샘플 -->
-                        <p class="text-[8px] text-slate-600 font-black uppercase tracking-widest mb-2">지역 채용 (샘플)</p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <button class="quick-chip" onclick="goPage('/coco/gangnam')">강남</button>
-                            <button class="quick-chip" onclick="goPage('/coco/hongdae')">홍대</button>
-                            <button class="quick-chip" onclick="goPage('/coco/incheon')">인천</button>
-                            <button class="quick-chip" onclick="goPage('/coco/busan')">부산</button>
-                            <button class="quick-chip" onclick="goPage('/coco/daegu')">대구</button>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- 📓 Sticky Task Pad -->
                 <div class="accordion-header" onclick="toggleAccordion(this)">
@@ -323,56 +307,61 @@
                 </div>
                 <div class="accordion-content open" style="max-height:1200px">
                     <div class="accordion-inner space-y-1.5">
-                        <button onclick="loadRemote('https://www.cocoalba.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
+                        <button onclick="loadRemote('https://chocoidea.vercel.app')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://chocoidea.vercel.app">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                                <span class="text-[10px] text-emerald-400 font-black">cocoalba.kr (운영)</span>
+                                <span class="health-dot checking"></span>
+                                <span class="text-[10px] text-white">P1. 초코아이디어</span>
                             </div>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://chocoidea.vercel.app')" class="w-full btn-action flex justify-between items-center group py-2.5">
-                            <span class="text-[10px] text-white">P1. 초코아이디어</span>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </button>
-                        <button onclick="loadRemote('https://www.cocoalba.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
+                        <button onclick="loadRemote('https://www.cocoalba.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://www.cocoalba.kr">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                                <span class="health-dot checking"></span>
                                 <span class="text-[10px] text-rose-400 font-black">P2. 코코알바 (운영)</span>
                             </div>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://region.cocoalba.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
+                        <button onclick="loadRemote('https://region.cocoalba.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://region.cocoalba.kr">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-                                <span class="text-[10px] text-rose-400 font-black">P3. 지역 랜딩 (region.cocoalba.kr)</span>
+                                <span class="health-dot checking"></span>
+                                <span class="text-[10px] text-rose-400 font-black">P3. 지역 랜딩</span>
                             </div>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://partners-credit.vercel.app')" class="w-full btn-action flex justify-between items-center group py-2.5">
-                            <span class="text-[10px] text-white">P4. 파트너스크레딧</span>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </button>
-                        <button onclick="loadRemote('https://www.yasajang.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
+                        <button onclick="loadRemote('https://partners-credit.vercel.app')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://partners-credit.vercel.app">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                <span class="health-dot checking"></span>
+                                <span class="text-[10px] text-white">P4. 파트너스크레딧</span>
+                            </div>
+                            <span class="health-ms"></span>
+                        </button>
+                        <button onclick="loadRemote('https://www.yasajang.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://www.yasajang.kr">
+                            <div class="flex items-center gap-2">
+                                <span class="health-dot checking"></span>
                                 <span class="text-[10px] text-amber-400 font-black">P5. 야사장 (사장님 B2B)</span>
                             </div>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://www.bamgil.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
+                        <button onclick="loadRemote('https://www.bamgil.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://www.bamgil.kr">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                <span class="health-dot checking"></span>
                                 <span class="text-[10px] text-amber-400 font-black">P6. 밤길 (손님 탐색)</span>
                             </div>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://www.waiterzone.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
-                            <span class="text-[10px] text-white">P9. 웨이터존</span>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <button onclick="loadRemote('https://www.waiterzone.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://www.waiterzone.kr">
+                            <div class="flex items-center gap-2">
+                                <span class="health-dot checking"></span>
+                                <span class="text-[10px] text-white">P9. 웨이터존</span>
+                            </div>
+                            <span class="health-ms"></span>
                         </button>
-                        <button onclick="loadRemote('https://www.sunsuzone.kr')" class="w-full btn-action flex justify-between items-center group py-2.5">
-                            <span class="text-[10px] text-white">P10. 선수존</span>
-                            <svg class="w-3 h-3 text-slate-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <button onclick="loadRemote('https://www.sunsuzone.kr')" class="w-full btn-action flex justify-between items-center group py-2.5" data-health="https://www.sunsuzone.kr">
+                            <div class="flex items-center gap-2">
+                                <span class="health-dot checking"></span>
+                                <span class="text-[10px] text-white">P10. 선수존</span>
+                            </div>
+                            <span class="health-ms"></span>
                         </button>
                     </div>
                 </div>
@@ -524,6 +513,20 @@
             </div>
         </aside>
 
+        <!-- 📱 QR 코드 모달 -->
+        <div id="qr-modal" onclick="closeQR()">
+            <div id="qr-card" onclick="event.stopPropagation()">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">📱 모바일 실기기 테스트</p>
+                <h3 class="text-base font-black text-slate-900 mb-4">QR 코드를 스캔하세요</h3>
+                <img id="qr-img" src="" alt="QR Code">
+                <p id="qr-url-text"></p>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="copyQRUrl()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">URL 복사</button>
+                    <button onclick="closeQR()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors">닫기</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 📱 Primary Mirroring Container -->
         <main class="iphone-container">
             <div class="iphone-frame" id="frame">
@@ -602,7 +605,81 @@
             const observer = new ResizeObserver(() => smartFit());
             const container = document.querySelector('.iphone-container');
             if (container) observer.observe(container);
+            // 헬스체크 시작 (페이지 로드 후 1초 + 5분마다 자동)
+            setTimeout(runHealthCheck, 1000);
+            setInterval(runHealthCheck, 5 * 60 * 1000);
         });
+
+        // ─── Health Check (운영 도메인 6+개 자동 모니터링) ────────
+        async function checkSingle(url) {
+            const start = performance.now();
+            try {
+                const ctrl = new AbortController();
+                const timer = setTimeout(() => ctrl.abort(), 6000);
+                await fetch(url + '?_hc=' + Date.now(), {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-store',
+                    signal: ctrl.signal,
+                });
+                clearTimeout(timer);
+                return { ok: true, ms: Math.round(performance.now() - start) };
+            } catch(e) {
+                return { ok: false, ms: 0 };
+            }
+        }
+
+        async function runHealthCheck() {
+            const buttons = document.querySelectorAll('[data-health]');
+            const promises = Array.from(buttons).map(async (btn) => {
+                const url = btn.dataset.health;
+                const dot = btn.querySelector('.health-dot');
+                const ms = btn.querySelector('.health-ms');
+                if (dot) { dot.classList.remove('online','offline'); dot.classList.add('checking'); }
+                const r = await checkSingle(url);
+                if (dot) {
+                    dot.classList.remove('checking');
+                    dot.classList.toggle('online', r.ok);
+                    dot.classList.toggle('offline', !r.ok);
+                }
+                if (ms) ms.textContent = r.ok ? `${r.ms}ms` : 'down';
+            });
+            await Promise.all(promises);
+        }
+
+        // ─── QR Code (모바일 실기기 테스트) ──────────────────────
+        function getCurrentMirrorUrl() {
+            try {
+                const href = mirrorFrame.contentWindow.location.href;
+                if (href && href.startsWith('http')) return href;
+            } catch(e) {}
+            // fallback: url-input + basePort 조합
+            const path = urlInput.value.trim();
+            if (path.startsWith('http')) return path;
+            return `http://localhost:${basePort}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+        function showQR() {
+            const url = getCurrentMirrorUrl();
+            // localhost는 외부 폰에서 접근 불가 → 사용자에게 안내
+            const isLocal = url.includes('localhost') || url.includes('127.0.0.1');
+            const qrImg = document.getElementById('qr-img');
+            const qrText = document.getElementById('qr-url-text');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&margin=10`;
+            qrText.innerHTML = url + (isLocal ? '<br><span style="color:#dc2626;font-weight:900">⚠ localhost는 외부 폰에서 접근 불가 — 같은 WiFi에서 PC IP 사용 필요</span>' : '');
+            document.getElementById('qr-modal').classList.add('visible');
+        }
+        function closeQR() {
+            document.getElementById('qr-modal').classList.remove('visible');
+        }
+        function copyQRUrl() {
+            const url = getCurrentMirrorUrl();
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = event.target;
+                const orig = btn.textContent;
+                btn.textContent = '✓ 복사됨';
+                setTimeout(() => { btn.textContent = orig; }, 1200);
+            });
+        }
 
         // ─── Navigation ──────────────────────────────────────────
         function navBack()    { try { mirrorFrame.contentWindow.history.back(); } catch(e) {} }
@@ -626,6 +703,7 @@
         function goPage(path) {
             urlInput.value = path;
             updateMirror();
+            closeSidebarOnMobile();
         }
 
         function copyCurrentUrl() {
@@ -665,7 +743,7 @@
             }
         }
 
-        function loadRemote(url) { urlInput.value = url; updateMirror(); }
+        function loadRemote(url) { urlInput.value = url; updateMirror(); closeSidebarOnMobile(); }
 
         function setBasePort(port) {
             basePort = port;
@@ -673,6 +751,7 @@
                 btn.classList.toggle('active', btn.textContent.trim() === port.toString());
             });
             updateMirror();
+            closeSidebarOnMobile();
         }
 
         urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') updateMirror(); });
@@ -807,7 +886,42 @@
             content.style.maxHeight = content.classList.contains('open') ? content.scrollHeight + 'px' : '0px';
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebar-backdrop');
+            sb.classList.toggle('open');
+            const isOpen = sb.classList.contains('open');
+            if (bd) bd.classList.toggle('visible', isOpen && window.innerWidth <= 800);
+        }
+        // 모바일 뷰(<=800px)에서 사이트/페이지 클릭 시 자동으로 사이드바 닫기
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 800) {
+                document.getElementById('sidebar')?.classList.remove('open');
+                document.getElementById('sidebar-backdrop')?.classList.remove('visible');
+            }
+        }
+        // ESC 키로 사이드바/오버레이 닫기, Cmd/Ctrl+K → URL 입력 포커스, Cmd/Ctrl+Shift+R → 새로고침
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSidebarOnMobile();
+                closeQR();
+            }
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                document.getElementById('url-input')?.focus();
+                document.getElementById('url-input')?.select();
+            }
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'r') {
+                e.preventDefault();
+                navReload();
+            }
+        });
+        // 윈도우 리사이즈 시 큰 화면이면 backdrop 숨김
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 800) {
+                document.getElementById('sidebar-backdrop')?.classList.remove('visible');
+            }
+        });
 
         // ─── Task Pad ─────────────────────────────────────────────
         function initTaskPad() {
