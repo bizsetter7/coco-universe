@@ -945,7 +945,6 @@ function MyShopContent() {
         if (!authUser?.id || authUser.id === 'guest') return;
 
         try {
-            // 1. Get ad details for tier and jump counts
             const ad = registeredAds.find(a => String(a.id) === String(adId));
             if (!ad) throw new Error('공고를 찾을 수 없습니다.');
 
@@ -961,78 +960,39 @@ function MyShopContent() {
                 return;
             }
 
-            // [Fix] getJumpConfig로 tier 매핑 통일 (p1~p7, altId, 레거시 한글명 모두 대응)
-            const tierKey = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
-            const { manual: maxJumps } = getJumpConfig(tierKey);
-            
-            const options = ad.options || {};
-            // KST timezone today
-            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
-            
-            let currentJumps = options.daily_manual_jump_count || 0;
-            if (options.last_manual_jump_date !== today) {
-                currentJumps = 0;
-            }
-            
-            let isPaidJump = false;
-            if (currentJumps >= maxJumps) {
-                if (userJumpBalance <= 0) {
-                if (window.confirm('잔여 횟수가 소진되었습니다.\n\n점프 서비스 구매 페이지로 이동하시겠습니까?')) {
-                    setView('buy-points');
-                }
-                return;
-            }
+            if (!window.confirm('공고를 가장 위로 끌어올립니다.\n수동 점프를 사용하시겠습니까?')) return;
 
-            if (!window.confirm(`오늘 제공된 무료 점프 횟수를 모두 소진했습니다. (${maxJumps}/${maxJumps}회)\n\n보유 중인 유료 점프 이용권 1회를 사용하여 추가 점프하시겠습니까?\n(현재 잔여: ${userJumpBalance}회)`)) {
+            // 새 점프 시스템 (2026-04-30 정책) — /api/jump/use 호출
+            // 우선순위: subscription_balance(구독 무료 적립) → package_balance(패키지 충전)
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            if (!token) throw new Error('로그인이 필요합니다.');
+
+            const res = await fetch('/api/jump/use', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ adId }),
+            });
+            const result = await res.json();
+
+            if (!res.ok) {
+                if (result.code === 'NO_BALANCE') {
+                    if (window.confirm('점프 잔액이 없습니다.\n\n점프 패키지 구매 페이지로 이동하시겠습니까?')) {
+                        setView('buy-points');
+                    }
                     return;
                 }
-                
-                // 유료 점프 횟수 차감 (profiles 테이블의 jump_balance)
-                const { error: deductError } = await supabase.from('profiles')
-                    .update({ 
-                        jump_balance: userJumpBalance - 1, 
-                        updated_at: new Date().toISOString() 
-                    })
-                    .eq('id', authUser.id);
-                
-                if (deductError) throw deductError;
-
-                // 점프 로그 — point_logs 실제 컬럼: id/user_id/amount/reason/created_at 만 존재 (note/description 없음)
-                await supabase.from('point_logs').insert({
-                    user_id: authUser.id,
-                    amount: -1,
-                    reason: `SHOP_JUMP_PAID:${adId}`,
-                });
-                
-                isPaidJump = true;
-            } else {
-                if (!window.confirm(`공고를 가장 위로 끌어올립니다.\n(무료 잔여 횟수: ${maxJumps - currentJumps}회 / 일일 최대 ${maxJumps}회)\n\n수동 점프를 사용하시겠습니까?`)) return;
+                throw new Error(result.error || '점프 실패');
             }
 
-            const newOptions = {
-                ...options,
-                daily_manual_jump_count: isPaidJump ? currentJumps : currentJumps + 1,
-                last_manual_jump_date: today
-            };
-            const nowIso = new Date().toISOString();
+            const { source, remaining } = result;
+            const sourceLabel = source === 'subscription' ? '구독 무료 점프' : '패키지 점프';
+            alert(`✨ JUMP 완료!\n사용: ${sourceLabel}\n잔여: 구독 ${remaining.subscription_balance}회 / 패키지 ${remaining.package_balance}회`);
 
-            const { error: jumpError } = await supabase.from('shops')
-                .update({ 
-                    created_at: nowIso, 
-                    updated_at: nowIso,
-                    options: newOptions 
-                })
-                .eq('id', adId).eq('user_id', authUser.id);
-            if (jumpError) throw jumpError;
-
-            if (isPaidJump) {
-                alert(`유료 점프권 1회를 사용하여 성공적으로 추가 JUMP 되었습니다! ✨\n(잔여 유료 횟수: ${userJumpBalance - 1}회)`);
-                // useAuth의 세션 업데이트 유도를 위해 credit-updated 이벤트 활용 (또는 페이지 리로드)
-                window.dispatchEvent(new Event('credit-updated'));
-            } else {
-                alert(`무료 JUMP 완료! ✨\n(오늘 남은 무료 횟수: ${maxJumps - (currentJumps + 1)}회)`);
-            }
-            
+            window.dispatchEvent(new Event('credit-updated'));
             fetchRegisteredAds();
         } catch (err: any) {
             console.error('Jump error:', err);

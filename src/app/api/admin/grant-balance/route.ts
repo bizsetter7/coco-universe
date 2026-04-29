@@ -28,42 +28,67 @@ export async function POST(request: NextRequest) {
         }
 
         const now = new Date().toISOString();
+        let newTotal = 0;
 
-        // 1. 현재 잔액 조회
-        const { data: profile, error: fetchError } = await supabaseAdmin
-            .from('profiles')
-            .select(type)
-            .eq('id', userId)
-            .single();
-        if (fetchError) throw fetchError;
-
-        const current = (profile as any)?.[type] || 0;
-        const newTotal = current + Number(amount);
-
-        // 2. 잔액 업데이트
-        const { error: updateError } = await supabaseAdmin
-            .from('profiles')
-            .update({ [type]: newTotal, updated_at: now })
-            .eq('id', userId);
-        if (updateError) throw updateError;
-
-        // 3. point_logs 기록 (포인트만 — 점프는 별도 로그 테이블 없음)
         if (type === 'points') {
+            // 포인트 — profiles.points 사용 (P2 코코알바 레거시 유지)
+            const { data: profile, error: fetchError } = await supabaseAdmin
+                .from('profiles')
+                .select('points')
+                .eq('id', userId)
+                .single();
+            if (fetchError) throw fetchError;
+
+            const current = profile?.points || 0;
+            newTotal = current + Number(amount);
+
+            const { error: updateError } = await supabaseAdmin
+                .from('profiles')
+                .update({ points: newTotal, updated_at: now })
+                .eq('id', userId);
+            if (updateError) throw updateError;
+
+            // point_logs 기록
             const { error: logError } = await supabaseAdmin
                 .from('point_logs')
-                .insert({
-                    user_id: userId,
-                    amount: Number(amount),
-                    reason: 'ADMIN_GRANT',
-                });
+                .insert({ user_id: userId, amount: Number(amount), reason: 'ADMIN_GRANT' });
             if (logError) {
                 // 로그 실패 시 포인트 롤백
                 await supabaseAdmin
                     .from('profiles')
-                    .update({ [type]: current, updated_at: now })
+                    .update({ points: current, updated_at: now })
                     .eq('id', userId);
                 throw new Error(`point_logs 기록 실패: ${logError.message}`);
             }
+        } else {
+            // 점프 — user_jumps.package_balance 사용 (2026-04-30 신규 시스템)
+            // 어드민 지급 = 패키지 충전과 동일 취급 (만료 없음)
+            const { data: existing } = await supabaseAdmin
+                .from('user_jumps')
+                .select('package_balance')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            const current = existing?.package_balance ?? 0;
+            newTotal = current + Number(amount);
+
+            if (existing) {
+                const { error: updateError } = await supabaseAdmin
+                    .from('user_jumps')
+                    .update({ package_balance: newTotal, updated_at: now })
+                    .eq('user_id', userId);
+                if (updateError) throw updateError;
+            } else {
+                const { error: insertError } = await supabaseAdmin
+                    .from('user_jumps')
+                    .insert({ user_id: userId, package_balance: newTotal });
+                if (insertError) throw insertError;
+            }
+
+            // 점프 로그도 point_logs 재활용
+            await supabaseAdmin
+                .from('point_logs')
+                .insert({ user_id: userId, amount: Number(amount), reason: 'ADMIN_JUMP_GRANT' });
         }
 
         return NextResponse.json({ success: true, newTotal });
