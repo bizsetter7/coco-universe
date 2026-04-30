@@ -47,9 +47,8 @@ export default async function JobPage() {
         .order('created_at', { ascending: false })
         .limit(500);
 
-    const { data: userData } = await supabase.from('profiles').select('*');
-
-    const rawShops: Shop[] = (data || []).map((ad: any) => enrichAdData(ad, userData || []));
+    // userData 조회 제거 — enrichAdData(ad, []) 통일 (메인페이지와 닉네임 폴백 일치)
+    const rawShops: Shop[] = (data || []).map((ad: any) => enrichAdData(ad, []));
 
     // [Fix 2] 메인 페이지와 동일한 정렬 기준 (p1~p7 tier, 실제광고 우선)
     const getTierRank = (tier: string): number => {

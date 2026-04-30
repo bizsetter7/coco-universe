@@ -246,12 +246,14 @@ function MyShopContent() {
                 if (profile) {
                     const verified = (profile as any).business_verified === true;
                     setBizVerified(verified);
-                    // 인증 완료된 경우에만 business_name 반영
-                    if (verified && (profile as any).business_name) {
-                        formState.setShopName((profile as any).business_name);
-                        setBizShopName((profile as any).business_name);
+                    // business_name이 있으면 인증 여부와 무관하게 즉시 반영
+                    // (신청 직후~승인 전에도 상호명 표시, 승인 시 인증 배지만 추가됨)
+                    const bizName = (profile as any).business_name || '';
+                    if (bizName) {
+                        formState.setShopName(bizName);
+                        setBizShopName(bizName);
                     } else {
-                        // 미인증 회원: sessionStorage draft에 남아있을 타 계정 상호명 초기화
+                        // 미신청 회원: 타 계정 상호명 초기화
                         formState.setShopName('');
                         setBizShopName('');
                     }
@@ -1245,7 +1247,13 @@ function MyShopContent() {
 
                     <div className={`grid grid-cols-1 ${userType === 'individual' ? '' : 'md:grid-cols-4'} gap-4 md:pt-0 md:pb-6`}>
                         {userType === 'corporate' && (
-                            <BusinessSidebar brand={brand} shopName={bizShopName || formState.shopName} nickname={formState.nickname || authUser?.nickname || '사장님'} view={view} setView={setView} />
+                            <BusinessSidebar brand={brand} shopName={bizShopName || formState.shopName}
+                                nickname={
+                                    (['닉네임','관리자',''].includes(formState.nickname) ? undefined : formState.nickname)
+                                    ?? (['닉네임','관리자',''].includes(authUser?.nickname || '') ? undefined : authUser?.nickname)
+                                    ?? undefined
+                                }
+                                view={view} setView={setView} />
                         )}
 
                         <div className={userType === 'individual' ? 'w-full' : 'col-span-3 space-y-4'}>
