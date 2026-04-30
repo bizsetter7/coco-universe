@@ -267,10 +267,16 @@ function MyShopContent() {
                         formState.setShopName('');
                         setBizShopName('');
                     }
-                    // 사업장 주소 로드
+                    // 사업장 주소 로드 + 근무지역 자동 반영
                     const addr = (profile as any).business_address || '';
                     const detail = (profile as any).business_address_detail || '';
-                    if (addr) setBizAddress(detail ? `${addr} ${detail}` : addr);
+                    if (addr) {
+                        setBizAddress(detail ? `${addr} ${detail}` : addr);
+                        // 공고등록 Step2 근무지역 자동 설정 (아직 미입력 시에만)
+                        const parts = addr.trim().split(/\s+/);
+                        if (parts[0] && !formState.regionCity) formState.setRegionCity(parts[0]); // '경기'
+                        if (parts[1] && !formState.regionGu)   formState.setRegionGu(parts[1]);   // '평택시'
+                    }
                 }
             } finally {
                 setBizDataLoaded(true); // [Fix] 성공/실패 무관하게 로드 완료 표시
@@ -703,6 +709,10 @@ function MyShopContent() {
                 finalPayType = '협의';
             }
 
+            // P5 야사장 경유 공고는 이미 active → P2 저장 시 active 유지 (재승인 불필요)
+            const isYasajangAd = !!(originalAd?.options?.yasajang_business_id);
+            const finalStatus = (isYasajangAd && originalAd?.status === 'active') ? 'active' : 'pending';
+
             const adData: any = {
                 // [Standard Root Columns] - V4 DB 컬럼명 100% 준수
                 name: formState.shopName,
@@ -729,7 +739,7 @@ function MyShopContent() {
                 ad_price: formState.totalAmount,
                 ad_duration: Number(formState.selectedAdPeriod || 30),
                 updated_at: new Date().toISOString(),
-                status: 'pending',
+                status: finalStatus,
                 user_id: authUser.id,
                 deadline: finalDeadline,
                 product_type: finalProductType,
