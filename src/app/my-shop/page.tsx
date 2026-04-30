@@ -248,12 +248,22 @@ function MyShopContent() {
                     setBizVerified(verified);
                     // business_name이 있으면 인증 여부와 무관하게 즉시 반영
                     // (신청 직후~승인 전에도 상호명 표시, 승인 시 인증 배지만 추가됨)
-                    const bizName = (profile as any).business_name || '';
+                    let bizName = (profile as any).business_name || '';
+                    if (!bizName) {
+                        // P5 경유 등록 회원은 profiles.business_name 미설정 → 등록된 shop name 폴백
+                        const { data: firstShop } = await supabase
+                            .from('shops')
+                            .select('name')
+                            .eq('user_id', authUser.id)
+                            .eq('status', 'active')
+                            .limit(1)
+                            .maybeSingle();
+                        bizName = firstShop?.name || '';
+                    }
                     if (bizName) {
                         formState.setShopName(bizName);
                         setBizShopName(bizName);
                     } else {
-                        // 미신청 회원: 타 계정 상호명 초기화
                         formState.setShopName('');
                         setBizShopName('');
                     }
