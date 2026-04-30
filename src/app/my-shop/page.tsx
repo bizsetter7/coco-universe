@@ -1191,6 +1191,9 @@ function MyShopContent() {
                     onConfirm={() => {
                         if (isNewEntry) {
                             formState.resetAdStates();
+                            if (profileRegionCity) formState.setRegionCity(profileRegionCity);
+                            if (profileRegionGu) formState.setRegionGu(profileRegionGu);
+                            if (bizVerified && bizShopName) formState.setShopName(bizShopName);
                             setView('form', undefined, true);
                         } else {
                             // [Critical Fix] Read from Ref to guarantee we have the ID regardless of render cycle
@@ -1315,6 +1318,8 @@ function MyShopContent() {
                                                             setEditingAdId(null);
                                                             editingAdIdRef.current = null;
                                                             formState.resetAdStates();
+                                                            if (profileRegionCity) formState.setRegionCity(profileRegionCity);
+                                                            if (profileRegionGu) formState.setRegionGu(profileRegionGu);
                                                             if (bizVerified && bizShopName) formState.setShopName(bizShopName);
                                                         }
                                                         setShowWarningModal(true);
