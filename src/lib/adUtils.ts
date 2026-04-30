@@ -147,6 +147,9 @@ export function anyAdToShop(ad: any): Shop {
             highlighter: opt?.highlighter || opt?.selectedHighlighter || ad?.selectedHighlighter,
             mediaUrl: opt?.mediaUrl,
         },
+        // P5 야사장에서 platform-ads/update로 저장한 options.workTime 읽기
+        // (shops 테이블에 work_time 직접 컬럼 없음 — options JSONB에서 읽어야 함)
+        workTime: ad?.work_time || ad?.workTime || opt?.workTime || undefined,
         managerName: ad?.managerName || ad?.manager_name || opt?.managerName || '',
         managerPhone: ad?.managerPhone || ad?.manager_phone || opt?.managerPhone || ad?.phone || '',
         businessAddress: ad?.businessAddress || ad?.business_address || opt?.businessAddress || '',
