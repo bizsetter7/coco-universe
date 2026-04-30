@@ -83,7 +83,7 @@ export const ClosedAdsView = ({ setView, ads = [], userName = '', onOpenMenu, on
                                                 <span className="text-gray-200">|</span>
                                                 <span className="shrink-0">{(ad.options?.regionCity || ad.regionCity)} {(ad.options?.regionGu || ad.regionGu)}</span>
                                                 <span className="text-gray-200">|</span>
-                                                <span className="truncate">{(ad.options?.category || ad.category)} | {(ad.options?.categorySub || ad.categorySub || '자유직종')}</span>
+                                                <span className="truncate">{(ad.options?.category || ad.category)}{(ad.options?.categorySub || ad.categorySub) ? ` | ${(ad.options?.categorySub || ad.categorySub)}` : ''}</span>
                                             </div>
                                             
                                             {/* Delete Button for Closed Ads */}

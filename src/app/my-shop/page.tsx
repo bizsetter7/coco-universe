@@ -224,6 +224,9 @@ function MyShopContent() {
     const [bizAddress, setBizAddress] = React.useState('');
     // [Fix] bizShopName은 formState.resetAdStates()에 영향 안 받는 별도 state (상호명 깜빡임 방지)
     const [bizShopName, setBizShopName] = React.useState('');
+    // [Fix M-059] resetAdStates() 후 근무지역 복원용 — profiles에서 파싱한 시/도·구군 보관
+    const [profileRegionCity, setProfileRegionCity] = React.useState('');
+    const [profileRegionGu, setProfileRegionGu] = React.useState('');
 
     useEffect(() => {
         if (!authUser?.id || authUser.id === 'guest' || authUser.id.startsWith('mock_')) {
@@ -272,10 +275,12 @@ function MyShopContent() {
                     const detail = (profile as any).business_address_detail || '';
                     if (addr) {
                         setBizAddress(detail ? `${addr} ${detail}` : addr);
-                        // 공고등록 Step2 근무지역 자동 설정 (아직 미입력 시에만)
                         const parts = addr.trim().split(/\s+/);
-                        if (parts[0] && !formState.regionCity) formState.setRegionCity(parts[0]); // '경기'
-                        if (parts[1] && !formState.regionGu)   formState.setRegionGu(parts[1]);   // '평택시'
+                        // [M-059] 시/도·구군을 별도 state에 보존 → resetAdStates() 후 view=form 복원 useEffect에서 재적용
+                        if (parts[0]) setProfileRegionCity(parts[0]);
+                        if (parts[1]) setProfileRegionGu(parts[1]);
+                        if (parts[0] && !formState.regionCity) formState.setRegionCity(parts[0]);
+                        if (parts[1] && !formState.regionGu)   formState.setRegionGu(parts[1]);
                     }
                 }
             } finally {
@@ -451,6 +456,18 @@ function MyShopContent() {
             _setView(viewParam);
         }
     }, [searchParams]); // searchParams 변경 시 트리거, 하지만 읽기는 window.location에서
+
+    // [M-059] view=form 진입 시 profileRegionCity/Gu 복원
+    // resetAdStates()가 regionCity/regionGu를 초기화하기 때문에, form view로 진입할 때마다 재적용
+    useEffect(() => {
+        if (view === 'form' && profileRegionCity && !formState.regionCity) {
+            formState.setRegionCity(profileRegionCity);
+        }
+        if (view === 'form' && profileRegionGu && !formState.regionGu) {
+            formState.setRegionGu(profileRegionGu);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [view, profileRegionCity, profileRegionGu]);
 
     useEffect(() => {
         const handleToggle = () => {

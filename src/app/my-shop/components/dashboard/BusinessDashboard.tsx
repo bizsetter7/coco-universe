@@ -210,7 +210,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                         </span>
                                         <span className="md:hidden"><br /></span>
                                         <span className="hidden md:inline"> | </span>
-                                        {ad.regionCity || '지역 정보 없음'} {ad.regionGu || ''} | {ad.category || '종류'} | {ad.categorySub || '자유직종'}
+                                        {ad.regionCity || '지역 정보 없음'} {ad.regionGu || ''} | {ad.category || '종류'}{ad.categorySub ? ` | ${ad.categorySub}` : ''}
                                     </div>
                                 </div>
                                 {(() => {
