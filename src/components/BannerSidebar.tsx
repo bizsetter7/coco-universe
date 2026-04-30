@@ -166,6 +166,9 @@ export const BannerSidebar = React.memo(({ side, shops }: BannerSidebarProps) =>
             .eq('is_closed', false)
             .eq('status', 'active')  // 승인된 광고만 표시 (PENDING_REVIEW/rejected 제외)
             .in('tier', ['grand', 'p1', 'premium', 'p2'])
+            // P5 야사장 자동 게시 shop 제외 — banner_status='none'(P5 설정) 또는 미승인 상태 노출 금지
+            // NULL = P2 자체 등록 grand/premium (정상 노출), 'approved_banner' = 배너 심사 승인
+            .or('banner_status.is.null,banner_status.eq.approved_banner')
             .order('updated_at', { ascending: false })
             .then(({ data }) => {
                 if (data && data.length > 0) {

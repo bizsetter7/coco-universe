@@ -25,10 +25,12 @@ interface BusinessDashboardProps {
     onJumpAd?: (adId: string) => void;
     onExtendAd?: (ad: any) => void;
     onToggleAutoJump?: (adId: string, enabled: boolean) => void;
+    // user_jumps.subscription_balance + package_balance + auto (신규 야사장 구독 기준)
+    subscriptionBalance?: number;
 }
 
 export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
-    brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd, onJumpAd, onExtendAd, onToggleAutoJump
+    brand, shopName, nickname, isVerified, bizVerified = false, bizAddress, onGoMemberInfo, handleAdClick, setShowDesignModal, setView, router, ads = [], onOpenMenu, onShowAdDetail, onDeleteAd, onJumpAd, onExtendAd, onToggleAutoJump, subscriptionBalance = 0
 }) => {
     const [activeTab, setActiveTab] = React.useState<'ongoing' | 'closed'>('ongoing');
 
@@ -215,13 +217,13 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                     // 승인 여부 — active 상태만 점프 허용
                                     const isApproved = ad?.status === 'active' || ad?.status === 'ACTIVE';
 
-                                    // 잔여 수동 점프 횟수 계산
+                                    // [신규] 야사장 구독 기준 수동 점프 잔여 — user_jumps.subscription_balance 사용
+                                    // subscriptionBalance prop = AuthProvider에서 읽은 (sub+pkg+auto) 합산
+                                    const remainManual = subscriptionBalance;
+                                    // 자동 점프: options JSONB에서 읽기 (cron 실행 후 daily_auto_jump_count 갱신)
                                     const todayKST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
                                     const tierKey = (ad.productType || ad.tier || ad.product_type || ad.ad_type || ad.options?.product_type || 'p7').toLowerCase();
                                     const jumpCfg = getJumpConfig(tierKey);
-                                    const usedManual = ad.options?.last_manual_jump_date === todayKST
-                                        ? (ad.options?.daily_manual_jump_count || 0) : 0;
-                                    const remainManual = Math.max(0, jumpCfg.manual - usedManual);
                                     const usedAuto = ad.options?.last_auto_jump_date === todayKST
                                         ? (ad.options?.daily_auto_jump_count || 0) : 0;
                                     const remainAuto = Math.max(0, jumpCfg.auto - usedAuto);
@@ -246,7 +248,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                 }`}>
                                                     <RefreshCw size={11} className={!isApproved ? 'text-gray-300' : remainManual === 0 ? 'text-red-400' : 'text-green-500'} />
                                                     <span className={`text-[11px] font-black ${!isApproved ? 'text-gray-400' : remainManual === 0 ? 'text-red-500' : 'text-green-700'}`}>
-                                                        {!isApproved ? '점프 잠김' : `수동 ${remainManual}/${jumpCfg.manual}`}
+                                                        {!isApproved ? '점프 잠김' : remainManual === 0 ? '잔여 0회' : `수동 ${remainManual}회`}
                                                     </span>
                                                 </div>
                                                 {/* 자동 점프 잔여 (지원 tier + 승인된 광고만) */}
@@ -273,7 +275,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                     disabled={!isApproved || remainManual === 0}
                                                     title={
                                                         !isApproved ? '관리자 승인 후 점프 이용 가능' :
-                                                        remainManual === 0 ? `오늘 수동 점프 소진 (${jumpCfg.manual}/${jumpCfg.manual}회)` :
+                                                        remainManual === 0 ? '점프 잔여 없음 — 패키지 구매 필요' :
                                                         `수동 점프 (잔여 ${remainManual}회)`
                                                     }
                                                     className={`flex items-center gap-1.5 px-3 py-2 text-white text-xs font-black rounded-lg shadow-sm transition active:scale-95 ${
@@ -281,7 +283,7 @@ export const BusinessDashboard: React.FC<BusinessDashboardProps> = ({
                                                     }`}
                                                 >
                                                     <RefreshCw size={12} />
-                                                    {!isApproved ? '승인대기' : `점프 ${remainManual}/${jumpCfg.manual}`}
+                                                    {!isApproved ? '승인대기' : `점프 ${remainManual}회`}
                                                 </button>
                                                 {/* 자동 점프 ON/OFF (지원 tier + 승인된 광고만) */}
                                                 {jumpCfg.auto > 0 && (

@@ -1257,7 +1257,7 @@ function MyShopContent() {
                                         <>
                                             {view === 'dashboard' && (
                                                 <BusinessDashboard
-                                                    brand={brand} shopName={bizShopName || formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified} bizVerified={bizVerified} bizAddress={bizAddress} onGoMemberInfo={() => setView('member-info')}
+                                                    brand={brand} shopName={bizShopName || formState.shopName} nickname={formState.nickname} isVerified={formState.isVerified} bizVerified={bizVerified} bizAddress={bizAddress} onGoMemberInfo={() => setView('member-info')} subscriptionBalance={userJumpBalance || 0}
                                                     handleAdClick={(isNew, ad) => {
                                                         setIsNewEntry(isNew);
                                                         if (!isNew && ad) {
