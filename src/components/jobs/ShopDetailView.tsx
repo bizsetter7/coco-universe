@@ -376,12 +376,10 @@ export default function ShopDetailView({
               ...(shop.options?.workClothes ? [{ label: '근무 복장', value: String(shop.options.workClothes) }] : []),
               ...(shop.options?.workCareer ? [{ label: '경력 조건', value: shop.options.workCareer }] : []),
             ].map((row, i) => (
-              <div key={i} className="flex items-start gap-1.5 text-[13px] text-gray-800">
-                <span className="text-gray-400 shrink-0 font-bold">·</span>
-                <span>
-                  <span className="font-bold text-gray-600 mr-1">{row.label}</span>
-                  {row.value}
-                </span>
+              <div key={i} className="flex items-center gap-0 text-[13px] text-gray-800">
+                <span className="font-bold text-gray-600 shrink-0 w-[72px]">{row.label}</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
+                <span>{row.value}</span>
               </div>
             ))}
           </div>
@@ -434,33 +432,37 @@ export default function ShopDetailView({
         <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-100 p-4">
           <h3 className="text-[14px] font-black text-gray-900 mb-3">가게 정보</h3>
           <div className="space-y-2 text-[13px] text-gray-800">
-            <div className="flex items-start gap-1.5">
-              <span className="text-gray-400 font-bold shrink-0">·</span>
-              <span><span className="font-bold text-gray-600 mr-1">업소명</span>{bizInfo?.name || shop.name}</span>
+            <div className="flex items-center">
+              <span className="font-bold text-gray-600 shrink-0 w-[76px]">업소명</span>
+              <span className="text-gray-300 mx-2 shrink-0">|</span>
+              <span>{bizInfo?.name || shop.name}</span>
             </div>
             {bizInfo?.business_reg_number && (
-              <div className="flex items-start gap-1.5">
-                <span className="text-gray-400 font-bold shrink-0">·</span>
-                <span><span className="font-bold text-gray-600 mr-1">사업자번호</span>{maskBizNum(bizInfo.business_reg_number)}</span>
+              <div className="flex items-center">
+                <span className="font-bold text-gray-600 shrink-0 w-[76px]">사업자번호</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
+                <span>{maskBizNum(bizInfo.business_reg_number)}</span>
               </div>
             )}
             {bizInfo?.license_number && (
-              <div className="flex items-start gap-1.5">
-                <span className="text-gray-400 font-bold shrink-0">·</span>
-                <span><span className="font-bold text-gray-600 mr-1">영업허가번호</span>{maskLicenseNum(bizInfo.license_number)}</span>
+              <div className="flex items-center">
+                <span className="font-bold text-gray-600 shrink-0 w-[76px]">영업허가번호</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
+                <span>{maskLicenseNum(bizInfo.license_number)}</span>
               </div>
             )}
             {openedAt && (
-              <div className="flex items-start gap-1.5">
-                <span className="text-gray-400 font-bold shrink-0">·</span>
-                <span><span className="font-bold text-gray-600 mr-1">개업일</span>{openedAt}{yearsOpen ? ` (오픈 ${yearsOpen})` : ''}</span>
+              <div className="flex items-center">
+                <span className="font-bold text-gray-600 shrink-0 w-[76px]">개업일</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
+                <span>{openedAt}{yearsOpen ? ` (오픈 ${yearsOpen})` : ''}</span>
               </div>
             )}
             {(roomCount || bizInfo?.floor_area) && (
-              <div className="flex items-start gap-1.5">
-                <span className="text-gray-400 font-bold shrink-0">·</span>
+              <div className="flex items-center">
+                <span className="font-bold text-gray-600 shrink-0 w-[76px]">업소 규모</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
                 <span>
-                  <span className="font-bold text-gray-600 mr-1">업소 규모</span>
                   {roomCount ? `룸 ${roomCount}개` : ''}
                   {roomCount && bizInfo?.floor_area ? ' ' : ''}
                   {bizInfo?.floor_area ? `(${bizInfo.floor_area}㎡)` : ''}
@@ -468,14 +470,14 @@ export default function ShopDetailView({
               </div>
             )}
             {managerName && (
-              <div className="flex items-start gap-1.5">
-                <span className="text-gray-400 font-bold shrink-0">·</span>
+              <div className="flex items-center flex-wrap gap-y-0">
+                <span className="font-bold text-gray-600 shrink-0 w-[76px]">채용담당자</span>
+                <span className="text-gray-300 mx-2 shrink-0">|</span>
                 <span className="flex items-center flex-wrap gap-x-1">
-                  <span className="font-bold text-gray-600">채용담당자</span>
                   <span>{maskName(managerName)} {managerRole}</span>
                   {managerPhone && (
                     <>
-                      <span className="text-gray-400">·</span>
+                      <span className="text-gray-300">·</span>
                       <span>{formatPhone(managerPhone)}</span>
                       <button
                         onClick={() => requireVerification(() => { window.location.href = `tel:${managerPhone}`; })}
@@ -488,8 +490,9 @@ export default function ShopDetailView({
                 </span>
               </div>
             )}
-            <div className="flex items-start gap-1.5">
-              <span className="text-gray-400 font-bold shrink-0">·</span>
+            <div className="flex items-center">
+              <span className="font-bold text-gray-600 shrink-0 w-[76px]">영업 현황</span>
+              <span className="text-gray-300 mx-2 shrink-0">|</span>
               <span>{todayStr} <span className="text-emerald-600 font-black">정상 영업 중</span></span>
             </div>
           </div>
