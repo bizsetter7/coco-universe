@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import {
     ShieldCheck,
@@ -17,7 +18,11 @@ import { HealthDashboard } from '@/components/admin/HealthDashboard';
 import { supabase } from '@/lib/supabase';
 import { StandardsGuardView } from './components/StandardsGuardView';
 import { AdminTab } from '@/components/admin/AdminSidebar';
-import { AdminStatsOverview } from '@/components/admin/dashboard/AdminStatsOverview';
+// chart.js를 메인 번들에서 분리 (어드민 통계 화면 진입 시에만 로드)
+const AdminStatsOverview = dynamic(
+  () => import('@/components/admin/dashboard/AdminStatsOverview').then(mod => mod.AdminStatsOverview),
+  { ssr: false, loading: () => <div className="p-8 text-center text-sm text-gray-400">통계 로딩 중...</div> }
+);
 import { useSearchParams } from 'next/navigation';
 
 

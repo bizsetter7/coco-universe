@@ -5,7 +5,7 @@ import {
   X, MapPin, Phone, MessageCircle, Heart, Share2,
   ChevronDown, CheckCircle2,
   Gift, Navigation, Briefcase, Clock, ExternalLink,
-  ChevronRight, AlertTriangle, MessageSquare, Copy
+  ChevronRight, MessageSquare, Copy
 } from 'lucide-react';
 import { Shop } from '@/types/shop';
 import { formatKoreanMoney } from '@/utils/formatMoney';
@@ -42,6 +42,13 @@ const maskBizNum = (num: string | null | undefined): string => {
   const clean = num.replace(/[^0-9]/g, '');
   if (clean.length >= 8) return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6, 8)}**`;
   return num;
+};
+
+// 영업허가번호 마스킹: 뒤 2자리 **
+const maskLicenseNum = (num: string | null | undefined): string => {
+  if (!num) return '-';
+  if (num.length <= 2) return '**';
+  return num.slice(0, -2) + '**';
 };
 
 // 날짜 포맷: ISO → 2025.02.20
@@ -94,12 +101,15 @@ export default function ShopDetailView({
     is_verified: boolean;
     manager_name: string | null;
     manager_phone: string | null;
+    manager_role: string | null;
     name: string | null;
     room_count: number | null;
     floor_area: number | null;
     opened_at: string | null;
     license_url: string | null;
     description: string | null;
+    business_reg_number: string | null;
+    license_number: string | null;
   } | null>(null);
 
   // 인근지역 채용정보
@@ -109,7 +119,7 @@ export default function ShopDetailView({
     if (!shop.user_id) return;
     supabase
       .from('businesses')
-      .select('cocoalba_tier, verified_at, is_verified, manager_name, manager_phone, name, room_count, floor_area, opened_at, license_url, description')
+      .select('cocoalba_tier, verified_at, is_verified, manager_name, manager_phone, manager_role, name, room_count, floor_area, opened_at, license_url, description, business_reg_number, license_number')
       .eq('owner_id', shop.user_id)
       .single()
       .then(({ data }) => { if (data) setBizInfo(data as any); });
@@ -165,13 +175,25 @@ export default function ShopDetailView({
   // 파생 값
   const managerName = bizInfo?.manager_name || (shop as any).manager_name || shop.managerName || '';
   const managerPhone = bizInfo?.manager_phone || (shop as any).manager_phone || shop.phone || '';
+  const managerRole = bizInfo?.manager_role || '사장';
   const verifiedAt = formatDate(bizInfo?.verified_at);
   const tier = bizInfo?.cocoalba_tier || shop.tier || null;
   const openedAt = formatDate(bizInfo?.opened_at);
   const yearsOpen = calcYears(bizInfo?.opened_at);
   const roomCount = bizInfo?.room_count;
 
-  const regionFull = [shop.region, shop.options?.regionGu].filter(Boolean).join(' ');
+  const regionGu = shop.options?.regionGu || '';
+  const regionFull = regionGu && !shop.region?.includes(regionGu)
+    ? `${shop.region} ${regionGu}`.trim()
+    : shop.region || '';
+
+  const todayStr = (() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}년 ${m}월 ${d}일`;
+  })();
   const ageMin = shop.options?.ageMin;
   const ageMax = shop.options?.ageMax;
   const ageLabel = (ageMin && ageMax) ? `${ageMin}~${ageMax}세` : shop.age ? `${shop.age}대` : '나이 무관';
@@ -270,7 +292,7 @@ export default function ShopDetailView({
           <h2 className="text-xl font-black text-gray-900 break-keep mb-2 leading-tight">{shop.name}</h2>
           {(managerName || managerPhone) && (
             <div className="flex items-center gap-2 flex-wrap">
-              {managerName && <span className="text-[13px] text-gray-600 font-medium">{maskName(managerName)} 사장</span>}
+              {managerName && <span className="text-[13px] text-gray-600 font-medium">{maskName(managerName)} {managerRole}</span>}
               {managerPhone && (
                 <>
                   <span className="text-[13px] text-gray-500">{formatPhone(managerPhone)}</span>
@@ -305,6 +327,28 @@ export default function ShopDetailView({
           <div className="text-[10px] text-gray-500 mt-1">협의 가능</div>
         </div>
 
+        {/* 안심하고 지원하세요 */}
+        {bizInfo?.is_verified && (
+          <div className="mx-4 mb-4 bg-emerald-50 rounded-2xl border border-emerald-100 p-4">
+            <h3 className="text-[13px] font-black text-emerald-800 mb-2.5">✅ 안심하고 지원하세요!</h3>
+            <div className="flex flex-wrap gap-2">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-full text-[11px] font-black text-emerald-700">
+                <CheckCircle2 size={11} className="text-emerald-500" />
+                사업자 인증 완료
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-full text-[11px] font-black text-emerald-700">
+                <CheckCircle2 size={11} className="text-emerald-500" />
+                영업허가증 확인
+              </span>
+              {verifiedAt && (
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-200 rounded-full text-[11px] font-bold text-emerald-600">
+                  {verifiedAt} 인증
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* 업체 기본정보 2열 */}
         <div className="mx-4 mb-4 grid grid-cols-2 gap-2">
           {[
@@ -321,20 +365,22 @@ export default function ShopDetailView({
         </div>
 
         {/* 근무 조건 */}
-        <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-50">
-            <h3 className="text-[14px] font-black text-gray-900">근무 조건</h3>
-          </div>
-          <div className="divide-y divide-gray-50">
+        <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-100 p-4">
+          <h3 className="text-[14px] font-black text-gray-900 mb-3">근무 조건</h3>
+          <div className="space-y-2">
             {[
               { label: '모집 직종', value: shop.workType || catLabel },
               { label: '모집 나이', value: ageLabel },
               { label: '근무 시간', value: shop.workTime || '협의' },
               { label: '고용 형태', value: shop.payType || '파트타임' },
+              ...(shop.options?.workCareer ? [{ label: '경력 조건', value: shop.options.workCareer }] : []),
             ].map((row, i) => (
-              <div key={i} className="flex items-start gap-3 px-4 py-3">
-                <span className="text-[11px] text-gray-400 font-bold w-18 shrink-0 pt-0.5">{row.label}</span>
-                <span className="text-[12px] font-bold text-gray-800 flex-1 leading-snug">{row.value}</span>
+              <div key={i} className="flex items-start gap-1.5 text-[13px] text-gray-700">
+                <span className="text-gray-400 shrink-0 font-bold">·</span>
+                <span>
+                  <span className="font-bold text-gray-500 mr-1">{row.label}</span>
+                  {row.value}
+                </span>
               </div>
             ))}
           </div>
@@ -384,35 +430,67 @@ export default function ShopDetailView({
         )}
 
         {/* ═══ 가게 정보 ═══ */}
-        <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-50">
-            <h3 className="text-[14px] font-black text-gray-900">가게 정보</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-px bg-gray-100">
-            {[
-              { label: '업소명', value: bizInfo?.name || shop.name },
-              { label: '업소규모', value: roomCount ? `룸 ${roomCount}개` : '-' },
-              { label: '영업허가', value: '정상영업' },
-              {
-                label: '개업일',
-                value: openedAt ? `${openedAt}${yearsOpen ? `\n(${yearsOpen})` : ''}` : '-'
-              },
-              { label: '채용담당자', value: maskName(managerName) + ' 사장' },
-              { label: '연락처', value: formatPhone(managerPhone) || '-' },
-            ].map((cell, i) => (
-              <div key={i} className="bg-white px-4 py-3">
-                <div className="text-[10px] text-gray-400 font-bold mb-1">{cell.label}</div>
-                <div className="text-[12px] font-black text-gray-800 whitespace-pre-line leading-snug">{cell.value || '-'}</div>
-                {cell.label === '채용담당자' && managerPhone && (
-                  <button
-                    onClick={() => requireVerification(() => { window.location.href = `tel:${managerPhone}`; })}
-                    className="text-[10px] text-blue-500 font-bold mt-1"
-                  >
-                    전화걸기
-                  </button>
-                )}
+        <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-100 p-4">
+          <h3 className="text-[14px] font-black text-gray-900 mb-3">가게 정보</h3>
+          <div className="space-y-2 text-[13px] text-gray-700">
+            <div className="flex items-start gap-1.5">
+              <span className="text-gray-400 font-bold shrink-0">·</span>
+              <span><span className="font-bold text-gray-500 mr-1">업소명</span>{bizInfo?.name || shop.name}</span>
+            </div>
+            {bizInfo?.business_reg_number && (
+              <div className="flex items-start gap-1.5">
+                <span className="text-gray-400 font-bold shrink-0">·</span>
+                <span><span className="font-bold text-gray-500 mr-1">사업자번호</span>{maskBizNum(bizInfo.business_reg_number)}</span>
               </div>
-            ))}
+            )}
+            {bizInfo?.license_number && (
+              <div className="flex items-start gap-1.5">
+                <span className="text-gray-400 font-bold shrink-0">·</span>
+                <span><span className="font-bold text-gray-500 mr-1">영업허가번호</span>{maskLicenseNum(bizInfo.license_number)}</span>
+              </div>
+            )}
+            {openedAt && (
+              <div className="flex items-start gap-1.5">
+                <span className="text-gray-400 font-bold shrink-0">·</span>
+                <span><span className="font-bold text-gray-500 mr-1">개업일</span>{openedAt}{yearsOpen ? ` (오픈 ${yearsOpen})` : ''}</span>
+              </div>
+            )}
+            {(roomCount || bizInfo?.floor_area) && (
+              <div className="flex items-start gap-1.5">
+                <span className="text-gray-400 font-bold shrink-0">·</span>
+                <span>
+                  <span className="font-bold text-gray-500 mr-1">업소 규모</span>
+                  {roomCount ? `룸 ${roomCount}개` : ''}
+                  {roomCount && bizInfo?.floor_area ? ' ' : ''}
+                  {bizInfo?.floor_area ? `(${bizInfo.floor_area}㎡)` : ''}
+                </span>
+              </div>
+            )}
+            {managerName && (
+              <div className="flex items-start gap-1.5">
+                <span className="text-gray-400 font-bold shrink-0">·</span>
+                <span className="flex items-center flex-wrap gap-x-1">
+                  <span className="font-bold text-gray-500">채용담당자</span>
+                  <span>{maskName(managerName)} {managerRole}</span>
+                  {managerPhone && (
+                    <>
+                      <span className="text-gray-400">·</span>
+                      <span>{formatPhone(managerPhone)}</span>
+                      <button
+                        onClick={() => requireVerification(() => { window.location.href = `tel:${managerPhone}`; })}
+                        className="text-blue-500 font-black text-[12px]"
+                      >
+                        전화
+                      </button>
+                    </>
+                  )}
+                </span>
+              </div>
+            )}
+            <div className="flex items-start gap-1.5">
+              <span className="text-gray-400 font-bold shrink-0">·</span>
+              <span>{todayStr} <span className="text-emerald-600 font-black">정상 영업 중</span></span>
+            </div>
           </div>
         </div>
 
@@ -554,7 +632,7 @@ export default function ShopDetailView({
                 >
                   <div className="relative w-full bg-gray-100" style={{ aspectRatio: '4/3' }}>
                     {img && !imgFailed ? (
-                      <img src={img} alt={s.name} className="w-full h-full object-cover"
+                      <img src={img} alt={s.name} loading="lazy" decoding="async" className="w-full h-full object-cover"
                         onError={() => setImgErrors(prev => new Set([...prev, s.id]))} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">

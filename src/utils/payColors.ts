@@ -23,7 +23,8 @@ export const getPayColor = (payType: string = '') => {
 export const getPayAbbreviation = (payType: string = '') => {
     if (!payType) return '협';
     const type = payType.trim();
-    if (type.startsWith('TC') || type === 'T') return 'T';
+    if (type.startsWith('TC')) return 'TC';
+    if (type === 'T') return 'T';
     if (type.includes('시급') || type === '시') return '시';
     if (type.includes('일급') || type.includes('일')) return '일';
     if (type.includes('주급') || type.includes('주')) return '주';
