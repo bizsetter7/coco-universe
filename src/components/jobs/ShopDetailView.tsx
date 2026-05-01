@@ -373,6 +373,7 @@ export default function ShopDetailView({
               { label: '모집 나이', value: ageLabel },
               { label: '근무 시간', value: shop.workTime || '협의' },
               { label: '고용 형태', value: shop.payType || '파트타임' },
+              ...(shop.options?.workClothes ? [{ label: '근무 복장', value: String(shop.options.workClothes) }] : []),
               ...(shop.options?.workCareer ? [{ label: '경력 조건', value: shop.options.workCareer }] : []),
             ].map((row, i) => (
               <div key={i} className="flex items-start gap-1.5 text-[13px] text-gray-700">
