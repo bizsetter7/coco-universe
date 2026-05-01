@@ -591,15 +591,15 @@ export default function ShopDetailView({
           </div>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { icon: '🔒', label: '보이스피싱 주의' },
-              { icon: '⚠️', label: '취업 사기 주의' },
-              { icon: '📋', label: '허위광고, 임금체불 신고' },
-              { icon: '📢', label: '체불사업주 명단공개' },
+              { icon: '🔒', label: '보이스피싱 주의', href: 'https://www.moel.go.kr/news/cardinfo/view.do?bbs_seq=20220800325' },
+              { icon: '⚠️', label: '취업 사기 주의', href: 'https://www.cocoalba.kr/customer-center?tab=notice' },
+              { icon: '📋', label: '허위광고, 임금체불 신고', href: 'https://www.moel.go.kr/minwon/apply/formApplyList.do' },
+              { icon: '📢', label: '체불사업주 명단공개', href: 'https://www.moel.go.kr/info/defaulter/list.do' },
             ].map((btn, i) => (
-              <button key={i} className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors text-left">
+              <a key={i} href={btn.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors text-left">
                 <span className="text-base">{btn.icon}</span>
                 <span className="text-[10px] font-bold text-gray-600 leading-tight">{btn.label}</span>
-              </button>
+              </a>
             ))}
           </div>
         </div>
