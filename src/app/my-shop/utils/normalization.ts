@@ -84,18 +84,11 @@ export const normalizeAd = (ad: any) => {
         status: ad.status || opt.status || '진행중',
         rejection_reason: ad.rejection_reason || opt.rejection_reason || '',
 
-        // region — BannerSidebar SideAdCard에서 ad.region으로 직접 사용
         region: getValid(ad.region, opt.regionCity, ''),
 
-        // 미디어 URL — 카드 썸네일용 (banner_image_url과 별도)
+        // 미디어 URL — 카드 썸네일용
         mediaUrl: getValid(ad.media_url || ad.mediaUrl, opt.mediaUrl, ''),
         media_url: getValid(ad.media_url || ad.mediaUrl, opt.mediaUrl, ''),
-
-        // 배너 슬롯 (migration 06 이후 반영)
-        banner_position: ad.banner_position || null,
-        banner_image_url: ad.banner_image_url || null,
-        banner_media_type: ad.banner_media_type || 'image',
-        banner_status: ad.banner_status || null,
 
         // 상품 및 디자인 옵션
         productType: ad.tier || ad.productType || ad.product_type || opt.product_type || ad.ad_type || 'p1',
