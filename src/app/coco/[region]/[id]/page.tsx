@@ -357,7 +357,7 @@ export default async function ShopDetailPage({ params }: Props) {
                     work_type:  shop.workType || shop.category,
                     pay:        shop.pay,
                     pay_type:   shop.payType,
-                    pay_amount: shop.payAmount,
+                    pay_amount: shop.pay_amount,
                 }),
                 "representativeOfPage": true
             }

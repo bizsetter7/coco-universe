@@ -46,13 +46,6 @@ import { PointShopView } from './components/PointShopView';
 
 // Removed problematic ErrorBoundary class for framework compatibility
 // --- Constants (Exported for sub-components) ---
-import { JOB_CATEGORY_MAP as INDUSTRY_DATA_MAP } from '@/constants/jobs';
-import { REGIONS_MAP as REGION_DATA_MAP } from '@/constants/regions';
-import { PAY_TYPES as PAY_TYPES_CONST } from '@/constants/job-options';
-
-export const INDUSTRY_DATA = INDUSTRY_DATA_MAP;
-export const REGION_DATA = REGION_DATA_MAP;
-export const PAY_TYPES = PAY_TYPES_CONST;
 
 export default function MyShopPage() {
     // Force rebuild
@@ -151,7 +144,7 @@ function MyShopContent() {
 
             // 야사장 회원 감지: 등록된 공고 중 yasajang_business_id 옵션이 있으면 야사장 구독 회원
             const hasYasajang = finalAds.some(
-                ad => ad?.options?.yasajang_business_id || ad?.rawOptions?.yasajang_business_id
+                ad => ad?.options?.yasajang_business_id
             );
             setIsYasajangMember(hasYasajang);
 

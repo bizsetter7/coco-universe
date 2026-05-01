@@ -10,14 +10,15 @@ import ShopDetailView from '@/components/jobs/ShopDetailView';
 export const dynamic = 'force-dynamic';
 
 interface Props {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 // 1. Generate Metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const shop = (shopsData as Shop[]).find((s) => s.id === params.id);
+    const { id } = await params;
+    const shop = (shopsData as Shop[]).find((s) => s.id === id);
 
     if (!shop) {
         return {
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title: `${shop.name} 채용정보 - 코코알바`,
             description,
-            url: `https://cocoalba.kr/jobs/${params.id}`,
+            url: `https://cocoalba.kr/jobs/${id}`,
             siteName: '코코알바',
             type: 'article',
         },
@@ -51,8 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // 2. Page Component
-export default function JobDetailPage({ params }: Props) {
-    const shop = (shopsData as Shop[]).find((s) => s.id === params.id);
+export default async function JobDetailPage({ params }: Props) {
+    const { id } = await params;
+    const shop = (shopsData as Shop[]).find((s) => s.id === id);
 
     if (!shop) {
         notFound();
@@ -68,7 +70,7 @@ export default function JobDetailPage({ params }: Props) {
         "@type": "WebPage",
         "name": `${shop.name} - ${regionName} 채용정보`,
         "description": `${shop.name}에서 ${category} 파트를 채용합니다.`,
-        "url": `https://cocoalba.kr/jobs/${params.id}`,
+        "url": `https://cocoalba.kr/jobs/${id}`,
         "publisher": { "@type": "Organization", "name": "코코알바" }
     };
 
@@ -78,7 +80,7 @@ export default function JobDetailPage({ params }: Props) {
         "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "홈", "item": "https://cocoalba.kr" },
             { "@type": "ListItem", "position": 2, "name": "채용정보", "item": "https://cocoalba.kr/jobs" },
-            { "@type": "ListItem", "position": 3, "name": `${shop.name} 채용`, "item": `https://cocoalba.kr/jobs/${params.id}` }
+            { "@type": "ListItem", "position": 3, "name": `${shop.name} 채용`, "item": `https://cocoalba.kr/jobs/${id}` }
         ]
     };
 
