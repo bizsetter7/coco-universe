@@ -88,17 +88,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     .eq('id', authUser.id)
                     .single();
 
-                // 새 점프 시스템 (2026-04-30) — user_jumps 합산
-                // subscription_balance(구독 무료) + package_balance(패키지 충전) + auto_remaining_today(오늘 자동)
+                // 점프 잔액 표시 — subscription_balance 단독 사용
+                // 자정 cron(daily-jump-tasks)이 subscription_balance +1/일 적립
+                // package_balance(패키지 충전)/auto_remaining_today(자동)는 실제 사용 시 차감되지만 표시에 합산 안 함
                 const { data: userJump } = await supabase
                     .from('user_jumps')
-                    .select('subscription_balance, package_balance, auto_remaining_today')
+                    .select('subscription_balance')
                     .eq('user_id', authUser.id)
                     .maybeSingle();
-                const totalJumpBalance =
-                    (userJump?.subscription_balance ?? 0) +
-                    (userJump?.package_balance ?? 0) +
-                    (userJump?.auto_remaining_today ?? 0);
+                const totalJumpBalance = userJump?.subscription_balance ?? 0;
 
                 // 신규 사용자 또는 다른 사용자 로그인 시 이전 프로필 이미지 캐시 완전 초기화
                 // cachedUserId 없음(= 처음 로그인 or 신규가입) 포함하여 항상 초기화
