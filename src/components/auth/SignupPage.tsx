@@ -347,9 +347,12 @@ export const SignupPage = () => {
 
         setIsLoading(true);
         try {
-            const emailId = role === 'individual' ? iId : cId;
+            const username = role === 'individual' ? iId : cId;
             const pw = role === 'individual' ? iPw : cPw;
-            await signUp(`${emailId}@cocoalba.kr`, pw, {
+            // [FIXED] auth.email = 실제 이메일(contact_email) 사용 — fake @cocoalba.kr 제거
+            // 로그인 시 회원이 입력한 실제 이메일이 auth email과 일치해야 정상 로그인 가능
+            const contactEmail = role === 'individual' ? iEmail : cEmail;
+            await signUp(contactEmail, pw, {
                 name: role === 'individual' ? iName : cManager,
                 nickname: role === 'individual' ? iNickname : undefined,
                 role,
@@ -357,7 +360,8 @@ export const SignupPage = () => {
                 birthdate: role === 'individual' ? iBirth : cBirth,
                 gender: role === 'individual' ? iGender : cGender,
                 identity_ci: verifyResult?.ci,
-                contact_email: role === 'individual' ? iEmail : cEmail,
+                username,           // 사용자가 선택한 아이디 — API에서 profiles.username에 저장
+                contact_email: contactEmail,
             });
             goStep(3);
         } catch (err: any) {
