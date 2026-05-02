@@ -68,6 +68,7 @@ export function PointShopView({ brand, shopName, userId, onOpenMenu }: PointShop
                 status: 'pending',
                 method: 'bank_transfer',
                 description: chargeDesc,
+                platform: 'cocoalba',  // ⭐ Phase A-4 (P-08 SSOT)
                 metadata: {
                     type: isPoint ? 'point_charge' : 'jump_charge',
                     packageId: pkg.id,

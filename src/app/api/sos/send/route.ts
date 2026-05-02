@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
                 amount: pointCost,
                 status: 'completed',
                 pay_type: 'SOS',        // ✅ pay_type (type 컬럼 없음)
+                platform: 'cocoalba',   // ⭐ Phase A-4 (P-08 SSOT)
                 method: 'points',
                 description: `[SOS] ${shopName} — ${recipientCount}명 발송`,
                 metadata: {

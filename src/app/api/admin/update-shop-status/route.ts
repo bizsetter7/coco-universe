@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
                     amount: adPrice,          // integer
                     status: 'completed',
                     pay_type: 'AD',           // pay_type (type 컬럼 없음)
+                    platform: 'cocoalba',     // ⭐ Phase A-4 (P-08 SSOT)
                     method: 'bank_transfer',
                     description: `[관리자승인] ${shopName} 결제 완료`,
                     created_at: nowIso,

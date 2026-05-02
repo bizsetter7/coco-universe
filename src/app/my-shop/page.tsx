@@ -868,6 +868,8 @@ function MyShopContent() {
                             dbPayload[col] = val;
                         }
                     });
+                    // ⭐ Phase A — shops.platform 명시 (P-08 SSOT, M-062 회귀 방지)
+                    dbPayload.platform = 'cocoalba';
 
                     const { data, error } = await supabase.from('shops').insert([dbPayload]).select().single();
                     if (error) throw new Error(`DB 삽입 실패: ${error.message}`);
@@ -916,7 +918,8 @@ function MyShopContent() {
                     },
                     created_at: new Date().toISOString()
                 };
-                const { error } = await supabase.from('payments').insert([paymentData]);
+                // ⭐ Phase A-4: payments.platform 명시 (P-08 SSOT)
+                const { error } = await supabase.from('payments').insert([{ ...paymentData, platform: 'cocoalba' }]);
                     if (error) {
                         console.error("Payment log failed", error);
                         alert(`결제 내역 생성 실패: ${error.message}`);
@@ -1066,7 +1069,8 @@ function MyShopContent() {
                     created_at: new Date().toISOString(),
                 };
 
-                const { error } = await supabase.from('payments').insert([paymentData]);
+                // ⭐ Phase A-4: payments.platform 명시 (P-08 SSOT)
+                const { error } = await supabase.from('payments').insert([{ ...paymentData, platform: 'cocoalba' }]);
                 if (error) {
                     console.error('연장 결제 내역 생성 실패:', error);
                     alert(`연장 신청 실패: ${error.message}`);
