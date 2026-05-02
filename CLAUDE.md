@@ -4,10 +4,12 @@
 > **용도**: 새 에이전트(Claude Code / Antigravity) 세션 시작 시 즉시 컨텍스트 획득용
 >
 > **[필독] 작업 시작 전 반드시 읽어야 할 선행 문서**
-> 1. `D:\토탈프로젝트\My-site\p1.choco-idea\MISTAKES_LOG.md` — 공통 실수 방지 체크리스트 ⭐
-> 2. `D:\토탈프로젝트\My-site\p1.choco-idea\AI_SOP.md` — 전사 운영 철학 + 절대 수칙
-> 3. `D:\토탈프로젝트\My-site\p1.choco-idea\SEO_GEO_MASTERY_LOG.md` — SEO/GEO 베스트프랙티스
-> 4. `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템\CLAUDE.md` — 이 파일 (P2 기술 가이드)
+> 1. `D:\토탈프로젝트\My-site\p1.choco-idea\PATTERNS\INDEX.md` — ⭐ 재사용 패턴 (P-01~P-06) 2026-05-02 신규
+> 2. `D:\토탈프로젝트\My-site\p1.choco-idea\MISTAKES_LOG.md` — 공통 실수 방지 체크리스트 (M-001~M-062)
+> 3. `D:\토탈프로젝트\My-site\p1.choco-idea\AI_SOP.md` — 전사 운영 철학 + 절대 수칙
+> 4. `D:\토탈프로젝트\My-site\p1.choco-idea\SEO_GEO_MASTERY_LOG.md` — SEO/GEO 베스트프랙티스
+> 5. `D:\토탈프로젝트\My-site\p1.choco-idea\RECIPES\R-01_new_brand_clone.md` — 신규 브랜드 시작 가이드
+> 6. `D:\토탈프로젝트\My-site\p2.브랜드_통합_시스템\CLAUDE.md` — 이 파일 (P2 기술 가이드)
 
 ---
 
