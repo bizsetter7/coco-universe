@@ -643,9 +643,21 @@ function MyShopContent() {
                 return;
             }
 
-            // [Phase A 정정] STEP3(메인 광고 상품)·STEP4(부스터) 제거됨 — 야사장 구독/입점 방식으로 변경
+            // [Phase A 정정] STEP3·STEP4 제거됨 — 야사장 구독/입점 방식
             // 기존 selectedAdProduct·borderOption 검증은 잔재 코드. 제거하지 않으면 등록 막힘.
-            // 부스터는 별도 결제(부스터 탭) — 광고 등록 단계에서 검증 불필요.
+
+            // [Phase F 임시 차단 — 추가광고 결제 시스템 구현 전까지]
+            // 야사장 구독자 외 일반 회원이 두 번째 이상 광고 등록 시도 시 결제 안내 + 차단
+            if (!editingAdId && registeredAds.length > 0 && !isYasajangMember) {
+                alert(
+                    '⚠️ 추가광고 등록 안내\n\n' +
+                    '두 번째 이상 광고 등록은 66,000원/월 결제가 필요합니다.\n' +
+                    '(3개월 5% 할인 / 6개월 10% 할인)\n\n' +
+                    '결제 시스템이 곧 오픈됩니다. 잠시 후 다시 시도해주세요.\n' +
+                    '문의: 1877-1442'
+                );
+                return;
+            }
 
             setIsSaving(true);
             // [Fix] 에디터 내용 최종 동기화 강제 (저장 직전)
