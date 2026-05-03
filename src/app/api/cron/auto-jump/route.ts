@@ -7,32 +7,14 @@ function getAdmin() {
     return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
 }
 
-// [Fix] constants.ts getJumpConfig와 동일한 매핑 (서버 사이드 독립 정의)
+// 야사장 구독 플랜 기준 자동 점프 설정 (M-060 정책표)
+// premium: 8회/일(3h), deluxe: 6회/일(4h), special: 3회/일(8h), standard/basic: 0
 const JUMP_AUTO_CONFIG: Record<string, { auto: number; intervalHours: number }> = {
-    // id 기준
-    p1: { auto: 8, intervalHours: 3 },
-    p2: { auto: 8, intervalHours: 3 },
-    p3: { auto: 6, intervalHours: 4 },
-    p4: { auto: 6, intervalHours: 4 },
-    p5: { auto: 3, intervalHours: 8 },
-    p6: { auto: 0, intervalHours: 0 },
-    p7: { auto: 0, intervalHours: 0 },
-    // altId 기준 (레거시 DB 데이터 호환)
-    grand:       { auto: 8, intervalHours: 3 },
-    premium:     { auto: 8, intervalHours: 3 },
-    deluxe:      { auto: 6, intervalHours: 4 },
-    special:     { auto: 6, intervalHours: 4 },
-    recommended: { auto: 3, intervalHours: 8 },
-    native:      { auto: 0, intervalHours: 0 },
-    basic:       { auto: 0, intervalHours: 0 },
-    // 한글 tier명 기준 (레거시)
-    '그랜드':   { auto: 8, intervalHours: 3 },
-    '프리미엄': { auto: 8, intervalHours: 3 },
-    '디럭스':   { auto: 6, intervalHours: 4 },
-    '스페셜':   { auto: 6, intervalHours: 4 },
-    '급구/추천':{ auto: 3, intervalHours: 8 },
-    '네이티브': { auto: 0, intervalHours: 0 },
-    '베이직':   { auto: 0, intervalHours: 0 },
+    premium:  { auto: 8, intervalHours: 3 },
+    deluxe:   { auto: 6, intervalHours: 4 },
+    special:  { auto: 3, intervalHours: 8 },
+    standard: { auto: 0, intervalHours: 0 },
+    basic:    { auto: 0, intervalHours: 0 },
 };
 
 function resolveAutoJumpConfig(rawTier: string) {
