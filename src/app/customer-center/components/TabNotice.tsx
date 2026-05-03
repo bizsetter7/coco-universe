@@ -113,7 +113,7 @@ interface DbNotice {
 
 export const TabNotice = () => {
     const brand = useBrand();
-    const [expandedNotice, setExpandedNotice] = useState<number | null>(null);
+    const [expandedKey, setExpandedKey] = useState<string | null>(null);
     const [dbNotices, setDbNotices] = useState<DbNotice[] | null>(null);
 
     useEffect(() => {
@@ -125,10 +125,18 @@ export const TabNotice = () => {
             .catch(() => {});
     }, []);
 
-    // DB 데이터 있으면 DB 우선, 없으면 하드코딩 fallback
-    const notices = dbNotices
-        ? dbNotices.map(n => ({ id: n.id, title: n.title, date: n.published_at?.slice(0, 10) ?? '', isNew: true, category: n.badge, content: n.content, type: undefined as string | undefined }))
-        : HARDCODED_NOTICES;
+    // DB 공지(어드민 등록)는 맨 앞에, 하드코딩 9건은 항상 유지 (병합)
+    const dbItems = (dbNotices ?? []).map(n => ({
+        key: `db-${n.id}`,
+        title: n.title,
+        date: n.published_at?.slice(0, 10) ?? '',
+        isNew: true,
+        category: n.badge,
+        content: n.content,
+        type: undefined as string | undefined,
+    }));
+    const hcItems = HARDCODED_NOTICES.map(n => ({ ...n, key: `hc-${n.id}` }));
+    const notices = [...dbItems, ...hcItems];
 
     return (
         <div className="space-y-2 md:space-y-3">
@@ -140,10 +148,10 @@ export const TabNotice = () => {
                 </div>
             </div>
             {notices.map((notice, idx) => (
-                <div key={notice.id} className={`${idx !== notices.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
+                <div key={notice.key} className={`${idx !== notices.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
                     <div
-                        onClick={() => setExpandedNotice(expandedNotice === notice.id ? null : notice.id)}
-                        className={`p-3 md:p-4 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
+                        onClick={() => setExpandedKey(expandedKey === notice.key ? null : notice.key)}
+                        className={`p-3 md:p-4 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedKey === notice.key ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}
                     >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             <span className={`w-12 h-6 flex items-center justify-center shrink-0 rounded text-[10px] font-black ${notice.category === '필독' ? 'bg-red-600 text-white' : notice.category === '공지' ? 'bg-gray-900 text-white' : notice.category === '점검' ? 'bg-gray-400 text-white' : 'bg-[#f82b60] text-white'}`}>
@@ -160,12 +168,12 @@ export const TabNotice = () => {
                             <span className="text-xs text-gray-600 font-bold flex items-center gap-1.5">
                                 <Clock size={16} /> {notice.date}
                             </span>
-                            <div className={`transition-transform duration-300 ${expandedNotice === notice.id ? 'rotate-180 text-[#f82b60]' : 'text-gray-300'}`}>
+                            <div className={`transition-transform duration-300 ${expandedKey === notice.key ? 'rotate-180 text-[#f82b60]' : 'text-gray-300'}`}>
                                 <ChevronDown size={20} />
                             </div>
                         </div>
                     </div>
-                    {expandedNotice === notice.id && (
+                    {expandedKey === notice.key && (
                         <div className={`p-4 md:p-8 pt-2 border-t text-[14px] md:text-[15px] leading-loose font-bold whitespace-pre-wrap animate-in slide-in-from-top-2 duration-300 ${brand.theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-100 text-gray-800'}`}>
                             {notice.type === 'rich-resume' ? (
                                 <ResumeNoticeDetail />
