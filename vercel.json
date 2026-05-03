@@ -18,7 +18,7 @@
     },
     {
       "path": "/api/cron/auto-jump",
-      "schedule": "0 */3 * * *"
+      "schedule": "0 18 * * *"
     }
   ]
 }
