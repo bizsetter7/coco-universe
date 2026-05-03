@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/expire-additional-ads",
       "schedule": "50 15 * * *"
+    },
+    {
+      "path": "/api/cron/auto-jump",
+      "schedule": "0 */3 * * *"
     }
   ]
 }
