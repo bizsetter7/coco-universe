@@ -1,5 +1,5 @@
 import React from 'react';
-import { Store, List, LogOut, User, CreditCard, Settings, ShieldCheck, Zap, Wallet, Coins, Sparkles } from 'lucide-react';
+import { Store, List, LogOut, User, CreditCard, Settings, ShieldCheck, Zap, Wallet, Coins, Sparkles, Megaphone } from 'lucide-react';
 
 export const BusinessSidebar = ({
     brand, shopName, nickname, view, setView
@@ -33,6 +33,7 @@ export const BusinessSidebar = ({
         { id: 'applicants', label: '지원자 관리', icon: User },
         { id: 'sos-alert', label: 'SOS 긴급구인', icon: Zap, highlight: true },
         { id: 'ad-boosting', label: '광고 부스팅', icon: Sparkles, highlightPurple: true },
+        { id: 'additional-ad', label: '추가광고 신청', icon: Megaphone, highlightBlue: true },
         { id: 'buy-points', label: '추가옵션안내', icon: Wallet },
         { id: 'payments', label: '유료 결제 내역', icon: CreditCard },
         { id: 'point-history', label: '포인트 및 점프 내역', icon: Coins },
@@ -91,7 +92,7 @@ export const BusinessSidebar = ({
                     <div
                         key={item.id}
                         onClick={() => setView(item.id)}
-                        className={`flex items-center gap-3 p-3 cursor-pointer font-bold text-sm ${item.borderTop ? 'border-t mt-2 pt-4' : ''} ${view === item.id ? activeItemStyle : inactiveItemStyle} ${(item as any).highlight && view !== item.id ? 'text-red-500' : ''} ${(item as any).highlightPurple && view !== item.id ? 'text-purple-500' : ''}`}
+                        className={`flex items-center gap-3 p-3 cursor-pointer font-bold text-sm ${item.borderTop ? 'border-t mt-2 pt-4' : ''} ${view === item.id ? activeItemStyle : inactiveItemStyle} ${(item as any).highlight && view !== item.id ? 'text-red-500' : ''} ${(item as any).highlightPurple && view !== item.id ? 'text-purple-500' : ''} ${(item as any).highlightBlue && view !== item.id ? 'text-blue-500' : ''}`}
                     >
                         <item.icon size={18} /> {item.label}
                     </div>

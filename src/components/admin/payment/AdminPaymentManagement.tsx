@@ -14,7 +14,7 @@ interface AdminPaymentManagementProps {
 export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAdForModal }: AdminPaymentManagementProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
-    const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION' | 'BOOST'>('all');
+    const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION' | 'BOOST' | 'ADDITIONAL_AD'>('all');
     const [recoverShopId, setRecoverShopId] = useState('');
     const [recoverResult, setRecoverResult] = useState<string | null>(null);
     const [isRecovering, setIsRecovering] = useState(false);
@@ -177,6 +177,38 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
         }
     };
 
+    const handleAdditionalAdActivate = async (paymentId: string, shopId: string, metadata: any) => {
+        const durationDays = metadata?.duration_days ?? 30;
+        const durationLabel = metadata?.duration_key === '1m' ? '1개월' : metadata?.duration_key === '3m' ? '3개월' : '6개월';
+        if (!confirm(`추가광고(${durationLabel}) 를 활성화하시겠습니까? shops.additional_ad_status='active' 처리됩니다.`)) return;
+
+        try {
+            const { error: payError } = await supabase
+                .from('payments')
+                .update({ status: 'completed' })
+                .eq('id', paymentId);
+            if (payError) throw payError;
+
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + durationDays);
+
+            const { error: shopError } = await supabase
+                .from('shops')
+                .update({
+                    additional_ad_status: 'active',
+                    additional_ad_expires_at: expiresAt.toISOString(),
+                })
+                .eq('id', Number(shopId));
+            if (shopError) throw shopError;
+
+            alert(`추가광고 활성화 완료! 만료일: ${expiresAt.toLocaleDateString('ko-KR')}`);
+            fetchData();
+        } catch (err: any) {
+            console.error('Additional ad activate error:', err);
+            alert(`오류: ${err.message || '알 수 없는 오류'}`);
+        }
+    };
+
     const formatPrice = (priceInWon: number) => {
         if (priceInWon >= 10000 && priceInWon % 10000 === 0) return `${priceInWon / 10000}만원`;
         return `${priceInWon.toLocaleString()}원`;
@@ -262,6 +294,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                         <option value="JUMP">점프 서비스</option>
                         <option value="OPTION">옵션 신청</option>
                         <option value="BOOST">부스팅</option>
+                        <option value="ADDITIONAL_AD">추가광고</option>
                     </select>
                 </div>
             </div>
@@ -372,7 +405,9 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                             ? handlePointGrant(pay.id, pay.user_id, pay.metadata)
                                                             : pay.pay_type === 'BOOST'
                                                                 ? handleBoostActivate(pay.id, pay.user_id, pay.shop_id, pay.metadata)
-                                                                : handlePaymentConfirm(pay.id, pay.shop_id)
+                                                                : pay.pay_type === 'ADDITIONAL_AD'
+                                                                    ? handleAdditionalAdActivate(pay.id, pay.shop_id, pay.metadata)
+                                                                    : handlePaymentConfirm(pay.id, pay.shop_id)
                                                     }
                                                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100"
                                                 >

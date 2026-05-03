@@ -10,6 +10,7 @@ import { usePreventLeave } from '@/hooks/usePreventLeave';
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
+import { normalizeRegionFull } from '@/lib/regionUtils';
 
 // --- Late Imports Moved to top ---
 import { PaymentsView } from './components/PaymentsView';
@@ -40,6 +41,7 @@ import { OngoingAdsView } from './components/OngoingAdsView';
 import { ClosedAdsView } from './components/ClosedAdsView';
 import { SosAlertView } from './components/SosAlertView';
 import { BoostingView } from './components/BoostingView';
+import { AdditionalAdView } from './components/AdditionalAdView';
 import { BankTransferModal } from './components/BankTransferModal';
 import { ExtendAdModal } from './components/ExtendAdModal';
 import { PointShopView } from './components/PointShopView';
@@ -269,13 +271,7 @@ function MyShopContent() {
                     if (addr) {
                         setBizAddress(detail ? `${addr} ${detail}` : addr);
                         const parts = addr.trim().split(/\s+/);
-                        // [Fix] 주소 약칭 → REGIONS_MAP 정식 키 변환 ('경기' → '경기도' 등)
-                        const REGION_ALIAS: Record<string, string> = {
-                            '경기': '경기도', '강원': '강원도', '경남': '경상남도', '경북': '경상북도',
-                            '전남': '전라남도', '전북': '전라북도', '충남': '충청남도', '충북': '충청북도',
-                            '제주': '제주도',
-                        };
-                        const city = REGION_ALIAS[parts[0]] || parts[0] || '';
+                        const city = normalizeRegionFull(parts[0]) || '';
                         // [M-059] 시/도·구군을 별도 state에 보존 → resetAdStates() 후 view=form 복원 useEffect에서 재적용
                         if (city) setProfileRegionCity(city);
                         if (parts[1]) setProfileRegionGu(parts[1]);
@@ -1350,6 +1346,18 @@ function MyShopContent() {
                                                     }}
                                                     setExampleType={setExampleType}
                                                     setShowExampleModal={setShowExampleModal}
+                                                />
+                                            )}
+                                            {view === 'additional-ad' && (
+                                                <AdditionalAdView
+                                                    brand={brand}
+                                                    ads={(registeredAds || []).filter(ad => !ad?.isClosed)}
+                                                    userId={authUser?.id ?? ''}
+                                                    onOpenBankModal={(amount, title) => {
+                                                        setBankModalAmount(amount);
+                                                        setBankModalTitle(title);
+                                                        setShowBankModal(true);
+                                                    }}
                                                 />
                                             )}
                                             {view === 'buy-points' && <PointShopView brand={brand} shopName={bizShopName || formState.shopName} userId={authUser?.id ?? ''} onOpenMenu={() => setShowMobileMenu(true)} />}

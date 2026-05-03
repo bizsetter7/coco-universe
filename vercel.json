@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/expire-boosters",
       "schedule": "45 15 * * *"
+    },
+    {
+      "path": "/api/cron/expire-additional-ads",
+      "schedule": "50 15 * * *"
     }
   ]
 }

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
-    Users,
     MessageSquare,
     Settings,
     ShieldCheck,
@@ -158,7 +157,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'sns' | 'yasajang' | 'notices';
+export type AdminTab = 'stats' | 'ads' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'applications' | 'sns' | 'yasajang' | 'notices';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -250,19 +249,6 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'inquiry'}
                     badge={counts?.inquiries}
                     onClick={() => handleNav('inquiry')}
-                />
-                <NavItem
-                    icon={<Users size={20} />}
-                    label="회원 관리"
-                    active={activeTab === 'users'}
-                    onClick={() => handleNav('users')}
-                />
-                <NavItem
-                    icon={<Building2 size={20} className="text-amber-400" />}
-                    label="사업자 인증 심사"
-                    active={activeTab === 'business'}
-                    badge={counts?.business}
-                    onClick={() => handleNav('business')}
                 />
                 <NavItem
                     icon={<ClipboardList size={20} className="text-emerald-400" />}
@@ -384,19 +370,6 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'inquiry'}
                         badge={counts?.inquiries}
                         onClick={() => handleNav('inquiry')}
-                    />
-                    <NavItem
-                        icon={<Users size={20} />}
-                        label="회원 관리"
-                        active={activeTab === 'users'}
-                        onClick={() => handleNav('users')}
-                    />
-                    <NavItem
-                        icon={<Building2 size={20} className="text-amber-400" />}
-                        label="사업자 인증 심사"
-                        active={activeTab === 'business'}
-                        badge={counts?.business}
-                        onClick={() => handleNav('business')}
                     />
                     <NavItem
                         icon={<Building2 size={20} className="text-pink-500" />}
