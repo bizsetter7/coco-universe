@@ -148,7 +148,7 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                 </div>
             </div>
 
-            <div className="bg-white rounded-[32px] md:rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+            <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>

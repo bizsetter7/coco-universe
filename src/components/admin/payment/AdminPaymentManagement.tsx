@@ -300,7 +300,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
             </div>
 
             {/* List Table */}
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/10 overflow-hidden">
+            <div className="bg-white border border-slate-100 shadow-2xl shadow-slate-200/10 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[1000px]">
                         <thead>

@@ -126,6 +126,17 @@ const componentIcon = (id: string) => {
         admin_mock_security: <Lock size={16} />, admin_password_hash: <ShieldCheck size={16} />,
         autologin_security: <Lock size={16} />, sitemap_accessible: <Wifi size={16} />,
         z_index_standard: <Layout size={16} />,
+        // 회원 데이터 매핑 (M-014 재발 방지)
+        role_usertype_mismatch: <ShieldCheck size={16} />,
+        username_empty: <AlertTriangle size={16} />,
+        new_member_data_integrity: <Database size={16} />,
+        // 추가 무결성 검사 (M-020 / M-060 / Phase A)
+        migration_05_columns: <Database size={16} />,
+        approved_ad_payment_integrity: <CreditCard size={16} />,
+        shops_platform_null: <Layout size={16} />,
+        payments_platform_null: <CreditCard size={16} />,
+        ad_jumps_negative: <Zap size={16} />,
+        user_jumps_subscription_drift: <Zap size={16} />,
     };
     return map[id] || <Activity size={16} />;
 };
@@ -153,13 +164,25 @@ const labelMap: Record<string, string> = {
     admin_mock_security: 'Mock 관리자 쿠키 보안', admin_password_hash: '어드민 비밀번호 해시',
     autologin_security: 'autoLogin URL 파라미터 보안',
     sitemap_accessible: '사이트맵 접근성', z_index_standard: 'z-index 계층 표준',
+    // 회원 데이터 매핑 (M-014 재발 방지)
+    role_usertype_mismatch: 'role ↔ user_type 매핑',
+    username_empty: 'username(로그인ID) 빈값',
+    new_member_data_integrity: '신규 회원 데이터 완전성',
+    // 추가 무결성 검사
+    migration_05_columns: 'migration 05 필수 컬럼',
+    approved_ad_payment_integrity: '승인 광고↔결제 연결 (M-020)',
+    shops_platform_null: 'shops.platform NULL (Phase A)',
+    payments_platform_null: 'payments.platform NULL (Phase A)',
+    ad_jumps_negative: 'ad_jumps 음수 잔액',
+    user_jumps_subscription_drift: 'user_jumps 30일 reset 미설정 (M-060)',
 };
 
-// 체크 항목 카테고리 분류
+// 체크 항목 카테고리 분류 (2026-05-04 최신화: 누락 9개 항목 추가 + 회원 데이터 매핑 카테고리 신설)
 const CATEGORY_MAP: Record<string, string[]> = {
-    'DB 스키마': ['supabase', 'db_points', 'db_point_logs', 'db_applications', 'db_messages', 'db_resumes', 'db_contact_email', 'db_withdraw', 'db_notifications', 'db_biz_verified'],
+    'DB 스키마': ['supabase', 'db_points', 'db_point_logs', 'db_applications', 'db_messages', 'db_resumes', 'db_contact_email', 'db_withdraw', 'db_notifications', 'db_biz_verified', 'migration_05_columns'],
     '운영 현황': ['pending_ads', 'unanswered_inquiries', 'pending_payments', 'expiring_soon', 'unread_notifications', 'unverified_corporate'],
-    '데이터 무결성': ['negative_points', 'orphaned_shops', 'stale_active_ads', 'payment_ad_mismatch', 'point_log_integrity', 'duplicate_username', 'jump_abuse', 'message_orphans', 'application_orphans', 'new_join_no_points', 'attendance_dup', 'payment_log_sync', 'sos_log_integrity'],
+    '회원 데이터 매핑': ['role_usertype_mismatch', 'username_empty', 'new_member_data_integrity'],
+    '데이터 무결성': ['negative_points', 'orphaned_shops', 'stale_active_ads', 'payment_ad_mismatch', 'point_log_integrity', 'duplicate_username', 'jump_abuse', 'message_orphans', 'application_orphans', 'new_join_no_points', 'attendance_dup', 'payment_log_sync', 'sos_log_integrity', 'approved_ad_payment_integrity', 'shops_platform_null', 'payments_platform_null', 'ad_jumps_negative', 'user_jumps_subscription_drift'],
     '보안': ['admin_role_sync', 'active_without_approval', 'admin_mock_security', 'admin_password_hash', 'autologin_security'],
     '표준 검증': ['title_length', 'standards', 'normalization', 'sitemap_accessible', 'z_index_standard'],
     '환경변수': ['env_sms', 'env_kakao', 'portone'],
