@@ -116,6 +116,8 @@ export async function GET(request: Request) {
         }
 
         // ─── 3. 프리미엄 회원 매일 +1 적립 ───
+        // next_reset_at IS NOT NULL 인 경우에만 적립: P5 confirm-payment가 설정한 레코드만 대상
+        // NULL = P5 결제 미완료 → cron이 독자적으로 레코드 생성하지 않음 [A-5, M-060]
         const premiumUsers = Array.from(userPlanMap.entries())
             .filter(([, plan]) => plan === 'premium')
             .map(([userId]) => userId);
@@ -123,27 +125,20 @@ export async function GET(request: Request) {
         for (const userId of premiumUsers) {
             const { data: existing } = await supabaseAdmin
                 .from('user_jumps')
-                .select('subscription_balance')
+                .select('subscription_balance, next_reset_at')
                 .eq('user_id', userId)
                 .maybeSingle();
 
-            if (existing) {
-                await supabaseAdmin
-                    .from('user_jumps')
-                    .update({
-                        subscription_balance: (existing.subscription_balance ?? 0) + 1,
-                        updated_at: nowIso,
-                    })
-                    .eq('user_id', userId);
-            } else {
-                await supabaseAdmin
-                    .from('user_jumps')
-                    .insert({
-                        user_id: userId,
-                        subscription_balance: 1,
-                        next_reset_at: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                    });
-            }
+            // next_reset_at 없음 = P5 결제 미확정 → 건너뜀 (P5/P2 책임 분리)
+            if (!existing || !existing.next_reset_at) continue;
+
+            await supabaseAdmin
+                .from('user_jumps')
+                .update({
+                    subscription_balance: (existing.subscription_balance ?? 0) + 1,
+                    updated_at: nowIso,
+                })
+                .eq('user_id', userId);
             summary.premium_increment++;
         }
 

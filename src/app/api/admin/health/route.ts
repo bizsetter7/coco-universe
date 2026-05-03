@@ -912,6 +912,92 @@ async function runHealthCheck(force = false): Promise<any> {
         components.approved_ad_payment_integrity = { status: 'warning', message: `승인-결제 무결성 검사 실패: ${err.message}` };
     }
 
+    // ── 41. shops.platform NULL 행 검출 (Phase A 무결성) ─────────
+    try {
+        const svc = getServiceClient();
+        const { count, error } = await svc
+            .from('shops')
+            .select('id', { count: 'exact', head: true })
+            .is('platform', null);
+        if (error) throw error;
+        const n = count ?? 0;
+        if (n === 0) {
+            components.shops_platform_null = { status: 'healthy', message: 'shops.platform NULL 행 없음' };
+        } else if (n < 10) {
+            components.shops_platform_null = { status: 'warning', message: `shops.platform NULL ${n}건 — A-3 platform 명시 패치 필요`, count: n };
+            overall = setWorst(overall, 'warning');
+        } else {
+            components.shops_platform_null = { status: 'error', message: `shops.platform NULL ${n}건 — 플랫폼 필터링 불능 상태`, count: n };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.shops_platform_null = { status: 'warning', message: `shops.platform NULL 검사 실패: ${err.message}` };
+    }
+
+    // ── 42. payments.platform NULL 행 검출 (Phase A 무결성) ──────
+    try {
+        const svc = getServiceClient();
+        const { count, error } = await svc
+            .from('payments')
+            .select('id', { count: 'exact', head: true })
+            .is('platform', null);
+        if (error) throw error;
+        const n = count ?? 0;
+        if (n === 0) {
+            components.payments_platform_null = { status: 'healthy', message: 'payments.platform NULL 행 없음' };
+        } else if (n < 10) {
+            components.payments_platform_null = { status: 'warning', message: `payments.platform NULL ${n}건 — A-4 backfill 필요`, count: n };
+            overall = setWorst(overall, 'warning');
+        } else {
+            components.payments_platform_null = { status: 'error', message: `payments.platform NULL ${n}건 — 정산 분리 불능 상태`, count: n };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.payments_platform_null = { status: 'warning', message: `payments.platform NULL 검사 실패: ${err.message}` };
+    }
+
+    // ── 43. ad_jumps 음수 잔액 검출 ──────────────────────────────
+    try {
+        const svc = getServiceClient();
+        const { count, error } = await svc
+            .from('ad_jumps')
+            .select('id', { count: 'exact', head: true })
+            .or('subscription_jumps.lt.0,package_jumps.lt.0');
+        if (error && !error.message.includes('does not exist')) throw error;
+        const n = count ?? 0;
+        if (n === 0) {
+            components.ad_jumps_negative = { status: 'healthy', message: 'ad_jumps 음수 잔액 없음' };
+        } else {
+            components.ad_jumps_negative = { status: 'error', message: `ad_jumps 음수 잔액 ${n}건 — 점프 차감 로직 버그`, count: n };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.ad_jumps_negative = { status: 'healthy', message: `ad_jumps 테이블 미생성 또는 접근 불가 (정상): ${err.message}` };
+    }
+
+    // ── 44. user_jumps.next_reset_at 미설정 (P5 confirm-payment 누락) ──
+    try {
+        const svc = getServiceClient();
+        const { count, error } = await svc
+            .from('user_jumps')
+            .select('user_id', { count: 'exact', head: true })
+            .gt('subscription_balance', 0)
+            .is('next_reset_at', null);
+        if (error) throw error;
+        const n = count ?? 0;
+        if (n === 0) {
+            components.user_jumps_subscription_drift = { status: 'healthy', message: 'user_jumps.next_reset_at 정상 설정됨' };
+        } else if (n < 10) {
+            components.user_jumps_subscription_drift = { status: 'warning', message: `user_jumps next_reset_at 미설정 ${n}건 — P5 confirm-payment 누락 가능성 (A-5)`, count: n };
+            overall = setWorst(overall, 'warning');
+        } else {
+            components.user_jumps_subscription_drift = { status: 'error', message: `user_jumps next_reset_at 미설정 ${n}건 — 30일 reset 불능`, count: n };
+            overall = setWorst(overall, 'error');
+        }
+    } catch (err: any) {
+        components.user_jumps_subscription_drift = { status: 'warning', message: `user_jumps drift 검사 실패: ${err.message}` };
+    }
+
     // ── 이슈 총집계 (배지용) ─────────────────────────────────────
     const issueCount = Object.values(components).filter(c => c.status === 'error' || c.status === 'warning').length;
 

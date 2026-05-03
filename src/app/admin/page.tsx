@@ -33,6 +33,7 @@ import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { BusinessVerifyView } from '@/components/admin/BusinessVerifyView';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
 import { AdminYasajangManagement } from '@/components/admin/yasajang/AdminYasajangManagement';
+import { AdminNoticeManagement } from '@/components/admin/notice/AdminNoticeManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
 import ShopDetailView from '@/components/jobs/ShopDetailView';
@@ -669,6 +670,13 @@ function AdminContent() {
             {/* Tab: Yasajang Management */}
             {activeTab === 'yasajang' && (
                 <AdminYasajangManagement />
+            )}
+
+            {/* Tab: 공지사항 관리 */}
+            {activeTab === 'notices' && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                    <AdminNoticeManagement />
+                </div>
             )}
 
             {/* 헬스 모니터: 42개 API/DB 헬스체크 */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBrand } from '@/components/BrandProvider';
 import { JobScamNoticeDetail } from './JobScamNoticeDetail';
 import { CardPaymentNoticeDetail } from './CardPaymentNoticeDetail';
@@ -8,7 +8,7 @@ import { ResumeNoticeDetail } from './ResumeNoticeDetail';
 import { EventOpenNoticeDetail } from './EventOpenNoticeDetail';
 import { ChevronDown, Clock } from 'lucide-react';
 
-const NOTICES = [
+const HARDCODED_NOTICES = [
     {
         id: 11,
         title: '[이벤트] 코코알바 오픈기념 상생지원 이벤트 및 이용안내',
@@ -102,9 +102,33 @@ const NOTICES = [
     },
 ];
 
+interface DbNotice {
+    id: number;
+    badge: string;
+    title: string;
+    content: string;
+    is_pinned: boolean;
+    published_at: string;
+}
+
 export const TabNotice = () => {
     const brand = useBrand();
     const [expandedNotice, setExpandedNotice] = useState<number | null>(null);
+    const [dbNotices, setDbNotices] = useState<DbNotice[] | null>(null);
+
+    useEffect(() => {
+        fetch('/api/notices?platform=cocoalba')
+            .then(r => r.json())
+            .then(({ notices }) => {
+                if (Array.isArray(notices) && notices.length > 0) setDbNotices(notices);
+            })
+            .catch(() => {});
+    }, []);
+
+    // DB 데이터 있으면 DB 우선, 없으면 하드코딩 fallback
+    const notices = dbNotices
+        ? dbNotices.map(n => ({ id: n.id, title: n.title, date: n.published_at?.slice(0, 10) ?? '', isNew: true, category: n.badge, content: n.content, type: undefined as string | undefined }))
+        : HARDCODED_NOTICES;
 
     return (
         <div className="space-y-2 md:space-y-3">
@@ -112,11 +136,11 @@ export const TabNotice = () => {
                 <div className="w-2 h-8 bg-[#f82b60] rounded-full"></div>
                 <div className="flex items-center justify-between flex-1">
                     <h3 className={`text-2xl font-black ${brand.theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>공지사항</h3>
-                    <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {NOTICES.length}건</span>
+                    <span className={`text-xs px-3 py-1 rounded-full font-black ${brand.theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-gray-200 text-gray-900'}`}>총 {notices.length}건</span>
                 </div>
             </div>
-            {NOTICES.map((notice, idx) => (
-                <div key={notice.id} className={`${idx !== NOTICES.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
+            {notices.map((notice, idx) => (
+                <div key={notice.id} className={`${idx !== notices.length - 1 ? (brand.theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-gray-100') : ''}`}>
                     <div
                         onClick={() => setExpandedNotice(expandedNotice === notice.id ? null : notice.id)}
                         className={`p-3 md:p-4 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-colors ${brand.theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} ${expandedNotice === notice.id ? (brand.theme === 'dark' ? 'bg-gray-700/30' : 'bg-gray-50/50') : ''}`}

@@ -5,20 +5,28 @@ import { Sparkles, MousePointer2, Highlighter, Palette, Zap, Radio, ChevronRight
 import {
     ICONS, HIGHLIGHTERS, PAY_SUFFIX_OPTIONS, STEP4_CONVENIENCE_KEYWORDS
 } from '../constants';
+import { supabase } from '@/lib/supabase';
+import { PRICING, calcBoosterPrice } from '@/data/pricing';
 
 interface BoostingViewProps {
     brand: any;
     ads: any[];
+    userId: string;
     onOpenBankModal: (amount: number, title?: string) => void;
     setExampleType: (v: string) => void;
     setShowExampleModal: (v: boolean) => void;
 }
 
 const PERIOD_OPTS = [0, 30, 60, 90] as const;
-const PERIOD_PRICE = (p: number) => p === 30 ? 30000 : p === 60 ? 55000 : p === 90 ? 70000 : 0;
+// pricing.ts 단일 출처 — booster 가격 (3종 동일 가격표)
+const PERIOD_PRICE = (p: 0 | 30 | 60 | 90): number => {
+    if (p === 0) return 0;
+    const key = `${p}d` as '30d' | '60d' | '90d';
+    return PRICING.booster.moving_icon[key];
+};
 
 export const BoostingView: React.FC<BoostingViewProps> = ({
-    brand, ads, onOpenBankModal, setExampleType, setShowExampleModal
+    brand, ads, userId, onOpenBankModal, setExampleType, setShowExampleModal
 }) => {
     const isDark = brand.theme === 'dark';
     const cardCls = `p-5 rounded-2xl border shadow-sm ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`;
@@ -44,15 +52,27 @@ export const BoostingView: React.FC<BoostingViewProps> = ({
 
     const selectedAd = activeAds.find(a => String(a.id) === String(selectedAdId));
 
-    // 총 금액 계산
+    // 광고 잔여일 계산 (일할 차감 기준) — deadline 없으면 999일로 처리
+    const adRemainingDays = useMemo(() => {
+        if (!selectedAd?.deadline) return 999;
+        const deadlineDate = new Date(selectedAd.deadline + 'T23:59:59+09:00');
+        const today = new Date();
+        const diffMs = deadlineDate.getTime() - today.getTime();
+        return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    }, [selectedAd]);
+
+    // 총 금액 계산 (일할 적용)
     const totalAmount = useMemo(() => {
         let total = 0;
-        if (selectedIcon !== null && iconPeriod > 0) total += PERIOD_PRICE(iconPeriod);
-        if (selectedHighlighter !== null && highlighterPeriod > 0) total += PERIOD_PRICE(highlighterPeriod);
-        if (borderOption !== 'none' && borderPeriod > 0) total += PERIOD_PRICE(borderPeriod);
-        if (paySuffixes.length > 1) total += (paySuffixes.length - 1) * 5000;
+        if (selectedIcon !== null && iconPeriod > 0)
+            total += calcBoosterPrice(PERIOD_PRICE(iconPeriod as 0|30|60|90), iconPeriod, adRemainingDays);
+        if (selectedHighlighter !== null && highlighterPeriod > 0)
+            total += calcBoosterPrice(PERIOD_PRICE(highlighterPeriod as 0|30|60|90), highlighterPeriod, adRemainingDays);
+        if (borderOption !== 'none' && borderPeriod > 0)
+            total += calcBoosterPrice(PERIOD_PRICE(borderPeriod as 0|30|60|90), borderPeriod, adRemainingDays);
+        if (paySuffixes.length > 1) total += (paySuffixes.length - 1) * PRICING.booster.pay_suffix_extra;
         return total;
-    }, [selectedIcon, iconPeriod, selectedHighlighter, highlighterPeriod, borderOption, borderPeriod, paySuffixes]);
+    }, [selectedIcon, iconPeriod, selectedHighlighter, highlighterPeriod, borderOption, borderPeriod, paySuffixes, adRemainingDays]);
 
     const togglePaySuffix = (s: string) => {
         if (paySuffixes.includes(s)) {
@@ -72,12 +92,46 @@ export const BoostingView: React.FC<BoostingViewProps> = ({
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!selectedAd) { alert('부스팅을 적용할 공고를 선택해주세요.'); return; }
         if (totalAmount === 0) { alert('적용할 부스팅 옵션을 1개 이상 선택해주세요.'); return; }
         if (selectedIcon !== null && iconPeriod === 0) { alert("아이콘의 기간을 선택해주세요."); return; }
         if (selectedHighlighter !== null && highlighterPeriod === 0) { alert("형광펜의 기간을 선택해주세요."); return; }
         if (borderOption !== 'none' && borderPeriod === 0) { alert("테두리 효과의 기간을 선택해주세요."); return; }
+
+        // [A-6] payments 레코드 생성 — 부스터 선택 내용 metadata에 저장
+        // 어드민 승인 시 metadata를 읽어 ad_boosters 테이블에 반영
+        const paymentData = {
+            user_id: userId,
+            shop_id: Number(selectedAd.id),
+            amount: totalAmount,
+            method: 'bank_transfer',
+            status: 'pending',
+            pay_type: 'BOOST',
+            platform: 'cocoalba',
+            description: `[부스팅] ${selectedAd.title || selectedAd.name}`,
+            metadata: {
+                type: 'booster',
+                shop_id: Number(selectedAd.id),
+                ad_title: selectedAd.title || selectedAd.name,
+                ad_remaining_days: adRemainingDays,
+                selections: {
+                    icon: (selectedIcon !== null && iconPeriod > 0) ? { id: selectedIcon, period: iconPeriod, amount: calcBoosterPrice(PERIOD_PRICE(iconPeriod as 0|30|60|90), iconPeriod, adRemainingDays) } : null,
+                    highlighter: (selectedHighlighter !== null && highlighterPeriod > 0) ? { id: selectedHighlighter, period: highlighterPeriod, amount: calcBoosterPrice(PERIOD_PRICE(highlighterPeriod as 0|30|60|90), highlighterPeriod, adRemainingDays) } : null,
+                    border: (borderOption !== 'none' && borderPeriod > 0) ? { option: borderOption, period: borderPeriod, amount: calcBoosterPrice(PERIOD_PRICE(borderPeriod as 0|30|60|90), borderPeriod, adRemainingDays) } : null,
+                    pay_suffixes: paySuffixes.length > 0 ? { items: paySuffixes, extra_count: Math.max(0, paySuffixes.length - 1), amount: Math.max(0, paySuffixes.length - 1) * PRICING.booster.pay_suffix_extra } : null,
+                },
+            },
+            created_at: new Date().toISOString(),
+        };
+
+        const { error: payErr } = await supabase.from('payments').insert([paymentData]);
+        if (payErr) {
+            console.error('[BoostingView] payments insert 실패:', payErr);
+            alert(`결제 신청 중 오류가 발생했습니다: ${payErr.message}`);
+            return;
+        }
+
         onOpenBankModal(totalAmount, `[부스팅] ${selectedAd.title || selectedAd.name}`);
     };
 

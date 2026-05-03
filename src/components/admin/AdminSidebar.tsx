@@ -20,6 +20,7 @@ import {
     Eye,
     EyeOff,
     CheckCircle,
+    Bell,
 } from 'lucide-react';
 // ── 비밀번호 변경 모달 ─────────────────────────────────────────
 function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
@@ -157,7 +158,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'sns' | 'yasajang';
+export type AdminTab = 'stats' | 'ads' | 'users' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'business' | 'applications' | 'sns' | 'yasajang' | 'notices';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -276,6 +277,12 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'yasajang'}
                     badge={counts?.yasajang}
                     onClick={() => handleNav('yasajang')}
+                />
+                <NavItem
+                    icon={<Bell size={20} className="text-amber-500" />}
+                    label="공지사항 관리"
+                    active={activeTab === 'notices'}
+                    onClick={() => handleNav('notices')}
                 />
                 <NavItem
                     icon={<Megaphone size={20} />}
@@ -397,6 +404,12 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'yasajang'}
                         badge={counts?.yasajang}
                         onClick={() => handleNav('yasajang')}
+                    />
+                    <NavItem
+                        icon={<Bell size={20} className="text-amber-500" />}
+                        label="공지사항 관리"
+                        active={activeTab === 'notices'}
+                        onClick={() => handleNav('notices')}
                     />
                     <NavItem
                         icon={<Megaphone size={20} />}

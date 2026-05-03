@@ -1342,6 +1342,7 @@ function MyShopContent() {
                                                 <BoostingView
                                                     brand={brand}
                                                     ads={(registeredAds || []).filter(ad => !ad?.isClosed)}
+                                                    userId={authUser?.id ?? ''}
                                                     onOpenBankModal={(amount, title) => {
                                                         setBankModalAmount(amount);
                                                         setBankModalTitle(title);
