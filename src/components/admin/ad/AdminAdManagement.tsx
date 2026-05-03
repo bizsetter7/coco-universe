@@ -411,50 +411,97 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                                                     })()}
                                                 </td>
                                             </tr>
-                                            {expandedAd === ad.id && (
-                                                <tr>
-                                                    <td colSpan={6} className="px-8 py-0">
-                                                        <div className="bg-slate-900/5 border-x border-slate-100 p-10 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                                                <div className="space-y-6">
-                                                                    <div className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest">
-                                                                        <Info size={14} /> 규칙 및 정책 위반 정보 검사
-                                                                    </div>
-                                                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
-                                                                        <div className="absolute top-0 right-0 px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black">NORMAL</div>
-                                                                        <p className="text-xs font-bold text-slate-600 leading-relaxed">
-                                                                            &quot;안녕하세요! 저희 상점은 최고의 대우와 안락한 환경을 보장합니다. 주저 말고 연락 주세요. {ad.shopName}은 언제나 열려 있습니다.&quot;
-                                                                        </p>
-                                                                        <div className="mt-4 pt-4 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
-                                                                            * 현재 본문 내 정책 위반 단어가 발견되지 않았습니다.
+                                            {expandedAd === ad.id && (() => {
+                                                // 같은 광고주의 다른 광고 통계 (현재 로드된 mockAds 범위 기준)
+                                                const ownerId = String((ad as any).user_id || (ad as any).ownerId || (ad as any).owner_id || '').toLowerCase();
+                                                const stats = { active: 0, closed: 0, rejected: 0 };
+                                                if (ownerId) {
+                                                    mockAds.forEach(a => {
+                                                        if (String(a.id) === String(ad.id)) return;
+                                                        const otherId = String((a as any).user_id || (a as any).ownerId || (a as any).owner_id || '').toLowerCase();
+                                                        if (otherId !== ownerId) return;
+                                                        const s = String(a.status || '').toLowerCase();
+                                                        if (s === 'active') stats.active++;
+                                                        else if (s === 'closed' || s === 'completed' || (a as any).is_closed) stats.closed++;
+                                                        else if (s === 'rejected') stats.rejected++;
+                                                    });
+                                                }
+
+                                                // 본인 거절 이력
+                                                const rh = (ad as any).rejection_history;
+                                                const rejectionCount = Array.isArray(rh) ? rh.length : 0;
+                                                const lastRejection = rejectionCount > 0 ? rh[rh.length - 1] : null;
+
+                                                // 본문 미리보기 (HTML 태그 제거)
+                                                const rawContent = String((ad as any).content || '').replace(/<[^>]*>/g, '').trim();
+                                                const contentPreview = rawContent.slice(0, 240);
+                                                const contentLen = rawContent.length;
+                                                const tooShort = contentLen > 0 && contentLen < 50;
+
+                                                return (
+                                                    <tr>
+                                                        <td colSpan={6} className="px-8 py-0">
+                                                            <div className="bg-slate-900/5 border-x border-slate-100 p-10 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                                                    <div className="space-y-6">
+                                                                        <div className="flex items-center gap-2 text-rose-600 font-black text-[10px] uppercase tracking-widest">
+                                                                            <Info size={14} /> 본문 미리보기 (정책 자동검사 미구현)
+                                                                        </div>
+                                                                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+                                                                            <div className={`absolute top-0 right-0 px-3 py-1 text-[10px] font-black ${tooShort ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-400'}`}>{contentLen}자{tooShort ? ' (짧음)' : ''}</div>
+                                                                            <p className="text-xs font-bold text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                                                                {contentPreview || <span className="text-slate-300">본문 없음</span>}{rawContent.length > 240 ? '…' : ''}
+                                                                            </p>
+                                                                            <div className="mt-4 pt-4 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
+                                                                                * 정책 위반 자동 검사 미구현 — 본문은 수동 확인 필요. 가이드 위반 시 반려 처리하세요.
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                                <div className="space-y-6">
-                                                                    <div className="text-slate-950 font-black text-sm tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">
-                                                                        광고주(회원) 통합 이력
+                                                                    <div className="space-y-6">
+                                                                        <div className="text-slate-950 font-black text-sm tracking-tighter italic underline decoration-blue-500 decoration-2 underline-offset-4">
+                                                                            광고주(회원) 통합 이력
+                                                                        </div>
+                                                                        <div className="space-y-3">
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
+                                                                                <span className="font-black text-blue-600">{(ad as any).edit_count || 0} / 30회</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">진행 중인 광고 <span className="text-slate-300 font-normal">(본인 외)</span></span>
+                                                                                <span className="font-black text-slate-950">{stats.active}건</span>
+                                                                            </div>
+                                                                            <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
+                                                                                <span className="font-bold text-slate-500">마감된 광고</span>
+                                                                                <span className="font-black text-slate-400">{stats.closed}건</span>
+                                                                            </div>
+                                                                            <div className={`flex justify-between items-center p-4 bg-white rounded-2xl border text-xs shadow-sm ${rejectionCount > 0 || stats.rejected > 0 ? 'border-rose-200 bg-rose-50/30' : 'border-slate-100'}`}>
+                                                                                <span className="font-bold text-slate-500">반려 이력</span>
+                                                                                <span className={`font-black ${rejectionCount > 0 || stats.rejected > 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                                                                                    본인 {rejectionCount}회 · 동일회원 {stats.rejected}건
+                                                                                </span>
+                                                                            </div>
+                                                                            {lastRejection && (
+                                                                                <div className="text-[10px] text-rose-500 font-bold leading-snug px-2">
+                                                                                    ↳ 최근 반려 사유: {String(lastRejection?.reason || lastRejection?.message || lastRejection).slice(0, 80)}
+                                                                                </div>
+                                                                            )}
+                                                                            <p className="text-[9px] text-slate-300 font-bold px-1">
+                                                                                * 통계는 현재 화면에 로드된 광고 범위 기준 (페이지네이션 적용 시 일부 누락 가능).
+                                                                            </p>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); setSelectedAdForModal(ad); }}
+                                                                            className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg shadow-slate-200 hover:bg-black transition-colors"
+                                                                        >
+                                                                            광고 상세 보기 →
+                                                                        </button>
                                                                     </div>
-                                                                    <div className="space-y-3">
-                                                                        <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                            <span className="font-bold text-slate-500">누적 수정 횟수 (이번달)</span>
-                                                                            <span className="font-black text-blue-600">{(ad as any).edit_count || 0} / 30회</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                            <span className="font-bold text-slate-500">진행 중인 광고</span>
-                                                                            <span className="font-black text-slate-950">2건</span>
-                                                                        </div>
-                                                                        <div className="flex justify-between items-center p-4 bg-white rounded-2xl border border-slate-100 text-xs shadow-sm">
-                                                                            <span className="font-bold text-slate-500">마감된 광고</span>
-                                                                            <span className="font-black text-slate-400">14건</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <button className="w-full py-4 bg-slate-950 text-white rounded-2xl text-xs font-black shadow-lg shadow-slate-200">광고주 상세 프로필 보기</button>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })()}
                                         </React.Fragment>
                                     ))
                             ) : (
