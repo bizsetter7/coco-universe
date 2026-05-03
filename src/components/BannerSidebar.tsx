@@ -199,7 +199,7 @@ export const BannerSidebar = React.memo(({ side, shops = [] }: BannerSidebarProp
 
     return (
         <>
-            <div className="flex flex-col gap-2 w-full pt-0">
+            <div className="hidden xl:flex flex-col gap-2 w-full pt-0">
                 <div className="flex flex-col gap-2 pb-4">
                     <div className="flex flex-col gap-1.5">
                         <div
