@@ -344,7 +344,7 @@ export function TabAdGuide({ onTabChange }: TabAdGuideProps) {
                     <h3 className={`text-2xl font-black tracking-tighter ${dark ? 'text-white' : 'text-gray-900'}`}>광고 점프(JUMP) 시스템</h3>
                 </div>
                 <p className={`text-[13px] leading-relaxed ${dark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    점프는 내 광고를 리스트 최상단으로 끌어올리는 기능입니다. 매일 자정(KST)마다 <b>점프 +1회가 자동 적립</b>되며, 별도 충전 없이 누적된 잔액으로 사용할 수 있습니다.
+                    점프는 내 광고를 리스트 최상단으로 끌어올리는 기능입니다. 플랜에 따라 <b>즉시 무료 점프 지급</b>, <b>매일 자동 점프(cron)</b>, <b>프리미엄 전용 매일 +1회 추가 적립</b>이 제공됩니다.
                 </p>
 
                 {/* 구독 시 무료 점프 즉시 지급 */}
@@ -364,7 +364,7 @@ export function TabAdGuide({ onTabChange }: TabAdGuideProps) {
                             <div className={`text-[20px] font-black ${dark ? 'text-white' : 'text-gray-900'}`}>30회</div>
                         </div>
                     </div>
-                    <p className="text-[11px] text-gray-400 font-bold">※ 베이직·스탠다드는 무료 점프 미지급. 자정 +1회 자동 적립만 받습니다.</p>
+                    <p className="text-[11px] text-gray-400 font-bold">※ 베이직·스탠다드는 즉시 무료 점프 미지급 · 자동 점프 미제공. 매일 +1회 추가 적립은 프리미엄 전용입니다.</p>
                 </div>
 
                 {/* 프리미엄 매일 +1 자동 적립 */}
