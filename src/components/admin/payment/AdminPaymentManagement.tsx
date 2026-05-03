@@ -14,7 +14,7 @@ interface AdminPaymentManagementProps {
 export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAdForModal }: AdminPaymentManagementProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
-    const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION'>('all');
+    const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION' | 'BOOST'>('all');
     const [recoverShopId, setRecoverShopId] = useState('');
     const [recoverResult, setRecoverResult] = useState<string | null>(null);
     const [isRecovering, setIsRecovering] = useState(false);
@@ -142,6 +142,41 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
         }
     };
 
+    const handleBoostActivate = async (paymentId: string, userId: string, shopId: string, metadata: any) => {
+        const days = metadata?.option_days ?? 0;
+        if (!confirm(`부스팅(무빙아이콘 ${days}일) 서비스를 활성화하시겠습니까?`)) return;
+
+        try {
+            const { error: payError } = await supabase
+                .from('payments')
+                .update({ status: 'completed' })
+                .eq('id', paymentId);
+            if (payError) throw payError;
+
+            const now = new Date();
+            const endAt = new Date(now);
+            endAt.setDate(endAt.getDate() + days);
+
+            const { error: boostError } = await supabase
+                .from('ad_boosters')
+                .insert({
+                    shop_id: Number(shopId),
+                    user_id: userId,
+                    option_type: metadata?.option_type ?? 'moving_icon',
+                    start_at: now.toISOString(),
+                    end_at: endAt.toISOString(),
+                    status: 'active',
+                });
+            if (boostError) throw boostError;
+
+            alert('부스팅 서비스 활성화 완료!');
+            fetchData();
+        } catch (err: any) {
+            console.error('Boost activate error:', err);
+            alert(`오류: ${err.message || '알 수 없는 오류'}`);
+        }
+    };
+
     const formatPrice = (priceInWon: number) => {
         if (priceInWon >= 10000 && priceInWon % 10000 === 0) return `${priceInWon / 10000}만원`;
         return `${priceInWon.toLocaleString()}원`;
@@ -226,6 +261,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                         <option value="SOS">SOS 발송</option>
                         <option value="JUMP">점프 서비스</option>
                         <option value="OPTION">옵션 신청</option>
+                        <option value="BOOST">부스팅</option>
                     </select>
                 </div>
             </div>
@@ -331,7 +367,13 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                         <td className="px-4 py-4 text-right">
                                             {pay.status !== 'completed' && (
                                                 <button
-                                                    onClick={() => (pay.pay_type === 'JUMP' || pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge') ? handlePointGrant(pay.id, pay.user_id, pay.metadata) : handlePaymentConfirm(pay.id, pay.shop_id)}
+                                                    onClick={() =>
+                                                        (pay.pay_type === 'JUMP' || pay.metadata?.type === 'point_charge' || pay.metadata?.type === 'jump_charge')
+                                                            ? handlePointGrant(pay.id, pay.user_id, pay.metadata)
+                                                            : pay.pay_type === 'BOOST'
+                                                                ? handleBoostActivate(pay.id, pay.user_id, pay.shop_id, pay.metadata)
+                                                                : handlePaymentConfirm(pay.id, pay.shop_id)
+                                                    }
                                                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100"
                                                 >
                                                     승인 실행
