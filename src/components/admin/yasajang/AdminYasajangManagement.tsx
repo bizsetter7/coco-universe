@@ -10,20 +10,24 @@ export function AdminYasajangManagement() {
 
     const fetchBusinesses = async () => {
         setIsLoading(true);
-        // 클라이언트에서 일단 anon으로 조회 시도 (RLS 정책에 따라 admin은 보일 수 있음)
-        // 만약 RLS로 막히면 API를 하나 더 파야 하지만 지시서상 리뷰 API만 명시됨
-        const { data, error } = await supabase
-            .from('businesses')
-            .select('*')
-            .eq('status', 'pending')
-            .order('created_at', { ascending: false });
-
-        if (!error && data) {
-            setBusinesses(data);
-        } else {
-            console.error('Failed to fetch businesses:', error);
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const token = sessionData.session?.access_token;
+            const res = await fetch('/api/admin/yasajang-review?status=pending', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+            });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
+            const json = await res.json();
+            setBusinesses(json.businesses || []);
+        } catch (err: any) {
+            console.error('Failed to fetch businesses:', err);
+            setBusinesses([]);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     useEffect(() => {

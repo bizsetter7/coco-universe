@@ -9,6 +9,30 @@ const supabaseAdmin = createClient(
     { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
+export async function GET(req: NextRequest) {
+    try {
+        const authError = await requireAdmin(req);
+        if (authError) return authError;
+
+        // anon 클라이언트는 businesses RLS에 막힘 → service_role 필수
+        const url = new URL(req.url);
+        const status = url.searchParams.get('status') || 'pending';
+
+        const { data, error } = await supabaseAdmin
+            .from('businesses')
+            .select('*')
+            .eq('status', status)
+            .order('created_at', { ascending: false })
+            .limit(200);
+
+        if (error) throw error;
+        return NextResponse.json({ businesses: data || [] });
+    } catch (error: any) {
+        console.error('Yasajang fetch error:', error);
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    }
+}
+
 export async function POST(req: NextRequest) {
     try {
         const authError = await requireAdmin(req);
