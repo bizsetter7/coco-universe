@@ -28,6 +28,20 @@ export default function AuthCallbackPage() {
       // 세션 확인 후 리다이렉트
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        // OAuth 가입자 profiles 보정 (placeholder username, 미설정 full_name, 미지급 100p)
+        // 멱등 — 이미 정상 데이터면 즉시 return
+        try {
+          await fetch('/api/auth/oauth-complete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+          });
+        } catch {
+          // 보정 실패해도 로그인 흐름은 진행
+        }
+
         // 로그인 완료 → 성인게이트 자동 통과 (localStorage 플래그)
         localStorage.setItem('adult_verified', 'true');
         window.location.href = '/';

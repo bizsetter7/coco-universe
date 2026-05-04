@@ -17,6 +17,17 @@ export async function GET(req: NextRequest) {
         // anon 클라이언트는 businesses RLS에 막힘 → service_role 필수
         const url = new URL(req.url);
         const status = url.searchParams.get('status') || 'pending';
+        const mode = url.searchParams.get('mode'); // 'owners' = owner_id 목록만 (회원관리 유입 표시용)
+
+        if (mode === 'owners') {
+            const { data, error } = await supabaseAdmin
+                .from('businesses')
+                .select('owner_id')
+                .not('owner_id', 'is', null);
+            if (error) throw error;
+            const ownerIds = Array.from(new Set((data || []).map((b: any) => b.owner_id))).filter(Boolean);
+            return NextResponse.json({ ownerIds });
+        }
 
         const { data, error } = await supabaseAdmin
             .from('businesses')

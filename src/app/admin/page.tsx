@@ -131,12 +131,33 @@ function AdminContent() {
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(2000); // 범위를 2000으로 확장하여 누락 방지
+
+            // 2-1. Fetch yasajang owner_ids — 야사장 입점 회원 식별 (referrer='야사장' 표시용)
+            // anon RLS 우회 위해 service_role API 사용
+            let yasajangOwnerSet = new Set<string>();
+            try {
+                const { data: { session: ysSession } } = await supabase.auth.getSession();
+                const ysToken = ysSession?.access_token;
+                const ysRes = await fetch('/api/admin/yasajang-review?mode=owners', {
+                    headers: ysToken ? { 'Authorization': `Bearer ${ysToken}` } : undefined,
+                });
+                if (ysRes.ok) {
+                    const ysJson = await ysRes.json();
+                    yasajangOwnerSet = new Set<string>(ysJson.ownerIds || []);
+                }
+            } catch { /* 실패 시 referrer 미적용 */ }
+
             if (userData) {
-                setRealUsers(userData);
+                // 야사장 owner면 referrer='야사장' 자동 설정 (수동 입력 referrer 우선)
+                const enriched = userData.map((u: any) => ({
+                    ...u,
+                    referrer: u.referrer || (yasajangOwnerSet.has(u.id) ? '야사장' : null),
+                }));
+                setRealUsers(enriched);
                 setStats(prev => ({
                     ...prev,
-                    totalUsers: userData?.length || 0,
-                    newUserToday: userData?.filter(u => {
+                    totalUsers: enriched?.length || 0,
+                    newUserToday: enriched?.filter(u => {
                         const today = new Date().toISOString().split('T')[0];
                         return u?.created_at?.startsWith(today);
                     }).length || 0
