@@ -20,6 +20,7 @@ import {
     EyeOff,
     CheckCircle,
     Bell,
+    Users,
 } from 'lucide-react';
 // ── 비밀번호 변경 모달 ─────────────────────────────────────────
 function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
@@ -157,7 +158,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'applications' | 'sns' | 'yasajang' | 'notices';
+export type AdminTab = 'stats' | 'ads' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'applications' | 'sns' | 'yasajang' | 'notices' | 'members';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -256,6 +257,12 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     active={activeTab === 'applications'}
                     badge={counts?.applications}
                     onClick={() => handleNav('applications')}
+                />
+                <NavItem
+                    icon={<Users size={20} className="text-cyan-400" />}
+                    label="회원 관리"
+                    active={activeTab === 'members'}
+                    onClick={() => handleNav('members')}
                 />
                 <NavItem
                     icon={<Building2 size={20} className="text-pink-500" />}
@@ -370,6 +377,12 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         active={activeTab === 'inquiry'}
                         badge={counts?.inquiries}
                         onClick={() => handleNav('inquiry')}
+                    />
+                    <NavItem
+                        icon={<Users size={20} className="text-cyan-400" />}
+                        label="회원 관리"
+                        active={activeTab === 'members'}
+                        onClick={() => handleNav('members')}
                     />
                     <NavItem
                         icon={<Building2 size={20} className="text-pink-500" />}

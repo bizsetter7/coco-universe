@@ -31,6 +31,7 @@ import { AdminPaymentManagement } from '@/components/admin/payment/AdminPaymentM
 import { AdminAdManagement } from '@/components/admin/ad/AdminAdManagement';
 import { AdminApplicationManagement } from '@/components/admin/applications/AdminApplicationManagement';
 import { AdminYasajangManagement } from '@/components/admin/yasajang/AdminYasajangManagement';
+import { AdminMemberManagement } from '@/components/admin/member/AdminMemberManagement';
 import { AdminNoticeManagement } from '@/components/admin/notice/AdminNoticeManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
@@ -654,6 +655,13 @@ function AdminContent() {
             {/* Tab: Yasajang Management */}
             {activeTab === 'yasajang' && (
                 <AdminYasajangManagement />
+            )}
+
+            {/* Tab: 회원 관리 (개인 + 업체) */}
+            {activeTab === 'members' && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+                    <AdminMemberManagement users={realUsers} mockUsers={mockUsers} fetchData={fetchData} />
+                </div>
             )}
 
             {/* Tab: 공지사항 관리 */}

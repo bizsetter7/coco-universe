@@ -239,7 +239,7 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                     </p>
                                 </div>
 
-                                {/* Rule: Ad Tier Colors [IMMUTABLE] */}
+                                {/* Rule: Ad Tier Colors [IMMUTABLE] — 야사장 구독 플랜 기준 */}
                                 <div className="p-5 bg-white rounded-3xl border-2 border-purple-100 shadow-sm space-y-3">
                                     <div className="flex items-center gap-2 mb-1">
                                         <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
@@ -248,12 +248,13 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                         <h4 className="font-black text-gray-900">광고 등급별 불변 컬러</h4>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {AD_TIER_STANDARDS.slice(0, 5).map((t, i) => (
+                                        {AD_TIER_STANDARDS.filter(t => !t.legacy).map((t, i) => (
                                             <div key={i} className="flex items-center gap-2 text-[10px] font-bold">
-                                                <span className={`w-3 h-3 rounded-full ${t.tw}`}></span> {t.name.split(' ')[1].replace('(', '').replace(')', '')}: {t.name.split(' ')[0]}
+                                                <span className={`w-3 h-3 rounded-full ${t.tw}`}></span> {t.name}
                                             </div>
                                         ))}
                                     </div>
+                                    <p className="text-[9px] text-slate-400 font-bold pt-1 border-t border-slate-100">* 야사장 구독 플랜 기준 (구 grand/recommended/native 폐지)</p>
                                 </div>
 
                                 {/* Rule: Option Abbreviations [IMMUTABLE] */}
@@ -373,15 +374,30 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
                                         {openSection === 'tiers' ? <ChevronUp size={16} className="text-indigo-600" /> : <ChevronDown size={16} className="text-slate-300" />}
                                     </button>
                                     {openSection === 'tiers' && (
-                                        <div className="p-6 bg-white border-t border-slate-50 animate-in slide-in-from-top-2 duration-300">
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                {AD_TIER_STANDARDS.map((tier, i) => (
-                                                    <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
-                                                        <div className={`text-xs font-black mb-1 p-1 rounded font-mono ${tier.tw.replace('bg-', 'text-')}`}>{tier.id}</div>
-                                                        <div className="text-[10px] font-bold text-slate-500">{tier.name}</div>
-                                                        <div className="text-[10px] font-black text-indigo-500 mt-1">Alt: {tier.altId}</div>
-                                                    </div>
-                                                ))}
+                                        <div className="p-6 bg-white border-t border-slate-50 animate-in slide-in-from-top-2 duration-300 space-y-4">
+                                            <div>
+                                                <h5 className="text-xs font-black text-emerald-600 mb-3 uppercase tracking-widest">현행 야사장 구독 플랜</h5>
+                                                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                    {AD_TIER_STANDARDS.filter(t => !t.legacy).map((tier, i) => (
+                                                        <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                                                            <div className={`text-xs font-black mb-1 p-1 rounded font-mono ${tier.tw.replace('bg-', 'text-')}`}>{tier.id}</div>
+                                                            <div className="text-[10px] font-bold text-slate-500">{tier.name}</div>
+                                                            <div className="text-[10px] font-black text-indigo-500 mt-1">Alt: {tier.altId}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="opacity-60">
+                                                <h5 className="text-xs font-black text-rose-500 mb-3 uppercase tracking-widest">구 직접입점 등급 (Legacy — 신규 사용 금지)</h5>
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                    {AD_TIER_STANDARDS.filter(t => t.legacy).map((tier, i) => (
+                                                        <div key={i} className="p-3 bg-rose-50/30 rounded-xl border border-dashed border-rose-200 text-center">
+                                                            <div className={`text-xs font-black mb-1 p-1 rounded font-mono ${tier.tw.replace('bg-', 'text-')}`}>{tier.id}</div>
+                                                            <div className="text-[10px] font-bold text-slate-500">{tier.name}</div>
+                                                            <div className="text-[10px] font-black text-rose-400 mt-1">Alt: {tier.altId}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     )}

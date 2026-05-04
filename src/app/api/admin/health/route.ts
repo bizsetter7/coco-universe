@@ -230,8 +230,8 @@ async function runHealthCheck(force = false): Promise<any> {
 
     // ── 12. 급여 뱃지 표준 검증 ──────────────────────────────────
     try {
-        // v2.0 표준 (2026-03-22 확정) — standards.ts PAY_BADGE_STANDARDS 반영
-        const expected = ['시', '일', '주', '월', '연', 'T', '건', '협'];
+        // v2.1 표준 (2026-05-04 갱신) — abbr 풀네임 (시급/일급/주급/월급/연봉/TC/건별/협의)
+        const expected = ['시급', '일급', '주급', '월급', '연봉', 'TC', '건별', '협의'];
         const expectedColors = ['bg-cyan-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500', 'bg-orange-500', 'bg-slate-500', 'bg-gray-400'];
         const payTypes = ['시급', '일급', '주급', '월급', '연봉', 'TC', '건별', '협의'];
         const errors: string[] = [];
