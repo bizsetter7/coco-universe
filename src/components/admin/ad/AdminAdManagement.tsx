@@ -50,7 +50,13 @@ function calcDeadline(baseIso: string | undefined | null, periodDays: number): s
 export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedAdForModal }: AdminAdManagementProps) {
     const brand = useBrand();
     const [adFilter, setAdFilter] = useState<'all' | 'pending'>('pending');
+    const [originFilter, setOriginFilter] = useState<'all' | 'direct' | 'yasajang'>('all');
     const [searchTerm, setSearchTerm] = useState('');
+
+    // 광고 출처 판별: options.yasajang_business_id가 있으면 야사장 경유, 없으면 직접 입점
+    const getAdOrigin = (ad: any): 'direct' | 'yasajang' => {
+        return ad?.options?.yasajang_business_id ? 'yasajang' : 'direct';
+    };
     const [expandedAd, setExpandedAd] = useState<string | null>(null);
 
     // Rejection State
@@ -146,6 +152,22 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                         {adFilter === 'all' ? '승인완료 숨기기' : `전체 보기 (${mockAds.length})`}
                     </button>
                 </div>
+                {/* 출처 필터 (직접 입점 vs 야사장 경유) */}
+                <div className="flex gap-2 mt-3">
+                    {([
+                        { key: 'all', label: '전체 출처', count: mockAds.length },
+                        { key: 'direct', label: '직접 입점', count: mockAds.filter(a => getAdOrigin(a) === 'direct').length },
+                        { key: 'yasajang', label: '야사장 경유', count: mockAds.filter(a => getAdOrigin(a) === 'yasajang').length },
+                    ] as const).map(opt => (
+                        <button
+                            key={opt.key}
+                            onClick={() => setOriginFilter(opt.key)}
+                            className={`px-3 py-1.5 rounded-xl text-[10px] font-black border transition-all active:scale-95 ${originFilter === opt.key ? 'bg-pink-600 text-white border-pink-600 shadow-md shadow-pink-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                        >
+                            {opt.label} <span className="opacity-70">({opt.count})</span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="bg-white border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
@@ -170,7 +192,11 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                                         // 'active' 또는 'completed' 상태는 게시중으로 간주하여 기본(pending) 필터에서 제외
                                         const adStatus = String(ad.status || '').toLowerCase();
                                         const statusMatch = adFilter === 'all' || (adStatus !== 'active' && adStatus !== 'completed' && adStatus !== 'approved');
-                                        
+
+                                        // 1-1. 출처 필터 (직접/야사장)
+                                        const originMatch = originFilter === 'all' || getAdOrigin(ad) === originFilter;
+                                        if (!originMatch) return false;
+
                                         // 2. 검색어 필터 (ID, 상호명, 제목, 회원ID, 담당자명 등)
                                         const s = searchTerm.toLowerCase().trim();
                                         if (!s) return statusMatch;
@@ -220,9 +246,14 @@ export function AdminAdManagement({ mockAds, setMockAds, fetchData, setSelectedA
                                                         className="flex flex-col gap-0.5 cursor-pointer hover:opacity-70 transition-opacity"
                                                         onClick={(e) => { e.stopPropagation(); setSelectedAdForModal(ad); }}
                                                     >
-                                                        {/* 1) 상호명 */}
-                                                        <div className="text-sm font-black text-slate-900 leading-tight">
-                                                            {(ad as any).shopName || ad.name || '—'}
+                                                        {/* 1) 상호명 + 출처 배지 */}
+                                                        <div className="text-sm font-black text-slate-900 leading-tight flex items-center gap-1.5 flex-wrap">
+                                                            <span>{(ad as any).shopName || ad.name || '—'}</span>
+                                                            {getAdOrigin(ad) === 'yasajang' ? (
+                                                                <span className="text-[8px] font-black px-1.5 py-0.5 rounded-sm bg-pink-100 text-pink-700 border border-pink-200">야사장</span>
+                                                            ) : (
+                                                                <span className="text-[8px] font-black px-1.5 py-0.5 rounded-sm bg-slate-100 text-slate-600 border border-slate-200">직접</span>
+                                                            )}
                                                         </div>
                                                         {/* 2) 회원ID (username 우선, 없으면 UUID 앞 8자) */}
                                                         <div className="text-[10px] font-black text-blue-600 font-mono mt-0.5 flex items-center gap-1">

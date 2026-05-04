@@ -15,6 +15,14 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('all');
     const [typeFilter, setTypeFilter] = useState<'all' | 'AD' | 'SOS' | 'JUMP' | 'OPTION' | 'BOOST' | 'ADDITIONAL_AD'>('all');
+    const [originFilter, setOriginFilter] = useState<'all' | 'direct' | 'yasajang'>('all');
+
+    // 결제 출처 판별: 연결된 shop의 options.yasajang_business_id 존재 여부
+    const getPayOrigin = (pay: any): 'direct' | 'yasajang' => {
+        if (pay?.metadata?.yasajang_business_id) return 'yasajang';
+        const linkedAd = ads.find((a: any) => String(a.id) === String(pay.shop_id));
+        return linkedAd?.options?.yasajang_business_id ? 'yasajang' : 'direct';
+    };
     const [recoverShopId, setRecoverShopId] = useState('');
     const [recoverResult, setRecoverResult] = useState<string | null>(null);
     const [isRecovering, setIsRecovering] = useState(false);
@@ -53,9 +61,10 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
         return payments.filter(pay => {
             const matchesStatus = statusFilter === 'all' || pay.status === statusFilter;
             const matchesType = typeFilter === 'all' || pay.pay_type === typeFilter;
-            
+            const matchesOrigin = originFilter === 'all' || getPayOrigin(pay) === originFilter;
+
             const searchLower = searchTerm.toLowerCase();
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 (String(pay.id) || '').toLowerCase().includes(searchLower) ||
                 (String(pay.shop_id) || '').toLowerCase().includes(searchLower) ||
                 (pay.metadata?.adTitle || '').toLowerCase().includes(searchLower) ||
@@ -67,9 +76,10 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                 (pay.profiles?.business_number || '').includes(searchLower) ||
                 (pay.user_id || '').toLowerCase().includes(searchLower);
 
-            return matchesStatus && matchesType && matchesSearch;
+            return matchesStatus && matchesType && matchesOrigin && matchesSearch;
         });
-    }, [payments, searchTerm, statusFilter, typeFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [payments, searchTerm, statusFilter, typeFilter, originFilter, ads]);
 
     const handlePaymentConfirm = async (paymentId: string, shopId: string) => {
         if (!confirm('입금을 확인하셨습니까? 승인 시 광고가 즉시 게시될 수 있습니다.')) return;
@@ -283,7 +293,7 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                 </div>
                 <div className="relative">
                     <Layout size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <select 
+                    <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value as any)}
                         className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 appearance-none"
@@ -295,6 +305,18 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                         <option value="OPTION">옵션 신청</option>
                         <option value="BOOST">부스팅</option>
                         <option value="ADDITIONAL_AD">추가광고</option>
+                    </select>
+                </div>
+                <div className="relative">
+                    <Filter size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <select
+                        value={originFilter}
+                        onChange={(e) => setOriginFilter(e.target.value as any)}
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-pink-500/20 appearance-none"
+                    >
+                        <option value="all">모든 출처</option>
+                        <option value="direct">직접 입점 ({payments.filter(p => getPayOrigin(p) === 'direct').length})</option>
+                        <option value="yasajang">야사장 경유 ({payments.filter(p => getPayOrigin(p) === 'yasajang').length})</option>
                     </select>
                 </div>
             </div>
