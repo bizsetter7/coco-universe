@@ -156,6 +156,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] w-[60px] text-center">번호</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">회원정보</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">연락처/유입</th>
                                 <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">상태/등급</th>
@@ -165,8 +166,11 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                         </thead>
                         <tbody>
                             {filteredUsers.length > 0 ? (
-                                filteredUsers.map((user) => (
+                                filteredUsers.map((user, idx) => (
                                     <tr key={user.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-4 py-4 text-center">
+                                            <span className="text-xs font-black text-slate-400 tabular-nums">{filteredUsers.length - idx}</span>
+                                        </td>
                                         <td className="px-8 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${user.status === 'blocked' ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-600'}`}>
@@ -233,7 +237,7 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-8 py-20 text-center text-slate-400 text-xs font-bold">
+                                    <td colSpan={6} className="px-8 py-20 text-center text-slate-400 text-xs font-bold">
                                         검색 결과가 없습니다.
                                     </td>
                                 </tr>
