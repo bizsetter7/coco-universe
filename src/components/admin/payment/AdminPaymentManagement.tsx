@@ -366,8 +366,14 @@ export function AdminPaymentManagement({ payments, ads, fetchData, setSelectedAd
                                                             return matchedAd?.title || pay.metadata?.adTitle || pay.metadata?.reason || pay.description || '시스템 결제';
                                                         })()}
                                                     </div>
-                                                    <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                                                        <span className="text-blue-500 font-black uppercase">{pay.pay_type}</span> • No.{pay.shop_id || '—'}
+                                                    <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1 flex-wrap">
+                                                        <span className="text-blue-500 font-black uppercase">{pay.pay_type}</span>
+                                                        <span>• No.{pay.shop_id || '—'}</span>
+                                                        {getPayOrigin(pay) === 'yasajang' ? (
+                                                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded-sm bg-pink-100 text-pink-700 border border-pink-200">야사장</span>
+                                                        ) : (
+                                                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded-sm bg-slate-100 text-slate-600 border border-slate-200">직접</span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
