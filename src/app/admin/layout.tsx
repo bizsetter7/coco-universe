@@ -49,6 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         business: 0,
         applications: 0,
         health: 0,
+        banner: 0,
     });
 
     const fetchCounts = React.useCallback(async () => {
@@ -100,6 +101,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 healthCount = healthData.issueCount || 0;
             } catch { healthCount = 1; }
 
+            // Fetch Pending Banner count
+            const { count: bannerCount } = await supabase
+                .from('shops')
+                .select('*', { count: 'exact', head: true })
+                .eq('banner_status', 'pending_banner');
+
             setCounts({
                 ads: (adsCount || 0) + localPendingAds,
                 inquiries: inqCount || 0,
@@ -107,6 +114,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 business: bizCount || 0,
                 applications: appCount || 0,
                 health: healthCount,
+                banner: bannerCount || 0,
             });
         } catch (e) {
             console.error('Error fetching admin counts:', e);

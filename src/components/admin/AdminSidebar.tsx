@@ -21,6 +21,7 @@ import {
     CheckCircle,
     Bell,
     Users,
+    ImageIcon,
 } from 'lucide-react';
 // ── 비밀번호 변경 모달 ─────────────────────────────────────────
 function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
@@ -158,7 +159,7 @@ function AdminChangePasswordModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-export type AdminTab = 'stats' | 'ads' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'applications' | 'sns' | 'yasajang' | 'notices' | 'members';
+export type AdminTab = 'stats' | 'ads' | 'inquiry' | 'messages' | 'seo' | 'payments' | 'health' | 'marketing' | 'applications' | 'sns' | 'yasajang' | 'notices' | 'members' | 'banner';
 
 interface AdminSidebarProps {
     activeTab: AdminTab | string;
@@ -170,6 +171,7 @@ interface AdminSidebarProps {
         applications?: number;
         health?: number;
         yasajang?: number;
+        banner?: number;
     };
     onNavigate: (tab: AdminTab) => void;
     className?: string;
@@ -263,6 +265,13 @@ export const AdminSidebar = ({ activeTab, counts, onNavigate, className = '' }: 
                     label="회원 관리"
                     active={activeTab === 'members'}
                     onClick={() => handleNav('members')}
+                />
+                <NavItem
+                    icon={<ImageIcon size={20} className="text-amber-400" />}
+                    label="배너 심사 관리"
+                    active={activeTab === 'banner'}
+                    badge={counts?.banner}
+                    onClick={() => handleNav('banner')}
                 />
                 <NavItem
                     icon={<Building2 size={20} className="text-pink-500" />}
@@ -383,6 +392,13 @@ export const AdminMobileSidebar = ({ activeTab, counts, onNavigate, isOpen, onCl
                         label="회원 관리"
                         active={activeTab === 'members'}
                         onClick={() => handleNav('members')}
+                    />
+                    <NavItem
+                        icon={<ImageIcon size={20} className="text-amber-400" />}
+                        label="배너 심사 관리"
+                        active={activeTab === 'banner'}
+                        badge={counts?.banner}
+                        onClick={() => handleNav('banner')}
                     />
                     <NavItem
                         icon={<Building2 size={20} className="text-pink-500" />}

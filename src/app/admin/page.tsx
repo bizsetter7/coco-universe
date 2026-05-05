@@ -33,6 +33,7 @@ import { AdminApplicationManagement } from '@/components/admin/applications/Admi
 import { AdminYasajangManagement } from '@/components/admin/yasajang/AdminYasajangManagement';
 import { AdminMemberManagement } from '@/components/admin/member/AdminMemberManagement';
 import { AdminNoticeManagement } from '@/components/admin/notice/AdminNoticeManagement';
+import { AdminBannerManagement } from '@/components/admin/banner/AdminBannerManagement';
 import { useBrand } from '@/components/BrandProvider';
 import { enrichAdData, anyAdToShop } from '@/lib/adUtils';
 import ShopDetailView from '@/components/jobs/ShopDetailView';
@@ -56,6 +57,7 @@ function AdminContent() {
     const [payments, setPayments] = useState<any[]>([]);
     const [pendingApplications, setPendingApplications] = useState(0);
     const [pendingYasajangCount, setPendingYasajangCount] = useState(0);
+    const [pendingBannerCount, setPendingBannerCount] = useState(0);
     const [healthIssueCount, setHealthIssueCount] = useState(0);
     const [liveVisitors, setLiveVisitors] = useState<number | null>(null);
     const [stats, setStats] = useState({
@@ -197,6 +199,13 @@ function AdminContent() {
                 .select('id', { count: 'exact', head: true })
                 .eq('status', 'pending');
             setPendingYasajangCount(yasajangCount || 0);
+
+            // 3-4. Fetch pending banner count
+            const { count: bannerCount } = await supabase
+                .from('shops')
+                .select('id', { count: 'exact', head: true })
+                .eq('banner_status', 'pending_banner');
+            setPendingBannerCount(bannerCount || 0);
 
             // 4. Fetch Messages
             const ADMIN_ALIASES = ['시스템 관리자', '운영자', '관리자', 'admin', '마스터관리자', 'admin_user', 'Admin'];
@@ -683,6 +692,11 @@ function AdminContent() {
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
                     <AdminMemberManagement users={realUsers} mockUsers={mockUsers} fetchData={fetchData} />
                 </div>
+            )}
+
+            {/* Tab: 배너 심사 관리 */}
+            {activeTab === 'banner' && (
+                <AdminBannerManagement />
             )}
 
             {/* Tab: 공지사항 관리 */}

@@ -7,7 +7,7 @@ import { requireAdmin } from '@/lib/requireAdmin';
  * 배너 이미지 승인/반려 처리 (service_role 사용으로 RLS 우회)
  *
  * POST body: { adId: string, action: 'approve' | 'reject', rejectReason?: string }
- * approve → banner_status: 'approved'
+ * approve → banner_status: 'approved_banner'
  * reject  → banner_status: 'rejected_banner', banner_image_url: null
  */
 const supabaseAdmin = createClient(
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
         const updateData: Record<string, any> = { updated_at: nowIso };
 
         if (action === 'approve') {
-            updateData.banner_status = 'approved';
+            updateData.banner_status = 'approved_banner';
         } else {
             updateData.banner_status = 'rejected_banner';
             updateData.banner_image_url = null;
