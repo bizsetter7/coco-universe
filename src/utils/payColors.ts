@@ -35,3 +35,11 @@ export const getPayAbbreviation = (payType: string = '') => {
     if (type.includes('선택') || type.includes('종류')) return '협의';
     return '협의';
 };
+
+// label + bgColor(text-white 제외)를 한번에 반환 — JobListView 전용
+export function getPayBadgeMeta(payType: string): { label: string; bgColor: string } {
+    return {
+        label: getPayAbbreviation(payType),
+        bgColor: getPayColor(payType).replace(' text-white', ''),
+    };
+}

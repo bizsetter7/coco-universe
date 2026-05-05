@@ -34,7 +34,7 @@ export function isBandConfigured(): boolean {
 
 // ─── Access Token 갱신 ───────────────────────────────────────────────────────
 
-export async function refreshBandToken(): Promise<string> {
+async function refreshBandToken(): Promise<string> {
     const clientId     = process.env.BAND_CLIENT_ID!;
     const clientSecret = process.env.BAND_CLIENT_SECRET!;
     const refreshToken = process.env.BAND_REFRESH_TOKEN!;
@@ -73,7 +73,7 @@ export async function getBandList(accessToken: string): Promise<{ name: string; 
 
 // ─── 이미지 업로드 → photoKey 획득 ──────────────────────────────────────────
 
-export async function uploadBandPhoto(
+async function uploadBandPhoto(
     accessToken: string,
     bandKey: string,
     imageBuffer: Buffer,
@@ -106,12 +106,12 @@ export async function uploadBandPhoto(
 
 // ─── 게시글 작성 ─────────────────────────────────────────────────────────────
 
-export interface BandPostResult {
+interface BandPostResult {
     post_key: string;
     url: string;
 }
 
-export async function createBandPost(
+async function createBandPost(
     accessToken: string,
     bandKey: string,
     content: string,

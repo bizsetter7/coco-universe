@@ -10,6 +10,7 @@ import { getHighlighterStyle } from '@/utils/highlighter';
 import { cleanShopTitle } from '@/utils/shopUtils';
 import { IconBadge } from '../common/IconBadge';
 import { saveShopSnapshot } from '@/utils/favorites';
+import { getPayBadgeMeta } from '@/utils/payColors';
 
 // Use Shop type directly
 type Job = Shop;
@@ -44,42 +45,13 @@ interface JobListViewProps {
     onNativeAdRegister?: (tier?: string) => void;
 }
 
-// [Optimization] Helper for Pay Badge Logic (Pure function)
-// ⚠️ Pay Badge Standards v2.1 — standards.ts PAY_BADGE_STANDARDS 풀네임 표기 (2026-05-04)
+// [Optimization] Helper for Pay Badge Logic — delegates type→label/color to payColors.ts
 const getPayBadgeInfo = (shop: Shop) => {
     const payStr = shop.pay || '';
-    let badgeLabel = '협의';
-    let badgeColor = 'bg-gray-400';
-    let amount = payStr;
-
     const typeToCheck = shop.payType || payStr;
+    const { label: badgeLabel, bgColor: badgeColor } = getPayBadgeMeta(typeToCheck);
 
-    if (typeToCheck.includes('TC')) {
-        badgeLabel = 'TC';
-        badgeColor = 'bg-orange-500';
-    } else if (typeToCheck.includes('시급')) {
-        badgeLabel = '시급';
-        badgeColor = 'bg-cyan-500';
-    } else if (typeToCheck.includes('일급')) {
-        badgeLabel = '일급';
-        badgeColor = 'bg-blue-500';
-    } else if (typeToCheck.includes('주급')) {
-        badgeLabel = '주급';
-        badgeColor = 'bg-green-500';
-    } else if (typeToCheck.includes('월급')) {
-        badgeLabel = '월급';
-        badgeColor = 'bg-purple-500';
-    } else if (typeToCheck.includes('연봉')) {
-        badgeLabel = '연봉';
-        badgeColor = 'bg-red-500';
-    } else if (typeToCheck.includes('건별') || typeToCheck.includes('건당')) {
-        badgeLabel = '건별';
-        badgeColor = 'bg-slate-500';
-    } else if (typeToCheck.includes('협의') || amount === '면접후결정') {
-        badgeLabel = '협의';
-        badgeColor = 'bg-gray-400';
-        amount = '면접후협의';
-    }
+    let amount = badgeLabel === '협의' ? '면접후협의' : payStr;
 
     const cleanedAmount = typeof amount === 'string' ? amount.replace(/[^\d]/g, '') : String(amount);
     if (!isNaN(Number(cleanedAmount)) && cleanedAmount !== '') {

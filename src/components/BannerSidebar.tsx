@@ -137,6 +137,8 @@ export const BannerSidebar = React.memo(({ side, shops = [] }: BannerSidebarProp
             .select('*')
             .eq('status', 'active')
             .in('tier', ['p2', 'premium', 'p3', 'deluxe', 'p4', 'special', 'standard'])
+            // 배너 이미지 별도 승인된 광고만 (일반 야사장 게시 광고 자동 노출 방지)
+            .in('banner_status', ['approved_banner', 'approved'])
             .order('updated_at', { ascending: false })
             .then(({ data }) => {
                 if (data && data.length > 0) {
