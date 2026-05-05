@@ -4,11 +4,14 @@ import { requireAdmin } from '@/lib/requireAdmin';
 
 /**
  * [Admin API] /api/admin/banner-approve
- * 배너 이미지 승인/반려 처리 (service_role 사용으로 RLS 우회)
+ * 배너 이미지 승인/반려/취소/수정/직접등록 처리 (service_role 사용으로 RLS 우회)
  *
- * POST body: { adId: string, action: 'approve' | 'reject', rejectReason?: string }
- * approve → banner_status: 'approved_banner'
- * reject  → banner_status: 'rejected_banner', banner_image_url: null
+ * POST body:
+ *   approve → { adId, action:'approve' }
+ *   reject  → { adId, action:'reject', rejectReason? }
+ *   revoke  → { adId, action:'revoke' }  (게시 취소 — banner 필드 초기화)
+ *   update  → { adId, action:'update', banner_image_url?, banner_position?, banner_media_type? }
+ *   create  → { adId:shopId, action:'create', banner_image_url, banner_position, banner_media_type? }
  */
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,16 +24,44 @@ export async function POST(request: NextRequest) {
     if (authError) return authError;
 
     try {
-        const { adId, action, rejectReason } = await request.json();
+        const body = await request.json();
+        const {
+            adId,
+            action,
+            rejectReason,
+            banner_image_url,
+            banner_position,
+            banner_media_type,
+        } = body;
 
-        if (!adId || !action) {
-            return NextResponse.json({ error: 'adId와 action은 필수입니다.' }, { status: 400 });
+        const VALID_ACTIONS = ['approve', 'reject', 'revoke', 'update', 'create'];
+        if (!action || !VALID_ACTIONS.includes(action)) {
+            return NextResponse.json({ error: `action은 ${VALID_ACTIONS.join('/')} 중 하나여야 합니다.` }, { status: 400 });
         }
-        if (action !== 'approve' && action !== 'reject') {
-            return NextResponse.json({ error: 'action은 approve 또는 reject만 허용합니다.' }, { status: 400 });
+        if (!adId) {
+            return NextResponse.json({ error: 'adId(shopId)는 필수입니다.' }, { status: 400 });
         }
 
         const nowIso = new Date().toISOString();
+
+        // ── create: 어드민 직접 배너 등록 (즉시 approved_banner) ──
+        if (action === 'create') {
+            if (!banner_image_url || !banner_position) {
+                return NextResponse.json({ error: 'banner_image_url, banner_position 필수' }, { status: 400 });
+            }
+            const { error: createErr } = await supabaseAdmin
+                .from('shops')
+                .update({
+                    banner_image_url,
+                    banner_position,
+                    banner_media_type: banner_media_type || 'image',
+                    banner_status: 'approved_banner',
+                    updated_at: nowIso,
+                })
+                .eq('id', Number(adId));
+            if (createErr) throw createErr;
+            return NextResponse.json({ success: true, action: 'create', adId });
+        }
 
         // 현재 광고 데이터 조회 (알림 발송용)
         const { data: shop, error: fetchError } = await supabaseAdmin
@@ -48,10 +79,19 @@ export async function POST(request: NextRequest) {
 
         if (action === 'approve') {
             updateData.banner_status = 'approved_banner';
-        } else {
+        } else if (action === 'reject') {
             updateData.banner_status = 'rejected_banner';
             updateData.banner_image_url = null;
             updateData.banner_media_type = null;
+        } else if (action === 'revoke') {
+            updateData.banner_status = 'none';
+            updateData.banner_image_url = null;
+            updateData.banner_position = null;
+            updateData.banner_media_type = null;
+        } else if (action === 'update') {
+            if (banner_image_url !== undefined) updateData.banner_image_url = banner_image_url;
+            if (banner_position !== undefined) updateData.banner_position = banner_position;
+            if (banner_media_type !== undefined) updateData.banner_media_type = banner_media_type;
         }
 
         // shops 테이블 업데이트
@@ -65,22 +105,24 @@ export async function POST(request: NextRequest) {
             throw new Error(`DB 업데이트 실패: 대상 광고(ID: ${adId})를 찾을 수 없습니다.`);
         }
 
-        // 업체회원에게 알림 발송 (UUID인 경우만)
-        const targetUserId = shop.user_id;
-        const isUuid = targetUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetUserId);
-        if (isUuid) {
-            const adName = shop.title || shop.name || '공고';
-            await supabaseAdmin.from('notifications').insert({
-                user_id: targetUserId,
-                type: action === 'approve' ? 'BANNER_APPROVED' : 'BANNER_REJECTED',
-                title: action === 'approve' ? '배너 이미지가 승인되었습니다 ✅' : '배너 이미지가 반려되었습니다 ❌',
-                message: action === 'approve'
-                    ? `'${adName}' 광고의 배너 이미지가 사이드바에 게재됩니다.`
-                    : `'${adName}' 배너 이미지가 반려되었습니다. ${rejectReason ? `사유: ${rejectReason}` : '다시 업로드해 주세요.'}`,
-                read: false,
-                link: '/my-shop?view=dashboard',
-                created_at: nowIso,
-            });
+        // 알림 발송 (approve/reject만)
+        if (action === 'approve' || action === 'reject') {
+            const targetUserId = shop.user_id;
+            const isUuid = targetUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetUserId);
+            if (isUuid) {
+                const adName = shop.title || shop.name || '공고';
+                await supabaseAdmin.from('notifications').insert({
+                    user_id: targetUserId,
+                    type: action === 'approve' ? 'BANNER_APPROVED' : 'BANNER_REJECTED',
+                    title: action === 'approve' ? '배너 이미지가 승인되었습니다 ✅' : '배너 이미지가 반려되었습니다 ❌',
+                    message: action === 'approve'
+                        ? `'${adName}' 광고의 배너 이미지가 사이드바에 게재됩니다.`
+                        : `'${adName}' 배너 이미지가 반려되었습니다. ${rejectReason ? `사유: ${rejectReason}` : '다시 업로드해 주세요.'}`,
+                    read: false,
+                    link: '/my-shop?view=dashboard',
+                    created_at: nowIso,
+                });
+            }
         }
 
         return NextResponse.json({
