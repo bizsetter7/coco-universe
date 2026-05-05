@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         // active 상태이면서 deadline이 오늘 이전인 공고 조회
         const { data: expiredShops, error: fetchError } = await supabaseAdmin
             .from('shops')
-            .select('id, user_id, title, name, deadline')
+            .select('id, user_id, title, name, deadline, banner_status')
             .eq('status', 'active')
             .lt('deadline', todayKST)
             .not('deadline', 'is', null);
@@ -43,10 +43,17 @@ export async function GET(request: Request) {
         let expiredCount = 0;
 
         for (const shop of expiredShops) {
-            // 상태를 CLOSED로 변경
+            // 상태를 CLOSED로 변경 + 배너도 자동 내림 (마감된 광고의 배너는 유지 불필요)
+            const updateFields: Record<string, unknown> = { status: 'CLOSED', updated_at: nowIso };
+            if ((shop as any).banner_status === 'approved_banner') {
+                updateFields.banner_status = 'none';
+                updateFields.banner_image_url = null;
+                updateFields.banner_position = null;
+                updateFields.banner_media_type = null;
+            }
             const { error: updateError } = await supabaseAdmin
                 .from('shops')
-                .update({ status: 'CLOSED', updated_at: nowIso })
+                .update(updateFields)
                 .eq('id', shop.id);
 
             if (updateError) {

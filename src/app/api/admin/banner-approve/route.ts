@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
             banner_media_type,
         } = body;
 
-        const VALID_ACTIONS = ['approve', 'reject', 'revoke', 'update', 'create'];
+        const VALID_ACTIONS = ['approve', 'reject', 'revoke', 'update', 'create', 'cleanup'];
         if (!action || !VALID_ACTIONS.includes(action)) {
             return NextResponse.json({ error: `action은 ${VALID_ACTIONS.join('/')} 중 하나여야 합니다.` }, { status: 400 });
         }
@@ -43,6 +43,34 @@ export async function POST(request: NextRequest) {
         }
 
         const nowIso = new Date().toISOString();
+
+        // ── cleanup: 마감/반려된 광고의 배너 일괄 정리 ──
+        if (action === 'cleanup') {
+            const todayKST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+            // 마감된 광고: status=CLOSED 또는 is_closed=true 또는 deadline < 오늘
+            const { data: stale, error: staleErr } = await supabaseAdmin
+                .from('shops')
+                .select('id')
+                .eq('banner_status', 'approved_banner')
+                .or(`status.eq.CLOSED,is_closed.eq.true,deadline.lt.${todayKST}`);
+            if (staleErr) throw staleErr;
+            if (!stale || stale.length === 0) {
+                return NextResponse.json({ success: true, cleaned: 0, message: '정리할 마감 배너 없음' });
+            }
+            const ids = stale.map(s => s.id);
+            const { error: cleanErr } = await supabaseAdmin
+                .from('shops')
+                .update({
+                    banner_status: 'none',
+                    banner_image_url: null,
+                    banner_position: null,
+                    banner_media_type: null,
+                    updated_at: new Date().toISOString(),
+                })
+                .in('id', ids);
+            if (cleanErr) throw cleanErr;
+            return NextResponse.json({ success: true, cleaned: ids.length });
+        }
 
         // ── create: 어드민 직접 배너 등록 (즉시 approved_banner) ──
         if (action === 'create') {
