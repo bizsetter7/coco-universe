@@ -14,6 +14,20 @@ interface PaymentPopupProps {
 
 const PLANS = [
     {
+        id: 'free',
+        name: '무료',
+        price: 0,
+        tag: '3개월',
+        features: [
+            { label: '밤길 지도 핀', included: true },
+            { label: '웨이터존 구인 노출', included: false },
+            { label: '코코알바 / 선수존', included: false },
+            { label: '강조효과 (인기 아이콘)', included: false },
+            { label: 'PC 사이드바 노출', included: false },
+            { label: 'PC/모바일 최상단 고정', included: false },
+        ],
+    },
+    {
         id: 'basic',
         name: '베이직',
         price: 22000,
@@ -131,17 +145,26 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) =
                 onClick={e => e.stopPropagation()}
             >
                 {/* 헤더 */}
-                <div className={`px-5 py-4 border-b text-center relative shrink-0 ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <h2 className={`text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        야사장 구독 플랜 안내
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-1">한 번의 구독으로 여러 플랫폼에 동시 노출!</p>
+                <div className="relative shrink-0 bg-gradient-to-br from-gray-900 to-gray-800 px-5 pt-5 pb-4 text-center">
                     <button
                         onClick={onClose}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/5 rounded-full transition-colors"
+                        className="absolute right-4 top-4 p-1.5 hover:bg-white/10 rounded-full transition-colors"
                     >
-                        <X size={20} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
+                        <X size={20} className="text-gray-400" />
                     </button>
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                        <span className="bg-pink-600/20 text-pink-400 text-[10px] font-black px-2.5 py-1 rounded-full border border-pink-600/30 flex items-center gap-1">
+                            ⚡ 즉시 노출
+                        </span>
+                        <span className="bg-gray-700 text-gray-300 text-[10px] font-black px-2.5 py-1 rounded-full border border-gray-600 flex items-center gap-1">
+                            🏷 언제든 해지
+                        </span>
+                    </div>
+                    <h2 className="text-white font-black text-lg leading-tight tracking-tight">
+                        손님유입+웨이터+아가씨 모집
+                    </h2>
+                    <p className="text-pink-400 font-black text-xl mt-1">월 88,000원으로</p>
+                    <p className="text-white font-black text-lg">한 번에 해결!</p>
                 </div>
 
                 {/* 스크롤 영역 */}
@@ -204,13 +227,21 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) =
                                         월 기본가
                                     </span>
                                     <div className="flex items-baseline gap-1 mt-0.5">
-                                        <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                            {currentPlan.price.toLocaleString()}
-                                        </span>
-                                        <span className={`text-sm font-bold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>원/월</span>
+                                        {currentPlan.price === 0 ? (
+                                            <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>3개월 무료</span>
+                                        ) : (
+                                            <>
+                                                <span className={`text-2xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                                    {currentPlan.price.toLocaleString()}
+                                                </span>
+                                                <span className={`text-sm font-bold ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>원/월</span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                                <span className="text-[10px] text-gray-400 font-medium">3개월↑ 최대 17% 할인</span>
+                                {currentPlan.price > 0 && (
+                                    <span className="text-[10px] text-gray-400 font-medium">3개월↑ 최대 17% 할인</span>
+                                )}
                             </div>
 
                             {/* 포함 항목 체크리스트 */}
@@ -254,7 +285,7 @@ export const PaymentPopup: React.FC<PaymentPopupProps> = ({ isOpen, onClose }) =
                         onClick={handleApply}
                     >
                         <ExternalLink size={18} />
-                        월 {currentPlan.price.toLocaleString()}원 · 야사장에서 신청하기
+                        {currentPlan.price === 0 ? '3개월 무료로 시작하기 · 야사장에서 신청하기' : `월 ${currentPlan.price.toLocaleString()}원 · 야사장에서 신청하기`}
                     </button>
                 </div>
             </div>
