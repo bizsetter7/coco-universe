@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, CheckCircle2, AlertCircle, RefreshCw, Server, Zap, CreditCard, Layout, Palette, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import {
     AD_TIER_STANDARDS,
     PAY_BADGE_STANDARDS,
@@ -134,7 +135,12 @@ export const StandardsGuardView = ({ ads = EMPTY_ARRAY, payments = EMPTY_ARRAY }
         setError(null);
         try {
             // [DDR] 인프라 체크는 데이터 감사와 별개로 진행
-            const res = await fetch('/api/admin/health', { method: 'POST' });
+            const { data: { session: hlSession } } = await supabase.auth.getSession();
+            const hlToken = hlSession?.access_token;
+            const res = await fetch('/api/admin/health', {
+                method: 'POST',
+                headers: hlToken ? { 'Authorization': `Bearer ${hlToken}` } : undefined,
+            });
             const data = res.ok ? await res.json() : { status: 'unstable' };
             setHealth(data);
         } catch (err: any) {
