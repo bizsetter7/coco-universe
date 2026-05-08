@@ -41,9 +41,8 @@ const nextConfig: NextConfig = {
 
 // Sentry 래핑 — NEXT_PUBLIC_SENTRY_DSN 환경변수 설정 시 에러 추적 활성화
 export default withSentryConfig(nextConfig, {
-    silent: true,        // 빌드 로그 최소화
-    disableLogger: true, // 번들 크기 최소화 (Sentry 자체 로거 제거)
-    // 소스맵 업로드 (SENTRY_AUTH_TOKEN + org + project 설정 시 활성화)
-    // org: 'choco-idea',
-    // project: 'coco-universe',
+    org: 'a5f1f5ea21a7',
+    project: 'javascript-nextjs',
+    silent: true,
+    disableLogger: true,
 });
