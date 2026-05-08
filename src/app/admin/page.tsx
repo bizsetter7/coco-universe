@@ -149,11 +149,27 @@ function AdminContent() {
                 }
             } catch { /* 실패 시 referrer 미적용 */ }
 
+            // 2-2. Fetch auth emails — OAuth 회원의 실제 이메일 맵 [M-066]
+            // profiles.contact_email은 OAuth 가입자에게 없으므로 auth.users에서 직접 조회
+            let authEmailMap: Record<string, string> = {};
+            try {
+                const { data: { session: aeSession } } = await supabase.auth.getSession();
+                const aeToken = aeSession?.access_token;
+                const aeRes = await fetch('/api/admin/get-auth-emails', {
+                    headers: aeToken ? { 'Authorization': `Bearer ${aeToken}` } : undefined,
+                });
+                if (aeRes.ok) {
+                    const aeJson = await aeRes.json();
+                    authEmailMap = aeJson.emails || {};
+                }
+            } catch { /* 실패 시 auth_email 미표시 */ }
+
             if (userData) {
-                // 야사장 owner면 referrer='야사장' 자동 설정 (수동 입력 referrer 우선)
+                // 야사장 owner면 referrer='야사장', auth_email 보강 [M-066]
                 const enriched = userData.map((u: any) => ({
                     ...u,
                     referrer: u.referrer || (yasajangOwnerSet.has(u.id) ? '야사장' : null),
+                    auth_email: authEmailMap[u.id] || null,
                 }));
                 setRealUsers(enriched);
                 setStats(prev => ({

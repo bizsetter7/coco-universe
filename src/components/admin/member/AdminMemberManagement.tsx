@@ -277,11 +277,22 @@ export function AdminMemberManagement({ users, mockUsers, fetchData }: AdminMemb
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Login ID / Email</p>
-                                    <p className="text-sm font-bold text-slate-900 text-wrap break-all">{selectedUser.username || selectedUser.loginId || selectedUser.email || '-'}</p>
+                                    {/* auth_email: OAuth 가입자 실제 이메일 [M-066] / username이 '신규회원'이면 숨김 */}
+                                    <p className="text-sm font-bold text-slate-900 text-wrap break-all">
+                                        {selectedUser.auth_email
+                                            || (selectedUser.username && selectedUser.username !== '신규회원' ? selectedUser.username : null)
+                                            || selectedUser.loginId
+                                            || selectedUser.contact_email
+                                            || '-'}
+                                    </p>
+                                    {/* auth_email이 있고 username이 따로 있으면 아이디도 함께 표시 */}
+                                    {selectedUser.auth_email && selectedUser.username && selectedUser.username !== '신규회원' && (
+                                        <p className="text-xs text-slate-400 mt-0.5">@{selectedUser.username}</p>
+                                    )}
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Phone Number</p>
-                                    <p className="text-sm font-bold text-slate-900">{selectedUser.phone || '전화번호 없음'}</p>
+                                    <p className="text-sm font-bold text-slate-900">{selectedUser.phone || selectedUser.manager_phone || '전화번호 없음'}</p>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Member Type</p>
