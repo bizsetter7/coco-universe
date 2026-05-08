@@ -35,6 +35,18 @@ const nextConfig: NextConfig = {
         destination: 'https://www.cocoalba.kr/:path*',
         permanent: true, // 301
       },
+      // [SEO] /region/:slug → /coco/:slug (구 sitemap URL 404 해소)
+      {
+        source: '/region/:slug+',
+        destination: '/coco/:slug+',
+        permanent: true, // 301
+      },
+      // [SEO] /shop/:id → / (구 shop 상세 URL 404 해소 — 현재 라우트 없음)
+      {
+        source: '/shop/:id*',
+        destination: '/',
+        permanent: true, // 301
+      },
     ];
   },
 };
