@@ -185,8 +185,12 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
                         onVerify={handleVerify}
                         onSkip={handleSkip}
                         // 로그인 상태이나 is_adult_verified=false → 간소화 본인인증 UI [M-066]
+                        // 개인회원(individual/employee) OAuth 가입자만 본인인증 간소화 게이트 적용
+                        // corporate는 business_verified 별도 경로 → 본인인증 재요구 금지
                         loggedInUserId={
-                            (isLoggedIn && authUser && authUser.id !== 'guest' && !authUser.isVerifiedPartnerVerified)
+                            (isLoggedIn && authUser && authUser.id !== 'guest' &&
+                             !authUser.isVerifiedPartnerVerified &&
+                             authUser.type === 'individual')
                                 ? authUser.id
                                 : undefined
                         }
