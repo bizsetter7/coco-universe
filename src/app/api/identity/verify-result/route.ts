@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { IdentityVerifyResult } from '@/types/identity-verify';
+import { sendTelegramAlert } from '@/lib/telegram';
 
 // service_role — 로그인 유저 본인인증 완료 후 프로필 업데이트용
 const supabaseAdmin = createClient(
@@ -66,8 +67,14 @@ export async function POST(req: NextRequest) {
         });
 
         if (!portoneRes.ok) {
-            const errorBody = await portoneRes.json();
+            const errorStatus = portoneRes.status;
+            const errorBody = await portoneRes.json().catch(() => ({}));
             console.error('[Identity/PortOneV2] API 조회 실패:', errorBody);
+            // 포트원 API 장애 → 본인인증 불가 상태 즉시 알림
+            const platform = process.env.NEXT_PUBLIC_SITE_NAME || '코코알바';
+            await sendTelegramAlert(
+                `🔴 <b>[본인인증 API 실패] ${platform}</b>\n\n인증ID: <code>${identityVerificationId}</code>\n포트원 응답: ${errorStatus}`
+            ).catch(() => {});
             return NextResponse.json(
                 { success: false, code: 'FETCH_FAILED', message: '포트원 서버에서 인증 정보를 가져오지 못했습니다.' },
                 { status: 500 }
@@ -128,6 +135,11 @@ export async function POST(req: NextRequest) {
             } catch (patchErr) {
                 // 프로필 갱신 실패해도 인증 성공 응답은 반환 (게이트 해제 허용)
                 console.warn('[Identity/verify-result] 프로필 갱신 실패:', patchErr);
+                // 인증 완료됐으나 DB 저장 실패 → is_adult_verified 미반영 위험 → 즉시 알림
+                const platform = process.env.NEXT_PUBLIC_SITE_NAME || '코코알바';
+                await sendTelegramAlert(
+                    `⚠️ <b>[인증 후 프로필 저장 실패] ${platform}</b>\n\n유저ID: <code>${userId}</code>\n오류: ${String(patchErr)}`
+                ).catch(() => {});
             }
         }
 
@@ -141,6 +153,11 @@ export async function POST(req: NextRequest) {
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : '알 수 없는 오류';
         console.error('[Identity/verify-result] 서버 내부 처리 오류:', message);
+        // 예상치 못한 서버 오류 → 즉시 알림
+        const platform = process.env.NEXT_PUBLIC_SITE_NAME || '코코알바';
+        await sendTelegramAlert(
+            `💥 <b>[본인인증 서버 오류] ${platform}</b>\n\n오류: ${message}`
+        ).catch(() => {});
         return NextResponse.json(
             { success: false, code: 'SERVER_ERROR', message: '검증 처리 중 서버 오류가 발생했습니다.' },
             { status: 500 }
