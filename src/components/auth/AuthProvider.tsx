@@ -109,6 +109,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     localStorage.setItem('_auth_user_id', authUser.id);
                 }
 
+                // [M-066 OAuth 신규회원 자동 패치]
+                // Google/카카오 OAuth 최초 로그인 시 DB 트리거가 username='신규회원', points=0으로 생성
+                // → 실제 이메일/이름으로 업데이트 + 개인회원 가입 축하 100P 지급
+                if (profile && (!profile.username || profile.username === '신규회원')) {
+                    const oauthPatch: Record<string, unknown> = {
+                        username: authUser.email?.split('@')[0] || `user_${authUser.id.slice(0, 8)}`,
+                        full_name: authUser.user_metadata?.full_name || profile.full_name || '',
+                        nickname: authUser.user_metadata?.full_name || profile.nickname || authUser.email?.split('@')[0] || '사용자',
+                    };
+                    const oauthRole = profile.role || profile.user_type || 'individual';
+                    if ((oauthRole === 'individual' || oauthRole === 'employee') && (!profile.points || profile.points === 0)) {
+                        oauthPatch.points = 100; // 개인회원 가입 축하 포인트
+                    }
+                    try {
+                        await supabase.from('profiles').update(oauthPatch).eq('id', authUser.id);
+                        Object.assign(profile, oauthPatch);
+                    } catch { /* 패치 실패 시 로그인 진행 */ }
+                }
+
                 if (profile || isMasterEmail) {
                     // [호환성] role 컬럼 우선 사용. 단 role이 개인회원계열(employee/individual/null)일 때만
                     // user_type이 corporate/admin이면 그걸로 보정 (최근 트리거가 user_type에 올바른 값 쓰는 경우 대응)
