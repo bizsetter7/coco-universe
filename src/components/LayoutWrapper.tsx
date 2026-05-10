@@ -124,6 +124,14 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
             return;
         }
 
+        // [M-069] 로그인된 개인회원 중 is_adult_verified=false → localStorage 무시, 게이트 강제 표시
+        // 비회원으로 인증(localStorage 설정) 후 로그인한 경우 DB 인증 상태 우선 적용
+        // (localStorage만 설정된 상태로 is_adult_verified=false인 유저 영구 우회 차단)
+        if (authUser && authUser.id !== 'guest' && authUser.type === 'individual' && !authUser.isVerifiedPartnerVerified) {
+            setIsVerified(false);
+            return;
+        }
+
         // adult_gate_skipped 제거 — "나가기" 는 Google로 이탈하므로 skip으로 진입 허용 안 함
         const localVerified = typeof window !== 'undefined' && localStorage.getItem('adult_verified') === 'true';
         setIsVerified(localVerified);

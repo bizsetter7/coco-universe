@@ -117,6 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         username: authUser.email?.split('@')[0] || `user_${authUser.id.slice(0, 8)}`,
                         full_name: authUser.user_metadata?.full_name || profile.full_name || '',
                         nickname: authUser.user_metadata?.full_name || profile.nickname || authUser.email?.split('@')[0] || '사용자',
+                        // [M-069] OAuth 가입 시 contact_email 자동 저장 — auth.email을 기존 값 없으면 채워넣음
+                        contact_email: profile.contact_email || authUser.email || null,
                     };
                     const oauthRole = profile.role || profile.user_type || 'individual';
                     if ((oauthRole === 'individual' || oauthRole === 'employee') && (!profile.points || profile.points === 0)) {
@@ -126,6 +128,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         await supabase.from('profiles').update(oauthPatch).eq('id', authUser.id);
                         Object.assign(profile, oauthPatch);
                     } catch { /* 패치 실패 시 로그인 진행 */ }
+                }
+
+                // [M-069] OAuth 기가입자 contact_email 소급 패치
+                // username은 이미 설정됐지만 contact_email이 null인 OAuth 유저 대상 (Google/Kakao 한정)
+                const isOAuthProvider = ['google', 'kakao'].includes(authUser.app_metadata?.provider || '');
+                if (profile && !profile.contact_email && authUser.email && isOAuthProvider) {
+                    try {
+                        await supabase.from('profiles').update({ contact_email: authUser.email }).eq('id', authUser.id);
+                        profile.contact_email = authUser.email;
+                    } catch { /* 소급 패치 실패 시 로그인 진행 — 다음 로그인에서 재시도 */ }
                 }
 
                 if (profile || isMasterEmail) {
