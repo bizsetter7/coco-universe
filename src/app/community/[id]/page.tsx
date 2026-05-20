@@ -62,10 +62,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         title,
         description,
         keywords, // ← 자동 생성된 SEO 키워드
+        alternates: {
+            canonical: `https://www.cocoalba.kr/community/${id}`,
+        },
         openGraph: {
             title,
             description,
-            url: `https://cocoalba.kr/community/${id}`,
+            url: `https://www.cocoalba.kr/community/${id}`,
             siteName: '코코알바',
             type: 'article',
         },
